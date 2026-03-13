@@ -23,6 +23,24 @@ export interface Company {
 
 export type CompanySize = 'small' | 'medium' | 'large' | 'enterprise'
 
+export interface CompanyRegisterRequest {
+  companyName: string
+  industry: string
+  size: CompanySize
+  country: string
+  adminEmail: string
+  adminPassword: string
+  adminFirstName: string
+  adminLastName: string
+}
+
+export interface AcceptInvitationRequest {
+  token: string
+  password: string
+  firstName: string
+  lastName: string
+}
+
 export interface LoginRequest {
   email: string
   password: string
