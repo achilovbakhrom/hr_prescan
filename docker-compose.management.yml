@@ -1,0 +1,50 @@
+# Management UIs — run with:
+# docker compose -f docker-compose.yml -f docker-compose.management.yml up -d
+
+services:
+  portainer:
+    image: portainer/portainer-ce:latest
+    ports:
+      - "9443:9443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      - management
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@hrprescan.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - management
+      - backend
+    restart: unless-stopped
+
+  redisinsight:
+    image: redis/redisinsight:latest
+    ports:
+      - "5540:5540"
+    volumes:
+      - redisinsight_data:/data
+    networks:
+      - management
+      - backend
+    restart: unless-stopped
+
+volumes:
+  portainer_data:
+  pgadmin_data:
+  redisinsight_data:
+
+networks:
+  management:
+  backend:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME:-agent-afa99b9b}_backend
