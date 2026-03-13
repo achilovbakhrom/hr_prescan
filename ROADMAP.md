@@ -46,19 +46,19 @@ Mark tasks with `[x]` as they are completed.
 
 **Goal:** Users can register, login, and have role-based access.
 
-- [ ] 2.1 Create `common` app — BaseModel (UUID, timestamps), custom exceptions, pagination
-- [ ] 2.2 Create `accounts` app — User model (email-based, role field: admin/hr/candidate)
-- [ ] 2.3 Create Company model (name, industry, size, country, logo, website, description)
-- [ ] 2.4 JWT authentication (access + refresh tokens) — login, logout, refresh endpoints
-- [ ] 2.5 User registration API (email + password)
-- [ ] 2.6 Email verification flow (send email, verify token)
+- [x] 2.1 Create `common` app — BaseModel (UUID, timestamps), custom exceptions, pagination
+- [x] 2.2 Create `accounts` app — User model (email-based, role field: admin/hr/candidate)
+- [x] 2.3 Create Company model (name, industry, size, country, logo, website, description)
+- [x] 2.4 JWT authentication (access + refresh tokens) — login, logout, refresh endpoints
+- [x] 2.5 User registration API (email + password)
+- [x] 2.6 Email verification flow (send email, verify token)
 - [ ] 2.7 Google OAuth 2.0 social login
-- [ ] 2.8 Role-based permissions (IsAdmin, IsHRManager, IsCandidate)
-- [ ] 2.9 Multi-tenancy middleware (scope HR queries to their company)
-- [ ] 2.10 Frontend: auth feature module — login, register, email verify pages
-- [ ] 2.11 Frontend: Axios client with JWT interceptor (auto-attach token, refresh on 401)
-- [ ] 2.12 Frontend: route guards (redirect unauthenticated, role-based access)
-- [ ] 2.13 Frontend: app layout (sidebar, navbar, role-based navigation)
+- [x] 2.8 Role-based permissions (IsAdmin, IsHRManager, IsCandidate)
+- [x] 2.9 Multi-tenancy middleware (scope HR queries to their company)
+- [x] 2.10 Frontend: auth feature module — login, register, email verify pages
+- [x] 2.11 Frontend: Axios client with JWT interceptor (auto-attach token, refresh on 401)
+- [x] 2.12 Frontend: route guards (redirect unauthenticated, role-based access)
+- [x] 2.13 Frontend: app layout (sidebar, navbar, role-based navigation)
 
 ---
 
