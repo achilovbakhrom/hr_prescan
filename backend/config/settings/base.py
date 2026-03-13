@@ -187,3 +187,6 @@ SIMPLE_JWT = {
     "USER_ID_FIELD": "id",
     "USER_ID_CLAIM": "user_id",
 }
+
+# Internal API key for LiveKit agent communication
+INTERNAL_API_KEY = os.environ.get("INTERNAL_API_KEY", "change-me-in-production")
