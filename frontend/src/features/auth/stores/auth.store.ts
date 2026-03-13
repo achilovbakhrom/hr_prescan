@@ -6,6 +6,8 @@ import type {
   AuthTokens,
   LoginRequest,
   RegisterRequest,
+  CompanyRegisterRequest,
+  AcceptInvitationRequest,
 } from '../types/auth.types'
 
 const TOKENS_KEY = 'hr_prescan_tokens'
@@ -59,6 +61,34 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
     try {
       await authService.register(data)
+    } catch (err: unknown) {
+      const message = extractErrorMessage(err)
+      error.value = message
+      throw new Error(message)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function registerCompany(data: CompanyRegisterRequest): Promise<void> {
+    loading.value = true
+    error.value = null
+    try {
+      await authService.registerCompany(data)
+    } catch (err: unknown) {
+      const message = extractErrorMessage(err)
+      error.value = message
+      throw new Error(message)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function acceptInvitation(data: AcceptInvitationRequest): Promise<void> {
+    loading.value = true
+    error.value = null
+    try {
+      await authService.acceptInvitation(data)
     } catch (err: unknown) {
       const message = extractErrorMessage(err)
       error.value = message
@@ -124,6 +154,8 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated,
     login,
     register,
+    registerCompany,
+    acceptInvitation,
     logout,
     refreshAccessToken,
     fetchUser,
