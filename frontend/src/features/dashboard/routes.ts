@@ -1,5 +1,11 @@
 import type { RouteRecordRaw } from 'vue-router'
+import { ROUTE_NAMES } from '@/shared/constants/routes'
 
 export const dashboardRoutes: RouteRecordRaw[] = [
-  // Dashboard routes will be added in later phases
+  {
+    path: '/dashboard',
+    name: ROUTE_NAMES.DASHBOARD,
+    component: () => import('./pages/DashboardPage.vue'),
+    meta: { requiresAuth: true },
+  },
 ]
