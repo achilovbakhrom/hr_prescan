@@ -58,7 +58,7 @@ const navItems: NavItem[] = [
     label: 'Candidates',
     icon: 'pi pi-user',
     to: '/candidates',
-    roles: [USER_ROLES.HR],
+    roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
   },
   {
     label: 'Interviews',
@@ -81,7 +81,7 @@ const navItems: NavItem[] = [
   {
     label: 'Browse Jobs',
     icon: 'pi pi-search',
-    to: '/browse-jobs',
+    to: '/jobs',
     roles: [USER_ROLES.CANDIDATE],
   },
 ]

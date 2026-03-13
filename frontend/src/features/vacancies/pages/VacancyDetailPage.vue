@@ -12,11 +12,15 @@ import VacancyForm from '../components/VacancyForm.vue'
 import QuestionList from '../components/QuestionList.vue'
 import CriteriaList from '../components/CriteriaList.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
+import { useCandidateStore } from '@/features/candidates/stores/candidate.store'
+import ApplicationStatusBadge from '@/features/candidates/components/ApplicationStatusBadge.vue'
+import type { Application } from '@/features/candidates/types/candidate.types'
 import type { CreateVacancyRequest, VacancyStatus } from '../types/vacancy.types'
 
 const route = useRoute()
 const router = useRouter()
 const vacancyStore = useVacancyStore()
+const candidateStore = useCandidateStore()
 const activeTab = ref(0)
 const vacancyId = computed(() => route.params.id as string)
 const vacancy = computed(() => vacancyStore.currentVacancy)
@@ -34,7 +38,22 @@ const editFormData = computed(() => {
   }
 })
 
-onMounted(() => vacancyStore.fetchVacancyDetail(vacancyId.value))
+onMounted(() => {
+  vacancyStore.fetchVacancyDetail(vacancyId.value)
+  candidateStore.fetchVacancyCandidates(vacancyId.value)
+})
+
+function viewCandidate(candidate: Application): void {
+  router.push({ name: ROUTE_NAMES.CANDIDATE_DETAIL, params: { id: candidate.id } })
+}
+
+function viewAllCandidates(): void {
+  router.push({ name: ROUTE_NAMES.VACANCY_CANDIDATES, params: { vacancyId: vacancyId.value } })
+}
+
+function formatDate(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString()
+}
 
 async function handleStatusChange(status: VacancyStatus): Promise<void> {
   await vacancyStore.changeStatus(vacancyId.value, status).catch(() => {})
@@ -109,10 +128,38 @@ async function handleUpdate(data: CreateVacancyRequest, publish: boolean): Promi
           </div>
         </TabPanel>
         <TabPanel header="Candidates">
-          <div class="py-12 text-center text-gray-500">
-            <i class="pi pi-users mb-3 text-4xl"></i>
-            <p class="text-lg font-medium">Coming soon</p>
-            <p class="text-sm">Candidate management will be available in a future update.</p>
+          <div class="py-4">
+            <div v-if="candidateStore.loading && candidateStore.candidates.length === 0" class="py-8 text-center">
+              <i class="pi pi-spinner pi-spin text-2xl text-gray-400"></i>
+            </div>
+            <div v-else-if="candidateStore.candidates.length === 0" class="py-8 text-center text-gray-500">
+              <i class="pi pi-users mb-2 text-3xl"></i>
+              <p>No candidates have applied yet</p>
+            </div>
+            <template v-else>
+              <div class="mb-3 flex items-center justify-between">
+                <p class="text-sm text-gray-500">{{ candidateStore.candidates.length }} candidate(s)</p>
+                <button class="text-sm text-blue-600 hover:underline" @click="viewAllCandidates">View all</button>
+              </div>
+              <div class="space-y-2">
+                <div
+                  v-for="candidate in candidateStore.candidates.slice(0, 5)"
+                  :key="candidate.id"
+                  class="flex cursor-pointer items-center justify-between rounded-lg border border-gray-100 p-3 hover:bg-gray-50"
+                  @click="viewCandidate(candidate)"
+                >
+                  <div>
+                    <p class="font-medium">{{ candidate.candidateName }}</p>
+                    <p class="text-sm text-gray-500">{{ candidate.candidateEmail }}</p>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <span v-if="candidate.matchScore !== null" class="text-sm font-semibold">{{ candidate.matchScore }}%</span>
+                    <ApplicationStatusBadge :status="candidate.status" />
+                    <span class="text-xs text-gray-400">{{ formatDate(candidate.createdAt) }}</span>
+                  </div>
+                </div>
+              </div>
+            </template>
           </div>
         </TabPanel>
       </TabView>
