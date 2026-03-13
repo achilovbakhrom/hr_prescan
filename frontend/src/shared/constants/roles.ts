@@ -1,8 +1,7 @@
-export const UserRole = {
+export const USER_ROLES = {
   ADMIN: 'admin',
-  HR_MANAGER: 'hr_manager',
-  RECRUITER: 'recruiter',
-  VIEWER: 'viewer',
+  HR: 'hr',
+  CANDIDATE: 'candidate',
 } as const
 
-export type UserRole = (typeof UserRole)[keyof typeof UserRole]
+export type UserRoleValue = (typeof USER_ROLES)[keyof typeof USER_ROLES]

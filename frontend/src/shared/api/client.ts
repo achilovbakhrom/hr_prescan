@@ -1,4 +1,13 @@
-import axios from 'axios'
+import axios, {
+  type AxiosResponse,
+  type InternalAxiosRequestConfig,
+} from 'axios'
+
+const TOKENS_KEY = 'hr_prescan_tokens'
+
+interface RetryableRequestConfig extends InternalAxiosRequestConfig {
+  _retry?: boolean
+}
 
 export const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -7,22 +16,109 @@ export const apiClient = axios.create({
   },
 })
 
-// TODO: Request interceptor — attach auth token
-// apiClient.interceptors.request.use((config) => {
-//   const token = localStorage.getItem('access_token')
-//   if (token) {
-//     config.headers.Authorization = `Bearer ${token}`
-//   }
-//   return config
-// })
+apiClient.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    const raw = localStorage.getItem(TOKENS_KEY)
+    if (raw) {
+      try {
+        const tokens = JSON.parse(raw) as { access: string }
+        config.headers.Authorization = `Bearer ${tokens.access}`
+      } catch {
+        // Invalid token data, skip
+      }
+    }
+    return config
+  },
+)
 
-// TODO: Response interceptor — handle 401 unauthorized
-// apiClient.interceptors.response.use(
-//   (response) => response,
-//   (error) => {
-//     if (error.response?.status === 401) {
-//       // Redirect to login or refresh token
-//     }
-//     return Promise.reject(error)
-//   },
-// )
+let isRefreshing = false
+let failedQueue: Array<{
+  resolve: (token: string) => void
+  reject: (error: unknown) => void
+}> = []
+
+function processQueue(error: unknown, token: string | null): void {
+  failedQueue.forEach((promise) => {
+    if (error) {
+      promise.reject(error)
+    } else if (token) {
+      promise.resolve(token)
+    }
+  })
+  failedQueue = []
+}
+
+function redirectToLogin(): void {
+  if (window.location.pathname !== '/login') {
+    window.location.href = '/login'
+  }
+}
+
+apiClient.interceptors.response.use(
+  (response: AxiosResponse) => response,
+  async (error: unknown) => {
+    const axiosError = error as {
+      config?: RetryableRequestConfig
+      response?: { status: number }
+    }
+
+    const originalRequest = axiosError.config
+    if (!originalRequest) {
+      return Promise.reject(error)
+    }
+
+    const isAuthEndpoint =
+      originalRequest.url?.includes('/auth/login') ||
+      originalRequest.url?.includes('/auth/token/refresh')
+
+    if (
+      axiosError.response?.status !== 401 ||
+      originalRequest._retry ||
+      isAuthEndpoint
+    ) {
+      return Promise.reject(error)
+    }
+
+    if (isRefreshing) {
+      return new Promise<string>((resolve, reject) => {
+        failedQueue.push({ resolve, reject })
+      }).then((token) => {
+        originalRequest.headers.Authorization = `Bearer ${token}`
+        return apiClient(originalRequest)
+      })
+    }
+
+    originalRequest._retry = true
+    isRefreshing = true
+
+    const raw = localStorage.getItem(TOKENS_KEY)
+    if (!raw) {
+      isRefreshing = false
+      redirectToLogin()
+      return Promise.reject(error)
+    }
+
+    try {
+      const tokens = JSON.parse(raw) as { access: string; refresh: string }
+      const response = await axios.post<{ access: string }>(
+        `${import.meta.env.VITE_API_URL}/auth/token/refresh`,
+        { refresh: tokens.refresh },
+      )
+
+      const newAccess = response.data.access
+      const updatedTokens = { ...tokens, access: newAccess }
+      localStorage.setItem(TOKENS_KEY, JSON.stringify(updatedTokens))
+
+      processQueue(null, newAccess)
+      originalRequest.headers.Authorization = `Bearer ${newAccess}`
+      return apiClient(originalRequest)
+    } catch (refreshError) {
+      processQueue(refreshError, null)
+      localStorage.removeItem(TOKENS_KEY)
+      redirectToLogin()
+      return Promise.reject(refreshError)
+    } finally {
+      isRefreshing = false
+    }
+  },
+)
