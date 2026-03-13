@@ -142,20 +142,20 @@ Mark tasks with `[x]` as they are completed.
 
 **Goal:** AI agent conducts video interviews with candidates.
 
-- [ ] 7.1 Create LiveKit Agent project (Python, separate Dockerfile)
-- [ ] 7.2 Setup VoicePipelineAgent (Deepgram STT + GPT LLM + ElevenLabs TTS)
-- [ ] 7.3 Agent: fetch interview context from Django API via RabbitMQ (vacancy, CV data, questions)
-- [ ] 7.4 Agent: system prompt engineering (interviewer persona, question flow, language handling)
-- [ ] 7.5 Agent: conduct structured interview (greet → ask questions → follow-ups → close)
-- [ ] 7.6 Agent: handle EN/RU language (code-switching with Deepgram `language=multi`)
-- [ ] 7.7 Agent: time management (track duration, wrap up when limit reached)
-- [ ] 7.8 Agent: generate evaluation scores after interview (fixed + custom criteria, 1-10)
-- [ ] 7.9 Agent: send results back to Django via RabbitMQ (scores, transcript, recording path)
-- [ ] 7.10 Django: consume interview results from RabbitMQ, save to DB
+- [x] 7.1 Create LiveKit Agent project (Python, separate Dockerfile)
+- [x] 7.2 Setup VoicePipelineAgent (Deepgram STT + GPT LLM + ElevenLabs TTS)
+- [x] 7.3 Agent: fetch interview context from Django API via RabbitMQ (vacancy, CV data, questions)
+- [x] 7.4 Agent: system prompt engineering (interviewer persona, question flow, language handling)
+- [x] 7.5 Agent: conduct structured interview (greet → ask questions → follow-ups → close)
+- [x] 7.6 Agent: handle EN/RU language (code-switching with Deepgram `language=multi`)
+- [x] 7.7 Agent: time management (track duration, wrap up when limit reached)
+- [x] 7.8 Agent: generate evaluation scores after interview (fixed + custom criteria, 1-10)
+- [x] 7.9 Agent: send results back to Django via RabbitMQ (scores, transcript, recording path)
+- [x] 7.10 Django: consume interview results from RabbitMQ, save to DB
 - [ ] 7.11 LiveKit: configure recording egress to MinIO
-- [ ] 7.12 Frontend: interview room page (LiveKit video room, candidate joins via link)
-- [ ] 7.13 Frontend: pre-interview check page (camera/mic test, instructions)
-- [ ] 7.14 Frontend: post-interview page (thank you, status update)
+- [x] 7.12 Frontend: interview room page (LiveKit video room, candidate joins via link)
+- [x] 7.13 Frontend: pre-interview check page (camera/mic test, instructions)
+- [x] 7.14 Frontend: post-interview page (thank you, status update)
 - [ ] 7.15 Test full interview loop end-to-end
 
 ---
