@@ -6,6 +6,8 @@ from apps.interviews.apis import (
     CandidateScheduleApi,
     HRInterviewDetailApi,
     HRInterviewListApi,
+    InterviewRecordingApi,
+    InterviewTranscriptApi,
     ObserverTokenApi,
     ScheduleInterviewApi,
 )
@@ -40,6 +42,16 @@ hr_interview_urlpatterns = [
         "<uuid:interview_id>/observer-token/",
         ObserverTokenApi.as_view(),
         name="observer-token",
+    ),
+    path(
+        "<uuid:interview_id>/transcript/",
+        InterviewTranscriptApi.as_view(),
+        name="interview-transcript",
+    ),
+    path(
+        "<uuid:interview_id>/recording/",
+        InterviewRecordingApi.as_view(),
+        name="interview-recording",
     ),
 ]
 

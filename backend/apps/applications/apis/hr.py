@@ -5,7 +5,10 @@ from rest_framework.views import APIView
 
 from apps.accounts.permissions import IsAdmin, IsHRManager
 from apps.applications.models import Application
-from apps.applications.selectors import get_application_by_id, get_vacancy_applications
+from apps.applications.selectors import (
+    get_application_by_id,
+    get_vacancy_applications_filtered,
+)
 from apps.applications.serializers import (
     ApplicationDetailOutputSerializer,
     ApplicationListOutputSerializer,
@@ -30,10 +33,19 @@ class HRApplicationListApi(APIView):
                 ("created_at", "Oldest first"),
                 ("-match_score", "Highest match"),
                 ("match_score", "Lowest match"),
+                ("-candidate_name", "Name Z-A"),
+                ("candidate_name", "Name A-Z"),
             ],
             required=False,
             default="-created_at",
         )
+        min_score = serializers.DecimalField(
+            max_digits=5, decimal_places=2, required=False,
+        )
+        max_score = serializers.DecimalField(
+            max_digits=5, decimal_places=2, required=False,
+        )
+        search = serializers.CharField(required=False)
 
     def get(self, request: Request, vacancy_id: str) -> Response:
         company = request.user.company
@@ -52,11 +64,15 @@ class HRApplicationListApi(APIView):
 
         filter_serializer = self.FilterSerializer(data=request.query_params)
         filter_serializer.is_valid(raise_exception=True)
+        data = filter_serializer.validated_data
 
-        applications = get_vacancy_applications(
+        applications = get_vacancy_applications_filtered(
             vacancy=vacancy,
-            status=filter_serializer.validated_data.get("status"),
-            ordering=filter_serializer.validated_data.get("ordering", "-created_at"),
+            status=data.get("status"),
+            ordering=data.get("ordering", "-created_at"),
+            min_score=data.get("min_score"),
+            max_score=data.get("max_score"),
+            search=data.get("search"),
         )
 
         return Response(
