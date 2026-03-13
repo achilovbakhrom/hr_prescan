@@ -1,0 +1,79 @@
+# Development overrides — auto-loaded by `docker compose up`
+# Hot reload, exposed ports, dev servers
+
+services:
+  # Use Vite dev server instead of Nginx + built assets
+  nginx:
+    profiles:
+      - prod-only
+    # Disabled in dev — use frontend service instead
+
+  # Frontend dev server (Vite)
+  frontend:
+    build:
+      context: ./frontend
+      target: build
+    command: npm run dev -- --host 0.0.0.0
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      VITE_API_URL: http://localhost:8000
+    networks:
+      - frontend
+
+  # Django dev server (runserver instead of gunicorn)
+  django:
+    entrypoint: []
+    command: >
+      bash -c "
+        python manage.py migrate --noinput &&
+        python manage.py runserver 0.0.0.0:8000
+      "
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+
+  # Expose PostgreSQL for local tools
+  postgres:
+    ports:
+      - "5432:5432"
+
+  # Expose Redis for local tools
+  redis:
+    ports:
+      - "6379:6379"
+
+  # Expose RabbitMQ ports (AMQP + Management UI)
+  rabbitmq:
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  # Celery worker with hot reload
+  celery-worker:
+    entrypoint: []
+    command: celery -A config worker -l info --concurrency=2
+    volumes:
+      - ./backend:/app
+
+  # Celery beat with hot reload
+  celery-beat:
+    entrypoint: []
+    command: celery -A config beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    volumes:
+      - ./backend:/app
+
+  # Expose MinIO ports (API + Console)
+  minio:
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+
+  # LiveKit Agent placeholder with source mount
+  livekit-agent:
+    volumes:
+      - ./backend:/app

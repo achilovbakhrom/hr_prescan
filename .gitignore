@@ -1,0 +1,84 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.mypy_cache/
+.pytest_cache/
+*.egg-info/
+*.egg
+
+# Node
+node_modules/
+dist/
+.vite/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Database
+*.sqlite3
+
+# Docker volumes data
+postgres_data/
+redis_data/
+rabbitmq_data/
+minio_data/
+portainer_data/
+pgadmin_data/
+grafana_data/
+prometheus_data/
+loki_data/
+jaeger_data/
+redisinsight_data/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Expo (legacy)
+.expo/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
+
+# Native builds (legacy)
+ios/
+android/
+
+# Firebase (legacy)
+.firebase/
+
+# Cloud Functions (legacy)
+apps/functions/lib/
+
+# TypeScript build
+packages/shared/dist/
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+coverage/
+htmlcov/
+.coverage
+
+# Static files (collected)
+staticfiles/
+static_collected/
