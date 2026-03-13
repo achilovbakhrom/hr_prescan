@@ -9,15 +9,15 @@ Mark tasks with `[x]` as they are completed.
 
 **Goal:** Set up specialized Claude Code agents (PM, Backend, Frontend, DevOps) that work as a team via GitHub Issues/PRs.
 
-- [ ] 0.1 Create agent config directory (`agents/`)
-- [ ] 0.2 Create PM Agent prompt (orchestrator — reads roadmap, creates issues, reviews PRs, merges)
-- [ ] 0.3 Create Backend Engineer Agent prompt (Django, DRF, Celery, models, services, selectors)
-- [ ] 0.4 Create Frontend Engineer Agent prompt (Vue.js, TypeScript, Pinia, PrimeVue, Tailwind)
-- [ ] 0.5 Create DevOps Engineer Agent prompt (Docker, CI/CD, Nginx, monitoring)
-- [ ] 0.6 Create orchestration script (`scripts/run_agent.sh`) to launch agents with correct prompts
-- [ ] 0.7 Define git branching strategy (be/*, fe/*, devops/*, review process)
+- [x] 0.1 Create agent config directory (`agents/`)
+- [x] 0.2 Create PM Agent prompt (orchestrator — reads roadmap, creates issues, reviews PRs, merges)
+- [x] 0.3 Create Backend Engineer Agent prompt (Django, DRF, Celery, models, services, selectors)
+- [x] 0.4 Create Frontend Engineer Agent prompt (Vue.js, TypeScript, Pinia, PrimeVue, Tailwind)
+- [x] 0.5 Create DevOps Engineer Agent prompt (Docker, CI/CD, Nginx, monitoring)
+- [x] 0.6 Create orchestration script (`scripts/run_agent.sh`) to launch agents with correct prompts
+- [x] 0.7 Define git branching strategy (be/*, fe/*, devops/*, review process)
 - [ ] 0.8 Test agent team on a small sample task (e.g., create a dummy Django app + Vue page)
-- [ ] 0.9 Document agent workflow in `AGENTS.md`
+- [x] 0.9 Document agent workflow in `AGENTS.md`
 
 ---
 
