@@ -123,18 +123,18 @@ Mark tasks with `[x]` as they are completed.
 
 **Goal:** Candidates pick time slots, calendar events are created, links are generated.
 
-- [ ] 6.1 Create `interviews` app — Interview model (application FK, scheduled_at, room name, status, recording, transcript, scores)
-- [ ] 6.2 InterviewScore model (criteria FK, score 1-10, AI notes)
-- [ ] 6.3 InterviewIntegrityFlag model (flag type, severity, description, timestamp)
-- [ ] 6.4 Scheduling API — candidate picks time slot
+- [x] 6.1 Create `interviews` app — Interview model (application FK, scheduled_at, room name, status, recording, transcript, scores)
+- [x] 6.2 InterviewScore model (criteria FK, score 1-10, AI notes)
+- [x] 6.3 InterviewIntegrityFlag model (flag type, severity, description, timestamp)
+- [x] 6.4 Scheduling API — candidate picks time slot
 - [ ] 6.5 LiveKit integration — create room, generate participant tokens
 - [ ] 6.6 Calendar invite generation (iCal format, attached to email)
-- [ ] 6.7 Celery task: send scheduling confirmation email (with room link + calendar invite)
-- [ ] 6.8 Celery task: send interview reminders (1 hour before, 15 min before)
-- [ ] 6.9 Celery Beat: scheduled job for checking upcoming interviews and sending reminders
-- [ ] 6.10 Frontend: calendar/time slot picker for candidates
-- [ ] 6.11 Frontend: interview confirmation page (with link and calendar download)
-- [ ] 6.12 Frontend: HR view of scheduled interviews
+- [x] 6.7 Celery task: send scheduling confirmation email (with room link + calendar invite)
+- [x] 6.8 Celery task: send interview reminders (1 hour before, 15 min before)
+- [x] 6.9 Celery Beat: scheduled job for checking upcoming interviews and sending reminders
+- [x] 6.10 Frontend: calendar/time slot picker for candidates
+- [x] 6.11 Frontend: interview confirmation page (with link and calendar download)
+- [x] 6.12 Frontend: HR view of scheduled interviews
 
 ---
 
