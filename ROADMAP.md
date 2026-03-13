@@ -25,20 +25,20 @@ Mark tasks with `[x]` as they are completed.
 
 **Goal:** Empty but runnable project with all services starting via Docker Compose.
 
-- [ ] 1.1 Initialize git repo, add `.gitignore` (Python, Node, Docker, env files)
-- [ ] 1.2 Create Django project (`config/`) with settings split (base, local, production, test)
-- [ ] 1.3 Create Vue.js project with Vite + TypeScript + Pinia + Vue Router + PrimeVue + Tailwind
-- [ ] 1.4 Create `Dockerfile` for backend (Python 3.12, Gunicorn)
-- [ ] 1.5 Create `Dockerfile` for frontend (Node build + Nginx)
-- [ ] 1.6 Create `docker-compose.yml` (base) with all 10 app services
-- [ ] 1.7 Create `docker-compose.override.yml` (dev: hot reload, exposed ports)
-- [ ] 1.8 Create `docker-compose.monitoring.yml` (Grafana, Prometheus, Jaeger, Loki)
-- [ ] 1.9 Create `docker-compose.management.yml` (Portainer, pgAdmin, RedisInsight)
-- [ ] 1.10 Setup health checks for all services
-- [ ] 1.11 Setup entrypoint script (wait for DB → migrate → collectstatic → start)
+- [x] 1.1 Initialize git repo, add `.gitignore` (Python, Node, Docker, env files)
+- [x] 1.2 Create Django project (`config/`) with settings split (base, local, production, test)
+- [x] 1.3 Create Vue.js project with Vite + TypeScript + Pinia + Vue Router + PrimeVue + Tailwind
+- [x] 1.4 Create `Dockerfile` for backend (Python 3.12, Gunicorn)
+- [x] 1.5 Create `Dockerfile` for frontend (Node build + Nginx)
+- [x] 1.6 Create `docker-compose.yml` (base) with all 10 app services
+- [x] 1.7 Create `docker-compose.override.yml` (dev: hot reload, exposed ports)
+- [x] 1.8 Create `docker-compose.monitoring.yml` (Grafana, Prometheus, Jaeger, Loki)
+- [x] 1.9 Create `docker-compose.management.yml` (Portainer, pgAdmin, RedisInsight)
+- [x] 1.10 Setup health checks for all services
+- [x] 1.11 Setup entrypoint script (wait for DB → migrate → collectstatic → start)
 - [ ] 1.12 Verify all 18 services start and are healthy
-- [ ] 1.13 Setup Ruff + mypy (backend), ESLint + Prettier (frontend), pre-commit hooks
-- [ ] 1.14 Setup GitHub Actions CI (lint + format + type checks)
+- [x] 1.13 Setup Ruff + mypy (backend), ESLint + Prettier (frontend), pre-commit hooks
+- [x] 1.14 Setup GitHub Actions CI (lint + format + type checks)
 
 ---
 
