@@ -41,4 +41,6 @@ urlpatterns = [
     path("api/public/vacancies/", include((application_public_urlpatterns, "public-applications"))),
     path("api/candidate/", include((application_candidate_urlpatterns, "candidate"))),
     path("api/candidate/", include((interview_candidate_urlpatterns, "candidate-interviews"))),
+    # Internal APIs — LiveKit agent communication (no JWT, key-based auth)
+    path("api/internal/interviews/", include("apps.interviews.urls_internal")),
 ]

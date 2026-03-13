@@ -9,6 +9,10 @@ from apps.interviews.apis.hr import (
     ObserverTokenApi,
     ScheduleInterviewApi,
 )
+from apps.interviews.apis.internal import (
+    InternalInterviewContextApi,
+    InternalInterviewResultsApi,
+)
 
 __all__ = [
     "CandidateInterviewApi",
@@ -16,6 +20,8 @@ __all__ = [
     "CancelInterviewApi",
     "HRInterviewDetailApi",
     "HRInterviewListApi",
+    "InternalInterviewContextApi",
+    "InternalInterviewResultsApi",
     "ObserverTokenApi",
     "ScheduleInterviewApi",
 ]
