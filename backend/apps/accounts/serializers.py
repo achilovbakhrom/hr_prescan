@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from apps.accounts.models import Company, User
+from apps.accounts.models import Company, Invitation, User
 
 
 class CompanyOutputSerializer(serializers.ModelSerializer):
@@ -44,3 +44,61 @@ class UserOutputSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
         read_only_fields = fields
+
+
+class CompanyRegisterInputSerializer(serializers.Serializer):
+    # Company fields
+    company_name = serializers.CharField(max_length=255)
+    industry = serializers.CharField(max_length=255)
+    size = serializers.ChoiceField(choices=Company.Size.choices)
+    country = serializers.CharField(max_length=100)
+    website = serializers.URLField(max_length=500, required=False, allow_blank=True)
+    description = serializers.CharField(required=False, allow_blank=True)
+
+    # Admin user fields
+    admin_email = serializers.EmailField()
+    admin_password = serializers.CharField(min_length=8)
+    admin_first_name = serializers.CharField(max_length=150)
+    admin_last_name = serializers.CharField(max_length=150)
+
+
+class CompanyProfileInputSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=255, required=False)
+    industry = serializers.CharField(max_length=255, required=False)
+    size = serializers.ChoiceField(choices=Company.Size.choices, required=False)
+    country = serializers.CharField(max_length=100, required=False)
+    website = serializers.URLField(max_length=500, required=False, allow_blank=True)
+    description = serializers.CharField(required=False, allow_blank=True)
+    logo = serializers.CharField(max_length=500, required=False, allow_blank=True)
+
+
+class InviteHRInputSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
+class AcceptInvitationInputSerializer(serializers.Serializer):
+    token = serializers.UUIDField()
+    password = serializers.CharField(min_length=8)
+    first_name = serializers.CharField(max_length=150)
+    last_name = serializers.CharField(max_length=150)
+
+
+class InvitationOutputSerializer(serializers.ModelSerializer):
+    invited_by_email = serializers.EmailField(source="invited_by.email", read_only=True)
+
+    class Meta:
+        model = Invitation
+        fields = [
+            "id",
+            "email",
+            "invited_by_email",
+            "token",
+            "is_accepted",
+            "expires_at",
+            "created_at",
+        ]
+        read_only_fields = fields
+
+
+class TeamMemberUpdateSerializer(serializers.Serializer):
+    is_active = serializers.BooleanField()

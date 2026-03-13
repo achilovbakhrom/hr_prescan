@@ -1,7 +1,9 @@
 import uuid
+from datetime import timedelta
 
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
+from django.utils import timezone
 
 
 class Company(models.Model):
@@ -122,3 +124,48 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def full_name(self) -> str:
         return f"{self.first_name} {self.last_name}".strip()
+
+
+def _default_invitation_expiry() -> timezone.datetime:
+    """Return default expiry: 7 days from now."""
+    return timezone.now() + timedelta(days=7)
+
+
+class Invitation(models.Model):
+    """HR invitation to join a company."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.CASCADE,
+        related_name="invitations",
+    )
+    email = models.EmailField()
+    invited_by = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="sent_invitations",
+    )
+    token = models.UUIDField(unique=True, default=uuid.uuid4)
+    is_accepted = models.BooleanField(default=False)
+    expires_at = models.DateTimeField(default=_default_invitation_expiry)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["company", "email"],
+                condition=models.Q(is_accepted=False),
+                name="unique_pending_invitation_per_company",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"Invitation for {self.email} to {self.company.name}"
+
+    @property
+    def is_expired(self) -> bool:
+        return timezone.now() > self.expires_at
