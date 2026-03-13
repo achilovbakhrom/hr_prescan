@@ -20,6 +20,7 @@ django-storages>=1.14,<2.0
 
 # Authentication
 djangorestframework-simplejwt>=5.3,<6.0
+PyJWT>=2.8,<3.0
 
 # Monitoring
 django-prometheus>=2.3,<3.0
