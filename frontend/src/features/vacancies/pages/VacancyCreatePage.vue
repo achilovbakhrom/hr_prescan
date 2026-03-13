@@ -1,0 +1,48 @@
+<script setup lang="ts">
+import { useRouter } from 'vue-router'
+import { useVacancyStore } from '../stores/vacancy.store'
+import VacancyForm from '../components/VacancyForm.vue'
+import { ROUTE_NAMES } from '@/shared/constants/routes'
+import type { CreateVacancyRequest } from '../types/vacancy.types'
+
+const router = useRouter()
+const vacancyStore = useVacancyStore()
+
+async function handleSave(
+  data: CreateVacancyRequest,
+  publish: boolean,
+): Promise<void> {
+  try {
+    const vacancy = await vacancyStore.createVacancy(data)
+    if (publish) {
+      await vacancyStore.changeStatus(vacancy.id, 'published')
+    }
+    router.push({
+      name: ROUTE_NAMES.VACANCY_DETAIL,
+      params: { id: vacancy.id },
+    })
+  } catch {
+    // Error is handled by the store
+  }
+}
+</script>
+
+<template>
+  <div class="space-y-4">
+    <div class="flex items-center gap-3">
+      <button
+        class="text-gray-500 hover:text-gray-700"
+        @click="router.back()"
+      >
+        <i class="pi pi-arrow-left text-lg"></i>
+      </button>
+      <h1 class="text-2xl font-bold">Create Vacancy</h1>
+    </div>
+
+    <p v-if="vacancyStore.error" class="text-sm text-red-600">
+      {{ vacancyStore.error }}
+    </p>
+
+    <VacancyForm :loading="vacancyStore.loading" @save="handleSave" />
+  </div>
+</template>

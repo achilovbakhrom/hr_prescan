@@ -2,7 +2,10 @@ import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import { authRoutes } from '@/features/auth/routes'
 import { dashboardRoutes } from '@/features/dashboard/routes'
-import { settingsRoutes } from '@/features/settings/routes'
+import {
+  vacancyRoutes,
+  publicVacancyRoutes,
+} from '@/features/vacancies/routes'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { UserRole } from '@/features/auth/types/auth.types'
 
@@ -19,10 +22,11 @@ const routes: RouteRecordRaw[] = [
     redirect: '/dashboard',
   },
   ...authRoutes,
+  ...publicVacancyRoutes,
   {
     path: '/',
     component: () => import('@/shared/components/AppLayout.vue'),
-    children: [...dashboardRoutes, ...settingsRoutes],
+    children: [...dashboardRoutes, ...vacancyRoutes],
   },
 ]
 
