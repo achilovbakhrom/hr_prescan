@@ -9,4 +9,9 @@ export const ROUTE_NAMES = {
   JOB_BOARD: 'job-board',
   JOB_DETAIL: 'job-detail',
   JOB_SHARE: 'job-share',
+  JOB_APPLY: 'job-apply',
+  MY_APPLICATIONS: 'my-applications',
+  MY_APPLICATION_DETAIL: 'my-application-detail',
+  VACANCY_CANDIDATES: 'vacancy-candidates',
+  CANDIDATE_DETAIL: 'candidate-detail',
 } as const

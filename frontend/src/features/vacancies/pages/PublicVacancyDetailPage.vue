@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
 import { vacancyService } from '../services/vacancy.service'
@@ -8,6 +8,7 @@ import { EMPLOYMENT_LABELS, EXPERIENCE_LABELS, formatSalaryRange, formatDate } f
 import type { Vacancy } from '../types/vacancy.types'
 
 const route = useRoute()
+const router = useRouter()
 const vacancy = ref<Vacancy | null>(null)
 const loading = ref(false)
 const error = ref<string | null>(null)
@@ -49,8 +50,13 @@ onMounted(async () => {
         {{ formatSalaryRange(vacancy) }}
       </p>
       <div class="mb-8">
-        <Button label="Apply for this position" icon="pi pi-send" size="large" class="w-full sm:w-auto" />
-        <p class="mt-1 text-xs text-gray-400">Application form coming in a future update</p>
+        <Button
+          label="Apply for this position"
+          icon="pi pi-send"
+          size="large"
+          class="w-full sm:w-auto"
+          @click="router.push(`/jobs/${route.params.id || route.params.token}/apply`)"
+        />
       </div>
       <div v-if="vacancy.skills.length > 0" class="mb-6">
         <h2 class="mb-2 text-lg font-semibold">Skills</h2>
