@@ -5,6 +5,7 @@ import Button from 'primevue/button'
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
 import { useInterviewStore } from '../stores/interview.store'
+import { ROUTE_NAMES } from '@/shared/constants/routes'
 import InterviewStatusBadge from '../components/InterviewStatusBadge.vue'
 import InterviewScoresView from '../components/InterviewScoresView.vue'
 import TranscriptView from '../components/TranscriptView.vue'
@@ -30,13 +31,11 @@ async function handleCancel(): Promise<void> {
   await interviewStore.cancelInterview(interviewId.value).catch(() => {})
 }
 
-async function handleWatchLive(): Promise<void> {
-  try {
-    const token = await interviewStore.getObserverToken(interviewId.value)
-    window.alert(`Observer token: ${token}\n\nLiveKit integration coming in Phase 7.`)
-  } catch {
-    // error is set in store
-  }
+function handleWatchLive(): void {
+  router.push({
+    name: ROUTE_NAMES.INTERVIEW_OBSERVE,
+    params: { id: interviewId.value },
+  })
 }
 </script>
 
