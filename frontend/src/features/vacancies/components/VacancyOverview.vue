@@ -1,0 +1,75 @@
+<script setup lang="ts">
+import Tag from 'primevue/tag'
+import type { VacancyDetail } from '../types/vacancy.types'
+
+const props = defineProps<{
+  vacancy: VacancyDetail
+}>()
+
+const employmentLabel: Record<string, string> = {
+  full_time: 'Full Time',
+  part_time: 'Part Time',
+  contract: 'Contract',
+  internship: 'Internship',
+}
+
+const experienceLabel: Record<string, string> = {
+  junior: 'Junior',
+  middle: 'Middle',
+  senior: 'Senior',
+  lead: 'Lead',
+  director: 'Director',
+}
+
+function formatSalary(): string {
+  const { salaryMin, salaryMax, salaryCurrency } = props.vacancy
+  if (!salaryMin && !salaryMax) return 'Not specified'
+  if (salaryMin && salaryMax) {
+    return `${salaryMin.toLocaleString()} - ${salaryMax.toLocaleString()} ${salaryCurrency}`
+  }
+  if (salaryMin) return `From ${salaryMin.toLocaleString()} ${salaryCurrency}`
+  return `Up to ${salaryMax?.toLocaleString()} ${salaryCurrency}`
+}
+</script>
+
+<template>
+  <div class="space-y-4">
+    <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
+      <div>
+        <p class="text-sm text-gray-500">Employment</p>
+        <p class="font-medium">
+          {{ employmentLabel[vacancy.employmentType] }}
+        </p>
+      </div>
+      <div>
+        <p class="text-sm text-gray-500">Experience</p>
+        <p class="font-medium">
+          {{ experienceLabel[vacancy.experienceLevel] }}
+        </p>
+      </div>
+      <div>
+        <p class="text-sm text-gray-500">Location</p>
+        <p class="font-medium">
+          {{ vacancy.location || 'Not specified' }}
+          <Tag v-if="vacancy.isRemote" value="Remote" severity="info" class="ml-1" />
+        </p>
+      </div>
+      <div>
+        <p class="text-sm text-gray-500">Salary</p>
+        <p class="font-medium">{{ formatSalary() }}</p>
+      </div>
+    </div>
+
+    <div v-if="vacancy.skills.length > 0">
+      <p class="mb-1 text-sm text-gray-500">Skills</p>
+      <div class="flex flex-wrap gap-1">
+        <Tag
+          v-for="skill in vacancy.skills"
+          :key="skill"
+          :value="skill"
+          severity="secondary"
+        />
+      </div>
+    </div>
+  </div>
+</template>

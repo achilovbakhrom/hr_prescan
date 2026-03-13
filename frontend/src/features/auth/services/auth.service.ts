@@ -3,10 +3,7 @@ import type {
   LoginRequest,
   LoginResponse,
   RegisterRequest,
-  CompanyRegisterRequest,
-  AcceptInvitationRequest,
   User,
-  Company,
 } from '../types/auth.types'
 
 export const authService = {
@@ -17,24 +14,6 @@ export const authService = {
 
   async register(data: RegisterRequest): Promise<User> {
     const response = await apiClient.post<User>('/auth/register', data)
-    return response.data
-  },
-
-  async registerCompany(
-    data: CompanyRegisterRequest,
-  ): Promise<{ company: Company; user: User }> {
-    const response = await apiClient.post<{ company: Company; user: User }>(
-      '/auth/register-company',
-      data,
-    )
-    return response.data
-  },
-
-  async acceptInvitation(data: AcceptInvitationRequest): Promise<User> {
-    const response = await apiClient.post<User>(
-      '/auth/accept-invitation',
-      data,
-    )
     return response.data
   },
 

@@ -52,7 +52,7 @@ const navItems: NavItem[] = [
     label: 'Vacancies',
     icon: 'pi pi-briefcase',
     to: '/vacancies',
-    roles: [USER_ROLES.HR],
+    roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
   },
   {
     label: 'Candidates',
@@ -86,31 +86,10 @@ const navItems: NavItem[] = [
   },
 ]
 
-const settingsItems: NavItem[] = [
-  {
-    label: 'Company Profile',
-    icon: 'pi pi-building',
-    to: '/settings/company',
-    roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
-  },
-  {
-    label: 'Team',
-    icon: 'pi pi-users',
-    to: '/settings/team',
-    roles: [USER_ROLES.ADMIN],
-  },
-]
-
 const filteredItems = computed(() => {
   const userRole = authStore.user?.role
   if (!userRole) return []
   return navItems.filter((item) => item.roles.includes(userRole))
-})
-
-const filteredSettingsItems = computed(() => {
-  const userRole = authStore.user?.role
-  if (!userRole) return []
-  return settingsItems.filter((item) => item.roles.includes(userRole))
 })
 
 function isActive(path: string): boolean {
@@ -127,7 +106,7 @@ function handleNav(): void {
     class="flex h-full flex-col border-r border-gray-200 bg-white transition-all duration-300"
     :class="collapsed ? 'w-0 overflow-hidden lg:w-16' : 'w-64'"
   >
-    <nav class="mt-4 flex flex-1 flex-col gap-1 px-2">
+    <nav class="mt-4 flex flex-col gap-1 px-2">
       <RouterLink
         v-for="item in filteredItems"
         :key="item.to"
@@ -143,32 +122,6 @@ function handleNav(): void {
         <i :class="item.icon" class="text-base"></i>
         <span v-if="!collapsed" class="truncate">{{ item.label }}</span>
       </RouterLink>
-
-      <template v-if="filteredSettingsItems.length">
-        <div
-          v-if="!collapsed"
-          class="mt-4 border-t border-gray-200 px-3 pt-4 text-xs font-semibold uppercase tracking-wider text-gray-400"
-        >
-          Settings
-        </div>
-        <div v-else class="mt-4 border-t border-gray-200 pt-4"></div>
-
-        <RouterLink
-          v-for="item in filteredSettingsItems"
-          :key="item.to"
-          :to="item.to"
-          class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors"
-          :class="
-            isActive(item.to)
-              ? 'bg-blue-50 text-blue-700'
-              : 'text-gray-700 hover:bg-gray-100'
-          "
-          @click="handleNav"
-        >
-          <i :class="item.icon" class="text-base"></i>
-          <span v-if="!collapsed" class="truncate">{{ item.label }}</span>
-        </RouterLink>
-      </template>
     </nav>
   </aside>
 </template>
