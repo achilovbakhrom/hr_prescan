@@ -66,15 +66,15 @@ Mark tasks with `[x]` as they are completed.
 
 **Goal:** A company can register, set up profile, invite HR users.
 
-- [ ] 3.1 Company registration API (create company + admin user in one step)
-- [ ] 3.2 Company profile setup API (logo upload, description, website, default settings)
-- [ ] 3.3 HR invitation API (admin invites HR by email, generates signup link)
-- [ ] 3.4 HR signup via invitation link (auto-link to company)
-- [ ] 3.5 Company team management API (list HRs, activate/deactivate)
+- [x] 3.1 Company registration API (create company + admin user in one step)
+- [x] 3.2 Company profile setup API (logo upload, description, website, default settings)
+- [x] 3.3 HR invitation API (admin invites HR by email, generates signup link)
+- [x] 3.4 HR signup via invitation link (auto-link to company)
+- [x] 3.5 Company team management API (list HRs, activate/deactivate)
 - [ ] 3.6 MinIO integration — file upload service (presigned URLs)
-- [ ] 3.7 Frontend: company registration wizard
-- [ ] 3.8 Frontend: company profile settings page
-- [ ] 3.9 Frontend: team management page (invite, list, deactivate HRs)
+- [x] 3.7 Frontend: company registration wizard
+- [x] 3.8 Frontend: company profile settings page
+- [x] 3.9 Frontend: team management page (invite, list, deactivate HRs)
 
 ---
 
