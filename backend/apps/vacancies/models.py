@@ -1,0 +1,138 @@
+import uuid
+
+from django.db import models
+
+from apps.common.models import BaseModel
+
+
+class Vacancy(BaseModel):
+    """A job vacancy posted by a company."""
+
+    class Status(models.TextChoices):
+        DRAFT = "draft", "Draft"
+        PUBLISHED = "published", "Published"
+        PAUSED = "paused", "Paused"
+        CLOSED = "closed", "Closed"
+
+    class Visibility(models.TextChoices):
+        PUBLIC = "public", "Public"
+        PRIVATE = "private", "Private"
+
+    class EmploymentType(models.TextChoices):
+        FULL_TIME = "full_time", "Full Time"
+        PART_TIME = "part_time", "Part Time"
+        CONTRACT = "contract", "Contract"
+        INTERNSHIP = "internship", "Internship"
+
+    class ExperienceLevel(models.TextChoices):
+        JUNIOR = "junior", "Junior"
+        MIDDLE = "middle", "Middle"
+        SENIOR = "senior", "Senior"
+        LEAD = "lead", "Lead"
+        DIRECTOR = "director", "Director"
+
+    company = models.ForeignKey(
+        "accounts.Company",
+        on_delete=models.CASCADE,
+        related_name="vacancies",
+    )
+    created_by = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.CASCADE,
+        related_name="created_vacancies",
+    )
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    requirements = models.TextField(blank=True)
+    responsibilities = models.TextField(blank=True)
+    skills = models.JSONField(default=list)
+    salary_min = models.DecimalField(
+        max_digits=12, decimal_places=2, null=True, blank=True
+    )
+    salary_max = models.DecimalField(
+        max_digits=12, decimal_places=2, null=True, blank=True
+    )
+    salary_currency = models.CharField(max_length=3, default="USD")
+    location = models.CharField(max_length=255, blank=True)
+    is_remote = models.BooleanField(default=False)
+    employment_type = models.CharField(
+        max_length=20,
+        choices=EmploymentType.choices,
+        default=EmploymentType.FULL_TIME,
+    )
+    experience_level = models.CharField(
+        max_length=20,
+        choices=ExperienceLevel.choices,
+        default=ExperienceLevel.MIDDLE,
+    )
+    deadline = models.DateField(null=True, blank=True)
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.DRAFT,
+    )
+    visibility = models.CharField(
+        max_length=20,
+        choices=Visibility.choices,
+        default=Visibility.PUBLIC,
+    )
+    share_token = models.UUIDField(unique=True, default=uuid.uuid4)
+    interview_duration = models.IntegerField(default=30)
+
+    class Meta:
+        verbose_name_plural = "vacancies"
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"{self.title} ({self.company.name})"
+
+
+class VacancyCriteria(BaseModel):
+    """Evaluation criteria for scoring candidates in interviews."""
+
+    vacancy = models.ForeignKey(
+        Vacancy,
+        on_delete=models.CASCADE,
+        related_name="criteria",
+    )
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    weight = models.IntegerField(default=1)
+    is_default = models.BooleanField(default=False)
+    order = models.IntegerField(default=0)
+
+    class Meta:
+        verbose_name_plural = "vacancy criteria"
+        ordering = ["order"]
+
+    def __str__(self) -> str:
+        return f"{self.name} (weight={self.weight})"
+
+
+class InterviewQuestion(BaseModel):
+    """Interview questions for a vacancy."""
+
+    class Source(models.TextChoices):
+        AI_GENERATED = "ai_generated", "AI Generated"
+        HR_ADDED = "hr_added", "HR Added"
+
+    vacancy = models.ForeignKey(
+        Vacancy,
+        on_delete=models.CASCADE,
+        related_name="questions",
+    )
+    text = models.TextField()
+    category = models.CharField(max_length=100, blank=True)
+    source = models.CharField(
+        max_length=20,
+        choices=Source.choices,
+        default=Source.AI_GENERATED,
+    )
+    order = models.IntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["order"]
+
+    def __str__(self) -> str:
+        return f"Q{self.order}: {self.text[:60]}"
