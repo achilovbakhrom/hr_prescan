@@ -82,21 +82,21 @@ Mark tasks with `[x]` as they are completed.
 
 **Goal:** HR can create, edit, publish, and share vacancies.
 
-- [ ] 4.1 Create `vacancies` app — Vacancy model (title, description, skills, salary, location, deadline, status, visibility)
-- [ ] 4.2 VacancyCriteria model (fixed + custom evaluation criteria per vacancy)
-- [ ] 4.3 InterviewQuestion model (AI-generated + HR-editable questions)
-- [ ] 4.4 Vacancy CRUD API (create, update, list, detail)
-- [ ] 4.5 Vacancy lifecycle API (publish, pause, close)
-- [ ] 4.6 Vacancy share link generation (unique URL for external sharing)
-- [ ] 4.7 Public job board API (list public vacancies, search, filter)
-- [ ] 4.8 AI question generation — service that generates interview questions from vacancy description (OpenAI integration)
-- [ ] 4.9 HR question editing API (review, edit, add, remove AI-suggested questions)
-- [ ] 4.10 Frontend: vacancy creation form
-- [ ] 4.11 Frontend: vacancy list page (with status badges, candidate counts)
-- [ ] 4.12 Frontend: vacancy detail/edit page
-- [ ] 4.13 Frontend: question review/edit interface
-- [ ] 4.14 Frontend: public job board page (searchable, filterable)
-- [ ] 4.15 Frontend: public vacancy detail page (with apply button)
+- [x] 4.1 Create `vacancies` app — Vacancy model (title, description, skills, salary, location, deadline, status, visibility)
+- [x] 4.2 VacancyCriteria model (fixed + custom evaluation criteria per vacancy)
+- [x] 4.3 InterviewQuestion model (AI-generated + HR-editable questions)
+- [x] 4.4 Vacancy CRUD API (create, update, list, detail)
+- [x] 4.5 Vacancy lifecycle API (publish, pause, close)
+- [x] 4.6 Vacancy share link generation (unique URL for external sharing)
+- [x] 4.7 Public job board API (list public vacancies, search, filter)
+- [x] 4.8 AI question generation — service that generates interview questions from vacancy description (OpenAI integration)
+- [x] 4.9 HR question editing API (review, edit, add, remove AI-suggested questions)
+- [x] 4.10 Frontend: vacancy creation form
+- [x] 4.11 Frontend: vacancy list page (with status badges, candidate counts)
+- [x] 4.12 Frontend: vacancy detail/edit page
+- [x] 4.13 Frontend: question review/edit interface
+- [x] 4.14 Frontend: public job board page (searchable, filterable)
+- [x] 4.15 Frontend: public vacancy detail page (with apply button)
 
 ---
 
