@@ -1,6 +1,7 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { candidateService } from '../services/candidate.service'
+import type { CandidateFilterParams } from '../services/candidate.service'
 import type {
   Application,
   ApplicationDetail,
@@ -19,7 +20,7 @@ export const useCandidateStore = defineStore('candidate', () => {
   // HR actions
   async function fetchVacancyCandidates(
     vacancyId: string,
-    params?: { status?: string; ordering?: string },
+    params?: CandidateFilterParams,
   ): Promise<void> {
     loading.value = true
     error.value = null

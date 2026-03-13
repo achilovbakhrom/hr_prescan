@@ -6,8 +6,16 @@ import type {
   SubmitApplicationRequest,
 } from '../types/candidate.types'
 
+export interface CandidateFilterParams {
+  status?: string
+  ordering?: string
+  search?: string
+  min_score?: number
+  max_score?: number
+}
+
 export const candidateService = {
-  // Public — submit application with CV upload
+  // Public -- submit application with CV upload
   async submitApplication(
     vacancyId: string,
     data: SubmitApplicationRequest,
@@ -45,7 +53,7 @@ export const candidateService = {
   // HR
   async getVacancyCandidates(
     vacancyId: string,
-    params?: { status?: string; ordering?: string },
+    params?: CandidateFilterParams,
   ): Promise<Application[]> {
     const response = await apiClient.get<Application[]>(
       `/vacancies/${vacancyId}/candidates`,

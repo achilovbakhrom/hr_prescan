@@ -10,6 +10,7 @@ import InterviewStatusBadge from '../components/InterviewStatusBadge.vue'
 import InterviewScoresView from '../components/InterviewScoresView.vue'
 import TranscriptView from '../components/TranscriptView.vue'
 import IntegrityFlagsView from '../components/IntegrityFlagsView.vue'
+import RecordingPlayer from '../components/RecordingPlayer.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -20,6 +21,13 @@ const interview = computed(() => interviewStore.currentInterview)
 
 const isScheduled = computed(() => interview.value?.status === 'scheduled')
 const isInProgress = computed(() => interview.value?.status === 'in_progress')
+
+const recordingUrl = computed(() => {
+  if (!interview.value?.recordingPath) return null
+  const path = interview.value.recordingPath
+  if (path.startsWith('http')) return path
+  return `${import.meta.env.VITE_API_URL}${path}`
+})
 
 onMounted(() => interviewStore.fetchInterviewDetail(interviewId.value))
 
@@ -72,6 +80,12 @@ function handleWatchLive(): void {
               {{ formatDate(interview.scheduledAt) }} &middot;
               {{ interview.durationMinutes }} min
             </p>
+            <p
+              v-if="interview.overallScore !== null"
+              class="text-sm font-semibold text-blue-600"
+            >
+              Overall Score: {{ interview.overallScore }}/100
+            </p>
           </div>
           <div class="flex items-center gap-3">
             <InterviewStatusBadge :status="interview.status" />
@@ -119,23 +133,7 @@ function handleWatchLive(): void {
         </TabPanel>
         <TabPanel header="Recording">
           <div class="py-4">
-            <div
-              v-if="interview.recordingPath"
-              class="rounded-lg border border-gray-200 p-6"
-            >
-              <p class="mb-2 text-sm font-medium text-gray-700">
-                Recording Path
-              </p>
-              <code class="text-sm text-gray-600">
-                {{ interview.recordingPath }}
-              </code>
-              <p class="mt-4 text-xs text-gray-400">
-                Audio/video playback will be available in a future release.
-              </p>
-            </div>
-            <p v-else class="text-sm text-gray-500">
-              No recording available.
-            </p>
+            <RecordingPlayer :recording-url="recordingUrl" />
           </div>
         </TabPanel>
       </TabView>

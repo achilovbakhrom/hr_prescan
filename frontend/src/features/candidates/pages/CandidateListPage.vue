@@ -16,6 +16,9 @@ const vacancyId = computed(() => route.params.vacancyId as string)
 
 const statusFilter = ref<string | undefined>(undefined)
 const orderingFilter = ref<string>('-created_at')
+const searchQuery = ref('')
+const minScore = ref<number | undefined>(undefined)
+const maxScore = ref<number | undefined>(undefined)
 
 const statusOptions = [
   { label: 'All Statuses', value: undefined },
@@ -39,11 +42,24 @@ function fetchCandidates(): void {
   candidateStore.fetchVacancyCandidates(vacancyId.value, {
     status: statusFilter.value,
     ordering: orderingFilter.value,
+    search: searchQuery.value || undefined,
+    min_score: minScore.value,
+    max_score: maxScore.value,
   })
 }
 
 onMounted(fetchCandidates)
 watch([statusFilter, orderingFilter], fetchCandidates)
+
+let searchTimeout: ReturnType<typeof setTimeout> | null = null
+function onSearchInput(): void {
+  if (searchTimeout) clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(fetchCandidates, 400)
+}
+
+function onScoreChange(): void {
+  fetchCandidates()
+}
 
 function viewDetail(candidate: Application): void {
   router.push({
@@ -73,7 +89,17 @@ function formatDate(dateStr: string): string {
       {{ candidateStore.error }}
     </p>
 
-    <div class="flex flex-wrap gap-3">
+    <div class="flex flex-wrap items-end gap-3">
+      <div class="relative">
+        <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="Search by name or email..."
+          class="w-60 rounded-lg border border-gray-300 py-2 pl-9 pr-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          @input="onSearchInput"
+        />
+      </div>
       <Dropdown
         v-model="statusFilter"
         :options="statusOptions"
@@ -90,6 +116,28 @@ function formatDate(dateStr: string): string {
         placeholder="Sort by"
         class="w-48"
       />
+      <div class="flex items-center gap-2">
+        <label class="text-xs font-medium text-gray-500">Score:</label>
+        <input
+          v-model.number="minScore"
+          type="number"
+          min="0"
+          max="100"
+          placeholder="Min"
+          class="w-20 rounded border border-gray-300 px-2 py-1.5 text-sm"
+          @change="onScoreChange"
+        />
+        <span class="text-gray-400">-</span>
+        <input
+          v-model.number="maxScore"
+          type="number"
+          min="0"
+          max="100"
+          placeholder="Max"
+          class="w-20 rounded border border-gray-300 px-2 py-1.5 text-sm"
+          @change="onScoreChange"
+        />
+      </div>
     </div>
 
     <DataTable
