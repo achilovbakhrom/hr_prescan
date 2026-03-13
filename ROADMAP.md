@@ -104,18 +104,18 @@ Mark tasks with `[x]` as they are completed.
 
 **Goal:** Candidates can apply, upload CV, CV is parsed and analyzed by AI.
 
-- [ ] 5.1 Create `applications` app — Application model (candidate info, CV file, status, parsed data, match score)
-- [ ] 5.2 Application submission API (no auth required — name, email, phone, CV upload)
-- [ ] 5.3 Optional candidate account creation (link applications to account)
+- [x] 5.1 Create `applications` app — Application model (candidate info, CV file, status, parsed data, match score)
+- [x] 5.2 Application submission API (no auth required — name, email, phone, CV upload)
+- [x] 5.3 Optional candidate account creation (link applications to account)
 - [ ] 5.4 CV upload to MinIO via presigned URL
-- [ ] 5.5 Celery task: parse CV (extract text from PDF/DOCX)
-- [ ] 5.6 Celery task: AI CV analysis (extract skills, experience, education — OpenAI)
-- [ ] 5.7 Celery task: CV match scoring (compare CV vs vacancy requirements — OpenAI)
-- [ ] 5.8 Candidate status management API (update status: applied → shortlisted → rejected)
-- [ ] 5.9 Frontend: application form (public vacancy page)
-- [ ] 5.10 Frontend: candidate dashboard (if logged in — my applications, statuses)
-- [ ] 5.11 Frontend: HR candidate list per vacancy (table with scores, status, filtering, sorting)
-- [ ] 5.12 Frontend: HR candidate detail page (CV viewer, parsed data, match score, notes)
+- [x] 5.5 Celery task: parse CV (extract text from PDF/DOCX)
+- [x] 5.6 Celery task: AI CV analysis (extract skills, experience, education — OpenAI)
+- [x] 5.7 Celery task: CV match scoring (compare CV vs vacancy requirements — OpenAI)
+- [x] 5.8 Candidate status management API (update status: applied → shortlisted → rejected)
+- [x] 5.9 Frontend: application form (public vacancy page)
+- [x] 5.10 Frontend: candidate dashboard (if logged in — my applications, statuses)
+- [x] 5.11 Frontend: HR candidate list per vacancy (table with scores, status, filtering, sorting)
+- [x] 5.12 Frontend: HR candidate detail page (CV viewer, parsed data, match score, notes)
 
 ---
 
