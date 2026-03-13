@@ -64,7 +64,7 @@ const navItems: NavItem[] = [
     label: 'Interviews',
     icon: 'pi pi-calendar',
     to: '/interviews',
-    roles: [USER_ROLES.HR],
+    roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
   },
   {
     label: 'Team',

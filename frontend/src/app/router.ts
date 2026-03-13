@@ -11,6 +11,10 @@ import {
   hrCandidateRoutes,
   publicApplicationRoutes,
 } from '@/features/candidates/routes'
+import {
+  hrInterviewRoutes,
+  candidateInterviewRoutes,
+} from '@/features/interviews/routes'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { UserRole } from '@/features/auth/types/auth.types'
 
@@ -29,6 +33,7 @@ const routes: RouteRecordRaw[] = [
   ...authRoutes,
   ...publicVacancyRoutes,
   ...publicApplicationRoutes,
+  ...candidateInterviewRoutes,
   {
     path: '/',
     component: () => import('@/shared/components/AppLayout.vue'),
@@ -37,6 +42,7 @@ const routes: RouteRecordRaw[] = [
       ...vacancyRoutes,
       ...candidateRoutes,
       ...hrCandidateRoutes,
+      ...hrInterviewRoutes,
     ],
   },
 ]
