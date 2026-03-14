@@ -17,7 +17,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.interviews.models import Interview
-from apps.interviews.services import complete_interview, save_interview_scores
+from apps.interviews.services import complete_interview, create_integrity_flags, save_interview_scores
 
 logger = logging.getLogger(__name__)
 
@@ -49,11 +49,19 @@ class _InterviewScoreInputSerializer(serializers.Serializer):
     notes = serializers.CharField(required=False, default="", allow_blank=True)
 
 
+class _IntegrityFlagInputSerializer(serializers.Serializer):
+    flag_type = serializers.CharField(max_length=30)
+    severity = serializers.CharField(max_length=10)
+    description = serializers.CharField()
+    timestamp_seconds = serializers.IntegerField(required=False, allow_null=True, default=None)
+
+
 class _InterviewResultsInputSerializer(serializers.Serializer):
     overall_score = serializers.DecimalField(max_digits=4, decimal_places=2)
     ai_summary = serializers.CharField()
     transcript = serializers.ListField(child=serializers.DictField())
     scores = _InterviewScoreInputSerializer(many=True)
+    integrity_flags = _IntegrityFlagInputSerializer(many=True, required=False, default=list)
 
 
 # ---------------------------------------------------------------------------
@@ -172,6 +180,27 @@ class InternalInterviewResultsApi(APIView):
             for s in validated["scores"]
         ]
         save_interview_scores(interview=interview, scores=scores_data)
+
+        # Save integrity flags (if any were collected during the interview)
+        flags_data = validated.get("integrity_flags", [])
+        if flags_data:
+            create_integrity_flags(
+                interview_id=interview.id,
+                flags_data=[
+                    {
+                        "flag_type": f["flag_type"],
+                        "severity": f["severity"],
+                        "description": f["description"],
+                        "timestamp_seconds": f.get("timestamp_seconds"),
+                    }
+                    for f in flags_data
+                ],
+            )
+            logger.info(
+                "Saved %d integrity flags for interview %s.",
+                len(flags_data),
+                interview_id,
+            )
 
         logger.info(
             "Interview %s results saved. Overall score: %s",

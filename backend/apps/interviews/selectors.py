@@ -106,3 +106,27 @@ def get_interview_integrity_flags(
         .filter(interview=interview)
         .order_by("timestamp_seconds")
     )
+
+
+def get_integrity_flags(
+    *,
+    interview_id: UUID,
+    company: Company | None = None,
+) -> QuerySet[InterviewIntegrityFlag] | None:
+    """Return integrity flags for an interview by ID, optionally scoped to a company.
+
+    Returns None if the interview does not exist (or does not belong to the company).
+    """
+    interview_qs = Interview.objects.filter(id=interview_id)
+    if company:
+        interview_qs = interview_qs.filter(application__vacancy__company=company)
+
+    interview = interview_qs.first()
+    if interview is None:
+        return None
+
+    return (
+        InterviewIntegrityFlag.objects
+        .filter(interview=interview)
+        .order_by("timestamp_seconds")
+    )
