@@ -4,21 +4,23 @@ import { useRoute, useRouter } from 'vue-router'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Dropdown from 'primevue/dropdown'
+import Button from 'primevue/button'
+import ConfirmDialog from 'primevue/confirmdialog'
+import { useConfirm } from 'primevue/useconfirm'
 import { useCandidateStore } from '../stores/candidate.store'
 import ApplicationStatusBadge from '../components/ApplicationStatusBadge.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
-import type { Application } from '../types/candidate.types'
+import type { Application, ApplicationStatus } from '../types/candidate.types'
 
 const route = useRoute()
 const router = useRouter()
+const confirm = useConfirm()
 const candidateStore = useCandidateStore()
 const vacancyId = computed(() => route.params.vacancyId as string)
 
 const statusFilter = ref<string | undefined>(undefined)
 const orderingFilter = ref<string>('-created_at')
-const searchQuery = ref('')
-const minScore = ref<number | undefined>(undefined)
-const maxScore = ref<number | undefined>(undefined)
+const selectedCandidates = ref<Application[]>([])
 
 const statusOptions = [
   { label: 'All Statuses', value: undefined },
@@ -38,28 +40,20 @@ const orderingOptions = [
   { label: 'Lowest score', value: 'match_score' },
 ]
 
+const bulkActionOptions = [
+  { label: 'Shortlist', value: 'shortlisted' as ApplicationStatus },
+  { label: 'Reject', value: 'rejected' as ApplicationStatus },
+]
+
 function fetchCandidates(): void {
   candidateStore.fetchVacancyCandidates(vacancyId.value, {
     status: statusFilter.value,
     ordering: orderingFilter.value,
-    search: searchQuery.value || undefined,
-    min_score: minScore.value,
-    max_score: maxScore.value,
   })
 }
 
 onMounted(fetchCandidates)
 watch([statusFilter, orderingFilter], fetchCandidates)
-
-let searchTimeout: ReturnType<typeof setTimeout> | null = null
-function onSearchInput(): void {
-  if (searchTimeout) clearTimeout(searchTimeout)
-  searchTimeout = setTimeout(fetchCandidates, 400)
-}
-
-function onScoreChange(): void {
-  fetchCandidates()
-}
 
 function viewDetail(candidate: Application): void {
   router.push({
@@ -70,6 +64,25 @@ function viewDetail(candidate: Application): void {
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString()
+}
+
+function handleBulkAction(event: { value: ApplicationStatus }): void {
+  const status = event.value
+  const count = selectedCandidates.value.length
+  const label = status === 'shortlisted' ? 'shortlist' : 'reject'
+
+  confirm.require({
+    message: `Are you sure you want to ${label} ${count} candidate(s)?`,
+    header: 'Confirm Bulk Action',
+    icon: 'pi pi-exclamation-triangle',
+    acceptClass:
+      status === 'rejected' ? 'p-button-danger' : 'p-button-success',
+    accept: async () => {
+      const ids = selectedCandidates.value.map((c) => c.id)
+      await candidateStore.bulkUpdateStatus(ids, status).catch(() => {})
+      selectedCandidates.value = []
+    },
+  })
 }
 </script>
 
@@ -89,17 +102,7 @@ function formatDate(dateStr: string): string {
       {{ candidateStore.error }}
     </p>
 
-    <div class="flex flex-wrap items-end gap-3">
-      <div class="relative">
-        <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-        <input
-          v-model="searchQuery"
-          type="text"
-          placeholder="Search by name or email..."
-          class="w-60 rounded-lg border border-gray-300 py-2 pl-9 pr-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-          @input="onSearchInput"
-        />
-      </div>
+    <div class="flex flex-wrap items-center gap-3">
       <Dropdown
         v-model="statusFilter"
         :options="statusOptions"
@@ -116,38 +119,37 @@ function formatDate(dateStr: string): string {
         placeholder="Sort by"
         class="w-48"
       />
-      <div class="flex items-center gap-2">
-        <label class="text-xs font-medium text-gray-500">Score:</label>
-        <input
-          v-model.number="minScore"
-          type="number"
-          min="0"
-          max="100"
-          placeholder="Min"
-          class="w-20 rounded border border-gray-300 px-2 py-1.5 text-sm"
-          @change="onScoreChange"
-        />
-        <span class="text-gray-400">-</span>
-        <input
-          v-model.number="maxScore"
-          type="number"
-          min="0"
-          max="100"
-          placeholder="Max"
-          class="w-20 rounded border border-gray-300 px-2 py-1.5 text-sm"
-          @change="onScoreChange"
+
+      <div
+        v-if="selectedCandidates.length > 0"
+        class="flex items-center gap-2"
+      >
+        <span class="text-sm text-gray-600">
+          {{ selectedCandidates.length }} selected
+        </span>
+        <Dropdown
+          :model-value="null"
+          :options="bulkActionOptions"
+          option-label="label"
+          option-value="value"
+          placeholder="Bulk Actions"
+          class="w-40"
+          @change="handleBulkAction"
         />
       </div>
     </div>
 
     <DataTable
+      v-model:selection="selectedCandidates"
       :value="candidateStore.candidates"
       :loading="candidateStore.loading"
       striped-rows
       row-hover
       class="cursor-pointer"
+      data-key="id"
       @row-click="(e: { data: Application }) => viewDetail(e.data)"
     >
+      <Column selection-mode="multiple" header-style="width: 3rem" />
       <Column field="candidateName" header="Name" sortable />
       <Column field="candidateEmail" header="Email" sortable />
       <Column header="Status">
@@ -176,5 +178,7 @@ function formatDate(dateStr: string): string {
         </div>
       </template>
     </DataTable>
+
+    <ConfirmDialog />
   </div>
 </template>

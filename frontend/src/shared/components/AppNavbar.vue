@@ -3,6 +3,8 @@ import { useRouter } from 'vue-router'
 import Button from 'primevue/button'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
+import NotificationBell from '@/features/notifications/components/NotificationBell.vue'
+import { useNotificationPolling } from '@/features/notifications/composables/useNotificationPolling'
 
 defineProps<{
   sidebarCollapsed: boolean
@@ -14,6 +16,8 @@ const emit = defineEmits<{
 
 const router = useRouter()
 const authStore = useAuthStore()
+
+useNotificationPolling()
 
 async function handleLogout(): Promise<void> {
   await authStore.logout()
@@ -37,13 +41,7 @@ async function handleLogout(): Promise<void> {
     </div>
 
     <div class="flex items-center gap-4">
-      <Button
-        icon="pi pi-bell"
-        text
-        severity="secondary"
-        rounded
-        aria-label="Notifications"
-      />
+      <NotificationBell />
 
       <div class="flex items-center gap-2">
         <div

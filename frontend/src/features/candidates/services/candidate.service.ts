@@ -5,17 +5,21 @@ import type {
   ApplicationStatus,
   SubmitApplicationRequest,
 } from '../types/candidate.types'
+import type { Message } from '../types/message.types'
 
-export interface CandidateFilterParams {
-  status?: string
-  ordering?: string
-  search?: string
-  min_score?: number
-  max_score?: number
+interface SendEmailPayload {
+  subject: string
+  body: string
+}
+
+interface ScheduleInterviewPayload {
+  dateTime: string
+  interviewerName: string
+  meetingLink?: string
 }
 
 export const candidateService = {
-  // Public -- submit application with CV upload
+  // Public — submit application with CV upload
   async submitApplication(
     vacancyId: string,
     data: SubmitApplicationRequest,
@@ -53,7 +57,7 @@ export const candidateService = {
   // HR
   async getVacancyCandidates(
     vacancyId: string,
-    params?: CandidateFilterParams,
+    params?: { status?: string; ordering?: string },
   ): Promise<Application[]> {
     const response = await apiClient.get<Application[]>(
       `/vacancies/${vacancyId}/candidates`,
@@ -89,5 +93,51 @@ export const candidateService = {
       { hr_notes: note },
     )
     return response.data
+  },
+
+  // Messaging
+  async getMessages(candidateId: string): Promise<Message[]> {
+    const response = await apiClient.get<Message[]>(
+      `/candidates/${candidateId}/messages`,
+    )
+    return response.data
+  },
+
+  async sendMessage(candidateId: string, content: string): Promise<Message> {
+    const response = await apiClient.post<Message>(
+      `/candidates/${candidateId}/messages`,
+      { content },
+    )
+    return response.data
+  },
+
+  // Email
+  async sendEmail(
+    candidateId: string,
+    payload: SendEmailPayload,
+  ): Promise<void> {
+    await apiClient.post(`/candidates/${candidateId}/email`, payload)
+  },
+
+  // Schedule human interview
+  async scheduleHumanInterview(
+    candidateId: string,
+    payload: ScheduleInterviewPayload,
+  ): Promise<void> {
+    await apiClient.post(
+      `/candidates/${candidateId}/schedule-interview`,
+      payload,
+    )
+  },
+
+  // Bulk actions
+  async bulkUpdateStatus(
+    applicationIds: string[],
+    status: ApplicationStatus,
+  ): Promise<void> {
+    await apiClient.patch('/candidates/bulk-status', {
+      application_ids: applicationIds,
+      status,
+    })
   },
 }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
@@ -7,8 +7,9 @@ import { useCandidateStore } from '../stores/candidate.store'
 import CandidateOverview from '../components/CandidateOverview.vue'
 import CvDataView from '../components/CvDataView.vue'
 import MatchScoreView from '../components/MatchScoreView.vue'
-import InterviewScoresPanel from '../components/InterviewScoresPanel.vue'
 import HRNotesPanel from '../components/HRNotesPanel.vue'
+import CandidateActions from '../components/CandidateActions.vue'
+import MessageThread from '../components/MessageThread.vue'
 import type { ApplicationStatus } from '../types/candidate.types'
 
 const route = useRoute()
@@ -16,6 +17,7 @@ const router = useRouter()
 const candidateStore = useCandidateStore()
 const candidateId = computed(() => route.params.id as string)
 const candidate = computed(() => candidateStore.currentCandidate)
+const activeTab = ref(0)
 
 onMounted(() => candidateStore.fetchCandidateDetail(candidateId.value))
 
@@ -31,6 +33,10 @@ function handleDownloadCv(): void {
   if (candidate.value?.cvFile) {
     window.open(candidate.value.cvFile, '_blank')
   }
+}
+
+function handleOpenMessages(): void {
+  activeTab.value = 4
 }
 </script>
 
@@ -57,7 +63,17 @@ function handleDownloadCv(): void {
     </div>
 
     <template v-else-if="candidate">
-      <TabView>
+      <CandidateActions
+        :candidate-id="candidate.id"
+        :candidate-name="candidate.candidateName"
+        :candidate-email="candidate.candidateEmail"
+        :current-status="candidate.status"
+        :loading="candidateStore.loading"
+        @status-change="handleStatusChange"
+        @open-messages="handleOpenMessages"
+      />
+
+      <TabView v-model:activeIndex="activeTab">
         <TabPanel header="Overview">
           <div class="py-4">
             <CandidateOverview
@@ -79,7 +95,6 @@ function handleDownloadCv(): void {
               :overall-score="candidate.matchScore"
               :match-details="candidate.matchDetails"
             />
-            <InterviewScoresPanel :candidate-id="candidateId" class="mt-6" />
           </div>
         </TabPanel>
         <TabPanel header="Notes">
@@ -89,6 +104,11 @@ function handleDownloadCv(): void {
               :loading="candidateStore.loading"
               @save="handleSaveNotes"
             />
+          </div>
+        </TabPanel>
+        <TabPanel header="Messages">
+          <div class="py-4">
+            <MessageThread :candidate-id="candidate.id" />
           </div>
         </TabPanel>
       </TabView>

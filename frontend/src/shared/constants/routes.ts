@@ -19,5 +19,5 @@ export const ROUTE_NAMES = {
   CANDIDATE_SCHEDULE: 'candidate-schedule',
   CANDIDATE_INTERVIEW: 'candidate-interview',
   INTERVIEW_CONFIRMATION: 'interview-confirmation',
-  INTERVIEW_OBSERVE: 'interview-observe',
+  NOTIFICATIONS: 'notifications',
 } as const

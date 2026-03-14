@@ -15,12 +15,6 @@ export const hrInterviewRoutes: RouteRecordRaw[] = [
     component: () => import('./pages/InterviewDetailPage.vue'),
     meta: { requiresAuth: true, roles: [USER_ROLES.ADMIN, USER_ROLES.HR] },
   },
-  {
-    path: '/interviews/:id/observe',
-    name: ROUTE_NAMES.INTERVIEW_OBSERVE,
-    component: () => import('./pages/ObserverPage.vue'),
-    meta: { requiresAuth: true, roles: [USER_ROLES.ADMIN, USER_ROLES.HR] },
-  },
 ]
 
 export const candidateInterviewRoutes: RouteRecordRaw[] = [
