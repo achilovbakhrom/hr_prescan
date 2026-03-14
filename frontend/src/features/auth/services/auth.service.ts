@@ -1,7 +1,9 @@
 import { apiClient } from '@/shared/api/client'
 import type {
+  AcceptInvitationRequest,
   LoginRequest,
   LoginResponse,
+  RegisterCompanyRequest,
   RegisterRequest,
   User,
 } from '../types/auth.types'
@@ -36,5 +38,13 @@ export const authService = {
   async getMe(): Promise<User> {
     const response = await apiClient.get<User>('/auth/me')
     return response.data
+  },
+
+  async acceptInvitation(data: AcceptInvitationRequest): Promise<void> {
+    await apiClient.post('/auth/accept-invitation', data)
+  },
+
+  async registerCompany(data: RegisterCompanyRequest): Promise<void> {
+    await apiClient.post('/auth/register-company', data)
   },
 }

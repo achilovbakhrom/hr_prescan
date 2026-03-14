@@ -33,7 +33,7 @@ function formatDateTime(dateStr: string): string {
       striped-rows
       row-hover
       class="cursor-pointer"
-      @row-click="(e: { data: UpcomingInterview }) => viewDetail(e.data)"
+      @row-click="(e) => viewDetail(e.data)"
     >
       <Column field="candidateName" header="Candidate" />
       <Column field="vacancyTitle" header="Vacancy" />

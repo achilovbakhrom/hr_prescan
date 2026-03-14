@@ -36,7 +36,7 @@ function formatDate(dateStr: string): string {
       striped-rows
       row-hover
       class="cursor-pointer"
-      @row-click="(e: { data: Application }) => viewDetail(e.data)"
+      @row-click="(e) => viewDetail(e.data)"
     >
       <Column field="vacancyTitle" header="Vacancy" sortable />
       <Column header="Status">

@@ -126,9 +126,23 @@ services:
     ports:
       - "7880:7880"
       - "7881:7881/udp"
-    volumes:
-      - ./livekit/livekit.yaml:/etc/livekit.yaml:ro
-    command: --config /etc/livekit.yaml
+    environment:
+      LIVEKIT_CONFIG: |
+        port: 7880
+        rtc:
+          tcp_port: 7881
+          port_range_start: 50000
+          port_range_end: 60000
+          use_external_ip: false
+        keys:
+          devkey: devsecret
+        logging:
+          level: info
+        room:
+          empty_timeout: 300
+          max_participants: 10
+        webhook:
+          urls: []
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:7880"]
       interval: 10s
@@ -161,8 +175,8 @@ services:
     image: minio/minio:latest
     command: server /data --console-address ":9001"
     environment:
-      MINIO_ROOT_USER: ${S3_ACCESS_KEY}
-      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY}
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
     volumes:
       - minio_data:/data
     healthcheck:

@@ -44,3 +44,21 @@ export interface LoginResponse {
   tokens: AuthTokens
   user: User
 }
+
+export interface AcceptInvitationRequest {
+  token: string
+  password: string
+  firstName: string
+  lastName: string
+}
+
+export interface RegisterCompanyRequest {
+  companyName: string
+  industry: string
+  size: CompanySize
+  country: string
+  adminEmail: string
+  adminPassword: string
+  adminFirstName: string
+  adminLastName: string
+}

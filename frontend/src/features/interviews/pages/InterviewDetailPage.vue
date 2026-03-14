@@ -103,22 +103,22 @@ async function handleWatchLive(): Promise<void> {
       </div>
 
       <TabView>
-        <TabPanel header="Scores">
+        <TabPanel value="0" header="Scores">
           <div class="py-4">
             <InterviewScoresView :scores="interview.scores" />
           </div>
         </TabPanel>
-        <TabPanel header="Transcript">
+        <TabPanel value="1" header="Transcript">
           <div class="py-4">
             <TranscriptView :transcript="interview.transcript" />
           </div>
         </TabPanel>
-        <TabPanel header="Integrity">
+        <TabPanel value="2" header="Integrity">
           <div class="py-4">
             <IntegrityFlagsView :flags="interview.integrityFlags" />
           </div>
         </TabPanel>
-        <TabPanel header="Recording">
+        <TabPanel value="3" header="Recording">
           <div class="py-4">
             <div
               v-if="interview.recordingPath"

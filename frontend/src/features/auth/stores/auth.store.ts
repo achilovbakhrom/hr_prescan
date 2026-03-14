@@ -2,9 +2,11 @@ import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { authService } from '../services/auth.service'
 import type {
+  AcceptInvitationRequest,
   User,
   AuthTokens,
   LoginRequest,
+  RegisterCompanyRequest,
   RegisterRequest,
 } from '../types/auth.types'
 
@@ -106,6 +108,34 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function acceptInvitation(data: AcceptInvitationRequest): Promise<void> {
+    loading.value = true
+    error.value = null
+    try {
+      await authService.acceptInvitation(data)
+    } catch (err: unknown) {
+      const message = extractErrorMessage(err)
+      error.value = message
+      throw new Error(message)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function registerCompany(data: RegisterCompanyRequest): Promise<void> {
+    loading.value = true
+    error.value = null
+    try {
+      await authService.registerCompany(data)
+    } catch (err: unknown) {
+      const message = extractErrorMessage(err)
+      error.value = message
+      throw new Error(message)
+    } finally {
+      loading.value = false
+    }
+  }
+
   async function initAuth(): Promise<void> {
     const stored = loadTokens()
     if (!stored?.access) {
@@ -126,6 +156,8 @@ export const useAuthStore = defineStore('auth', () => {
     register,
     logout,
     refreshAccessToken,
+    acceptInvitation,
+    registerCompany,
     fetchUser,
     initAuth,
   }

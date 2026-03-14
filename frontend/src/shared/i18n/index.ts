@@ -27,11 +27,13 @@ export const i18n = createI18n<[MessageSchema], 'en' | 'ru'>({
 })
 
 export function setLocale(locale: 'en' | 'ru'): void {
-  i18n.global.locale.value = locale
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ;(i18n.global.locale as any).value = locale
   localStorage.setItem(LOCALE_STORAGE_KEY, locale)
   document.documentElement.lang = locale
 }
 
 export function getLocale(): string {
-  return i18n.global.locale.value
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (i18n.global.locale as any).value ?? i18n.global.locale
 }

@@ -147,7 +147,7 @@ function handleBulkAction(event: { value: ApplicationStatus }): void {
       row-hover
       class="cursor-pointer"
       data-key="id"
-      @row-click="(e: { data: Application }) => viewDetail(e.data)"
+      @row-click="(e) => viewDetail(e.data)"
     >
       <Column selection-mode="multiple" header-style="width: 3rem" />
       <Column field="candidateName" header="Name" sortable />

@@ -99,14 +99,14 @@ async function handleUpdate(data: CreateVacancyRequest, publish: boolean): Promi
       </div>
 
       <TabView v-model:active-index="activeTab">
-        <TabPanel header="Overview">
+        <TabPanel value="0" header="Overview">
           <div class="space-y-4 py-4">
             <VacancyOverview :vacancy="vacancy" />
             <hr class="border-gray-200" />
             <VacancyForm :initial-data="editFormData" :loading="vacancyStore.loading" @save="handleUpdate" />
           </div>
         </TabPanel>
-        <TabPanel header="Questions">
+        <TabPanel value="1" header="Questions">
           <div class="py-4">
             <QuestionList
               :questions="vacancy.questions" :loading="vacancyStore.loading"
@@ -117,7 +117,7 @@ async function handleUpdate(data: CreateVacancyRequest, publish: boolean): Promi
             />
           </div>
         </TabPanel>
-        <TabPanel header="Criteria">
+        <TabPanel value="2" header="Criteria">
           <div class="py-4">
             <CriteriaList
               :criteria="vacancy.criteria" :loading="vacancyStore.loading"
@@ -127,7 +127,7 @@ async function handleUpdate(data: CreateVacancyRequest, publish: boolean): Promi
             />
           </div>
         </TabPanel>
-        <TabPanel header="Candidates">
+        <TabPanel value="3" header="Candidates">
           <div class="py-4">
             <div v-if="candidateStore.loading && candidateStore.candidates.length === 0" class="py-8 text-center">
               <i class="pi pi-spinner pi-spin text-2xl text-gray-400"></i>

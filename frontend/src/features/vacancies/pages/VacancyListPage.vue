@@ -72,7 +72,7 @@ function formatDate(dateStr: string): string {
       striped-rows
       row-hover
       class="cursor-pointer"
-      @row-click="(e: { data: { id: string } }) => navigateToDetail(e.data.id)"
+      @row-click="(e) => navigateToDetail(e.data.id)"
     >
       <Column field="title" header="Title" sortable />
       <Column field="status" header="Status" style="width: 130px" sortable>

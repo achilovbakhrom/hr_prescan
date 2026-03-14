@@ -74,7 +74,7 @@ function handleOpenMessages(): void {
       />
 
       <TabView v-model:activeIndex="activeTab">
-        <TabPanel header="Overview">
+        <TabPanel value="0" header="Overview">
           <div class="py-4">
             <CandidateOverview
               :candidate="candidate"
@@ -84,12 +84,12 @@ function handleOpenMessages(): void {
             />
           </div>
         </TabPanel>
-        <TabPanel header="CV Data">
+        <TabPanel value="1" header="CV Data">
           <div class="py-4">
             <CvDataView :data="candidate.cvParsedData" />
           </div>
         </TabPanel>
-        <TabPanel header="Match Analysis">
+        <TabPanel value="2" header="Match Analysis">
           <div class="py-4">
             <MatchScoreView
               :overall-score="candidate.matchScore"
@@ -97,7 +97,7 @@ function handleOpenMessages(): void {
             />
           </div>
         </TabPanel>
-        <TabPanel header="Notes">
+        <TabPanel value="3" header="Notes">
           <div class="py-4">
             <HRNotesPanel
               :notes="candidate.hrNotes"
@@ -106,7 +106,7 @@ function handleOpenMessages(): void {
             />
           </div>
         </TabPanel>
-        <TabPanel header="Messages">
+        <TabPanel value="4" header="Messages">
           <div class="py-4">
             <MessageThread :candidate-id="candidate.id" />
           </div>
