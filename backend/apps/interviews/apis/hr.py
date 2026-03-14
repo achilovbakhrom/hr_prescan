@@ -187,3 +187,84 @@ class ObserverTokenApi(APIView):
             },
             status=status.HTTP_200_OK,
         )
+
+
+class InterviewTranscriptApi(APIView):
+    """GET /api/hr/interviews/{id}/transcript/ — timestamped transcript."""
+
+    permission_classes = [IsHRManager | IsAdmin]
+
+    def get(self, request: Request, interview_id: str) -> Response:
+        company = request.user.company
+        if company is None:
+            return Response(
+                {"detail": "You are not associated with a company."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        interview = get_interview_by_id(
+            interview_id=interview_id, company=company,
+        )
+        if interview is None:
+            return Response(
+                {"detail": "Interview not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        if interview.status != Interview.Status.COMPLETED:
+            return Response(
+                {"detail": "Transcript is only available for completed interviews."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        return Response(
+            {
+                "interview_id": str(interview.id),
+                "transcript": interview.transcript,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+class InterviewRecordingApi(APIView):
+    """GET /api/hr/interviews/{id}/recording/ — recording path / presigned URL."""
+
+    permission_classes = [IsHRManager | IsAdmin]
+
+    def get(self, request: Request, interview_id: str) -> Response:
+        company = request.user.company
+        if company is None:
+            return Response(
+                {"detail": "You are not associated with a company."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        interview = get_interview_by_id(
+            interview_id=interview_id, company=company,
+        )
+        if interview is None:
+            return Response(
+                {"detail": "Interview not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        if interview.status != Interview.Status.COMPLETED:
+            return Response(
+                {"detail": "Recording is only available for completed interviews."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not interview.recording_path:
+            return Response(
+                {"detail": "No recording available for this interview."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        # TODO: Generate presigned URL from MinIO/S3 instead of raw path
+        return Response(
+            {
+                "interview_id": str(interview.id),
+                "recording_url": interview.recording_path,
+            },
+            status=status.HTTP_200_OK,
+        )

@@ -9,8 +9,6 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
-from celery.schedules import crontab
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -111,14 +109,6 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = "UTC"
 
-# Celery Beat schedule
-CELERY_BEAT_SCHEDULE = {
-    "check-upcoming-interviews": {
-        "task": "apps.interviews.tasks.check_upcoming_interviews",
-        "schedule": crontab(minute="*/15"),
-    },
-}
-
 # MinIO / S3 storage
 AWS_ACCESS_KEY_ID = os.environ.get("MINIO_ACCESS_KEY", "")
 AWS_SECRET_ACCESS_KEY = os.environ.get("MINIO_SECRET_KEY", "")
@@ -187,6 +177,3 @@ SIMPLE_JWT = {
     "USER_ID_FIELD": "id",
     "USER_ID_CLAIM": "user_id",
 }
-
-# Internal API key for LiveKit agent communication
-INTERNAL_API_KEY = os.environ.get("INTERNAL_API_KEY", "change-me-in-production")

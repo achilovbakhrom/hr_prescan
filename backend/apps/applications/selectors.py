@@ -1,6 +1,7 @@
+from decimal import Decimal
 from uuid import UUID
 
-from django.db.models import QuerySet
+from django.db.models import Q, QuerySet
 
 from apps.accounts.models import Company
 from apps.applications.models import Application
@@ -30,6 +31,51 @@ def get_vacancy_applications(
     )
     if status:
         qs = qs.filter(status=status)
+    return qs.order_by(ordering)
+
+
+def get_vacancy_applications_filtered(
+    *,
+    vacancy: Vacancy,
+    status: str | None = None,
+    min_score: Decimal | None = None,
+    max_score: Decimal | None = None,
+    ordering: str = "-created_at",
+    search: str | None = None,
+) -> QuerySet[Application]:
+    """Return filtered applications for a vacancy with score range and search."""
+    allowed_orderings = {
+        "-created_at",
+        "created_at",
+        "-match_score",
+        "match_score",
+        "-candidate_name",
+        "candidate_name",
+    }
+    if ordering not in allowed_orderings:
+        ordering = "-created_at"
+
+    qs = (
+        Application.objects
+        .filter(vacancy=vacancy)
+        .select_related("candidate")
+    )
+
+    if status:
+        qs = qs.filter(status=status)
+
+    if min_score is not None:
+        qs = qs.filter(match_score__gte=min_score)
+
+    if max_score is not None:
+        qs = qs.filter(match_score__lte=max_score)
+
+    if search:
+        qs = qs.filter(
+            Q(candidate_name__icontains=search)
+            | Q(candidate_email__icontains=search)
+        )
+
     return qs.order_by(ordering)
 
 
