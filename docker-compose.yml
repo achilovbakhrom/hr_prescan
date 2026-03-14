@@ -139,11 +139,11 @@ services:
       - livekit
     restart: unless-stopped
 
-  # --- LiveKit Agent (placeholder — will be built later) ---
+  # --- LiveKit Agent ---
   livekit-agent:
     build:
-      context: ./backend
-    command: echo "LiveKit Agent placeholder — will be implemented in a future phase"
+      context: ./livekit-agent
+    command: python agent.py start
     env_file:
       - .env
     depends_on:

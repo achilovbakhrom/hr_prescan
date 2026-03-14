@@ -73,7 +73,7 @@ services:
       - "9000:9000"
       - "9001:9001"
 
-  # LiveKit Agent placeholder with source mount
+  # LiveKit Agent with source mount for hot reload
   livekit-agent:
     volumes:
-      - ./backend:/app
+      - ./livekit-agent:/app
