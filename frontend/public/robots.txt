@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+Allow: /jobs
+Allow: /pricing
+
+Disallow: /dashboard
+Disallow: /vacancies
+Disallow: /candidates
+Disallow: /interviews
+Disallow: /notifications
+Disallow: /settings
+Disallow: /subscription
+Disallow: /admin
+Disallow: /team
+Disallow: /my-applications
+
+Sitemap: https://hrprescan.com/sitemap.xml

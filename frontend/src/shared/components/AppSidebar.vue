@@ -123,23 +123,33 @@ function handleNav(): void {
   <aside
     class="flex h-full flex-col border-r border-gray-200 bg-white transition-all duration-300"
     :class="collapsed ? 'w-0 overflow-hidden lg:w-16' : 'w-64'"
+    role="navigation"
+    aria-label="Main navigation"
+    :aria-expanded="!collapsed"
   >
-    <nav class="mt-4 flex flex-col gap-1 px-2">
-      <RouterLink
-        v-for="item in filteredItems"
-        :key="item.to"
-        :to="item.to"
-        class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors"
-        :class="
-          isActive(item.to)
-            ? 'bg-blue-50 text-blue-700'
-            : 'text-gray-700 hover:bg-gray-100'
-        "
-        @click="handleNav"
-      >
-        <i :class="item.icon" class="text-base"></i>
-        <span v-if="!collapsed" class="truncate">{{ item.label }}</span>
-      </RouterLink>
+    <nav
+      class="mt-4 flex flex-col gap-1 px-2"
+      aria-label="Application sections"
+    >
+      <ul class="flex flex-col gap-1" role="list">
+        <li v-for="item in filteredItems" :key="item.to" role="listitem">
+          <RouterLink
+            :to="item.to"
+            class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors"
+            :class="
+              isActive(item.to)
+                ? 'bg-blue-50 text-blue-700'
+                : 'text-gray-700 hover:bg-gray-100'
+            "
+            :aria-label="collapsed ? item.label : undefined"
+            :aria-current="isActive(item.to) ? 'page' : undefined"
+            @click="handleNav"
+          >
+            <i :class="item.icon" class="text-base" aria-hidden="true"></i>
+            <span v-if="!collapsed" class="truncate">{{ item.label }}</span>
+          </RouterLink>
+        </li>
+      </ul>
     </nav>
   </aside>
 </template>
