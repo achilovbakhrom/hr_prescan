@@ -2,12 +2,14 @@
 
 import logging
 import os
+import time
 
 from livekit.agents import VoicePipelineAgent
 from livekit.plugins import deepgram, elevenlabs, openai
 
 from context import fetch_interview_context
 from evaluator import evaluate_interview
+from integrity import IntegrityMonitor
 from prompt import build_system_prompt
 
 logger = logging.getLogger("interview-agent")
@@ -51,17 +53,37 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
     # Collect transcript entries during the interview
     transcript: list[dict] = []
 
+    # Initialise integrity monitor
+    monitor = IntegrityMonitor(interview_start_time=time.time())
+
     @agent.on("user_speech_committed")
     def _on_user_speech(text: str) -> None:
         transcript.append({"speaker": "candidate", "text": text})
+        # Feed transcript into integrity monitor for audio anomaly detection
+        monitor.add_transcript_entry(speaker="candidate", text=text)
 
     @agent.on("agent_speech_committed")
     def _on_agent_speech(text: str) -> None:
         transcript.append({"speaker": "interviewer", "text": text})
+        monitor.add_transcript_entry(speaker="interviewer", text=text)
+
+    @agent.on("agent_started")
+    def _on_started() -> None:
+        """Start integrity monitoring when the interview begins."""
+        monitor.start()
+        logger.info("Integrity monitoring started for interview %s.", context.interview_id)
 
     @agent.on("agent_stopped")
     async def _on_stopped() -> None:
-        """Triggered when the interview ends — evaluate and send results."""
+        """Triggered when the interview ends — stop monitoring, evaluate, send results."""
+        # Stop integrity monitor and collect flags
+        integrity_flags = await monitor.stop()
+        logger.info(
+            "Integrity monitoring stopped for interview %s. Flags: %d",
+            context.interview_id,
+            len(integrity_flags),
+        )
+
         if not transcript:
             logger.warning("Interview %s ended with empty transcript.", context.interview_id)
             return
@@ -76,6 +98,8 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
                 interview_id=context.interview_id,
                 transcript=transcript,
                 criteria=context.criteria,
+                cv_summary=context.cv_summary,
+                integrity_flags=integrity_flags,
             )
         except Exception:
             logger.exception(

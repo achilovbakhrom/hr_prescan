@@ -7,8 +7,13 @@ from apps.accounts.permissions import IsAdmin, IsHRManager
 from apps.applications.selectors import get_application_by_id
 from apps.common.exceptions import ApplicationError
 from apps.interviews.models import Interview
-from apps.interviews.selectors import get_company_interviews, get_interview_by_id
+from apps.interviews.selectors import (
+    get_company_interviews,
+    get_integrity_flags,
+    get_interview_by_id,
+)
 from apps.interviews.serializers import (
+    IntegrityFlagOutputSerializer,
     InterviewDetailOutputSerializer,
     InterviewOutputSerializer,
 )
@@ -310,6 +315,40 @@ class InterviewRecordingApi(APIView):
             {
                 "interview_id": str(interview.id),
                 "recording_url": interview.recording_path,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+class IntegrityFlagsApi(APIView):
+    """GET /api/hr/interviews/{id}/integrity-flags/
+
+    Returns all anti-cheating integrity flags detected during an interview.
+    Only available for HR managers and admins scoped to their company.
+    """
+
+    permission_classes = [IsHRManager | IsAdmin]
+
+    def get(self, request: Request, interview_id: str) -> Response:
+        company = request.user.company
+        if company is None:
+            return Response(
+                {"detail": "You are not associated with a company."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        flags = get_integrity_flags(interview_id=interview_id, company=company)
+        if flags is None:
+            return Response(
+                {"detail": "Interview not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        return Response(
+            {
+                "interview_id": str(interview_id),
+                "flags": IntegrityFlagOutputSerializer(flags, many=True).data,
+                "total_flags": flags.count(),
             },
             status=status.HTTP_200_OK,
         )

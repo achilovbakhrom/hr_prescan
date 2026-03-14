@@ -6,6 +6,7 @@ from apps.interviews.apis import (
     CandidateScheduleApi,
     HRInterviewDetailApi,
     HRInterviewListApi,
+    IntegrityFlagsApi,
     InterviewRecordingApi,
     InterviewTranscriptApi,
     ObserverTokenApi,
@@ -58,6 +59,11 @@ hr_interview_urlpatterns = [
         "<uuid:interview_id>/recording/",
         InterviewRecordingApi.as_view(),
         name="interview-recording",
+    ),
+    path(
+        "<uuid:interview_id>/integrity-flags/",
+        IntegrityFlagsApi.as_view(),
+        name="interview-integrity-flags",
     ),
 ]
 
