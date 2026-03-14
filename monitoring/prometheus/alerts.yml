@@ -1,0 +1,254 @@
+groups:
+  # -----------------------------------------------------------------------
+  # Application Alerts
+  # -----------------------------------------------------------------------
+  - name: application
+    interval: 30s
+    rules:
+      - alert: HighErrorRate
+        expr: |
+          rate(django_http_responses_total_by_status_total{status=~"5.."}[5m])
+          / rate(django_http_requests_total_by_method_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          team: backend
+        annotations:
+          summary: "High 5xx error rate on Django"
+          description: "5xx error rate is {{ $value | humanizePercentage }} over the last 5 minutes (threshold: 5%)."
+
+      - alert: HighLatencyP95
+        expr: |
+          histogram_quantile(0.95,
+            rate(django_http_requests_latency_seconds_by_view_method_bucket[5m])
+          ) > 2
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "High p95 request latency"
+          description: "p95 latency is {{ $value | humanizeDuration }} (threshold: 2s)."
+
+      - alert: HighLatencyP99
+        expr: |
+          histogram_quantile(0.99,
+            rate(django_http_requests_latency_seconds_by_view_method_bucket[5m])
+          ) > 5
+        for: 5m
+        labels:
+          severity: critical
+          team: backend
+        annotations:
+          summary: "Critical p99 request latency"
+          description: "p99 latency is {{ $value | humanizeDuration }} (threshold: 5s)."
+
+      - alert: ServiceDown
+        expr: up{job="django"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: backend
+        annotations:
+          summary: "Django service is down"
+          description: "The Django application ({{ $labels.instance }}) has been unreachable for > 1 minute."
+
+  # -----------------------------------------------------------------------
+  # Database Alerts
+  # -----------------------------------------------------------------------
+  - name: database
+    interval: 30s
+    rules:
+      - alert: PostgresConnectionExhaustion
+        expr: |
+          pg_stat_activity_count / pg_settings_max_connections > 0.80
+        for: 5m
+        labels:
+          severity: critical
+          team: backend
+        annotations:
+          summary: "PostgreSQL connection pool near exhaustion"
+          description: "{{ $value | humanizePercentage }} of max_connections in use (threshold: 80%)."
+
+      - alert: PostgresHighReplicationLag
+        expr: pg_replication_lag > 300
+        for: 5m
+        labels:
+          severity: warning
+          team: dba
+        annotations:
+          summary: "PostgreSQL replication lag is high"
+          description: "Replication lag is {{ $value | humanizeDuration }} (threshold: 5m)."
+
+      - alert: PostgresDown
+        expr: up{job="postgres"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: dba
+        annotations:
+          summary: "PostgreSQL is down"
+          description: "PostgreSQL ({{ $labels.instance }}) has been unreachable for > 1 minute."
+
+      - alert: PostgresDeadlocks
+        expr: rate(pg_stat_database_deadlocks{datname="hr_prescan"}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "Elevated PostgreSQL deadlock rate"
+          description: "Deadlock rate is {{ $value | humanize }}/s on hr_prescan database."
+
+  # -----------------------------------------------------------------------
+  # Queue / Celery Alerts
+  # -----------------------------------------------------------------------
+  - name: queue
+    interval: 30s
+    rules:
+      - alert: CeleryQueueBacklog
+        expr: celery_queue_length > 500
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "Celery queue backlog is growing"
+          description: "Queue '{{ $labels.queue }}' has {{ $value }} pending tasks (threshold: 500)."
+
+      - alert: CeleryQueueCriticalBacklog
+        expr: celery_queue_length > 2000
+        for: 5m
+        labels:
+          severity: critical
+          team: backend
+        annotations:
+          summary: "Celery queue critically backed up"
+          description: "Queue '{{ $labels.queue }}' has {{ $value }} pending tasks — workers may be stuck."
+
+      - alert: CeleryWorkerDown
+        expr: up{job="celery"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          team: backend
+        annotations:
+          summary: "Celery worker is down"
+          description: "No Celery workers have been reachable for > 2 minutes."
+
+  # -----------------------------------------------------------------------
+  # Infrastructure / Disk Alerts
+  # -----------------------------------------------------------------------
+  - name: infrastructure
+    interval: 60s
+    rules:
+      - alert: DiskSpaceLow
+        expr: |
+          (node_filesystem_size_bytes{mountpoint="/"} - node_filesystem_free_bytes{mountpoint="/"})
+          / node_filesystem_size_bytes{mountpoint="/"} > 0.80
+        for: 10m
+        labels:
+          severity: warning
+          team: devops
+        annotations:
+          summary: "Disk usage above 80%"
+          description: "{{ $labels.instance }} disk ({{ $labels.mountpoint }}) is {{ $value | humanizePercentage }} full."
+
+      - alert: DiskSpaceCritical
+        expr: |
+          (node_filesystem_size_bytes{mountpoint="/"} - node_filesystem_free_bytes{mountpoint="/"})
+          / node_filesystem_size_bytes{mountpoint="/"} > 0.90
+        for: 5m
+        labels:
+          severity: critical
+          team: devops
+        annotations:
+          summary: "Disk usage above 90% — immediate action required"
+          description: "{{ $labels.instance }} disk ({{ $labels.mountpoint }}) is {{ $value | humanizePercentage }} full."
+
+      - alert: HighMemoryUsage
+        expr: |
+          (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes)
+          / node_memory_MemTotal_bytes > 0.90
+        for: 10m
+        labels:
+          severity: warning
+          team: devops
+        annotations:
+          summary: "Host memory usage above 90%"
+          description: "{{ $labels.instance }} is using {{ $value | humanizePercentage }} of available memory."
+
+      - alert: HighCPUUsage
+        expr: |
+          1 - avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) by (instance) > 0.85
+        for: 10m
+        labels:
+          severity: warning
+          team: devops
+        annotations:
+          summary: "High CPU utilization"
+          description: "{{ $labels.instance }} CPU usage is {{ $value | humanizePercentage }} (threshold: 85%)."
+
+      - alert: ContainerMemoryLimit
+        expr: |
+          container_memory_usage_bytes{name=~".+"}
+          / container_spec_memory_limit_bytes{name=~".+"} > 0.90
+        for: 5m
+        labels:
+          severity: warning
+          team: devops
+        annotations:
+          summary: "Container approaching memory limit"
+          description: "Container {{ $labels.name }} is using {{ $value | humanizePercentage }} of its memory limit."
+
+  # -----------------------------------------------------------------------
+  # Redis Alerts
+  # -----------------------------------------------------------------------
+  - name: redis
+    interval: 30s
+    rules:
+      - alert: RedisDown
+        expr: up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: backend
+        annotations:
+          summary: "Redis is down"
+          description: "Redis ({{ $labels.instance }}) has been unreachable for > 1 minute."
+
+      - alert: RedisHighMemoryUsage
+        expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.85
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "Redis memory usage above 85%"
+          description: "Redis is using {{ $value | humanizePercentage }} of its configured maxmemory."
+
+  # -----------------------------------------------------------------------
+  # SSL Certificate Alerts
+  # -----------------------------------------------------------------------
+  - name: ssl
+    interval: 1h
+    rules:
+      - alert: SSLCertExpiringSoon
+        expr: probe_ssl_earliest_cert_expiry - time() < 86400 * 14
+        for: 1h
+        labels:
+          severity: warning
+          team: devops
+        annotations:
+          summary: "SSL certificate expiring within 14 days"
+          description: "Certificate for {{ $labels.instance }} expires in {{ $value | humanizeDuration }}."
+
+      - alert: SSLCertExpiryCritical
+        expr: probe_ssl_earliest_cert_expiry - time() < 86400 * 3
+        for: 1h
+        labels:
+          severity: critical
+          team: devops
+        annotations:
+          summary: "SSL certificate expiring within 3 days"
+          description: "Certificate for {{ $labels.instance }} expires in {{ $value | humanizeDuration }} — renew immediately."

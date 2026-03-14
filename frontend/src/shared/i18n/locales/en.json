@@ -1,0 +1,120 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "noData": "No data available",
+    "error": "An error occurred",
+    "success": "Success",
+    "required": "This field is required"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "vacancies": "Vacancies",
+    "candidates": "Candidates",
+    "interviews": "Interviews",
+    "notifications": "Notifications",
+    "settings": "Settings",
+    "subscription": "Subscription",
+    "team": "Team",
+    "browseJobs": "Browse Jobs",
+    "myApplications": "My Applications",
+    "admin": "Admin",
+    "signOut": "Sign Out"
+  },
+  "auth": {
+    "login": "Sign In",
+    "register": "Create Account",
+    "logout": "Sign Out",
+    "email": "Email address",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "companyName": "Company name"
+  },
+  "landing": {
+    "hero": {
+      "title": "AI-Powered Candidate Pre-Screening",
+      "subtitle": "Screen hundreds of candidates automatically with AI video interviews.",
+      "cta": "Start Free Trial",
+      "demo": "Watch Demo"
+    },
+    "features": {
+      "title": "Everything you need to hire smarter",
+      "aiInterviews": "AI-Powered Interviews",
+      "smartScoring": "Smart Scoring",
+      "antiCheating": "Anti-Cheating Protection",
+      "easyManagement": "Easy Management"
+    }
+  },
+  "errors": {
+    "notFound": "Page not found",
+    "notFoundDesc": "Sorry, we couldn't find the page you're looking for.",
+    "serverError": "Internal server error",
+    "serverErrorDesc": "Something went wrong on our end. Our team has been notified.",
+    "forbidden": "Access forbidden",
+    "forbiddenDesc": "You don't have permission to access this page.",
+    "goHome": "Go to Dashboard",
+    "goBack": "Go Back",
+    "tryAgain": "Try Again"
+  },
+  "cookies": {
+    "message": "We use cookies to enhance your experience, analyze site traffic, and serve personalized content. By clicking \"Accept\", you consent to our use of cookies.",
+    "accept": "Accept All",
+    "decline": "Decline",
+    "learnMore": "Privacy Policy"
+  },
+  "vacancies": {
+    "title": "Vacancies",
+    "create": "Create Vacancy",
+    "status": {
+      "draft": "Draft",
+      "active": "Active",
+      "paused": "Paused",
+      "closed": "Closed"
+    }
+  },
+  "candidates": {
+    "title": "Candidates",
+    "status": {
+      "applied": "Applied",
+      "screening": "Screening",
+      "shortlisted": "Shortlisted",
+      "rejected": "Rejected",
+      "hired": "Hired"
+    }
+  },
+  "interviews": {
+    "title": "Interviews",
+    "status": {
+      "scheduled": "Scheduled",
+      "inProgress": "In Progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "noNotifications": "No notifications yet"
+  },
+  "settings": {
+    "title": "Settings",
+    "profile": "Profile",
+    "company": "Company",
+    "language": "Language",
+    "theme": "Theme"
+  }
+}
