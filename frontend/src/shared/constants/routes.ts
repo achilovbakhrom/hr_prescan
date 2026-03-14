@@ -20,4 +20,13 @@ export const ROUTE_NAMES = {
   CANDIDATE_INTERVIEW: 'candidate-interview',
   INTERVIEW_CONFIRMATION: 'interview-confirmation',
   NOTIFICATIONS: 'notifications',
+  COMPANY_PROFILE: 'company-profile',
+  TEAM_MANAGEMENT: 'team-management',
+  PRICING: 'pricing',
+  SUBSCRIPTION: 'subscription',
+  ADMIN_DASHBOARD: 'admin-dashboard',
+  ADMIN_COMPANIES: 'admin-companies',
+  ADMIN_USERS: 'admin-users',
+  ADMIN_ANALYTICS: 'admin-analytics',
+  ADMIN_PLANS: 'admin-plans',
 } as const

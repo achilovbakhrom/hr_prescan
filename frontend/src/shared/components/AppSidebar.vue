@@ -31,21 +31,33 @@ const navItems: NavItem[] = [
     roles: [USER_ROLES.ADMIN, USER_ROLES.HR, USER_ROLES.CANDIDATE],
   },
   {
+    label: 'Admin Dashboard',
+    icon: 'pi pi-shield',
+    to: '/admin',
+    roles: [USER_ROLES.ADMIN],
+  },
+  {
     label: 'Companies',
     icon: 'pi pi-building',
-    to: '/companies',
+    to: '/admin/companies',
     roles: [USER_ROLES.ADMIN],
   },
   {
     label: 'Users',
     icon: 'pi pi-users',
-    to: '/users',
+    to: '/admin/users',
     roles: [USER_ROLES.ADMIN],
   },
   {
     label: 'Analytics',
     icon: 'pi pi-chart-bar',
-    to: '/analytics',
+    to: '/admin/analytics',
+    roles: [USER_ROLES.ADMIN],
+  },
+  {
+    label: 'Plans',
+    icon: 'pi pi-list',
+    to: '/admin/plans',
     roles: [USER_ROLES.ADMIN],
   },
   {
@@ -71,6 +83,12 @@ const navItems: NavItem[] = [
     icon: 'pi pi-users',
     to: '/team',
     roles: [USER_ROLES.HR],
+  },
+  {
+    label: 'Subscription',
+    icon: 'pi pi-credit-card',
+    to: '/subscription',
+    roles: [USER_ROLES.ADMIN],
   },
   {
     label: 'My Applications',

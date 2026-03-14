@@ -12,6 +12,12 @@ import {
   publicApplicationRoutes,
 } from '@/features/candidates/routes'
 import { notificationRoutes } from '@/features/notifications/routes'
+import { settingsRoutes } from '@/features/settings/routes'
+import {
+  subscriptionRoutes,
+  publicSubscriptionRoutes,
+} from '@/features/subscriptions/routes'
+import { adminRoutes } from '@/features/admin/routes'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { UserRole } from '@/features/auth/types/auth.types'
 
@@ -30,6 +36,7 @@ const routes: RouteRecordRaw[] = [
   ...authRoutes,
   ...publicVacancyRoutes,
   ...publicApplicationRoutes,
+  ...publicSubscriptionRoutes,
   {
     path: '/',
     component: () => import('@/shared/components/AppLayout.vue'),
@@ -39,6 +46,9 @@ const routes: RouteRecordRaw[] = [
       ...candidateRoutes,
       ...hrCandidateRoutes,
       ...notificationRoutes,
+      ...settingsRoutes,
+      ...subscriptionRoutes,
+      ...adminRoutes,
     ],
   },
 ]
