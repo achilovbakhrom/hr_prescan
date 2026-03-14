@@ -183,3 +183,37 @@ def calculate_match_score(*, application_id: UUID) -> None:
     application.save(
         update_fields=["match_score", "match_details", "updated_at"]
     )
+
+
+def bulk_update_status(
+    *,
+    application_ids: list[UUID],
+    status: str,
+    updated_by: User,
+) -> int:
+    """Update multiple applications to a new status. Returns count of updated records.
+
+    Only transitions that are valid per _STATUS_TRANSITIONS are applied;
+    applications that cannot transition are silently skipped.
+    """
+    applications = Application.objects.filter(
+        id__in=application_ids,
+        vacancy__company=updated_by.company,
+    ).select_related("vacancy")
+
+    updated = 0
+    for application in applications:
+        allowed = _STATUS_TRANSITIONS.get(application.status, set())
+        if status not in allowed:
+            continue
+
+        application.status = status
+        application.save(update_fields=["status", "updated_at"])
+
+        # Trigger notification
+        from apps.notifications.services import notify_status_changed
+
+        notify_status_changed(application=application)
+        updated += 1
+
+    return updated
