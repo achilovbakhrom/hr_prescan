@@ -1,7 +1,6 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { candidateService } from '../services/candidate.service'
-import type { CandidateFilterParams } from '../services/candidate.service'
 import type {
   Application,
   ApplicationDetail,
@@ -20,7 +19,7 @@ export const useCandidateStore = defineStore('candidate', () => {
   // HR actions
   async function fetchVacancyCandidates(
     vacancyId: string,
-    params?: CandidateFilterParams,
+    params?: { status?: string; ordering?: string },
   ): Promise<void> {
     loading.value = true
     error.value = null
@@ -136,6 +135,26 @@ export const useCandidateStore = defineStore('candidate', () => {
     }
   }
 
+  async function bulkUpdateStatus(
+    applicationIds: string[],
+    status: ApplicationStatus,
+  ): Promise<void> {
+    loading.value = true
+    error.value = null
+    try {
+      await candidateService.bulkUpdateStatus(applicationIds, status)
+      candidates.value = candidates.value.map((c: Application) =>
+        applicationIds.includes(c.id) ? { ...c, status } : c,
+      )
+    } catch (err: unknown) {
+      const message = extractErrorMessage(err)
+      error.value = message
+      throw new Error(message)
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     candidates,
     currentCandidate,
@@ -150,6 +169,7 @@ export const useCandidateStore = defineStore('candidate', () => {
     submitApplication,
     fetchMyApplications,
     fetchMyApplicationDetail,
+    bulkUpdateStatus,
   }
 })
 
