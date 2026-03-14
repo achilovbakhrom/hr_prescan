@@ -9,6 +9,7 @@ from apps.interviews.apis.hr import (
     InterviewRecordingApi,
     InterviewTranscriptApi,
     ObserverTokenApi,
+    ScheduleHumanInterviewApi,
     ScheduleInterviewApi,
 )
 
@@ -21,5 +22,6 @@ __all__ = [
     "InterviewRecordingApi",
     "InterviewTranscriptApi",
     "ObserverTokenApi",
+    "ScheduleHumanInterviewApi",
     "ScheduleInterviewApi",
 ]

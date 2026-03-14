@@ -12,7 +12,12 @@ from apps.interviews.serializers import (
     InterviewDetailOutputSerializer,
     InterviewOutputSerializer,
 )
-from apps.interviews.services import cancel_interview, generate_observer_token, schedule_interview
+from apps.interviews.services import (
+    cancel_interview,
+    generate_observer_token,
+    schedule_human_interview,
+    schedule_interview,
+)
 
 
 class ScheduleInterviewApi(APIView):
@@ -58,6 +63,46 @@ class ScheduleInterviewApi(APIView):
             InterviewDetailOutputSerializer(interview).data,
             status=status.HTTP_201_CREATED,
         )
+
+
+class ScheduleHumanInterviewApi(APIView):
+    """POST /api/hr/candidates/{application_id}/schedule-human-interview/"""
+
+    permission_classes = [IsHRManager | IsAdmin]
+
+    class InputSerializer(serializers.Serializer):
+        scheduled_at = serializers.DateTimeField()
+        interviewer_name = serializers.CharField(max_length=255)
+        meeting_link = serializers.URLField(required=False, default="", allow_blank=True)
+
+    def post(self, request: Request, application_id: str) -> Response:
+        company = request.user.company
+        if company is None:
+            return Response(
+                {"detail": "You are not associated with a company."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        application = get_application_by_id(
+            application_id=application_id, company=company,
+        )
+        if application is None:
+            return Response(
+                {"detail": "Application not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        serializer = self.InputSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        data = schedule_human_interview(
+            application=application,
+            scheduled_at=serializer.validated_data["scheduled_at"],
+            interviewer_name=serializer.validated_data["interviewer_name"],
+            meeting_link=serializer.validated_data.get("meeting_link", ""),
+        )
+
+        return Response(data, status=status.HTTP_201_CREATED)
 
 
 class HRInterviewListApi(APIView):

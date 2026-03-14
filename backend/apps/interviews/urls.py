@@ -9,6 +9,7 @@ from apps.interviews.apis import (
     InterviewRecordingApi,
     InterviewTranscriptApi,
     ObserverTokenApi,
+    ScheduleHumanInterviewApi,
     ScheduleInterviewApi,
 )
 
@@ -18,6 +19,11 @@ hr_candidate_urlpatterns = [
         "<uuid:application_id>/schedule-interview/",
         ScheduleInterviewApi.as_view(),
         name="schedule-interview",
+    ),
+    path(
+        "<uuid:application_id>/schedule-human-interview/",
+        ScheduleHumanInterviewApi.as_view(),
+        name="schedule-human-interview",
     ),
 ]
 

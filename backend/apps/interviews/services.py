@@ -177,3 +177,52 @@ def generate_observer_token(*, interview: Interview) -> str:
     STUB: Returns a placeholder token. Real implementation will use LiveKit SDK.
     """
     return f"observer-token-{interview.id}"
+
+
+def schedule_human_interview(
+    *,
+    application: Application,
+    scheduled_at: datetime,
+    interviewer_name: str,
+    meeting_link: str = "",
+) -> dict:
+    """Schedule a human (non-AI) interview for a candidate.
+
+    This does NOT create an Interview model instance (that is for AI interviews).
+    Instead it returns scheduling data and sends a notification to the candidate.
+    """
+    data = {
+        "application_id": str(application.id),
+        "candidate_name": application.candidate_name,
+        "candidate_email": application.candidate_email,
+        "vacancy_title": application.vacancy.title,
+        "scheduled_at": scheduled_at.isoformat(),
+        "interviewer_name": interviewer_name,
+        "meeting_link": meeting_link,
+    }
+
+    # Notify candidate
+    if application.candidate:
+        from apps.notifications.services import create_notification
+        from apps.notifications.models import Notification
+
+        create_notification(
+            user=application.candidate,
+            type=Notification.Type.INTERVIEW_SCHEDULED,
+            title="Human Interview Scheduled",
+            message=(
+                f"A follow-up interview for {application.vacancy.title} has been "
+                f"scheduled with {interviewer_name} on "
+                f"{scheduled_at.strftime('%b %d, %Y %H:%M UTC')}."
+            ),
+            data=data,
+        )
+
+    logger.info(
+        "Human interview scheduled for application %s with %s at %s",
+        application.id,
+        interviewer_name,
+        scheduled_at,
+    )
+
+    return data
