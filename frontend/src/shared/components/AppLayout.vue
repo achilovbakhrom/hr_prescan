@@ -2,15 +2,26 @@
 import { ref } from 'vue'
 import AppNavbar from './AppNavbar.vue'
 import AppSidebar from './AppSidebar.vue'
+import MobileNav from './MobileNav.vue'
 
 const sidebarCollapsed = ref(false)
+const mobileNavOpen = ref(false)
 
 function toggleSidebar(): void {
-  sidebarCollapsed.value = !sidebarCollapsed.value
+  // On mobile, toggle the mobile drawer; on desktop, collapse the sidebar
+  if (window.innerWidth < 1024) {
+    mobileNavOpen.value = !mobileNavOpen.value
+  } else {
+    sidebarCollapsed.value = !sidebarCollapsed.value
+  }
 }
 
 function closeSidebar(): void {
   sidebarCollapsed.value = true
+}
+
+function closeMobileNav(): void {
+  mobileNavOpen.value = false
 }
 </script>
 
@@ -22,25 +33,28 @@ function closeSidebar(): void {
     />
 
     <div class="flex flex-1 overflow-hidden">
-      <!-- Mobile overlay -->
+      <!-- Desktop overlay (collapsed sidebar backdrop) -->
       <div
         v-if="!sidebarCollapsed"
         class="fixed inset-0 z-20 bg-black/50 lg:hidden"
         @click="closeSidebar"
       ></div>
 
-      <!-- Sidebar -->
+      <!-- Desktop Sidebar -->
       <div
-        class="z-30 lg:relative lg:z-auto"
-        :class="!sidebarCollapsed ? 'fixed inset-y-16 left-0 lg:static' : ''"
+        class="hidden lg:relative lg:z-auto lg:flex"
+        :class="!sidebarCollapsed ? 'lg:static' : ''"
       >
         <AppSidebar :collapsed="sidebarCollapsed" @close="closeSidebar" />
       </div>
 
       <!-- Main content -->
-      <main class="flex-1 overflow-y-auto bg-gray-50">
+      <main class="flex-1 overflow-y-auto bg-gray-50" id="main-content">
         <RouterView />
       </main>
     </div>
+
+    <!-- Mobile slide-out navigation -->
+    <MobileNav :open="mobileNavOpen" @close="closeMobileNav" />
   </div>
 </template>
