@@ -32,11 +32,11 @@ class Company(models.Model):
 
     # Subscription fields
     subscription_plan = models.ForeignKey(
-        "self",  # placeholder — will be replaced with actual SubscriptionPlan model
+        "subscriptions.SubscriptionPlan",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="+",
+        related_name="companies",
     )
     subscription_status = models.CharField(
         max_length=20,
