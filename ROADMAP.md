@@ -164,20 +164,20 @@ Mark tasks with `[x]` as they are completed.
 
 **Goal:** HR can review AI scores, watch recordings, filter candidates.
 
-- [ ] 8.1 Interview results API (scores with AI notes per category, overall score)
-- [ ] 8.2 Interview transcript API (timestamped conversation)
-- [ ] 8.3 Interview recording playback (presigned URL from MinIO)
-- [ ] 8.4 Integrity flags API (anti-cheating flags per interview)
-- [ ] 8.5 HR dashboard API (active vacancies, recent interviews, key metrics)
-- [ ] 8.6 Candidate filtering/sorting API (by score range, category, status)
-- [ ] 8.7 HR notes API (add/edit notes on candidates)
-- [ ] 8.8 HR observer mode — generate observer token for live interview
-- [ ] 8.9 Frontend: HR dashboard page (vacancy cards, stats, recent activity)
-- [ ] 8.10 Frontend: candidate scores detail page (per-category scores, AI notes, integrity flags)
-- [ ] 8.11 Frontend: interview recording player
-- [ ] 8.12 Frontend: interview transcript viewer
-- [ ] 8.13 Frontend: candidate filtering/sorting controls
-- [ ] 8.14 Frontend: HR silent observer view (watch live interview)
+- [x] 8.1 Interview results API (scores with AI notes per category, overall score)
+- [x] 8.2 Interview transcript API (timestamped conversation)
+- [x] 8.3 Interview recording playback (presigned URL from MinIO)
+- [x] 8.4 Integrity flags API (anti-cheating flags per interview)
+- [x] 8.5 HR dashboard API (active vacancies, recent interviews, key metrics)
+- [x] 8.6 Candidate filtering/sorting API (by score range, category, status)
+- [x] 8.7 HR notes API (add/edit notes on candidates)
+- [x] 8.8 HR observer mode — generate observer token for live interview
+- [x] 8.9 Frontend: HR dashboard page (vacancy cards, stats, recent activity)
+- [x] 8.10 Frontend: candidate scores detail page (per-category scores, AI notes, integrity flags)
+- [x] 8.11 Frontend: interview recording player
+- [x] 8.12 Frontend: interview transcript viewer
+- [x] 8.13 Frontend: candidate filtering/sorting controls
+- [x] 8.14 Frontend: HR silent observer view (watch live interview)
 
 ---
 
