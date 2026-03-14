@@ -185,16 +185,16 @@ Mark tasks with `[x]` as they are completed.
 
 **Goal:** Email and in-app notifications for all events.
 
-- [ ] 9.1 Create `notifications` app — Notification model (user, type, title, message, data, is_read)
-- [ ] 9.2 Notification creation service (called by other services when events happen)
-- [ ] 9.3 Email notification templates (application received, interview scheduled, results ready, etc.)
-- [ ] 9.4 Celery tasks for sending emails (SMTP integration)
+- [x] 9.1 Create `notifications` app — Notification model (user, type, title, message, data, is_read)
+- [x] 9.2 Notification creation service (called by other services when events happen)
+- [x] 9.3 Email notification templates (application received, interview scheduled, results ready, etc.)
+- [x] 9.4 Celery tasks for sending emails (SMTP integration)
 - [ ] 9.5 SSE endpoint for real-time in-app notifications (Redis pub/sub)
-- [ ] 9.6 Notification list/mark-read API
-- [ ] 9.7 Frontend: notification bell with unread count
-- [ ] 9.8 Frontend: notification dropdown/panel
-- [ ] 9.9 Frontend: SSE composable (`useSSE`) for real-time updates
-- [ ] 9.10 Wire up notifications to all events (new application, interview completed, status change, etc.)
+- [x] 9.6 Notification list/mark-read API
+- [x] 9.7 Frontend: notification bell with unread count
+- [x] 9.8 Frontend: notification dropdown/panel
+- [x] 9.9 Frontend: SSE composable (`useSSE`) for real-time updates
+- [x] 9.10 Wire up notifications to all events (new application, interview completed, status change, etc.)
 
 ---
 
@@ -202,13 +202,13 @@ Mark tasks with `[x]` as they are completed.
 
 **Goal:** HR can take action on screened candidates.
 
-- [ ] 10.1 Schedule full (human) interview — create event, send invite to candidate
-- [ ] 10.2 Direct chat — messaging between HR and candidate within the platform
-- [ ] 10.3 Send email to candidate from platform
-- [ ] 10.4 Bulk actions (reject multiple, shortlist multiple)
-- [ ] 10.5 Frontend: action buttons on candidate detail page
-- [ ] 10.6 Frontend: chat interface (if direct chat is implemented)
-- [ ] 10.7 Frontend: bulk action controls on candidate list
+- [x] 10.1 Schedule full (human) interview — create event, send invite to candidate
+- [x] 10.2 Direct chat — messaging between HR and candidate within the platform
+- [x] 10.3 Send email to candidate from platform
+- [x] 10.4 Bulk actions (reject multiple, shortlist multiple)
+- [x] 10.5 Frontend: action buttons on candidate detail page
+- [x] 10.6 Frontend: chat interface (if direct chat is implemented)
+- [x] 10.7 Frontend: bulk action controls on candidate list
 
 ---
 
