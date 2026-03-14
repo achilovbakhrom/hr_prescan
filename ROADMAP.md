@@ -216,13 +216,13 @@ Mark tasks with `[x]` as they are completed.
 
 **Goal:** Companies choose plans with limits.
 
-- [ ] 11.1 Create `subscriptions` app — SubscriptionPlan model, CompanySubscription
-- [ ] 11.2 Plan limits enforcement (max vacancies, max interviews/month, max HRs)
-- [ ] 11.3 Quota checking in services (before creating vacancy, scheduling interview, inviting HR)
+- [x] 11.1 Create `subscriptions` app — SubscriptionPlan model, CompanySubscription
+- [x] 11.2 Plan limits enforcement (max vacancies, max interviews/month, max HRs)
+- [x] 11.3 Quota checking in services (before creating vacancy, scheduling interview, inviting HR)
 - [ ] 11.4 Stripe integration (checkout, webhooks, subscription management)
-- [ ] 11.5 Trial period logic
-- [ ] 11.6 Frontend: pricing page
-- [ ] 11.7 Frontend: subscription management page (current plan, upgrade, billing history)
+- [x] 11.5 Trial period logic
+- [x] 11.6 Frontend: pricing page
+- [x] 11.7 Frontend: subscription management page (current plan, upgrade, billing history)
 
 ---
 
@@ -230,14 +230,14 @@ Mark tasks with `[x]` as they are completed.
 
 **Goal:** Platform admin can manage companies, users, and system settings.
 
-- [ ] 12.1 Admin company management API (list, detail, activate/block)
-- [ ] 12.2 Admin user management API (list, detail, activate/block)
-- [ ] 12.3 Admin platform analytics API (total companies, users, interviews, revenue)
-- [ ] 12.4 Admin subscription plan management API
-- [ ] 12.5 Frontend: admin dashboard
-- [ ] 12.6 Frontend: admin company management page
-- [ ] 12.7 Frontend: admin user management page
-- [ ] 12.8 Frontend: admin analytics page
+- [x] 12.1 Admin company management API (list, detail, activate/block)
+- [x] 12.2 Admin user management API (list, detail, activate/block)
+- [x] 12.3 Admin platform analytics API (total companies, users, interviews, revenue)
+- [x] 12.4 Admin subscription plan management API
+- [x] 12.5 Frontend: admin dashboard
+- [x] 12.6 Frontend: admin company management page
+- [x] 12.7 Frontend: admin user management page
+- [x] 12.8 Frontend: admin analytics page
 
 ---
 
