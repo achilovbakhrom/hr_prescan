@@ -245,13 +245,13 @@ Mark tasks with `[x]` as they are completed.
 
 **Goal:** AI monitors candidate behavior during interview.
 
-- [ ] 13.1 Agent: face presence detection (flag if face disappears)
-- [ ] 13.2 Agent: multiple faces detection
-- [ ] 13.3 Agent: gaze deviation tracking
-- [ ] 13.4 Agent: audio anomaly detection (second voice)
-- [ ] 13.5 Agent: CV vs answer consistency checking
-- [ ] 13.6 Integrity report generation (flags with severity, included in results)
-- [ ] 13.7 Frontend: integrity flags display on candidate detail page
+- [x] 13.1 Agent: face presence detection (flag if face disappears)
+- [x] 13.2 Agent: multiple faces detection
+- [x] 13.3 Agent: gaze deviation tracking
+- [x] 13.4 Agent: audio anomaly detection (second voice)
+- [x] 13.5 Agent: CV vs answer consistency checking
+- [x] 13.6 Integrity report generation (flags with severity, included in results)
+- [x] 13.7 Frontend: integrity flags display on candidate detail page
 
 ---
 
@@ -259,19 +259,19 @@ Mark tasks with `[x]` as they are completed.
 
 **Goal:** Production-grade deployment, monitoring, backups.
 
-- [ ] 14.1 `docker-compose.prod.yml` with resource limits, restart policies
-- [ ] 14.2 SSL/TLS setup (Let's Encrypt + Certbot + Nginx)
-- [ ] 14.3 Network isolation (separate Docker networks per concern)
-- [ ] 14.4 Automated DB backup script (daily + pre-migration)
-- [ ] 14.5 Backup cron job setup
-- [ ] 14.6 Grafana dashboards (application, infrastructure, business metrics)
+- [x] 14.1 `docker-compose.prod.yml` with resource limits, restart policies
+- [x] 14.2 SSL/TLS setup (Let's Encrypt + Certbot + Nginx)
+- [x] 14.3 Network isolation (separate Docker networks per concern)
+- [x] 14.4 Automated DB backup script (daily + pre-migration)
+- [x] 14.5 Backup cron job setup
+- [x] 14.6 Grafana dashboards (application, infrastructure, business metrics)
 - [ ] 14.7 Prometheus alert rules
-- [ ] 14.8 OpenTelemetry instrumentation (Django, Celery, external API calls)
-- [ ] 14.9 Structured JSON logging with trace correlation
+- [x] 14.8 OpenTelemetry instrumentation (Django, Celery, external API calls)
+- [x] 14.9 Structured JSON logging with trace correlation
 - [ ] 14.10 CD pipeline (GitHub Actions → SSH deploy → rolling update)
 - [ ] 14.11 Smoke tests post-deploy
-- [ ] 14.12 Security review (CORS, CSRF, rate limiting, input sanitization)
-- [ ] 14.13 Performance review (N+1 queries, caching strategy, connection pooling)
+- [x] 14.12 Security review (CORS, CSRF, rate limiting, input sanitization)
+- [x] 14.13 Performance review (N+1 queries, caching strategy, connection pooling)
 
 ---
 
@@ -279,12 +279,12 @@ Mark tasks with `[x]` as they are completed.
 
 **Goal:** Final touches before going live.
 
-- [ ] 15.1 Landing page (hero, features, pricing, CTA)
-- [ ] 15.2 SEO optimization (meta tags, sitemap, robots.txt for public job board)
-- [ ] 15.3 Error pages (404, 500, 403)
-- [ ] 15.4 Loading states and skeleton screens
-- [ ] 15.5 Responsive design review
-- [ ] 15.6 Accessibility review (ARIA labels, keyboard navigation)
+- [x] 15.1 Landing page (hero, features, pricing, CTA)
+- [x] 15.2 SEO optimization (meta tags, sitemap, robots.txt for public job board)
+- [x] 15.3 Error pages (404, 500, 403)
+- [x] 15.4 Loading states and skeleton screens
+- [x] 15.5 Responsive design review
+- [x] 15.6 Accessibility review (ARIA labels, keyboard navigation)
 - [ ] 15.7 i18n setup (EN/RU for all UI text)
 - [ ] 15.8 GDPR compliance (data deletion request, privacy policy, cookie consent)
 - [ ] 15.9 Terms of service page
