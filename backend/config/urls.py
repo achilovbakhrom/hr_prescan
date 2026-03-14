@@ -7,6 +7,11 @@ from django.http import JsonResponse
 from django.urls import include, path
 
 from apps.accounts.urls import hr_urlpatterns
+from apps.common.urls_admin import admin_urlpatterns
+from apps.subscriptions.urls import (
+    hr_urlpatterns as subscription_hr_urlpatterns,
+    public_urlpatterns as subscription_public_urlpatterns,
+)
 from apps.applications.urls import (
     candidate_urlpatterns as application_candidate_urlpatterns,
     hr_candidate_urlpatterns as application_hr_candidate_urlpatterns,
@@ -53,4 +58,9 @@ urlpatterns = [
     path("api/candidate/", include((application_candidate_urlpatterns, "candidate"))),
     path("api/candidate/", include((interview_candidate_urlpatterns, "candidate-interviews"))),
     path("api/candidate/", include((notification_candidate_urlpatterns, "candidate-messages"))),
+    # Subscriptions
+    path("api/subscriptions/", include((subscription_public_urlpatterns, "subscriptions"))),
+    path("api/hr/subscription/", include((subscription_hr_urlpatterns, "hr-subscription"))),
+    # Admin panel
+    path("api/admin-panel/", include((admin_urlpatterns, "admin-panel"))),
 ]
