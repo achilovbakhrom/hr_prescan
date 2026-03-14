@@ -265,11 +265,11 @@ Mark tasks with `[x]` as they are completed.
 - [x] 14.4 Automated DB backup script (daily + pre-migration)
 - [x] 14.5 Backup cron job setup
 - [x] 14.6 Grafana dashboards (application, infrastructure, business metrics)
-- [ ] 14.7 Prometheus alert rules
+- [x] 14.7 Prometheus alert rules
 - [x] 14.8 OpenTelemetry instrumentation (Django, Celery, external API calls)
 - [x] 14.9 Structured JSON logging with trace correlation
-- [ ] 14.10 CD pipeline (GitHub Actions → SSH deploy → rolling update)
-- [ ] 14.11 Smoke tests post-deploy
+- [x] 14.10 CD pipeline (GitHub Actions → SSH deploy → rolling update)
+- [x] 14.11 Smoke tests post-deploy
 - [x] 14.12 Security review (CORS, CSRF, rate limiting, input sanitization)
 - [x] 14.13 Performance review (N+1 queries, caching strategy, connection pooling)
 
@@ -285,7 +285,7 @@ Mark tasks with `[x]` as they are completed.
 - [x] 15.4 Loading states and skeleton screens
 - [x] 15.5 Responsive design review
 - [x] 15.6 Accessibility review (ARIA labels, keyboard navigation)
-- [ ] 15.7 i18n setup (EN/RU for all UI text)
-- [ ] 15.8 GDPR compliance (data deletion request, privacy policy, cookie consent)
-- [ ] 15.9 Terms of service page
+- [x] 15.7 i18n setup (EN/RU for all UI text)
+- [x] 15.8 GDPR compliance (data deletion request, privacy policy, cookie consent)
+- [x] 15.9 Terms of service page
 - [ ] 15.10 Final end-to-end testing (full flow: register company → create vacancy → candidate applies → AI interview → HR reviews)
