@@ -18,6 +18,9 @@ import {
   publicSubscriptionRoutes,
 } from '@/features/subscriptions/routes'
 import { adminRoutes } from '@/features/admin/routes'
+import { landingRoutes } from '@/features/landing/routes'
+import { legalRoutes } from '@/features/legal/routes'
+import { errorRoutes } from '@/features/errors/routes'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { UserRole } from '@/features/auth/types/auth.types'
 
@@ -29,14 +32,21 @@ declare module 'vue-router' {
 }
 
 const routes: RouteRecordRaw[] = [
-  {
-    path: '/',
-    redirect: '/dashboard',
-  },
+  // Landing page (public, unauthenticated root)
+  ...landingRoutes,
+
+  // Auth routes
   ...authRoutes,
+
+  // Public routes (no auth required)
   ...publicVacancyRoutes,
   ...publicApplicationRoutes,
   ...publicSubscriptionRoutes,
+
+  // Legal pages (public)
+  ...legalRoutes,
+
+  // Authenticated app routes (layout wrapper)
   {
     path: '/',
     component: () => import('@/shared/components/AppLayout.vue'),
@@ -51,11 +61,18 @@ const routes: RouteRecordRaw[] = [
       ...adminRoutes,
     ],
   },
+
+  // Error pages — catch-all must be last
+  ...errorRoutes,
 ]
 
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
+  scrollBehavior(_to, _from, savedPosition) {
+    if (savedPosition) return savedPosition
+    return { top: 0 }
+  },
 })
 
 router.beforeEach(async (to) => {
@@ -66,6 +83,7 @@ router.beforeEach(async (to) => {
     await authStore.initAuth()
   }
 
+  // Pages that explicitly set requiresAuth: false skip the auth check
   const requiresAuth = to.meta.requiresAuth !== false
 
   if (requiresAuth && !authStore.isAuthenticated) {
@@ -82,7 +100,7 @@ router.beforeEach(async (to) => {
   const allowedRoles = to.meta.roles
   if (allowedRoles && authStore.user) {
     if (!allowedRoles.includes(authStore.user.role)) {
-      return { name: ROUTE_NAMES.DASHBOARD }
+      return { name: ROUTE_NAMES.FORBIDDEN }
     }
   }
 

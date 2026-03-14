@@ -1,7 +1,13 @@
 export const ROUTE_NAMES = {
+  // Landing
+  LANDING: 'landing',
+
+  // Auth
   LOGIN: 'login',
   REGISTER: 'register',
   VERIFY_EMAIL: 'verify-email',
+
+  // App
   DASHBOARD: 'dashboard',
   VACANCY_LIST: 'vacancy-list',
   VACANCY_CREATE: 'vacancy-create',
@@ -29,4 +35,13 @@ export const ROUTE_NAMES = {
   ADMIN_USERS: 'admin-users',
   ADMIN_ANALYTICS: 'admin-analytics',
   ADMIN_PLANS: 'admin-plans',
+
+  // Legal
+  PRIVACY_POLICY: 'privacy-policy',
+  TERMS_OF_SERVICE: 'terms-of-service',
+
+  // Errors
+  NOT_FOUND: 'not-found',
+  FORBIDDEN: 'forbidden',
+  SERVER_ERROR: 'server-error',
 } as const
