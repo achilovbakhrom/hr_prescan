@@ -7,7 +7,10 @@ from apps.applications.apis import (
     HRApplicationListApi,
     HRApplicationNotesApi,
     HRApplicationStatusApi,
+    HRBatchMoveApi,
+    HRBulkStatusApi,
     HRCvDownloadApi,
+    HRSoftDeleteApi,
     SubmitApplicationApi,
 )
 
@@ -42,10 +45,25 @@ hr_vacancy_urlpatterns = [
         HRApplicationListApi.as_view(),
         name="hr-application-list",
     ),
+    path(
+        "<uuid:vacancy_id>/candidates/batch-move/",
+        HRBatchMoveApi.as_view(),
+        name="hr-batch-move",
+    ),
 ]
 
 # Direct candidate endpoints: mounted at /api/hr/candidates/
 hr_candidate_urlpatterns = [
+    path(
+        "bulk-status/",
+        HRBulkStatusApi.as_view(),
+        name="hr-bulk-status",
+    ),
+    path(
+        "soft-delete/",
+        HRSoftDeleteApi.as_view(),
+        name="hr-soft-delete",
+    ),
     path(
         "<uuid:application_id>/",
         HRApplicationDetailApi.as_view(),

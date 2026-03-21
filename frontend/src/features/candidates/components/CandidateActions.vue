@@ -29,31 +29,79 @@ const statusOptions = computed(() => {
   const options: { label: string; value: ApplicationStatus }[] = []
   const s = props.currentStatus
 
-  if (s !== 'shortlisted') {
+  // Forward moves
+  if (s === 'applied') {
+    options.push({ label: 'Move to Prescanned', value: 'prescanned' })
+  }
+  if (s === 'prescanned') {
+    options.push({ label: 'Move to Interviewed', value: 'interviewed' })
+  }
+  if (s !== 'shortlisted' && s !== 'hired' && s !== 'archived') {
     options.push({ label: 'Shortlist', value: 'shortlisted' })
   }
-  if (s !== 'rejected') {
+  if (s !== 'hired' && s !== 'archived') {
+    options.push({ label: 'Hire', value: 'hired' })
+  }
+
+  // Reject (from any active status)
+  if (s !== 'rejected' && s !== 'hired' && s !== 'archived') {
     options.push({ label: 'Reject', value: 'rejected' })
   }
-  if (s !== 'applied' && s !== 'interview_in_progress') {
+
+  // Archive
+  if (s === 'rejected' || s === 'expired' || s === 'shortlisted' || s === 'hired') {
+    options.push({ label: 'Archive', value: 'archived' })
+  }
+
+  // Reset (from any non-applied, non-archived)
+  if (s !== 'applied' && s !== 'archived') {
     options.push({ label: 'Reset to Applied', value: 'applied' })
+  }
+
+  // Unarchive
+  if (s === 'archived') {
+    options.push({ label: 'Restore to Applied', value: 'applied' })
   }
 
   return options
 })
 
 const statusMessages: Record<string, { message: string; icon: string; acceptClass: string; acceptLabel: string }> = {
+  prescanned: {
+    message: 'This will mark the candidate as prescanned.',
+    icon: 'pi pi-check',
+    acceptClass: 'p-button-info',
+    acceptLabel: 'Yes, move',
+  },
+  interviewed: {
+    message: 'This will mark the candidate as interviewed.',
+    icon: 'pi pi-check',
+    acceptClass: 'p-button-info',
+    acceptLabel: 'Yes, move',
+  },
   shortlisted: {
-    message: 'This will move them to the next stage.',
+    message: 'This will move them to the shortlist.',
     icon: 'pi pi-check-circle',
     acceptClass: 'p-button-success',
     acceptLabel: 'Yes, shortlist',
   },
+  hired: {
+    message: 'This will mark the candidate as hired.',
+    icon: 'pi pi-check-circle',
+    acceptClass: 'p-button-success',
+    acceptLabel: 'Yes, hire',
+  },
   rejected: {
-    message: 'This will notify the candidate.',
+    message: 'This will reject the candidate.',
     icon: 'pi pi-exclamation-triangle',
     acceptClass: 'p-button-danger',
     acceptLabel: 'Yes, reject',
+  },
+  archived: {
+    message: 'This will archive the candidate. They can be restored later.',
+    icon: 'pi pi-inbox',
+    acceptClass: '',
+    acceptLabel: 'Yes, archive',
   },
   applied: {
     message: 'This will reset them back to the initial state.',
@@ -86,7 +134,7 @@ function handleStatusChange(event: { value: ApplicationStatus }): void {
 </script>
 
 <template>
-  <div class="flex flex-wrap items-center gap-2">
+  <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
     <Button
       label="Send Email"
       icon="pi pi-envelope"
@@ -109,7 +157,6 @@ function handleStatusChange(event: { value: ApplicationStatus }): void {
       option-label="label"
       option-value="value"
       placeholder="Change status"
-      class="w-44"
       :disabled="props.loading"
       @change="handleStatusChange"
     />

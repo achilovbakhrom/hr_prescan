@@ -11,12 +11,13 @@ const STATUS_CONFIG: Record<
   { label: string; severity: string }
 > = {
   applied: { label: 'Applied', severity: 'info' },
-  interview_in_progress: { label: 'Interview In Progress', severity: 'warn' },
-  interview_completed: { label: 'Interview Completed', severity: 'success' },
-  reviewing: { label: 'Reviewing', severity: 'warn' },
+  prescanned: { label: 'Prescanned', severity: 'info' },
+  interviewed: { label: 'Interviewed', severity: 'success' },
   shortlisted: { label: 'Shortlisted', severity: 'success' },
+  hired: { label: 'Hired', severity: 'success' },
   rejected: { label: 'Rejected', severity: 'danger' },
   expired: { label: 'Expired', severity: 'secondary' },
+  archived: { label: 'Archived', severity: 'secondary' },
 }
 </script>
 

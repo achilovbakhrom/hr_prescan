@@ -8,15 +8,27 @@ import type {
 const props = defineProps<{
   candidate: ApplicationDetail
   loading: boolean
+  prescanningScore?: number | null
   interviewScore?: number | null
   aiSummary?: string | null
 }>()
 
 const overallScore = computed(() => {
   const cv = props.candidate.matchScore
+  const ps = props.prescanningScore != null ? Math.round(props.prescanningScore * 10) : null
   const iv = props.interviewScore != null ? Math.round(props.interviewScore * 10) : null
+
+  // If all three available: 30% CV, 30% prescanning, 40% interview
+  if (cv != null && ps != null && iv != null) return Math.round(cv * 0.3 + ps * 0.3 + iv * 0.4)
+  // CV + prescanning: 40% CV, 60% prescanning
+  if (cv != null && ps != null) return Math.round(cv * 0.4 + ps * 0.6)
+  // CV + interview: 40% CV, 60% interview
   if (cv != null && iv != null) return Math.round(cv * 0.4 + iv * 0.6)
+  // Prescanning + interview: 40% prescanning, 60% interview
+  if (ps != null && iv != null) return Math.round(ps * 0.4 + iv * 0.6)
+  // Single scores
   if (iv != null) return iv
+  if (ps != null) return ps
   if (cv != null) return cv
   return null
 })
@@ -71,29 +83,51 @@ const recommendation = computed(() => {
       </div>
     </div>
 
+    <!-- CV Processing indicator -->
+    <div
+      v-if="props.candidate.cvFile && props.candidate.matchScore === null"
+      class="flex items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 p-3"
+    >
+      <i class="pi pi-spinner pi-spin text-blue-500"></i>
+      <div>
+        <p class="text-sm font-medium text-blue-800">CV is being analyzed...</p>
+        <p class="text-xs text-blue-600">Extracting skills, experience, and calculating match score. This takes about 20 seconds.</p>
+      </div>
+    </div>
+
     <!-- Scores -->
-    <div class="grid grid-cols-3 gap-3">
-      <div class="rounded-lg border border-gray-200 bg-gray-50 p-3 text-center">
-        <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">CV Match</p>
-        <p v-if="props.candidate.matchScore !== null" class="mt-1 text-lg font-bold" :class="scoreColor(props.candidate.matchScore)">
+    <div class="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
+      <div class="rounded-lg border border-gray-200 bg-gray-50 p-2 text-center sm:p-3">
+        <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide sm:text-[10px]">CV Match</p>
+        <p v-if="props.candidate.matchScore !== null" class="mt-0.5 text-base font-bold sm:mt-1 sm:text-lg" :class="scoreColor(props.candidate.matchScore)">
           {{ props.candidate.matchScore }}%
         </p>
-        <p v-else class="mt-1 text-lg text-gray-300">—</p>
+        <div v-else-if="props.candidate.cvFile" class="mt-1">
+          <i class="pi pi-spinner pi-spin text-sm text-blue-400"></i>
+        </div>
+        <p v-else class="mt-0.5 text-base text-gray-300 sm:mt-1 sm:text-lg">—</p>
       </div>
-      <div class="rounded-lg border border-gray-200 bg-gray-50 p-3 text-center">
-        <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Interview</p>
-        <p v-if="props.interviewScore != null" class="mt-1 text-lg font-bold" :class="scoreColor(props.interviewScore * 10)">
+      <div class="rounded-lg border border-gray-200 bg-gray-50 p-2 text-center sm:p-3">
+        <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide sm:text-[10px]">Prescanning</p>
+        <p v-if="props.prescanningScore != null" class="mt-0.5 text-base font-bold sm:mt-1 sm:text-lg" :class="scoreColor(props.prescanningScore * 10)">
+          {{ props.prescanningScore }}/10
+        </p>
+        <p v-else class="mt-0.5 text-base text-gray-300 sm:mt-1 sm:text-lg">—</p>
+      </div>
+      <div class="rounded-lg border border-gray-200 bg-gray-50 p-2 text-center sm:p-3">
+        <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide sm:text-[10px]">Interview</p>
+        <p v-if="props.interviewScore != null" class="mt-0.5 text-base font-bold sm:mt-1 sm:text-lg" :class="scoreColor(props.interviewScore * 10)">
           {{ props.interviewScore }}/10
         </p>
-        <p v-else class="mt-1 text-lg text-gray-300">—</p>
+        <p v-else class="mt-0.5 text-base text-gray-300 sm:mt-1 sm:text-lg">—</p>
       </div>
-      <div class="rounded-lg border-2 p-3 text-center" :class="overallScore !== null ? 'border-blue-200 bg-blue-50' : 'border-gray-200 bg-gray-50'">
-        <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Overall</p>
-        <p v-if="overallScore !== null" class="mt-1 text-lg font-bold" :class="scoreColor(overallScore)">
+      <div class="rounded-lg border-2 p-2 text-center sm:p-3" :class="overallScore !== null ? 'border-blue-200 bg-blue-50' : 'border-gray-200 bg-gray-50'">
+        <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide sm:text-[10px]">Overall</p>
+        <p v-if="overallScore !== null" class="mt-0.5 text-base font-bold sm:mt-1 sm:text-lg" :class="scoreColor(overallScore)">
           {{ overallScore }}%
         </p>
-        <p v-else class="mt-1 text-lg text-gray-300">—</p>
-        <p v-if="overallScore !== null" class="mt-0.5 text-[10px] text-gray-400">40% CV · 60% Interview</p>
+        <p v-else class="mt-0.5 text-base text-gray-300 sm:mt-1 sm:text-lg">—</p>
+        <p v-if="overallScore !== null" class="mt-0.5 hidden text-[10px] text-gray-400 sm:block">Combined score</p>
       </div>
     </div>
 

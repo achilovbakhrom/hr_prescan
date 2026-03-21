@@ -109,7 +109,7 @@ export const useVacancyStore = defineStore('vacancy', () => {
 
   async function addCriteria(
     vacancyId: string,
-    data: { name: string; description?: string; weight?: number },
+    data: { name: string; description?: string; weight?: number; step?: string },
   ): Promise<void> {
     try {
       const criteria = await vacancyService.addCriteria(vacancyId, data)
@@ -170,7 +170,7 @@ export const useVacancyStore = defineStore('vacancy', () => {
 
   async function addQuestion(
     vacancyId: string,
-    data: { text: string; category?: string },
+    data: { text: string; category?: string; step?: string },
   ): Promise<void> {
     try {
       const question = await vacancyService.addQuestion(vacancyId, data)

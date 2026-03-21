@@ -61,35 +61,47 @@ def generate_cv_download_url(*, cv_file_path: str, expiration: int = 3600) -> st
 # Valid status transitions: current_status -> set of allowed next statuses
 _STATUS_TRANSITIONS: dict[str, set[str]] = {
     Application.Status.APPLIED: {
-        Application.Status.INTERVIEW_IN_PROGRESS,
-        Application.Status.REVIEWING,
+        Application.Status.PRESCANNED,
+        Application.Status.SHORTLISTED,
+        Application.Status.HIRED,
         Application.Status.REJECTED,
+        Application.Status.ARCHIVED,
         Application.Status.EXPIRED,
     },
-    Application.Status.INTERVIEW_IN_PROGRESS: {
-        Application.Status.INTERVIEW_COMPLETED,
-        Application.Status.APPLIED,
-        Application.Status.REJECTED,
-    },
-    Application.Status.INTERVIEW_COMPLETED: {
-        Application.Status.APPLIED,
-        Application.Status.REVIEWING,
+    Application.Status.PRESCANNED: {
+        Application.Status.INTERVIEWED,
         Application.Status.SHORTLISTED,
+        Application.Status.HIRED,
         Application.Status.REJECTED,
-    },
-    Application.Status.REVIEWING: {
+        Application.Status.ARCHIVED,
         Application.Status.APPLIED,
+        Application.Status.EXPIRED,
+    },
+    Application.Status.INTERVIEWED: {
         Application.Status.SHORTLISTED,
+        Application.Status.HIRED,
         Application.Status.REJECTED,
+        Application.Status.ARCHIVED,
+        Application.Status.PRESCANNED,
     },
     Application.Status.SHORTLISTED: {
-        Application.Status.APPLIED,
+        Application.Status.HIRED,
         Application.Status.REJECTED,
+        Application.Status.ARCHIVED,
+        Application.Status.APPLIED,
+    },
+    Application.Status.HIRED: {
+        Application.Status.ARCHIVED,
     },
     Application.Status.REJECTED: {
         Application.Status.APPLIED,
+        Application.Status.ARCHIVED,
     },
     Application.Status.EXPIRED: {
+        Application.Status.APPLIED,
+        Application.Status.ARCHIVED,
+    },
+    Application.Status.ARCHIVED: {
         Application.Status.APPLIED,
     },
 }
@@ -107,8 +119,8 @@ def submit_application(
 ) -> dict:
     """Submit a new application to a vacancy.
 
-    Creates both the Application and a PENDING Interview record immediately.
-    Returns a dict with the application and interview info (including token).
+    Creates the Application and a PENDING prescanning session immediately.
+    Returns a dict with the application and prescanning session info.
     """
     try:
         vacancy = Vacancy.objects.get(id=vacancy_id)
@@ -140,23 +152,42 @@ def submit_application(
 
         transaction.on_commit(lambda: process_cv.delay(str(application.id)))
 
-    # Create Interview record immediately (AI is always available)
-    interview_kwargs: dict = {
-        "application": application,
-        "screening_mode": vacancy.screening_mode,
-        "status": Interview.Status.PENDING,
-    }
-    if vacancy.screening_mode == Interview.ScreeningMode.MEET:
-        interview_kwargs["duration_minutes"] = vacancy.interview_duration
-        interview_kwargs["livekit_room_name"] = f"interview-{application.id}"
-
-    interview = Interview.objects.create(**interview_kwargs)
+    # Create prescanning session immediately (always chat mode)
+    prescan_session = Interview.objects.create(
+        application=application,
+        session_type=Interview.SessionType.PRESCANNING,
+        screening_mode=Interview.ScreeningMode.CHAT,
+        status=Interview.Status.PENDING,
+    )
 
     return {
         "application": application,
-        "interview": interview,
-        "interview_token": str(interview.interview_token),
+        "prescan_session": prescan_session,
+        "prescan_token": str(prescan_session.interview_token),
     }
+
+
+def create_interview_session(*, application: Application) -> Interview | None:
+    """Create an interview session for a prescanned application.
+
+    Only creates if the vacancy has interview_enabled=True.
+    Returns the new Interview session or None if interview not enabled.
+    """
+    vacancy = application.vacancy
+    if not vacancy.interview_enabled:
+        return None
+
+    interview_kwargs: dict = {
+        "application": application,
+        "session_type": Interview.SessionType.INTERVIEW,
+        "screening_mode": vacancy.interview_mode,
+        "status": Interview.Status.PENDING,
+    }
+    if vacancy.interview_mode == Interview.ScreeningMode.MEET:
+        interview_kwargs["duration_minutes"] = vacancy.interview_duration
+        interview_kwargs["livekit_room_name"] = f"interview-{application.id}"
+
+    return Interview.objects.create(**interview_kwargs)
 
 
 def update_application_status(
@@ -165,7 +196,11 @@ def update_application_status(
     status: str,
     updated_by: User,
 ) -> Application:
-    """Update the status of an application with transition validation."""
+    """Update the status of an application with transition validation.
+
+    When resetting to Applied, cancels all existing sessions and creates
+    a fresh prescanning session (full pipeline restart).
+    """
     current = application.status
     allowed = _STATUS_TRANSITIONS.get(current, set())
 
@@ -174,9 +209,30 @@ def update_application_status(
             f"Cannot transition from '{current}' to '{status}'."
         )
 
+    # Reset to Applied = full pipeline restart
+    if status == Application.Status.APPLIED and current != Application.Status.APPLIED:
+        _reset_pipeline(application=application)
+
     application.status = status
     application.save(update_fields=["status", "updated_at"])
     return application
+
+
+def _reset_pipeline(*, application: Application) -> None:
+    """Cancel all existing sessions and create a fresh prescanning session."""
+    # Cancel all non-completed, non-cancelled sessions
+    active_sessions = application.sessions.exclude(
+        status__in=[Interview.Status.COMPLETED, Interview.Status.CANCELLED, Interview.Status.EXPIRED]
+    )
+    active_sessions.update(status=Interview.Status.CANCELLED)
+
+    # Create fresh prescanning session
+    Interview.objects.create(
+        application=application,
+        session_type=Interview.SessionType.PRESCANNING,
+        screening_mode=Interview.ScreeningMode.CHAT,
+        status=Interview.Status.PENDING,
+    )
 
 
 def add_hr_note(*, application: Application, note: str) -> Application:
@@ -387,6 +443,88 @@ def bulk_update_status(
         updated += 1
 
     return updated
+
+
+def soft_delete_applications(
+    *,
+    application_ids: list[UUID],
+    updated_by: User,
+) -> int:
+    """Soft-delete applications (clear from archive). Completely hidden from UI."""
+    return Application.objects.filter(
+        id__in=application_ids,
+        vacancy__company=updated_by.company,
+        status=Application.Status.ARCHIVED,
+    ).update(is_deleted=True)
+
+
+def bulk_move_by_filter(
+    *,
+    vacancy_id: UUID,
+    from_status: str,
+    to_status: str,
+    updated_by: User,
+    max_score: float | None = None,
+    min_score: float | None = None,
+    score_field: str = "match_score",
+    has_cv: bool | None = None,
+    days_since_applied: int | None = None,
+) -> int:
+    """Batch move candidates from one status to another with optional filters.
+
+    Args:
+        from_status: Source status to filter candidates.
+        to_status: Target status to move to.
+        max_score: Only include candidates with score < this value.
+        min_score: Only include candidates with score > this value.
+        score_field: Which score to filter by: match_score, prescanning_score, interview_score.
+        has_cv: Filter by whether candidate has a CV.
+        days_since_applied: Only include candidates applied more than X days ago.
+    """
+    from django.utils import timezone as tz
+    from datetime import timedelta
+
+    # Validate transition
+    allowed = _STATUS_TRANSITIONS.get(from_status, set())
+    if to_status not in allowed:
+        raise ApplicationError(f"Cannot transition from '{from_status}' to '{to_status}'.")
+
+    qs = Application.objects.filter(
+        vacancy_id=vacancy_id,
+        vacancy__company=updated_by.company,
+        status=from_status,
+        is_deleted=False,
+    )
+
+    # Score filters — for prescanning/interview scores, join through sessions
+    if score_field == "match_score":
+        if max_score is not None:
+            qs = qs.filter(match_score__lt=max_score)
+        if min_score is not None:
+            qs = qs.filter(match_score__gt=min_score)
+    elif score_field in ("prescanning_score", "interview_score"):
+        session_type = "prescanning" if score_field == "prescanning_score" else "interview"
+        session_filter = Q(
+            sessions__session_type=session_type,
+            sessions__status="completed",
+        )
+        if max_score is not None:
+            session_filter &= Q(sessions__overall_score__lt=max_score)
+        if min_score is not None:
+            session_filter &= Q(sessions__overall_score__gt=min_score)
+        qs = qs.filter(session_filter).distinct()
+
+    if has_cv is True:
+        qs = qs.exclude(cv_file="")
+    elif has_cv is False:
+        qs = qs.filter(cv_file="")
+
+    if days_since_applied is not None:
+        cutoff = tz.now() - timedelta(days=days_since_applied)
+        qs = qs.filter(created_at__lt=cutoff)
+
+    count = qs.update(status=to_status)
+    return count
 
 
 def bind_existing_applications(*, user: User) -> int:

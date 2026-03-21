@@ -7,7 +7,7 @@ from apps.common.models import BaseModel
 
 
 class Interview(BaseModel):
-    """AI interview session linked to an application."""
+    """AI screening session (prescanning or interview) linked to an application."""
 
     class Status(models.TextChoices):
         PENDING = "pending", "Pending"
@@ -20,15 +20,24 @@ class Interview(BaseModel):
         CHAT = "chat", "Chat"
         MEET = "meet", "Meet"
 
-    application = models.OneToOneField(
+    class SessionType(models.TextChoices):
+        PRESCANNING = "prescanning", "Prescanning"
+        INTERVIEW = "interview", "Interview"
+
+    application = models.ForeignKey(
         "applications.Application",
         on_delete=models.CASCADE,
-        related_name="interview",
+        related_name="sessions",
+    )
+    session_type = models.CharField(
+        max_length=15,
+        choices=SessionType.choices,
+        default=SessionType.PRESCANNING,
     )
     screening_mode = models.CharField(
         max_length=10,
         choices=ScreeningMode.choices,
-        default=ScreeningMode.MEET,  # Existing interviews were all meet mode
+        default=ScreeningMode.CHAT,
     )
     interview_token = models.UUIDField(unique=True, default=uuid.uuid4)
     duration_minutes = models.IntegerField(default=30)  # Meet mode only
@@ -58,7 +67,7 @@ class Interview(BaseModel):
         ordering = ["-created_at"]
 
     def __str__(self) -> str:
-        return f"Interview ({self.screening_mode}) for {self.application_id}"
+        return f"{self.session_type} ({self.screening_mode}) for {self.application_id}"
 
 
 class InterviewScore(BaseModel):

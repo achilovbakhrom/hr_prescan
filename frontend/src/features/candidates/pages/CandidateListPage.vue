@@ -6,6 +6,8 @@ import Column from 'primevue/column'
 import Dropdown from 'primevue/dropdown'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
+import IconField from 'primevue/iconfield'
+import InputIcon from 'primevue/inputicon'
 import ConfirmDialog from 'primevue/confirmdialog'
 import { useConfirm } from 'primevue/useconfirm'
 import { useCandidateStore } from '../stores/candidate.store'
@@ -31,8 +33,8 @@ let searchTimeout: ReturnType<typeof setTimeout> | null = null
 const statusOptions = [
   { label: 'All Statuses', value: undefined },
   { label: 'Applied', value: 'applied' },
-  { label: 'Interview In Progress', value: 'interview_in_progress' },
-  { label: 'Interview Completed', value: 'interview_completed' },
+  { label: 'Prescanned', value: 'prescanned' },
+  { label: 'Interviewed', value: 'interviewed' },
   { label: 'Shortlisted', value: 'shortlisted' },
   { label: 'Rejected', value: 'rejected' },
   { label: 'Expired', value: 'expired' },
@@ -118,13 +120,13 @@ function handleKanbanStatusChange(candidateId: string, status: ApplicationStatus
 <template>
   <div class="space-y-4">
     <!-- Header -->
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div class="flex items-center gap-3">
         <button class="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600" @click="router.back()">
           <i class="pi pi-arrow-left"></i>
         </button>
         <div>
-          <h1 class="text-xl font-bold text-gray-900">Candidate Pipeline</h1>
+          <h1 class="text-lg font-bold text-gray-900 md:text-xl">Candidate Pipeline</h1>
           <p class="text-sm text-gray-500">{{ candidateStore.candidates.length }} candidates</p>
         </div>
       </div>
@@ -154,15 +156,15 @@ function handleKanbanStatusChange(candidateId: string, status: ApplicationStatus
 
     <!-- Search (always visible) + Filters -->
     <div class="flex flex-wrap items-center gap-3">
-      <div class="relative w-64">
-        <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+      <IconField class="w-full sm:w-64">
+        <InputIcon class="pi pi-search" />
         <InputText
           v-model="searchQuery"
           placeholder="Search by name or email..."
-          class="w-full pl-9"
+          class="w-full"
           @input="onSearchInput"
         />
-      </div>
+      </IconField>
 
       <template v-if="viewMode === 'table'">
         <Dropdown
@@ -171,7 +173,7 @@ function handleKanbanStatusChange(candidateId: string, status: ApplicationStatus
           option-label="label"
           option-value="value"
           placeholder="Filter by status"
-          class="w-48"
+          class="w-full sm:w-48"
         />
         <Dropdown
           v-model="orderingFilter"
@@ -179,7 +181,7 @@ function handleKanbanStatusChange(candidateId: string, status: ApplicationStatus
           option-label="label"
           option-value="value"
           placeholder="Sort by"
-          class="w-48"
+          class="w-full sm:w-48"
         />
       </template>
 
@@ -191,7 +193,7 @@ function handleKanbanStatusChange(candidateId: string, status: ApplicationStatus
           option-label="label"
           option-value="value"
           placeholder="Bulk Actions"
-          class="w-40"
+          class="w-full sm:w-40"
           @change="handleBulkAction"
         />
       </div>

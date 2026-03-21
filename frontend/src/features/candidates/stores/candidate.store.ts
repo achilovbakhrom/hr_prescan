@@ -21,6 +21,7 @@ export const useCandidateStore = defineStore('candidate', () => {
     vacancyId: string,
     params?: { status?: string; ordering?: string; search?: string },
   ): Promise<void> {
+    candidates.value = []
     loading.value = true
     error.value = null
     try {

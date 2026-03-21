@@ -7,7 +7,10 @@ from apps.applications.apis.hr import (
     HRApplicationListApi,
     HRApplicationNotesApi,
     HRApplicationStatusApi,
+    HRBatchMoveApi,
+    HRBulkStatusApi,
     HRCvDownloadApi,
+    HRSoftDeleteApi,
 )
 from apps.applications.apis.public import SubmitApplicationApi
 
@@ -18,6 +21,9 @@ __all__ = [
     "HRApplicationListApi",
     "HRApplicationNotesApi",
     "HRApplicationStatusApi",
+    "HRBatchMoveApi",
+    "HRBulkStatusApi",
     "HRCvDownloadApi",
+    "HRSoftDeleteApi",
     "SubmitApplicationApi",
 ]

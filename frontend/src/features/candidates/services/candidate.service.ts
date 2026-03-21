@@ -132,8 +132,9 @@ export const candidateService = {
   },
 
   // Interview data for candidate
-  async getCandidateInterview(candidateId: string): Promise<Record<string, unknown>> {
-    const response = await apiClient.get(`/hr/candidates/${candidateId}/interview`)
+  async getCandidateInterview(candidateId: string, sessionType?: string): Promise<Record<string, unknown>> {
+    const params = sessionType ? { session_type: sessionType } : undefined
+    const response = await apiClient.get(`/hr/candidates/${candidateId}/interview`, { params })
     return response.data as Record<string, unknown>
   },
 
@@ -154,5 +155,42 @@ export const candidateService = {
       application_ids: applicationIds,
       status,
     })
+  },
+
+  // Filtered batch move
+  async batchMove(
+    vacancyId: string,
+    params: {
+      fromStatus: ApplicationStatus
+      toStatus: ApplicationStatus
+      maxScore?: number
+      minScore?: number
+      scoreField?: 'match_score' | 'prescanning_score' | 'interview_score'
+      hasCv?: boolean
+      daysSinceApplied?: number
+    },
+  ): Promise<{ moved: number }> {
+    const response = await apiClient.post<{ moved: number }>(
+      `/hr/vacancies/${vacancyId}/candidates/batch-move`,
+      {
+        from_status: params.fromStatus,
+        to_status: params.toStatus,
+        max_score: params.maxScore,
+        min_score: params.minScore,
+        score_field: params.scoreField,
+        has_cv: params.hasCv,
+        days_since_applied: params.daysSinceApplied,
+      },
+    )
+    return response.data
+  },
+
+  // Soft delete archived candidates
+  async softDelete(applicationIds: string[]): Promise<{ deleted: number }> {
+    const response = await apiClient.post<{ deleted: number }>(
+      '/hr/candidates/soft-delete',
+      { application_ids: applicationIds },
+    )
+    return response.data
   },
 }

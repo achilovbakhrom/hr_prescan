@@ -39,7 +39,7 @@ function closeMobileNav(): void {
       />
 
       <!-- Main content -->
-      <main class="flex-1 overflow-y-auto bg-gray-50 p-6 lg:p-8" id="main-content">
+      <main class="flex-1 overflow-y-auto bg-gray-50 p-3 sm:p-5 lg:p-8" id="main-content">
         <RouterView />
       </main>
     </div>

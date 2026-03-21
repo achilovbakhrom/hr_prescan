@@ -69,7 +69,7 @@ const pendingApplications = computed(() =>
 )
 const interviewedApplications = computed(() =>
   candidateStore.myApplications.filter((a) =>
-    ['interview_in_progress', 'interview_completed'].includes(a.status),
+    ['prescanned', 'interviewed'].includes(a.status),
   ).length,
 )
 
@@ -258,7 +258,7 @@ function goToInterview(interview: Interview): void {
     <!-- ==================== CANDIDATE DASHBOARD ==================== -->
     <template v-else-if="role === 'candidate'">
       <!-- Stats Cards -->
-      <div class="mb-8 grid grid-cols-3 gap-4">
+      <div class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div class="rounded-xl border border-gray-100 bg-white p-5">
           <div class="flex items-center justify-between">
             <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50">

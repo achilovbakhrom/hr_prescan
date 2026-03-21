@@ -38,7 +38,7 @@ export const vacancyService = {
     const statusToAction: Record<string, string> = {
       published: 'publish',
       paused: 'pause',
-      closed: 'close',
+      archived: 'archive',
     }
     const action = statusToAction[status]
     if (!action) throw new Error(`Invalid status transition: ${status}`)
@@ -59,7 +59,7 @@ export const vacancyService = {
 
   async addCriteria(
     vacancyId: string,
-    data: { name: string; description?: string; weight?: number },
+    data: { name: string; description?: string; weight?: number; step?: string },
   ): Promise<VacancyCriteria> {
     const response = await apiClient.post<VacancyCriteria>(
       `/hr/vacancies/${vacancyId}/criteria`,
@@ -94,7 +94,7 @@ export const vacancyService = {
 
   async addQuestion(
     vacancyId: string,
-    data: { text: string; category?: string },
+    data: { text: string; category?: string; step?: string },
   ): Promise<InterviewQuestion> {
     const response = await apiClient.post<InterviewQuestion>(
       `/hr/vacancies/${vacancyId}/questions`,

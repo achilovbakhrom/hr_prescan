@@ -73,10 +73,10 @@ class InterviewRoomJoinApi(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # If interview is still pending, check vacancy is not closed
+        # If interview is still pending, check vacancy is not archived
         if interview.status == Interview.Status.PENDING:
             vacancy = interview.application.vacancy
-            if vacancy.status == "closed":
+            if vacancy.status == "archived":
                 return Response(
                     {"detail": "This vacancy is no longer accepting interviews."},
                     status=status.HTTP_400_BAD_REQUEST,
@@ -94,6 +94,7 @@ class InterviewRoomJoinApi(APIView):
             "id": str(interview.id),
             "vacancy_title": interview.application.vacancy.title,
             "candidate_name": interview.application.candidate_name,
+            "session_type": interview.session_type,
             "screening_mode": interview.screening_mode,
             "started_at": interview.started_at.isoformat() if interview.started_at else None,
             "duration_minutes": interview.duration_minutes,

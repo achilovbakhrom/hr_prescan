@@ -56,30 +56,26 @@ const menuItems: MenuItem[] = [
 function toggleUserMenu(event: Event): void {
   userMenu.value?.toggle(event)
 }
+
+function handleMenuToggle(): void {
+  if (globalThis.innerWidth >= 1024) {
+    emit('toggleSidebar')
+  } else {
+    emit('toggleMobileNav')
+  }
+}
 </script>
 
 <template>
-  <header
-    class="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4"
-  >
+  <header class="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4">
     <div class="flex items-center gap-3">
-      <!-- Mobile nav toggle -->
+      <!-- Single menu toggle: mobile nav on small screens, sidebar on desktop -->
       <Button
         icon="pi pi-bars"
         text
         severity="secondary"
-        class="lg:hidden"
-        aria-label="Open menu"
-        @click="emit('toggleMobileNav')"
-      />
-      <!-- Desktop sidebar toggle -->
-      <Button
-        icon="pi pi-bars"
-        text
-        severity="secondary"
-        class="hidden lg:inline-flex"
-        aria-label="Toggle sidebar"
-        @click="emit('toggleSidebar')"
+        aria-label="Toggle menu"
+        @click="handleMenuToggle"
       />
       <RouterLink to="/" class="text-xl font-bold text-gray-900 hover:text-blue-600">
         HR PreScan
@@ -107,7 +103,11 @@ function toggleUserMenu(event: Event): void {
       >
         <template #icon>
           <i class="pi pi-envelope"></i>
-          <Badge :value="pendingInvitationsCount" severity="danger" class="absolute -right-1 -top-1" />
+          <Badge
+            :value="pendingInvitationsCount"
+            severity="danger"
+            class="absolute -right-1 -top-1"
+          />
         </template>
       </Button>
 
@@ -124,7 +124,8 @@ function toggleUserMenu(event: Event): void {
         <div
           class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-medium text-blue-700"
         >
-          {{ authStore.user?.firstName?.charAt(0) ?? '' }}{{ authStore.user?.lastName?.charAt(0) ?? '' }}
+          {{ authStore.user?.firstName?.charAt(0) ?? ''
+          }}{{ authStore.user?.lastName?.charAt(0) ?? '' }}
         </div>
         <span class="hidden text-sm font-medium text-gray-700 sm:inline">
           {{ authStore.user?.firstName }} {{ authStore.user?.lastName }}

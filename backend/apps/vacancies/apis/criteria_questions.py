@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.permissions import IsAdmin, IsHRManager
+from apps.vacancies.models import ScreeningStep
 from apps.vacancies.selectors import get_vacancy_by_id, get_vacancy_criteria, get_vacancy_questions
 from apps.vacancies.serializers import InterviewQuestionOutputSerializer, VacancyCriteriaOutputSerializer
 from apps.vacancies.services import (
@@ -19,7 +20,7 @@ from apps.vacancies.services import (
 
 class VacancyCriteriaListCreateApi(APIView):
     """
-    GET  /api/hr/vacancies/{id}/criteria/ — list criteria
+    GET  /api/hr/vacancies/{id}/criteria/?step=prescanning — list criteria
     POST /api/hr/vacancies/{id}/criteria/ — add criteria
     """
 
@@ -29,13 +30,19 @@ class VacancyCriteriaListCreateApi(APIView):
         name = serializers.CharField(max_length=255)
         description = serializers.CharField(required=False, allow_blank=True, default="")
         weight = serializers.IntegerField(required=False, default=1, min_value=1, max_value=5)
+        step = serializers.ChoiceField(
+            choices=ScreeningStep.choices,
+            required=False,
+            default=ScreeningStep.PRESCANNING,
+        )
 
     def get(self, request: Request, vacancy_id: str) -> Response:
         vacancy = get_vacancy_by_id(vacancy_id=vacancy_id, company=request.user.company)
         if vacancy is None:
             return Response({"detail": "Vacancy not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        criteria = get_vacancy_criteria(vacancy=vacancy)
+        step = request.query_params.get("step")
+        criteria = get_vacancy_criteria(vacancy=vacancy, step=step)
         return Response(
             VacancyCriteriaOutputSerializer(criteria, many=True).data,
             status=status.HTTP_200_OK,
@@ -103,7 +110,7 @@ class VacancyCriteriaDetailApi(APIView):
 
 class VacancyQuestionListCreateApi(APIView):
     """
-    GET  /api/hr/vacancies/{id}/questions/ — list questions
+    GET  /api/hr/vacancies/{id}/questions/?step=prescanning — list questions
     POST /api/hr/vacancies/{id}/questions/ — add question
     """
 
@@ -112,13 +119,19 @@ class VacancyQuestionListCreateApi(APIView):
     class InputSerializer(serializers.Serializer):
         text = serializers.CharField()
         category = serializers.CharField(max_length=100, required=False, allow_blank=True, default="")
+        step = serializers.ChoiceField(
+            choices=ScreeningStep.choices,
+            required=False,
+            default=ScreeningStep.PRESCANNING,
+        )
 
     def get(self, request: Request, vacancy_id: str) -> Response:
         vacancy = get_vacancy_by_id(vacancy_id=vacancy_id, company=request.user.company)
         if vacancy is None:
             return Response({"detail": "Vacancy not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        questions = get_vacancy_questions(vacancy=vacancy, active_only=False)
+        step = request.query_params.get("step")
+        questions = get_vacancy_questions(vacancy=vacancy, active_only=False, step=step)
         return Response(
             InterviewQuestionOutputSerializer(questions, many=True).data,
             status=status.HTTP_200_OK,
@@ -189,12 +202,23 @@ class GenerateQuestionsApi(APIView):
 
     permission_classes = [IsHRManager | IsAdmin]
 
+    class InputSerializer(serializers.Serializer):
+        step = serializers.ChoiceField(
+            choices=ScreeningStep.choices,
+            required=False,
+            default=ScreeningStep.PRESCANNING,
+        )
+
     def post(self, request: Request, vacancy_id: str) -> Response:
         vacancy = get_vacancy_by_id(vacancy_id=vacancy_id, company=request.user.company)
         if vacancy is None:
             return Response({"detail": "Vacancy not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        questions = generate_interview_questions(vacancy=vacancy)
+        serializer = self.InputSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        step = serializer.validated_data.get("step", ScreeningStep.PRESCANNING)
+        questions = generate_interview_questions(vacancy=vacancy, step=step)
         return Response(
             InterviewQuestionOutputSerializer(questions, many=True).data,
             status=status.HTTP_201_CREATED,

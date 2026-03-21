@@ -107,6 +107,18 @@ function contactHref(label: string, value: string): string | undefined {
     />
   </div>
 
+  <!-- CV Processing indicator -->
+  <div
+    v-if="props.cvFile && (props.matchScore === null || props.matchScore === undefined) && !hasData"
+    class="mb-4 flex items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4"
+  >
+    <i class="pi pi-spinner pi-spin text-lg text-blue-500"></i>
+    <div>
+      <p class="text-sm font-medium text-blue-800">Analyzing CV...</p>
+      <p class="text-xs text-blue-600">Extracting skills, experience, education and calculating match score.</p>
+    </div>
+  </div>
+
   <!-- CV Match Score -->
   <div v-if="props.matchScore !== null && props.matchScore !== undefined" class="mb-4 rounded-xl border border-gray-200 bg-white p-4">
     <div class="flex items-center gap-4">

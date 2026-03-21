@@ -17,7 +17,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.interviews.models import Interview
-from apps.interviews.services import complete_interview, create_integrity_flags, save_interview_scores
+from apps.interviews.services import complete_session, create_integrity_flags, save_interview_scores
 
 logger = logging.getLogger(__name__)
 
@@ -59,6 +59,11 @@ class _IntegrityFlagInputSerializer(serializers.Serializer):
 class _InterviewResultsInputSerializer(serializers.Serializer):
     overall_score = serializers.DecimalField(max_digits=4, decimal_places=2)
     ai_summary = serializers.CharField()
+    ai_decision = serializers.ChoiceField(
+        choices=["advance", "reject"],
+        required=False,
+        default="advance",
+    )
     transcript = serializers.ListField(child=serializers.DictField())
     scores = _InterviewScoreInputSerializer(many=True)
     integrity_flags = _IntegrityFlagInputSerializer(many=True, required=False, default=list)
@@ -101,17 +106,21 @@ class InternalInterviewContextApi(APIView):
         vacancy = interview.application.vacancy
         company = vacancy.company
 
-        # Gather questions
+        # Map session_type to step for filtering questions/criteria
+        step = interview.session_type  # "prescanning" or "interview"
+
+        # Gather questions filtered by step
         questions = list(
             vacancy.questions
-            .filter(is_active=True)
+            .filter(is_active=True, step=step)
             .order_by("order")
             .values("text", "category")
         )
 
-        # Gather criteria
+        # Gather criteria filtered by step
         criteria = list(
             vacancy.criteria
+            .filter(step=step)
             .order_by("order")
             .values("id", "name", "description", "weight")
         )
@@ -119,14 +128,24 @@ class InternalInterviewContextApi(APIView):
         for c in criteria:
             c["id"] = str(c["id"])
 
+        # Choose the appropriate prompt for this session type
+        custom_prompt = ""
+        if step == "prescanning":
+            custom_prompt = vacancy.prescanning_prompt or ""
+        elif step == "interview":
+            custom_prompt = vacancy.interview_prompt or ""
+
         data = {
             "interview_id": str(interview.id),
+            "session_type": interview.session_type,
+            "screening_mode": interview.screening_mode,
             "vacancy_title": vacancy.title,
             "company_name": company.name,
             "duration_minutes": interview.duration_minutes,
             "cv_summary": interview.application.cv_parsed_text or "No CV data available.",
             "questions": questions,
             "criteria": criteria,
+            "custom_prompt": custom_prompt,
         }
 
         return Response(data, status=status.HTTP_200_OK)
@@ -162,12 +181,13 @@ class InternalInterviewResultsApi(APIView):
         serializer.is_valid(raise_exception=True)
         validated = serializer.validated_data
 
-        # Complete the interview
-        complete_interview(
+        # Complete the session (prescanning or interview)
+        complete_session(
             interview=interview,
             overall_score=validated["overall_score"],
             ai_summary=validated["ai_summary"],
             transcript=validated["transcript"],
+            ai_decision=validated.get("ai_decision", "advance"),
         )
 
         # Save per-criteria scores

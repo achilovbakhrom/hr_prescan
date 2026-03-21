@@ -8,12 +8,13 @@ class Application(BaseModel):
 
     class Status(models.TextChoices):
         APPLIED = "applied", "Applied"
-        INTERVIEW_IN_PROGRESS = "interview_in_progress", "Interview In Progress"
-        INTERVIEW_COMPLETED = "interview_completed", "Interview Completed"
-        REVIEWING = "reviewing", "Reviewing"
+        PRESCANNED = "prescanned", "Prescanned"
+        INTERVIEWED = "interviewed", "Interviewed"
         SHORTLISTED = "shortlisted", "Shortlisted"
+        HIRED = "hired", "Hired"
         REJECTED = "rejected", "Rejected"
         EXPIRED = "expired", "Expired"
+        ARCHIVED = "archived", "Archived"
 
     vacancy = models.ForeignKey(
         "vacancies.Vacancy",
@@ -50,6 +51,7 @@ class Application(BaseModel):
         choices=Status.choices,
         default=Status.APPLIED,
     )
+    is_deleted = models.BooleanField(default=False)  # soft delete (cleared from archive)
     hr_notes = models.TextField(blank=True, default="")
 
     class Meta:

@@ -2,6 +2,8 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import InputText from 'primevue/inputtext'
+import IconField from 'primevue/iconfield'
+import InputIcon from 'primevue/inputicon'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
 import { vacancyService } from '../services/vacancy.service'
@@ -112,24 +114,24 @@ function formatRelativeDate(dateStr: string): string {
         <p class="mb-5 text-sm text-gray-500">{{ jobs.length }} open positions</p>
 
         <div class="flex gap-3">
-          <div class="relative flex-1">
-            <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400"></i>
+          <IconField class="flex-1">
+            <InputIcon class="pi pi-search" />
             <InputText
               v-model="search"
-              class="w-full pl-9"
+              class="w-full"
               placeholder="Job title, skill, or keyword..."
               @keyup.enter="fetchJobs"
             />
-          </div>
-          <div class="relative w-52">
-            <i class="pi pi-map-marker absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400"></i>
+          </IconField>
+          <IconField class="w-52">
+            <InputIcon class="pi pi-map-marker" />
             <InputText
               v-model="locationFilter"
-              class="w-full pl-9"
+              class="w-full"
               placeholder="Location..."
               @keyup.enter="fetchJobs"
             />
-          </div>
+          </IconField>
           <Button label="Search" icon="pi pi-search" :loading="loading" @click="fetchJobs" />
         </div>
       </div>

@@ -25,21 +25,20 @@ const errors = ref<Record<string, string>>({})
 
 // Post-submit state
 const step = ref<'form' | 'ready'>('form')
-const interviewToken = ref<string | null>(null)
-const screeningMode = ref<'chat' | 'meet'>('chat')
+const prescanToken = ref<string | null>(null)
 const linkCopied = ref(false)
 
 // Chat overlay state
 const showChatOverlay = ref(false)
 
-const interviewUrl = computed(() => {
-  if (!interviewToken.value) return ''
-  return `${window.location.origin}/interview/${interviewToken.value}`
+const prescanUrl = computed(() => {
+  if (!prescanToken.value) return ''
+  return `${window.location.origin}/interview/${prescanToken.value}`
 })
 
 const chatUrl = computed(() => {
-  if (!interviewToken.value) return ''
-  return `/interview/${interviewToken.value}/chat`
+  if (!prescanToken.value) return ''
+  return `/interview/${prescanToken.value}/chat`
 })
 
 onMounted(async () => {
@@ -78,30 +77,26 @@ async function handleSubmit(): Promise<void> {
       cvFile: cvFile.value ?? undefined,
     })
     const resp = application as unknown as Record<string, unknown>
-    interviewToken.value = (resp.interviewToken ?? resp.interview_token ?? null) as string | null
-    screeningMode.value = ((resp.screeningMode ?? resp.screening_mode ?? 'chat') as 'chat' | 'meet')
+    prescanToken.value = (resp.prescanToken ?? resp.prescan_token ?? resp.interviewToken ?? resp.interview_token ?? null) as string | null
     step.value = 'ready'
   } catch {
     /* store handles error */
   }
 }
 
-function startInterview(): void {
-  if (!interviewToken.value) return
-  if (screeningMode.value === 'chat') {
-    showChatOverlay.value = true
-  } else {
-    router.push({ name: ROUTE_NAMES.INTERVIEW_GATEWAY, params: { token: interviewToken.value } })
-  }
+function startPrescanning(): void {
+  if (!prescanToken.value) return
+  // Prescanning is always chat-based
+  showChatOverlay.value = true
 }
 
 function openInFullScreen(): void {
-  router.push({ name: ROUTE_NAMES.INTERVIEW_GATEWAY, params: { token: interviewToken.value! } })
+  router.push({ name: ROUTE_NAMES.INTERVIEW_GATEWAY, params: { token: prescanToken.value! } })
 }
 
 async function copyLink(): Promise<void> {
   try {
-    await navigator.clipboard.writeText(interviewUrl.value)
+    await navigator.clipboard.writeText(prescanUrl.value)
     linkCopied.value = true
     setTimeout(() => { linkCopied.value = false }, 2000)
   } catch {
@@ -132,27 +127,27 @@ async function copyLink(): Promise<void> {
             <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
               <i class="pi pi-comments text-3xl text-blue-600"></i>
             </div>
-            <h2 class="mb-2 text-xl font-bold text-gray-900">Your Interview is Ready</h2>
+            <h2 class="mb-2 text-xl font-bold text-gray-900">Your Prescanning is Ready</h2>
             <p class="mb-6 text-sm text-gray-500">
-              You can start your AI {{ screeningMode === 'chat' ? 'chat' : 'video' }} interview now,
+              You can start your AI prescanning chat now,
               or do it later using the link below.
             </p>
 
             <Button
-              label="Start Interview Now"
+              label="Start Prescanning Now"
               icon="pi pi-play"
               class="mb-4 w-full"
               size="large"
-              @click="startInterview"
+              @click="startPrescanning"
             />
 
             <div class="mb-6 rounded-lg border border-gray-200 bg-gray-50 p-3">
-              <label class="mb-1 block text-xs font-medium text-gray-500">Interview Link</label>
+              <label class="mb-1 block text-xs font-medium text-gray-500">Prescanning Link</label>
               <div class="flex items-center gap-2">
                 <input
                   type="text"
                   readonly
-                  :value="interviewUrl"
+                  :value="prescanUrl"
                   class="flex-1 rounded border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700"
                   @focus="($event.target as HTMLInputElement).select()"
                 />
@@ -168,7 +163,7 @@ async function copyLink(): Promise<void> {
 
             <p class="mb-4 text-sm text-gray-500">
               <i class="pi pi-envelope mr-1"></i>
-              We've also sent the interview link to your email.
+              We've also sent the prescanning link to your email.
             </p>
 
             <div class="rounded-lg border border-blue-100 bg-blue-50 p-4">
@@ -253,7 +248,7 @@ async function copyLink(): Promise<void> {
 
     <!-- Chat overlay -->
     <div
-      v-if="showChatOverlay && interviewToken"
+      v-if="showChatOverlay && prescanToken"
       class="fixed inset-0 z-50 flex flex-col bg-black/30 backdrop-blur-sm"
     >
       <div class="mx-auto mt-4 flex w-full max-w-3xl flex-1 flex-col overflow-hidden rounded-t-2xl bg-white shadow-2xl">
@@ -263,7 +258,7 @@ async function copyLink(): Promise<void> {
             <div class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600">
               <i class="pi pi-comments text-sm text-white"></i>
             </div>
-            <span class="text-sm font-medium text-gray-700">AI Interview</span>
+            <span class="text-sm font-medium text-gray-700">AI Prescanning</span>
           </div>
           <div class="flex items-center gap-1">
             <button
@@ -293,7 +288,7 @@ async function copyLink(): Promise<void> {
 
     <!-- Minimized chat bar (shown when overlay is closed but interview started) -->
     <div
-      v-if="!showChatOverlay && step === 'ready' && interviewToken && screeningMode === 'chat'"
+      v-if="!showChatOverlay && step === 'ready' && prescanToken"
       class="fixed bottom-0 left-0 right-0 z-40 cursor-pointer border-t border-gray-200 bg-white px-4 py-3 shadow-lg transition-all hover:bg-gray-50"
       @click="showChatOverlay = true"
     >
@@ -303,8 +298,8 @@ async function copyLink(): Promise<void> {
             <i class="pi pi-comments text-white"></i>
           </div>
           <div>
-            <p class="text-sm font-medium text-gray-900">AI Interview</p>
-            <p class="text-xs text-gray-500">Click to open interview chat</p>
+            <p class="text-sm font-medium text-gray-900">AI Prescanning</p>
+            <p class="text-xs text-gray-500">Click to open prescanning chat</p>
           </div>
         </div>
         <i class="pi pi-chevron-up text-gray-400"></i>

@@ -20,18 +20,21 @@ LIVEKIT_API_SECRET = os.environ.get("LIVEKIT_API_SECRET", "")
 
 
 def cancel_interview(*, interview: Interview) -> Interview:
-    """Cancel a pending or in-progress interview and revert application status."""
+    """Cancel a pending or in-progress session and revert application status."""
     if interview.status not in (Interview.Status.PENDING, Interview.Status.IN_PROGRESS):
         raise ApplicationError(
-            f"Cannot cancel interview with status '{interview.status}'."
+            f"Cannot cancel session with status '{interview.status}'."
         )
 
     interview.status = Interview.Status.CANCELLED
     interview.save(update_fields=["status", "updated_at"])
 
-    # Revert application status
+    # Revert application status based on session type
     application = interview.application
-    application.status = Application.Status.APPLIED
+    if interview.session_type == Interview.SessionType.PRESCANNING:
+        application.status = Application.Status.APPLIED
+    else:
+        application.status = Application.Status.PRESCANNED
     application.save(update_fields=["status", "updated_at"])
 
     return interview
@@ -84,55 +87,55 @@ def start_interview(*, interview: Interview) -> Interview:
 
     interview.save(update_fields=update_fields)
 
-    application = interview.application
-    application.status = Application.Status.INTERVIEW_IN_PROGRESS
-    application.save(update_fields=["status", "updated_at"])
+    # In-progress state is tracked on the session object only;
+    # application status remains at its current pipeline stage.
 
     return interview
 
 
 def reset_interview(*, interview: Interview) -> Interview:
-    """Reset an abandoned interview by creating a new one.
+    """Reset an abandoned session by creating a new one.
 
-    Validates interview is IN_PROGRESS or CANCELLED. Marks the old interview
-    as CANCELLED (if not already), creates a new Interview for the same
-    application with a fresh token, and resets application status to APPLIED.
+    Validates session is IN_PROGRESS or CANCELLED. Marks the old session
+    as CANCELLED (if not already), creates a new session for the same
+    application with a fresh token, preserving the session_type.
 
-    Returns the newly created Interview.
+    Returns the newly created session.
     """
     if interview.status not in (Interview.Status.IN_PROGRESS, Interview.Status.CANCELLED):
         raise ApplicationError(
-            f"Cannot reset interview with status '{interview.status}'."
+            f"Cannot reset session with status '{interview.status}'."
         )
 
     application = interview.application
 
-    # Mark old interview as cancelled
+    # Mark old session as cancelled
     if interview.status != Interview.Status.CANCELLED:
         interview.status = Interview.Status.CANCELLED
         interview.save(update_fields=["status", "updated_at"])
 
-    # Delete the old interview so the OneToOneField allows a new one
-    interview.delete()
-
-    # Create a fresh interview
-    interview_kwargs: dict = {
+    # Create a fresh session with the same session_type
+    session_kwargs: dict = {
         "application": application,
+        "session_type": interview.session_type,
         "screening_mode": interview.screening_mode,
         "interview_token": uuid.uuid4(),
         "status": Interview.Status.PENDING,
     }
     if interview.screening_mode == Interview.ScreeningMode.MEET:
-        interview_kwargs["duration_minutes"] = application.vacancy.interview_duration
-        interview_kwargs["livekit_room_name"] = f"interview-{application.id}"
+        session_kwargs["duration_minutes"] = application.vacancy.interview_duration
+        session_kwargs["livekit_room_name"] = f"interview-{application.id}"
 
-    new_interview = Interview.objects.create(**interview_kwargs)
+    new_session = Interview.objects.create(**session_kwargs)
 
-    # Reset application status
-    application.status = Application.Status.APPLIED
+    # Revert application status based on session type
+    if interview.session_type == Interview.SessionType.PRESCANNING:
+        application.status = Application.Status.APPLIED
+    else:
+        application.status = Application.Status.PRESCANNED
     application.save(update_fields=["status", "updated_at"])
 
-    return new_interview
+    return new_session
 
 
 def expire_interviews_for_vacancy(*, vacancy: Vacancy) -> int:
@@ -158,18 +161,23 @@ def expire_interviews_for_vacancy(*, vacancy: Vacancy) -> int:
     return count
 
 
-def complete_interview(
+def complete_session(
     *,
     interview: Interview,
     overall_score: Decimal,
     ai_summary: str,
     transcript: list,
     recording_path: str = "",
+    ai_decision: str = "advance",
 ) -> Interview:
-    """Mark an interview as completed with results."""
+    """Complete a screening session (prescanning or interview) with results.
+
+    Args:
+        ai_decision: "advance" to move candidate forward, "reject" to reject.
+    """
     if interview.status != Interview.Status.IN_PROGRESS:
         raise ApplicationError(
-            f"Cannot complete interview with status '{interview.status}'."
+            f"Cannot complete session with status '{interview.status}'."
         )
 
     interview.status = Interview.Status.COMPLETED
@@ -189,7 +197,22 @@ def complete_interview(
     )
 
     application = interview.application
-    application.status = Application.Status.INTERVIEW_COMPLETED
+
+    if interview.session_type == Interview.SessionType.PRESCANNING:
+        if ai_decision == "reject":
+            application.status = Application.Status.REJECTED
+        else:
+            application.status = Application.Status.PRESCANNED
+            # Auto-create interview session if vacancy has it enabled
+            from apps.applications.services import create_interview_session
+
+            create_interview_session(application=application)
+    elif interview.session_type == Interview.SessionType.INTERVIEW:
+        if ai_decision == "reject":
+            application.status = Application.Status.REJECTED
+        else:
+            application.status = Application.Status.INTERVIEWED
+
     application.save(update_fields=["status", "updated_at"])
 
     return interview

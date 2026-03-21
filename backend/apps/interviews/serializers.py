@@ -37,7 +37,7 @@ class IntegrityFlagOutputSerializer(serializers.ModelSerializer):
 
 
 class InterviewOutputSerializer(serializers.ModelSerializer):
-    """List serializer for interviews."""
+    """List serializer for sessions (prescanning and interview)."""
 
     candidate_name = serializers.SerializerMethodField()
     vacancy_title = serializers.SerializerMethodField()
@@ -49,6 +49,7 @@ class InterviewOutputSerializer(serializers.ModelSerializer):
             "application",
             "candidate_name",
             "vacancy_title",
+            "session_type",
             "screening_mode",
             "interview_token",
             "started_at",
@@ -83,6 +84,7 @@ class InterviewDetailOutputSerializer(serializers.ModelSerializer):
             "candidate_name",
             "candidate_email",
             "vacancy_title",
+            "session_type",
             "screening_mode",
             "interview_token",
             "started_at",
@@ -124,6 +126,7 @@ class CandidateInterviewOutputSerializer(serializers.ModelSerializer):
             "vacancy_title",
             "company_name",
             "interview_token",
+            "session_type",
             "screening_mode",
             "started_at",
             "duration_minutes",
@@ -142,7 +145,7 @@ class CandidateInterviewOutputSerializer(serializers.ModelSerializer):
 
 
 class PublicInterviewOutputSerializer(serializers.ModelSerializer):
-    """Public view for interview accessed by token — minimal info."""
+    """Public view for session accessed by token — minimal info."""
 
     vacancy_title = serializers.SerializerMethodField()
     company_name = serializers.SerializerMethodField()
@@ -154,6 +157,7 @@ class PublicInterviewOutputSerializer(serializers.ModelSerializer):
             "vacancy_title",
             "company_name",
             "interview_token",
+            "session_type",
             "screening_mode",
             "started_at",
             "duration_minutes",

@@ -17,32 +17,58 @@ import type { ApplicationStatus } from '../types/candidate.types'
 const route = useRoute()
 const router = useRouter()
 const candidateStore = useCandidateStore()
-const TAB_NAMES = ['overview', 'cv', 'interview', 'analysis', 'notes', 'messages'] as const
+const candidateId = computed(() => route.params.id as string)
+const candidate = computed(() => candidateStore.currentCandidate)
+const hasInterview = computed(() => candidate.value?.interviewEnabled ?? false)
+
+const tabNames = computed(() => {
+  const base = ['overview', 'cv', 'prescanning']
+  if (hasInterview.value) base.push('interview')
+  base.push('analysis', 'notes', 'messages')
+  return base
+})
 const activeTab = computed({
   get: () => {
     const tab = route.query.tab as string
-    const idx = TAB_NAMES.indexOf(tab as (typeof TAB_NAMES)[number])
+    const idx = tabNames.value.indexOf(tab)
     return idx >= 0 ? idx : 0
   },
   set: (val: number) => {
-    router.replace({ query: { ...route.query, tab: TAB_NAMES[val] } })
+    router.replace({ query: { ...route.query, tab: tabNames.value[val] } })
   },
 })
-const candidateId = computed(() => route.params.id as string)
-const candidate = computed(() => candidateStore.currentCandidate)
 
-// Interview score for badge
+const prescanningScore = ref<number | null>(null)
 const interviewScore = ref<number | null>(null)
 const aiSummary = ref<string | null>(null)
 
 onMounted(async () => {
   await candidateStore.fetchCandidateDetail(candidateId.value)
+  // Fetch prescanning interview data
   try {
-    const data = await candidateService.getCandidateInterview(candidateId.value) as Record<string, unknown>
-    interviewScore.value = (data.overallScore as number) ?? null
+    const data = (await candidateService.getCandidateInterview(
+      candidateId.value,
+      'prescanning',
+    )) as Record<string, unknown>
+    prescanningScore.value = (data.overallScore as number) ?? null
     aiSummary.value = (data.aiSummary as string) ?? null
   } catch {
-    // no interview yet
+    // no prescanning interview yet
+  }
+  // Fetch interview data if interview is enabled
+  if (candidate.value?.interviewEnabled) {
+    try {
+      const data = (await candidateService.getCandidateInterview(
+        candidateId.value,
+        'interview',
+      )) as Record<string, unknown>
+      interviewScore.value = (data.overallScore as number) ?? null
+      if (!aiSummary.value) {
+        aiSummary.value = (data.aiSummary as string) ?? null
+      }
+    } catch {
+      // no interview yet
+    }
   }
 })
 
@@ -75,14 +101,23 @@ function formatScore(score: number | null | undefined): string {
 </script>
 
 <template>
-  <div class="space-y-4">
-    <div class="flex items-center gap-3">
-      <button class="text-gray-500 hover:text-gray-700" @click="router.back()">
-        <i class="pi pi-arrow-left text-lg"></i>
+  <div class="space-y-3 sm:space-y-4">
+    <!-- Header -->
+    <div class="flex items-center gap-2 sm:gap-3">
+      <button
+        class="shrink-0 rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+        @click="router.back()"
+      >
+        <i class="pi pi-arrow-left"></i>
       </button>
-      <h1 class="text-2xl font-bold">
-        {{ candidate?.candidateName ?? 'Loading...' }}
-      </h1>
+      <div class="min-w-0 flex-1">
+        <h1 class="truncate text-base font-bold sm:text-lg md:text-2xl">
+          {{ candidate?.candidateName ?? 'Loading...' }}
+        </h1>
+        <p v-if="candidate" class="truncate text-xs text-gray-500 sm:text-sm">
+          {{ candidate.vacancyTitle }}
+        </p>
+      </div>
     </div>
 
     <p v-if="candidateStore.error" class="text-sm text-red-600">
@@ -105,12 +140,16 @@ function formatScore(score: number | null | undefined): string {
         @open-messages="handleOpenMessages"
       />
 
-      <TabView v-model:activeIndex="activeTab">
-        <TabPanel value="0" header="Overview">
-          <div class="py-4">
+      <TabView v-model:activeIndex="activeTab" scrollable>
+        <TabPanel value="0">
+          <template #header>
+            <span class="text-xs sm:text-sm">Overview</span>
+          </template>
+          <div class="py-3 sm:py-4">
             <CandidateOverview
               :candidate="candidate"
               :loading="candidateStore.loading"
+              :prescanning-score="prescanningScore"
               :interview-score="interviewScore"
               :ai-summary="aiSummary"
             />
@@ -119,10 +158,10 @@ function formatScore(score: number | null | undefined): string {
 
         <TabPanel value="1">
           <template #header>
-            <span>CV Data</span>
+            <span class="text-xs sm:text-sm">CV</span>
             <span
               v-if="candidate.matchScore !== null"
-              class="ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-bold text-white"
+              class="ml-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold text-white sm:h-5 sm:min-w-5 sm:px-1.5 sm:text-[10px]"
               :class="
                 candidate.matchScore >= 70
                   ? 'bg-green-500'
@@ -133,7 +172,7 @@ function formatScore(score: number | null | undefined): string {
               >{{ formatScore(candidate.matchScore) }}%</span
             >
           </template>
-          <div class="py-4">
+          <div class="py-3 sm:py-4">
             <CvDataView
               :data="candidate.cvParsedData as Record<string, unknown>"
               :cv-file="candidate.cvFile"
@@ -147,10 +186,31 @@ function formatScore(score: number | null | undefined): string {
 
         <TabPanel value="2">
           <template #header>
-            <span>Interview</span>
+            <span class="text-xs sm:text-sm">Prescanning</span>
+            <span
+              v-if="prescanningScore !== null"
+              class="ml-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold text-white sm:h-5 sm:min-w-5 sm:px-1.5 sm:text-[10px]"
+              :class="
+                prescanningScore >= 7
+                  ? 'bg-green-500'
+                  : prescanningScore >= 5
+                    ? 'bg-yellow-500'
+                    : 'bg-red-500'
+              "
+              >{{ formatScore(prescanningScore) }}/10</span
+            >
+          </template>
+          <div class="py-3 sm:py-4">
+            <InterviewReviewPanel :candidate-id="candidate.id" session-type="prescanning" />
+          </div>
+        </TabPanel>
+
+        <TabPanel v-if="hasInterview" value="3">
+          <template #header>
+            <span class="text-xs sm:text-sm">Interview</span>
             <span
               v-if="interviewScore !== null"
-              class="ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-bold text-white"
+              class="ml-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold text-white sm:h-5 sm:min-w-5 sm:px-1.5 sm:text-[10px]"
               :class="
                 interviewScore >= 7
                   ? 'bg-green-500'
@@ -161,23 +221,30 @@ function formatScore(score: number | null | undefined): string {
               >{{ formatScore(interviewScore) }}/10</span
             >
           </template>
-          <div class="py-4">
-            <InterviewReviewPanel :candidate-id="candidate.id" />
+          <div class="py-3 sm:py-4">
+            <InterviewReviewPanel :candidate-id="candidate.id" session-type="interview" />
           </div>
         </TabPanel>
 
-        <TabPanel value="3" header="Analysis">
-          <div class="py-4">
+        <TabPanel :value="String(hasInterview ? 4 : 3)">
+          <template #header>
+            <span class="text-xs sm:text-sm">Analysis</span>
+          </template>
+          <div class="py-3 sm:py-4">
             <MatchScoreView
               :overall-score="candidate.matchScore"
               :match-details="candidate.matchDetails"
+              :prescanning-score="prescanningScore"
               :interview-score="interviewScore"
             />
           </div>
         </TabPanel>
 
-        <TabPanel value="4" header="Notes">
-          <div class="py-4">
+        <TabPanel :value="String(hasInterview ? 5 : 4)">
+          <template #header>
+            <span class="text-xs sm:text-sm">Notes</span>
+          </template>
+          <div class="py-3 sm:py-4">
             <HRNotesPanel
               :notes="candidate.hrNotes"
               :loading="candidateStore.loading"
@@ -185,8 +252,12 @@ function formatScore(score: number | null | undefined): string {
             />
           </div>
         </TabPanel>
-        <TabPanel value="5" header="Messages">
-          <div class="py-4">
+
+        <TabPanel :value="String(hasInterview ? 6 : 5)">
+          <template #header>
+            <span class="text-xs sm:text-sm">Messages</span>
+          </template>
+          <div class="py-3 sm:py-4">
             <MessageThread :candidate-id="candidate.id" />
           </div>
         </TabPanel>
@@ -196,22 +267,30 @@ function formatScore(score: number | null | undefined): string {
 </template>
 
 <style scoped>
-/* Keep white background on panels, remove only side/bottom borders */
 :deep(.p-tabview-panels) {
   border-top: none !important;
   background: white !important;
   border-radius: 0 0 0.5rem 0.5rem !important;
 }
 
-/* Clean up tab list */
 :deep(.p-tabview-tablist) {
   border-width: 0 0 1px 0 !important;
   border-color: #e5e7eb !important;
 }
 
-/* Remove bottom border from tab header links */
 :deep(.p-tabview-tab-header) {
   border-bottom: none !important;
   border: none !important;
+}
+
+/* Compact tab padding on mobile */
+:deep(.p-tabview-tab-header) {
+  padding: 0.5rem 0.75rem !important;
+}
+
+@media (min-width: 640px) {
+  :deep(.p-tabview-tab-header) {
+    padding: 0.75rem 1rem !important;
+  }
 }
 </style>

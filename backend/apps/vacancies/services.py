@@ -6,7 +6,7 @@ from openai import OpenAI
 
 from apps.accounts.models import Company, User
 from apps.common.exceptions import ApplicationError
-from apps.vacancies.models import InterviewQuestion, Vacancy, VacancyCriteria
+from apps.vacancies.models import InterviewQuestion, ScreeningStep, Vacancy, VacancyCriteria
 
 logger = logging.getLogger(__name__)
 
@@ -44,21 +44,22 @@ def create_vacancy(
 def update_vacancy(*, vacancy: Vacancy, data: dict) -> Vacancy:
     """Update allowed vacancy fields.
 
-    screening_mode can only be changed if the vacancy has no applications.
+    interview_mode can only be changed if the vacancy has no applications.
     """
     allowed_fields = {
         "title", "description", "requirements", "responsibilities",
         "skills", "salary_min", "salary_max", "salary_currency",
         "location", "is_remote", "employment_type", "experience_level",
         "deadline", "visibility", "interview_duration",
-        "screening_mode", "cv_required", "company_info",
+        "interview_mode", "interview_enabled", "cv_required", "company_info",
+        "prescanning_prompt", "interview_prompt",
     }
 
-    # Guard: screening_mode cannot be changed once applications exist
-    if "screening_mode" in data and data["screening_mode"] != vacancy.screening_mode:
+    # Guard: interview_mode cannot be changed once applications exist
+    if "interview_mode" in data and data["interview_mode"] != vacancy.interview_mode:
         if vacancy.applications.exists():
             raise ApplicationError(
-                "Cannot change screening mode after applications have been submitted."
+                "Cannot change interview mode after applications have been submitted."
             )
 
     update_fields: list[str] = []
@@ -77,15 +78,18 @@ def update_vacancy(*, vacancy: Vacancy, data: dict) -> Vacancy:
 
 
 def publish_vacancy(*, vacancy: Vacancy) -> Vacancy:
-    """Publish a vacancy. It must have at least one question."""
-    if vacancy.status == Vacancy.Status.PUBLISHED:
-        raise ApplicationError("Vacancy is already published.")
+    """Publish a vacancy. Allowed from draft or paused.
 
-    if vacancy.status == Vacancy.Status.CLOSED:
-        raise ApplicationError("Cannot publish a closed vacancy.")
+    Lifecycle: draft → published ↔ paused → archived. Cannot go back to draft.
+    """
+    if vacancy.status not in (Vacancy.Status.DRAFT, Vacancy.Status.PAUSED):
+        raise ApplicationError("Only draft or paused vacancies can be published.")
 
-    if not vacancy.questions.filter(is_active=True).exists():
-        raise ApplicationError("Cannot publish a vacancy without active questions.")
+    if not vacancy.questions.filter(is_active=True, step=ScreeningStep.PRESCANNING).exists():
+        raise ApplicationError("Cannot publish a vacancy without active prescanning questions.")
+
+    if vacancy.interview_enabled and not vacancy.questions.filter(is_active=True, step=ScreeningStep.INTERVIEW).exists():
+        raise ApplicationError("Cannot publish a vacancy with interview enabled but no active interview questions.")
 
     vacancy.status = Vacancy.Status.PUBLISHED
     vacancy.save(update_fields=["status", "updated_at"])
@@ -93,7 +97,7 @@ def publish_vacancy(*, vacancy: Vacancy) -> Vacancy:
 
 
 def pause_vacancy(*, vacancy: Vacancy) -> Vacancy:
-    """Pause a published vacancy."""
+    """Pause a published vacancy. Can be resumed (published again)."""
     if vacancy.status != Vacancy.Status.PUBLISHED:
         raise ApplicationError("Only published vacancies can be paused.")
 
@@ -102,15 +106,18 @@ def pause_vacancy(*, vacancy: Vacancy) -> Vacancy:
     return vacancy
 
 
-def close_vacancy(*, vacancy: Vacancy) -> Vacancy:
-    """Close a vacancy and expire all pending interviews."""
-    if vacancy.status == Vacancy.Status.CLOSED:
-        raise ApplicationError("Vacancy is already closed.")
+def archive_vacancy(*, vacancy: Vacancy) -> Vacancy:
+    """Archive a vacancy and expire all pending sessions.
 
-    vacancy.status = Vacancy.Status.CLOSED
+    Allowed from published or paused. Terminal state — cannot go back.
+    """
+    if vacancy.status not in (Vacancy.Status.PUBLISHED, Vacancy.Status.PAUSED):
+        raise ApplicationError("Only published or paused vacancies can be archived.")
+
+    vacancy.status = Vacancy.Status.ARCHIVED
     vacancy.save(update_fields=["status", "updated_at"])
 
-    # Expire all pending interviews for this vacancy
+    # Expire all pending sessions for this vacancy
     from apps.interviews.services import expire_interviews_for_vacancy
 
     expire_interviews_for_vacancy(vacancy=vacancy)
@@ -119,7 +126,7 @@ def close_vacancy(*, vacancy: Vacancy) -> Vacancy:
 
 
 def create_default_criteria(*, vacancy: Vacancy) -> list[VacancyCriteria]:
-    """Create the default set of evaluation criteria for a vacancy."""
+    """Create the default set of evaluation criteria for prescanning."""
     criteria_list = []
     for item in DEFAULT_CRITERIA:
         criteria = VacancyCriteria.objects.create(
@@ -129,6 +136,7 @@ def create_default_criteria(*, vacancy: Vacancy) -> list[VacancyCriteria]:
             weight=item["weight"],
             order=item["order"],
             is_default=True,
+            step=ScreeningStep.PRESCANNING,
         )
         criteria_list.append(criteria)
     return criteria_list
@@ -140,9 +148,10 @@ def add_vacancy_criteria(
     name: str,
     description: str = "",
     weight: int = 1,
+    step: str = ScreeningStep.PRESCANNING,
 ) -> VacancyCriteria:
     """Add a custom evaluation criteria to a vacancy."""
-    max_order = vacancy.criteria.aggregate(
+    max_order = vacancy.criteria.filter(step=step).aggregate(
         max_order=models.Max("order")
     )["max_order"] or 0
 
@@ -153,6 +162,7 @@ def add_vacancy_criteria(
         weight=weight,
         is_default=False,
         order=max_order + 1,
+        step=step,
     )
 
 
@@ -185,9 +195,10 @@ def add_interview_question(
     text: str,
     category: str = "",
     source: str = "hr_added",
+    step: str = ScreeningStep.PRESCANNING,
 ) -> InterviewQuestion:
-    """Add an interview question to a vacancy."""
-    max_order = vacancy.questions.aggregate(
+    """Add a question to a vacancy for the specified step."""
+    max_order = vacancy.questions.filter(step=step).aggregate(
         max_order=models.Max("order")
     )["max_order"] or 0
 
@@ -197,6 +208,7 @@ def add_interview_question(
         category=category,
         source=source,
         order=max_order + 1,
+        step=step,
     )
 
 
@@ -223,11 +235,26 @@ def delete_interview_question(*, question: InterviewQuestion) -> None:
     question.delete()
 
 
-def generate_interview_questions(*, vacancy: Vacancy) -> list[InterviewQuestion]:
-    """Generate interview questions using OpenAI based on vacancy details."""
+def generate_interview_questions(
+    *, vacancy: Vacancy, step: str = ScreeningStep.PRESCANNING
+) -> list[InterviewQuestion]:
+    """Generate questions using OpenAI based on vacancy details and step type."""
     skills_text = ", ".join(vacancy.skills) if vacancy.skills else "not specified"
-    criteria = list(vacancy.criteria.values_list("name", flat=True))
+    criteria = list(vacancy.criteria.filter(step=step).values_list("name", flat=True))
     criteria_text = ", ".join(criteria) if criteria else "general assessment"
+
+    if step == ScreeningStep.PRESCANNING:
+        step_instruction = (
+            "Generate prescanning questions for a QUICK initial AI screening. "
+            "Questions should be lighter — focus on basic fit, motivation, "
+            "and general qualifications. Generate 4-7 questions."
+        )
+    else:
+        step_instruction = (
+            "Generate interview questions for a RIGOROUS AI interview. "
+            "Questions should be tougher — test technical depth, real-world scenarios, "
+            "and domain expertise. Generate 7-10 questions."
+        )
 
     try:
         client = OpenAI()
@@ -239,16 +266,15 @@ def generate_interview_questions(*, vacancy: Vacancy) -> list[InterviewQuestion]
                 {
                     "role": "system",
                     "content": (
-                        "You are an expert HR interviewer. Generate interview questions "
-                        "for a pre-screening AI interview. Questions should be:\n"
+                        f"You are an expert HR interviewer. {step_instruction}\n"
+                        "Questions should be:\n"
                         "- Specific to the role and required skills\n"
                         "- A mix of technical, behavioral, and situational questions\n"
                         "- Open-ended (not yes/no)\n"
                         "- Concise (1-2 sentences max)\n\n"
                         "Return JSON with a 'questions' array. Each item has:\n"
                         '- "text": the question\n'
-                        '- "category": one of Technical, Behavioral, Situational, Experience, Problem Solving\n\n'
-                        "Generate 7-10 questions."
+                        '- "category": one of Technical, Behavioral, Situational, Experience, Problem Solving'
                     ),
                 },
                 {
@@ -271,7 +297,7 @@ def generate_interview_questions(*, vacancy: Vacancy) -> list[InterviewQuestion]
         logger.exception("Failed to generate questions with AI for vacancy %s", vacancy.id)
         raise ApplicationError("Failed to generate questions. Please try again.")
 
-    max_order = vacancy.questions.aggregate(
+    max_order = vacancy.questions.filter(step=step).aggregate(
         max_order=models.Max("order")
     )["max_order"] or 0
 
@@ -283,6 +309,7 @@ def generate_interview_questions(*, vacancy: Vacancy) -> list[InterviewQuestion]
             category=q.get("category", "General"),
             source=InterviewQuestion.Source.AI_GENERATED,
             order=max_order + i,
+            step=step,
         )
         created_questions.append(question)
 

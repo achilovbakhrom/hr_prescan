@@ -123,46 +123,80 @@ reset-db: ## Reset database (destructive!)
 	@sleep 10
 	docker compose exec django python manage.py migrate --noinput
 
-# ─── Local Dev (native Django + Vite, infra in Docker) ──────────────────────
+# ─── Local Dev (native Django + Celery + Vite, infra in Docker) ─────────────
+
+VENV = $(CURDIR)/backend/.venv/bin
 
 local-setup: ## First-time local dev setup: venv, deps, infra, migrate
 	@test -f backend/.env || cp backend/.env.example backend/.env
 	@test -f frontend/.env || cp frontend/.env.example frontend/.env
 	docker compose up -d postgres redis rabbitmq minio livekit
 	@test -d backend/.venv || python3 -m venv backend/.venv
-	backend/.venv/bin/pip install -r backend/requirements.txt
+	$(VENV)/pip install -r backend/requirements.txt
 	cd frontend && npm install
 	@echo "Waiting for Postgres to be ready..."
 	@until docker compose exec -T postgres pg_isready -U hr_prescan 2>/dev/null; do sleep 1; done
 	$(MAKE) local-migrate
 	@echo ""
-	@echo "Local dev ready! Run in two terminals:"
-	@echo "  make local-backend   # Django on :8000"
-	@echo "  make local-frontend  # Vite on :5173"
+	@echo "Local dev ready! Run:"
+	@echo "  make local-all       # Start everything (backend + celery + frontend)"
+	@echo "  make local-backend   # Django only on :8000"
+	@echo "  make local-frontend  # Vite only on :5173"
 
-local-infra: ## Start infra services (Postgres, Redis, RabbitMQ, MinIO, LiveKit)
+local-infra: ## Start only infra in Docker (stop app containers to free ports)
+	-@docker compose stop django celery-worker celery-beat frontend nginx 2>/dev/null || true
 	docker compose up -d postgres redis rabbitmq minio livekit
 
-local-backend: ## Run Django dev server natively (reads backend/.env)
-	cd backend && .venv/bin/python manage.py runserver 0.0.0.0:8000
+local-backend: ## Run Django dev server natively
+	cd backend && $(VENV)/python manage.py runserver 0.0.0.0:8000
 
-local-frontend: ## Run Vite dev server natively (reads frontend/.env)
+local-celery: ## Run Celery worker natively
+	cd backend && $(VENV)/celery -A config worker -l info --concurrency=2
+
+local-celery-beat: ## Run Celery beat natively
+	cd backend && $(VENV)/celery -A config beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+
+local-frontend: ## Run Vite dev server natively
 	cd frontend && npm run dev
 
+local-all: local-infra ## Start infra + backend + celery + frontend (all in background)
+	@echo "Starting infra containers..."
+	@sleep 3
+	@echo "Starting Django server..."
+	@cd backend && $(VENV)/python manage.py runserver 0.0.0.0:8000 &
+	@echo "Starting Celery worker..."
+	@cd backend && $(VENV)/celery -A config worker -l info --concurrency=2 &
+	@echo "Starting Vite dev server..."
+	@cd frontend && npm run dev &
+	@echo ""
+	@echo "All services started in background:"
+	@echo "  Django:   http://localhost:8000"
+	@echo "  Vite:     http://localhost:5173"
+	@echo "  RabbitMQ: http://localhost:15672"
+	@echo "  MinIO:    http://localhost:9001"
+	@echo ""
+	@echo "Run 'make local-stop' to stop everything."
+
 local-migrate: ## Run migrations (local)
-	cd backend && .venv/bin/python manage.py migrate
+	cd backend && $(VENV)/python manage.py migrate
 
 local-makemigrations: ## Create migrations (local)
-	cd backend && .venv/bin/python manage.py makemigrations
+	cd backend && $(VENV)/python manage.py makemigrations
 
 local-createsuperuser: ## Create superuser (local)
-	cd backend && .venv/bin/python manage.py createsuperuser
+	cd backend && $(VENV)/python manage.py createsuperuser
 
 local-shell: ## Django shell (local)
-	cd backend && .venv/bin/python manage.py shell
+	cd backend && $(VENV)/python manage.py shell
 
-local-stop: ## Stop infra containers
+local-stop: ## Stop everything (infra + background processes)
+	@echo "Stopping background processes..."
+	-@pkill -f "manage.py runserver" 2>/dev/null || true
+	-@pkill -f "celery -A config worker" 2>/dev/null || true
+	-@pkill -f "celery -A config beat" 2>/dev/null || true
+	-@pkill -f "vite" 2>/dev/null || true
 	docker compose down
+	@echo "All stopped."
 
 # ─── Cleanup ──────────────────────────────────────────────────────────────────
 

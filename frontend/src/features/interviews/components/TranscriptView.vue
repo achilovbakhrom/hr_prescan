@@ -11,8 +11,17 @@ function formatTimestamp(seconds: number): string {
   return `${mins}:${secs.toString().padStart(2, '0')}`
 }
 
-function isAi(speaker: string): boolean {
-  return speaker.toLowerCase() === 'ai' || speaker.toLowerCase() === 'interviewer'
+function isAi(entry: TranscriptEntry): boolean {
+  const val = (entry.speaker || (entry as any).role || '').toLowerCase()
+  return val === 'ai' || val === 'interviewer'
+}
+
+function getSpeakerLabel(entry: TranscriptEntry): string {
+  const val = entry.speaker || (entry as any).role || 'Unknown'
+  const lower = val.toLowerCase()
+  if (lower === 'ai' || lower === 'interviewer') return 'Interviewer'
+  if (lower === 'candidate' || lower === 'user') return 'Candidate'
+  return val
 }
 </script>
 
@@ -26,18 +35,18 @@ function isAi(speaker: string): boolean {
       v-for="(entry, index) in transcript"
       :key="index"
       class="flex gap-3"
-      :class="isAi(entry.speaker) ? 'justify-start' : 'justify-end'"
+      :class="isAi(entry) ? 'justify-start' : 'justify-end'"
     >
       <div
         class="max-w-[75%] rounded-lg px-4 py-2"
         :class="
-          isAi(entry.speaker)
+          isAi(entry)
             ? 'bg-gray-100 text-gray-800'
             : 'bg-blue-50 text-blue-900'
         "
       >
         <div class="mb-1 flex items-center gap-2">
-          <span class="text-xs font-semibold">{{ entry.speaker }}</span>
+          <span class="text-xs font-semibold">{{ getSpeakerLabel(entry) }}</span>
           <span class="text-xs text-gray-400">
             {{ formatTimestamp(entry.timestamp) }}
           </span>

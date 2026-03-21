@@ -5,6 +5,7 @@ import { candidateService } from '../services/candidate.service'
 
 const props = defineProps<{
   candidateId: string
+  sessionType?: string
 }>()
 
 interface ChatMessage {
@@ -57,7 +58,7 @@ function formatTime(ts: string): string {
 onMounted(async () => {
   loading.value = true
   try {
-    const data = await candidateService.getCandidateInterview(props.candidateId) as unknown as InterviewData
+    const data = await candidateService.getCandidateInterview(props.candidateId, props.sessionType) as unknown as InterviewData
     interview.value = data
   } catch {
     error.value = 'Interview data not available yet.'

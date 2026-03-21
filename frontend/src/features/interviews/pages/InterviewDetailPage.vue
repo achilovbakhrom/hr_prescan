@@ -2,6 +2,7 @@
 import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Button from 'primevue/button'
+import Tag from 'primevue/tag'
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
 import { useInterviewStore } from '../stores/interview.store'
@@ -65,7 +66,7 @@ async function handleWatchLive(): Promise<void> {
       >
         <i class="pi pi-arrow-left text-lg"></i>
       </button>
-      <h1 class="text-2xl font-bold">Interview Details</h1>
+      <h1 class="text-lg font-bold md:text-2xl">Interview Details</h1>
     </div>
 
     <p v-if="interviewStore.error" class="text-sm text-red-600">
@@ -80,17 +81,21 @@ async function handleWatchLive(): Promise<void> {
     </div>
 
     <template v-else-if="interview">
-      <div class="rounded-lg border border-gray-200 bg-white p-6">
-        <div class="flex flex-wrap items-start justify-between gap-4">
+      <div class="rounded-lg border border-gray-200 bg-white p-4 md:p-6">
+        <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-4">
           <div class="space-y-1">
-            <p class="text-lg font-semibold">{{ interview.candidateName }}</p>
+            <p class="text-base font-semibold md:text-lg">{{ interview.candidateName }}</p>
             <p class="text-sm text-gray-600">{{ interview.vacancyTitle }}</p>
-            <p class="text-sm text-gray-500">
+            <p class="text-xs text-gray-500 sm:text-sm">
               {{ formatDate(interview.createdAt) }} &middot;
               {{ interview.durationMinutes }} min
             </p>
           </div>
-          <div class="flex items-center gap-3">
+          <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+            <Tag
+              :value="interview.sessionType === 'prescanning' ? 'Prescanning' : 'Interview'"
+              :severity="interview.sessionType === 'prescanning' ? 'info' : 'success'"
+            />
             <InterviewStatusBadge :status="interview.status" />
             <Button
               v-if="isScheduled || isInProgress"

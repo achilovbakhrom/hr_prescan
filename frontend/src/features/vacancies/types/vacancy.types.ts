@@ -1,10 +1,10 @@
-export type VacancyStatus = 'draft' | 'published' | 'paused' | 'closed'
+export type VacancyStatus = 'draft' | 'published' | 'paused' | 'archived'
 export type VacancyVisibility = 'public' | 'private'
 export type EmploymentType = 'full_time' | 'part_time' | 'contract' | 'internship'
 export type ExperienceLevel = 'junior' | 'middle' | 'senior' | 'lead' | 'director'
 export type QuestionSource = 'ai_generated' | 'hr_added'
-
-export type ScreeningMode = 'chat' | 'meet'
+export type InterviewMode = 'chat' | 'meet'
+export type StepType = 'prescanning' | 'interview'
 
 export interface Vacancy {
   id: string
@@ -23,7 +23,8 @@ export interface Vacancy {
   deadline: string | null
   status: VacancyStatus
   visibility: VacancyVisibility
-  screeningMode: ScreeningMode
+  interviewMode: InterviewMode
+  interviewEnabled: boolean
   cvRequired: boolean
   companyInfo: string
   shareToken: string
@@ -35,8 +36,11 @@ export interface Vacancy {
 }
 
 export interface VacancyDetail extends Vacancy {
+  prescanningPrompt: string
+  interviewPrompt: string
   criteria: VacancyCriteria[]
   questions: InterviewQuestion[]
+  createdByEmail: string
 }
 
 export interface VacancyCriteria {
@@ -46,6 +50,7 @@ export interface VacancyCriteria {
   weight: number
   isDefault: boolean
   order: number
+  step: StepType
 }
 
 export interface InterviewQuestion {
@@ -55,6 +60,7 @@ export interface InterviewQuestion {
   source: QuestionSource
   order: number
   isActive: boolean
+  step: StepType
 }
 
 export interface CreateVacancyRequest {
@@ -72,10 +78,13 @@ export interface CreateVacancyRequest {
   experienceLevel?: ExperienceLevel
   deadline?: string | null
   visibility?: VacancyVisibility
-  screeningMode?: ScreeningMode
+  interviewMode?: InterviewMode
+  interviewEnabled?: boolean
   cvRequired?: boolean
   interviewDuration?: number
   companyInfo?: string
+  prescanningPrompt?: string
+  interviewPrompt?: string
 }
 
 export interface UpdateVacancyRequest extends Partial<CreateVacancyRequest> {}

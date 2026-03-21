@@ -9,7 +9,7 @@ from apps.vacancies.models import Vacancy
 from apps.vacancies.selectors import get_company_vacancies, get_vacancy_by_id
 from apps.vacancies.serializers import VacancyDetailOutputSerializer, VacancyListOutputSerializer
 from apps.vacancies.services import (
-    close_vacancy,
+    archive_vacancy,
     create_vacancy,
     pause_vacancy,
     publish_vacancy,
@@ -56,14 +56,17 @@ class VacancyListCreateApi(APIView):
             required=False,
             default=Vacancy.Visibility.PUBLIC,
         )
-        screening_mode = serializers.ChoiceField(
-            choices=Vacancy.ScreeningMode.choices,
+        interview_mode = serializers.ChoiceField(
+            choices=Vacancy.InterviewMode.choices,
             required=False,
-            default=Vacancy.ScreeningMode.CHAT,
+            default=Vacancy.InterviewMode.CHAT,
         )
+        interview_enabled = serializers.BooleanField(required=False, default=False)
         cv_required = serializers.BooleanField(required=False, default=False)
         interview_duration = serializers.IntegerField(required=False, default=30)
         company_info = serializers.CharField(required=False, allow_blank=True, default="")
+        prescanning_prompt = serializers.CharField(required=False, allow_blank=True, default="")
+        interview_prompt = serializers.CharField(required=False, allow_blank=True, default="")
 
     class FilterSerializer(serializers.Serializer):
         status = serializers.ChoiceField(choices=Vacancy.Status.choices, required=False)
@@ -142,12 +145,15 @@ class VacancyDetailApi(APIView):
         )
         deadline = serializers.DateField(required=False, allow_null=True)
         visibility = serializers.ChoiceField(choices=Vacancy.Visibility.choices, required=False)
-        screening_mode = serializers.ChoiceField(
-            choices=Vacancy.ScreeningMode.choices, required=False,
+        interview_mode = serializers.ChoiceField(
+            choices=Vacancy.InterviewMode.choices, required=False,
         )
+        interview_enabled = serializers.BooleanField(required=False)
         cv_required = serializers.BooleanField(required=False)
         interview_duration = serializers.IntegerField(required=False)
         company_info = serializers.CharField(required=False, allow_blank=True)
+        prescanning_prompt = serializers.CharField(required=False, allow_blank=True)
+        interview_prompt = serializers.CharField(required=False, allow_blank=True)
 
     def get(self, request: Request, vacancy_id: str) -> Response:
         vacancy = get_vacancy_by_id(vacancy_id=vacancy_id, company=request.user.company)
@@ -174,7 +180,7 @@ class VacancyStatusApi(APIView):
     permission_classes = [IsHRManager | IsAdmin]
 
     class InputSerializer(serializers.Serializer):
-        action = serializers.ChoiceField(choices=["publish", "pause", "close"])
+        action = serializers.ChoiceField(choices=["publish", "pause", "archive"])
 
     def patch(self, request: Request, vacancy_id: str) -> Response:
         vacancy = get_vacancy_by_id(vacancy_id=vacancy_id, company=request.user.company)
@@ -188,7 +194,7 @@ class VacancyStatusApi(APIView):
         action_map = {
             "publish": publish_vacancy,
             "pause": pause_vacancy,
-            "close": close_vacancy,
+            "archive": archive_vacancy,
         }
 
         try:

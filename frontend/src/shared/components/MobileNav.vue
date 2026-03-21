@@ -158,7 +158,7 @@ watch(
     >
       <div
         v-if="open"
-        class="fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-white shadow-xl lg:hidden"
+        class="fixed inset-y-0 left-0 z-50 flex w-[80vw] max-w-72 flex-col bg-white shadow-xl lg:hidden"
         role="dialog"
         aria-modal="true"
         aria-label="Mobile navigation"

@@ -2,6 +2,8 @@ export type InterviewStatus = 'pending' | 'in_progress' | 'completed' | 'cancell
 
 export type ScreeningMode = 'chat' | 'meet'
 
+export type SessionType = 'prescanning' | 'interview'
+
 export type IntegrityFlagType = 'face_not_visible' | 'multiple_faces' | 'gaze_deviation' | 'audio_anomaly' | 'cv_inconsistency'
 export type IntegritySeverity = 'low' | 'medium' | 'high'
 
@@ -10,6 +12,7 @@ export interface Interview {
   applicationId: string
   candidateName: string
   vacancyTitle: string
+  sessionType: SessionType
   screeningMode: ScreeningMode
   interviewToken: string
   startedAt: string | null
@@ -27,6 +30,7 @@ export interface ChatMessage {
 }
 
 export interface InterviewDetail extends Interview {
+  candidateEmail: string
   candidateToken: string
   recordingPath: string
   transcript: TranscriptEntry[]
@@ -34,6 +38,7 @@ export interface InterviewDetail extends Interview {
   aiSummary: string
   scores: InterviewScore[]
   integrityFlags: IntegrityFlag[]
+  updatedAt: string
 }
 
 export interface InterviewScore {

@@ -12,13 +12,13 @@ class Vacancy(BaseModel):
         DRAFT = "draft", "Draft"
         PUBLISHED = "published", "Published"
         PAUSED = "paused", "Paused"
-        CLOSED = "closed", "Closed"
+        ARCHIVED = "archived", "Archived"
 
     class Visibility(models.TextChoices):
         PUBLIC = "public", "Public"
         PRIVATE = "private", "Private"
 
-    class ScreeningMode(models.TextChoices):
+    class InterviewMode(models.TextChoices):
         CHAT = "chat", "Chat"
         MEET = "meet", "Meet"
 
@@ -81,14 +81,17 @@ class Vacancy(BaseModel):
         default=Visibility.PUBLIC,
     )
     share_token = models.UUIDField(unique=True, default=uuid.uuid4)
-    screening_mode = models.CharField(
+    interview_mode = models.CharField(
         max_length=10,
-        choices=ScreeningMode.choices,
-        default=ScreeningMode.CHAT,
+        choices=InterviewMode.choices,
+        default=InterviewMode.CHAT,
     )
+    interview_enabled = models.BooleanField(default=False)
     interview_duration = models.IntegerField(default=30)  # Meet mode only
     cv_required = models.BooleanField(default=False)
     company_info = models.TextField(blank=True, default="")  # Optional company description for AI interview intro
+    prescanning_prompt = models.TextField(blank=True, default="")  # Additional instructions for prescanning AI agent
+    interview_prompt = models.TextField(blank=True, default="")  # Additional instructions for interview AI agent
 
     class Meta:
         verbose_name_plural = "vacancies"
@@ -98,8 +101,15 @@ class Vacancy(BaseModel):
         return f"{self.title} ({self.company.name})"
 
 
+class ScreeningStep(models.TextChoices):
+    """Shared choices for prescanning vs interview step."""
+
+    PRESCANNING = "prescanning", "Prescanning"
+    INTERVIEW = "interview", "Interview"
+
+
 class VacancyCriteria(BaseModel):
-    """Evaluation criteria for scoring candidates in interviews."""
+    """Evaluation criteria for scoring candidates."""
 
     vacancy = models.ForeignKey(
         Vacancy,
@@ -111,6 +121,11 @@ class VacancyCriteria(BaseModel):
     weight = models.IntegerField(default=1)
     is_default = models.BooleanField(default=False)
     order = models.IntegerField(default=0)
+    step = models.CharField(
+        max_length=15,
+        choices=ScreeningStep.choices,
+        default=ScreeningStep.PRESCANNING,
+    )
 
     class Meta:
         verbose_name_plural = "vacancy criteria"
@@ -141,6 +156,11 @@ class InterviewQuestion(BaseModel):
     )
     order = models.IntegerField(default=0)
     is_active = models.BooleanField(default=True)
+    step = models.CharField(
+        max_length=15,
+        choices=ScreeningStep.choices,
+        default=ScreeningStep.PRESCANNING,
+    )
 
     class Meta:
         ordering = ["order"]

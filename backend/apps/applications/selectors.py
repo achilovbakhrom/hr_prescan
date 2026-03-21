@@ -26,7 +26,7 @@ def get_vacancy_applications(
 
     qs = (
         Application.objects
-        .filter(vacancy=vacancy)
+        .filter(vacancy=vacancy, is_deleted=False)
         .select_related("candidate")
     )
     if status:
@@ -57,8 +57,9 @@ def get_vacancy_applications_filtered(
 
     qs = (
         Application.objects
-        .filter(vacancy=vacancy)
-        .select_related("candidate", "interview")
+        .filter(vacancy=vacancy, is_deleted=False)
+        .select_related("candidate")
+        .prefetch_related("sessions")
     )
 
     if status:

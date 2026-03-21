@@ -64,8 +64,8 @@ class SubmitApplicationApi(APIView):
 
         application = result["application"]
         response_data = ApplicationDetailOutputSerializer(application).data
-        response_data["interview_token"] = result["interview_token"]
-        response_data["screening_mode"] = result["interview"].screening_mode
+        response_data["prescan_token"] = result["prescan_token"]
+        response_data["screening_mode"] = result["prescan_session"].screening_mode
 
         return Response(
             response_data,

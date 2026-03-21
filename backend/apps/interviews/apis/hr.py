@@ -26,7 +26,12 @@ from apps.interviews.services import (
 
 
 class HRApplicationInterviewApi(APIView):
-    """GET /api/hr/candidates/{application_id}/interview/ — get interview data for a candidate."""
+    """GET /api/hr/candidates/{application_id}/interview/ — get session data for a candidate.
+
+    Returns the most recent non-cancelled session. Accepts an optional
+    ``session_type`` query parameter ("prescanning" or "interview") to
+    retrieve a specific session.
+    """
 
     permission_classes = [IsHRManager | IsAdmin]
 
@@ -47,13 +52,26 @@ class HRApplicationInterviewApi(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        try:
-            interview = Interview.objects.select_related("application__vacancy__company").prefetch_related(
-                "scores__criteria", "integrity_flags"
-            ).get(application=application)
-        except Interview.DoesNotExist:
+        sessions_qs = (
+            Interview.objects
+            .filter(application=application)
+            .exclude(status=Interview.Status.CANCELLED)
+            .select_related("application__vacancy__company")
+            .prefetch_related("scores__criteria", "integrity_flags")
+            .order_by("-created_at")
+        )
+
+        session_type = request.query_params.get("session_type")
+        if session_type in (
+            Interview.SessionType.PRESCANNING,
+            Interview.SessionType.INTERVIEW,
+        ):
+            sessions_qs = sessions_qs.filter(session_type=session_type)
+
+        interview = sessions_qs.first()
+        if interview is None:
             return Response(
-                {"detail": "No interview found for this application."},
+                {"detail": "No session found for this application."},
                 status=status.HTTP_404_NOT_FOUND,
             )
 

@@ -7,16 +7,17 @@ const props = defineProps<{
 }>()
 
 const statusConfig: Record<
-  VacancyStatus,
+  string,
   { label: string; severity: 'success' | 'info' | 'warn' | 'danger' | 'secondary' }
 > = {
   draft: { label: 'Draft', severity: 'secondary' },
   published: { label: 'Published', severity: 'success' },
   paused: { label: 'Paused', severity: 'warn' },
+  archived: { label: 'Archived', severity: 'secondary' },
   closed: { label: 'Closed', severity: 'danger' },
 }
 
-const config = statusConfig[props.status]
+const config = statusConfig[props.status] ?? { label: props.status, severity: 'secondary' as const }
 </script>
 
 <template>

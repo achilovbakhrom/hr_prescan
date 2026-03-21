@@ -8,8 +8,13 @@ import Calendar from 'primevue/calendar'
 import ToggleSwitch from 'primevue/toggleswitch'
 import Chips from 'primevue/chips'
 import Button from 'primevue/button'
-import { EMPLOYMENT_OPTIONS, EXPERIENCE_OPTIONS, CURRENCY_OPTIONS, VISIBILITY_OPTIONS, SCREENING_MODE_OPTIONS } from '../constants/formOptions'
-import type { CreateVacancyRequest, EmploymentType, ExperienceLevel, ScreeningMode, VacancyVisibility } from '../types/vacancy.types'
+import { EMPLOYMENT_OPTIONS, EXPERIENCE_OPTIONS, CURRENCY_OPTIONS, VISIBILITY_OPTIONS } from '../constants/formOptions'
+import type { CreateVacancyRequest, EmploymentType, ExperienceLevel, InterviewMode, VacancyVisibility } from '../types/vacancy.types'
+
+const INTERVIEW_MODE_OPTIONS = [
+  { label: 'Chat', value: 'chat' },
+  { label: 'Meet (Video)', value: 'meet' },
+]
 
 const props = defineProps<{ initialData?: Partial<CreateVacancyRequest>; loading?: boolean }>()
 const emit = defineEmits<{ save: [data: CreateVacancyRequest, publish: boolean] }>()
@@ -28,9 +33,12 @@ const employmentType = ref<EmploymentType>(props.initialData?.employmentType ?? 
 const experienceLevel = ref<ExperienceLevel>(props.initialData?.experienceLevel ?? 'middle')
 const deadline = ref<Date | null>(props.initialData?.deadline ? new Date(props.initialData.deadline) : null)
 const visibility = ref<VacancyVisibility>(props.initialData?.visibility ?? 'public')
-const screeningMode = ref<ScreeningMode>(props.initialData?.screeningMode ?? 'chat')
 const cvRequired = ref(props.initialData?.cvRequired ?? false)
+const prescanningPrompt = ref(props.initialData?.prescanningPrompt ?? '')
+const interviewEnabled = ref(props.initialData?.interviewEnabled ?? false)
+const interviewMode = ref<InterviewMode>(props.initialData?.interviewMode ?? 'chat')
 const interviewDuration = ref(props.initialData?.interviewDuration ?? 30)
+const interviewPrompt = ref(props.initialData?.interviewPrompt ?? '')
 const companyInfo = ref(props.initialData?.companyInfo ?? '')
 
 watch(() => props.initialData, (d) => {
@@ -43,8 +51,13 @@ watch(() => props.initialData, (d) => {
   employmentType.value = d.employmentType ?? 'full_time'
   experienceLevel.value = d.experienceLevel ?? 'middle'
   deadline.value = d.deadline ? new Date(d.deadline) : null
-  visibility.value = d.visibility ?? 'public'; interviewDuration.value = d.interviewDuration ?? 30
-  screeningMode.value = d.screeningMode ?? 'chat'; cvRequired.value = d.cvRequired ?? false
+  visibility.value = d.visibility ?? 'public'
+  cvRequired.value = d.cvRequired ?? false
+  prescanningPrompt.value = d.prescanningPrompt ?? ''
+  interviewEnabled.value = d.interviewEnabled ?? false
+  interviewMode.value = d.interviewMode ?? 'chat'
+  interviewDuration.value = d.interviewDuration ?? 30
+  interviewPrompt.value = d.interviewPrompt ?? ''
   companyInfo.value = d.companyInfo ?? ''
 })
 
@@ -57,8 +70,13 @@ function handleSave(publish: boolean): void {
     location: location.value || undefined, isRemote: isRemote.value,
     employmentType: employmentType.value, experienceLevel: experienceLevel.value,
     deadline: deadline.value ? deadline.value.toISOString().split('T')[0] : null,
-    visibility: visibility.value, screeningMode: screeningMode.value,
-    cvRequired: cvRequired.value, interviewDuration: interviewDuration.value,
+    visibility: visibility.value,
+    cvRequired: cvRequired.value,
+    prescanningPrompt: prescanningPrompt.value || undefined,
+    interviewEnabled: interviewEnabled.value,
+    interviewMode: interviewMode.value,
+    interviewDuration: interviewDuration.value,
+    interviewPrompt: interviewPrompt.value || undefined,
     companyInfo: companyInfo.value || undefined,
   }, publish)
 }
@@ -114,15 +132,51 @@ function handleSave(publish: boolean): void {
       <p class="mb-2 text-sm text-gray-500">Optional. If provided, the AI interviewer will introduce the company to the candidate at the start of the interview.</p>
       <Textarea v-model="companyInfo" class="w-full" rows="3" placeholder="e.g. We are a leading fintech company based in Tashkent, building next-gen payment solutions..." />
     </div>
+
+    <!-- Prescanning Section -->
+    <div class="rounded-lg border border-teal-200 bg-teal-50/30 p-4">
+      <h3 class="mb-2 text-lg font-semibold">Prescanning</h3>
+      <p class="mb-4 text-sm text-gray-500">AI prescanning is always enabled. Every candidate goes through an automated prescanning chat after applying.</p>
+      <div>
+        <label class="mb-1 block text-sm font-medium">Prescanning Prompt (optional)</label>
+        <p class="mb-2 text-xs text-gray-400">Additional instructions for the AI during prescanning. The AI already knows the vacancy details.</p>
+        <Textarea v-model="prescanningPrompt" class="w-full" rows="3" placeholder="e.g. Focus on their experience with microservices architecture..." />
+      </div>
+    </div>
+
+    <!-- Interview Section -->
+    <div class="rounded-lg border border-emerald-200 bg-emerald-50/30 p-4">
+      <div class="mb-4 flex items-center justify-between">
+        <div>
+          <h3 class="text-lg font-semibold">Interview (Optional)</h3>
+          <p class="text-sm text-gray-500">Enable a second-step AI interview for shortlisted candidates after prescanning.</p>
+        </div>
+        <ToggleSwitch v-model="interviewEnabled" />
+      </div>
+      <div v-if="interviewEnabled" class="space-y-4">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div>
+            <label class="mb-1 block text-sm font-medium">Interview Mode</label>
+            <Dropdown v-model="interviewMode" :options="INTERVIEW_MODE_OPTIONS" option-label="label" option-value="value" class="w-full" />
+          </div>
+          <div v-if="interviewMode === 'meet'">
+            <label class="mb-1 block text-sm font-medium">Interview Duration (min)</label>
+            <InputNumber v-model="interviewDuration" class="w-full" :min="10" :max="120" :step="5" />
+          </div>
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium">Interview Prompt (optional)</label>
+          <p class="mb-2 text-xs text-gray-400">Additional instructions for the AI during the interview step.</p>
+          <Textarea v-model="interviewPrompt" class="w-full" rows="3" placeholder="e.g. Ask deeper technical questions about system design..." />
+        </div>
+      </div>
+    </div>
+
     <div class="rounded-lg border border-gray-200 bg-white p-4">
       <h3 class="mb-4 text-lg font-semibold">Settings</h3>
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div><label class="mb-1 block text-sm font-medium">Visibility</label>
           <Dropdown v-model="visibility" :options="VISIBILITY_OPTIONS" option-label="label" option-value="value" class="w-full" /></div>
-        <div><label class="mb-1 block text-sm font-medium">Screening Mode</label>
-          <Dropdown v-model="screeningMode" :options="SCREENING_MODE_OPTIONS" option-label="label" option-value="value" class="w-full" /></div>
-        <div><label class="mb-1 block text-sm font-medium">Interview Duration (min)</label>
-          <InputNumber v-model="interviewDuration" class="w-full" :min="10" :max="120" :step="5" /></div>
         <div class="flex items-end gap-2"><label class="text-sm font-medium">CV Required</label>
           <ToggleSwitch v-model="cvRequired" /></div>
       </div>

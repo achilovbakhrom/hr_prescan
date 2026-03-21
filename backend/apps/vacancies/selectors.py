@@ -22,7 +22,7 @@ def get_company_vacancies(
             candidates_total=Count("applications", distinct=True),
             candidates_interviewed=Count(
                 "applications",
-                filter=Q(applications__status__in=["interview_completed", "reviewing", "shortlisted"]),
+                filter=Q(applications__status__in=["prescanned", "interviewed", "shortlisted"]),
                 distinct=True,
             ),
             candidates_shortlisted=Count(
@@ -98,18 +98,28 @@ def get_public_vacancies(
     return qs
 
 
-def get_vacancy_criteria(*, vacancy: Vacancy) -> QuerySet[VacancyCriteria]:
-    """Return all criteria for a vacancy."""
-    return VacancyCriteria.objects.filter(vacancy=vacancy)
+def get_vacancy_criteria(
+    *,
+    vacancy: Vacancy,
+    step: str | None = None,
+) -> QuerySet[VacancyCriteria]:
+    """Return criteria for a vacancy, optionally filtered by step."""
+    qs = VacancyCriteria.objects.filter(vacancy=vacancy)
+    if step:
+        qs = qs.filter(step=step)
+    return qs
 
 
 def get_vacancy_questions(
     *,
     vacancy: Vacancy,
     active_only: bool = True,
+    step: str | None = None,
 ) -> QuerySet[InterviewQuestion]:
-    """Return questions for a vacancy, optionally only active ones."""
+    """Return questions for a vacancy, optionally filtered by step and active status."""
     qs = InterviewQuestion.objects.filter(vacancy=vacancy)
     if active_only:
         qs = qs.filter(is_active=True)
+    if step:
+        qs = qs.filter(step=step)
     return qs

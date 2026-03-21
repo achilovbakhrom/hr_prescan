@@ -1,11 +1,15 @@
 """
-AI chat interview service — handles conversation with candidates via OpenAI.
+AI chat screening service — handles conversation with candidates via OpenAI.
+
+Supports two session types:
+- Prescanning: lighter, quicker initial screening (always chat mode)
+- Interview: tougher, domain-specific evaluation (chat or meet mode)
 
 Responsibilities:
-- Build system prompt from vacancy + CV + questions
+- Build system prompt from vacancy + CV + questions (filtered by step)
 - Generate AI greeting
 - Process candidate messages and generate AI responses
-- Detect when the interview should end
+- Detect when the session should end and AI decision (advance/reject)
 - Trigger scoring/evaluation on completion
 """
 
@@ -20,7 +24,8 @@ from apps.interviews.models import Interview
 
 logger = logging.getLogger(__name__)
 
-INTERVIEW_COMPLETE_MARKER = "[INTERVIEW_COMPLETE]"
+SESSION_COMPLETE_ADVANCE = "[SESSION_ADVANCE]"
+SESSION_COMPLETE_REJECT = "[SESSION_REJECT]"
 
 
 def _get_client() -> OpenAI:
@@ -28,19 +33,23 @@ def _get_client() -> OpenAI:
 
 
 def _build_system_prompt(interview: Interview) -> str:
-    """Build the system prompt for the AI interviewer."""
+    """Build the system prompt for the AI agent, differentiated by session type."""
     application = interview.application
     vacancy = application.vacancy
+    step = interview.session_type  # "prescanning" or "interview"
 
-    # Gather interview questions
+    # Filter questions and criteria by step
     questions = list(
-        vacancy.questions.filter(is_active=True).order_by("order").values_list("text", flat=True)
+        vacancy.questions.filter(is_active=True, step=step)
+        .order_by("order")
+        .values_list("text", flat=True)
     )
     questions_text = "\n".join(f"- {q}" for q in questions) if questions else "No specific questions defined."
 
-    # Gather evaluation criteria
     criteria = list(
-        vacancy.criteria.all().order_by("order").values_list("name", "description", "weight")
+        vacancy.criteria.filter(step=step)
+        .order_by("order")
+        .values_list("name", "description", "weight")
     )
     criteria_text = "\n".join(
         f"- {name} (weight: {weight}): {desc}" for name, desc, weight in criteria
@@ -79,15 +88,26 @@ Use this CV data to ask targeted follow-up questions and verify claims.
 Include a brief company introduction in your greeting (1-2 sentences based on the above).
 """
 
-    return f"""You are an AI interviewer conducting a text-based pre-screening interview for the position of "{vacancy.title}" at {vacancy.company.name}.
+    # Step-specific additional prompt from HR
+    additional_prompt = ""
+    if step == Interview.SessionType.PRESCANNING and vacancy.prescanning_prompt:
+        additional_prompt = f"""
+## Additional Instructions from HR
+{vacancy.prescanning_prompt}
+"""
+    elif step == Interview.SessionType.INTERVIEW and vacancy.interview_prompt:
+        additional_prompt = f"""
+## Additional Instructions from HR
+{vacancy.interview_prompt}
+"""
 
-## Your Role
-- Professional, warm, and concise interviewer
-- Ask ONE question at a time, wait for response
-- Keep your messages SHORT (2-4 sentences max). Candidates prefer brief, clear communication
-- Prefix each question with "Q:" to clearly mark it
-- Ask follow-up questions when answers are vague or interesting
-- Be conversational but professional — this is a chat, not a formal exam
+    # Step-specific behavior
+    if step == Interview.SessionType.PRESCANNING:
+        behavior = _prescanning_behavior(vacancy, company_info)
+    else:
+        behavior = _interview_behavior(vacancy, company_info)
+
+    return f"""{behavior}
 {company_info_section}
 ## Vacancy Details
 - Title: {vacancy.title}
@@ -95,34 +115,19 @@ Include a brief company introduction in your greeting (1-2 sentences based on th
 - Requirements: {(vacancy.requirements or 'Not specified')[:500]}
 - Skills needed: {', '.join(vacancy.skills) if vacancy.skills else 'Not specified'}
 - Experience level: {vacancy.get_experience_level_display()}
-{cv_section}
-## Prepared Interview Questions
+{cv_section}{additional_prompt}
+## Prepared Questions
 {questions_text}
 
 ## Evaluation Criteria
 {criteria_text}
 
-## Interview Rules
-1. Greet the candidate briefly{' and introduce the company' if company_info else ''}, then ask them to introduce themselves
-2. Work through the prepared questions, adapting based on answers
-3. Ask follow-up questions to probe deeper when needed
-4. Keep your responses concise — no long paragraphs or lectures
-5. Cover all evaluation criteria through your questions
-6. Typically ask 6-10 questions total (including follow-ups)
-
-## IMPORTANT — Early Termination for Unsuitable Candidates
-If after 3-4 questions it becomes clear the candidate is significantly underqualified for this role (e.g., an intern applying for a senior position, completely wrong tech stack, no relevant experience at all):
-- Politely acknowledge their background
-- Kindly explain that this specific role requires a different experience level or skill set
-- Thank them for their time and wish them well in their career
-- End the interview early with the {INTERVIEW_COMPLETE_MARKER} marker
-- Do NOT be harsh — be encouraging and suggest they might be a better fit for other positions
-
-## CRITICAL — Ending the Interview
-When you have enough information OR the candidate is clearly unsuitable:
-- Send a brief thank-you message
-- Append the exact marker {INTERVIEW_COMPLETE_MARKER} at the very end of your final message
-- This marker signals the system to end the interview — the candidate will NOT see it
+## CRITICAL — Ending the Session and Making a Decision
+When you have enough information to make a decision:
+- Send a brief thank-you message to the candidate
+- If the candidate should ADVANCE to the next stage, append {SESSION_COMPLETE_ADVANCE} at the very end
+- If the candidate should be REJECTED, append {SESSION_COMPLETE_REJECT} at the very end
+- These markers signal the system — the candidate will NOT see them
 - The marker must be the last thing in your message
 
 ## Language
@@ -136,24 +141,79 @@ Respond in the same language the candidate uses. If they write in Russian, respo
 """
 
 
+def _prescanning_behavior(vacancy, company_info: str) -> str:
+    """Build the prescanning-specific behavior prompt."""
+    return f"""You are an AI pre-screener conducting a quick text-based prescanning for the position of "{vacancy.title}" at {vacancy.company.name}.
+
+## Your Role — Prescanning
+- Professional, warm, and concise screener
+- This is a QUICK initial screening — keep it light and efficient
+- Ask ONE question at a time, wait for response
+- Keep your messages SHORT (2-3 sentences max)
+- Focus on basic fit: motivation, availability, general qualifications
+- Be conversational and friendly — this is the candidate's first impression
+- Typically ask 4-6 questions total
+
+## Prescanning Rules
+1. Greet the candidate briefly{' and introduce the company' if company_info else ''}, then ask them to introduce themselves
+2. Work through the prepared questions, adapting based on answers
+3. Quickly assess basic fit — don't probe deeply (that's for the interview step)
+4. Cover the evaluation criteria through your questions
+5. If clearly unqualified after 2-3 questions, wrap up politely
+
+## Decision Criteria
+- ADVANCE: Candidate shows basic fit, motivation, and relevant background
+- REJECT: Candidate is clearly unqualified, wrong field, or shows red flags"""
+
+
+def _interview_behavior(vacancy, company_info: str) -> str:
+    """Build the interview-specific behavior prompt."""
+    return f"""You are an AI interviewer conducting a rigorous text-based interview for the position of "{vacancy.title}" at {vacancy.company.name}.
+
+## Your Role — Interview
+- Professional and thorough interviewer
+- This is a DEEPER evaluation — be more demanding and probing
+- Ask ONE question at a time, wait for response
+- Keep your messages concise but substantive (2-4 sentences)
+- Prefix each question with "Q:" to clearly mark it
+- Ask follow-up questions to probe depth of knowledge
+- Challenge vague answers — ask for specifics, examples, numbers
+- Present practical scenarios or cases when appropriate
+- Typically ask 6-10 questions total (including follow-ups)
+
+## Interview Rules
+1. Greet the candidate briefly and explain this is the interview stage
+2. Work through the prepared questions with rigor
+3. Probe deeper — ask for concrete examples, technical details, real-world scenarios
+4. Cover all evaluation criteria thoroughly
+5. Test claims from their CV or prescanning answers
+6. If clearly unqualified, wrap up politely after 4-5 questions
+
+## Decision Criteria
+- ADVANCE: Candidate demonstrates strong skills, clear thinking, and domain expertise
+- REJECT: Candidate lacks required depth, cannot substantiate claims, or shows significant gaps"""
+
+
 def generate_greeting(interview: Interview) -> str:
-    """Generate the AI's opening message for a chat interview."""
+    """Generate the AI's opening message for a chat session."""
     client = _get_client()
     system_prompt = _build_system_prompt(interview)
+
+    step_label = "prescanning" if interview.session_type == Interview.SessionType.PRESCANNING else "interview"
 
     response = client.chat.completions.create(
         model=settings.OPENAI_CHAT_MODEL,
         messages=[
             {"role": "system", "content": system_prompt},
-            {"role": "user", "content": "[SYSTEM: The candidate has just opened the chat. Send a brief, warm greeting (2-3 sentences). Introduce yourself and the company briefly if company info is available. Then ask the candidate to tell you about themselves.]"},
+            {"role": "user", "content": f"[SYSTEM: The candidate has just opened the {step_label} chat. Send a brief, warm greeting (2-3 sentences). Introduce yourself and the company briefly if company info is available. Then ask the candidate to tell you about themselves.]"},
         ],
         max_tokens=300,
         temperature=0.7,
     )
 
     greeting = response.choices[0].message.content or ""
-    # Remove the completion marker from greeting (shouldn't be there, but safety check)
-    greeting = greeting.replace(INTERVIEW_COMPLETE_MARKER, "").strip()
+    # Remove completion markers from greeting (safety check)
+    greeting = greeting.replace(SESSION_COMPLETE_ADVANCE, "").replace(SESSION_COMPLETE_REJECT, "").strip()
     return greeting
 
 
@@ -163,7 +223,8 @@ def process_candidate_message(interview: Interview, candidate_message: str) -> d
 
     Returns dict with:
     - ai_message: str — the AI's response text (cleaned, no markers)
-    - is_complete: bool — whether the interview is now complete
+    - is_complete: bool — whether the session is now complete
+    - ai_decision: str | None — "advance" or "reject" if complete
     - chat_history: list — updated chat history
     """
     client = _get_client()
@@ -196,11 +257,16 @@ def process_candidate_message(interview: Interview, candidate_message: str) -> d
 
     raw_ai_text = response.choices[0].message.content or ""
 
-    # Check if interview is complete
-    is_complete = INTERVIEW_COMPLETE_MARKER in raw_ai_text
+    # Check if session is complete and determine AI decision
+    is_complete = SESSION_COMPLETE_ADVANCE in raw_ai_text or SESSION_COMPLETE_REJECT in raw_ai_text
+    ai_decision = None
+    if SESSION_COMPLETE_ADVANCE in raw_ai_text:
+        ai_decision = "advance"
+    elif SESSION_COMPLETE_REJECT in raw_ai_text:
+        ai_decision = "reject"
 
-    # Clean the marker from the displayed text
-    clean_ai_text = raw_ai_text.replace(INTERVIEW_COMPLETE_MARKER, "").strip()
+    # Clean markers from the displayed text
+    clean_ai_text = raw_ai_text.replace(SESSION_COMPLETE_ADVANCE, "").replace(SESSION_COMPLETE_REJECT, "").strip()
 
     ai_timestamp = timezone.now().isoformat()
 
@@ -221,40 +287,41 @@ def process_candidate_message(interview: Interview, candidate_message: str) -> d
 
     interview.save(update_fields=update_fields)
 
-    # If complete, update application status and run evaluation
+    # If complete, run evaluation and update application status
     if is_complete:
-        application = interview.application
-        from apps.applications.models import Application
-        application.status = Application.Status.INTERVIEW_COMPLETED
-        application.save(update_fields=["status", "updated_at"])
-        logger.info("Chat interview %s completed, running evaluation...", interview.id)
+        logger.info("Chat session %s (%s) completed, running evaluation...", interview.id, interview.session_type)
 
         try:
-            evaluate_chat_interview(interview)
+            evaluate_chat_interview(interview, ai_decision=ai_decision or "advance")
         except Exception as e:
-            logger.error("Failed to evaluate interview %s: %s", interview.id, e)
+            logger.error("Failed to evaluate session %s: %s", interview.id, e)
 
     return {
         "ai_message": clean_ai_text,
         "ai_timestamp": ai_timestamp,
         "is_complete": is_complete,
+        "ai_decision": ai_decision,
         "chat_history": chat_history,
     }
 
 
-def evaluate_chat_interview(interview: Interview) -> None:
+def evaluate_chat_interview(interview: Interview, *, ai_decision: str = "advance") -> None:
     """
-    Evaluate a completed chat interview using GPT.
+    Evaluate a completed chat session using GPT.
 
     Analyzes the full transcript and scores the candidate on each
-    vacancy criteria. Saves scores, overall score, and AI summary.
+    step-specific criteria. Saves scores, overall score, AI summary,
+    and triggers the application status update via complete_session().
     """
     import json
+    from decimal import Decimal
     from apps.interviews.models import InterviewScore
+    from apps.interviews.services import complete_session
 
     client = _get_client()
     application = interview.application
     vacancy = application.vacancy
+    step = interview.session_type
 
     # Build transcript text
     transcript_lines = []
@@ -263,13 +330,21 @@ def evaluate_chat_interview(interview: Interview) -> None:
         transcript_lines.append(f"{role_label}: {msg['text']}")
     transcript_text = "\n\n".join(transcript_lines)
 
-    # Get criteria
+    # Get criteria filtered by step
     criteria_list = list(
-        vacancy.criteria.all().order_by("order").values("id", "name", "description", "weight")
+        vacancy.criteria.filter(step=step).order_by("order").values("id", "name", "description", "weight")
     )
 
     if not criteria_list:
-        logger.warning("No criteria for vacancy %s, skipping evaluation", vacancy.id)
+        logger.warning("No criteria for vacancy %s step %s, skipping scoring", vacancy.id, step)
+        # Still complete the session even without scoring
+        complete_session(
+            interview=interview,
+            overall_score=Decimal("0"),
+            ai_summary="No evaluation criteria configured.",
+            transcript=interview.chat_history or [],
+            ai_decision=ai_decision,
+        )
         return
 
     criteria_json = json.dumps([
@@ -277,7 +352,9 @@ def evaluate_chat_interview(interview: Interview) -> None:
         for c in criteria_list
     ])
 
-    eval_prompt = f"""You are an expert HR evaluator. Analyze this interview transcript and score the candidate.
+    step_label = "prescanning" if step == Interview.SessionType.PRESCANNING else "interview"
+
+    eval_prompt = f"""You are an expert HR evaluator. Analyze this {step_label} transcript and score the candidate.
 
 ## Position
 {vacancy.title} at {vacancy.company.name}
@@ -291,7 +368,7 @@ def evaluate_chat_interview(interview: Interview) -> None:
 ## Evaluation Criteria
 {criteria_json}
 
-## Interview Transcript
+## {step_label.title()} Transcript
 {transcript_text}
 
 ## Your Task
@@ -323,7 +400,7 @@ Respond with ONLY valid JSON in this exact format:
     try:
         result = json.loads(raw)
     except json.JSONDecodeError:
-        logger.error("Failed to parse evaluation JSON for interview %s", interview.id)
+        logger.error("Failed to parse evaluation JSON for session %s", interview.id)
         return
 
     # Save scores
@@ -347,15 +424,20 @@ Respond with ONLY valid JSON in this exact format:
         InterviewScore.objects.filter(interview=interview).delete()
         InterviewScore.objects.bulk_create(score_objects)
 
-    # Save overall score and summary
-    overall = result.get("overall_score")
-    if overall is not None:
-        interview.overall_score = min(10, max(0, float(overall)))
-    interview.ai_summary = result.get("summary", "")
-    interview.transcript = interview.chat_history  # Store chat as transcript too
-    interview.save(update_fields=["overall_score", "ai_summary", "transcript", "updated_at"])
+    overall = result.get("overall_score", 0)
+    overall_decimal = Decimal(str(min(10, max(0, float(overall)))))
+    summary = result.get("summary", "")
+
+    # Complete the session — this updates application status and creates interview if needed
+    complete_session(
+        interview=interview,
+        overall_score=overall_decimal,
+        ai_summary=summary,
+        transcript=interview.chat_history or [],
+        ai_decision=ai_decision,
+    )
 
     logger.info(
-        "Evaluation complete for interview %s: score=%.1f, %d criteria scored",
-        interview.id, interview.overall_score or 0, len(score_objects),
+        "Evaluation complete for session %s (%s): score=%.1f, decision=%s, %d criteria scored",
+        interview.id, step, interview.overall_score or 0, ai_decision, len(score_objects),
     )

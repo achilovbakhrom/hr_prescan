@@ -25,7 +25,7 @@ export const VISIBILITY_OPTIONS = [
   { label: 'Private', value: 'private' },
 ]
 
-export const SCREENING_MODE_OPTIONS = [
+export const INTERVIEW_MODE_OPTIONS = [
   { label: 'Chat', value: 'chat' },
   { label: 'Meet (Video)', value: 'meet' },
 ]

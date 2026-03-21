@@ -8,6 +8,7 @@ class ApplicationListOutputSerializer(serializers.ModelSerializer):
 
     vacancy_id = serializers.UUIDField(source="vacancy.id", read_only=True)
     vacancy_title = serializers.CharField(source="vacancy.title", read_only=True)
+    prescanning_score = serializers.SerializerMethodField()
     interview_score = serializers.SerializerMethodField()
 
     class Meta:
@@ -17,28 +18,38 @@ class ApplicationListOutputSerializer(serializers.ModelSerializer):
             "vacancy_id",
             "candidate_name",
             "candidate_email",
+            "cv_file",
             "status",
             "match_score",
+            "prescanning_score",
             "interview_score",
             "vacancy_title",
             "created_at",
         ]
         read_only_fields = fields
 
-    def get_interview_score(self, obj: Application) -> float | None:
-        # Use annotated value if available, otherwise query
-        if hasattr(obj, '_interview_score'):
-            return obj._interview_score
-        interview = getattr(obj, 'interview', None)
-        if interview is None:
-            try:
-                from apps.interviews.models import Interview
-                interview = Interview.objects.filter(application=obj).first()
-            except Exception:
-                return None
-        if interview and interview.overall_score is not None:
-            return float(interview.overall_score)
+    def _get_session_score(self, obj: Application, session_type: str) -> float | None:
+        # Use prefetched sessions if available
+        sessions = getattr(obj, '_prefetched_objects_cache', {}).get('sessions')
+        if sessions is not None:
+            for s in sessions:
+                if s.session_type == session_type and s.status == "completed" and s.overall_score is not None:
+                    return float(s.overall_score)
+            return None
+        # Fallback to query
+        from apps.interviews.models import Interview
+        session = Interview.objects.filter(
+            application=obj, session_type=session_type, status="completed"
+        ).first()
+        if session and session.overall_score is not None:
+            return float(session.overall_score)
         return None
+
+    def get_prescanning_score(self, obj: Application) -> float | None:
+        return self._get_session_score(obj, "prescanning")
+
+    def get_interview_score(self, obj: Application) -> float | None:
+        return self._get_session_score(obj, "interview")
 
 
 class ApplicationDetailOutputSerializer(serializers.ModelSerializer):
@@ -48,11 +59,13 @@ class ApplicationDetailOutputSerializer(serializers.ModelSerializer):
     company_name = serializers.CharField(
         source="vacancy.company.name", read_only=True,
     )
-    interview_token = serializers.UUIDField(
-        source="interview.interview_token", read_only=True, default=None,
+    prescan_token = serializers.SerializerMethodField()
+    interview_token = serializers.SerializerMethodField()
+    interview_enabled = serializers.BooleanField(
+        source="vacancy.interview_enabled", read_only=True,
     )
-    screening_mode = serializers.CharField(
-        source="interview.screening_mode", read_only=True, default=None,
+    interview_mode = serializers.CharField(
+        source="vacancy.interview_mode", read_only=True,
     )
 
     class Meta:
@@ -71,14 +84,30 @@ class ApplicationDetailOutputSerializer(serializers.ModelSerializer):
             "cv_parsed_data",
             "match_score",
             "match_details",
+            "prescan_token",
             "interview_token",
-            "screening_mode",
+            "interview_enabled",
+            "interview_mode",
             "status",
             "hr_notes",
             "created_at",
             "updated_at",
         ]
         read_only_fields = fields
+
+    def _get_session_token(self, obj: Application, session_type: str) -> str | None:
+        session = obj.sessions.filter(session_type=session_type).exclude(
+            status="cancelled"
+        ).order_by("-created_at").first()
+        if session:
+            return str(session.interview_token)
+        return None
+
+    def get_prescan_token(self, obj: Application) -> str | None:
+        return self._get_session_token(obj, "prescanning")
+
+    def get_interview_token(self, obj: Application) -> str | None:
+        return self._get_session_token(obj, "interview")
 
 
 class CandidateApplicationListOutputSerializer(serializers.ModelSerializer):
@@ -108,12 +137,8 @@ class CandidateApplicationDetailOutputSerializer(serializers.ModelSerializer):
     company_name = serializers.CharField(
         source="vacancy.company.name", read_only=True,
     )
-    interview_token = serializers.UUIDField(
-        source="interview.interview_token", read_only=True, default=None,
-    )
-    screening_mode = serializers.CharField(
-        source="interview.screening_mode", read_only=True, default=None,
-    )
+    prescan_token = serializers.SerializerMethodField()
+    interview_token = serializers.SerializerMethodField()
 
     class Meta:
         model = Application
@@ -126,11 +151,25 @@ class CandidateApplicationDetailOutputSerializer(serializers.ModelSerializer):
             "candidate_email",
             "candidate_phone",
             "cv_original_filename",
+            "prescan_token",
             "interview_token",
-            "screening_mode",
             "status",
             "match_score",
             "created_at",
             "updated_at",
         ]
         read_only_fields = fields
+
+    def _get_session_token(self, obj: Application, session_type: str) -> str | None:
+        session = obj.sessions.filter(session_type=session_type).exclude(
+            status="cancelled"
+        ).order_by("-created_at").first()
+        if session:
+            return str(session.interview_token)
+        return None
+
+    def get_prescan_token(self, obj: Application) -> str | None:
+        return self._get_session_token(obj, "prescanning")
+
+    def get_interview_token(self, obj: Application) -> str | None:
+        return self._get_session_token(obj, "interview")
