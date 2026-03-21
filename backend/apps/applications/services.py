@@ -6,7 +6,7 @@ from uuid import UUID
 import boto3
 from botocore.config import Config as BotoConfig
 from django.conf import settings
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.db.models import Q
 from openai import OpenAI
 
@@ -411,6 +411,7 @@ def calculate_match_score(*, application_id: UUID) -> None:
     logger.info("calculate_match_score: score=%.1f for application %s", application.match_score, application_id)
 
 
+@transaction.atomic
 def bulk_update_status(
     *,
     application_ids: list[UUID],
@@ -422,6 +423,8 @@ def bulk_update_status(
     Only transitions that are valid per _STATUS_TRANSITIONS are applied;
     applications that cannot transition are silently skipped.
     """
+    from apps.notifications.services import notify_status_changed
+
     applications = Application.objects.filter(
         id__in=application_ids,
         vacancy__company=updated_by.company,
@@ -436,9 +439,6 @@ def bulk_update_status(
         application.status = status
         application.save(update_fields=["status", "updated_at"])
 
-        # Trigger notification
-        from apps.notifications.services import notify_status_changed
-
         notify_status_changed(application=application)
         updated += 1
 
@@ -451,11 +451,13 @@ def soft_delete_applications(
     updated_by: User,
 ) -> int:
     """Soft-delete applications (clear from archive). Completely hidden from UI."""
+    from django.utils import timezone
+
     return Application.objects.filter(
         id__in=application_ids,
         vacancy__company=updated_by.company,
         status=Application.Status.ARCHIVED,
-    ).update(is_deleted=True)
+    ).update(is_deleted=True, updated_at=timezone.now())
 
 
 def bulk_move_by_filter(

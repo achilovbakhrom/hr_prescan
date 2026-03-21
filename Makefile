@@ -3,7 +3,8 @@
        lint format typecheck test \
        up-monitoring up-management up-all \
        clean reset-db backup-db \
-       local-setup local-infra local-backend local-frontend local-stop
+       local-setup local-infra local-backend local-frontend local-stop \
+       local-test local-test-backend local-test-frontend local-test-e2e
 
 # ─── General ──────────────────────────────────────────────────────────────────
 
@@ -197,6 +198,19 @@ local-stop: ## Stop everything (infra + background processes)
 	-@pkill -f "vite" 2>/dev/null || true
 	docker compose down
 	@echo "All stopped."
+
+# ─── Testing (local) ─────────────────────────────────────────────────────────
+
+local-test: local-test-backend local-test-frontend ## Run all tests (backend + frontend)
+
+local-test-backend: ## Run backend tests (pytest)
+	cd backend && $(VENV)/python -m pytest tests/ -v --tb=short
+
+local-test-frontend: ## Run frontend unit tests (vitest)
+	cd frontend && npx vitest run --reporter=verbose
+
+local-test-e2e: ## Run E2E tests (playwright) — app must be running
+	cd frontend && npx playwright test --reporter=list
 
 # ─── Cleanup ──────────────────────────────────────────────────────────────────
 

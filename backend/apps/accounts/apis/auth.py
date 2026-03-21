@@ -27,7 +27,10 @@ class RegisterApi(APIView):
         serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        user = register_user(**serializer.validated_data)
+        try:
+            user = register_user(**serializer.validated_data)
+        except ApplicationError as e:
+            return Response({"detail": e.message}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(
             {"detail": "Registration successful. Please verify your email.", "user": UserOutputSerializer(user).data},
@@ -141,7 +144,10 @@ class VerifyEmailApi(APIView):
         serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        verify_email(token=serializer.validated_data["token"])
+        try:
+            verify_email(token=serializer.validated_data["token"])
+        except ApplicationError as e:
+            return Response({"detail": e.message}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({"detail": "Email verified successfully."}, status=status.HTTP_200_OK)
 

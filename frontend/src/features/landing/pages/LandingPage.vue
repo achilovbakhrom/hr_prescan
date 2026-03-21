@@ -7,7 +7,7 @@ import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { vacancyService } from '@/features/vacancies/services/vacancy.service'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import { EMPLOYMENT_LABELS, formatSalaryRange, formatDate } from '@/features/vacancies/composables/useVacancyLabels'
-import type { Vacancy } from '@/features/vacancies/types/vacancy.types'
+import type { Vacancy } from '@/shared/types/vacancy.types'
 
 const router = useRouter()
 const authStore = useAuthStore()

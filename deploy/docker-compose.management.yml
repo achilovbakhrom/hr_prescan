@@ -12,6 +12,13 @@ services:
     networks:
       - management
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.25"
+        reservations:
+          memory: 64M
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -26,6 +33,13 @@ services:
       - management
       - backend
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.50"
+        reservations:
+          memory: 128M
 
   redisinsight:
     image: redis/redisinsight:latest
@@ -37,6 +51,13 @@ services:
       - management
       - backend
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.25"
+        reservations:
+          memory: 64M
 
 volumes:
   portainer_data:

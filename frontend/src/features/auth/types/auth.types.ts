@@ -1,27 +1,8 @@
-export interface User {
-  id: string
-  email: string
-  firstName: string
-  lastName: string
-  phone: string | null
-  role: UserRole
-  company: Company | null
-  emailVerified: boolean
-}
+// Re-export shared types so intra-feature imports still work
+export type { User, Company, CompanySize, UserRole, PendingInvitation } from '@/shared/types/auth.types'
 
-export type UserRole = 'admin' | 'hr' | 'candidate'
-
-export interface Company {
-  id: string
-  name: string
-  industry: string
-  size: CompanySize
-  country: string
-  logo: string | null
-  website: string | null
-}
-
-export type CompanySize = 'small' | 'medium' | 'large' | 'enterprise'
+// Import shared types needed by feature-specific interfaces
+import type { User, CompanySize } from '@/shared/types/auth.types'
 
 export interface LoginRequest {
   email: string
@@ -50,15 +31,6 @@ export interface AcceptInvitationRequest {
   password: string
   firstName: string
   lastName: string
-}
-
-export interface PendingInvitation {
-  id: string
-  company: Company
-  invitedByName: string
-  token: string
-  expiresAt: string
-  createdAt: string
 }
 
 export interface RegisterCompanyRequest {

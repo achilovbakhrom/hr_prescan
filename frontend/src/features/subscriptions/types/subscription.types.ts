@@ -1,18 +1,10 @@
-export type PlanTier = 'free' | 'starter' | 'professional' | 'enterprise'
-export type BillingPeriod = 'monthly' | 'yearly'
+// Re-export shared types so intra-feature imports still work
+export type { SubscriptionPlan, PlanTier } from '@/shared/types/subscription.types'
 
-export interface SubscriptionPlan {
-  id: string
-  name: string
-  tier: PlanTier
-  description: string
-  priceMonthly: number
-  priceYearly: number
-  maxVacancies: number
-  maxInterviewsPerMonth: number
-  maxHrUsers: number
-  maxStorageGb: number
-}
+// Import shared types needed by feature-specific interfaces
+import type { SubscriptionPlan } from '@/shared/types/subscription.types'
+
+export type BillingPeriod = 'monthly' | 'yearly'
 
 export interface CompanySubscription {
   id: string

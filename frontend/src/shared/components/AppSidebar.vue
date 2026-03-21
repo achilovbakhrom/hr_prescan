@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { USER_ROLES } from '@/shared/constants/roles'
-import type { UserRole } from '@/features/auth/types/auth.types'
+import type { UserRole } from '@/shared/types/auth.types'
 
 interface NavItem {
   label: string

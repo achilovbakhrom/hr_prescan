@@ -27,7 +27,7 @@ import { landingRoutes } from '@/features/landing/routes'
 import { legalRoutes } from '@/features/legal/routes'
 import { errorRoutes } from '@/features/errors/routes'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
-import type { UserRole } from '@/features/auth/types/auth.types'
+import type { UserRole } from '@/shared/types/auth.types'
 
 declare module 'vue-router' {
   interface RouteMeta {

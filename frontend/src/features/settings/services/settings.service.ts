@@ -1,5 +1,5 @@
 import { apiClient } from '@/shared/api/client'
-import type { Company } from '@/features/auth/types/auth.types'
+import type { Company } from '@/shared/types/auth.types'
 import type {
   CompanyProfileUpdate,
   Invitation,

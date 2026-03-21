@@ -1,4 +1,4 @@
-import type { CompanySize, UserRole, User } from '@/features/auth/types/auth.types'
+import type { CompanySize, UserRole, User } from '@/shared/types/auth.types'
 
 export interface CompanyProfileUpdate {
   name: string
