@@ -8,7 +8,7 @@ import type { FileUploadSelectEvent } from 'primevue/fileupload'
 import { vacancyService } from '@/features/vacancies/services/vacancy.service'
 import { useCandidateStore } from '../stores/candidate.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
-import type { Vacancy } from '@/features/vacancies/types/vacancy.types'
+import type { Vacancy } from '@/shared/types/vacancy.types'
 
 const route = useRoute()
 const router = useRouter()

@@ -1,10 +1,27 @@
 from uuid import UUID
 
+from django.core import signing
 from django.db import transaction
 
 from apps.accounts.models import Company, Invitation, User
 from apps.accounts.tasks import send_invitation_email, send_verification_email
 from apps.common.exceptions import ApplicationError
+
+EMAIL_VERIFICATION_SALT = "email-verification"
+EMAIL_VERIFICATION_MAX_AGE = 60 * 60 * 24 * 3  # 3 days
+
+
+def generate_email_verification_token(*, user_id: str) -> str:
+    """Generate a signed, time-limited token for email verification."""
+    return signing.dumps(user_id, salt=EMAIL_VERIFICATION_SALT)
+
+
+def decode_email_verification_token(*, token: str) -> str:
+    """Decode and validate a signed email verification token. Returns user_id."""
+    try:
+        return signing.loads(token, salt=EMAIL_VERIFICATION_SALT, max_age=EMAIL_VERIFICATION_MAX_AGE)
+    except signing.BadSignature as exc:
+        raise ApplicationError("Invalid or expired verification token.") from exc
 
 
 def create_user(
@@ -51,11 +68,11 @@ def register_user(
 
 
 def verify_email(*, token: str) -> User:
-    """Verify a user's email address using the provided token."""
-    # In a full implementation, this would decode a signed token.
-    # For now, we treat the token as the user ID (placeholder logic).
+    """Verify a user's email address using a signed token."""
+    user_id = decode_email_verification_token(token=token)
+
     try:
-        user = User.objects.get(id=token)
+        user = User.objects.get(id=user_id)
     except (User.DoesNotExist, ValueError) as exc:
         raise ApplicationError("Invalid or expired verification token.") from exc
 

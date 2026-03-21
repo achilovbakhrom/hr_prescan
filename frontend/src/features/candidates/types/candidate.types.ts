@@ -1,29 +1,8 @@
-export type ApplicationStatus =
-  | 'applied'
-  | 'prescanned'
-  | 'interviewed'
-  | 'shortlisted'
-  | 'hired'
-  | 'rejected'
-  | 'expired'
-  | 'archived'
+// Re-export shared types so intra-feature imports still work
+export type { Application, ApplicationStatus } from '@/shared/types/candidate.types'
 
-export interface Application {
-  id: string
-  vacancyId: string
-  vacancyTitle: string
-  candidateName: string
-  candidateEmail: string
-  candidatePhone: string
-  cvFile: string
-  cvOriginalFilename: string
-  matchScore: number | null
-  prescanningScore: number | null
-  interviewScore: number | null
-  status: ApplicationStatus
-  createdAt: string
-  updatedAt: string
-}
+// Import shared types needed by feature-specific interfaces
+import type { Application } from '@/shared/types/candidate.types'
 
 export interface ApplicationDetail extends Application {
   cvParsedText: string

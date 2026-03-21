@@ -7,7 +7,7 @@ import Button from 'primevue/button'
 import FileUpload from 'primevue/fileupload'
 import Message from 'primevue/message'
 import { useSettingsStore } from '../stores/settings.store'
-import type { CompanySize } from '@/features/auth/types/auth.types'
+import type { CompanySize } from '@/shared/types/auth.types'
 
 const settingsStore = useSettingsStore()
 

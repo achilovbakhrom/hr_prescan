@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import ProgressBar from 'primevue/progressbar'
 import { apiClient } from '@/shared/api/client'
-import type { InterviewScore, IntegrityFlag } from '@/features/interviews/types/interview.types'
+import type { InterviewScore, IntegrityFlag } from '@/shared/types/interview.types'
 
 interface CandidateInterviewScores {
   overallScore: number | null

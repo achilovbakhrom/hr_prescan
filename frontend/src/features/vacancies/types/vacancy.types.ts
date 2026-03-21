@@ -1,39 +1,18 @@
-export type VacancyStatus = 'draft' | 'published' | 'paused' | 'archived'
-export type VacancyVisibility = 'public' | 'private'
-export type EmploymentType = 'full_time' | 'part_time' | 'contract' | 'internship'
-export type ExperienceLevel = 'junior' | 'middle' | 'senior' | 'lead' | 'director'
-export type QuestionSource = 'ai_generated' | 'hr_added'
-export type InterviewMode = 'chat' | 'meet'
-export type StepType = 'prescanning' | 'interview'
+// Re-export shared types so intra-feature imports still work
+export type {
+  Vacancy,
+  VacancyStatus,
+  VacancyVisibility,
+  EmploymentType,
+  ExperienceLevel,
+  InterviewMode,
+} from '@/shared/types/vacancy.types'
 
-export interface Vacancy {
-  id: string
-  title: string
-  description: string
-  requirements: string
-  responsibilities: string
-  skills: string[]
-  salaryMin: number | null
-  salaryMax: number | null
-  salaryCurrency: string
-  location: string
-  isRemote: boolean
-  employmentType: EmploymentType
-  experienceLevel: ExperienceLevel
-  deadline: string | null
-  status: VacancyStatus
-  visibility: VacancyVisibility
-  interviewMode: InterviewMode
-  interviewEnabled: boolean
-  cvRequired: boolean
-  companyInfo: string
-  shareToken: string
-  interviewDuration: number
-  criteriaCount: number
-  questionsCount: number
-  createdAt: string
-  updatedAt: string
-}
+// Import shared types needed by feature-specific interfaces
+import type { Vacancy, EmploymentType, ExperienceLevel, VacancyVisibility, InterviewMode } from '@/shared/types/vacancy.types'
+
+export type QuestionSource = 'ai_generated' | 'hr_added'
+export type StepType = 'prescanning' | 'interview'
 
 export interface VacancyDetail extends Vacancy {
   prescanningPrompt: string

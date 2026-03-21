@@ -24,7 +24,7 @@ import { useCandidateStore } from '@/features/candidates/stores/candidate.store'
 import { candidateService } from '@/features/candidates/services/candidate.service'
 import CandidateKanban from '@/features/candidates/components/CandidateKanban.vue'
 import ApplicationStatusBadge from '@/features/candidates/components/ApplicationStatusBadge.vue'
-import type { Application, ApplicationStatus } from '@/features/candidates/types/candidate.types'
+import type { Application, ApplicationStatus } from '@/shared/types/candidate.types'
 import type { CreateVacancyRequest, VacancyStatus } from '../types/vacancy.types'
 
 const route = useRoute()

@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
+import { extractErrorMessage } from '@/shared/api/errors'
 import { authService } from '../services/auth.service'
 import type {
   AcceptInvitationRequest,
@@ -180,22 +181,3 @@ export const useAuthStore = defineStore('auth', () => {
     initAuth,
   }
 })
-
-function extractErrorMessage(err: unknown): string {
-  if (
-    typeof err === 'object' &&
-    err !== null &&
-    'response' in err &&
-    typeof (err as Record<string, unknown>).response === 'object'
-  ) {
-    const response = (err as { response: { data?: { message?: string } } })
-      .response
-    if (response.data?.message) {
-      return response.data.message
-    }
-  }
-  if (err instanceof Error) {
-    return err.message
-  }
-  return 'An unexpected error occurred'
-}

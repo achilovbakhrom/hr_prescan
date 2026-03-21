@@ -5,7 +5,7 @@ import Button from 'primevue/button'
 import Message from 'primevue/message'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { authService } from '@/features/auth/services/auth.service'
-import type { PendingInvitation } from '@/features/auth/types/auth.types'
+import type { PendingInvitation } from '@/shared/types/auth.types'
 
 const authStore = useAuthStore()
 

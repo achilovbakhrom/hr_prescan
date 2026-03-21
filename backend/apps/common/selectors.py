@@ -16,20 +16,24 @@ def get_dashboard_stats(*, company: Company) -> dict:
 
     total_candidates_count = Application.objects.filter(
         vacancy__company=company,
+        is_deleted=False,
     ).count()
 
     pending_interviews_count = Interview.objects.filter(
         application__vacancy__company=company,
+        application__is_deleted=False,
         status=Interview.Status.PENDING,
     ).count()
 
     completed_interviews_count = Interview.objects.filter(
         application__vacancy__company=company,
+        application__is_deleted=False,
         status=Interview.Status.COMPLETED,
     ).count()
 
     avg_match = Application.objects.filter(
         vacancy__company=company,
+        is_deleted=False,
         match_score__isnull=False,
     ).aggregate(avg=Avg("match_score"))["avg"]
 
@@ -52,7 +56,7 @@ def get_recent_applications(
     """Return the most recent applications for a company."""
     return (
         Application.objects
-        .filter(vacancy__company=company)
+        .filter(vacancy__company=company, is_deleted=False)
         .select_related("vacancy")
         .order_by("-created_at")[:limit]
     )

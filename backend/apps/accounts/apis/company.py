@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.permissions import IsAdmin, IsHRManager
+from apps.common.exceptions import ApplicationError
 from apps.accounts.selectors import get_company_invitations, get_company_users, get_user_by_id
 from apps.accounts.serializers import (
     AcceptInvitationInputSerializer,
@@ -35,7 +36,10 @@ class CompanyRegisterApi(APIView):
         serializer = CompanyRegisterInputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        company, user = create_company_with_admin(**serializer.validated_data)
+        try:
+            company, user = create_company_with_admin(**serializer.validated_data)
+        except ApplicationError as e:
+            return Response({"detail": e.message}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(
             {
@@ -89,11 +93,14 @@ class InviteHRApi(APIView):
         serializer = InviteHRInputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        invitation = invite_hr(
-            company=request.user.company,
-            email=serializer.validated_data["email"],
-            invited_by=request.user,
-        )
+        try:
+            invitation = invite_hr(
+                company=request.user.company,
+                email=serializer.validated_data["email"],
+                invited_by=request.user,
+            )
+        except ApplicationError as e:
+            return Response({"detail": e.message}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(
             {
@@ -121,7 +128,10 @@ class AcceptInvitationApi(APIView):
         serializer = AcceptInvitationInputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        user = accept_invitation(**serializer.validated_data)
+        try:
+            user = accept_invitation(**serializer.validated_data)
+        except ApplicationError as e:
+            return Response({"detail": e.message}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(
             {
@@ -168,9 +178,12 @@ class TeamMemberDetailApi(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        if serializer.validated_data["is_active"]:
-            target_user = activate_user(user=target_user, activated_by=request.user)
-        else:
-            target_user = deactivate_user(user=target_user, deactivated_by=request.user)
+        try:
+            if serializer.validated_data["is_active"]:
+                target_user = activate_user(user=target_user, activated_by=request.user)
+            else:
+                target_user = deactivate_user(user=target_user, deactivated_by=request.user)
+        except ApplicationError as e:
+            return Response({"detail": e.message}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(UserOutputSerializer(target_user).data, status=status.HTTP_200_OK)
