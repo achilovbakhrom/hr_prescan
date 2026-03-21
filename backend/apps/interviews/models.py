@@ -1,3 +1,5 @@
+import uuid
+
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
@@ -8,28 +10,41 @@ class Interview(BaseModel):
     """AI interview session linked to an application."""
 
     class Status(models.TextChoices):
-        SCHEDULED = "scheduled", "Scheduled"
+        PENDING = "pending", "Pending"
         IN_PROGRESS = "in_progress", "In Progress"
         COMPLETED = "completed", "Completed"
         CANCELLED = "cancelled", "Cancelled"
-        NO_SHOW = "no_show", "No Show"
+        EXPIRED = "expired", "Expired"
+
+    class ScreeningMode(models.TextChoices):
+        CHAT = "chat", "Chat"
+        MEET = "meet", "Meet"
 
     application = models.OneToOneField(
         "applications.Application",
         on_delete=models.CASCADE,
         related_name="interview",
     )
-    scheduled_at = models.DateTimeField()
-    duration_minutes = models.IntegerField(default=30)
+    screening_mode = models.CharField(
+        max_length=10,
+        choices=ScreeningMode.choices,
+        default=ScreeningMode.MEET,  # Existing interviews were all meet mode
+    )
+    interview_token = models.UUIDField(unique=True, default=uuid.uuid4)
+    duration_minutes = models.IntegerField(default=30)  # Meet mode only
     status = models.CharField(
         max_length=20,
         choices=Status.choices,
-        default=Status.SCHEDULED,
+        default=Status.PENDING,
     )
+    started_at = models.DateTimeField(null=True, blank=True)
 
-    # LiveKit
+    # LiveKit (Meet mode only)
     livekit_room_name = models.CharField(max_length=255, blank=True)
     candidate_token = models.CharField(max_length=500, blank=True)
+
+    # Chat mode
+    chat_history = models.JSONField(default=list)  # [{role, text, timestamp}]
 
     # Results (populated after interview)
     recording_path = models.CharField(max_length=500, blank=True)
@@ -40,10 +55,10 @@ class Interview(BaseModel):
     ai_summary = models.TextField(blank=True)
 
     class Meta:
-        ordering = ["-scheduled_at"]
+        ordering = ["-created_at"]
 
     def __str__(self) -> str:
-        return f"Interview for {self.application_id} at {self.scheduled_at}"
+        return f"Interview ({self.screening_mode}) for {self.application_id}"
 
 
 class InterviewScore(BaseModel):
@@ -80,6 +95,7 @@ class InterviewIntegrityFlag(BaseModel):
         GAZE_DEVIATION = "gaze_deviation", "Gaze Deviation"
         AUDIO_ANOMALY = "audio_anomaly", "Audio Anomaly"
         CV_INCONSISTENCY = "cv_inconsistency", "CV Inconsistency"
+        SUSPICIOUS_TIMING = "suspicious_timing", "Suspicious Timing"
 
     class Severity(models.TextChoices):
         LOW = "low", "Low"

@@ -67,22 +67,22 @@ const navItems: NavItem[] = [
     roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
   },
   {
-    label: 'Candidates',
-    icon: 'pi pi-user',
-    to: '/candidates',
-    roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
-  },
-  {
     label: 'Interviews',
     icon: 'pi pi-calendar',
     to: '/interviews',
-    roles: [USER_ROLES.HR],
+    roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
   },
   {
     label: 'Team',
     icon: 'pi pi-users',
-    to: '/team',
-    roles: [USER_ROLES.HR],
+    to: '/settings/team',
+    roles: [USER_ROLES.ADMIN],
+  },
+  {
+    label: 'Company',
+    icon: 'pi pi-cog',
+    to: '/settings/company',
+    roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
   },
   {
     label: 'Subscription',
@@ -111,14 +111,13 @@ const filteredItems = computed(() => {
 })
 
 function isActive(path: string): boolean {
+  if (path === '/admin') {
+    return route.path === '/admin'
+  }
   return route.path === path || route.path.startsWith(path + '/')
 }
 
-function handleNav(): void {
-  emit('close')
-}
-
-// Close sidebar on route change
+// Close drawer on route change
 watch(
   () => route.path,
   () => {
@@ -202,7 +201,7 @@ watch(
                     ? 'bg-blue-50 text-blue-700'
                     : 'text-gray-700 hover:bg-gray-100'
                 "
-                @click="handleNav"
+                :aria-current="isActive(item.to) ? 'page' : undefined"
               >
                 <i :class="item.icon" class="text-base"></i>
                 <span>{{ item.label }}</span>

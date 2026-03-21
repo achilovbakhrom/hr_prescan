@@ -12,144 +12,119 @@ interface NavItem {
   roles: UserRole[]
 }
 
+interface NavSection {
+  title?: string
+  items: NavItem[]
+}
+
 defineProps<{
   collapsed: boolean
-}>()
-
-const emit = defineEmits<{
-  close: []
 }>()
 
 const route = useRoute()
 const authStore = useAuthStore()
 
-const navItems: NavItem[] = [
+const sections: NavSection[] = [
   {
-    label: 'Dashboard',
-    icon: 'pi pi-home',
-    to: '/dashboard',
-    roles: [USER_ROLES.ADMIN, USER_ROLES.HR, USER_ROLES.CANDIDATE],
+    items: [
+      { label: 'Dashboard', icon: 'pi pi-home', to: '/dashboard', roles: [USER_ROLES.ADMIN, USER_ROLES.HR, USER_ROLES.CANDIDATE] },
+    ],
   },
   {
-    label: 'Admin Dashboard',
-    icon: 'pi pi-shield',
-    to: '/admin',
-    roles: [USER_ROLES.ADMIN],
+    title: 'Recruitment',
+    items: [
+      { label: 'Vacancies', icon: 'pi pi-briefcase', to: '/vacancies', roles: [USER_ROLES.ADMIN, USER_ROLES.HR] },
+      { label: 'Interviews', icon: 'pi pi-video', to: '/interviews', roles: [USER_ROLES.ADMIN, USER_ROLES.HR] },
+    ],
   },
   {
-    label: 'Companies',
-    icon: 'pi pi-building',
-    to: '/admin/companies',
-    roles: [USER_ROLES.ADMIN],
+    title: 'Candidate',
+    items: [
+      { label: 'Browse Jobs', icon: 'pi pi-search', to: '/jobs', roles: [USER_ROLES.CANDIDATE] },
+      { label: 'My Applications', icon: 'pi pi-file', to: '/my-applications', roles: [USER_ROLES.CANDIDATE] },
+    ],
   },
   {
-    label: 'Users',
-    icon: 'pi pi-users',
-    to: '/admin/users',
-    roles: [USER_ROLES.ADMIN],
+    title: 'Platform',
+    items: [
+      { label: 'Admin', icon: 'pi pi-shield', to: '/admin', roles: [USER_ROLES.ADMIN] },
+      { label: 'Companies', icon: 'pi pi-building', to: '/admin/companies', roles: [USER_ROLES.ADMIN] },
+      { label: 'Users', icon: 'pi pi-users', to: '/admin/users', roles: [USER_ROLES.ADMIN] },
+      { label: 'Plans', icon: 'pi pi-list', to: '/admin/plans', roles: [USER_ROLES.ADMIN] },
+      { label: 'Analytics', icon: 'pi pi-chart-bar', to: '/admin/analytics', roles: [USER_ROLES.ADMIN] },
+    ],
   },
   {
-    label: 'Analytics',
-    icon: 'pi pi-chart-bar',
-    to: '/admin/analytics',
-    roles: [USER_ROLES.ADMIN],
-  },
-  {
-    label: 'Plans',
-    icon: 'pi pi-list',
-    to: '/admin/plans',
-    roles: [USER_ROLES.ADMIN],
-  },
-  {
-    label: 'Vacancies',
-    icon: 'pi pi-briefcase',
-    to: '/vacancies',
-    roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
-  },
-  {
-    label: 'Candidates',
-    icon: 'pi pi-user',
-    to: '/candidates',
-    roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
-  },
-  {
-    label: 'Interviews',
-    icon: 'pi pi-calendar',
-    to: '/interviews',
-    roles: [USER_ROLES.HR],
-  },
-  {
-    label: 'Team',
-    icon: 'pi pi-users',
-    to: '/team',
-    roles: [USER_ROLES.HR],
-  },
-  {
-    label: 'Subscription',
-    icon: 'pi pi-credit-card',
-    to: '/subscription',
-    roles: [USER_ROLES.ADMIN],
-  },
-  {
-    label: 'My Applications',
-    icon: 'pi pi-file',
-    to: '/my-applications',
-    roles: [USER_ROLES.CANDIDATE],
-  },
-  {
-    label: 'Browse Jobs',
-    icon: 'pi pi-search',
-    to: '/jobs',
-    roles: [USER_ROLES.CANDIDATE],
+    title: 'Settings',
+    items: [
+      { label: 'Company', icon: 'pi pi-cog', to: '/settings/company', roles: [USER_ROLES.ADMIN, USER_ROLES.HR] },
+      { label: 'Team', icon: 'pi pi-users', to: '/settings/team', roles: [USER_ROLES.ADMIN] },
+      { label: 'Subscription', icon: 'pi pi-credit-card', to: '/subscription', roles: [USER_ROLES.ADMIN] },
+    ],
   },
 ]
 
-const filteredItems = computed(() => {
+const filteredSections = computed(() => {
   const userRole = authStore.user?.role
   if (!userRole) return []
-  return navItems.filter((item) => item.roles.includes(userRole))
+  return sections
+    .map((section) => ({
+      ...section,
+      items: section.items.filter((item) => item.roles.includes(userRole)),
+    }))
+    .filter((section) => section.items.length > 0)
 })
 
 function isActive(path: string): boolean {
+  if (path === '/admin') return route.path === '/admin'
   return route.path === path || route.path.startsWith(path + '/')
-}
-
-function handleNav(): void {
-  emit('close')
 }
 </script>
 
 <template>
   <aside
-    class="flex h-full flex-col border-r border-gray-200 bg-white transition-all duration-300"
-    :class="collapsed ? 'w-0 overflow-hidden lg:w-16' : 'w-64'"
+    class="flex h-full shrink-0 flex-col border-r border-gray-100 bg-white transition-all duration-200"
+    :class="collapsed ? 'w-16' : 'w-60'"
     role="navigation"
     aria-label="Main navigation"
-    :aria-expanded="!collapsed"
   >
-    <nav
-      class="mt-4 flex flex-col gap-1 px-2"
-      aria-label="Application sections"
-    >
-      <ul class="flex flex-col gap-1" role="list">
-        <li v-for="item in filteredItems" :key="item.to" role="listitem">
-          <RouterLink
-            :to="item.to"
-            class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors"
-            :class="
-              isActive(item.to)
-                ? 'bg-blue-50 text-blue-700'
-                : 'text-gray-700 hover:bg-gray-100'
-            "
-            :aria-label="collapsed ? item.label : undefined"
-            :aria-current="isActive(item.to) ? 'page' : undefined"
-            @click="handleNav"
-          >
-            <i :class="item.icon" class="text-base" aria-hidden="true"></i>
-            <span v-if="!collapsed" class="truncate">{{ item.label }}</span>
-          </RouterLink>
-        </li>
-      </ul>
+    <nav class="flex flex-1 flex-col gap-0.5 overflow-y-auto px-2 py-3">
+      <template v-for="(section, sIdx) in filteredSections" :key="sIdx">
+        <!-- Section divider -->
+        <div
+          v-if="section.title && !collapsed && sIdx > 0"
+          class="mb-1 mt-3 px-3"
+        >
+          <span class="text-[10px] font-semibold uppercase tracking-widest text-gray-400">
+            {{ section.title }}
+          </span>
+        </div>
+        <div v-else-if="sIdx > 0 && collapsed" class="my-2 border-t border-gray-100"></div>
+
+        <ul class="flex flex-col gap-0.5" role="list">
+          <li v-for="item in section.items" :key="item.to" role="listitem">
+            <RouterLink
+              :to="item.to"
+              class="flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-colors"
+              :class="
+                isActive(item.to)
+                  ? 'bg-blue-50 text-blue-700'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              "
+              :title="collapsed ? item.label : undefined"
+              :aria-current="isActive(item.to) ? 'page' : undefined"
+            >
+              <i
+                :class="item.icon"
+                class="shrink-0 text-sm"
+                :style="{ width: '18px', textAlign: 'center' }"
+                aria-hidden="true"
+              ></i>
+              <span v-if="!collapsed" class="truncate">{{ item.label }}</span>
+            </RouterLink>
+          </li>
+        </ul>
+      </template>
     </nav>
   </aside>
 </template>

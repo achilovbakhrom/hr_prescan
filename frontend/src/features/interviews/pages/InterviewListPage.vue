@@ -15,11 +15,11 @@ const statusFilter = ref<string | undefined>(undefined)
 
 const statusOptions = [
   { label: 'All Statuses', value: undefined },
-  { label: 'Scheduled', value: 'scheduled' },
+  { label: 'Pending', value: 'pending' },
   { label: 'In Progress', value: 'in_progress' },
   { label: 'Completed', value: 'completed' },
   { label: 'Cancelled', value: 'cancelled' },
-  { label: 'No Show', value: 'no_show' },
+  { label: 'Expired', value: 'expired' },
 ]
 
 const interviews = computed(() => interviewStore.interviews)
@@ -77,9 +77,9 @@ function formatScore(score: number | null): string {
     >
       <Column field="candidateName" header="Candidate" sortable />
       <Column field="vacancyTitle" header="Vacancy" sortable />
-      <Column header="Scheduled" sortable sort-field="scheduledAt">
+      <Column header="Created" sortable sort-field="createdAt">
         <template #body="{ data }">
-          {{ formatDate((data as Interview).scheduledAt) }}
+          {{ formatDate((data as Interview).createdAt) }}
         </template>
       </Column>
       <Column header="Status" sort-field="status">

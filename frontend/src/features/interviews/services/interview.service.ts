@@ -1,62 +1,88 @@
 import { apiClient } from '@/shared/api/client'
 import type {
+  ChatMessage,
   Interview,
   InterviewDetail,
-  ScheduleInterviewRequest,
 } from '../types/interview.types'
 
 export const interviewService = {
   // HR
-  async scheduleInterview(
-    applicationId: string,
-    data: ScheduleInterviewRequest,
-  ): Promise<Interview> {
-    const response = await apiClient.post<Interview>(
-      `/applications/${applicationId}/schedule-interview`,
-      data,
-    )
-    return response.data
-  },
-
   async getInterviews(params?: { status?: string }): Promise<Interview[]> {
-    const response = await apiClient.get<Interview[]>('/interviews', { params })
+    const response = await apiClient.get<Interview[]>('/hr/interviews', {
+      params,
+    })
     return response.data
   },
 
   async getInterviewDetail(id: string): Promise<InterviewDetail> {
-    const response = await apiClient.get<InterviewDetail>(`/interviews/${id}`)
+    const response = await apiClient.get<InterviewDetail>(
+      `/hr/interviews/${id}`,
+    )
     return response.data
   },
 
   async cancelInterview(id: string): Promise<Interview> {
     const response = await apiClient.post<Interview>(
-      `/interviews/${id}/cancel`,
+      `/hr/interviews/${id}/cancel`,
     )
     return response.data
   },
 
   async getObserverToken(id: string): Promise<{ token: string }> {
     const response = await apiClient.get<{ token: string }>(
-      `/interviews/${id}/observer-token`,
+      `/hr/interviews/${id}/observer-token`,
+    )
+    return response.data
+  },
+
+  async resetInterview(interviewId: string): Promise<Interview> {
+    const response = await apiClient.post<Interview>(
+      `/hr/interviews/${interviewId}/reset/`,
     )
     return response.data
   },
 
   // Candidate
-  async scheduleByCandidate(
-    applicationId: string,
-    data: ScheduleInterviewRequest,
-  ): Promise<Interview> {
-    const response = await apiClient.post<Interview>(
-      `/applications/${applicationId}/candidate-schedule`,
-      data,
+  async getCandidateInterview(id: string): Promise<InterviewDetail> {
+    const response = await apiClient.get<InterviewDetail>(
+      `/candidate/interview/${id}`,
     )
     return response.data
   },
 
-  async getCandidateInterview(id: string): Promise<InterviewDetail> {
+  // Public — token-based interview access
+  async getInterviewByToken(token: string): Promise<InterviewDetail> {
     const response = await apiClient.get<InterviewDetail>(
-      `/candidate/interviews/${id}`,
+      `/public/interview/${token}/`,
+    )
+    return response.data
+  },
+
+  async startInterview(token: string): Promise<InterviewDetail> {
+    const response = await apiClient.post<InterviewDetail>(
+      `/public/interview/${token}/start/`,
+    )
+    return response.data
+  },
+
+  async sendChatMessage(token: string, message: string): Promise<ChatMessage> {
+    const response = await apiClient.post<ChatMessage>(
+      `/public/interview/${token}/chat/`,
+      { message },
+    )
+    return response.data
+  },
+
+  async getChatHistory(token: string): Promise<ChatMessage[]> {
+    const response = await apiClient.get<ChatMessage[]>(
+      `/public/interview/${token}/chat/history/`,
+    )
+    return response.data
+  },
+
+  async getRoomJoinInfo(id: string): Promise<InterviewDetail> {
+    const response = await apiClient.get<InterviewDetail>(
+      `/public/interview/${id}/join`,
     )
     return response.data
   },

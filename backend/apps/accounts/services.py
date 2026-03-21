@@ -177,6 +177,38 @@ def accept_invitation(
     return user
 
 
+@transaction.atomic
+def accept_invitation_existing_user(
+    *,
+    user: User,
+    token: UUID,
+) -> User:
+    """Accept an invitation for an existing user — switches their company and role."""
+    try:
+        invitation = Invitation.objects.select_related("company").get(token=token)
+    except Invitation.DoesNotExist as exc:
+        raise ApplicationError("Invalid invitation token.") from exc
+
+    if invitation.is_accepted:
+        raise ApplicationError("This invitation has already been accepted.")
+
+    if invitation.is_expired:
+        raise ApplicationError("This invitation has expired.")
+
+    if invitation.email != user.email:
+        raise ApplicationError("This invitation was sent to a different email.")
+
+    # Switch user's company and role
+    user.company = invitation.company
+    user.role = User.Role.HR
+    user.save(update_fields=["company", "role", "updated_at"])
+
+    invitation.is_accepted = True
+    invitation.save(update_fields=["is_accepted", "updated_at"])
+
+    return user
+
+
 def deactivate_user(*, user: User, deactivated_by: User) -> User:
     """Deactivate a user. Only admins of the same company can deactivate."""
     if deactivated_by.role != User.Role.ADMIN:

@@ -14,11 +14,27 @@ const route = useRoute()
 const router = useRouter()
 const interviewStore = useInterviewStore()
 
+const TAB_NAMES = ['scores', 'transcript', 'integrity', 'recording'] as const
+const activeTab = computed({
+  get: () => {
+    const tab = route.query.tab as string
+    const idx = TAB_NAMES.indexOf(tab as typeof TAB_NAMES[number])
+    return idx >= 0 ? idx : 0
+  },
+  set: (val: number) => {
+    router.replace({ query: { ...route.query, tab: TAB_NAMES[val] } })
+  },
+})
+
 const interviewId = computed(() => route.params.id as string)
 const interview = computed(() => interviewStore.currentInterview)
 
-const isScheduled = computed(() => interview.value?.status === 'scheduled')
+const isScheduled = computed(() => interview.value?.status === 'pending')
 const isInProgress = computed(() => interview.value?.status === 'in_progress')
+const roomUrl = computed(() => {
+  if (!interview.value) return ''
+  return `${window.location.origin}/interview/${interview.value.id}/room`
+})
 
 onMounted(() => interviewStore.fetchInterviewDetail(interviewId.value))
 
@@ -70,12 +86,20 @@ async function handleWatchLive(): Promise<void> {
             <p class="text-lg font-semibold">{{ interview.candidateName }}</p>
             <p class="text-sm text-gray-600">{{ interview.vacancyTitle }}</p>
             <p class="text-sm text-gray-500">
-              {{ formatDate(interview.scheduledAt) }} &middot;
+              {{ formatDate(interview.createdAt) }} &middot;
               {{ interview.durationMinutes }} min
             </p>
           </div>
           <div class="flex items-center gap-3">
             <InterviewStatusBadge :status="interview.status" />
+            <Button
+              v-if="isScheduled || isInProgress"
+              label="Open Room"
+              icon="pi pi-external-link"
+              size="small"
+              severity="info"
+              @click="router.push(`/interview/${interview.id}/room`)"
+            />
             <Button
               v-if="isScheduled"
               label="Cancel"
@@ -94,6 +118,13 @@ async function handleWatchLive(): Promise<void> {
             />
           </div>
         </div>
+        <div v-if="isScheduled || isInProgress" class="mt-4 rounded border border-blue-100 bg-blue-50 p-3">
+          <p class="text-sm font-medium text-blue-800">Interview Room Link</p>
+          <p class="mt-1 text-sm text-blue-600">
+            {{ roomUrl }}
+          </p>
+          <p class="mt-1 text-xs text-blue-500">Share this link with the candidate to join the AI interview.</p>
+        </div>
         <p
           v-if="interview.aiSummary"
           class="mt-4 rounded bg-gray-50 p-3 text-sm text-gray-700"
@@ -102,7 +133,7 @@ async function handleWatchLive(): Promise<void> {
         </p>
       </div>
 
-      <TabView>
+      <TabView v-model:activeIndex="activeTab">
         <TabPanel value="0" header="Scores">
           <div class="py-4">
             <InterviewScoresView :scores="interview.scores" />

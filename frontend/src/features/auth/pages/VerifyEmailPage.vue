@@ -35,7 +35,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex min-h-screen items-center justify-center bg-gray-50">
+  <div class="flex flex-1 items-center justify-center py-12">
     <div class="w-full max-w-md rounded-lg bg-white p-8 text-center shadow-md">
       <div v-if="loading" class="flex flex-col items-center gap-4">
         <i class="pi pi-spin pi-spinner text-4xl text-blue-600"></i>

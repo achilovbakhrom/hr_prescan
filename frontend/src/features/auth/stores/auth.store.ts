@@ -56,6 +56,23 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function googleLogin(credential: string): Promise<void> {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await authService.googleAuth(credential)
+      tokens.value = response.tokens
+      user.value = response.user
+      saveTokens(response.tokens)
+    } catch (err: unknown) {
+      const message = extractErrorMessage(err)
+      error.value = message
+      throw new Error(message)
+    } finally {
+      loading.value = false
+    }
+  }
+
   async function register(data: RegisterRequest): Promise<void> {
     loading.value = true
     error.value = null
@@ -153,6 +170,7 @@ export const useAuthStore = defineStore('auth', () => {
     error,
     isAuthenticated,
     login,
+    googleLogin,
     register,
     logout,
     refreshAccessToken,

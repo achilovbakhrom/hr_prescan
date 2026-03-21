@@ -1,7 +1,6 @@
 from uuid import UUID
 
 from django.db.models import QuerySet
-from django.utils import timezone
 
 from apps.accounts.models import Company
 from apps.interviews.models import Interview, InterviewIntegrityFlag, InterviewScore
@@ -44,6 +43,24 @@ def get_interview_by_id(
     return qs.filter(id=interview_id).first()
 
 
+def get_interview_by_token(
+    *,
+    interview_token: UUID,
+) -> Interview | None:
+    """Get an interview by its unique interview_token (for candidate access)."""
+    return (
+        Interview.objects
+        .select_related(
+            "application",
+            "application__vacancy",
+            "application__vacancy__company",
+            "application__candidate",
+        )
+        .filter(interview_token=interview_token)
+        .first()
+    )
+
+
 def get_interview_for_candidate(
     *,
     interview_id: UUID,
@@ -62,24 +79,6 @@ def get_interview_for_candidate(
             application__candidate_email=candidate_email,
         )
         .first()
-    )
-
-
-def get_upcoming_interviews(
-    *,
-    hours_ahead: int = 24,
-) -> QuerySet[Interview]:
-    """Return scheduled interviews in the next N hours (for reminder tasks)."""
-    now = timezone.now()
-    cutoff = now + timezone.timedelta(hours=hours_ahead)
-    return (
-        Interview.objects
-        .filter(
-            status=Interview.Status.SCHEDULED,
-            scheduled_at__gte=now,
-            scheduled_at__lte=cutoff,
-        )
-        .select_related("application")
     )
 
 

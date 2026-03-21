@@ -19,12 +19,12 @@ class InterviewIntegrityFlagInline(admin.TabularInline):
 class InterviewAdmin(admin.ModelAdmin):
     list_display = [
         "application",
-        "scheduled_at",
+        "screening_mode",
         "status",
         "overall_score",
         "created_at",
     ]
-    list_filter = ["status"]
+    list_filter = ["status", "screening_mode"]
     search_fields = [
         "application__candidate_name",
         "application__candidate_email",
@@ -32,6 +32,7 @@ class InterviewAdmin(admin.ModelAdmin):
     ]
     readonly_fields = [
         "id",
+        "interview_token",
         "livekit_room_name",
         "candidate_token",
         "recording_path",

@@ -18,6 +18,10 @@ class Vacancy(BaseModel):
         PUBLIC = "public", "Public"
         PRIVATE = "private", "Private"
 
+    class ScreeningMode(models.TextChoices):
+        CHAT = "chat", "Chat"
+        MEET = "meet", "Meet"
+
     class EmploymentType(models.TextChoices):
         FULL_TIME = "full_time", "Full Time"
         PART_TIME = "part_time", "Part Time"
@@ -77,7 +81,14 @@ class Vacancy(BaseModel):
         default=Visibility.PUBLIC,
     )
     share_token = models.UUIDField(unique=True, default=uuid.uuid4)
-    interview_duration = models.IntegerField(default=30)
+    screening_mode = models.CharField(
+        max_length=10,
+        choices=ScreeningMode.choices,
+        default=ScreeningMode.CHAT,
+    )
+    interview_duration = models.IntegerField(default=30)  # Meet mode only
+    cv_required = models.BooleanField(default=False)
+    company_info = models.TextField(blank=True, default="")  # Optional company description for AI interview intro
 
     class Meta:
         verbose_name_plural = "vacancies"

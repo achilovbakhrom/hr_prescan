@@ -1,17 +1,18 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { ref } from 'vue'
 import Button from 'primevue/button'
 import Dropdown from 'primevue/dropdown'
 import ConfirmDialog from 'primevue/confirmdialog'
 import { useConfirm } from 'primevue/useconfirm'
 import type { ApplicationStatus } from '../types/candidate.types'
-import ScheduleHumanInterviewDialog from './ScheduleHumanInterviewDialog.vue'
 import SendEmailDialog from './SendEmailDialog.vue'
 
 const props = defineProps<{
   candidateId: string
   candidateName: string
   candidateEmail: string
+  vacancyId: string
   currentStatus: ApplicationStatus
   loading: boolean
 }>()
@@ -22,38 +23,70 @@ const emit = defineEmits<{
 }>()
 
 const confirm = useConfirm()
-const showScheduleDialog = ref(false)
 const showEmailDialog = ref(false)
 
-const statusOptions = [
-  { label: 'Shortlist', value: 'shortlisted' as ApplicationStatus },
-  { label: 'Reject', value: 'rejected' as ApplicationStatus },
-]
+const statusOptions = computed(() => {
+  const options: { label: string; value: ApplicationStatus }[] = []
+  const s = props.currentStatus
+
+  if (s !== 'shortlisted') {
+    options.push({ label: 'Shortlist', value: 'shortlisted' })
+  }
+  if (s !== 'rejected') {
+    options.push({ label: 'Reject', value: 'rejected' })
+  }
+  if (s !== 'applied' && s !== 'interview_in_progress') {
+    options.push({ label: 'Reset to Applied', value: 'applied' })
+  }
+
+  return options
+})
+
+const statusMessages: Record<string, { message: string; icon: string; acceptClass: string; acceptLabel: string }> = {
+  shortlisted: {
+    message: 'This will move them to the next stage.',
+    icon: 'pi pi-check-circle',
+    acceptClass: 'p-button-success',
+    acceptLabel: 'Yes, shortlist',
+  },
+  rejected: {
+    message: 'This will notify the candidate.',
+    icon: 'pi pi-exclamation-triangle',
+    acceptClass: 'p-button-danger',
+    acceptLabel: 'Yes, reject',
+  },
+  applied: {
+    message: 'This will reset them back to the initial state.',
+    icon: 'pi pi-refresh',
+    acceptClass: '',
+    acceptLabel: 'Yes, reset',
+  },
+}
 
 function handleStatusChange(event: { value: ApplicationStatus }): void {
   const status = event.value
-  const label = status === 'shortlisted' ? 'shortlist' : 'reject'
+  const config = statusMessages[status] ?? {
+    message: `Change status to "${status.replace(/_/g, ' ')}"?`,
+    icon: 'pi pi-question-circle',
+    acceptClass: '',
+    acceptLabel: 'Confirm',
+  }
 
   confirm.require({
-    message: `Are you sure you want to ${label} ${props.candidateName}?`,
-    header: 'Confirm Action',
-    icon: 'pi pi-exclamation-triangle',
-    acceptClass:
-      status === 'rejected' ? 'p-button-danger' : 'p-button-success',
+    message: `${props.candidateName}: ${config.message}`,
+    header: status === 'applied' ? 'Reset Candidate Status' : `Confirm ${status.replace(/_/g, ' ')}`,
+    icon: config.icon,
+    acceptClass: config.acceptClass,
+    acceptLabel: config.acceptLabel,
+    rejectLabel: 'Cancel',
     accept: () => emit('statusChange', status),
   })
 }
+
 </script>
 
 <template>
   <div class="flex flex-wrap items-center gap-2">
-    <Button
-      label="Schedule Interview"
-      icon="pi pi-calendar-plus"
-      size="small"
-      severity="info"
-      @click="showScheduleDialog = true"
-    />
     <Button
       label="Send Email"
       icon="pi pi-envelope"
@@ -82,13 +115,6 @@ function handleStatusChange(event: { value: ApplicationStatus }): void {
     />
 
     <ConfirmDialog />
-
-    <ScheduleHumanInterviewDialog
-      :visible="showScheduleDialog"
-      :candidate-id="props.candidateId"
-      :candidate-name="props.candidateName"
-      @close="showScheduleDialog = false"
-    />
 
     <SendEmailDialog
       :visible="showEmailDialog"

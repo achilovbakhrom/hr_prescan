@@ -19,21 +19,36 @@ export const hrInterviewRoutes: RouteRecordRaw[] = [
 
 export const candidateInterviewRoutes: RouteRecordRaw[] = [
   {
-    path: '/schedule/:applicationId',
-    name: ROUTE_NAMES.CANDIDATE_SCHEDULE,
-    component: () => import('./pages/CandidateSchedulePage.vue'),
-    meta: { requiresAuth: false },
-  },
-  {
-    path: '/interview/:id',
+    path: '/my-interview/:id',
     name: ROUTE_NAMES.CANDIDATE_INTERVIEW,
     component: () => import('./pages/CandidateInterviewPage.vue'),
     meta: { requiresAuth: false },
   },
   {
-    path: '/interview/:id/confirmation',
+    path: '/my-interview/:id/confirmation',
     name: ROUTE_NAMES.INTERVIEW_CONFIRMATION,
     component: () => import('./pages/InterviewConfirmationPage.vue'),
+    meta: { requiresAuth: false },
+  },
+]
+
+export const publicInterviewRoutes: RouteRecordRaw[] = [
+  {
+    path: '/interview/:token',
+    name: ROUTE_NAMES.INTERVIEW_GATEWAY,
+    component: () => import('./pages/InterviewGatewayPage.vue'),
+    meta: { requiresAuth: false },
+  },
+  {
+    path: '/interview/:token/chat',
+    name: ROUTE_NAMES.CHAT_INTERVIEW,
+    component: () => import('./pages/ChatInterviewPage.vue'),
+    meta: { requiresAuth: false },
+  },
+  {
+    path: '/interview/:token/room',
+    name: ROUTE_NAMES.INTERVIEW_ROOM,
+    component: () => import('./pages/InterviewRoomPage.vue'),
     meta: { requiresAuth: false },
   },
 ]

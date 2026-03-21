@@ -1,13 +1,16 @@
 from django.urls import path
 
 from apps.accounts.apis import (
+    AcceptCompanyInvitationApi,
     AcceptInvitationApi,
     CompanyProfileApi,
     CompanyRegisterApi,
+    GoogleAuthApi,
     InviteHRApi,
     LoginApi,
     LogoutApi,
     MeApi,
+    MyInvitationsApi,
     RegisterApi,
     TeamListApi,
     TeamMemberDetailApi,
@@ -25,6 +28,9 @@ auth_urlpatterns = [
     path("me/", MeApi.as_view(), name="me"),
     path("company-register/", CompanyRegisterApi.as_view(), name="company-register"),
     path("accept-invitation/", AcceptInvitationApi.as_view(), name="accept-invitation"),
+    path("google/", GoogleAuthApi.as_view(), name="google-auth"),
+    path("my-invitations/", MyInvitationsApi.as_view(), name="my-invitations"),
+    path("accept-company-invitation/", AcceptCompanyInvitationApi.as_view(), name="accept-company-invitation"),
 ]
 
 # HR URLs — mounted at /api/hr/company/

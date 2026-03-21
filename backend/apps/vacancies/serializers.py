@@ -40,6 +40,10 @@ class VacancyListOutputSerializer(serializers.ModelSerializer):
 
     criteria_count = serializers.IntegerField(read_only=True)
     questions_count = serializers.IntegerField(read_only=True)
+    candidates_total = serializers.IntegerField(read_only=True, default=0)
+    candidates_interviewed = serializers.IntegerField(read_only=True, default=0)
+    candidates_shortlisted = serializers.IntegerField(read_only=True, default=0)
+    candidates_rejected = serializers.IntegerField(read_only=True, default=0)
     created_by_email = serializers.EmailField(source="created_by.email", read_only=True)
 
     class Meta:
@@ -54,8 +58,14 @@ class VacancyListOutputSerializer(serializers.ModelSerializer):
             "employment_type",
             "experience_level",
             "deadline",
+            "screening_mode",
+            "cv_required",
             "criteria_count",
             "questions_count",
+            "candidates_total",
+            "candidates_interviewed",
+            "candidates_shortlisted",
+            "candidates_rejected",
             "created_by_email",
             "created_at",
             "updated_at",
@@ -90,7 +100,10 @@ class VacancyDetailOutputSerializer(serializers.ModelSerializer):
             "status",
             "visibility",
             "share_token",
+            "screening_mode",
+            "cv_required",
             "interview_duration",
+            "company_info",
             "criteria",
             "questions",
             "created_by_email",
@@ -101,7 +114,7 @@ class VacancyDetailOutputSerializer(serializers.ModelSerializer):
 
 
 class PublicVacancyListOutputSerializer(serializers.ModelSerializer):
-    """Public vacancy list — no salary or internal details."""
+    """Public vacancy list — includes salary and skills for job seekers."""
 
     company_name = serializers.CharField(source="company.name", read_only=True)
 
@@ -116,6 +129,12 @@ class PublicVacancyListOutputSerializer(serializers.ModelSerializer):
             "employment_type",
             "experience_level",
             "company_name",
+            "screening_mode",
+            "cv_required",
+            "skills",
+            "salary_min",
+            "salary_max",
+            "salary_currency",
             "deadline",
             "created_at",
         ]
@@ -141,6 +160,8 @@ class PublicVacancyDetailOutputSerializer(serializers.ModelSerializer):
             "employment_type",
             "experience_level",
             "company_name",
+            "screening_mode",
+            "cv_required",
             "deadline",
             "interview_duration",
             "created_at",

@@ -1,8 +1,14 @@
+import json
+import logging
+
 from django.db import models, transaction
+from openai import OpenAI
 
 from apps.accounts.models import Company, User
 from apps.common.exceptions import ApplicationError
 from apps.vacancies.models import InterviewQuestion, Vacancy, VacancyCriteria
+
+logger = logging.getLogger(__name__)
 
 
 DEFAULT_CRITERIA = [
@@ -36,13 +42,25 @@ def create_vacancy(
 
 
 def update_vacancy(*, vacancy: Vacancy, data: dict) -> Vacancy:
-    """Update allowed vacancy fields."""
+    """Update allowed vacancy fields.
+
+    screening_mode can only be changed if the vacancy has no applications.
+    """
     allowed_fields = {
         "title", "description", "requirements", "responsibilities",
         "skills", "salary_min", "salary_max", "salary_currency",
         "location", "is_remote", "employment_type", "experience_level",
         "deadline", "visibility", "interview_duration",
+        "screening_mode", "cv_required", "company_info",
     }
+
+    # Guard: screening_mode cannot be changed once applications exist
+    if "screening_mode" in data and data["screening_mode"] != vacancy.screening_mode:
+        if vacancy.applications.exists():
+            raise ApplicationError(
+                "Cannot change screening mode after applications have been submitted."
+            )
+
     update_fields: list[str] = []
 
     for field, value in data.items():
@@ -85,12 +103,18 @@ def pause_vacancy(*, vacancy: Vacancy) -> Vacancy:
 
 
 def close_vacancy(*, vacancy: Vacancy) -> Vacancy:
-    """Close a vacancy."""
+    """Close a vacancy and expire all pending interviews."""
     if vacancy.status == Vacancy.Status.CLOSED:
         raise ApplicationError("Vacancy is already closed.")
 
     vacancy.status = Vacancy.Status.CLOSED
     vacancy.save(update_fields=["status", "updated_at"])
+
+    # Expire all pending interviews for this vacancy
+    from apps.interviews.services import expire_interviews_for_vacancy
+
+    expire_interviews_for_vacancy(vacancy=vacancy)
+
     return vacancy
 
 
@@ -200,43 +224,63 @@ def delete_interview_question(*, question: InterviewQuestion) -> None:
 
 
 def generate_interview_questions(*, vacancy: Vacancy) -> list[InterviewQuestion]:
-    """Generate placeholder interview questions based on vacancy details.
+    """Generate interview questions using OpenAI based on vacancy details."""
+    skills_text = ", ".join(vacancy.skills) if vacancy.skills else "not specified"
+    criteria = list(vacancy.criteria.values_list("name", flat=True))
+    criteria_text = ", ".join(criteria) if criteria else "general assessment"
 
-    STUB: Will integrate OpenAI in Phase 7.
-    """
-    placeholder_questions = [
-        {
-            "text": f"Tell us about your experience related to {vacancy.title}.",
-            "category": "Experience",
-        },
-        {
-            "text": "Describe a challenging project you worked on and how you handled it.",
-            "category": "Problem Solving",
-        },
-        {
-            "text": "How do you prioritize tasks when working on multiple projects?",
-            "category": "Organization",
-        },
-        {
-            "text": "What motivates you in your professional career?",
-            "category": "Behavioral",
-        },
-        {
-            "text": "Where do you see yourself in the next few years?",
-            "category": "Career Goals",
-        },
-    ]
+    try:
+        client = OpenAI()
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            temperature=0.8,
+            response_format={"type": "json_object"},
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You are an expert HR interviewer. Generate interview questions "
+                        "for a pre-screening AI interview. Questions should be:\n"
+                        "- Specific to the role and required skills\n"
+                        "- A mix of technical, behavioral, and situational questions\n"
+                        "- Open-ended (not yes/no)\n"
+                        "- Concise (1-2 sentences max)\n\n"
+                        "Return JSON with a 'questions' array. Each item has:\n"
+                        '- "text": the question\n'
+                        '- "category": one of Technical, Behavioral, Situational, Experience, Problem Solving\n\n'
+                        "Generate 7-10 questions."
+                    ),
+                },
+                {
+                    "role": "user",
+                    "content": (
+                        f"Role: {vacancy.title}\n"
+                        f"Experience level: {vacancy.experience_level}\n"
+                        f"Description: {vacancy.description[:1000]}\n"
+                        f"Requirements: {(vacancy.requirements or 'N/A')[:1000]}\n"
+                        f"Skills: {skills_text}\n"
+                        f"Evaluation criteria: {criteria_text}"
+                    ),
+                },
+            ],
+        )
+
+        data = json.loads(response.choices[0].message.content)
+        questions_data = data.get("questions", [])
+    except Exception:
+        logger.exception("Failed to generate questions with AI for vacancy %s", vacancy.id)
+        raise ApplicationError("Failed to generate questions. Please try again.")
 
     max_order = vacancy.questions.aggregate(
         max_order=models.Max("order")
     )["max_order"] or 0
 
     created_questions: list[InterviewQuestion] = []
-    for i, q in enumerate(placeholder_questions, start=1):
+    for i, q in enumerate(questions_data, start=1):
         question = InterviewQuestion.objects.create(
             vacancy=vacancy,
-            text=q["text"],
-            category=q["category"],
+            text=q.get("text", ""),
+            category=q.get("category", "General"),
             source=InterviewQuestion.Source.AI_GENERATED,
             order=max_order + i,
         )

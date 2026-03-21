@@ -11,12 +11,12 @@ const STATUS_CONFIG: Record<
   { label: string; severity: string }
 > = {
   applied: { label: 'Applied', severity: 'info' },
-  interview_scheduled: { label: 'Interview Scheduled', severity: 'warn' },
   interview_in_progress: { label: 'Interview In Progress', severity: 'warn' },
   interview_completed: { label: 'Interview Completed', severity: 'success' },
   reviewing: { label: 'Reviewing', severity: 'warn' },
   shortlisted: { label: 'Shortlisted', severity: 'success' },
   rejected: { label: 'Rejected', severity: 'danger' },
+  expired: { label: 'Expired', severity: 'secondary' },
 }
 </script>
 

@@ -39,7 +39,7 @@ function formatDateTime(dateStr: string): string {
       <Column field="vacancyTitle" header="Vacancy" />
       <Column header="Date/Time">
         <template #body="{ data }">
-          {{ formatDateTime((data as UpcomingInterview).scheduledAt) }}
+          {{ formatDateTime((data as UpcomingInterview).createdAt) }}
         </template>
       </Column>
       <Column field="status" header="Status" />

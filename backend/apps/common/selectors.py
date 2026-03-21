@@ -20,7 +20,7 @@ def get_dashboard_stats(*, company: Company) -> dict:
 
     pending_interviews_count = Interview.objects.filter(
         application__vacancy__company=company,
-        status=Interview.Status.SCHEDULED,
+        status=Interview.Status.PENDING,
     ).count()
 
     completed_interviews_count = Interview.objects.filter(
@@ -58,23 +58,21 @@ def get_recent_applications(
     )
 
 
-def get_upcoming_company_interviews(
+def get_pending_company_interviews(
     *,
     company: Company,
     limit: int = 5,
 ) -> QuerySet[Interview]:
-    """Return the next upcoming scheduled interviews for a company."""
-    now = timezone.now()
+    """Return pending interviews (awaiting candidate) for a company."""
     return (
         Interview.objects
         .filter(
             application__vacancy__company=company,
-            status=Interview.Status.SCHEDULED,
-            scheduled_at__gte=now,
+            status=Interview.Status.PENDING,
         )
         .select_related(
             "application",
             "application__vacancy",
         )
-        .order_by("scheduled_at")[:limit]
+        .order_by("-created_at")[:limit]
     )

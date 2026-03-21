@@ -4,6 +4,12 @@ import { USER_ROLES } from '@/shared/constants/roles'
 
 export const settingsRoutes: RouteRecordRaw[] = [
   {
+    path: '/profile',
+    name: ROUTE_NAMES.PROFILE,
+    component: () => import('./pages/ProfilePage.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
     path: '/settings/company',
     name: ROUTE_NAMES.COMPANY_PROFILE,
     component: () => import('./pages/CompanyProfilePage.vue'),

@@ -7,6 +7,7 @@ from apps.applications.apis import (
     HRApplicationListApi,
     HRApplicationNotesApi,
     HRApplicationStatusApi,
+    HRCvDownloadApi,
     SubmitApplicationApi,
 )
 
@@ -59,5 +60,10 @@ hr_candidate_urlpatterns = [
         "<uuid:application_id>/notes/",
         HRApplicationNotesApi.as_view(),
         name="hr-application-notes",
+    ),
+    path(
+        "<uuid:application_id>/cv-download/",
+        HRCvDownloadApi.as_view(),
+        name="hr-cv-download",
     ),
 ]

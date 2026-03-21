@@ -21,6 +21,6 @@ export interface UpcomingInterview {
   id: string
   candidateName: string
   vacancyTitle: string
-  scheduledAt: string
+  createdAt: string
   status: string
 }

@@ -20,7 +20,6 @@ function formatDate(dateStr: string): string {
 
 const statusSteps = [
   'applied',
-  'interview_scheduled',
   'interview_in_progress',
   'interview_completed',
   'reviewing',

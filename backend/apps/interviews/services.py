@@ -1,58 +1,27 @@
 import logging
+import os
+import uuid
 from datetime import datetime
 from decimal import Decimal
 from uuid import UUID
 
+from django.utils import timezone
+from livekit.api import AccessToken, VideoGrants
+
 from apps.applications.models import Application
 from apps.common.exceptions import ApplicationError
 from apps.interviews.models import Interview, InterviewIntegrityFlag, InterviewScore
+from apps.vacancies.models import Vacancy
 
 logger = logging.getLogger(__name__)
 
-
-def schedule_interview(
-    *,
-    application: Application,
-    scheduled_at: datetime,
-) -> Interview:
-    """Create an interview for an application and update status."""
-    if application.status not in (
-        Application.Status.APPLIED,
-        Application.Status.REVIEWING,
-    ):
-        raise ApplicationError(
-            f"Cannot schedule interview for application with status '{application.status}'."
-        )
-
-    if hasattr(application, "interview"):
-        raise ApplicationError("This application already has an interview scheduled.")
-
-    interview = Interview.objects.create(
-        application=application,
-        scheduled_at=scheduled_at,
-        duration_minutes=application.vacancy.interview_duration,
-    )
-
-    # Generate LiveKit room name (stub)
-    interview.livekit_room_name = f"interview-{interview.id}"
-    interview.candidate_token = generate_candidate_token(interview=interview)
-    interview.save(update_fields=["livekit_room_name", "candidate_token", "updated_at"])
-
-    # Update application status
-    application.status = Application.Status.INTERVIEW_SCHEDULED
-    application.save(update_fields=["status", "updated_at"])
-
-    # Trigger confirmation email
-    from apps.interviews.tasks import send_scheduling_confirmation_email
-
-    send_scheduling_confirmation_email.delay(str(interview.id))
-
-    return interview
+LIVEKIT_API_KEY = os.environ.get("LIVEKIT_API_KEY", "")
+LIVEKIT_API_SECRET = os.environ.get("LIVEKIT_API_SECRET", "")
 
 
 def cancel_interview(*, interview: Interview) -> Interview:
-    """Cancel a scheduled interview and revert application status."""
-    if interview.status not in (Interview.Status.SCHEDULED,):
+    """Cancel a pending or in-progress interview and revert application status."""
+    if interview.status not in (Interview.Status.PENDING, Interview.Status.IN_PROGRESS):
         raise ApplicationError(
             f"Cannot cancel interview with status '{interview.status}'."
         )
@@ -69,20 +38,124 @@ def cancel_interview(*, interview: Interview) -> Interview:
 
 
 def start_interview(*, interview: Interview) -> Interview:
-    """Mark an interview as in progress."""
-    if interview.status != Interview.Status.SCHEDULED:
+    """Mark an interview as in progress.
+
+    Accepts PENDING status. Sets started_at to now.
+    For meet mode, generates a LiveKit candidate token.
+    """
+    if interview.status != Interview.Status.PENDING:
         raise ApplicationError(
             f"Cannot start interview with status '{interview.status}'."
         )
 
     interview.status = Interview.Status.IN_PROGRESS
-    interview.save(update_fields=["status", "updated_at"])
+    interview.started_at = timezone.now()
+
+    update_fields = ["status", "started_at", "updated_at"]
+
+    if interview.screening_mode == Interview.ScreeningMode.MEET:
+        if not interview.livekit_room_name:
+            interview.livekit_room_name = f"interview-{interview.id}"
+            update_fields.append("livekit_room_name")
+        interview.candidate_token = generate_candidate_token(interview=interview)
+        update_fields.append("candidate_token")
+    elif interview.screening_mode == Interview.ScreeningMode.CHAT:
+        # Generate AI greeting for chat mode via OpenAI
+        from apps.interviews.chat_service import generate_greeting
+
+        try:
+            greeting = generate_greeting(interview)
+        except Exception as e:
+            logger.warning("Failed to generate AI greeting: %s. Using fallback.", e)
+            vacancy = interview.application.vacancy
+            greeting = (
+                f"Hello! Welcome to the interview for the {vacancy.title} position. "
+                f"I'll be asking you a series of questions to learn more about your "
+                f"experience and skills. Please take your time with each answer.\n\n"
+                f"Let's start — could you briefly introduce yourself and tell me "
+                f"why you're interested in this role?"
+            )
+        interview.chat_history = [{
+            "role": "ai",
+            "text": greeting,
+            "timestamp": timezone.now().isoformat(),
+        }]
+        update_fields.append("chat_history")
+
+    interview.save(update_fields=update_fields)
 
     application = interview.application
     application.status = Application.Status.INTERVIEW_IN_PROGRESS
     application.save(update_fields=["status", "updated_at"])
 
     return interview
+
+
+def reset_interview(*, interview: Interview) -> Interview:
+    """Reset an abandoned interview by creating a new one.
+
+    Validates interview is IN_PROGRESS or CANCELLED. Marks the old interview
+    as CANCELLED (if not already), creates a new Interview for the same
+    application with a fresh token, and resets application status to APPLIED.
+
+    Returns the newly created Interview.
+    """
+    if interview.status not in (Interview.Status.IN_PROGRESS, Interview.Status.CANCELLED):
+        raise ApplicationError(
+            f"Cannot reset interview with status '{interview.status}'."
+        )
+
+    application = interview.application
+
+    # Mark old interview as cancelled
+    if interview.status != Interview.Status.CANCELLED:
+        interview.status = Interview.Status.CANCELLED
+        interview.save(update_fields=["status", "updated_at"])
+
+    # Delete the old interview so the OneToOneField allows a new one
+    interview.delete()
+
+    # Create a fresh interview
+    interview_kwargs: dict = {
+        "application": application,
+        "screening_mode": interview.screening_mode,
+        "interview_token": uuid.uuid4(),
+        "status": Interview.Status.PENDING,
+    }
+    if interview.screening_mode == Interview.ScreeningMode.MEET:
+        interview_kwargs["duration_minutes"] = application.vacancy.interview_duration
+        interview_kwargs["livekit_room_name"] = f"interview-{application.id}"
+
+    new_interview = Interview.objects.create(**interview_kwargs)
+
+    # Reset application status
+    application.status = Application.Status.APPLIED
+    application.save(update_fields=["status", "updated_at"])
+
+    return new_interview
+
+
+def expire_interviews_for_vacancy(*, vacancy: Vacancy) -> int:
+    """Expire all PENDING interviews for a vacancy.
+
+    Sets matching interviews to EXPIRED and their applications to EXPIRED.
+    Returns the number of interviews expired.
+    """
+    pending_interviews = Interview.objects.filter(
+        application__vacancy=vacancy,
+        status=Interview.Status.PENDING,
+    ).select_related("application")
+
+    count = 0
+    for interview in pending_interviews:
+        interview.status = Interview.Status.EXPIRED
+        interview.save(update_fields=["status", "updated_at"])
+
+        interview.application.status = Application.Status.EXPIRED
+        interview.application.save(update_fields=["status", "updated_at"])
+        count += 1
+
+    return count
 
 
 def complete_interview(
@@ -201,20 +274,57 @@ def create_integrity_flags(
     return created
 
 
-def generate_candidate_token(*, interview: Interview) -> str:
-    """Generate a LiveKit participant token for the candidate.
+def _create_livekit_token(
+    *,
+    room_name: str,
+    participant_identity: str,
+    participant_name: str,
+    can_publish: bool = True,
+    can_subscribe: bool = True,
+) -> str:
+    """Create a LiveKit access token with the given grants."""
+    if not LIVEKIT_API_KEY or not LIVEKIT_API_SECRET:
+        raise ApplicationError(
+            "LiveKit credentials not configured. "
+            "Set LIVEKIT_API_KEY and LIVEKIT_API_SECRET."
+        )
 
-    STUB: Returns a placeholder token. Real implementation will use LiveKit SDK.
-    """
-    return f"candidate-token-{interview.id}"
+    token = (
+        AccessToken(LIVEKIT_API_KEY, LIVEKIT_API_SECRET)
+        .with_identity(participant_identity)
+        .with_name(participant_name)
+        .with_grants(
+            VideoGrants(
+                room=room_name,
+                room_join=True,
+                can_publish=can_publish,
+                can_subscribe=can_subscribe,
+            )
+        )
+    )
+    return token.to_jwt()
+
+
+def generate_candidate_token(*, interview: Interview) -> str:
+    """Generate a LiveKit participant token for the candidate."""
+    return _create_livekit_token(
+        room_name=interview.livekit_room_name,
+        participant_identity=f"candidate-{interview.application.id}",
+        participant_name=interview.application.candidate_name,
+        can_publish=True,
+        can_subscribe=True,
+    )
 
 
 def generate_observer_token(*, interview: Interview) -> str:
-    """Generate a LiveKit observer token for HR to watch live.
-
-    STUB: Returns a placeholder token. Real implementation will use LiveKit SDK.
-    """
-    return f"observer-token-{interview.id}"
+    """Generate a LiveKit observer token for HR to watch live (no publishing)."""
+    return _create_livekit_token(
+        room_name=interview.livekit_room_name,
+        participant_identity=f"observer-{interview.id}",
+        participant_name="HR Observer",
+        can_publish=False,
+        can_subscribe=True,
+    )
 
 
 def schedule_human_interview(

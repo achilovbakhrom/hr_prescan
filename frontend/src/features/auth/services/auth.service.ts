@@ -3,6 +3,7 @@ import type {
   AcceptInvitationRequest,
   LoginRequest,
   LoginResponse,
+  PendingInvitation,
   RegisterCompanyRequest,
   RegisterRequest,
   User,
@@ -45,6 +46,21 @@ export const authService = {
   },
 
   async registerCompany(data: RegisterCompanyRequest): Promise<void> {
-    await apiClient.post('/auth/register-company', data)
+    await apiClient.post('/auth/company-register', data)
+  },
+
+  async googleAuth(credential: string): Promise<LoginResponse> {
+    const response = await apiClient.post<LoginResponse>('/auth/google', { credential })
+    return response.data
+  },
+
+  async getMyInvitations(): Promise<PendingInvitation[]> {
+    const response = await apiClient.get<PendingInvitation[]>('/auth/my-invitations')
+    return response.data
+  },
+
+  async acceptCompanyInvitation(token: string): Promise<{ user: User }> {
+    const response = await apiClient.post<{ user: User }>('/auth/accept-company-invitation', { token })
+    return response.data
   },
 }

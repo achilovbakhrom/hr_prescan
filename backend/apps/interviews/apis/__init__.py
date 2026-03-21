@@ -1,29 +1,39 @@
 from apps.interviews.apis.candidate import (
     CandidateInterviewApi,
-    CandidateScheduleApi,
+    ChatHistoryApi,
+    ChatMessageApi,
+    InterviewRoomJoinApi,
+    PublicInterviewApi,
+    StartInterviewApi,
 )
 from apps.interviews.apis.hr import (
     CancelInterviewApi,
+    HRApplicationInterviewApi,
     HRInterviewDetailApi,
     HRInterviewListApi,
     IntegrityFlagsApi,
     InterviewRecordingApi,
     InterviewTranscriptApi,
     ObserverTokenApi,
+    ResetInterviewApi,
     ScheduleHumanInterviewApi,
-    ScheduleInterviewApi,
 )
 
 __all__ = [
     "CandidateInterviewApi",
-    "CandidateScheduleApi",
+    "ChatHistoryApi",
+    "ChatMessageApi",
+    "InterviewRoomJoinApi",
+    "PublicInterviewApi",
+    "StartInterviewApi",
     "CancelInterviewApi",
+    "HRApplicationInterviewApi",
     "HRInterviewDetailApi",
     "HRInterviewListApi",
     "IntegrityFlagsApi",
     "InterviewRecordingApi",
     "InterviewTranscriptApi",
     "ObserverTokenApi",
+    "ResetInterviewApi",
     "ScheduleHumanInterviewApi",
-    "ScheduleInterviewApi",
 ]

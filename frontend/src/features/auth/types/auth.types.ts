@@ -52,6 +52,15 @@ export interface AcceptInvitationRequest {
   lastName: string
 }
 
+export interface PendingInvitation {
+  id: string
+  company: Company
+  invitedByName: string
+  token: string
+  expiresAt: string
+  createdAt: string
+}
+
 export interface RegisterCompanyRequest {
   companyName: string
   industry: string

@@ -1,18 +1,20 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import Button from 'primevue/button'
 import { useInterviewStore } from '../stores/interview.store'
 import InterviewStatusBadge from '../components/InterviewStatusBadge.vue'
+import { ROUTE_NAMES } from '@/shared/constants/routes'
 
 const route = useRoute()
+const router = useRouter()
 const interviewStore = useInterviewStore()
 
 const interviewId = computed(() => route.params.id as string)
 const interview = computed(() => interviewStore.currentInterview)
 
 const isCompleted = computed(() => interview.value?.status === 'completed')
-const isScheduled = computed(() => interview.value?.status === 'scheduled')
+const isScheduled = computed(() => interview.value?.status === 'pending')
 const isInProgress = computed(() => interview.value?.status === 'in_progress')
 
 onMounted(() => interviewStore.fetchCandidateInterview(interviewId.value))
@@ -22,7 +24,7 @@ function formatDate(dateStr: string): string {
 }
 
 function handleJoinInterview(): void {
-  window.alert('LiveKit interview room will be available in Phase 7.')
+  router.push({ name: ROUTE_NAMES.INTERVIEW_ROOM, params: { id: interviewId.value } })
 }
 </script>
 
@@ -72,7 +74,7 @@ function handleJoinInterview(): void {
               <div class="flex justify-between">
                 <dt class="text-gray-500">Scheduled</dt>
                 <dd class="font-medium">
-                  {{ formatDate(interview.scheduledAt) }}
+                  {{ formatDate(interview.createdAt) }}
                 </dd>
               </div>
               <div class="flex justify-between">

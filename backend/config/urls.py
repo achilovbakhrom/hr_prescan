@@ -5,6 +5,7 @@ Root URL configuration for HR PreScan.
 from django.contrib import admin
 from django.http import JsonResponse
 from django.urls import include, path
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 
 from apps.accounts.urls import hr_urlpatterns
 from apps.common.urls_admin import admin_urlpatterns
@@ -22,6 +23,7 @@ from apps.interviews.urls import (
     candidate_urlpatterns as interview_candidate_urlpatterns,
     hr_candidate_urlpatterns as interview_hr_candidate_urlpatterns,
     hr_interview_urlpatterns,
+    public_urlpatterns as interview_public_urlpatterns,
 )
 from apps.common.apis import HRDashboardApi
 from apps.notifications.urls import (
@@ -55,6 +57,7 @@ urlpatterns = [
     path("api/notifications/", include((notification_urlpatterns, "notifications"))),
     path("api/public/vacancies/", include((vacancy_public_urlpatterns, "public-vacancies"))),
     path("api/public/vacancies/", include((application_public_urlpatterns, "public-applications"))),
+    path("api/public/", include((interview_public_urlpatterns, "public-interviews"))),
     path("api/candidate/", include((application_candidate_urlpatterns, "candidate"))),
     path("api/candidate/", include((interview_candidate_urlpatterns, "candidate-interviews"))),
     path("api/candidate/", include((notification_candidate_urlpatterns, "candidate-messages"))),
@@ -63,4 +66,8 @@ urlpatterns = [
     path("api/hr/subscription/", include((subscription_hr_urlpatterns, "hr-subscription"))),
     # Admin panel
     path("api/admin-panel/", include((admin_urlpatterns, "admin-panel"))),
+    # API documentation
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
+    path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
 ]

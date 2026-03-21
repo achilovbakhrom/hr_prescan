@@ -13,7 +13,7 @@ from apps.applications.serializers import (
     ApplicationDetailOutputSerializer,
     ApplicationListOutputSerializer,
 )
-from apps.applications.services import add_hr_note, update_application_status
+from apps.applications.services import add_hr_note, generate_cv_download_url, update_application_status
 from apps.common.exceptions import ApplicationError
 from apps.vacancies.selectors import get_vacancy_by_id
 
@@ -190,5 +190,40 @@ class HRApplicationNotesApi(APIView):
 
         return Response(
             ApplicationDetailOutputSerializer(application).data,
+            status=status.HTTP_200_OK,
+        )
+
+
+class HRCvDownloadApi(APIView):
+    """GET /api/hr/candidates/{id}/cv-download/ — get presigned URL for CV download."""
+
+    permission_classes = [IsHRManager | IsAdmin]
+
+    def get(self, request: Request, application_id: str) -> Response:
+        company = request.user.company
+        if company is None:
+            return Response(
+                {"detail": "You are not associated with a company."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        application = get_application_by_id(
+            application_id=application_id, company=company,
+        )
+        if application is None:
+            return Response(
+                {"detail": "Application not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        if not application.cv_file:
+            return Response(
+                {"detail": "No CV uploaded for this application."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        url = generate_cv_download_url(cv_file_path=application.cv_file)
+        return Response(
+            {"url": url, "filename": application.cv_original_filename},
             status=status.HTTP_200_OK,
         )

@@ -83,8 +83,8 @@ def notify_application_received(*, application: Application) -> None:
         )
 
 
-def notify_interview_scheduled(*, interview: Interview) -> None:
-    """Notify candidate and HR users when an interview is scheduled."""
+def notify_interview_ready(*, interview: Interview) -> None:
+    """Notify candidate and HR users when an interview is ready."""
     application = interview.application
     company = application.vacancy.company
 
@@ -93,14 +93,15 @@ def notify_interview_scheduled(*, interview: Interview) -> None:
         create_notification(
             user=application.candidate,
             type=Notification.Type.INTERVIEW_SCHEDULED,
-            title="Interview Scheduled",
+            title="Interview Ready",
             message=(
-                f"Your interview for {application.vacancy.title} is scheduled "
-                f"for {interview.scheduled_at.strftime('%b %d, %Y %H:%M UTC')}."
+                f"Your interview for {application.vacancy.title} is ready. "
+                f"Start whenever you're ready using the interview link."
             ),
             data={
                 "interview_id": str(interview.id),
                 "application_id": str(application.id),
+                "interview_token": str(interview.interview_token),
             },
         )
 
@@ -114,10 +115,10 @@ def notify_interview_scheduled(*, interview: Interview) -> None:
         create_notification(
             user=user,
             type=Notification.Type.INTERVIEW_SCHEDULED,
-            title="Interview Scheduled",
+            title="New Application",
             message=(
-                f"Interview scheduled for {application.candidate_name} "
-                f"({application.vacancy.title})."
+                f"New application from {application.candidate_name} "
+                f"({application.vacancy.title}). Interview link sent."
             ),
             data={
                 "interview_id": str(interview.id),

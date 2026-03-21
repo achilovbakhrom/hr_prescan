@@ -58,7 +58,7 @@ def get_vacancy_applications_filtered(
     qs = (
         Application.objects
         .filter(vacancy=vacancy)
-        .select_related("candidate")
+        .select_related("candidate", "interview")
     )
 
     if status:

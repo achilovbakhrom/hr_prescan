@@ -34,7 +34,7 @@ export const candidateService = {
       formData.append('cv_file', data.cvFile)
     }
     const response = await apiClient.post<Application>(
-      `/jobs/${vacancyId}/apply`,
+      `/public/vacancies/${vacancyId}/apply`,
       formData,
       { headers: { 'Content-Type': 'multipart/form-data' } },
     )
@@ -43,13 +43,14 @@ export const candidateService = {
 
   // Candidate (auth required)
   async getMyApplications(): Promise<Application[]> {
-    const response = await apiClient.get<Application[]>('/my-applications')
+    const response =
+      await apiClient.get<Application[]>('/candidate/applications')
     return response.data
   },
 
   async getMyApplicationDetail(id: string): Promise<ApplicationDetail> {
     const response = await apiClient.get<ApplicationDetail>(
-      `/my-applications/${id}`,
+      `/candidate/applications/${id}`,
     )
     return response.data
   },
@@ -57,10 +58,10 @@ export const candidateService = {
   // HR
   async getVacancyCandidates(
     vacancyId: string,
-    params?: { status?: string; ordering?: string },
+    params?: { status?: string; ordering?: string; search?: string },
   ): Promise<Application[]> {
     const response = await apiClient.get<Application[]>(
-      `/vacancies/${vacancyId}/candidates`,
+      `/hr/vacancies/${vacancyId}/candidates`,
       { params },
     )
     return response.data
@@ -68,7 +69,7 @@ export const candidateService = {
 
   async getCandidateDetail(id: string): Promise<ApplicationDetail> {
     const response = await apiClient.get<ApplicationDetail>(
-      `/candidates/${id}`,
+      `/hr/candidates/${id}`,
     )
     return response.data
   },
@@ -78,7 +79,7 @@ export const candidateService = {
     status: ApplicationStatus,
   ): Promise<Application> {
     const response = await apiClient.patch<Application>(
-      `/candidates/${id}/status`,
+      `/hr/candidates/${id}/status`,
       { status },
     )
     return response.data
@@ -88,9 +89,9 @@ export const candidateService = {
     id: string,
     note: string,
   ): Promise<ApplicationDetail> {
-    const response = await apiClient.patch<ApplicationDetail>(
-      `/candidates/${id}/notes`,
-      { hr_notes: note },
+    const response = await apiClient.post<ApplicationDetail>(
+      `/hr/candidates/${id}/notes`,
+      { note },
     )
     return response.data
   },
@@ -98,14 +99,14 @@ export const candidateService = {
   // Messaging
   async getMessages(candidateId: string): Promise<Message[]> {
     const response = await apiClient.get<Message[]>(
-      `/candidates/${candidateId}/messages`,
+      `/hr/candidates/${candidateId}/messages`,
     )
     return response.data
   },
 
   async sendMessage(candidateId: string, content: string): Promise<Message> {
     const response = await apiClient.post<Message>(
-      `/candidates/${candidateId}/messages`,
+      `/hr/candidates/${candidateId}/messages`,
       { content },
     )
     return response.data
@@ -116,7 +117,7 @@ export const candidateService = {
     candidateId: string,
     payload: SendEmailPayload,
   ): Promise<void> {
-    await apiClient.post(`/candidates/${candidateId}/email`, payload)
+    await apiClient.post(`/hr/candidates/${candidateId}/email`, payload)
   },
 
   // Schedule human interview
@@ -125,9 +126,23 @@ export const candidateService = {
     payload: ScheduleInterviewPayload,
   ): Promise<void> {
     await apiClient.post(
-      `/candidates/${candidateId}/schedule-interview`,
+      `/hr/candidates/${candidateId}/schedule-human-interview`,
       payload,
     )
+  },
+
+  // Interview data for candidate
+  async getCandidateInterview(candidateId: string): Promise<Record<string, unknown>> {
+    const response = await apiClient.get(`/hr/candidates/${candidateId}/interview`)
+    return response.data as Record<string, unknown>
+  },
+
+  // CV download
+  async getCvDownloadUrl(candidateId: string): Promise<{ url: string; filename: string }> {
+    const response = await apiClient.get<{ url: string; filename: string }>(
+      `/hr/candidates/${candidateId}/cv-download`,
+    )
+    return response.data
   },
 
   // Bulk actions
@@ -135,7 +150,7 @@ export const candidateService = {
     applicationIds: string[],
     status: ApplicationStatus,
   ): Promise<void> {
-    await apiClient.patch('/candidates/bulk-status', {
+    await apiClient.patch('/hr/candidates/bulk-status', {
       application_ids: applicationIds,
       status,
     })

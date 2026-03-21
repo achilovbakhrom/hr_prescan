@@ -4,6 +4,8 @@ export type EmploymentType = 'full_time' | 'part_time' | 'contract' | 'internshi
 export type ExperienceLevel = 'junior' | 'middle' | 'senior' | 'lead' | 'director'
 export type QuestionSource = 'ai_generated' | 'hr_added'
 
+export type ScreeningMode = 'chat' | 'meet'
+
 export interface Vacancy {
   id: string
   title: string
@@ -21,6 +23,9 @@ export interface Vacancy {
   deadline: string | null
   status: VacancyStatus
   visibility: VacancyVisibility
+  screeningMode: ScreeningMode
+  cvRequired: boolean
+  companyInfo: string
   shareToken: string
   interviewDuration: number
   criteriaCount: number
@@ -67,7 +72,10 @@ export interface CreateVacancyRequest {
   experienceLevel?: ExperienceLevel
   deadline?: string | null
   visibility?: VacancyVisibility
+  screeningMode?: ScreeningMode
+  cvRequired?: boolean
   interviewDuration?: number
+  companyInfo?: string
 }
 
 export interface UpdateVacancyRequest extends Partial<CreateVacancyRequest> {}

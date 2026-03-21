@@ -11,6 +11,11 @@ import {
   hrCandidateRoutes,
   publicApplicationRoutes,
 } from '@/features/candidates/routes'
+import {
+  hrInterviewRoutes,
+  candidateInterviewRoutes,
+  publicInterviewRoutes,
+} from '@/features/interviews/routes'
 import { notificationRoutes } from '@/features/notifications/routes'
 import { settingsRoutes } from '@/features/settings/routes'
 import {
@@ -35,16 +40,22 @@ const routes: RouteRecordRaw[] = [
   // Landing page (public, unauthenticated root)
   ...landingRoutes,
 
-  // Auth routes
-  ...authRoutes,
+  // Public interview routes (full-screen, no layout wrapper)
+  ...publicInterviewRoutes,
 
-  // Public routes (no auth required)
-  ...publicVacancyRoutes,
-  ...publicApplicationRoutes,
-  ...publicSubscriptionRoutes,
-
-  // Legal pages (public)
-  ...legalRoutes,
+  // Public routes (no auth required) — with shared public header
+  {
+    path: '/',
+    component: () => import('@/shared/components/PublicLayout.vue'),
+    children: [
+      ...authRoutes,
+      ...publicVacancyRoutes,
+      ...publicApplicationRoutes,
+      ...publicSubscriptionRoutes,
+      ...candidateInterviewRoutes,
+      ...legalRoutes,
+    ],
+  },
 
   // Authenticated app routes (layout wrapper)
   {
@@ -55,6 +66,7 @@ const routes: RouteRecordRaw[] = [
       ...vacancyRoutes,
       ...candidateRoutes,
       ...hrCandidateRoutes,
+      ...hrInterviewRoutes,
       ...notificationRoutes,
       ...settingsRoutes,
       ...subscriptionRoutes,
@@ -91,7 +103,9 @@ router.beforeEach(async (to) => {
   }
 
   const isAuthPage =
-    to.name === ROUTE_NAMES.LOGIN || to.name === ROUTE_NAMES.REGISTER
+    to.name === ROUTE_NAMES.LOGIN ||
+    to.name === ROUTE_NAMES.REGISTER ||
+    to.name === ROUTE_NAMES.COMPANY_REGISTER
 
   if (isAuthPage && authStore.isAuthenticated) {
     return { name: ROUTE_NAMES.DASHBOARD }

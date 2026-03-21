@@ -32,7 +32,7 @@ const devicesReady = computed(() => {
 const canJoin = computed(() => {
   return (
     devicesReady.value &&
-    (props.interview.status === 'scheduled' ||
+    (props.interview.status === 'pending' ||
       props.interview.status === 'in_progress')
   )
 })
@@ -59,7 +59,7 @@ onMounted(() => {
         </div>
         <div class="flex justify-between">
           <dt class="text-gray-500">Scheduled</dt>
-          <dd class="font-medium">{{ formatDate(interview.scheduledAt) }}</dd>
+          <dd class="font-medium">{{ formatDate(interview.createdAt) }}</dd>
         </div>
         <div class="flex justify-between">
           <dt class="text-gray-500">Duration</dt>

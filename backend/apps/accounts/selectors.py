@@ -35,6 +35,22 @@ def get_company_invitations(*, company: Company) -> QuerySet[Invitation]:
     )
 
 
+def get_pending_invitations_for_email(*, email: str) -> QuerySet[Invitation]:
+    """Return all pending (not accepted, not expired) invitations for an email."""
+    from django.utils import timezone
+
+    return (
+        Invitation.objects
+        .filter(
+            email=email,
+            is_accepted=False,
+            expires_at__gt=timezone.now(),
+        )
+        .select_related("company", "invited_by")
+        .order_by("-created_at")
+    )
+
+
 def get_invitation_by_token(*, token: UUID) -> Invitation | None:
     """Retrieve an invitation by its token, with company pre-loaded."""
     return (

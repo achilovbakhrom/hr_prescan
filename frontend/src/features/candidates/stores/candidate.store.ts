@@ -19,7 +19,7 @@ export const useCandidateStore = defineStore('candidate', () => {
   // HR actions
   async function fetchVacancyCandidates(
     vacancyId: string,
-    params?: { status?: string; ordering?: string },
+    params?: { status?: string; ordering?: string; search?: string },
   ): Promise<void> {
     loading.value = true
     error.value = null
@@ -36,6 +36,7 @@ export const useCandidateStore = defineStore('candidate', () => {
   }
 
   async function fetchCandidateDetail(id: string): Promise<void> {
+    currentCandidate.value = null
     loading.value = true
     error.value = null
     try {

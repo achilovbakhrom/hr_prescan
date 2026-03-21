@@ -17,7 +17,7 @@ export const adminService = {
     page?: number
   }): Promise<PaginatedResponse<AdminCompany>> {
     const response = await apiClient.get<PaginatedResponse<AdminCompany>>(
-      '/admin/companies',
+      '/admin-panel/companies',
       { params },
     )
     return response.data
@@ -28,7 +28,7 @@ export const adminService = {
     isActive: boolean,
   ): Promise<AdminCompany> {
     const response = await apiClient.patch<AdminCompany>(
-      `/admin/companies/${id}`,
+      `/admin-panel/companies/${id}`,
       { isActive },
     )
     return response.data
@@ -40,28 +40,29 @@ export const adminService = {
     page?: number
   }): Promise<PaginatedResponse<AdminUser>> {
     const response = await apiClient.get<PaginatedResponse<AdminUser>>(
-      '/admin/users',
+      '/admin-panel/users',
       { params },
     )
     return response.data
   },
 
   async toggleUserStatus(id: string, isActive: boolean): Promise<AdminUser> {
-    const response = await apiClient.patch<AdminUser>(`/admin/users/${id}`, {
-      isActive,
-    })
+    const response = await apiClient.patch<AdminUser>(
+      `/admin-panel/users/${id}`,
+      { isActive },
+    )
     return response.data
   },
 
   async getAnalytics(): Promise<PlatformAnalytics> {
     const response =
-      await apiClient.get<PlatformAnalytics>('/admin/analytics')
+      await apiClient.get<PlatformAnalytics>('/admin-panel/analytics')
     return response.data
   },
 
   async getPlans(): Promise<SubscriptionPlan[]> {
     const response =
-      await apiClient.get<SubscriptionPlan[]>('/admin/plans')
+      await apiClient.get<SubscriptionPlan[]>('/admin-panel/plans')
     return response.data
   },
 
@@ -69,8 +70,8 @@ export const adminService = {
     id: string,
     data: Partial<SubscriptionPlan>,
   ): Promise<SubscriptionPlan> {
-    const response = await apiClient.patch<SubscriptionPlan>(
-      `/admin/plans/${id}`,
+    const response = await apiClient.put<SubscriptionPlan>(
+      `/admin-panel/plans/${id}`,
       data,
     )
     return response.data

@@ -3,10 +3,17 @@
 
 import os
 import sys
+from pathlib import Path
+
+from dotenv import load_dotenv
 
 
 def main() -> None:
     """Run administrative tasks."""
+    # Load .env from backend/ directory if it exists
+    env_file = Path(__file__).resolve().parent / ".env"
+    load_dotenv(env_file)
+
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
     try:
         from django.core.management import execute_from_command_line

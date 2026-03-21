@@ -9,11 +9,76 @@ interface RetryableRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean
 }
 
+/**
+ * Convert camelCase keys to snake_case (Django convention).
+ */
+function toSnakeCase(str: string): string {
+  return str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`)
+}
+
+function convertKeysToSnakeCase(obj: unknown): unknown {
+  if (Array.isArray(obj)) {
+    return obj.map(convertKeysToSnakeCase)
+  }
+  if (obj !== null && typeof obj === 'object' && !(obj instanceof File) && !(obj instanceof Blob) && !(obj instanceof FormData)) {
+    return Object.fromEntries(
+      Object.entries(obj as Record<string, unknown>).map(([key, value]) => [
+        toSnakeCase(key),
+        convertKeysToSnakeCase(value),
+      ]),
+    )
+  }
+  return obj
+}
+
+/**
+ * Convert snake_case keys to camelCase (frontend convention).
+ */
+function toCamelCase(str: string): string {
+  return str.replace(/_([a-z])/g, (_, letter: string) => letter.toUpperCase())
+}
+
+function convertKeysToCamelCase(obj: unknown): unknown {
+  if (Array.isArray(obj)) {
+    return obj.map(convertKeysToCamelCase)
+  }
+  if (obj !== null && typeof obj === 'object') {
+    return Object.fromEntries(
+      Object.entries(obj as Record<string, unknown>).map(([key, value]) => [
+        toCamelCase(key),
+        convertKeysToCamelCase(value),
+      ]),
+    )
+  }
+  return obj
+}
+
+const baseURL = (import.meta.env.VITE_API_URL as string).replace(/\/$/, '')
+
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL,
   headers: {
     'Content-Type': 'application/json',
   },
+})
+
+// Ensure trailing slash + convert request body keys to snake_case
+apiClient.interceptors.request.use((config) => {
+  if (config.url && !config.url.endsWith('/')) {
+    config.url += '/'
+  }
+  if (config.data && typeof config.data === 'object') {
+    config.data = convertKeysToSnakeCase(config.data)
+  }
+  return config
+})
+
+// Convert response body keys to camelCase
+apiClient.interceptors.response.use((response) => {
+  if (response.data && typeof response.data === 'object') {
+    response.data = convertKeysToCamelCase(response.data)
+  }
+  return response
 })
 
 apiClient.interceptors.request.use(
@@ -101,7 +166,7 @@ apiClient.interceptors.response.use(
     try {
       const tokens = JSON.parse(raw) as { access: string; refresh: string }
       const response = await axios.post<{ access: string }>(
-        `${import.meta.env.VITE_API_URL}/auth/token/refresh`,
+        `${import.meta.env.VITE_API_URL}/auth/token/refresh/`,
         { refresh: tokens.refresh },
       )
 

@@ -5,6 +5,7 @@ import Button from 'primevue/button'
 import Tag from 'primevue/tag'
 import { vacancyService } from '../services/vacancy.service'
 import { EMPLOYMENT_LABELS, EXPERIENCE_LABELS, formatSalaryRange, formatDate } from '../composables/useVacancyLabels'
+import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { Vacancy } from '../types/vacancy.types'
 
 const route = useRoute()
@@ -27,7 +28,9 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="mx-auto max-w-3xl px-4 py-8">
+  <div>
+
+    <div class="mx-auto max-w-3xl px-4 py-8">
     <div v-if="loading" class="py-12 text-center">
       <i class="pi pi-spinner pi-spin text-3xl text-gray-400"></i>
     </div>
@@ -80,5 +83,6 @@ onMounted(async () => {
         <i class="pi pi-clock mr-1"></i>Application deadline: {{ formatDate(vacancy.deadline) }}
       </div>
     </template>
+    </div>
   </div>
 </template>

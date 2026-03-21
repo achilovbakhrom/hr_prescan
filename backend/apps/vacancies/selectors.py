@@ -19,6 +19,22 @@ def get_company_vacancies(
         .annotate(
             criteria_count=Count("criteria"),
             questions_count=Count("questions", filter=Q(questions__is_active=True)),
+            candidates_total=Count("applications", distinct=True),
+            candidates_interviewed=Count(
+                "applications",
+                filter=Q(applications__status__in=["interview_completed", "reviewing", "shortlisted"]),
+                distinct=True,
+            ),
+            candidates_shortlisted=Count(
+                "applications",
+                filter=Q(applications__status="shortlisted"),
+                distinct=True,
+            ),
+            candidates_rejected=Count(
+                "applications",
+                filter=Q(applications__status="rejected"),
+                distinct=True,
+            ),
         )
     )
     if status:
@@ -53,6 +69,8 @@ def get_public_vacancies(
     search: str | None = None,
     location: str | None = None,
     is_remote: bool | None = None,
+    employment_type: str | None = None,
+    experience_level: str | None = None,
 ) -> QuerySet[Vacancy]:
     """Return published, public vacancies for the job board."""
     qs = (
@@ -73,6 +91,10 @@ def get_public_vacancies(
         qs = qs.filter(location__icontains=location)
     if is_remote is not None:
         qs = qs.filter(is_remote=is_remote)
+    if employment_type:
+        qs = qs.filter(employment_type=employment_type)
+    if experience_level:
+        qs = qs.filter(experience_level=experience_level)
     return qs
 
 

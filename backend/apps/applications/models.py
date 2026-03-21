@@ -8,12 +8,12 @@ class Application(BaseModel):
 
     class Status(models.TextChoices):
         APPLIED = "applied", "Applied"
-        INTERVIEW_SCHEDULED = "interview_scheduled", "Interview Scheduled"
         INTERVIEW_IN_PROGRESS = "interview_in_progress", "Interview In Progress"
         INTERVIEW_COMPLETED = "interview_completed", "Interview Completed"
         REVIEWING = "reviewing", "Reviewing"
         SHORTLISTED = "shortlisted", "Shortlisted"
         REJECTED = "rejected", "Rejected"
+        EXPIRED = "expired", "Expired"
 
     vacancy = models.ForeignKey(
         "vacancies.Vacancy",

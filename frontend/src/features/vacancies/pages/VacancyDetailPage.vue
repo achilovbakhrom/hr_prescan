@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
@@ -13,15 +13,25 @@ import QuestionList from '../components/QuestionList.vue'
 import CriteriaList from '../components/CriteriaList.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import { useCandidateStore } from '@/features/candidates/stores/candidate.store'
-import ApplicationStatusBadge from '@/features/candidates/components/ApplicationStatusBadge.vue'
-import type { Application } from '@/features/candidates/types/candidate.types'
+import CandidateKanban from '@/features/candidates/components/CandidateKanban.vue'
+import type { ApplicationStatus } from '@/features/candidates/types/candidate.types'
 import type { CreateVacancyRequest, VacancyStatus } from '../types/vacancy.types'
 
 const route = useRoute()
 const router = useRouter()
 const vacancyStore = useVacancyStore()
 const candidateStore = useCandidateStore()
-const activeTab = ref(0)
+const TAB_NAMES = ['overview', 'questions', 'criteria', 'candidates'] as const
+const activeTab = computed({
+  get: () => {
+    const tab = route.query.tab as string
+    const idx = TAB_NAMES.indexOf(tab as typeof TAB_NAMES[number])
+    return idx >= 0 ? idx : 0
+  },
+  set: (val: number) => {
+    router.replace({ query: { ...route.query, tab: TAB_NAMES[val] } })
+  },
+})
 const vacancyId = computed(() => route.params.id as string)
 const vacancy = computed(() => vacancyStore.currentVacancy)
 
@@ -43,12 +53,8 @@ onMounted(() => {
   candidateStore.fetchVacancyCandidates(vacancyId.value)
 })
 
-function viewCandidate(candidate: Application): void {
-  router.push({ name: ROUTE_NAMES.CANDIDATE_DETAIL, params: { id: candidate.id } })
-}
-
-function viewAllCandidates(): void {
-  router.push({ name: ROUTE_NAMES.VACANCY_CANDIDATES, params: { vacancyId: vacancyId.value } })
+async function handleCandidateStatusChange(candidateId: string, status: ApplicationStatus): Promise<void> {
+  await candidateStore.updateStatus(candidateId, status).catch(() => {})
 }
 
 function formatDate(dateStr: string): string {
@@ -98,7 +104,7 @@ async function handleUpdate(data: CreateVacancyRequest, publish: boolean): Promi
         <VacancyShareLink :share-token="vacancy.shareToken" />
       </div>
 
-      <TabView v-model:active-index="activeTab">
+      <TabView v-model:activeIndex="activeTab">
         <TabPanel value="0" header="Overview">
           <div class="space-y-4 py-4">
             <VacancyOverview :vacancy="vacancy" />
@@ -129,37 +135,11 @@ async function handleUpdate(data: CreateVacancyRequest, publish: boolean): Promi
         </TabPanel>
         <TabPanel value="3" header="Candidates">
           <div class="py-4">
-            <div v-if="candidateStore.loading && candidateStore.candidates.length === 0" class="py-8 text-center">
-              <i class="pi pi-spinner pi-spin text-2xl text-gray-400"></i>
-            </div>
-            <div v-else-if="candidateStore.candidates.length === 0" class="py-8 text-center text-gray-500">
-              <i class="pi pi-users mb-2 text-3xl"></i>
-              <p>No candidates have applied yet</p>
-            </div>
-            <template v-else>
-              <div class="mb-3 flex items-center justify-between">
-                <p class="text-sm text-gray-500">{{ candidateStore.candidates.length }} candidate(s)</p>
-                <button class="text-sm text-blue-600 hover:underline" @click="viewAllCandidates">View all</button>
-              </div>
-              <div class="space-y-2">
-                <div
-                  v-for="candidate in candidateStore.candidates.slice(0, 5)"
-                  :key="candidate.id"
-                  class="flex cursor-pointer items-center justify-between rounded-lg border border-gray-100 p-3 hover:bg-gray-50"
-                  @click="viewCandidate(candidate)"
-                >
-                  <div>
-                    <p class="font-medium">{{ candidate.candidateName }}</p>
-                    <p class="text-sm text-gray-500">{{ candidate.candidateEmail }}</p>
-                  </div>
-                  <div class="flex items-center gap-3">
-                    <span v-if="candidate.matchScore !== null" class="text-sm font-semibold">{{ candidate.matchScore }}%</span>
-                    <ApplicationStatusBadge :status="candidate.status" />
-                    <span class="text-xs text-gray-400">{{ formatDate(candidate.createdAt) }}</span>
-                  </div>
-                </div>
-              </div>
-            </template>
+            <CandidateKanban
+              :candidates="candidateStore.candidates"
+              :loading="candidateStore.loading"
+              @status-change="handleCandidateStatusChange"
+            />
           </div>
         </TabPanel>
       </TabView>

@@ -2,7 +2,8 @@
        migrate makemigrations createsuperuser shell \
        lint format typecheck test \
        up-monitoring up-management up-all \
-       clean reset-db backup-db
+       clean reset-db backup-db \
+       local-setup local-infra local-backend local-frontend local-stop
 
 # ─── General ──────────────────────────────────────────────────────────────────
 
@@ -13,8 +14,9 @@ help: ## Show this help
 # ─── Setup ────────────────────────────────────────────────────────────────────
 
 setup: ## First-time setup: copy env, build images, start services, run migrations
-	@test -f .env || cp .env.example .env
-	@echo "✅ .env file ready (edit it with your API keys)"
+	@test -f backend/.env || cp backend/.env.example backend/.env
+	@test -f frontend/.env || cp frontend/.env.example frontend/.env
+	@echo "✅ .env files ready (edit backend/.env and frontend/.env)"
 	docker compose build
 	docker compose up -d
 	@echo "⏳ Waiting for services to be healthy..."
@@ -90,19 +92,26 @@ typecheck: ## Run type checks (backend + frontend)
 
 # ─── Optional Service Stacks ─────────────────────────────────────────────────
 
+PROD_COMPOSE = -f docker-compose.yml -f deploy/docker-compose.prod.yml
+MON_COMPOSE  = -f docker-compose.yml -f docker-compose.override.yml -f deploy/docker-compose.monitoring.yml
+MGMT_COMPOSE = -f docker-compose.yml -f docker-compose.override.yml -f deploy/docker-compose.management.yml
+
 up-monitoring: ## Start monitoring stack (Grafana, Prometheus, Jaeger, Loki)
-	docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.monitoring.yml up -d
+	docker compose $(MON_COMPOSE) up -d
 
 up-management: ## Start management UIs (Portainer, pgAdmin, RedisInsight)
-	docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.management.yml up -d
+	docker compose $(MGMT_COMPOSE) up -d
 
 up-all: ## Start everything (dev + monitoring + management)
-	docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.monitoring.yml -f docker-compose.management.yml up -d
+	docker compose -f docker-compose.yml -f docker-compose.override.yml -f deploy/docker-compose.monitoring.yml -f deploy/docker-compose.management.yml up -d
+
+up-prod: ## Start production stack
+	docker compose $(PROD_COMPOSE) up -d
 
 # ─── Database ─────────────────────────────────────────────────────────────────
 
 backup-db: ## Backup database
-	./scripts/backup-db.sh
+	./deploy/scripts/backup-db.sh
 
 reset-db: ## Reset database (destructive!)
 	@echo "⚠️  This will delete all data. Press Ctrl+C to cancel."
@@ -113,6 +122,47 @@ reset-db: ## Reset database (destructive!)
 	docker compose up -d
 	@sleep 10
 	docker compose exec django python manage.py migrate --noinput
+
+# ─── Local Dev (native Django + Vite, infra in Docker) ──────────────────────
+
+local-setup: ## First-time local dev setup: venv, deps, infra, migrate
+	@test -f backend/.env || cp backend/.env.example backend/.env
+	@test -f frontend/.env || cp frontend/.env.example frontend/.env
+	docker compose up -d postgres redis rabbitmq minio livekit
+	@test -d backend/.venv || python3 -m venv backend/.venv
+	backend/.venv/bin/pip install -r backend/requirements.txt
+	cd frontend && npm install
+	@echo "Waiting for Postgres to be ready..."
+	@until docker compose exec -T postgres pg_isready -U hr_prescan 2>/dev/null; do sleep 1; done
+	$(MAKE) local-migrate
+	@echo ""
+	@echo "Local dev ready! Run in two terminals:"
+	@echo "  make local-backend   # Django on :8000"
+	@echo "  make local-frontend  # Vite on :5173"
+
+local-infra: ## Start infra services (Postgres, Redis, RabbitMQ, MinIO, LiveKit)
+	docker compose up -d postgres redis rabbitmq minio livekit
+
+local-backend: ## Run Django dev server natively (reads backend/.env)
+	cd backend && .venv/bin/python manage.py runserver 0.0.0.0:8000
+
+local-frontend: ## Run Vite dev server natively (reads frontend/.env)
+	cd frontend && npm run dev
+
+local-migrate: ## Run migrations (local)
+	cd backend && .venv/bin/python manage.py migrate
+
+local-makemigrations: ## Create migrations (local)
+	cd backend && .venv/bin/python manage.py makemigrations
+
+local-createsuperuser: ## Create superuser (local)
+	cd backend && .venv/bin/python manage.py createsuperuser
+
+local-shell: ## Django shell (local)
+	cd backend && .venv/bin/python manage.py shell
+
+local-stop: ## Stop infra containers
+	docker compose down
 
 # ─── Cleanup ──────────────────────────────────────────────────────────────────
 

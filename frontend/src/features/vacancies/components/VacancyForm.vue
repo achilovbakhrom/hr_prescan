@@ -8,8 +8,8 @@ import Calendar from 'primevue/calendar'
 import ToggleSwitch from 'primevue/toggleswitch'
 import Chips from 'primevue/chips'
 import Button from 'primevue/button'
-import { EMPLOYMENT_OPTIONS, EXPERIENCE_OPTIONS, CURRENCY_OPTIONS, VISIBILITY_OPTIONS } from '../constants/formOptions'
-import type { CreateVacancyRequest, EmploymentType, ExperienceLevel, VacancyVisibility } from '../types/vacancy.types'
+import { EMPLOYMENT_OPTIONS, EXPERIENCE_OPTIONS, CURRENCY_OPTIONS, VISIBILITY_OPTIONS, SCREENING_MODE_OPTIONS } from '../constants/formOptions'
+import type { CreateVacancyRequest, EmploymentType, ExperienceLevel, ScreeningMode, VacancyVisibility } from '../types/vacancy.types'
 
 const props = defineProps<{ initialData?: Partial<CreateVacancyRequest>; loading?: boolean }>()
 const emit = defineEmits<{ save: [data: CreateVacancyRequest, publish: boolean] }>()
@@ -28,7 +28,10 @@ const employmentType = ref<EmploymentType>(props.initialData?.employmentType ?? 
 const experienceLevel = ref<ExperienceLevel>(props.initialData?.experienceLevel ?? 'middle')
 const deadline = ref<Date | null>(props.initialData?.deadline ? new Date(props.initialData.deadline) : null)
 const visibility = ref<VacancyVisibility>(props.initialData?.visibility ?? 'public')
+const screeningMode = ref<ScreeningMode>(props.initialData?.screeningMode ?? 'chat')
+const cvRequired = ref(props.initialData?.cvRequired ?? false)
 const interviewDuration = ref(props.initialData?.interviewDuration ?? 30)
+const companyInfo = ref(props.initialData?.companyInfo ?? '')
 
 watch(() => props.initialData, (d) => {
   if (!d) return
@@ -41,6 +44,8 @@ watch(() => props.initialData, (d) => {
   experienceLevel.value = d.experienceLevel ?? 'middle'
   deadline.value = d.deadline ? new Date(d.deadline) : null
   visibility.value = d.visibility ?? 'public'; interviewDuration.value = d.interviewDuration ?? 30
+  screeningMode.value = d.screeningMode ?? 'chat'; cvRequired.value = d.cvRequired ?? false
+  companyInfo.value = d.companyInfo ?? ''
 })
 
 function handleSave(publish: boolean): void {
@@ -51,8 +56,10 @@ function handleSave(publish: boolean): void {
     salaryMin: salaryMin.value, salaryMax: salaryMax.value, salaryCurrency: salaryCurrency.value,
     location: location.value || undefined, isRemote: isRemote.value,
     employmentType: employmentType.value, experienceLevel: experienceLevel.value,
-    deadline: deadline.value ? deadline.value.toISOString() : null,
-    visibility: visibility.value, interviewDuration: interviewDuration.value,
+    deadline: deadline.value ? deadline.value.toISOString().split('T')[0] : null,
+    visibility: visibility.value, screeningMode: screeningMode.value,
+    cvRequired: cvRequired.value, interviewDuration: interviewDuration.value,
+    companyInfo: companyInfo.value || undefined,
   }, publish)
 }
 </script>
@@ -103,12 +110,21 @@ function handleSave(publish: boolean): void {
       </div>
     </div>
     <div class="rounded-lg border border-gray-200 bg-white p-4">
+      <h3 class="mb-4 text-lg font-semibold">Company Information (for AI Interview)</h3>
+      <p class="mb-2 text-sm text-gray-500">Optional. If provided, the AI interviewer will introduce the company to the candidate at the start of the interview.</p>
+      <Textarea v-model="companyInfo" class="w-full" rows="3" placeholder="e.g. We are a leading fintech company based in Tashkent, building next-gen payment solutions..." />
+    </div>
+    <div class="rounded-lg border border-gray-200 bg-white p-4">
       <h3 class="mb-4 text-lg font-semibold">Settings</h3>
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div><label class="mb-1 block text-sm font-medium">Visibility</label>
           <Dropdown v-model="visibility" :options="VISIBILITY_OPTIONS" option-label="label" option-value="value" class="w-full" /></div>
+        <div><label class="mb-1 block text-sm font-medium">Screening Mode</label>
+          <Dropdown v-model="screeningMode" :options="SCREENING_MODE_OPTIONS" option-label="label" option-value="value" class="w-full" /></div>
         <div><label class="mb-1 block text-sm font-medium">Interview Duration (min)</label>
           <InputNumber v-model="interviewDuration" class="w-full" :min="10" :max="120" :step="5" /></div>
+        <div class="flex items-end gap-2"><label class="text-sm font-medium">CV Required</label>
+          <ToggleSwitch v-model="cvRequired" /></div>
       </div>
     </div>
     <div class="flex justify-end gap-3">

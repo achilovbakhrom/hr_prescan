@@ -100,5 +100,25 @@ class InvitationOutputSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
+class PendingInvitationOutputSerializer(serializers.ModelSerializer):
+    company = CompanyOutputSerializer(read_only=True)
+    invited_by_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Invitation
+        fields = [
+            "id",
+            "company",
+            "invited_by_name",
+            "token",
+            "expires_at",
+            "created_at",
+        ]
+        read_only_fields = fields
+
+    def get_invited_by_name(self, obj: Invitation) -> str:
+        return obj.invited_by.full_name if obj.invited_by else ""
+
+
 class TeamMemberUpdateSerializer(serializers.Serializer):
     is_active = serializers.BooleanField()

@@ -1,21 +1,49 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import InputText from 'primevue/inputtext'
-import ToggleSwitch from 'primevue/toggleswitch'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
 import { vacancyService } from '../services/vacancy.service'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
-import { EMPLOYMENT_LABELS, formatSalaryRange, formatDate } from '../composables/useVacancyLabels'
+import { EMPLOYMENT_LABELS, EXPERIENCE_LABELS, formatSalaryRange } from '../composables/useVacancyLabels'
 import type { Vacancy } from '../types/vacancy.types'
 
 const router = useRouter()
 const jobs = ref<Vacancy[]>([])
 const loading = ref(false)
+
+// Filters
 const search = ref('')
-const location = ref('')
-const isRemote = ref(false)
+const locationFilter = ref('')
+const employmentType = ref<string | null>(null)
+const experienceLevel = ref<string | null>(null)
+const remoteOnly = ref(false)
+
+const employmentOptions = [
+  { value: 'full_time', label: 'Full Time', icon: 'pi pi-clock' },
+  { value: 'part_time', label: 'Part Time', icon: 'pi pi-hourglass' },
+  { value: 'contract', label: 'Contract', icon: 'pi pi-file' },
+  { value: 'internship', label: 'Internship', icon: 'pi pi-graduation-cap' },
+]
+
+const experienceOptions = [
+  { value: 'junior', label: 'Junior' },
+  { value: 'middle', label: 'Middle' },
+  { value: 'senior', label: 'Senior' },
+  { value: 'lead', label: 'Lead' },
+  { value: 'director', label: 'Director' },
+]
+
+const activeFilterCount = computed(() => {
+  let count = 0
+  if (search.value) count++
+  if (locationFilter.value) count++
+  if (employmentType.value) count++
+  if (experienceLevel.value) count++
+  if (remoteOnly.value) count++
+  return count
+})
 
 onMounted(() => fetchJobs())
 
@@ -24,74 +52,245 @@ async function fetchJobs(): Promise<void> {
   try {
     jobs.value = await vacancyService.getPublicList({
       search: search.value || undefined,
-      location: location.value || undefined,
-      isRemote: isRemote.value || undefined,
+      location: locationFilter.value || undefined,
+      isRemote: remoteOnly.value || undefined,
+      employmentType: employmentType.value ?? undefined,
+      experienceLevel: experienceLevel.value ?? undefined,
     })
-  } catch { /* silent */ } finally { loading.value = false }
+  } catch { /* silent */ } finally {
+    loading.value = false
+  }
+}
+
+function toggleEmploymentType(value: string): void {
+  employmentType.value = employmentType.value === value ? null : value
+  fetchJobs()
+}
+
+function toggleExperienceLevel(value: string): void {
+  experienceLevel.value = experienceLevel.value === value ? null : value
+  fetchJobs()
+}
+
+function toggleRemote(): void {
+  remoteOnly.value = !remoteOnly.value
+  fetchJobs()
+}
+
+function clearFilters(): void {
+  search.value = ''
+  locationFilter.value = ''
+  employmentType.value = null
+  experienceLevel.value = null
+  remoteOnly.value = false
+  fetchJobs()
 }
 
 function navigateToDetail(id: string): void {
   router.push({ name: ROUTE_NAMES.JOB_DETAIL, params: { id } })
 }
+
+function formatRelativeDate(dateStr: string): string {
+  const d = new Date(dateStr)
+  const now = new Date()
+  const diffMs = now.getTime() - d.getTime()
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+  if (diffDays === 0) return 'Today'
+  if (diffDays === 1) return 'Yesterday'
+  if (diffDays < 7) return `${diffDays} days ago`
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`
+  return d.toLocaleDateString([], { month: 'short', day: 'numeric' })
+}
 </script>
 
 <template>
-  <div class="mx-auto max-w-5xl px-4 py-8">
-    <h1 class="mb-2 text-3xl font-bold">Job Board</h1>
-    <p class="mb-6 text-gray-600">Find your next opportunity</p>
+  <div>
+    <!-- Search Hero -->
+    <div class="border-b border-gray-100 bg-white">
+      <div class="mx-auto max-w-6xl px-6 py-8">
+        <h1 class="mb-1 text-2xl font-bold text-gray-900">Find Your Next Job</h1>
+        <p class="mb-5 text-sm text-gray-500">{{ jobs.length }} open positions</p>
 
-    <div class="mb-6 flex flex-wrap items-end gap-4">
-      <div class="flex-1">
-        <label class="mb-1 block text-sm font-medium">Search</label>
-        <InputText v-model="search" class="w-full" placeholder="Search jobs..." @keyup.enter="fetchJobs" />
+        <div class="flex gap-3">
+          <div class="relative flex-1">
+            <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400"></i>
+            <InputText
+              v-model="search"
+              class="w-full pl-9"
+              placeholder="Job title, skill, or keyword..."
+              @keyup.enter="fetchJobs"
+            />
+          </div>
+          <div class="relative w-52">
+            <i class="pi pi-map-marker absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400"></i>
+            <InputText
+              v-model="locationFilter"
+              class="w-full pl-9"
+              placeholder="Location..."
+              @keyup.enter="fetchJobs"
+            />
+          </div>
+          <Button label="Search" icon="pi pi-search" :loading="loading" @click="fetchJobs" />
+        </div>
       </div>
-      <div class="w-48">
-        <label class="mb-1 block text-sm font-medium">Location</label>
-        <InputText v-model="location" class="w-full" placeholder="Any location" @keyup.enter="fetchJobs" />
-      </div>
-      <div class="flex items-center gap-2 pb-1">
-        <ToggleSwitch v-model="isRemote" />
-        <label class="text-sm font-medium">Remote only</label>
-      </div>
-      <Button label="Search" icon="pi pi-search" :loading="loading" @click="fetchJobs" />
     </div>
 
-    <div v-if="loading" class="py-12 text-center">
-      <i class="pi pi-spinner pi-spin text-3xl text-gray-400"></i>
-    </div>
+    <!-- Main Content -->
+    <div class="mx-auto max-w-6xl px-6 py-6">
+      <div class="flex gap-6">
+        <!-- Sidebar Filters -->
+        <aside class="hidden w-56 shrink-0 lg:block">
+          <div class="sticky top-4 space-y-6">
+            <!-- Active filters -->
+            <div v-if="activeFilterCount > 0" class="flex items-center justify-between">
+              <span class="text-xs font-medium text-gray-500">{{ activeFilterCount }} filter(s) active</span>
+              <button class="text-xs text-blue-600 hover:underline" @click="clearFilters">Clear all</button>
+            </div>
 
-    <div v-else-if="jobs.length > 0" class="space-y-4">
-      <div
-        v-for="job in jobs" :key="job.id"
-        class="cursor-pointer rounded-lg border border-gray-200 bg-white p-5 transition-shadow hover:shadow-md"
-        @click="navigateToDetail(job.id)"
-      >
-        <div class="flex items-start justify-between">
-          <div>
-            <h2 class="text-lg font-semibold text-blue-700">{{ job.title }}</h2>
-            <div class="mt-1 flex flex-wrap items-center gap-2 text-sm text-gray-500">
-              <span v-if="job.location"><i class="pi pi-map-marker mr-1"></i>{{ job.location }}</span>
-              <Tag v-if="job.isRemote" value="Remote" severity="info" />
-              <span><i class="pi pi-briefcase mr-1"></i>{{ EMPLOYMENT_LABELS[job.employmentType] }}</span>
+            <!-- Remote toggle -->
+            <div>
+              <button
+                class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors"
+                :class="remoteOnly ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100'"
+                @click="toggleRemote"
+              >
+                <i class="pi pi-globe text-sm"></i>
+                Remote Only
+              </button>
+            </div>
+
+            <!-- Employment Type -->
+            <div>
+              <h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">Employment Type</h3>
+              <div class="space-y-1">
+                <button
+                  v-for="opt in employmentOptions" :key="opt.value"
+                  class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors"
+                  :class="employmentType === opt.value ? 'bg-blue-50 font-medium text-blue-700' : 'text-gray-600 hover:bg-gray-100'"
+                  @click="toggleEmploymentType(opt.value)"
+                >
+                  <i :class="opt.icon" class="text-xs"></i>
+                  {{ opt.label }}
+                </button>
+              </div>
+            </div>
+
+            <!-- Experience Level -->
+            <div>
+              <h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">Experience Level</h3>
+              <div class="space-y-1">
+                <button
+                  v-for="opt in experienceOptions" :key="opt.value"
+                  class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors"
+                  :class="experienceLevel === opt.value ? 'bg-blue-50 font-medium text-blue-700' : 'text-gray-600 hover:bg-gray-100'"
+                  @click="toggleExperienceLevel(opt.value)"
+                >
+                  {{ opt.label }}
+                </button>
+              </div>
             </div>
           </div>
-          <span class="text-sm text-gray-400">{{ formatDate(job.createdAt) }}</span>
+        </aside>
+
+        <!-- Mobile filter chips -->
+        <div class="mb-4 flex flex-wrap gap-2 lg:hidden">
+          <button
+            class="rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
+            :class="remoteOnly ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600'"
+            @click="toggleRemote"
+          >
+            Remote
+          </button>
+          <button
+            v-for="opt in employmentOptions" :key="opt.value"
+            class="rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
+            :class="employmentType === opt.value ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600'"
+            @click="toggleEmploymentType(opt.value)"
+          >
+            {{ opt.label }}
+          </button>
         </div>
-        <p v-if="formatSalaryRange(job) !== 'Not specified'" class="mt-2 font-medium text-green-700">
-          {{ formatSalaryRange(job) }}
-        </p>
-        <p class="mt-2 line-clamp-2 text-sm text-gray-600">{{ job.description }}</p>
-        <div v-if="job.skills.length > 0" class="mt-3 flex flex-wrap gap-1">
-          <Tag v-for="skill in job.skills.slice(0, 5)" :key="skill" :value="skill" severity="secondary" />
-          <Tag v-if="job.skills.length > 5" :value="`+${job.skills.length - 5}`" severity="secondary" />
+
+        <!-- Job Listings -->
+        <div class="min-w-0 flex-1">
+          <!-- Loading -->
+          <div v-if="loading" class="flex items-center justify-center py-20">
+            <i class="pi pi-spinner pi-spin text-3xl text-gray-300"></i>
+          </div>
+
+          <!-- Results -->
+          <div v-else-if="jobs.length > 0" class="space-y-3">
+            <div
+              v-for="job in jobs" :key="job.id"
+              class="group cursor-pointer rounded-xl border border-gray-100 bg-white p-5 transition-all hover:border-blue-200 hover:shadow-md"
+              @click="navigateToDetail(job.id)"
+            >
+              <!-- Top row -->
+              <div class="flex items-start justify-between gap-4">
+                <div class="min-w-0 flex-1">
+                  <h2 class="text-base font-semibold text-gray-900 group-hover:text-blue-600">
+                    {{ job.title }}
+                  </h2>
+                  <p v-if="(job as Record<string, unknown>).companyName" class="mt-0.5 text-sm text-gray-500">
+                    {{ (job as Record<string, unknown>).companyName }}
+                  </p>
+                </div>
+                <span
+                  v-if="formatSalaryRange(job) !== 'Not specified'"
+                  class="shrink-0 rounded-lg bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700"
+                >
+                  {{ formatSalaryRange(job) }}
+                </span>
+              </div>
+
+              <!-- Tags row -->
+              <div class="mt-3 flex flex-wrap items-center gap-2">
+                <span v-if="job.location" class="flex items-center gap-1 text-sm text-gray-500">
+                  <i class="pi pi-map-marker text-xs"></i>{{ job.location }}
+                </span>
+                <Tag v-if="job.isRemote" value="Remote" severity="info" class="text-xs" />
+                <span class="rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
+                  {{ EMPLOYMENT_LABELS[job.employmentType] || job.employmentType }}
+                </span>
+                <span class="rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
+                  {{ EXPERIENCE_LABELS[job.experienceLevel] || job.experienceLevel }}
+                </span>
+              </div>
+
+              <!-- Description -->
+              <p class="mt-2.5 line-clamp-2 text-sm leading-relaxed text-gray-500">
+                {{ job.description }}
+              </p>
+
+              <!-- Skills + date -->
+              <div class="mt-3 flex items-center justify-between">
+                <div v-if="job.skills?.length" class="flex flex-wrap gap-1.5">
+                  <span
+                    v-for="skill in job.skills.slice(0, 4)" :key="skill"
+                    class="rounded-md bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600"
+                  >
+                    {{ skill }}
+                  </span>
+                  <span v-if="job.skills.length > 4" class="rounded-md bg-gray-50 px-2 py-0.5 text-xs text-gray-400">
+                    +{{ job.skills.length - 4 }}
+                  </span>
+                </div>
+                <span class="shrink-0 text-xs text-gray-400">{{ formatRelativeDate(job.createdAt) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty -->
+          <div v-else class="flex flex-col items-center rounded-xl border border-dashed border-gray-200 bg-white py-20 text-center">
+            <div class="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
+              <i class="pi pi-search text-2xl text-gray-400"></i>
+            </div>
+            <p class="mt-4 font-medium text-gray-600">No jobs found</p>
+            <p class="mt-1 text-sm text-gray-400">Try adjusting your filters or search terms</p>
+            <Button v-if="activeFilterCount > 0" label="Clear Filters" text size="small" class="mt-3" @click="clearFilters" />
+          </div>
         </div>
       </div>
-    </div>
-
-    <div v-else class="py-12 text-center text-gray-500">
-      <i class="pi pi-briefcase mb-3 text-4xl"></i>
-      <p class="text-lg font-medium">No jobs found</p>
-      <p class="text-sm">Try adjusting your search criteria</p>
     </div>
   </div>
 </template>

@@ -1,10 +1,15 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Button from 'primevue/button'
+import Menu from 'primevue/menu'
+import Badge from 'primevue/badge'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
+import { authService } from '@/features/auth/services/auth.service'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import NotificationBell from '@/features/notifications/components/NotificationBell.vue'
 import { useNotificationPolling } from '@/features/notifications/composables/useNotificationPolling'
+import type { MenuItem } from 'primevue/menuitem'
 
 defineProps<{
   sidebarCollapsed: boolean
@@ -12,16 +17,44 @@ defineProps<{
 
 const emit = defineEmits<{
   toggleSidebar: []
+  toggleMobileNav: []
 }>()
 
 const router = useRouter()
 const authStore = useAuthStore()
+const userMenu = ref<InstanceType<typeof Menu> | null>(null)
+const pendingInvitationsCount = ref(0)
 
 useNotificationPolling()
 
-async function handleLogout(): Promise<void> {
-  await authStore.logout()
-  await router.push({ name: ROUTE_NAMES.LOGIN })
+onMounted(async () => {
+  try {
+    const invitations = await authService.getMyInvitations()
+    pendingInvitationsCount.value = invitations.length
+  } catch {
+    // silent
+  }
+})
+
+const menuItems: MenuItem[] = [
+  {
+    label: 'Profile',
+    icon: 'pi pi-user',
+    command: () => router.push({ name: ROUTE_NAMES.PROFILE }),
+  },
+  { separator: true },
+  {
+    label: 'Logout',
+    icon: 'pi pi-sign-out',
+    command: async () => {
+      await authStore.logout()
+      await router.push({ name: ROUTE_NAMES.LOGIN })
+    },
+  },
+]
+
+function toggleUserMenu(event: Event): void {
+  userMenu.value?.toggle(event)
 }
 </script>
 
@@ -30,20 +63,64 @@ async function handleLogout(): Promise<void> {
     class="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4"
   >
     <div class="flex items-center gap-3">
+      <!-- Mobile nav toggle -->
       <Button
         icon="pi pi-bars"
         text
         severity="secondary"
         class="lg:hidden"
+        aria-label="Open menu"
+        @click="emit('toggleMobileNav')"
+      />
+      <!-- Desktop sidebar toggle -->
+      <Button
+        icon="pi pi-bars"
+        text
+        severity="secondary"
+        class="hidden lg:inline-flex"
+        aria-label="Toggle sidebar"
         @click="emit('toggleSidebar')"
       />
-      <h1 class="text-xl font-bold text-gray-900">HR PreScan</h1>
+      <RouterLink to="/" class="text-xl font-bold text-gray-900 hover:text-blue-600">
+        HR PreScan
+      </RouterLink>
+      <!-- Current company -->
+      <span
+        v-if="authStore.user?.company"
+        class="hidden rounded-md bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600 sm:inline"
+      >
+        {{ authStore.user.company.name }}
+      </span>
     </div>
 
-    <div class="flex items-center gap-4">
+    <div class="flex items-center gap-3">
+      <!-- Pending invitations indicator -->
+      <Button
+        v-if="pendingInvitationsCount > 0"
+        icon="pi pi-envelope"
+        text
+        severity="info"
+        size="small"
+        class="relative"
+        aria-label="Pending invitations"
+        @click="router.push({ name: ROUTE_NAMES.PROFILE })"
+      >
+        <template #icon>
+          <i class="pi pi-envelope"></i>
+          <Badge :value="pendingInvitationsCount" severity="danger" class="absolute -right-1 -top-1" />
+        </template>
+      </Button>
+
       <NotificationBell />
 
-      <div class="flex items-center gap-2">
+      <!-- User avatar — click to open menu -->
+      <button
+        type="button"
+        class="flex items-center gap-2 rounded-lg px-2 py-1 transition-colors hover:bg-gray-100"
+        aria-label="User menu"
+        aria-haspopup="true"
+        @click="toggleUserMenu"
+      >
         <div
           class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-medium text-blue-700"
         >
@@ -52,16 +129,10 @@ async function handleLogout(): Promise<void> {
         <span class="hidden text-sm font-medium text-gray-700 sm:inline">
           {{ authStore.user?.firstName }} {{ authStore.user?.lastName }}
         </span>
-      </div>
+        <i class="pi pi-chevron-down hidden text-xs text-gray-400 sm:inline"></i>
+      </button>
 
-      <Button
-        icon="pi pi-sign-out"
-        text
-        severity="secondary"
-        rounded
-        aria-label="Logout"
-        @click="handleLogout"
-      />
+      <Menu ref="userMenu" :model="menuItems" :popup="true" />
     </div>
   </header>
 </template>

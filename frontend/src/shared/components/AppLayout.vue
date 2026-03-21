@@ -1,23 +1,20 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import AppNavbar from './AppNavbar.vue'
 import AppSidebar from './AppSidebar.vue'
 import MobileNav from './MobileNav.vue'
 
-const sidebarCollapsed = ref(false)
+const sidebarCollapsed = ref(localStorage.getItem('sidebar_collapsed') === 'true')
 const mobileNavOpen = ref(false)
 
-function toggleSidebar(): void {
-  // On mobile, toggle the mobile drawer; on desktop, collapse the sidebar
-  if (window.innerWidth < 1024) {
-    mobileNavOpen.value = !mobileNavOpen.value
-  } else {
-    sidebarCollapsed.value = !sidebarCollapsed.value
-  }
+function toggleDesktopSidebar(): void {
+  sidebarCollapsed.value = !sidebarCollapsed.value
 }
 
-function closeSidebar(): void {
-  sidebarCollapsed.value = true
+watch(sidebarCollapsed, (val) => localStorage.setItem('sidebar_collapsed', String(val)))
+
+function toggleMobileNav(): void {
+  mobileNavOpen.value = !mobileNavOpen.value
 }
 
 function closeMobileNav(): void {
@@ -29,32 +26,25 @@ function closeMobileNav(): void {
   <div class="flex h-screen flex-col">
     <AppNavbar
       :sidebar-collapsed="sidebarCollapsed"
-      @toggle-sidebar="toggleSidebar"
+      @toggle-sidebar="toggleDesktopSidebar"
+      @toggle-mobile-nav="toggleMobileNav"
     />
 
     <div class="flex flex-1 overflow-hidden">
-      <!-- Desktop overlay (collapsed sidebar backdrop) -->
-      <div
-        v-if="!sidebarCollapsed"
-        class="fixed inset-0 z-20 bg-black/50 lg:hidden"
-        @click="closeSidebar"
-      ></div>
-
-      <!-- Desktop Sidebar -->
-      <div
-        class="hidden lg:relative lg:z-auto lg:flex"
-        :class="!sidebarCollapsed ? 'lg:static' : ''"
-      >
-        <AppSidebar :collapsed="sidebarCollapsed" @close="closeSidebar" />
-      </div>
+      <!-- Desktop Sidebar (always rendered, collapsible) -->
+      <AppSidebar
+        :collapsed="sidebarCollapsed"
+        class="hidden lg:flex"
+        @toggle="toggleDesktopSidebar"
+      />
 
       <!-- Main content -->
-      <main class="flex-1 overflow-y-auto bg-gray-50" id="main-content">
+      <main class="flex-1 overflow-y-auto bg-gray-50 p-6 lg:p-8" id="main-content">
         <RouterView />
       </main>
     </div>
 
-    <!-- Mobile slide-out navigation -->
+    <!-- Mobile slide-out navigation (teleported, only on small screens) -->
     <MobileNav :open="mobileNavOpen" @close="closeMobileNav" />
   </div>
 </template>

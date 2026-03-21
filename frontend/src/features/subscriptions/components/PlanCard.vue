@@ -10,7 +10,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  select: [planId: string]
+  select: [planTier: string]
 }>()
 
 const price = computed(() => {
@@ -70,7 +70,7 @@ const isHighlighted = computed(() => props.plan.tier === 'professional')
       :disabled="isCurrentPlan"
       :outlined="!isHighlighted && !isCurrentPlan"
       class="mt-6 w-full"
-      @click="emit('select', plan.id)"
+      @click="emit('select', plan.tier)"
     />
   </div>
 </template>

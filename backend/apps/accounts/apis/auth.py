@@ -6,9 +6,10 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from apps.accounts.selectors import get_user_by_email
-from apps.accounts.serializers import UserOutputSerializer
-from apps.accounts.services import register_user, verify_email
+from apps.accounts.selectors import get_pending_invitations_for_email, get_user_by_email
+from apps.accounts.serializers import PendingInvitationOutputSerializer, UserOutputSerializer
+from apps.accounts.services import accept_invitation_existing_user, register_user, verify_email
+from apps.common.exceptions import ApplicationError
 
 
 class RegisterApi(APIView):
@@ -65,8 +66,10 @@ class LoginApi(APIView):
 
         return Response(
             {
-                "access": str(refresh.access_token),
-                "refresh": str(refresh),
+                "tokens": {
+                    "access": str(refresh.access_token),
+                    "refresh": str(refresh),
+                },
                 "user": UserOutputSerializer(user).data,
             },
             status=status.HTTP_200_OK,
@@ -151,3 +154,48 @@ class MeApi(APIView):
     def get(self, request: Request) -> Response:
         user = get_user_by_email(email=request.user.email)
         return Response(UserOutputSerializer(user).data, status=status.HTTP_200_OK)
+
+
+class MyInvitationsApi(APIView):
+    """GET /api/auth/my-invitations/ — list pending invitations for the current user."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request) -> Response:
+        invitations = get_pending_invitations_for_email(email=request.user.email)
+        return Response(
+            PendingInvitationOutputSerializer(invitations, many=True).data,
+            status=status.HTTP_200_OK,
+        )
+
+
+class AcceptCompanyInvitationApi(APIView):
+    """POST /api/auth/accept-company-invitation/ — accept invitation and switch company."""
+
+    permission_classes = [IsAuthenticated]
+
+    class InputSerializer(serializers.Serializer):
+        token = serializers.UUIDField()
+
+    def post(self, request: Request) -> Response:
+        serializer = self.InputSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            user = accept_invitation_existing_user(
+                user=request.user,
+                token=serializer.validated_data["token"],
+            )
+        except ApplicationError as e:
+            return Response(
+                {"detail": e.message},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        return Response(
+            {
+                "detail": "Invitation accepted. You are now part of the company.",
+                "user": UserOutputSerializer(user).data,
+            },
+            status=status.HTTP_200_OK,
+        )

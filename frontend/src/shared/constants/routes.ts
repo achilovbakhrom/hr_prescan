@@ -6,8 +6,10 @@ export const ROUTE_NAMES = {
   LOGIN: 'login',
   REGISTER: 'register',
   VERIFY_EMAIL: 'verify-email',
+  COMPANY_REGISTER: 'company-register',
 
   // App
+  PROFILE: 'profile',
   DASHBOARD: 'dashboard',
   VACANCY_LIST: 'vacancy-list',
   VACANCY_CREATE: 'vacancy-create',
@@ -22,9 +24,11 @@ export const ROUTE_NAMES = {
   CANDIDATE_DETAIL: 'candidate-detail',
   INTERVIEW_LIST: 'interview-list',
   INTERVIEW_DETAIL: 'interview-detail',
-  CANDIDATE_SCHEDULE: 'candidate-schedule',
   CANDIDATE_INTERVIEW: 'candidate-interview',
   INTERVIEW_CONFIRMATION: 'interview-confirmation',
+  INTERVIEW_GATEWAY: 'interview-gateway',
+  CHAT_INTERVIEW: 'chat-interview',
+  INTERVIEW_ROOM: 'interview-room',
   NOTIFICATIONS: 'notifications',
   COMPANY_PROFILE: 'company-profile',
   TEAM_MANAGEMENT: 'team-management',

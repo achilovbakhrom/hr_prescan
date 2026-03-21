@@ -1,5 +1,5 @@
 # Management UIs — run with:
-# docker compose -f docker-compose.yml -f docker-compose.management.yml up -d
+# docker compose -f docker-compose.yml -f deploy/docker-compose.management.yml up -d
 
 services:
   portainer:

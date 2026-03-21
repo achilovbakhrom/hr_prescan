@@ -109,7 +109,7 @@ async function handleSubmit(): Promise<void> {
 </script>
 
 <template>
-  <div class="flex min-h-screen items-center justify-center bg-gray-50">
+  <div class="flex flex-1 items-center justify-center py-12">
     <div class="w-full max-w-2xl rounded-lg bg-white p-8 shadow-md">
       <template v-if="registered">
         <div class="text-center">

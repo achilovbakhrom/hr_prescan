@@ -49,7 +49,9 @@ class InterviewOutputSerializer(serializers.ModelSerializer):
             "application",
             "candidate_name",
             "vacancy_title",
-            "scheduled_at",
+            "screening_mode",
+            "interview_token",
+            "started_at",
             "duration_minutes",
             "status",
             "overall_score",
@@ -81,12 +83,15 @@ class InterviewDetailOutputSerializer(serializers.ModelSerializer):
             "candidate_name",
             "candidate_email",
             "vacancy_title",
-            "scheduled_at",
+            "screening_mode",
+            "interview_token",
+            "started_at",
             "duration_minutes",
             "status",
             "livekit_room_name",
             "recording_path",
             "transcript",
+            "chat_history",
             "overall_score",
             "ai_summary",
             "scores",
@@ -107,7 +112,7 @@ class InterviewDetailOutputSerializer(serializers.ModelSerializer):
 
 
 class CandidateInterviewOutputSerializer(serializers.ModelSerializer):
-    """Limited view for candidates — room link, scheduled time, no scores."""
+    """Limited view for candidates — room link, screening mode, no scores."""
 
     vacancy_title = serializers.SerializerMethodField()
     company_name = serializers.SerializerMethodField()
@@ -118,11 +123,42 @@ class CandidateInterviewOutputSerializer(serializers.ModelSerializer):
             "id",
             "vacancy_title",
             "company_name",
-            "scheduled_at",
+            "interview_token",
+            "screening_mode",
+            "started_at",
             "duration_minutes",
             "status",
             "livekit_room_name",
             "candidate_token",
+            "chat_history",
+        ]
+        read_only_fields = fields
+
+    def get_vacancy_title(self, obj: Interview) -> str:
+        return obj.application.vacancy.title
+
+    def get_company_name(self, obj: Interview) -> str:
+        return obj.application.vacancy.company.name
+
+
+class PublicInterviewOutputSerializer(serializers.ModelSerializer):
+    """Public view for interview accessed by token — minimal info."""
+
+    vacancy_title = serializers.SerializerMethodField()
+    company_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Interview
+        fields = [
+            "id",
+            "vacancy_title",
+            "company_name",
+            "interview_token",
+            "screening_mode",
+            "started_at",
+            "duration_minutes",
+            "status",
+            "chat_history",
         ]
         read_only_fields = fields
 

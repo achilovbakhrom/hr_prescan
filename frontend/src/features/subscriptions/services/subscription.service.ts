@@ -15,28 +15,28 @@ export const subscriptionService = {
 
   async getCurrentSubscription(): Promise<CompanySubscription> {
     const response =
-      await apiClient.get<CompanySubscription>('/subscriptions/current')
+      await apiClient.get<CompanySubscription>('/hr/subscription')
     return response.data
   },
 
   async subscribe(
-    planId: string,
+    planTier: string,
     billingPeriod: BillingPeriod,
   ): Promise<CompanySubscription> {
     const response = await apiClient.post<CompanySubscription>(
-      '/subscriptions/subscribe',
-      { planId, billingPeriod },
+      '/hr/subscription',
+      { planTier, billingPeriod },
     )
     return response.data
   },
 
   async cancelSubscription(): Promise<void> {
-    await apiClient.post('/subscriptions/cancel')
+    await apiClient.post('/hr/subscription/cancel')
   },
 
   async getUsage(): Promise<SubscriptionUsage> {
     const response =
-      await apiClient.get<SubscriptionUsage>('/subscriptions/usage')
+      await apiClient.get<SubscriptionUsage>('/hr/subscription/usage')
     return response.data
   },
 }

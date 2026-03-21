@@ -20,20 +20,17 @@ from apps.interviews.serializers import (
 from apps.interviews.services import (
     cancel_interview,
     generate_observer_token,
+    reset_interview,
     schedule_human_interview,
-    schedule_interview,
 )
 
 
-class ScheduleInterviewApi(APIView):
-    """POST /api/hr/candidates/{application_id}/schedule-interview/"""
+class HRApplicationInterviewApi(APIView):
+    """GET /api/hr/candidates/{application_id}/interview/ — get interview data for a candidate."""
 
     permission_classes = [IsHRManager | IsAdmin]
 
-    class InputSerializer(serializers.Serializer):
-        scheduled_at = serializers.DateTimeField()
-
-    def post(self, request: Request, application_id: str) -> Response:
+    def get(self, request: Request, application_id: str) -> Response:
         company = request.user.company
         if company is None:
             return Response(
@@ -50,23 +47,19 @@ class ScheduleInterviewApi(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        serializer = self.InputSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
         try:
-            interview = schedule_interview(
-                application=application,
-                scheduled_at=serializer.validated_data["scheduled_at"],
-            )
-        except ApplicationError as e:
+            interview = Interview.objects.select_related("application__vacancy__company").prefetch_related(
+                "scores__criteria", "integrity_flags"
+            ).get(application=application)
+        except Interview.DoesNotExist:
             return Response(
-                {"detail": e.message},
-                status=status.HTTP_400_BAD_REQUEST,
+                {"detail": "No interview found for this application."},
+                status=status.HTTP_404_NOT_FOUND,
             )
 
         return Response(
             InterviewDetailOutputSerializer(interview).data,
-            status=status.HTTP_201_CREATED,
+            status=status.HTTP_200_OK,
         )
 
 
@@ -202,6 +195,46 @@ class CancelInterviewApi(APIView):
 
         return Response(
             InterviewDetailOutputSerializer(interview).data,
+            status=status.HTTP_200_OK,
+        )
+
+
+class ResetInterviewApi(APIView):
+    """POST /api/hr/interviews/{id}/reset/
+
+    Reset an abandoned interview. Creates a new interview with a fresh token
+    and cancels the old one.
+    """
+
+    permission_classes = [IsHRManager | IsAdmin]
+
+    def post(self, request: Request, interview_id: str) -> Response:
+        company = request.user.company
+        if company is None:
+            return Response(
+                {"detail": "You are not associated with a company."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        interview = get_interview_by_id(
+            interview_id=interview_id, company=company,
+        )
+        if interview is None:
+            return Response(
+                {"detail": "Interview not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        try:
+            new_interview = reset_interview(interview=interview)
+        except ApplicationError as e:
+            return Response(
+                {"detail": e.message},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        return Response(
+            InterviewDetailOutputSerializer(new_interview).data,
             status=status.HTTP_200_OK,
         )
 

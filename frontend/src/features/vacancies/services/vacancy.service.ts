@@ -12,29 +12,39 @@ import type {
 export const vacancyService = {
   // HR endpoints
   async list(params?: { status?: string }): Promise<Vacancy[]> {
-    const response = await apiClient.get<Vacancy[]>('/vacancies', { params })
+    const response = await apiClient.get<Vacancy[]>('/hr/vacancies', { params })
     return response.data
   },
 
   async create(data: CreateVacancyRequest): Promise<Vacancy> {
-    const response = await apiClient.post<Vacancy>('/vacancies', data)
+    const response = await apiClient.post<Vacancy>('/hr/vacancies', data)
     return response.data
   },
 
   async getDetail(id: string): Promise<VacancyDetail> {
-    const response = await apiClient.get<VacancyDetail>(`/vacancies/${id}`)
+    const response = await apiClient.get<VacancyDetail>(`/hr/vacancies/${id}`)
     return response.data
   },
 
   async update(id: string, data: UpdateVacancyRequest): Promise<Vacancy> {
-    const response = await apiClient.patch<Vacancy>(`/vacancies/${id}`, data)
+    const response = await apiClient.put<Vacancy>(
+      `/hr/vacancies/${id}`,
+      data,
+    )
     return response.data
   },
 
   async updateStatus(id: string, status: VacancyStatus): Promise<Vacancy> {
+    const statusToAction: Record<string, string> = {
+      published: 'publish',
+      paused: 'pause',
+      closed: 'close',
+    }
+    const action = statusToAction[status]
+    if (!action) throw new Error(`Invalid status transition: ${status}`)
     const response = await apiClient.patch<Vacancy>(
-      `/vacancies/${id}/status`,
-      { status },
+      `/hr/vacancies/${id}/status`,
+      { action },
     )
     return response.data
   },
@@ -42,7 +52,7 @@ export const vacancyService = {
   // Criteria
   async getCriteria(vacancyId: string): Promise<VacancyCriteria[]> {
     const response = await apiClient.get<VacancyCriteria[]>(
-      `/vacancies/${vacancyId}/criteria`,
+      `/hr/vacancies/${vacancyId}/criteria`,
     )
     return response.data
   },
@@ -52,7 +62,7 @@ export const vacancyService = {
     data: { name: string; description?: string; weight?: number },
   ): Promise<VacancyCriteria> {
     const response = await apiClient.post<VacancyCriteria>(
-      `/vacancies/${vacancyId}/criteria`,
+      `/hr/vacancies/${vacancyId}/criteria`,
       data,
     )
     return response.data
@@ -63,21 +73,21 @@ export const vacancyService = {
     criteriaId: string,
     data: Partial<VacancyCriteria>,
   ): Promise<VacancyCriteria> {
-    const response = await apiClient.patch<VacancyCriteria>(
-      `/vacancies/${vacancyId}/criteria/${criteriaId}`,
+    const response = await apiClient.put<VacancyCriteria>(
+      `/hr/vacancies/${vacancyId}/criteria/${criteriaId}`,
       data,
     )
     return response.data
   },
 
   async deleteCriteria(vacancyId: string, criteriaId: string): Promise<void> {
-    await apiClient.delete(`/vacancies/${vacancyId}/criteria/${criteriaId}`)
+    await apiClient.delete(`/hr/vacancies/${vacancyId}/criteria/${criteriaId}`)
   },
 
   // Questions
   async getQuestions(vacancyId: string): Promise<InterviewQuestion[]> {
     const response = await apiClient.get<InterviewQuestion[]>(
-      `/vacancies/${vacancyId}/questions`,
+      `/hr/vacancies/${vacancyId}/questions`,
     )
     return response.data
   },
@@ -87,7 +97,7 @@ export const vacancyService = {
     data: { text: string; category?: string },
   ): Promise<InterviewQuestion> {
     const response = await apiClient.post<InterviewQuestion>(
-      `/vacancies/${vacancyId}/questions`,
+      `/hr/vacancies/${vacancyId}/questions`,
       data,
     )
     return response.data
@@ -98,8 +108,8 @@ export const vacancyService = {
     questionId: string,
     data: Partial<InterviewQuestion>,
   ): Promise<InterviewQuestion> {
-    const response = await apiClient.patch<InterviewQuestion>(
-      `/vacancies/${vacancyId}/questions/${questionId}`,
+    const response = await apiClient.put<InterviewQuestion>(
+      `/hr/vacancies/${vacancyId}/questions/${questionId}`,
       data,
     )
     return response.data
@@ -110,13 +120,13 @@ export const vacancyService = {
     questionId: string,
   ): Promise<void> {
     await apiClient.delete(
-      `/vacancies/${vacancyId}/questions/${questionId}`,
+      `/hr/vacancies/${vacancyId}/questions/${questionId}`,
     )
   },
 
   async generateQuestions(vacancyId: string): Promise<InterviewQuestion[]> {
     const response = await apiClient.post<InterviewQuestion[]>(
-      `/vacancies/${vacancyId}/questions/generate`,
+      `/hr/vacancies/${vacancyId}/questions/generate`,
     )
     return response.data
   },
@@ -126,18 +136,24 @@ export const vacancyService = {
     search?: string
     location?: string
     isRemote?: boolean
+    employmentType?: string
+    experienceLevel?: string
   }): Promise<Vacancy[]> {
-    const response = await apiClient.get<Vacancy[]>('/jobs', { params })
+    const response = await apiClient.get<Vacancy[]>('/public/vacancies', {
+      params,
+    })
     return response.data
   },
 
   async getPublicDetail(id: string): Promise<Vacancy> {
-    const response = await apiClient.get<Vacancy>(`/jobs/${id}`)
+    const response = await apiClient.get<Vacancy>(`/public/vacancies/${id}`)
     return response.data
   },
 
   async getByShareToken(token: string): Promise<Vacancy> {
-    const response = await apiClient.get<Vacancy>(`/jobs/share/${token}`)
+    const response = await apiClient.get<Vacancy>(
+      `/public/vacancies/share/${token}`,
+    )
     return response.data
   },
 }

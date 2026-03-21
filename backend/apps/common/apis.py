@@ -8,7 +8,7 @@ from apps.applications.serializers import ApplicationListOutputSerializer
 from apps.common.selectors import (
     get_dashboard_stats,
     get_recent_applications,
-    get_upcoming_company_interviews,
+    get_pending_company_interviews,
 )
 from apps.interviews.serializers import InterviewOutputSerializer
 
@@ -29,7 +29,7 @@ class HRDashboardApi(APIView):
         stats = get_dashboard_stats(company=company)
 
         recent_applications = get_recent_applications(company=company, limit=5)
-        upcoming_interviews = get_upcoming_company_interviews(
+        upcoming_interviews = get_pending_company_interviews(
             company=company, limit=5,
         )
 

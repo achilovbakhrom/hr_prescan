@@ -1,11 +1,11 @@
 export type ApplicationStatus =
   | 'applied'
-  | 'interview_scheduled'
   | 'interview_in_progress'
   | 'interview_completed'
   | 'reviewing'
   | 'shortlisted'
   | 'rejected'
+  | 'expired'
 
 export interface Application {
   id: string
@@ -17,6 +17,7 @@ export interface Application {
   cvFile: string
   cvOriginalFilename: string
   matchScore: number | null
+  interviewScore: number | null
   status: ApplicationStatus
   createdAt: string
   updatedAt: string
@@ -27,6 +28,8 @@ export interface ApplicationDetail extends Application {
   cvParsedData: CvParsedData
   matchDetails: Record<string, number>
   hrNotes: string
+  interviewToken?: string
+  screeningMode?: 'chat' | 'meet'
 }
 
 export interface CvParsedData {

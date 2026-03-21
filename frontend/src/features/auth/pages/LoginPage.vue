@@ -5,6 +5,7 @@ import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
 import Button from 'primevue/button'
 import Message from 'primevue/message'
+import GoogleSignInButton from '../components/GoogleSignInButton.vue'
 import { useAuthStore } from '../stores/auth.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 
@@ -36,16 +37,33 @@ async function handleLogin(): Promise<void> {
       email: email.value,
       password: password.value,
     })
-    await router.push({ name: ROUTE_NAMES.DASHBOARD })
+    const redirect = router.currentRoute.value.query.redirect as string
+    await router.push(redirect || { name: ROUTE_NAMES.DASHBOARD })
   } catch (err: unknown) {
     errorMessage.value =
       err instanceof Error ? err.message : 'Login failed. Please try again.'
   }
 }
+
+async function handleGoogleSuccess(credential: string): Promise<void> {
+  errorMessage.value = null
+  try {
+    await authStore.googleLogin(credential)
+    const redirect = router.currentRoute.value.query.redirect as string
+    await router.push(redirect || { name: ROUTE_NAMES.DASHBOARD })
+  } catch (err: unknown) {
+    errorMessage.value =
+      err instanceof Error ? err.message : 'Google sign-in failed.'
+  }
+}
+
+function handleGoogleError(msg: string): void {
+  errorMessage.value = msg
+}
 </script>
 
 <template>
-  <div class="flex min-h-screen items-center justify-center bg-gray-50">
+  <div class="flex flex-1 items-center justify-center py-12">
     <div class="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
       <h1 class="mb-6 text-center text-2xl font-bold text-gray-900">
         Sign In
@@ -54,6 +72,17 @@ async function handleLogin(): Promise<void> {
       <Message v-if="errorMessage" severity="error" class="mb-4">
         {{ errorMessage }}
       </Message>
+
+      <GoogleSignInButton
+        @success="handleGoogleSuccess"
+        @error="handleGoogleError"
+      />
+
+      <div class="mb-4 flex items-center gap-3">
+        <div class="h-px flex-1 bg-gray-200"></div>
+        <span class="text-xs text-gray-400">or sign in with email</span>
+        <div class="h-px flex-1 bg-gray-200"></div>
+      </div>
 
       <form class="flex flex-col gap-4" @submit.prevent="handleLogin">
         <div class="flex flex-col gap-1">
@@ -107,6 +136,16 @@ async function handleLogin(): Promise<void> {
           class="font-medium text-blue-600 hover:text-blue-500"
         >
           Register
+        </RouterLink>
+      </p>
+
+      <p class="mt-2 text-center text-sm text-gray-600">
+        Want to hire?
+        <RouterLink
+          :to="{ name: ROUTE_NAMES.COMPANY_REGISTER }"
+          class="font-medium text-blue-600 hover:text-blue-500"
+        >
+          Register your company
         </RouterLink>
       </p>
     </div>

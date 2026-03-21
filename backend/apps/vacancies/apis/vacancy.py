@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.permissions import IsAdmin, IsHRManager
+from apps.common.exceptions import ApplicationError
 from apps.vacancies.models import Vacancy
 from apps.vacancies.selectors import get_company_vacancies, get_vacancy_by_id
 from apps.vacancies.serializers import VacancyDetailOutputSerializer, VacancyListOutputSerializer
@@ -55,7 +56,14 @@ class VacancyListCreateApi(APIView):
             required=False,
             default=Vacancy.Visibility.PUBLIC,
         )
+        screening_mode = serializers.ChoiceField(
+            choices=Vacancy.ScreeningMode.choices,
+            required=False,
+            default=Vacancy.ScreeningMode.CHAT,
+        )
+        cv_required = serializers.BooleanField(required=False, default=False)
         interview_duration = serializers.IntegerField(required=False, default=30)
+        company_info = serializers.CharField(required=False, allow_blank=True, default="")
 
     class FilterSerializer(serializers.Serializer):
         status = serializers.ChoiceField(choices=Vacancy.Status.choices, required=False)
@@ -134,7 +142,12 @@ class VacancyDetailApi(APIView):
         )
         deadline = serializers.DateField(required=False, allow_null=True)
         visibility = serializers.ChoiceField(choices=Vacancy.Visibility.choices, required=False)
+        screening_mode = serializers.ChoiceField(
+            choices=Vacancy.ScreeningMode.choices, required=False,
+        )
+        cv_required = serializers.BooleanField(required=False)
         interview_duration = serializers.IntegerField(required=False)
+        company_info = serializers.CharField(required=False, allow_blank=True)
 
     def get(self, request: Request, vacancy_id: str) -> Response:
         vacancy = get_vacancy_by_id(vacancy_id=vacancy_id, company=request.user.company)
@@ -178,5 +191,8 @@ class VacancyStatusApi(APIView):
             "close": close_vacancy,
         }
 
-        vacancy = action_map[action](vacancy=vacancy)
+        try:
+            vacancy = action_map[action](vacancy=vacancy)
+        except ApplicationError as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(VacancyDetailOutputSerializer(vacancy).data, status=status.HTTP_200_OK)

@@ -1,5 +1,5 @@
 # Monitoring stack — run with:
-# docker compose -f docker-compose.yml -f docker-compose.monitoring.yml up -d
+# docker compose -f docker-compose.yml -f deploy/docker-compose.monitoring.yml up -d
 
 services:
   grafana:
@@ -20,7 +20,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./deploy/monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"

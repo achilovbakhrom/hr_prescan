@@ -9,32 +9,33 @@ import type {
 
 export const settingsService = {
   async getCompanyProfile(): Promise<Company> {
-    const response = await apiClient.get<Company>('/company/profile')
+    const response = await apiClient.get<Company>('/hr/company/profile')
     return response.data
   },
 
   async updateCompanyProfile(data: CompanyProfileUpdate): Promise<Company> {
-    const response = await apiClient.put<Company>('/company/profile', data)
+    const response = await apiClient.put<Company>(
+      '/hr/company/profile',
+      data,
+    )
     return response.data
   },
 
   async inviteHR(data: InviteHRRequest): Promise<Invitation> {
     const response = await apiClient.post<Invitation>(
-      '/company/invitations',
+      '/hr/company/invite',
       data,
     )
     return response.data
   },
 
   async getTeam(): Promise<TeamMember[]> {
-    const response = await apiClient.get<TeamMember[]>('/company/team')
+    const response = await apiClient.get<TeamMember[]>('/hr/company/team')
     return response.data
   },
 
   async getInvitations(): Promise<Invitation[]> {
-    const response = await apiClient.get<Invitation[]>(
-      '/company/invitations',
-    )
+    const response = await apiClient.get<Invitation[]>('/hr/company/invite')
     return response.data
   },
 
@@ -43,7 +44,7 @@ export const settingsService = {
     data: { isActive: boolean },
   ): Promise<TeamMember> {
     const response = await apiClient.patch<TeamMember>(
-      `/company/team/${userId}`,
+      `/hr/company/team/${userId}`,
       data,
     )
     return response.data

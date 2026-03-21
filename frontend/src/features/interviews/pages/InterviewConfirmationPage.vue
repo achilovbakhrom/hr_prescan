@@ -68,13 +68,13 @@ function handleGoToInterview(): void {
           <div class="flex justify-between">
             <dt class="text-gray-500">Date</dt>
             <dd class="font-medium">
-              {{ formatDate(interview.scheduledAt) }}
+              {{ formatDate(interview.createdAt) }}
             </dd>
           </div>
           <div class="flex justify-between">
             <dt class="text-gray-500">Time</dt>
             <dd class="font-medium">
-              {{ formatTime(interview.scheduledAt) }}
+              {{ formatTime(interview.createdAt) }}
             </dd>
           </div>
           <div class="flex justify-between">

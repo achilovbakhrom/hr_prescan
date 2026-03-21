@@ -204,14 +204,22 @@ hr_prescan/
 │   ├── evaluator.py            # Post-interview scoring
 │   ├── integrity.py            # Anti-cheating monitoring
 │   └── Dockerfile
-├── nginx/                      # Nginx configs (dev + prod)
-├── monitoring/                 # Grafana dashboards, Prometheus alerts
-├── scripts/                    # Backup, deployment, agent launcher
+├── docs/                       # Project documentation
+│   ├── BUSINESS_LOGIC.md       # Product requirements, user flows
+│   ├── TECH_ARCHITECTURE.md    # Services, DB schema, API structure
+│   ├── CODE_STYLE.md           # Code conventions, patterns
+│   ├── DEVOPS.md               # CI/CD, deployment, monitoring
+│   └── ROADMAP.md              # Development phases
+├── deploy/                     # Deployment & infrastructure
+│   ├── nginx/                  # Nginx configs (dev + prod)
+│   ├── monitoring/             # Grafana, Prometheus configs
+│   ├── livekit/                # LiveKit server config
+│   ├── scripts/                # Backup, SSL, smoke-test scripts
+│   ├── docker-compose.prod.yml
+│   ├── docker-compose.monitoring.yml
+│   └── docker-compose.management.yml
 ├── docker-compose.yml          # Base services (10 containers)
 ├── docker-compose.override.yml # Dev overrides (hot reload, debug ports)
-├── docker-compose.prod.yml     # Production overrides
-├── docker-compose.monitoring.yml # Monitoring stack
-├── docker-compose.management.yml # Management UIs
 ├── Makefile                    # Dev commands
 └── .env.example                # Environment template
 ```
@@ -290,49 +298,49 @@ VITE_API_URL=https://yourdomain.com
 
 ```bash
 # Edit the script with your domain and email
-nano scripts/init-letsencrypt.sh
+nano deploy/scripts/init-letsencrypt.sh
 # Set DOMAIN=yourdomain.com and EMAIL=you@email.com
 
 # Make scripts executable
-chmod +x scripts/*.sh
+chmod +x deploy/scripts/*.sh
 
 # Get SSL certificates
-./scripts/init-letsencrypt.sh
+./deploy/scripts/init-letsencrypt.sh
 ```
 
 ### Step 4: Build and Deploy
 
 ```bash
 # Build production images
-docker compose -f docker-compose.yml -f docker-compose.prod.yml build
+docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml build
 
 # Start all services
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml up -d
 
 # Run migrations
-docker compose -f docker-compose.yml -f docker-compose.prod.yml exec django python manage.py migrate --noinput
+docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml exec django python manage.py migrate --noinput
 
 # Collect static files
-docker compose -f docker-compose.yml -f docker-compose.prod.yml exec django python manage.py collectstatic --noinput
+docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml exec django python manage.py collectstatic --noinput
 
 # Create admin user
-docker compose -f docker-compose.yml -f docker-compose.prod.yml exec django python manage.py createsuperuser
+docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml exec django python manage.py createsuperuser
 
 # Verify deployment
-./scripts/smoke-test.sh https://yourdomain.com
+./deploy/scripts/smoke-test.sh https://yourdomain.com
 ```
 
 ### Step 5: Setup Automated Backups
 
 ```bash
 # Setup daily database backup cron job
-./scripts/backup-cron-setup.sh
+./deploy/scripts/backup-cron-setup.sh
 ```
 
 ### Step 6: Enable Monitoring (Optional)
 
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.monitoring.yml up -d
+docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml -f deploy/docker-compose.monitoring.yml up -d
 
 # Grafana will be available at http://your-server-ip:3000
 # Default login: admin / admin (change immediately)
@@ -346,11 +354,11 @@ cd hr_prescan
 git pull origin main
 
 # Rebuild and restart
-docker compose -f docker-compose.yml -f docker-compose.prod.yml build
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml build
+docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml up -d
 
 # Run any new migrations
-docker compose -f docker-compose.yml -f docker-compose.prod.yml exec django python manage.py migrate --noinput
+docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml exec django python manage.py migrate --noinput
 ```
 
 ### CI/CD (Automated Deployment)
