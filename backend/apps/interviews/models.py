@@ -47,6 +47,7 @@ class Interview(BaseModel):
         default=Status.PENDING,
     )
     started_at = models.DateTimeField(null=True, blank=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
 
     # LiveKit (Meet mode only)
     livekit_room_name = models.CharField(max_length=255, blank=True)

@@ -185,7 +185,10 @@ def complete_session(
             f"Cannot complete session with status '{interview.status}'."
         )
 
+    from django.utils import timezone
+
     interview.status = Interview.Status.COMPLETED
+    interview.completed_at = timezone.now()
     interview.overall_score = overall_score
     interview.ai_summary = ai_summary
     interview.transcript = transcript
@@ -193,6 +196,7 @@ def complete_session(
     interview.save(
         update_fields=[
             "status",
+            "completed_at",
             "overall_score",
             "ai_summary",
             "transcript",
