@@ -81,7 +81,7 @@ function handleMenuToggle(): void {
         @click="handleMenuToggle"
       />
       <RouterLink to="/" class="text-xl font-bold text-gray-900 hover:text-blue-600">
-        HR PreScan
+        PreScreen AI
       </RouterLink>
       <!-- Current company -->
       <span

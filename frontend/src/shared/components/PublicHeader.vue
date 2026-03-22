@@ -53,7 +53,7 @@ function initials(): string {
     <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
       <RouterLink to="/" class="flex items-center gap-2.5">
         <AppLogo size="sm" />
-        <span class="text-xl font-bold tracking-tight text-gray-900">HR PreScan</span>
+        <span class="text-xl font-bold tracking-tight text-gray-900">PreScreen AI</span>
       </RouterLink>
 
       <slot name="center" />

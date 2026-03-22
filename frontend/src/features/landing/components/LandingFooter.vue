@@ -18,7 +18,7 @@ function scrollTo(id: string): void {
         <div class="lg:col-span-2">
           <div class="mb-4 flex items-center gap-2.5">
             <AppLogo size="sm" />
-            <span class="text-lg font-bold text-white">HR PreScan</span>
+            <span class="text-lg font-bold text-white">PreScreen AI</span>
           </div>
           <p class="max-w-xs text-sm leading-relaxed text-gray-400">
             {{ t('landing.footer.tagline') }}
@@ -120,7 +120,7 @@ function scrollTo(id: string): void {
       </div>
 
       <div class="mt-12 border-t border-gray-800 pt-6 text-center text-sm text-gray-500">
-        &copy; {{ new Date().getFullYear() }} HR PreScan. {{ t('landing.footer.copyright') }}
+        &copy; {{ new Date().getFullYear() }} PreScreen AI. {{ t('landing.footer.copyright') }}
       </div>
     </div>
   </footer>

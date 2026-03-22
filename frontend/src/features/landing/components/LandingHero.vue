@@ -18,11 +18,11 @@ const visibleMessages = ref<DemoMessage[]>([])
 const chatDemoComplete = ref(false)
 
 const demoMessages: DemoMessage[] = [
-  { role: 'ai', text: '👋 Hi! I\'m the AI interviewer for the Senior Frontend Developer position. Let\'s get started!' },
-  { role: 'candidate', text: 'Hello! I\'m excited to be here.' },
-  { role: 'ai', text: 'Great! Can you tell me about your experience with Vue.js and TypeScript?' },
-  { role: 'candidate', text: 'I\'ve been working with Vue 3 + TypeScript for 3 years, building SaaS products.' },
-  { role: 'ai', text: '✅ Excellent background! Prescanning score: 8.5/10' },
+  { role: 'ai', text: '👋 Hi! I\'m the AI interviewer for the Senior Frontend Developer role at TechCorp. Ready to begin?' },
+  { role: 'candidate', text: 'Yes, let\'s go!' },
+  { role: 'ai', text: 'Tell me about a complex UI challenge you solved recently.' },
+  { role: 'candidate', text: 'I built a real-time collaborative editor with conflict resolution using CRDTs and Vue 3.' },
+  { role: 'ai', text: '🎯 Impressive! Technical Skills: 9/10 • Communication: 8/10 • Advancing to interview stage.' },
 ]
 
 onMounted(() => {
