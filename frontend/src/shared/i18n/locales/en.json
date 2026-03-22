@@ -664,6 +664,19 @@
     "viewDetails": "View Details",
     "postedOn": "Posted"
   },
+  "telegram": {
+    "title": "Telegram",
+    "subtitle": "Connect your Telegram account to use AI assistant via Telegram",
+    "connected": "Connected",
+    "notConnected": "Your Telegram account is not connected",
+    "connect": "Connect Telegram",
+    "disconnect": "Disconnect",
+    "linkCode": "Your link code",
+    "linkCodeHint": "Send this code to @PreScreenAI_bot on Telegram",
+    "linkCodeExpires": "Expires in 10 minutes",
+    "generating": "Generating code...",
+    "disconnected": "Telegram disconnected"
+  },
   "aiAssistant": {
     "title": "AI Assistant",
     "subtitle": "PreScreen AI",

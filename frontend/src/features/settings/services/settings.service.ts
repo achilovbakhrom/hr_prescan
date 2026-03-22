@@ -49,4 +49,18 @@ export const settingsService = {
     )
     return response.data
   },
+
+  async getTelegramStatus(): Promise<{ linked: boolean; telegramUsername: string | null }> {
+    const response = await apiClient.get('/hr/telegram/status')
+    return response.data
+  },
+
+  async generateTelegramLinkCode(): Promise<{ code: string; expiresAt: string }> {
+    const response = await apiClient.get('/hr/telegram/link-code')
+    return response.data
+  },
+
+  async unlinkTelegram(): Promise<void> {
+    await apiClient.post('/hr/telegram/unlink')
+  },
 }

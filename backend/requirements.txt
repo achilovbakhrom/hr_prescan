@@ -56,6 +56,9 @@ beautifulsoup4>=4.12,<5.0
 # LiveKit
 livekit-api>=1.0,<2.0
 
+# Telegram bot
+python-telegram-bot>=21.0,<22.0
+
 # Env file loading
 python-dotenv>=1.0,<2.0
 

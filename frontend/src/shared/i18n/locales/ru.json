@@ -664,6 +664,19 @@
     "viewDetails": "Подробнее",
     "postedOn": "Опубликовано"
   },
+  "telegram": {
+    "title": "Telegram",
+    "subtitle": "Подключите Telegram для использования ИИ-ассистента",
+    "connected": "Подключён",
+    "notConnected": "Telegram не подключён",
+    "connect": "Подключить Telegram",
+    "disconnect": "Отключить",
+    "linkCode": "Код привязки",
+    "linkCodeHint": "Отправьте этот код боту @PreScreenAI_bot в Telegram",
+    "linkCodeExpires": "Действует 10 минут",
+    "generating": "Генерация кода...",
+    "disconnected": "Telegram отключён"
+  },
   "aiAssistant": {
     "title": "AI Ассистент",
     "subtitle": "PreScreen AI",
