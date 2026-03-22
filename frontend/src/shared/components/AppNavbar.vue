@@ -116,16 +116,14 @@ function handleMenuToggle(): void {
         </template>
       </Button>
 
-      <Button
+      <button
         type="button"
-        icon="pi pi-sparkles"
-        severity="secondary"
-        text
-        rounded
-        size="small"
+        class="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-violet-500 to-indigo-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-all hover:shadow-md hover:brightness-110 active:scale-95"
         @click="aiAssistant.toggle()"
-        v-tooltip.bottom="'AI Assistant'"
-      />
+      >
+        <i class="pi pi-sparkles text-[10px]"></i>
+        <span class="hidden sm:inline">AI</span>
+      </button>
 
       <LanguageSwitcher />
 
