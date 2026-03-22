@@ -174,14 +174,21 @@ def process_ai_command(*, user, message, context=None):
     max_iterations = 10
 
     try:
-        for _ in range(max_iterations):
-            response = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=messages,
-                tools=TOOL_DEFINITIONS,
-                tool_choice="auto",
-                temperature=0.1,
-            )
+        for iteration in range(max_iterations):
+            try:
+                response = client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    messages=messages,
+                    tools=TOOL_DEFINITIONS,
+                    tool_choice="auto",
+                    temperature=0.1,
+                )
+            except Exception as api_err:
+                logger.error("AI assistant OpenAI API error on iteration %d: %s", iteration, api_err)
+                return _build_error_response(
+                    actions_taken=actions_taken,
+                    fallback_message=f"AI service error: {api_err}",
+                )
 
             msg = response.choices[0].message
             messages.append(msg)
@@ -190,7 +197,10 @@ def process_ai_command(*, user, message, context=None):
             if msg.tool_calls:
                 for tool_call in msg.tool_calls:
                     fn_name = tool_call.function.name
-                    fn_args = json.loads(tool_call.function.arguments)
+                    try:
+                        fn_args = json.loads(tool_call.function.arguments)
+                    except json.JSONDecodeError:
+                        fn_args = {}
 
                     logger.info("AI assistant tool call: %s(%s)", fn_name, fn_args)
                     result = _execute_tool(user=user, name=fn_name, args=fn_args)
@@ -203,45 +213,66 @@ def process_ai_command(*, user, message, context=None):
                         "content": json.dumps(result, default=str),
                     })
             else:
-                # GPT is done — check if any tool actually failed
-                has_errors = any(
-                    a.get("result", {}).get("error") or a.get("result", {}).get("success") is False
-                    for a in actions_taken
+                # GPT is done — build final response
+                return _build_final_response(
+                    gpt_message=msg.content,
+                    actions_taken=actions_taken,
                 )
-                gpt_message = msg.content or "Done."
 
-                # If tools failed but GPT said success, append error details
-                if has_errors:
-                    error_details = []
-                    for a in actions_taken:
-                        err = a.get("result", {}).get("error")
-                        if err:
-                            error_details.append(f"- {a['tool']}: {err}")
-                        elif a.get("result", {}).get("success") is False:
-                            error_details.append(f"- {a['tool']}: {a['result'].get('message', 'failed')}")
-                    if error_details:
-                        gpt_message += "\n\n⚠️ Some actions encountered errors:\n" + "\n".join(error_details)
-
-                return {
-                    "success": not has_errors,
-                    "message": gpt_message,
-                    "actions": actions_taken,
-                }
-
-        # Safety: max iterations reached
-        return {
-            "success": True,
-            "message": "Completed (reached step limit).",
-            "actions": actions_taken,
-        }
+        # Safety: max iterations reached — still return something useful
+        return _build_final_response(
+            gpt_message="I completed some actions but reached the step limit.",
+            actions_taken=actions_taken,
+        )
 
     except Exception as e:
-        logger.error("AI assistant error: %s", e)
-        return {
-            "success": False,
-            "message": f"AI service error: {str(e)}",
-            "actions": actions_taken,
-        }
+        logger.error("AI assistant error: %s", e, exc_info=True)
+        return _build_error_response(
+            actions_taken=actions_taken,
+            fallback_message=f"Something went wrong: {e}",
+        )
+
+
+def _build_final_response(*, gpt_message, actions_taken):
+    """Build the final response, appending error details if any tools failed."""
+    has_errors = any(
+        a.get("result", {}).get("error") or a.get("result", {}).get("success") is False
+        for a in actions_taken
+    )
+
+    message = gpt_message or "Done."
+
+    if has_errors:
+        error_details = []
+        for a in actions_taken:
+            err = a.get("result", {}).get("error")
+            if err:
+                error_details.append(f"- {a['tool']}: {err}")
+            elif a.get("result", {}).get("success") is False:
+                err_msg = a.get("result", {}).get("message", "failed")
+                error_details.append(f"- {a['tool']}: {err_msg}")
+        if error_details:
+            message += "\n\n⚠️ Some actions encountered errors:\n" + "\n".join(error_details)
+
+    return {
+        "success": not has_errors,
+        "message": message,
+        "actions": actions_taken,
+    }
+
+
+def _build_error_response(*, actions_taken, fallback_message):
+    """Build an error response that includes any partial actions taken."""
+    message = fallback_message
+    if actions_taken:
+        successful = [a for a in actions_taken if not a.get("result", {}).get("error")]
+        if successful:
+            message += f"\n\n✅ {len(successful)} action(s) completed before the error."
+    return {
+        "success": False,
+        "message": message,
+        "actions": actions_taken,
+    }
 
 
 # ---------------------------------------------------------------------------
