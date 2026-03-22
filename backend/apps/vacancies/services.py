@@ -357,15 +357,43 @@ def _extract_text_from_docx(file_bytes: bytes) -> str:
     return "\n".join(p.text for p in doc.paragraphs if p.text.strip())
 
 
+def _validate_url_not_internal(url: str) -> None:
+    """Reject URLs pointing to private/internal networks to prevent SSRF."""
+    import ipaddress
+    import socket
+    from urllib.parse import urlparse
+
+    parsed = urlparse(url)
+    hostname = parsed.hostname
+    if not hostname:
+        raise ApplicationError("Invalid URL.")
+
+    # Block obvious internal hostnames
+    blocked_hostnames = {"localhost", "127.0.0.1", "::1", "0.0.0.0", "metadata.google.internal"}
+    if hostname.lower() in blocked_hostnames:
+        raise ApplicationError("Internal URLs are not allowed.")
+
+    try:
+        resolved_ip = socket.getaddrinfo(hostname, None, socket.AF_UNSPEC, socket.SOCK_STREAM)[0][4][0]
+        ip = ipaddress.ip_address(resolved_ip)
+    except (socket.gaierror, ValueError) as exc:
+        raise ApplicationError("Could not resolve the URL hostname.") from exc
+
+    if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved:
+        raise ApplicationError("Internal or private URLs are not allowed.")
+
+
 def parse_company_info_from_url(*, url: str) -> str:
     """Fetch a webpage and use AI to generate company info from its content."""
     import requests
     from bs4 import BeautifulSoup
 
+    _validate_url_not_internal(url)
+
     try:
-        response = requests.get(url, timeout=15, headers={
+        response = requests.get(url, timeout=10, headers={
             "User-Agent": "Mozilla/5.0 (compatible; HRPreScan/1.0)",
-        })
+        }, allow_redirects=True)
         response.raise_for_status()
     except requests.RequestException as exc:
         raise ApplicationError(f"Could not fetch the website: {exc}") from exc
