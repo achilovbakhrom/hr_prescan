@@ -7,10 +7,16 @@ export interface AIMessage {
   timestamp: string
 }
 
+export interface FrontendAction {
+  type: 'navigate' | 'clear_history'
+  path?: string
+}
+
 export interface AIResponse {
   success: boolean
   message: string
   actions?: Array<{ tool: string; result: Record<string, unknown> }>
+  frontendActions?: FrontendAction[]
 }
 
 export async function sendAICommand(
