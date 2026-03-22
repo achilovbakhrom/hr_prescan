@@ -338,6 +338,9 @@ function handleClose(): void {
             </div>
             <div>
               <p class="text-sm font-medium text-gray-900">{{ interview.vacancyTitle }}</p>
+              <p v-if="(interview as any).employerName || (interview as any).companyName" class="text-xs text-gray-500">
+                <i class="pi pi-building mr-0.5"></i>{{ (interview as any).employerName || (interview as any).companyName }}
+              </p>
               <p class="text-xs text-gray-500">AI Interview in progress - click to expand</p>
             </div>
           </div>
@@ -370,6 +373,9 @@ function handleClose(): void {
               </div>
               <div>
                 <h1 class="text-base font-semibold text-gray-900">{{ interview.vacancyTitle }}</h1>
+                <p v-if="(interview as any).employerName || (interview as any).companyName" class="text-xs text-gray-500">
+                  <i class="pi pi-building mr-1"></i>{{ (interview as any).employerName || (interview as any).companyName }}
+                </p>
                 <div class="flex items-center gap-1.5">
                   <span class="h-2 w-2 rounded-full" :class="isCompleted ? 'bg-gray-400' : 'bg-green-500 animate-pulse'"></span>
                   <span class="text-xs text-gray-500">{{ isCompleted ? t('interviews.status.completed') : t('interviews.chat.aiInterview') }}</span>

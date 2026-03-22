@@ -275,8 +275,8 @@ function formatRelativeDate(dateStr: string): string {
                   <h2 class="text-base font-semibold text-gray-900 group-hover:text-blue-600">
                     {{ job.title }}
                   </h2>
-                  <p v-if="(job as Record<string, unknown>).companyName" class="mt-0.5 text-sm text-gray-500">
-                    {{ (job as Record<string, unknown>).companyName }}
+                  <p v-if="(job as Record<string, unknown>).employerName || (job as Record<string, unknown>).companyName" class="mt-0.5 text-sm text-gray-500">
+                    <i class="pi pi-building mr-1 text-xs"></i>{{ (job as Record<string, unknown>).employerName || (job as Record<string, unknown>).companyName }}
                   </p>
                 </div>
                 <span

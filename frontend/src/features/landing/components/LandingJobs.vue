@@ -65,6 +65,9 @@ function goToJobDetail(id: string): void {
         >
           <div class="min-w-0 flex-1">
             <h3 class="text-base font-semibold text-gray-900">{{ job.title }}</h3>
+            <p v-if="(job as Record<string, unknown>).employerName || (job as Record<string, unknown>).companyName" class="mt-0.5 text-sm text-gray-500">
+              <i class="pi pi-building mr-1 text-xs"></i>{{ (job as Record<string, unknown>).employerName || (job as Record<string, unknown>).companyName }}
+            </p>
             <div class="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">
               <span v-if="job.location"><i class="pi pi-map-marker mr-1 text-xs"></i>{{ job.location }}</span>
               <span><i class="pi pi-briefcase mr-1 text-xs"></i>{{ EMPLOYMENT_LABELS[job.employmentType] }}</span>

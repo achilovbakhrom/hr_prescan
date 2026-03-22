@@ -18,7 +18,7 @@ def get_company_vacancies(
     qs = (
         Vacancy.objects
         .filter(company=company)
-        .select_related("created_by")
+        .select_related("created_by", "employer")
         .annotate(
             criteria_count=Count("criteria"),
             questions_count=Count("questions", filter=Q(questions__is_active=True)),
@@ -58,7 +58,7 @@ def get_vacancy_by_id(
     company: Company | None = None,
 ) -> Vacancy | None:
     """Get a single vacancy, optionally scoped to a company. Excludes soft-deleted."""
-    qs = Vacancy.objects.select_related("company", "created_by").filter(is_deleted=False)
+    qs = Vacancy.objects.select_related("company", "created_by", "employer").filter(is_deleted=False)
     if company:
         qs = qs.filter(company=company)
     return qs.filter(id=vacancy_id).first()
@@ -68,7 +68,7 @@ def get_vacancy_by_share_token(*, share_token: UUID) -> Vacancy | None:
     """Get a vacancy by its share token for public/private access."""
     return (
         Vacancy.objects
-        .select_related("company", "created_by")
+        .select_related("company", "created_by", "employer")
         .filter(share_token=share_token)
         .first()
     )
@@ -95,7 +95,7 @@ def get_public_vacancies(
             visibility=Vacancy.Visibility.PUBLIC,
             is_deleted=False,
         )
-        .select_related("company")
+        .select_related("company", "employer")
     )
     if search:
         # Both english (stemming: program→programming) and simple (exact: Russian words)
