@@ -10,7 +10,11 @@ from livekit.api import AccessToken, VideoGrants
 
 from apps.applications.models import Application
 from apps.common.exceptions import ApplicationError
-from apps.common.messages import MSG_INTERVIEW_NOT_FOUND
+from apps.common.messages import (
+    MSG_CANNOT_CANCEL_SESSION,
+    MSG_CANNOT_START_SESSION,
+    MSG_INTERVIEW_NOT_FOUND,
+)
 from apps.interviews.models import Interview, InterviewIntegrityFlag, InterviewScore
 from apps.vacancies.models import Vacancy
 
@@ -24,7 +28,7 @@ def cancel_interview(*, interview: Interview) -> Interview:
     """Cancel a pending or in-progress session and revert application status."""
     if interview.status not in (Interview.Status.PENDING, Interview.Status.IN_PROGRESS):
         raise ApplicationError(
-            f"Cannot cancel session with status '{interview.status}'."
+            str(MSG_CANNOT_CANCEL_SESSION).format(status=interview.status)
         )
 
     interview.status = Interview.Status.CANCELLED
@@ -49,7 +53,7 @@ def start_interview(*, interview: Interview) -> Interview:
     """
     if interview.status != Interview.Status.PENDING:
         raise ApplicationError(
-            f"Cannot start interview with status '{interview.status}'."
+            str(MSG_CANNOT_START_SESSION).format(status=interview.status)
         )
 
     interview.status = Interview.Status.IN_PROGRESS

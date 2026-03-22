@@ -246,10 +246,10 @@ function formatRelativeDate(dateStr: string): string {
                   </p>
                 </div>
                 <span
-                  v-if="formatSalaryRange(job) !== 'Not specified'"
+                  v-if="formatSalaryRange(job, t) !== t('vacancies.overview.salaryNotSpecified')"
                   class="shrink-0 rounded-lg bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700"
                 >
-                  {{ formatSalaryRange(job) }}
+                  {{ formatSalaryRange(job, t) }}
                 </span>
               </div>
 

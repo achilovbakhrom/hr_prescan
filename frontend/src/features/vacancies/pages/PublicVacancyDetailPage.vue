@@ -51,8 +51,8 @@ onMounted(async () => {
           <span><i class="pi pi-calendar mr-1"></i>{{ t('jobBoard.postedOn') }} {{ formatDate(vacancy.createdAt) }}</span>
         </div>
       </div>
-      <p v-if="formatSalaryRange(vacancy) !== 'Not specified'" class="mb-6 text-xl font-semibold text-green-700">
-        {{ formatSalaryRange(vacancy) }}
+      <p v-if="formatSalaryRange(vacancy, t) !== t('vacancies.overview.salaryNotSpecified')" class="mb-6 text-xl font-semibold text-green-700">
+        {{ formatSalaryRange(vacancy, t) }}
       </p>
       <div class="mb-8">
         <Button

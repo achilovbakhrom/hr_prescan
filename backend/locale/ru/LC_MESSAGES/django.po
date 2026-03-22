@@ -241,6 +241,14 @@ msgid "Interview not found."
 msgstr "Интервью не найдено."
 
 #: apps/common/messages.py
+msgid "Cannot cancel session with status '{status}'."
+msgstr "Невозможно отменить сессию со статусом '{status}'."
+
+#: apps/common/messages.py
+msgid "Cannot start interview with status '{status}'."
+msgstr "Невозможно начать интервью со статусом '{status}'."
+
+#: apps/common/messages.py
 msgid "This session is not a chat-mode session."
 msgstr "Эта сессия не является чат-сессией."
 

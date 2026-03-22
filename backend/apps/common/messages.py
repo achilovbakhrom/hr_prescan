@@ -77,6 +77,8 @@ MSG_NO_CV_UPLOADED = _("No CV uploaded for this application.")
 
 # Interviews
 MSG_INTERVIEW_NOT_FOUND = _("Interview not found.")
+MSG_CANNOT_CANCEL_SESSION = _("Cannot cancel session with status '{status}'.")
+MSG_CANNOT_START_SESSION = _("Cannot start interview with status '{status}'.")
 MSG_NOT_CHAT_MODE = _("This session is not a chat-mode session.")
 MSG_SESSION_NOT_IN_PROGRESS = _("This session is not currently in progress.")
 MSG_NO_FILE_UPLOADED = _("No file uploaded.")

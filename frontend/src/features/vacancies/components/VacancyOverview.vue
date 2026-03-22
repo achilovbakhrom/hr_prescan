@@ -16,12 +16,12 @@ const experienceLabel = useExperienceLabels()
 
 function formatSalary(): string {
   const { salaryMin, salaryMax, salaryCurrency } = props.vacancy
-  if (!salaryMin && !salaryMax) return t('vacancies.overview.notSpecified')
+  if (!salaryMin && !salaryMax) return t('vacancies.overview.salaryNotSpecified')
   if (salaryMin && salaryMax) {
-    return `${formatMoney(salaryMin)} - ${formatMoney(salaryMax)} ${salaryCurrency}`
+    return t('vacancies.overview.salaryRange', { min: formatMoney(salaryMin), max: formatMoney(salaryMax), currency: salaryCurrency })
   }
-  if (salaryMin) return `From ${formatMoney(salaryMin)} ${salaryCurrency}`
-  return `Up to ${formatMoney(salaryMax!)} ${salaryCurrency}`
+  if (salaryMin) return t('vacancies.overview.salaryFrom', { amount: formatMoney(salaryMin), currency: salaryCurrency })
+  return t('vacancies.overview.salaryUpTo', { amount: formatMoney(salaryMax!), currency: salaryCurrency })
 }
 </script>
 
