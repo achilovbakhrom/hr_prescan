@@ -193,6 +193,9 @@ local-createsuperuser: ## Create superuser (local)
 local-shell: ## Django shell (local)
 	cd backend && $(VENV)/python manage.py shell
 
+local-telegram: ## Run Telegram bot in polling mode (local dev)
+	cd backend && $(VENV)/python manage.py run_telegram_bot
+
 local-stop: ## Stop everything (infra + background processes)
 	@echo "Stopping background processes..."
 	-@pkill -f "manage.py runserver" 2>/dev/null || true
