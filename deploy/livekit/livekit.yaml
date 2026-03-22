@@ -6,8 +6,6 @@ rtc:
   use_external_ip: false
 
 keys:
-  # Set via LIVEKIT_API_KEY / LIVEKIT_API_SECRET env vars in .env
-  # devkey: devsecret  # DO NOT use default keys — generate strong keys per environment
 
 logging:
   level: info

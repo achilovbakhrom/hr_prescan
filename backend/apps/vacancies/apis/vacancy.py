@@ -8,9 +8,12 @@ from apps.common.exceptions import ApplicationError
 from apps.vacancies.models import Vacancy
 from apps.vacancies.selectors import get_company_vacancies, get_vacancy_by_id
 from apps.vacancies.serializers import VacancyDetailOutputSerializer, VacancyListOutputSerializer
+from rest_framework.parsers import MultiPartParser
 from apps.vacancies.services import (
     archive_vacancy,
     create_vacancy,
+    parse_company_info_from_file,
+    parse_company_info_from_url,
     pause_vacancy,
     publish_vacancy,
     update_vacancy,
@@ -202,3 +205,59 @@ class VacancyStatusApi(APIView):
         except ApplicationError as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(VacancyDetailOutputSerializer(vacancy).data, status=status.HTTP_200_OK)
+
+
+class ParseCompanyFileApi(APIView):
+    """POST /api/hr/vacancies/parse-company-file/ — extract company info from uploaded file."""
+
+    permission_classes = [IsHRManager | IsAdmin]
+    parser_classes = [MultiPartParser]
+
+    def post(self, request: Request) -> Response:
+        file_obj = request.FILES.get("file")
+        if not file_obj:
+            return Response(
+                {"detail": "No file uploaded."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        allowed_extensions = {"pdf", "docx", "doc", "txt"}
+        ext = file_obj.name.rsplit(".", 1)[-1].lower() if "." in file_obj.name else ""
+        if ext not in allowed_extensions:
+            return Response(
+                {"detail": f"Unsupported file type. Allowed: {', '.join(allowed_extensions)}"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if file_obj.size > 10 * 1024 * 1024:  # 10MB limit
+            return Response(
+                {"detail": "File too large. Maximum size is 10MB."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            company_info = parse_company_info_from_file(file_obj=file_obj)
+        except ApplicationError as e:
+            return Response({"detail": e.message}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"company_info": company_info}, status=status.HTTP_200_OK)
+
+
+class ParseCompanyUrlApi(APIView):
+    """POST /api/hr/vacancies/parse-company-url/ — extract company info from a website URL."""
+
+    permission_classes = [IsHRManager | IsAdmin]
+
+    class InputSerializer(serializers.Serializer):
+        url = serializers.URLField()
+
+    def post(self, request: Request) -> Response:
+        serializer = self.InputSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            company_info = parse_company_info_from_url(url=serializer.validated_data["url"])
+        except ApplicationError as e:
+            return Response({"detail": e.message}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"company_info": company_info}, status=status.HTTP_200_OK)

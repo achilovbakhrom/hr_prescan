@@ -415,15 +415,9 @@ async function handleStatusChange(status: VacancyStatus): Promise<void> {
   await vacancyStore.changeStatus(vacancyId.value, status).catch(() => {})
 }
 
-async function handleUpdate(
-  data: CreateVacancyRequest,
-  publish: boolean,
-): Promise<void> {
+async function handleUpdate(data: CreateVacancyRequest): Promise<void> {
   try {
     await vacancyStore.updateVacancy(vacancyId.value, data)
-    if (publish && vacancy.value?.status === 'draft') {
-      await vacancyStore.changeStatus(vacancyId.value, 'published')
-    }
   } catch {
     /* store handles error */
   }

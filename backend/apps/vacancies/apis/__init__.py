@@ -10,6 +10,8 @@ from apps.vacancies.apis.public import (
     PublicVacancyListApi,
 )
 from apps.vacancies.apis.vacancy import (
+    ParseCompanyFileApi,
+    ParseCompanyUrlApi,
     VacancyDetailApi,
     VacancyListCreateApi,
     VacancyStatusApi,
@@ -17,6 +19,8 @@ from apps.vacancies.apis.vacancy import (
 
 __all__ = [
     "GenerateQuestionsApi",
+    "ParseCompanyFileApi",
+    "ParseCompanyUrlApi",
     "PublicVacancyDetailApi",
     "PublicVacancyListApi",
     "VacancyCriteriaDetailApi",

@@ -46,6 +46,7 @@ class VacancyListOutputSerializer(serializers.ModelSerializer):
     candidates_interviewed = serializers.IntegerField(read_only=True, default=0)
     candidates_shortlisted = serializers.IntegerField(read_only=True, default=0)
     candidates_rejected = serializers.IntegerField(read_only=True, default=0)
+    candidates_hired = serializers.IntegerField(read_only=True, default=0)
     created_by_email = serializers.EmailField(source="created_by.email", read_only=True)
 
     class Meta:
@@ -69,6 +70,7 @@ class VacancyListOutputSerializer(serializers.ModelSerializer):
             "candidates_interviewed",
             "candidates_shortlisted",
             "candidates_rejected",
+            "candidates_hired",
             "created_by_email",
             "created_at",
             "updated_at",
