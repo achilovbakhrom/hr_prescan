@@ -7,6 +7,7 @@ import { ref, computed } from 'vue'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import LanguageSwitcher from '@/shared/components/LanguageSwitcher.vue'
+import AppLogo from '@/shared/components/AppLogo.vue'
 import type { MenuItem } from 'primevue/menuitem'
 
 const router = useRouter()
@@ -51,9 +52,7 @@ function initials(): string {
   <header class="sticky top-0 z-50 border-b border-gray-100 bg-white/95 backdrop-blur-md">
     <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
       <RouterLink to="/" class="flex items-center gap-2.5">
-        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 shadow-sm">
-          <i class="pi pi-bolt text-sm text-white"></i>
-        </div>
+        <AppLogo size="sm" />
         <span class="text-xl font-bold tracking-tight text-gray-900">HR PreScan</span>
       </RouterLink>
 
