@@ -28,6 +28,8 @@ function selectLocale(code: SupportedLocale): void {
     rounded
     size="small"
     class="!gap-1 !px-2.5"
+    aria-label="Select language"
+    aria-haspopup="true"
     @click="toggle"
   />
   <Popover ref="popover">
@@ -35,6 +37,9 @@ function selectLocale(code: SupportedLocale): void {
       <button
         v-for="option in localeOptions"
         :key="option.code"
+        type="button"
+        role="option"
+        :aria-selected="option.code === currentLocale"
         class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-gray-100"
         :class="option.code === currentLocale ? 'bg-blue-50 font-medium text-blue-700' : 'text-gray-700'"
         @click="selectLocale(option.code)"
