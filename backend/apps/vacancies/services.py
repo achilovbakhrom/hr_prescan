@@ -156,9 +156,9 @@ def archive_vacancy(*, vacancy: Vacancy) -> Vacancy:
 
 
 def soft_delete_vacancy(*, vacancy: Vacancy) -> Vacancy:
-    """Soft-delete an archived vacancy. Only archived vacancies can be deleted."""
-    if vacancy.status != Vacancy.Status.ARCHIVED:
-        raise ApplicationError(str(MSG_ONLY_ARCHIVED_DELETE))
+    """Soft-delete a vacancy. Only draft or archived vacancies can be deleted."""
+    if vacancy.status not in (Vacancy.Status.DRAFT, Vacancy.Status.ARCHIVED):
+        raise ApplicationError("Only draft or archived vacancies can be deleted.")
     vacancy.is_deleted = True
     vacancy.save(update_fields=["is_deleted", "updated_at"])
     return vacancy

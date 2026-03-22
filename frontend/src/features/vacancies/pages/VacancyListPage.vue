@@ -155,9 +155,9 @@ function formatDate(dateStr: string): string {
             </div>
           </div>
           <div class="flex items-center gap-2">
-            <!-- Delete button for archived vacancies -->
+            <!-- Delete button for draft and archived vacancies -->
             <Button
-              v-if="activeTab === 'archived'"
+              v-if="vacancy.status === 'draft' || vacancy.status === 'archived'"
               icon="pi pi-trash"
               severity="danger"
               text
