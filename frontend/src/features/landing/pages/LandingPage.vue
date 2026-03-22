@@ -69,13 +69,13 @@ const features = computed<Feature[]>(() => [
   {
     icon: 'pi pi-shield',
     title: t('landing.features.antiCheating'),
-    description: 'Real-time proctoring with face detection and environment monitoring ensures interview integrity.',
+    description: t('landing.features.antiCheatingDesc'),
     color: 'amber',
   },
   {
     icon: 'pi pi-briefcase',
     title: t('landing.features.easyManagement'),
-    description: 'Manage vacancies, track candidates, schedule interviews, and collaborate with your team in one platform.',
+    description: t('landing.features.easyManagementDesc'),
     color: 'violet',
   },
 ])
@@ -126,7 +126,7 @@ const steps = computed<Step[]>(() => [
       <div class="absolute -bottom-24 left-0 h-96 w-96 rounded-full bg-indigo-200/30 blur-3xl"></div>
       <div class="relative mx-auto max-w-4xl text-center">
         <div class="mb-6 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 py-1.5 text-sm font-medium text-blue-700">
-          <i class="pi pi-bolt text-xs"></i> Powered by Advanced AI
+          <i class="pi pi-bolt text-xs"></i> {{ t('landing.badge.poweredBy') }}
         </div>
         <h1 class="mb-6 text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl">
           {{ t('landing.hero.title') }}
@@ -138,7 +138,7 @@ const steps = computed<Step[]>(() => [
           <Button :label="t('landing.hero.cta')" icon="pi pi-arrow-right" icon-pos="right" size="large" @click="goToRegister" />
           <Button :label="t('landing.hero.browseJobs')" icon="pi pi-search" severity="secondary" outlined size="large" @click="goToJobs" />
         </div>
-        <p class="mt-4 text-sm text-gray-400">No credit card required &middot; 14-day free trial</p>
+        <p class="mt-4 text-sm text-gray-400">{{ t('landing.promo.noCreditCard') }} &middot; {{ t('landing.promo.freeTrial') }}</p>
       </div>
     </section>
 
@@ -147,7 +147,7 @@ const steps = computed<Step[]>(() => [
       <div class="mx-auto grid max-w-5xl grid-cols-3 divide-x divide-gray-200 py-10">
         <div class="text-center">
           <div class="text-3xl font-extrabold text-gray-900">10x</div>
-          <div class="mt-1 text-sm text-gray-500">Faster Screening</div>
+          <div class="mt-1 text-sm text-gray-500">{{ t('landing.stats.fasterScreening') }}</div>
         </div>
         <div class="text-center">
           <div class="text-3xl font-extrabold text-gray-900">90%</div>
@@ -155,7 +155,7 @@ const steps = computed<Step[]>(() => [
         </div>
         <div class="text-center">
           <div class="text-3xl font-extrabold text-gray-900">24/7</div>
-          <div class="mt-1 text-sm text-gray-500">Available</div>
+          <div class="mt-1 text-sm text-gray-500">{{ t('landing.stats.available') }}</div>
         </div>
       </div>
     </section>
@@ -165,7 +165,7 @@ const steps = computed<Step[]>(() => [
       <div class="mx-auto max-w-7xl">
         <div class="mb-14 text-center">
           <h2 class="mb-3 text-3xl font-bold text-gray-900">{{ t('landing.features.title') }}</h2>
-          <p class="mx-auto max-w-xl text-gray-500">Our AI platform handles the entire pre-screening process so your HR team can focus on finding the right people.</p>
+          <p class="mx-auto max-w-xl text-gray-500">{{ t('landing.howItWorks.subtitle') }}</p>
         </div>
         <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           <div
@@ -187,7 +187,7 @@ const steps = computed<Step[]>(() => [
       <div class="mx-auto max-w-5xl">
         <div class="mb-14 text-center">
           <h2 class="mb-3 text-3xl font-bold text-gray-900">{{ t('landing.howItWorks.title') }}</h2>
-          <p class="mx-auto max-w-xl text-gray-500">Get up and running in minutes. Our streamlined process makes AI-powered hiring effortless.</p>
+          <p class="mx-auto max-w-xl text-gray-500">{{ t('landing.howItWorks.subtitle') }}</p>
         </div>
         <div class="grid gap-8 lg:grid-cols-3">
           <div v-for="step in steps" :key="step.number" class="relative rounded-2xl bg-white p-8 shadow-sm">
@@ -207,7 +207,7 @@ const steps = computed<Step[]>(() => [
         <div class="mb-10 flex items-end justify-between">
           <div>
             <h2 class="mb-2 text-3xl font-bold text-gray-900">{{ t('landing.latestJobs') }}</h2>
-            <p class="text-gray-500">Browse the latest job openings from companies using HR PreScan</p>
+            <p class="text-gray-500">{{ t('landing.latestJobsSubtitle') }}</p>
           </div>
           <Button :label="t('landing.viewAllJobs')" icon="pi pi-arrow-right" icon-pos="right" text severity="secondary" @click="goToJobs" />
         </div>
@@ -231,8 +231,8 @@ const steps = computed<Step[]>(() => [
               </div>
             </div>
             <div class="ml-4 flex flex-col items-end gap-1">
-              <span v-if="formatSalaryRange(job) !== 'Not specified'" class="text-sm font-semibold text-emerald-600">
-                {{ formatSalaryRange(job) }}
+              <span v-if="formatSalaryRange(job, t) !== t('vacancies.overview.salaryNotSpecified')" class="text-sm font-semibold text-emerald-600">
+                {{ formatSalaryRange(job, t) }}
               </span>
               <span class="text-xs text-gray-400">{{ formatDate(job.createdAt) }}</span>
             </div>
@@ -242,7 +242,7 @@ const steps = computed<Step[]>(() => [
         <div v-else class="rounded-2xl border border-dashed border-gray-200 py-16 text-center">
           <i class="pi pi-briefcase mb-3 text-4xl text-gray-300"></i>
           <p class="text-gray-500">{{ t('landing.noJobsYet') }}</p>
-          <p class="mt-1 text-sm text-gray-400">Check back soon for new opportunities</p>
+          <p class="mt-1 text-sm text-gray-400">{{ t('landing.noJobsCheckBack') }}</p>
         </div>
       </div>
     </section>
@@ -272,7 +272,7 @@ const steps = computed<Step[]>(() => [
               </div>
               <span class="text-lg font-bold text-white">HR PreScan</span>
             </div>
-            <p class="text-sm text-gray-400">AI-powered candidate pre-screening for modern teams.</p>
+            <p class="text-sm text-gray-400">{{ t('landing.footer.tagline') }}</p>
           </div>
           <div>
             <h4 class="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">{{ t('landing.footer.product') }}</h4>

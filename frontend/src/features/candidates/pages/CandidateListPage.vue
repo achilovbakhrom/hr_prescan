@@ -85,8 +85,8 @@ function handleBulkAction(event: { value: ApplicationStatus }): void {
   const label = status === 'shortlisted' ? 'shortlist' : 'reject'
 
   confirm.require({
-    message: `Are you sure you want to ${label} ${count} candidate(s)?`,
-    header: 'Confirm Bulk Action',
+    message: t('candidates.dialogs.bulkConfirmMessage', { action: label, count }),
+    header: t('candidates.dialogs.bulkConfirmHeader'),
     icon: 'pi pi-exclamation-triangle',
     acceptClass: status === 'rejected' ? 'p-button-danger' : 'p-button-success',
     accept: async () => {
@@ -104,15 +104,15 @@ function handleKanbanStatusChange(candidateId: string, status: ApplicationStatus
   const statusLabel = status.replace(/_/g, ' ')
   const isReset = status === 'applied'
   const message = isReset
-    ? `Reset ${candidate.candidateName} back to "Applied"? This will clear their current status.`
-    : `Move ${candidate.candidateName} to "${statusLabel}"?`
+    ? t('candidates.dialogs.resetMessage', { name: candidate.candidateName })
+    : t('candidates.dialogs.moveMessage', { name: candidate.candidateName, status: statusLabel })
 
   confirm.require({
     message,
-    header: isReset ? 'Reset Candidate Status' : 'Confirm Status Change',
+    header: isReset ? t('candidates.dialogs.resetHeader') : t('candidates.dialogs.statusChangeHeader'),
     icon: isReset ? 'pi pi-refresh' : 'pi pi-exclamation-triangle',
-    acceptLabel: isReset ? 'Yes, reset' : 'Yes, move',
-    rejectLabel: 'Cancel',
+    acceptLabel: isReset ? t('candidates.dialogs.yesReset') : t('candidates.dialogs.yesMove'),
+    rejectLabel: t('common.cancel'),
     accept: async () => {
       await candidateStore.updateStatus(candidateId, status).catch(() => {})
     },

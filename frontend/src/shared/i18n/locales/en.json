@@ -145,10 +145,16 @@
       "timeDesc": "Reduce screening time by 80%. Let AI handle initial interviews while you focus on top candidates.",
       "smartScoring": "Smart Scoring",
       "antiCheating": "Anti-Cheating Protection",
-      "easyManagement": "Easy Management"
+      "antiCheatingDesc": "Real-time proctoring with face detection and environment monitoring ensures interview integrity.",
+      "easyManagement": "Easy Management",
+      "easyManagementDesc": "Manage vacancies, track candidates, schedule interviews, and collaborate with your team in one platform."
+    },
+    "badge": {
+      "poweredBy": "Powered by Advanced AI"
     },
     "howItWorks": {
       "title": "How It Works",
+      "subtitle": "Our AI platform handles the entire pre-screening process so your HR team can focus on finding the right people.",
       "step1": "Post a Vacancy",
       "step1Desc": "Create a vacancy with your requirements. AI generates screening questions automatically.",
       "step2": "Candidates Apply",
@@ -162,7 +168,13 @@
       "companies": "Companies",
       "interviews": "Interviews Conducted",
       "timeSaved": "Time Saved",
-      "satisfaction": "Satisfaction Rate"
+      "satisfaction": "Satisfaction Rate",
+      "fasterScreening": "Faster Screening",
+      "available": "Available"
+    },
+    "promo": {
+      "noCreditCard": "No credit card required",
+      "freeTrial": "14-day free trial"
     },
     "cta": {
       "title": "Ready to Transform Your Hiring?",
@@ -179,11 +191,14 @@
       "legal": "Legal",
       "privacy": "Privacy Policy",
       "terms": "Terms of Service",
-      "copyright": "All rights reserved."
+      "copyright": "All rights reserved.",
+      "tagline": "AI-powered candidate pre-screening for modern teams."
     },
     "latestJobs": "Latest Job Openings",
     "viewAllJobs": "View All Jobs",
+    "latestJobsSubtitle": "Browse the latest job openings from companies using HR PreScan",
     "noJobsYet": "No job openings yet. Check back soon!",
+    "noJobsCheckBack": "Check back soon for new opportunities",
     "remote": "Remote"
   },
   "dashboard": {
@@ -298,7 +313,11 @@
       "interviewMeet": "Interview (Video)",
       "noInterview": "Prescanning only",
       "skills": "Skills",
-      "notSpecified": "Not specified"
+      "notSpecified": "Not specified",
+      "salaryNotSpecified": "Not specified",
+      "salaryFrom": "From {amount} {currency}",
+      "salaryUpTo": "Up to {amount} {currency}",
+      "salaryRange": "{min} – {max} {currency}"
     },
     "employment": {
       "fullTime": "Full Time",
@@ -389,6 +408,16 @@
       "success": "Application submitted successfully!",
       "startPrescanning": "Start Prescanning Now",
       "doItLater": "I'll do it later"
+    },
+    "dialogs": {
+      "bulkConfirmHeader": "Confirm Bulk Action",
+      "bulkConfirmMessage": "Are you sure you want to {action} {count} candidate(s)?",
+      "statusChangeHeader": "Confirm Status Change",
+      "resetHeader": "Reset Candidate Status",
+      "resetMessage": "Reset {name} back to Applied? This will cancel active sessions and create a new prescanning link.",
+      "moveMessage": "Move {name} to {status}?",
+      "yesReset": "Yes, reset",
+      "yesMove": "Yes, move"
     },
     "noCandidates": "No candidates yet",
     "noCandidatesHint": "Candidates will appear here once they apply",

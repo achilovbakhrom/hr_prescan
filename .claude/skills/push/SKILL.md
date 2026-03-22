@@ -53,14 +53,28 @@ Parse the arguments:
    - Base branch: `dev`
 7. **Show the PR URL** to the user
 
-### 3. Review the PR
+### 3. Review the PR (MANDATORY)
 
-After the PR is created (Step 2b only), automatically run the `/review` skill on the changes to catch any issues before merge. Use the scope that matches the changes (e.g., if only backend changed, review backend).
+**This step is NOT optional. ALWAYS run the review before merging.**
+
+After the PR is created (Step 2b only):
+1. Spawn a review agent on the diff (`git diff dev...HEAD`) to catch issues
+2. If the review finds critical issues — fix them, commit, and push before proceeding
+3. If the review finds only warnings/suggestions — note them but proceed
+4. Show the review summary to the user
+
+### 4. Merge (only after review)
+
+- Do NOT merge until the review in Step 3 is complete
+- If the user asks to merge, confirm that the review has been done
+- If the review was skipped for any reason, run it before merging
+- Merge with `gh pr merge --merge`
 
 ### Important Rules
 
 - NEVER push secrets, .env files, credentials, or large binaries
 - NEVER force push
+- NEVER merge without reviewing first — the review step is mandatory
 - Always show the user what will be committed before committing (summarize the changes)
 - If the user provided a message, use it as the basis for both the commit message and PR title
 - The base branch for PRs is always `dev` unless the user specifies otherwise
