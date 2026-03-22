@@ -73,9 +73,14 @@ apiClient.interceptors.request.use((config) => {
   return config
 })
 
-// Convert response body keys to camelCase
+// Convert response body keys to camelCase (skip binary responses)
 apiClient.interceptors.response.use((response) => {
-  if (response.data && typeof response.data === 'object') {
+  if (
+    response.data &&
+    typeof response.data === 'object' &&
+    !(response.data instanceof Blob) &&
+    !(response.data instanceof ArrayBuffer)
+  ) {
     response.data = convertKeysToCamelCase(response.data)
   }
   return response

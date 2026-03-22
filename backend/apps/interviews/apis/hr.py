@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.http import HttpResponse
 from rest_framework import serializers, status
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -403,3 +405,63 @@ class IntegrityFlagsApi(APIView):
             },
             status=status.HTTP_200_OK,
         )
+
+
+class HRVoiceMessageAudioApi(APIView):
+    """GET /api/hr/interviews/{interview_id}/voice/{message_index}/audio/ — HR plays voice message."""
+
+    permission_classes = [IsHRManager | IsAdmin]
+
+    def get(self, request: Request, interview_id: str, message_index: int) -> Response:
+        company = request.user.company
+        interview = get_interview_by_id(interview_id=interview_id, company=company)
+        if interview is None:
+            return Response(
+                {"detail": "Interview not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        chat_history = interview.chat_history or []
+
+        if message_index < 0 or message_index >= len(chat_history):
+            return Response(
+                {"detail": "Message index out of range."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        message = chat_history[message_index]
+
+        if message.get("message_type") != "voice" or not message.get("audio_url"):
+            return Response(
+                {"detail": "This message does not have an associated audio file."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        audio_url = message["audio_url"]
+        if not audio_url.startswith("voice-messages/"):
+            return Response(
+                {"detail": "Invalid audio URL."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        from apps.interviews.transcription_service import _get_s3_client
+
+        s3 = _get_s3_client()
+        try:
+            s3_response = s3.get_object(
+                Bucket=settings.AWS_STORAGE_BUCKET_NAME,
+                Key=audio_url,
+            )
+        except Exception:
+            return Response(
+                {"detail": "Audio file not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        audio_bytes = s3_response["Body"].read()
+        content_type = s3_response.get("ContentType", "audio/webm")
+
+        response = HttpResponse(audio_bytes, content_type=content_type)
+        response["Content-Disposition"] = "inline"
+        response["Cache-Control"] = "private, max-age=3600"
+        return response

@@ -30,6 +30,9 @@ export interface ChatMessage {
   role: 'ai' | 'candidate'
   text: string
   timestamp: string
+  messageType?: 'text' | 'voice'
+  audioUrl?: string
+  duration?: number
 }
 
 export interface InterviewDetail extends Interview {
