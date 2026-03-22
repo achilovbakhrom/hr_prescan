@@ -15,14 +15,18 @@ export const EXPERIENCE_LABELS: Record<string, string> = {
   director: 'Director',
 }
 
+export function formatMoney(amount: number): string {
+  return Math.round(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+}
+
 export function formatSalaryRange(vacancy: Vacancy): string {
   const { salaryMin, salaryMax, salaryCurrency } = vacancy
   if (!salaryMin && !salaryMax) return 'Not specified'
   if (salaryMin && salaryMax) {
-    return `${salaryMin.toLocaleString()} - ${salaryMax.toLocaleString()} ${salaryCurrency}`
+    return `${formatMoney(salaryMin)} - ${formatMoney(salaryMax)} ${salaryCurrency}`
   }
-  if (salaryMin) return `From ${salaryMin.toLocaleString()} ${salaryCurrency}`
-  return `Up to ${salaryMax?.toLocaleString()} ${salaryCurrency}`
+  if (salaryMin) return `From ${formatMoney(salaryMin)} ${salaryCurrency}`
+  return `Up to ${formatMoney(salaryMax!)} ${salaryCurrency}`
 }
 
 export function formatDate(dateStr: string): string {

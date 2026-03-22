@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Tag from 'primevue/tag'
 import type { VacancyDetail } from '../types/vacancy.types'
+import { formatMoney } from '../composables/useVacancyLabels'
 
 const props = defineProps<{
   vacancy: VacancyDetail
@@ -25,10 +26,10 @@ function formatSalary(): string {
   const { salaryMin, salaryMax, salaryCurrency } = props.vacancy
   if (!salaryMin && !salaryMax) return 'Not specified'
   if (salaryMin && salaryMax) {
-    return `${salaryMin.toLocaleString()} - ${salaryMax.toLocaleString()} ${salaryCurrency}`
+    return `${formatMoney(salaryMin)} - ${formatMoney(salaryMax)} ${salaryCurrency}`
   }
-  if (salaryMin) return `From ${salaryMin.toLocaleString()} ${salaryCurrency}`
-  return `Up to ${salaryMax?.toLocaleString()} ${salaryCurrency}`
+  if (salaryMin) return `From ${formatMoney(salaryMin)} ${salaryCurrency}`
+  return `Up to ${formatMoney(salaryMax!)} ${salaryCurrency}`
 }
 </script>
 

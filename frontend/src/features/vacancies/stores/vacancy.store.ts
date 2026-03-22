@@ -48,6 +48,17 @@ export const useVacancyStore = defineStore('vacancy', () => {
     }
   }
 
+  async function deleteVacancy(id: string): Promise<void> {
+    try {
+      await vacancyService.deleteVacancy(id)
+      vacancies.value = vacancies.value.filter(v => v.id !== id)
+    } catch (err: unknown) {
+      const message = extractErrorMessage(err)
+      error.value = message
+      throw new Error(message)
+    }
+  }
+
   async function fetchVacancyDetail(id: string): Promise<void> {
     loading.value = true
     error.value = null
@@ -255,6 +266,7 @@ export const useVacancyStore = defineStore('vacancy', () => {
     error,
     fetchVacancies,
     createVacancy,
+    deleteVacancy,
     fetchVacancyDetail,
     updateVacancy,
     changeStatus,

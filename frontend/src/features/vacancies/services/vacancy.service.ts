@@ -34,6 +34,10 @@ export const vacancyService = {
     return response.data
   },
 
+  async deleteVacancy(id: string): Promise<void> {
+    await apiClient.delete(`/hr/vacancies/${id}`)
+  },
+
   async updateStatus(id: string, status: VacancyStatus): Promise<Vacancy> {
     const statusToAction: Record<string, string> = {
       published: 'publish',

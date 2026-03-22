@@ -92,6 +92,7 @@ class Vacancy(BaseModel):
     company_info = models.TextField(blank=True, default="")  # Optional company description for AI interview intro
     prescanning_prompt = models.TextField(blank=True, default="")  # Additional instructions for prescanning AI agent
     interview_prompt = models.TextField(blank=True, default="")  # Additional instructions for interview AI agent
+    is_deleted = models.BooleanField(default=False)
 
     class Meta:
         verbose_name_plural = "vacancies"

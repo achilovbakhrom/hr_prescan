@@ -1,14 +1,20 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Button from 'primevue/button'
 import Dropdown from 'primevue/dropdown'
+import ConfirmDialog from 'primevue/confirmdialog'
+import { useConfirm } from 'primevue/useconfirm'
 import { useVacancyStore } from '../stores/vacancy.store'
 import VacancyStatusBadge from '../components/VacancyStatusBadge.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 
 const router = useRouter()
 const vacancyStore = useVacancyStore()
+const confirm = useConfirm()
+
+type TabKey = 'active' | 'archived'
+const activeTab = ref<TabKey>('active')
 
 const saved = localStorage.getItem('vacancy_status_filter')
 const statusFilter = ref<string | null>(saved && saved !== 'null' ? saved : null)
@@ -17,18 +23,32 @@ const statusOptions = [
   { label: 'Draft', value: 'draft' },
   { label: 'Published', value: 'published' },
   { label: 'Paused', value: 'paused' },
-  { label: 'Archived', value: 'archived' },
 ]
 
-onMounted(() => {
-  const params = statusFilter.value ? { status: statusFilter.value } : undefined
-  vacancyStore.fetchVacancies(params)
+const filteredVacancies = computed(() => {
+  if (activeTab.value === 'archived') {
+    return vacancyStore.vacancies.filter(v => v.status === 'archived')
+  }
+  const active = vacancyStore.vacancies.filter(v => v.status !== 'archived')
+  if (statusFilter.value) {
+    return active.filter(v => v.status === statusFilter.value)
+  }
+  return active
 })
+
+const activeCount = computed(() => vacancyStore.vacancies.filter(v => v.status !== 'archived').length)
+const archivedCount = computed(() => vacancyStore.vacancies.filter(v => v.status === 'archived').length)
+
+onMounted(() => {
+  vacancyStore.fetchVacancies()
+})
+
+function switchTab(tab: TabKey): void {
+  activeTab.value = tab
+}
 
 function onStatusChange(): void {
   localStorage.setItem('vacancy_status_filter', String(statusFilter.value))
-  const params = statusFilter.value ? { status: statusFilter.value } : undefined
-  vacancyStore.fetchVacancies(params)
 }
 
 function navigateToCreate(): void {
@@ -37,6 +57,21 @@ function navigateToCreate(): void {
 
 function navigateToDetail(id: string): void {
   router.push({ name: ROUTE_NAMES.VACANCY_DETAIL, params: { id } })
+}
+
+function confirmDelete(event: Event, id: string, title: string): void {
+  event.stopPropagation()
+  confirm.require({
+    message: `Are you sure you want to permanently delete "${title}"? This action cannot be undone.`,
+    header: 'Delete Vacancy',
+    icon: 'pi pi-trash',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Delete',
+    acceptClass: 'p-button-danger',
+    accept: async () => {
+      await vacancyStore.deleteVacancy(id)
+    },
+  })
 }
 
 function formatDate(dateStr: string): string {
@@ -50,14 +85,35 @@ function formatDate(dateStr: string): string {
     <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div>
         <h1 class="text-lg font-bold text-gray-900 md:text-xl">Vacancies</h1>
-        <p class="mt-0.5 text-sm text-gray-500">{{ vacancyStore.vacancies.length }} total</p>
+        <p class="mt-0.5 text-sm text-gray-500">{{ filteredVacancies.length }} shown</p>
       </div>
       <Button label="New Vacancy" icon="pi pi-plus" size="small" @click="navigateToCreate" />
     </div>
 
-    <!-- Filters -->
-    <div class="mb-4">
+    <!-- Tabs -->
+    <div class="mb-4 flex items-center gap-2">
+      <div class="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-0.5">
+        <button
+          class="rounded-md px-4 py-1.5 text-sm font-medium transition-colors"
+          :class="activeTab === 'active' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+          @click="switchTab('active')"
+        >
+          Active
+          <span class="ml-1 text-xs text-gray-400">({{ activeCount }})</span>
+        </button>
+        <button
+          class="rounded-md px-4 py-1.5 text-sm font-medium transition-colors"
+          :class="activeTab === 'archived' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+          @click="switchTab('archived')"
+        >
+          Archived
+          <span class="ml-1 text-xs text-gray-400">({{ archivedCount }})</span>
+        </button>
+      </div>
+
+      <!-- Status filter (only for Active tab) -->
       <Dropdown
+        v-if="activeTab === 'active'"
         v-model="statusFilter"
         :options="statusOptions"
         option-label="label"
@@ -74,9 +130,9 @@ function formatDate(dateStr: string): string {
     </div>
 
     <!-- Vacancy Cards -->
-    <div v-else-if="vacancyStore.vacancies.length > 0" class="space-y-3">
+    <div v-else-if="filteredVacancies.length > 0" class="space-y-3">
       <div
-        v-for="vacancy in vacancyStore.vacancies"
+        v-for="vacancy in filteredVacancies"
         :key="vacancy.id"
         class="cursor-pointer rounded-xl border border-gray-100 bg-white px-4 py-3 transition-all hover:border-gray-200 hover:shadow-sm md:px-5 md:py-4"
         @click="navigateToDetail(vacancy.id)"
@@ -93,7 +149,19 @@ function formatDate(dateStr: string): string {
               <span><i class="pi pi-calendar mr-1"></i>{{ formatDate(vacancy.createdAt) }}</span>
             </div>
           </div>
-          <i class="pi pi-chevron-right mt-1 hidden text-sm text-gray-300 sm:block"></i>
+          <div class="flex items-center gap-2">
+            <!-- Delete button for archived vacancies -->
+            <Button
+              v-if="activeTab === 'archived'"
+              icon="pi pi-trash"
+              severity="danger"
+              text
+              rounded
+              size="small"
+              @click="confirmDelete($event, vacancy.id, vacancy.title)"
+            />
+            <i class="pi pi-chevron-right mt-1 hidden text-sm text-gray-300 sm:block"></i>
+          </div>
         </div>
 
         <!-- Stats row -->
@@ -127,9 +195,17 @@ function formatDate(dateStr: string): string {
       <div class="flex h-14 w-14 items-center justify-center rounded-full bg-gray-100">
         <i class="pi pi-briefcase text-2xl text-gray-400"></i>
       </div>
-      <p class="mt-4 text-sm font-medium text-gray-600">No vacancies yet</p>
-      <p class="mt-1 text-sm text-gray-400">Create your first vacancy to start receiving applications</p>
-      <Button label="Create Vacancy" icon="pi pi-plus" class="mt-4" size="small" @click="navigateToCreate" />
+      <template v-if="activeTab === 'archived'">
+        <p class="mt-4 text-sm font-medium text-gray-600">No archived vacancies</p>
+        <p class="mt-1 text-sm text-gray-400">Archived vacancies will appear here</p>
+      </template>
+      <template v-else>
+        <p class="mt-4 text-sm font-medium text-gray-600">No vacancies yet</p>
+        <p class="mt-1 text-sm text-gray-400">Create your first vacancy to start receiving applications</p>
+        <Button label="Create Vacancy" icon="pi pi-plus" class="mt-4" size="small" @click="navigateToCreate" />
+      </template>
     </div>
+
+    <ConfirmDialog />
   </div>
 </template>

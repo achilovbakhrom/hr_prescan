@@ -47,6 +47,12 @@ const activeFilterCount = computed(() => {
   return count
 })
 
+let searchTimeout: ReturnType<typeof setTimeout> | null = null
+watch([search, locationFilter], () => {
+  if (searchTimeout) clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(fetchJobs, 400)
+})
+
 onMounted(() => fetchJobs())
 
 async function fetchJobs(): Promise<void> {
@@ -55,7 +61,7 @@ async function fetchJobs(): Promise<void> {
     jobs.value = await vacancyService.getPublicList({
       search: search.value || undefined,
       location: locationFilter.value || undefined,
-      isRemote: remoteOnly.value || undefined,
+      isRemote: remoteOnly.value ? true : undefined,
       employmentType: employmentType.value ?? undefined,
       experienceLevel: experienceLevel.value ?? undefined,
     })

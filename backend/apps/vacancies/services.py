@@ -126,6 +126,15 @@ def archive_vacancy(*, vacancy: Vacancy) -> Vacancy:
     return vacancy
 
 
+def soft_delete_vacancy(*, vacancy: Vacancy) -> Vacancy:
+    """Soft-delete an archived vacancy. Only archived vacancies can be deleted."""
+    if vacancy.status != Vacancy.Status.ARCHIVED:
+        raise ApplicationError("Only archived vacancies can be deleted.")
+    vacancy.is_deleted = True
+    vacancy.save(update_fields=["is_deleted", "updated_at"])
+    return vacancy
+
+
 def create_default_criteria(*, vacancy: Vacancy) -> list[VacancyCriteria]:
     """Create the default set of evaluation criteria for prescanning."""
     criteria_list = []
