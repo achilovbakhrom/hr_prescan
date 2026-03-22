@@ -153,29 +153,58 @@ def _try_link_code(*, chat_id, telegram_id, telegram_username, text):
         )
         return
 
-    link = (
-        TelegramLinkCode.objects.filter(
-            code=code, is_used=False, expires_at__gt=timezone.now()
-        )
-        .select_related("user")
-        .first()
-    )
+    # Rate limit: max 5 link attempts per telegram_id per 10 minutes
+    from django.core.cache import cache
 
-    if link is None:
+    rate_key = f"tg_link_attempts:{telegram_id}"
+    attempts = cache.get(rate_key, 0)
+    if attempts >= 5:
         send_message(
             chat_id=chat_id,
-            text="Invalid or expired code. Please generate a new one from Settings -> Telegram.",
+            text="Too many attempts. Please wait a few minutes and try again.",
         )
         return
+    cache.set(rate_key, attempts + 1, timeout=600)
 
-    # Link the account
-    user = link.user
-    user.telegram_id = telegram_id
-    user.telegram_username = telegram_username
-    user.save(update_fields=["telegram_id", "telegram_username", "updated_at"])
+    from django.db import transaction, IntegrityError
 
-    link.is_used = True
-    link.save(update_fields=["is_used", "updated_at"])
+    try:
+        with transaction.atomic():
+            link = (
+                TelegramLinkCode.objects.filter(
+                    code=code, is_used=False, expires_at__gt=timezone.now()
+                )
+                .select_related("user")
+                .select_for_update()
+                .first()
+            )
+
+            if link is None:
+                send_message(
+                    chat_id=chat_id,
+                    text="Invalid or expired code. Please generate a new one from Settings -> Telegram.",
+                )
+                return
+
+            # Validate telegram_id
+            if not isinstance(telegram_id, int) or telegram_id <= 0:
+                send_message(chat_id=chat_id, text="Invalid Telegram account.")
+                return
+
+            # Link the account
+            user = link.user
+            user.telegram_id = telegram_id
+            user.telegram_username = telegram_username
+            user.save(update_fields=["telegram_id", "telegram_username", "updated_at"])
+
+            link.is_used = True
+            link.save(update_fields=["is_used", "updated_at"])
+    except IntegrityError:
+        send_message(
+            chat_id=chat_id,
+            text="This Telegram account is already linked to another user. Please unlink it first.",
+        )
+        return
 
     company_name = user.company.name if user.company else ""
     send_message(
