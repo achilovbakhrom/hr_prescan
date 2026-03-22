@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { USER_ROLES } from '@/shared/constants/roles'
+import { useAIAssistant } from '@/shared/composables/useAIAssistant'
 import type { UserRole } from '@/shared/types/auth.types'
 
 interface NavItem {
@@ -25,6 +26,7 @@ defineProps<{
 const route = useRoute()
 const authStore = useAuthStore()
 const { t } = useI18n()
+const aiAssistant = useAIAssistant()
 
 const sections = computed<NavSection[]>(() => [
   {
@@ -129,5 +131,22 @@ function isActive(path: string): boolean {
         </ul>
       </template>
     </nav>
+
+    <!-- AI Assistant button -->
+    <div class="border-t border-gray-100 px-2 py-3">
+      <button
+        type="button"
+        class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium text-violet-600 transition-colors hover:bg-violet-50"
+        :title="collapsed ? t('aiAssistant.title') : undefined"
+        @click="aiAssistant.toggle()"
+      >
+        <i
+          class="pi pi-sparkles shrink-0 text-sm"
+          :style="{ width: '18px', textAlign: 'center' }"
+          aria-hidden="true"
+        ></i>
+        <span v-if="!collapsed" class="truncate">{{ t('aiAssistant.title') }}</span>
+      </button>
+    </div>
   </aside>
 </template>

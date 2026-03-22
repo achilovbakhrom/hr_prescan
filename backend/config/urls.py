@@ -26,6 +26,7 @@ from apps.interviews.urls import (
     public_urlpatterns as interview_public_urlpatterns,
 )
 from apps.common.apis import HRDashboardApi
+from apps.common.apis_ai import AIAssistantApi
 from apps.notifications.urls import (
     candidate_urlpatterns as notification_candidate_urlpatterns,
     hr_bulk_urlpatterns as notification_hr_bulk_urlpatterns,
@@ -56,6 +57,7 @@ urlpatterns = [
     path("api/hr/candidates/", include((notification_hr_bulk_urlpatterns, "hr-bulk-actions"))),
     path("api/hr/interviews/", include((hr_interview_urlpatterns, "hr-interviews"))),
     path("api/hr/dashboard/", HRDashboardApi.as_view(), name="hr-dashboard"),
+    path("api/hr/ai-assistant/", AIAssistantApi.as_view(), name="hr-ai-assistant"),
     path("api/notifications/", include((notification_urlpatterns, "notifications"))),
     path("api/public/vacancies/", include((vacancy_public_urlpatterns, "public-vacancies"))),
     path("api/public/vacancies/", include((application_public_urlpatterns, "public-applications"))),

@@ -663,5 +663,15 @@
     "apply": "Apply Now",
     "viewDetails": "View Details",
     "postedOn": "Posted"
+  },
+  "aiAssistant": {
+    "title": "AI Assistant",
+    "subtitle": "PreScreen AI",
+    "placeholder": "Ask me anything...",
+    "welcome": "How can I help you?",
+    "welcomeHint": "I can manage vacancies, candidates, interviews, companies, and more. Just ask in natural language.",
+    "sending": "Thinking...",
+    "error": "Something went wrong. Please try again.",
+    "clearHistory": "Clear history"
   }
 }
