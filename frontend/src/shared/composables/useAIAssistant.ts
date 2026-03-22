@@ -38,7 +38,8 @@ export function useAIAssistant() {
     if (!actions) return
 
     for (const action of actions) {
-      const fa = action.result?.frontend_action as FrontendAction | undefined
+      // Check both camelCase (after axios interceptor) and snake_case (raw)
+      const fa = (action.result?.frontendAction || action.result?.frontend_action) as FrontendAction | undefined
       if (!fa) continue
 
       if (fa.type === 'navigate' && fa.path) {
