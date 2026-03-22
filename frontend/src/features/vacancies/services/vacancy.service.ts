@@ -124,6 +124,25 @@ export const vacancyService = {
     )
   },
 
+  async parseCompanyFile(file: File): Promise<string> {
+    const formData = new FormData()
+    formData.append('file', file)
+    const response = await apiClient.post<{ companyInfo: string }>(
+      '/hr/vacancies/parse-company-file',
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } },
+    )
+    return response.data.companyInfo
+  },
+
+  async parseCompanyUrl(url: string): Promise<string> {
+    const response = await apiClient.post<{ companyInfo: string }>(
+      '/hr/vacancies/parse-company-url',
+      { url },
+    )
+    return response.data.companyInfo
+  },
+
   async generateQuestions(vacancyId: string): Promise<InterviewQuestion[]> {
     const response = await apiClient.post<InterviewQuestion[]>(
       `/hr/vacancies/${vacancyId}/questions/generate`,

@@ -29,6 +29,12 @@ export interface Vacancy {
   interviewDuration: number
   criteriaCount: number
   questionsCount: number
+  candidatesTotal: number
+  candidatesInterviewed: number
+  candidatesShortlisted: number
+  candidatesRejected: number
+  candidatesHired: number
+  createdByEmail: string
   createdAt: string
   updatedAt: string
 }

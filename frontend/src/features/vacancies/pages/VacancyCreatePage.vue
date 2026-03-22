@@ -8,15 +8,9 @@ import type { CreateVacancyRequest } from '../types/vacancy.types'
 const router = useRouter()
 const vacancyStore = useVacancyStore()
 
-async function handleSave(
-  data: CreateVacancyRequest,
-  publish: boolean,
-): Promise<void> {
+async function handleSave(data: CreateVacancyRequest): Promise<void> {
   try {
     const vacancy = await vacancyStore.createVacancy(data)
-    if (publish) {
-      await vacancyStore.changeStatus(vacancy.id, 'published')
-    }
     router.push({
       name: ROUTE_NAMES.VACANCY_DETAIL,
       params: { id: vacancy.id },

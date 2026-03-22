@@ -65,6 +65,7 @@ const statusOptions = [
   { label: 'Prescanned', value: 'prescanned' },
   { label: 'Interviewed', value: 'interviewed' },
   { label: 'Shortlisted', value: 'shortlisted' },
+  { label: 'Hired', value: 'hired' },
   { label: 'Rejected', value: 'rejected' },
   { label: 'Expired', value: 'expired' },
   { label: 'Archived', value: 'archived' },
@@ -357,6 +358,8 @@ const editFormData = computed(() => {
     interviewDuration: v.interviewDuration,
     prescanningPrompt: v.prescanningPrompt,
     interviewPrompt: v.interviewPrompt,
+    companyInfo: v.companyInfo,
+    cvRequired: v.cvRequired,
   }
 })
 
@@ -415,15 +418,9 @@ async function handleStatusChange(status: VacancyStatus): Promise<void> {
   await vacancyStore.changeStatus(vacancyId.value, status).catch(() => {})
 }
 
-async function handleUpdate(
-  data: CreateVacancyRequest,
-  publish: boolean,
-): Promise<void> {
+async function handleUpdate(data: CreateVacancyRequest): Promise<void> {
   try {
     await vacancyStore.updateVacancy(vacancyId.value, data)
-    if (publish && vacancy.value?.status === 'draft') {
-      await vacancyStore.changeStatus(vacancyId.value, 'published')
-    }
   } catch {
     /* store handles error */
   }

@@ -35,6 +35,11 @@ def get_company_vacancies(
                 filter=Q(applications__status="rejected"),
                 distinct=True,
             ),
+            candidates_hired=Count(
+                "applications",
+                filter=Q(applications__status="hired"),
+                distinct=True,
+            ),
         )
     )
     if status:

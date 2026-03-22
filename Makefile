@@ -178,6 +178,9 @@ local-all: local-infra ## Start infra + backend + celery + frontend (all in back
 	@echo ""
 	@echo "Run 'make local-stop' to stop everything."
 
+local-pip: ## Install Python dependencies (local)
+	$(VENV)/pip install -r backend/requirements.txt
+
 local-migrate: ## Run migrations (local)
 	cd backend && $(VENV)/python manage.py migrate
 

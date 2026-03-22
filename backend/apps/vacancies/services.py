@@ -1,3 +1,4 @@
+import io
 import json
 import logging
 
@@ -314,3 +315,131 @@ def generate_interview_questions(
         created_questions.append(question)
 
     return created_questions
+
+
+def parse_company_info_from_file(*, file_obj) -> str:
+    """Extract text from an uploaded file (PDF/DOCX/TXT) and use AI to generate company info."""
+    filename = getattr(file_obj, "name", "file.txt")
+    ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else "txt"
+    file_bytes = file_obj.read()
+
+    if ext == "pdf":
+        text = _extract_text_from_pdf(file_bytes)
+    elif ext in ("docx", "doc"):
+        text = _extract_text_from_docx(file_bytes)
+    else:
+        text = file_bytes.decode("utf-8", errors="ignore")
+
+    if not text.strip():
+        raise ApplicationError("Could not extract text from the uploaded file.")
+
+    return _generate_company_info_with_ai(text=text, source_label="document")
+
+
+def _extract_text_from_pdf(file_bytes: bytes) -> str:
+    """Extract text from PDF bytes using PyPDF2."""
+    import PyPDF2
+
+    reader = PyPDF2.PdfReader(io.BytesIO(file_bytes))
+    pages = []
+    for page in reader.pages:
+        text = page.extract_text()
+        if text:
+            pages.append(text)
+    return "\n\n".join(pages)
+
+
+def _extract_text_from_docx(file_bytes: bytes) -> str:
+    """Extract text from DOCX bytes using python-docx."""
+    import docx
+
+    doc = docx.Document(io.BytesIO(file_bytes))
+    return "\n".join(p.text for p in doc.paragraphs if p.text.strip())
+
+
+def _validate_url_not_internal(url: str) -> None:
+    """Reject URLs pointing to private/internal networks to prevent SSRF."""
+    import ipaddress
+    import socket
+    from urllib.parse import urlparse
+
+    parsed = urlparse(url)
+    hostname = parsed.hostname
+    if not hostname:
+        raise ApplicationError("Invalid URL.")
+
+    # Block obvious internal hostnames
+    blocked_hostnames = {"localhost", "127.0.0.1", "::1", "0.0.0.0", "metadata.google.internal"}
+    if hostname.lower() in blocked_hostnames:
+        raise ApplicationError("Internal URLs are not allowed.")
+
+    try:
+        resolved_ip = socket.getaddrinfo(hostname, None, socket.AF_UNSPEC, socket.SOCK_STREAM)[0][4][0]
+        ip = ipaddress.ip_address(resolved_ip)
+    except (socket.gaierror, ValueError) as exc:
+        raise ApplicationError("Could not resolve the URL hostname.") from exc
+
+    if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved:
+        raise ApplicationError("Internal or private URLs are not allowed.")
+
+
+def parse_company_info_from_url(*, url: str) -> str:
+    """Fetch a webpage and use AI to generate company info from its content."""
+    import requests
+    from bs4 import BeautifulSoup
+
+    _validate_url_not_internal(url)
+
+    try:
+        response = requests.get(url, timeout=10, headers={
+            "User-Agent": "Mozilla/5.0 (compatible; HRPreScan/1.0)",
+        }, allow_redirects=True)
+        response.raise_for_status()
+    except requests.RequestException as exc:
+        raise ApplicationError(f"Could not fetch the website: {exc}") from exc
+
+    soup = BeautifulSoup(response.text, "html.parser")
+
+    # Remove non-content elements
+    for tag in soup(["script", "style", "nav", "footer", "header", "aside", "iframe"]):
+        tag.decompose()
+
+    text = soup.get_text(separator="\n", strip=True)
+
+    if not text.strip():
+        raise ApplicationError("Could not extract text from the website.")
+
+    return _generate_company_info_with_ai(text=text, source_label="website")
+
+
+def _generate_company_info_with_ai(*, text: str, source_label: str = "document") -> str:
+    """Use AI to generate a company info summary from extracted text."""
+    try:
+        client = OpenAI()
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            temperature=0.3,
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You are an AI assistant helping HR managers prepare company descriptions "
+                        "for AI-powered candidate interviews. Given the content extracted from a "
+                        f"company {source_label}, write a concise "
+                        "company introduction (3-5 paragraphs) that an AI interviewer can use to "
+                        "introduce the company to candidates.\n\n"
+                        "Include: what the company does, industry, mission/values, culture, "
+                        "notable achievements or products, and team size if available.\n"
+                        "Tone: professional but friendly. Write in third person."
+                    ),
+                },
+                {
+                    "role": "user",
+                    "content": f"Generate a company info summary from this {source_label}:\n\n{text[:6000]}",
+                },
+            ],
+        )
+        return response.choices[0].message.content.strip()
+    except Exception:
+        logger.exception("Failed to generate company info with AI from %s", source_label)
+        raise ApplicationError(f"Failed to generate company info from {source_label}. Please try again.")
