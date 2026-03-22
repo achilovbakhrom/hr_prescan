@@ -154,6 +154,11 @@ export const vacancyService = {
     return response.data
   },
 
+  async regenerateKeywords(id: string): Promise<{ keywords: string[] }> {
+    const response = await apiClient.post<{ keywords: string[] }>(`/hr/vacancies/${id}/regenerate-keywords`)
+    return response.data
+  },
+
   // Public
   async getPublicList(params?: {
     search?: string
@@ -161,6 +166,8 @@ export const vacancyService = {
     isRemote?: boolean
     employmentType?: string
     experienceLevel?: string
+    salaryMin?: number
+    salaryMax?: number
   }): Promise<Vacancy[]> {
     const response = await apiClient.get<Vacancy[]>('/public/vacancies', {
       params,

@@ -78,9 +78,13 @@ Use this CV data to ask targeted follow-up questions and verify claims.
 Use this CV data to ask targeted follow-up questions and verify claims.
 """
 
-    # Company info section
+    # Company info section — prefer employer description, fall back to vacancy.company_info
     company_info_section = ""
-    company_info = getattr(vacancy, "company_info", "") or ""
+    company_info = ""
+    if vacancy.employer and vacancy.employer.description:
+        company_info = vacancy.employer.description
+    elif vacancy.company_info:
+        company_info = vacancy.company_info
     if company_info:
         company_info_section = f"""
 ## About the Company

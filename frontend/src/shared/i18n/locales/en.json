@@ -372,7 +372,10 @@
     "addQuestion": "Add Question",
     "addCriteria": "Add Criteria",
     "deleteConfirm": "Are you sure you want to permanently delete this vacancy?",
-    "deleteConfirmHeader": "Delete Vacancy"
+    "deleteConfirmHeader": "Delete Vacancy",
+    "keywords": "Keywords",
+    "regenerateKeywords": "Regenerate Keywords",
+    "keywordsHint": "AI-generated search keywords for this vacancy"
   },
   "candidates": {
     "title": "Candidates",
@@ -610,6 +613,37 @@
     "decline": "Decline",
     "learnMore": "Learn more"
   },
+  "trial": {
+    "banner": "You're on a 14-day free trial of the Professional plan.",
+    "daysLeft": "{days} days remaining",
+    "expiringSoon": "Your free trial expires in {days} days.",
+    "expired": "Your free trial has expired.",
+    "choosePlan": "Choose a Plan"
+  },
+  "employers": {
+    "title": "Companies",
+    "create": "Add Company",
+    "name": "Company Name",
+    "industry": "Industry",
+    "website": "Website",
+    "description": "Description",
+    "source": "Source",
+    "manual": "Manual",
+    "file": "From File",
+    "fromWebsite": "From Website",
+    "noEmployers": "No companies yet",
+    "noEmployersHint": "Add a company to attach to your vacancies",
+    "deleteConfirm": "Are you sure you want to delete this company?",
+    "deleteConfirmHeader": "Delete Company",
+    "cannotDelete": "Cannot delete company with linked vacancies",
+    "selectEmployer": "Select company",
+    "createNew": "Create New",
+    "orCreateNew": "or create a new one",
+    "namePlaceholder": "e.g. TechCorp Inc.",
+    "urlPlaceholder": "https://company.com/about",
+    "fetchFromUrl": "Fetch from URL",
+    "uploadFile": "Upload & Parse"
+  },
   "jobBoard": {
     "title": "Browse Jobs",
     "subtitle": "Find your next opportunity",
@@ -620,6 +654,9 @@
     "allLevels": "All Levels",
     "activeFilters": "active filters",
     "clearAll": "Clear all",
+    "salaryRange": "Salary Range",
+    "minSalary": "Min salary",
+    "maxSalary": "Max salary",
     "noJobs": "No jobs match your criteria",
     "noJobsHint": "Try adjusting your filters or search terms",
     "apply": "Apply Now",

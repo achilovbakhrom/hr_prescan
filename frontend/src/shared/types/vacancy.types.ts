@@ -34,6 +34,7 @@ export interface Vacancy {
   candidatesShortlisted: number
   candidatesRejected: number
   candidatesHired: number
+  keywords: string[]
   createdByEmail: string
   createdAt: string
   updatedAt: string

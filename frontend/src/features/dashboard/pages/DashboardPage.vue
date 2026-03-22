@@ -9,6 +9,7 @@ import { useInterviewStore } from '@/features/interviews/stores/interview.store'
 import { useCandidateStore } from '@/features/candidates/stores/candidate.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { Interview } from '@/features/interviews/types/interview.types'
+import TrialBanner from '@/features/dashboard/components/TrialBanner.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -105,6 +106,9 @@ function goToInterview(interview: Interview): void {
         Here's what's happening today
       </p>
     </div>
+
+    <!-- Trial Banner -->
+    <TrialBanner class="mb-6" />
 
     <!-- Loading -->
     <div v-if="loadingStats" class="flex items-center justify-center py-20">

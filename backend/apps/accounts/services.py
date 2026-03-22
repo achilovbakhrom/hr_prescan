@@ -1,7 +1,10 @@
+import logging
+from datetime import timedelta
 from uuid import UUID
 
 from django.core import signing
 from django.db import transaction
+from django.utils import timezone
 
 from apps.accounts.models import Company, Invitation, User
 from apps.accounts.tasks import send_invitation_email, send_verification_email
@@ -22,6 +25,10 @@ from apps.common.messages import (
     MSG_USER_ALREADY_DEACTIVATED,
     MSG_USER_EXISTS,
 )
+
+logger = logging.getLogger(__name__)
+
+TRIAL_DURATION_DAYS = 14
 
 EMAIL_VERIFICATION_SALT = "email-verification"
 EMAIL_VERIFICATION_MAX_AGE = 60 * 60 * 24 * 3  # 3 days
@@ -114,7 +121,14 @@ def create_company_with_admin(
     website: str | None = None,
     description: str | None = None,
 ) -> tuple[Company, User]:
-    """Create a company and its admin user in a single transaction."""
+    """Create a company and its admin user in a single transaction.
+
+    The company starts on a 14-day free trial with Professional-tier limits.
+    """
+    from apps.subscriptions.models import CompanySubscription, SubscriptionPlan
+
+    now = timezone.now()
+
     company = Company.objects.create(
         name=company_name,
         industry=industry,
@@ -123,6 +137,33 @@ def create_company_with_admin(
         website=website or "",
         description=description or "",
     )
+
+    # Activate 14-day trial
+    company.trial_ends_at = now + timedelta(days=TRIAL_DURATION_DAYS)
+    company.subscription_status = Company.SubscriptionStatus.TRIAL
+    company.save(update_fields=["trial_ends_at", "subscription_status", "updated_at"])
+
+    # Grant Professional-tier limits during trial
+    pro_plan = SubscriptionPlan.objects.filter(
+        tier=SubscriptionPlan.Tier.PROFESSIONAL,
+        is_active=True,
+    ).first()
+
+    if pro_plan is not None:
+        CompanySubscription.objects.create(
+            company=company,
+            plan=pro_plan,
+            billing_period=CompanySubscription.BillingPeriod.MONTHLY,
+            current_period_start=now,
+            current_period_end=now + timedelta(days=TRIAL_DURATION_DAYS),
+            is_active=True,
+        )
+    else:
+        logger.warning(
+            "Professional plan not found — company %s (%s) created without trial subscription.",
+            company.name,
+            company.id,
+        )
 
     user = create_user(
         email=admin_email,

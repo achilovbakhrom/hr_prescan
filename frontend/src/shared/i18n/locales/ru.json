@@ -372,7 +372,10 @@
     "addQuestion": "Добавить вопрос",
     "addCriteria": "Добавить критерий",
     "deleteConfirm": "Вы уверены, что хотите безвозвратно удалить эту вакансию?",
-    "deleteConfirmHeader": "Удаление вакансии"
+    "deleteConfirmHeader": "Удаление вакансии",
+    "keywords": "Ключевые слова",
+    "regenerateKeywords": "Обновить ключевые слова",
+    "keywordsHint": "Ключевые слова для поиска, сгенерированные ИИ"
   },
   "candidates": {
     "title": "Кандидаты",
@@ -610,6 +613,37 @@
     "decline": "Отклонить",
     "learnMore": "Подробнее"
   },
+  "trial": {
+    "banner": "У вас 14-дневный бесплатный пробный период плана Professional.",
+    "daysLeft": "Осталось {days} дн.",
+    "expiringSoon": "Пробный период истекает через {days} дн.",
+    "expired": "Пробный период закончился.",
+    "choosePlan": "Выбрать план"
+  },
+  "employers": {
+    "title": "Компании",
+    "create": "Добавить компанию",
+    "name": "Название компании",
+    "industry": "Отрасль",
+    "website": "Веб-сайт",
+    "description": "Описание",
+    "source": "Источник",
+    "manual": "Вручную",
+    "file": "Из файла",
+    "fromWebsite": "С сайта",
+    "noEmployers": "Компаний пока нет",
+    "noEmployersHint": "Добавьте компанию, чтобы привязать к вакансиям",
+    "deleteConfirm": "Вы уверены, что хотите удалить эту компанию?",
+    "deleteConfirmHeader": "Удаление компании",
+    "cannotDelete": "Невозможно удалить компанию с привязанными вакансиями",
+    "selectEmployer": "Выберите компанию",
+    "createNew": "Создать новую",
+    "orCreateNew": "или создайте новую",
+    "namePlaceholder": "например, ТехКорп",
+    "urlPlaceholder": "https://company.com/about",
+    "fetchFromUrl": "Загрузить с URL",
+    "uploadFile": "Загрузить и распознать"
+  },
   "jobBoard": {
     "title": "Поиск вакансий",
     "subtitle": "Найдите свою следующую возможность",
@@ -620,6 +654,9 @@
     "allLevels": "Все уровни",
     "activeFilters": "активных фильтров",
     "clearAll": "Сбросить все",
+    "salaryRange": "Диапазон зарплаты",
+    "minSalary": "Мин. зарплата",
+    "maxSalary": "Макс. зарплата",
     "noJobs": "Нет вакансий, соответствующих критериям",
     "noJobsHint": "Попробуйте изменить фильтры или условия поиска",
     "apply": "Откликнуться",

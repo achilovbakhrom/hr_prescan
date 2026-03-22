@@ -23,6 +23,7 @@ import {
   publicSubscriptionRoutes,
 } from '@/features/subscriptions/routes'
 import { adminRoutes } from '@/features/admin/routes'
+import { employerRoutes } from '@/features/employers/routes'
 import { landingRoutes } from '@/features/landing/routes'
 import { legalRoutes } from '@/features/legal/routes'
 import { errorRoutes } from '@/features/errors/routes'
@@ -64,6 +65,7 @@ const routes: RouteRecordRaw[] = [
     children: [
       ...dashboardRoutes,
       ...vacancyRoutes,
+      ...employerRoutes,
       ...candidateRoutes,
       ...hrCandidateRoutes,
       ...hrInterviewRoutes,

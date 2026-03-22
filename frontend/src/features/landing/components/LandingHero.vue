@@ -74,7 +74,7 @@ onMounted(() => {
               icon-pos="right"
               size="large"
               class="w-full sm:w-auto"
-              @click="router.push({ name: ROUTE_NAMES.REGISTER })"
+              @click="router.push({ name: ROUTE_NAMES.COMPANY_REGISTER })"
             />
             <Button
               :label="t('landing.hero.browseJobs')"

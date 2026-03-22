@@ -19,6 +19,8 @@ export interface Company {
   country: string
   logo: string | null
   website: string | null
+  subscriptionStatus?: 'trial' | 'active' | 'past_due' | 'cancelled'
+  trialEndsAt?: string | null
 }
 
 export type CompanySize = 'small' | 'medium' | 'large' | 'enterprise'

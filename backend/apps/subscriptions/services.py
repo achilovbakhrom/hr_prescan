@@ -1,6 +1,8 @@
+import logging
 from datetime import timedelta
 from decimal import Decimal
 
+from django.db import transaction
 from django.db.models import Count, Q
 from django.utils import timezone
 
@@ -9,6 +11,8 @@ from apps.interviews.models import Interview
 from apps.subscriptions.models import CompanySubscription, SubscriptionPlan
 from apps.subscriptions.selectors import get_company_subscription
 from apps.vacancies.models import Vacancy
+
+logger = logging.getLogger(__name__)
 
 
 def create_default_plans() -> list[SubscriptionPlan]:
@@ -204,6 +208,10 @@ def get_subscription_usage(*, company: Company) -> dict:
         is_active=True,
     ).count()
 
+    # Trial info
+    is_trial = company.subscription_status == Company.SubscriptionStatus.TRIAL
+    trial_ends_at = company.trial_ends_at.isoformat() if company.trial_ends_at else None
+
     return {
         "has_subscription": True,
         "plan": {
@@ -212,6 +220,8 @@ def get_subscription_usage(*, company: Company) -> dict:
         },
         "billing_period": subscription.billing_period,
         "current_period_end": subscription.current_period_end.isoformat(),
+        "is_trial": is_trial,
+        "trial_ends_at": trial_ends_at,
         "vacancies": {
             "used": vacancy_count,
             "limit": plan.max_vacancies,
@@ -225,3 +235,62 @@ def get_subscription_usage(*, company: Company) -> dict:
             "limit": plan.max_hr_users,
         },
     }
+
+
+@transaction.atomic
+def expire_trial(*, company: Company) -> None:
+    """Downgrade a company from trial to the Free plan."""
+    free_plan = SubscriptionPlan.objects.filter(
+        tier=SubscriptionPlan.Tier.FREE,
+        is_active=True,
+    ).first()
+
+    if free_plan is None:
+        logger.error(
+            "Free plan not found — cannot downgrade company %s (%s) from trial.",
+            company.name,
+            company.id,
+        )
+        return
+
+    now = timezone.now()
+
+    # Update or create subscription with the free plan
+    CompanySubscription.objects.update_or_create(
+        company=company,
+        defaults={
+            "plan": free_plan,
+            "billing_period": CompanySubscription.BillingPeriod.MONTHLY,
+            "current_period_start": now,
+            "current_period_end": now + timedelta(days=30),
+            "is_active": True,
+        },
+    )
+
+    company.subscription_status = Company.SubscriptionStatus.ACTIVE
+    company.save(update_fields=["subscription_status", "updated_at"])
+
+    logger.info(
+        "Trial expired for company %s (%s) — downgraded to Free plan.",
+        company.name,
+        company.id,
+    )
+
+
+def check_and_expire_trials() -> int:
+    """Check all trial companies and downgrade expired ones. Returns count of expired trials."""
+    now = timezone.now()
+    expired_companies = Company.objects.filter(
+        subscription_status=Company.SubscriptionStatus.TRIAL,
+        trial_ends_at__lte=now,
+    )
+
+    count = 0
+    for company in expired_companies:
+        expire_trial(company=company)
+        count += 1
+
+    if count:
+        logger.info("Expired %d trial(s).", count)
+
+    return count

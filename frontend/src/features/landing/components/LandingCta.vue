@@ -30,7 +30,7 @@ const { t } = useI18n()
           size="large"
           severity="contrast"
           class="w-full sm:w-auto"
-          @click="router.push({ name: ROUTE_NAMES.REGISTER })"
+          @click="router.push({ name: ROUTE_NAMES.COMPANY_REGISTER })"
         />
         <Button
           :label="t('landing.cta.viewPricing')"

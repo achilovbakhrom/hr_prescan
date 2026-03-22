@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from apps.vacancies.models import InterviewQuestion, Vacancy, VacancyCriteria
+from apps.vacancies.models import EmployerCompany, InterviewQuestion, Vacancy, VacancyCriteria
 
 
 class VacancyCriteriaOutputSerializer(serializers.ModelSerializer):
@@ -31,6 +31,23 @@ class InterviewQuestionOutputSerializer(serializers.ModelSerializer):
             "order",
             "is_active",
             "step",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = fields
+
+
+class EmployerCompanyOutputSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmployerCompany
+        fields = [
+            "id",
+            "name",
+            "industry",
+            "logo",
+            "website",
+            "description",
+            "source",
             "created_at",
             "updated_at",
         ]
@@ -83,6 +100,7 @@ class VacancyDetailOutputSerializer(serializers.ModelSerializer):
 
     criteria = VacancyCriteriaOutputSerializer(many=True, read_only=True)
     questions = InterviewQuestionOutputSerializer(many=True, read_only=True)
+    employer = EmployerCompanyOutputSerializer(read_only=True)
     created_by_email = serializers.EmailField(source="created_by.email", read_only=True)
 
     class Meta:
@@ -112,6 +130,8 @@ class VacancyDetailOutputSerializer(serializers.ModelSerializer):
             "company_info",
             "prescanning_prompt",
             "interview_prompt",
+            "keywords",
+            "employer",
             "criteria",
             "questions",
             "created_by_email",
@@ -152,6 +172,7 @@ class PublicVacancyDetailOutputSerializer(serializers.ModelSerializer):
     """Public vacancy detail — includes requirements but no salary or internal info."""
 
     company_name = serializers.CharField(source="company.name", read_only=True)
+    employer = EmployerCompanyOutputSerializer(read_only=True)
 
     class Meta:
         model = Vacancy
@@ -167,6 +188,7 @@ class PublicVacancyDetailOutputSerializer(serializers.ModelSerializer):
             "employment_type",
             "experience_level",
             "company_name",
+            "employer",
             "cv_required",
             "deadline",
             "interview_duration",

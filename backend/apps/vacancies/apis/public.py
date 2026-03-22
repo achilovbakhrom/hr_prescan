@@ -20,6 +20,8 @@ class PublicVacancyListApi(APIView):
         is_remote = serializers.BooleanField(required=False, default=None, allow_null=True)
         employment_type = serializers.CharField(required=False)
         experience_level = serializers.CharField(required=False)
+        salary_min = serializers.IntegerField(required=False)
+        salary_max = serializers.IntegerField(required=False)
 
     def get(self, request: Request) -> Response:
         filter_serializer = self.FilterSerializer(data=request.query_params)

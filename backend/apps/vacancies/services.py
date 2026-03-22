@@ -11,6 +11,7 @@ from apps.common.messages import (
     MSG_AI_COMPANY_INFO_FAILED,
     MSG_AI_QUESTIONS_FAILED,
     MSG_CANNOT_CHANGE_MODE,
+    MSG_EMPLOYER_HAS_VACANCIES,
     MSG_FILE_EXTRACT_FAILED,
     MSG_INTERNAL_URL_NOT_ALLOWED,
     MSG_INVALID_URL,
@@ -24,7 +25,7 @@ from apps.common.messages import (
     MSG_WEBSITE_EXTRACT_FAILED,
     MSG_WEBSITE_FETCH_FAILED,
 )
-from apps.vacancies.models import InterviewQuestion, ScreeningStep, Vacancy, VacancyCriteria
+from apps.vacancies.models import EmployerCompany, InterviewQuestion, ScreeningStep, Vacancy, VacancyCriteria
 
 logger = logging.getLogger(__name__)
 
@@ -56,6 +57,11 @@ def create_vacancy(
         **kwargs,
     )
     create_default_criteria(vacancy=vacancy)
+
+    from apps.vacancies.tasks import generate_keywords_task
+
+    transaction.on_commit(lambda: generate_keywords_task.delay(str(vacancy.id)))
+
     return vacancy
 
 
@@ -90,6 +96,14 @@ def update_vacancy(*, vacancy: Vacancy, data: dict) -> Vacancy:
 
     update_fields.append("updated_at")
     vacancy.save(update_fields=update_fields)
+
+    # Regenerate keywords when search-relevant fields change
+    search_relevant_fields = {"title", "description", "requirements", "skills"}
+    if search_relevant_fields & set(update_fields):
+        from apps.vacancies.tasks import generate_keywords_task
+
+        transaction.on_commit(lambda: generate_keywords_task.delay(str(vacancy.id)))
+
     return vacancy
 
 
@@ -341,6 +355,60 @@ def generate_interview_questions(
     return created_questions
 
 
+def generate_vacancy_keywords(*, vacancy: Vacancy) -> list[str]:
+    """Generate search keywords using AI for a vacancy."""
+    client = OpenAI()
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        temperature=0.3,
+        response_format={"type": "json_object"},
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "Generate 15-25 search keywords for this job vacancy. "
+                    "Include: synonyms, related terms, industry jargon, abbreviations. "
+                    "Generate keywords in BOTH English and Russian. "
+                    'Return JSON: {"keywords": ["keyword1", "keyword2", ...]}'
+                ),
+            },
+            {
+                "role": "user",
+                "content": (
+                    f"Title: {vacancy.title}\n"
+                    f"Description: {vacancy.description[:2000]}\n"
+                    f"Requirements: {(vacancy.requirements or 'N/A')[:1000]}\n"
+                    f"Skills: {', '.join(vacancy.skills) if vacancy.skills else 'N/A'}"
+                ),
+            },
+        ],
+    )
+    data = json.loads(response.choices[0].message.content)
+    keywords = data.get("keywords", [])
+    vacancy.keywords = keywords
+    vacancy.save(update_fields=["keywords", "updated_at"])
+    return keywords
+
+
+def update_vacancy_search_vector(*, vacancy: Vacancy) -> None:
+    """Update the pre-computed search vector for a vacancy."""
+    from django.contrib.postgres.search import SearchVector
+    from django.db.models import Value
+
+    skills_text = " ".join(vacancy.skills) if vacancy.skills else ""
+    keywords_text = " ".join(vacancy.keywords) if vacancy.keywords else ""
+
+    Vacancy.objects.filter(id=vacancy.id).update(
+        search_vector=(
+            SearchVector("title", weight="A", config="simple")
+            + SearchVector(Value(skills_text), weight="A", config="simple")
+            + SearchVector(Value(keywords_text), weight="A", config="simple")
+            + SearchVector("requirements", weight="B", config="simple")
+            + SearchVector("description", weight="C", config="simple")
+        )
+    )
+
+
 def parse_company_info_from_file(*, file_obj) -> str:
     """Extract text from an uploaded file (PDF/DOCX/TXT) and use AI to generate company info."""
     filename = getattr(file_obj, "name", "file.txt")
@@ -467,3 +535,55 @@ def _generate_company_info_with_ai(*, text: str, source_label: str = "document")
     except Exception:
         logger.exception("Failed to generate company info with AI from %s", source_label)
         raise ApplicationError(str(MSG_AI_COMPANY_INFO_FAILED))
+
+
+# ---------------------------------------------------------------------------
+# Employer Company services
+# ---------------------------------------------------------------------------
+
+def create_employer(*, company: Company, name: str, **kwargs: object) -> EmployerCompany:
+    """Create a manually-entered employer company."""
+    return EmployerCompany.objects.create(company=company, name=name, **kwargs)
+
+
+def create_employer_from_file(*, company: Company, name: str, file_obj: object) -> EmployerCompany:
+    """Create an employer company with description parsed from an uploaded file."""
+    description = parse_company_info_from_file(file_obj=file_obj)
+    return EmployerCompany.objects.create(
+        company=company,
+        name=name,
+        description=description,
+        source=EmployerCompany.Source.FILE,
+    )
+
+
+def create_employer_from_url(*, company: Company, name: str, url: str) -> EmployerCompany:
+    """Create an employer company with description parsed from a website URL."""
+    description = parse_company_info_from_url(url=url)
+    return EmployerCompany.objects.create(
+        company=company,
+        name=name,
+        description=description,
+        source=EmployerCompany.Source.WEBSITE,
+    )
+
+
+def update_employer(*, employer: EmployerCompany, data: dict) -> EmployerCompany:
+    """Update allowed employer company fields."""
+    allowed_fields = {"name", "industry", "logo", "website", "description"}
+    update_fields: list[str] = []
+    for field, value in data.items():
+        if field in allowed_fields:
+            setattr(employer, field, value)
+            update_fields.append(field)
+    if update_fields:
+        update_fields.append("updated_at")
+        employer.save(update_fields=update_fields)
+    return employer
+
+
+def delete_employer(*, employer: EmployerCompany) -> None:
+    """Delete an employer company. Raises if it has linked vacancies."""
+    if employer.vacancies.exists():
+        raise ApplicationError(str(MSG_EMPLOYER_HAS_VACANCIES))
+    employer.delete()
