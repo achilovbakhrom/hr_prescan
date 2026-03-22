@@ -11,6 +11,7 @@ import { ROUTE_NAMES } from '@/shared/constants/routes'
 import NotificationBell from '@/features/notifications/components/NotificationBell.vue'
 import LanguageSwitcher from '@/shared/components/LanguageSwitcher.vue'
 import { useNotificationPolling } from '@/features/notifications/composables/useNotificationPolling'
+import { useAIAssistant } from '@/shared/composables/useAIAssistant'
 import type { MenuItem } from 'primevue/menuitem'
 
 defineProps<{
@@ -29,6 +30,7 @@ const userMenu = ref<InstanceType<typeof Menu> | null>(null)
 const pendingInvitationsCount = ref(0)
 
 useNotificationPolling()
+const aiAssistant = useAIAssistant()
 
 onMounted(async () => {
   try {
@@ -113,6 +115,17 @@ function handleMenuToggle(): void {
           />
         </template>
       </Button>
+
+      <Button
+        type="button"
+        icon="pi pi-sparkles"
+        severity="secondary"
+        text
+        rounded
+        size="small"
+        @click="aiAssistant.toggle()"
+        v-tooltip.bottom="'AI Assistant'"
+      />
 
       <LanguageSwitcher />
 
