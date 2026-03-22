@@ -72,6 +72,7 @@ All detailed docs live in `docs/`:
 - TypeScript strict — no `any`, proper interfaces.
 - `<script setup>` with typed `defineProps` / `defineEmits`.
 - PrimeVue for UI components, Tailwind for utility styling.
+- **Mobile responsiveness**: every UI change must be tested and work on mobile (375px+). Use Tailwind responsive prefixes (`sm:`, `md:`, `lg:`). Mobile-first approach — default styles for mobile, override for larger screens.
 
 ## Mandatory Rules
 

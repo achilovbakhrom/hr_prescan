@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { USER_ROLES } from '@/shared/constants/roles'
 import LanguageSwitcher from '@/shared/components/LanguageSwitcher.vue'
+import AppLogo from '@/shared/components/AppLogo.vue'
 import type { UserRole } from '@/shared/types/auth.types'
 
 interface NavItem {
@@ -171,11 +172,7 @@ watch(
           class="flex h-16 items-center justify-between border-b border-gray-200 px-4"
         >
           <div class="flex items-center gap-2">
-            <div
-              class="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-600"
-            >
-              <i class="pi pi-bolt text-xs text-white"></i>
-            </div>
+            <AppLogo size="sm" />
             <span class="text-lg font-bold text-gray-900">HR PreScan</span>
           </div>
           <button
