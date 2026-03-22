@@ -199,7 +199,11 @@ async function copyLink(): Promise<void> {
         </RouterLink>
 
         <h1 class="mb-1 text-2xl font-bold">{{ t('candidates.application.title') }}</h1>
-        <p v-if="vacancy" class="mb-6 text-gray-600">{{ vacancy.title }}</p>
+        <p v-if="vacancy" class="mb-1 text-gray-600">{{ vacancy.title }}</p>
+        <p v-if="vacancy && ((vacancy as any).employer?.name || (vacancy as any).companyName)" class="mb-6 text-sm text-gray-500">
+          <i class="pi pi-building mr-1"></i>{{ (vacancy as any).employer?.name || (vacancy as any).companyName }}
+        </p>
+        <div v-else class="mb-6"></div>
 
         <p v-if="candidateStore.error" class="mb-4 text-sm text-red-600">
           {{ candidateStore.error }}

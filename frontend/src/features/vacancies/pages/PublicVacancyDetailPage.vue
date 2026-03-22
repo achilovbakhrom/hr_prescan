@@ -57,6 +57,9 @@ onMounted(async () => {
     <template v-else-if="vacancy">
       <div class="mb-6">
         <h1 class="text-3xl font-bold">{{ vacancy.title }}</h1>
+        <p v-if="vacancy.employer?.name || (vacancy as any).companyName" class="mt-1 text-base text-gray-500">
+          <i class="pi pi-building mr-1"></i>{{ vacancy.employer?.name || (vacancy as any).companyName }}
+        </p>
         <div class="mt-2 flex flex-wrap items-center gap-3 text-gray-500">
           <span v-if="vacancy.location"><i class="pi pi-map-marker mr-1"></i>{{ vacancy.location }}</span>
           <Tag v-if="vacancy.isRemote" :value="t('vacancies.overview.remote')" severity="info" />

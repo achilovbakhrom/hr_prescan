@@ -42,6 +42,14 @@ function formatDate(dateStr: string): string {
       @row-click="(e) => viewDetail(e.data)"
     >
       <Column field="vacancyTitle" :header="t('nav.vacancies')" sortable />
+      <Column :header="t('vacancies.form.companyInfo')">
+        <template #body="{ data }">
+          <span v-if="(data as any).employerName || (data as any).companyName" class="text-sm text-gray-600">
+            <i class="pi pi-building mr-1 text-xs"></i>{{ (data as any).employerName || (data as any).companyName }}
+          </span>
+          <span v-else class="text-sm text-gray-400">-</span>
+        </template>
+      </Column>
       <Column :header="t('common.status')">
         <template #body="{ data }">
           <ApplicationStatusBadge :status="(data as Application).status" />
