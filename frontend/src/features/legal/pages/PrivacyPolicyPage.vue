@@ -37,7 +37,7 @@ function goBack(): void {
             1. Introduction
           </h2>
           <p class="leading-relaxed text-gray-600">
-            HR PreScan ("we", "our", or "us") is committed to protecting your
+            PreScreen AI ("we", "our", or "us") is committed to protecting your
             personal information. This Privacy Policy explains how we collect,
             use, disclose, and safeguard your information when you use our
             AI-powered candidate pre-screening platform.
@@ -168,7 +168,7 @@ function goBack(): void {
             practices, please contact us at:
           </p>
           <div class="mt-3 text-gray-600">
-            <p>HR PreScan</p>
+            <p>PreScreen AI</p>
             <p>
               Email:
               <a

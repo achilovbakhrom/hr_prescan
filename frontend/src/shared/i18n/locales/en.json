@@ -125,36 +125,36 @@
   },
   "landing": {
     "hero": {
-      "title": "AI-Powered Candidate Pre-Screening",
-      "subtitle": "Automate your hiring process with intelligent AI interviews. Screen hundreds of candidates effortlessly.",
+      "title": "AI That Screens Candidates While You Sleep",
+      "subtitle": "Let artificial intelligence conduct prescreening interviews 24/7. Our AI agent chats with every applicant, scores them on your criteria, and delivers a shortlist — so you only talk to the best.",
       "getStarted": "Get Started Free",
       "cta": "Start Free Trial",
       "demo": "Watch Demo",
-      "browseJobs": "Browse Jobs",
+      "browseJobs": "Browse Open Positions",
       "learnMore": "Learn More"
     },
     "features": {
-      "title": "Why HR PreScan?",
-      "subtitle": "Everything you need to automate candidate screening and make better hiring decisions.",
-      "aiPrescanning": "AI Prescanning",
-      "aiPrescanningDesc": "Every candidate goes through an automated AI chat screening. Quick, consistent, and available 24/7.",
-      "aiInterviews": "AI-Powered Interviews",
-      "aiInterviewsDesc": "Optional deeper interviews via chat or video with a tougher AI agent for shortlisted candidates.",
+      "title": "AI-First Hiring Platform",
+      "subtitle": "Our intelligent agents handle the entire screening pipeline — from first contact to final score.",
+      "aiPrescanning": "Intelligent Prescreening",
+      "aiPrescanningDesc": "Every candidate is automatically screened through an AI-powered chat. No scheduling, no manual effort.",
+      "aiInterviews": "AI Voice & Chat Interviews",
+      "aiInterviewsDesc": "Our AI agent conducts natural conversations via text chat or video call, available 24/7 in multiple languages.",
       "twoStep": "Two-Step Screening",
       "twoStepDesc": "Quick prescanning chat followed by an in-depth AI interview. Filter candidates efficiently.",
       "analytics": "Smart Analytics",
-      "analyticsDesc": "Detailed scoring across multiple criteria. Compare candidates objectively with AI-generated insights.",
+      "analyticsDesc": "Each candidate gets scored 1-10 across custom criteria with AI-generated summaries and recommendations.",
       "time": "Save Time",
       "timeDesc": "Reduce screening time by 80%. Let AI handle initial interviews while you focus on top candidates.",
-      "smartScoring": "Smart Scoring",
+      "smartScoring": "AI-Powered Scoring",
       "smartScoringDesc": "Per-criteria scoring on a 1-10 scale, overall weighted scores, and AI-generated summaries for every candidate.",
-      "antiCheating": "Anti-Cheating Protection",
-      "antiCheatingDesc": "Face detection, gaze tracking, response consistency checks, and AI-generated answer detection.",
-      "easyManagement": "Easy Management",
-      "easyManagementDesc": "Manage vacancies, track candidates, schedule interviews, and collaborate with your team in one platform."
+      "antiCheating": "AI Integrity Monitoring",
+      "antiCheatingDesc": "Face detection, gaze tracking, and response consistency analysis powered by computer vision AI.",
+      "easyManagement": "Smart Candidate Pipeline",
+      "easyManagementDesc": "AI automatically advances or rejects candidates based on scores. HR retains full control to override any decision."
     },
     "badge": {
-      "poweredBy": "Powered by Advanced AI"
+      "poweredBy": "Powered by GPT-4 & Voice AI"
     },
     "howItWorks": {
       "title": "How It Works",
@@ -181,8 +181,8 @@
       "freeTrial": "14-day free trial"
     },
     "cta": {
-      "title": "Ready to Transform Your Hiring?",
-      "subtitle": "Join hundreds of companies using AI to find the best talent.",
+      "title": "Ready to Let AI Handle Your Screening?",
+      "subtitle": "Join companies that save 90% of screening time with AI-powered interviews.",
       "startFree": "Start Free Trial",
       "viewPricing": "View Pricing"
     },
@@ -196,11 +196,11 @@
       "privacy": "Privacy Policy",
       "terms": "Terms of Service",
       "copyright": "All rights reserved.",
-      "tagline": "AI-powered candidate pre-screening for modern teams."
+      "tagline": "AI-powered candidate screening for modern hiring teams."
     },
     "pipeline": {
-      "title": "Two-Step Screening Pipeline",
-      "subtitle": "Our unique two-step pipeline ensures only the best candidates reach your desk.",
+      "title": "Two-Step AI Screening Pipeline",
+      "subtitle": "Our AI handles the heavy lifting — you make the final call.",
       "step1": "Candidate Applies",
       "step1Desc": "Submits application and uploads CV",
       "step2": "AI Prescanning",
@@ -214,7 +214,7 @@
     },
     "latestJobs": "Latest Job Openings",
     "viewAllJobs": "View All Jobs",
-    "latestJobsSubtitle": "Browse the latest job openings from companies using HR PreScan",
+    "latestJobsSubtitle": "Browse the latest job openings from companies using PreScreen AI",
     "noJobsYet": "No job openings yet. Check back soon!",
     "noJobsCheckBack": "Check back soon for new opportunities",
     "remote": "Remote"
