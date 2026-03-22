@@ -1,27 +1,52 @@
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { sendAICommand, type AIMessage } from '../api/aiAssistant'
 import { extractErrorMessage } from '../api/errors'
 
+const STORAGE_KEY = 'prescreen_ai_assistant_history'
+const MAX_MESSAGES = 200 // 100 prompts × 2 (user + assistant)
+
+function loadHistory(): AIMessage[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (raw) return JSON.parse(raw) as AIMessage[]
+  } catch { /* corrupted data */ }
+  return []
+}
+
+function saveHistory(msgs: AIMessage[]): void {
+  const trimmed = msgs.slice(-MAX_MESSAGES)
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed))
+}
+
 const isOpen = ref(false)
-const messages = ref<AIMessage[]>([])
+const messages = ref<AIMessage[]>(loadHistory())
 const sending = ref(false)
+
+// Persist on every change
+watch(messages, (val) => saveHistory(val), { deep: true })
 
 export function useAIAssistant() {
   const route = useRoute()
 
-  function toggle() {
-    isOpen.value = !isOpen.value
-  }
-  function open() {
-    isOpen.value = true
-  }
-  function close() {
-    isOpen.value = false
-  }
+  function toggle() { isOpen.value = !isOpen.value }
+  function open() { isOpen.value = true }
+  function close() { isOpen.value = false }
 
   async function sendMessage(text: string) {
     if (!text.trim() || sending.value) return
+
+    // Handle "clear history" command
+    const lower = text.trim().toLowerCase()
+    if (lower === 'clear history' || lower === 'очистить историю' || lower === 'clear') {
+      clearHistory()
+      messages.value.push({
+        role: 'assistant',
+        content: 'History cleared.',
+        timestamp: new Date().toISOString(),
+      })
+      return
+    }
 
     messages.value.push({
       role: 'user',
@@ -31,10 +56,20 @@ export function useAIAssistant() {
     sending.value = true
 
     try {
-      const context = {
+      const context: Record<string, unknown> = {
         currentPage: route.name,
         currentParams: route.params,
       }
+
+      // Send last 10 messages as conversation history for context
+      const recentHistory = messages.value.slice(-11, -1).map((m) => ({
+        role: m.role,
+        content: m.content,
+      }))
+      if (recentHistory.length > 0) {
+        context.conversationHistory = recentHistory
+      }
+
       const response = await sendAICommand(text, context)
       messages.value.push({
         role: 'assistant',
@@ -55,16 +90,8 @@ export function useAIAssistant() {
 
   function clearHistory() {
     messages.value = []
+    localStorage.removeItem(STORAGE_KEY)
   }
 
-  return {
-    isOpen,
-    messages,
-    sending,
-    toggle,
-    open,
-    close,
-    sendMessage,
-    clearHistory,
-  }
+  return { isOpen, messages, sending, toggle, open, close, sendMessage, clearHistory }
 }
