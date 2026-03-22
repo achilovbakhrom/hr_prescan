@@ -263,27 +263,3 @@ async function handleUpdate(data: CreateVacancyRequest): Promise<void> {
     <ConfirmDialog />
   </div>
 </template>
-
-<style scoped>
-:deep(.p-tabview-panels) {
-  border-top: none !important;
-  background: white !important;
-  border-radius: 0 0 0.5rem 0.5rem !important;
-}
-
-:deep(.p-tabview-tablist) {
-  border-width: 0 0 1px 0 !important;
-  border-color: #e5e7eb !important;
-}
-
-:deep(.p-tabview-tab-header) {
-  border: none !important;
-  padding: 0.5rem 0.75rem !important;
-}
-
-@media (min-width: 640px) {
-  :deep(.p-tabview-tab-header) {
-    padding: 0.75rem 1rem !important;
-  }
-}
-</style>
