@@ -68,6 +68,9 @@ TOOL_DEFINITIONS = [
     {"type": "function", "function": {"name": "invite_hr", "description": "Invite a new HR manager to the team", "parameters": {"type": "object", "properties": {"email": {"type": "string"}}, "required": ["email"]}}},
     {"type": "function", "function": {"name": "list_team", "description": "List team members", "parameters": {"type": "object", "properties": {}}}},
     {"type": "function", "function": {"name": "toggle_user_active", "description": "Activate or deactivate a team member", "parameters": {"type": "object", "properties": {"email": {"type": "string"}, "activate": {"type": "boolean"}}, "required": ["email", "activate"]}}},
+    # --- Frontend Actions ---
+    {"type": "function", "function": {"name": "navigate_to_page", "description": "Navigate the user to a specific page in the app. Use after creating/updating resources or when user asks to go somewhere. Available pages: dashboard, vacancies, vacancy-detail (needs vacancy_id), employers, employer-create, candidates, interviews, settings, profile, company-profile, team, pricing, subscription, notifications, jobs (public job board)", "parameters": {"type": "object", "properties": {"page": {"type": "string", "description": "Page name: dashboard, vacancies, vacancy-detail, employers, employer-create, candidates, interviews, settings, profile, company-profile, team, pricing, subscription, notifications, jobs"}, "params": {"type": "object", "description": "Route params if needed, e.g. {\"id\": \"vacancy-uuid\"} for vacancy-detail"}}, "required": ["page"]}}},
+    {"type": "function", "function": {"name": "clear_chat_history", "description": "Clear the AI assistant chat history. Use when user asks to clear history, reset conversation, or start fresh.", "parameters": {"type": "object", "properties": {}}}},
 ]
 
 # ---------------------------------------------------------------------------
@@ -103,6 +106,8 @@ TOOL_MAP = {
     "invite_hr": "_handle_invite_hr",
     "list_team": "_handle_list_team",
     "toggle_user_active": "_handle_toggle_user_active",
+    "navigate_to_page": "_handle_navigate_to_page",
+    "clear_chat_history": "_handle_clear_chat_history",
 }
 
 
@@ -896,6 +901,54 @@ def _handle_unknown(*, user, params):
         "message": "I didn't understand that command. Type 'help' to see what I can do.",
         "data": {},
         "action": "unknown",
+    }
+
+
+# ---------------------------------------------------------------------------
+# FRONTEND ACTION HANDLERS
+# ---------------------------------------------------------------------------
+
+PAGE_ROUTES = {
+    "dashboard": "/dashboard",
+    "vacancies": "/vacancies",
+    "vacancy-detail": "/vacancies/{id}",
+    "employers": "/employers",
+    "employer-create": "/employers/create",
+    "candidates": "/candidates",
+    "interviews": "/interviews",
+    "settings": "/settings",
+    "profile": "/settings/profile",
+    "company-profile": "/settings/company",
+    "team": "/settings/team",
+    "pricing": "/pricing",
+    "subscription": "/subscription",
+    "notifications": "/notifications",
+    "jobs": "/jobs",
+}
+
+
+def _handle_navigate_to_page(*, user, params):
+    page = params.get("page", "dashboard")
+    route_params = params.get("params", {})
+
+    path = PAGE_ROUTES.get(page, "/dashboard")
+    if "{id}" in path and route_params.get("id"):
+        path = path.replace("{id}", str(route_params["id"]))
+
+    return {
+        "success": True,
+        "message": f"Navigating to {page}.",
+        "data": {},
+        "frontend_action": {"type": "navigate", "path": path},
+    }
+
+
+def _handle_clear_chat_history(*, user, params):
+    return {
+        "success": True,
+        "message": "Chat history cleared.",
+        "data": {},
+        "frontend_action": {"type": "clear_history"},
     }
 
 

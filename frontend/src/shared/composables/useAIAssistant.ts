@@ -1,6 +1,6 @@
 import { ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
-import { sendAICommand, type AIMessage } from '../api/aiAssistant'
+import { useRoute, useRouter } from 'vue-router'
+import { sendAICommand, type AIMessage, type FrontendAction } from '../api/aiAssistant'
 import { extractErrorMessage } from '../api/errors'
 
 const STORAGE_KEY = 'prescreen_ai_assistant_history'
@@ -28,25 +28,29 @@ watch(messages, (val) => saveHistory(val), { deep: true })
 
 export function useAIAssistant() {
   const route = useRoute()
+  const router = useRouter()
 
   function toggle() { isOpen.value = !isOpen.value }
   function open() { isOpen.value = true }
   function close() { isOpen.value = false }
 
+  function executeFrontendActions(actions: Array<{ tool: string; result: Record<string, unknown> }> | undefined): void {
+    if (!actions) return
+
+    for (const action of actions) {
+      const fa = action.result?.frontend_action as FrontendAction | undefined
+      if (!fa) continue
+
+      if (fa.type === 'navigate' && fa.path) {
+        router.push(fa.path)
+      } else if (fa.type === 'clear_history') {
+        clearHistory()
+      }
+    }
+  }
+
   async function sendMessage(text: string) {
     if (!text.trim() || sending.value) return
-
-    // Handle "clear history" command
-    const lower = text.trim().toLowerCase()
-    if (lower === 'clear history' || lower === 'очистить историю' || lower === 'clear') {
-      clearHistory()
-      messages.value.push({
-        role: 'assistant',
-        content: 'History cleared.',
-        timestamp: new Date().toISOString(),
-      })
-      return
-    }
 
     messages.value.push({
       role: 'user',
@@ -77,6 +81,9 @@ export function useAIAssistant() {
         actions: response.actions,
         timestamp: new Date().toISOString(),
       })
+
+      // Execute frontend actions (navigate, clear history, etc.)
+      executeFrontendActions(response.actions)
     } catch (err) {
       messages.value.push({
         role: 'assistant',
