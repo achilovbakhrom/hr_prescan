@@ -33,6 +33,15 @@ onMounted(async () => {
   <div>
 
     <div class="mx-auto max-w-3xl px-4 py-8">
+    <!-- Back button -->
+    <button
+      class="mb-4 flex items-center gap-1.5 text-sm text-gray-500 transition-colors hover:text-gray-900"
+      @click="router.push({ name: ROUTE_NAMES.JOB_BOARD })"
+    >
+      <i class="pi pi-arrow-left text-xs"></i>
+      {{ t('common.back') }}
+    </button>
+
     <div v-if="loading" class="py-12 text-center">
       <i class="pi pi-spinner pi-spin text-3xl text-gray-400"></i>
     </div>
