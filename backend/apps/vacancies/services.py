@@ -366,8 +366,14 @@ def generate_vacancy_keywords(*, vacancy: Vacancy) -> list[str]:
             {
                 "role": "system",
                 "content": (
-                    "Generate 15-25 search keywords for this job vacancy. "
-                    "Include: synonyms, related terms, industry jargon, abbreviations. "
+                    "Generate 20-30 search keywords for this job vacancy. "
+                    "Include ALL of these categories:\n"
+                    "- Job title synonyms and variations\n"
+                    "- Broad field/industry terms (e.g. 'programming', 'software development', 'IT')\n"
+                    "- Related roles and specializations\n"
+                    "- Key skills and technologies mentioned\n"
+                    "- Industry jargon and abbreviations\n"
+                    "- Common search terms a job seeker would use\n"
                     "Generate keywords in BOTH English and Russian. "
                     'Return JSON: {"keywords": ["keyword1", "keyword2", ...]}'
                 ),
@@ -391,7 +397,11 @@ def generate_vacancy_keywords(*, vacancy: Vacancy) -> list[str]:
 
 
 def update_vacancy_search_vector(*, vacancy: Vacancy) -> None:
-    """Update the pre-computed search vector for a vacancy."""
+    """Update the pre-computed search vector for a vacancy.
+
+    Uses both 'english' (for stemming: program matches programming) and
+    'simple' (for exact matches of non-English words like Russian).
+    """
     from django.contrib.postgres.search import SearchVector
     from django.db.models import Value
 
@@ -400,11 +410,16 @@ def update_vacancy_search_vector(*, vacancy: Vacancy) -> None:
 
     Vacancy.objects.filter(id=vacancy.id).update(
         search_vector=(
-            SearchVector("title", weight="A", config="simple")
+            # English stemming (program → programming, develop → developer)
+            SearchVector("title", weight="A", config="english")
+            + SearchVector(Value(skills_text), weight="A", config="english")
+            + SearchVector(Value(keywords_text), weight="A", config="english")
+            + SearchVector("requirements", weight="B", config="english")
+            + SearchVector("description", weight="C", config="english")
+            # Simple config for exact matches (Russian words, abbreviations)
+            + SearchVector("title", weight="A", config="simple")
             + SearchVector(Value(skills_text), weight="A", config="simple")
             + SearchVector(Value(keywords_text), weight="A", config="simple")
-            + SearchVector("requirements", weight="B", config="simple")
-            + SearchVector("description", weight="C", config="simple")
         )
     )
 

@@ -98,8 +98,12 @@ def get_public_vacancies(
         .select_related("company")
     )
     if search:
-        query = SearchQuery(search, config="simple", search_type="websearch")
-        fts_rank = SearchRank(F("search_vector"), query)
+        # Both english (stemming: program→programming) and simple (exact: Russian words)
+        query_en = SearchQuery(search, config="english", search_type="websearch")
+        query_simple = SearchQuery(search, config="simple", search_type="websearch")
+        query_combined = query_en | query_simple
+
+        fts_rank = SearchRank(F("search_vector"), query_combined)
         trigram_sim = Greatest(
             TrigramSimilarity("title", search),
             TrigramSimilarity("requirements", search),
@@ -108,7 +112,7 @@ def get_public_vacancies(
             fts_rank=fts_rank,
             trigram_sim=trigram_sim,
         ).filter(
-            Q(search_vector=query) | Q(trigram_sim__gte=0.15)
+            Q(search_vector=query_combined) | Q(trigram_sim__gte=0.15)
         ).order_by("-fts_rank", "-trigram_sim")
     if location:
         qs = qs.filter(location__icontains=location)
