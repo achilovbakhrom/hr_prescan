@@ -138,14 +138,23 @@ Vacancies follow a one-directional lifecycle. Once published, a vacancy cannot r
 1. **Draft** — vacancy created but not published. HR configures questions, criteria, and settings.
 2. **Published** — live and accepting applications. Can be paused or archived.
 3. **Paused** — temporarily not accepting new applications. Can be resumed (back to published) or archived.
-4. **Archived** — vacancy is permanently closed. All pending sessions are expired. Cannot be reopened.
+4. **Archived** — vacancy is permanently closed. All pending sessions are expired. Cannot be reopened. Can be soft-deleted.
 
 ```
-Draft → Published ↔ Paused → Archived
+Draft → Published ↔ Paused → Archived → (Soft Delete)
                   └──────────→ Archived
 ```
 
 An HR can manage multiple active vacancies simultaneously.
+
+### 5.3.1 Vacancy Soft Delete
+
+- Only **archived** vacancies can be soft-deleted
+- Soft-deleted vacancies are permanently hidden from all views (HR vacancy list, public job board, API)
+- Data is retained in the database for compliance/audit purposes but is not accessible through the UI or API
+- Related data (applications, sessions, scores) remains intact and linked
+- The HR vacancy list is divided into two tabs: **Active** (draft + published + paused) and **Archived**
+- The Archived tab shows a delete button per vacancy with a confirmation dialog
 
 ### 5.4 Two-Step Screening Pipeline
 

@@ -55,8 +55,8 @@ def get_vacancy_by_id(
     vacancy_id: UUID,
     company: Company | None = None,
 ) -> Vacancy | None:
-    """Get a single vacancy, optionally scoped to a company."""
-    qs = Vacancy.objects.select_related("company", "created_by")
+    """Get a single vacancy, optionally scoped to a company. Excludes soft-deleted."""
+    qs = Vacancy.objects.select_related("company", "created_by").filter(is_deleted=False)
     if company:
         qs = qs.filter(company=company)
     return qs.filter(id=vacancy_id).first()
