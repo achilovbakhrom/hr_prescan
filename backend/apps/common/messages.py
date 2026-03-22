@@ -106,3 +106,7 @@ MSG_AUDIO_FILE_TOO_LARGE = _("Audio file exceeds maximum size of 10 MB.")
 MSG_INVALID_AUDIO_FILE_TYPE = _("Invalid file type. Only audio files are accepted.")
 MSG_INTERVIEW_RESULTS_SAVED = _("Interview results saved successfully.")
 MSG_INVALID_INTERNAL_KEY = _("Invalid or missing internal API key.")
+
+# Employer Companies
+MSG_EMPLOYER_NOT_FOUND = _("Employer company not found.")
+MSG_EMPLOYER_HAS_VACANCIES = _("Cannot delete employer with linked vacancies.")

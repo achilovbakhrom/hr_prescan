@@ -1,5 +1,7 @@
 import uuid
 
+from django.contrib.postgres.indexes import GinIndex
+from django.contrib.postgres.search import SearchVectorField
 from django.db import models
 
 from apps.common.models import BaseModel
@@ -92,14 +94,57 @@ class Vacancy(BaseModel):
     company_info = models.TextField(blank=True, default="")  # Optional company description for AI interview intro
     prescanning_prompt = models.TextField(blank=True, default="")  # Additional instructions for prescanning AI agent
     interview_prompt = models.TextField(blank=True, default="")  # Additional instructions for interview AI agent
+    employer = models.ForeignKey(
+        "vacancies.EmployerCompany",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="vacancies",
+    )
     is_deleted = models.BooleanField(default=False)
+    keywords = models.JSONField(default=list, blank=True)  # AI-generated search keywords
+    search_vector = SearchVectorField(null=True, blank=True)
 
     class Meta:
         verbose_name_plural = "vacancies"
         ordering = ["-created_at"]
+        indexes = [
+            GinIndex(fields=["search_vector"], name="vacancy_search_vector_gin"),
+        ]
 
     def __str__(self) -> str:
         return f"{self.title} ({self.company.name})"
+
+
+class EmployerCompany(BaseModel):
+    """A company that posts job vacancies. Belongs to a tenant Company."""
+
+    class Source(models.TextChoices):
+        MANUAL = "manual", "Manual"
+        FILE = "file", "File"
+        WEBSITE = "website", "Website"
+
+    company = models.ForeignKey(
+        "accounts.Company",
+        on_delete=models.CASCADE,
+        related_name="employers",
+    )
+    name = models.CharField(max_length=255)
+    industry = models.CharField(max_length=255, blank=True)
+    logo = models.URLField(blank=True)
+    website = models.URLField(blank=True)
+    description = models.TextField(blank=True)
+    source = models.CharField(
+        max_length=10,
+        choices=Source.choices,
+        default=Source.MANUAL,
+    )
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return self.name
 
 
 class ScreeningStep(models.TextChoices):

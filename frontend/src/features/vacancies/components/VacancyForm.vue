@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
 import Dropdown from 'primevue/dropdown'
@@ -15,9 +16,13 @@ import FileUpload from 'primevue/fileupload'
 import { getEmploymentOptions, getExperienceOptions, CURRENCY_OPTIONS, getVisibilityOptions, getInterviewModeOptions } from '../constants/formOptions'
 import { vacancyService } from '../services/vacancy.service'
 import { extractErrorMessage } from '@/shared/api/errors'
+import { employerService } from '@/features/employers/services/employer.service'
+import { ROUTE_NAMES } from '@/shared/constants/routes'
+import type { EmployerCompany } from '@/features/employers/types/employer.types'
 import type { CreateVacancyRequest, EmploymentType, ExperienceLevel, InterviewMode, VacancyVisibility } from '../types/vacancy.types'
 
 const { t } = useI18n()
+const router = useRouter()
 
 const employmentOptions = computed(() => getEmploymentOptions(t))
 const experienceOptions = computed(() => getExperienceOptions(t))
@@ -50,6 +55,25 @@ const interviewMode = ref<InterviewMode>(props.initialData?.interviewMode ?? 'ch
 const interviewDuration = ref(props.initialData?.interviewDuration ?? 30)
 const interviewPrompt = ref(props.initialData?.interviewPrompt ?? '')
 const companyInfo = ref(props.initialData?.companyInfo ?? '')
+const employerId = ref<string | null>(props.initialData?.employerId ?? null)
+const employersList = ref<EmployerCompany[]>([])
+const loadingEmployers = ref(false)
+
+const selectedEmployer = computed(() =>
+  employersList.value.find((e) => e.id === employerId.value) ?? null,
+)
+
+onMounted(async () => {
+  loadingEmployers.value = true
+  try {
+    employersList.value = await employerService.list()
+  } catch {
+    // silent — dropdown will just be empty
+  } finally {
+    loadingEmployers.value = false
+  }
+})
+
 const parsingFile = ref(false)
 const parsingUrl = ref(false)
 const parseError = ref('')
@@ -107,6 +131,7 @@ watch(() => props.initialData, (d) => {
   interviewDuration.value = d.interviewDuration ?? 30
   interviewPrompt.value = d.interviewPrompt ?? ''
   companyInfo.value = d.companyInfo ?? ''
+  employerId.value = d.employerId ?? null
 })
 
 const canSave = ref(true)
@@ -131,6 +156,7 @@ function handleSave(): void {
     interviewDuration: interviewDuration.value,
     interviewPrompt: interviewPrompt.value || undefined,
     companyInfo: companyInfo.value || undefined,
+    employerId: employerId.value || undefined,
   })
 }
 
@@ -221,53 +247,108 @@ function handleSave(): void {
             </p>
           </div>
 
-          <!-- Option 1: Website URL -->
+          <!-- Employer dropdown -->
           <div>
-            <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.fillFromWebsite') }}</label>
-            <p class="mb-2 text-xs text-gray-400">{{ t('vacancies.form.websiteHint') }}</p>
+            <label class="mb-1 block text-sm font-medium">{{ t('employers.selectEmployer') }}</label>
             <div class="flex gap-2">
-              <InputText v-model="websiteUrl" class="flex-1" :placeholder="t('vacancies.form.websitePlaceholder')" :disabled="isParsing" />
+              <Dropdown
+                v-model="employerId"
+                :options="employersList"
+                option-label="name"
+                option-value="id"
+                :placeholder="t('employers.selectEmployer')"
+                :loading="loadingEmployers"
+                show-clear
+                class="flex-1"
+              />
               <Button
                 type="button"
-                :label="t('vacancies.form.fetch')"
-                icon="pi pi-globe"
+                :label="t('employers.createNew')"
+                icon="pi pi-plus"
+                severity="secondary"
                 size="small"
-                :loading="parsingUrl"
-                :disabled="!websiteUrl || isParsing"
-                @click="handleUrlParse"
+                @click="router.push({ name: ROUTE_NAMES.EMPLOYER_CREATE })"
               />
             </div>
           </div>
 
-          <!-- Option 2: File upload -->
-          <div>
-            <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.uploadDocument') }}</label>
-            <p class="mb-2 text-xs text-gray-400">{{ t('vacancies.form.uploadHint') }}</p>
-            <div class="flex items-center gap-3">
-              <FileUpload
-                mode="basic"
-                accept=".pdf,.docx,.doc,.txt"
-                :max-file-size="10000000"
-                :choose-label="t('vacancies.form.uploadParse')"
-                :auto="true"
-                :custom-upload="true"
-                @uploader="handleFileUpload"
-                :disabled="isParsing"
-                class="text-sm"
-              />
-              <span v-if="parsingFile" class="flex items-center gap-2 text-sm text-gray-500">
-                <i class="pi pi-spinner pi-spin"></i> {{ t('vacancies.form.parsingFile') }}
-              </span>
+          <!-- Selected employer preview -->
+          <div
+            v-if="selectedEmployer"
+            class="rounded-lg border border-gray-200 bg-gray-50 p-4"
+          >
+            <div class="mb-2 flex items-center gap-2">
+              <div
+                v-if="selectedEmployer.logo"
+                class="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white"
+              >
+                <img :src="selectedEmployer.logo" :alt="selectedEmployer.name" class="h-full w-full object-contain" />
+              </div>
+              <div v-else class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+                <i class="pi pi-building text-sm"></i>
+              </div>
+              <div>
+                <p class="font-semibold text-gray-900">{{ selectedEmployer.name }}</p>
+                <p v-if="selectedEmployer.industry" class="text-xs text-gray-500">{{ selectedEmployer.industry }}</p>
+              </div>
             </div>
+            <p v-if="selectedEmployer.description" class="whitespace-pre-line text-sm text-gray-600">
+              {{ selectedEmployer.description }}
+            </p>
           </div>
 
-          <p v-if="parseError" class="text-sm text-red-500">{{ parseError }}</p>
+          <!-- Fallback: manual company info -->
+          <div v-if="!employerId" class="border-t border-gray-100 pt-4">
+            <p class="mb-3 text-sm text-gray-500">{{ t('employers.orCreateNew') }}</p>
 
-          <!-- Result textarea -->
-          <div>
-            <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.companyDescription') }}</label>
-            <p class="mb-2 text-xs text-gray-400">{{ t('vacancies.form.companyDescriptionHint') }}</p>
-            <Textarea v-model="companyInfo" class="w-full" rows="8" :placeholder="t('vacancies.form.companyInfoPlaceholder')" />
+            <!-- Option 1: Website URL -->
+            <div>
+              <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.fillFromWebsite') }}</label>
+              <p class="mb-2 text-xs text-gray-400">{{ t('vacancies.form.websiteHint') }}</p>
+              <div class="flex gap-2">
+                <InputText v-model="websiteUrl" class="flex-1" :placeholder="t('vacancies.form.websitePlaceholder')" :disabled="isParsing" />
+                <Button
+                  type="button"
+                  :label="t('vacancies.form.fetch')"
+                  icon="pi pi-globe"
+                  size="small"
+                  :loading="parsingUrl"
+                  :disabled="!websiteUrl || isParsing"
+                  @click="handleUrlParse"
+                />
+              </div>
+            </div>
+
+            <!-- Option 2: File upload -->
+            <div class="mt-4">
+              <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.uploadDocument') }}</label>
+              <p class="mb-2 text-xs text-gray-400">{{ t('vacancies.form.uploadHint') }}</p>
+              <div class="flex items-center gap-3">
+                <FileUpload
+                  mode="basic"
+                  accept=".pdf,.docx,.doc,.txt"
+                  :max-file-size="10000000"
+                  :choose-label="t('vacancies.form.uploadParse')"
+                  :auto="true"
+                  :custom-upload="true"
+                  @uploader="handleFileUpload"
+                  :disabled="isParsing"
+                  class="text-sm"
+                />
+                <span v-if="parsingFile" class="flex items-center gap-2 text-sm text-gray-500">
+                  <i class="pi pi-spinner pi-spin"></i> {{ t('vacancies.form.parsingFile') }}
+                </span>
+              </div>
+            </div>
+
+            <p v-if="parseError" class="mt-2 text-sm text-red-500">{{ parseError }}</p>
+
+            <!-- Result textarea -->
+            <div class="mt-4">
+              <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.companyDescription') }}</label>
+              <p class="mb-2 text-xs text-gray-400">{{ t('vacancies.form.companyDescriptionHint') }}</p>
+              <Textarea v-model="companyInfo" class="w-full" rows="8" :placeholder="t('vacancies.form.companyInfoPlaceholder')" />
+            </div>
           </div>
 
         </div>

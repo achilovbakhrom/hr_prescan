@@ -3,6 +3,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import InputText from 'primevue/inputtext'
+import InputNumber from 'primevue/inputnumber'
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import Button from 'primevue/button'
@@ -23,6 +24,8 @@ const locationFilter = ref('')
 const employmentType = ref<string | null>(null)
 const experienceLevel = ref<string | null>(null)
 const remoteOnly = ref(false)
+const salaryMin = ref<number | null>(null)
+const salaryMax = ref<number | null>(null)
 
 const employmentOptions = computed(() => [
   { value: 'full_time', label: t('vacancies.employment.fullTime'), icon: 'pi pi-clock' },
@@ -46,11 +49,13 @@ const activeFilterCount = computed(() => {
   if (employmentType.value) count++
   if (experienceLevel.value) count++
   if (remoteOnly.value) count++
+  if (salaryMin.value !== null) count++
+  if (salaryMax.value !== null) count++
   return count
 })
 
 let searchTimeout: ReturnType<typeof setTimeout> | null = null
-watch([search, locationFilter], () => {
+watch([search, locationFilter, salaryMin, salaryMax], () => {
   if (searchTimeout) clearTimeout(searchTimeout)
   searchTimeout = setTimeout(fetchJobs, 400)
 })
@@ -66,6 +71,8 @@ async function fetchJobs(): Promise<void> {
       isRemote: remoteOnly.value ? true : undefined,
       employmentType: employmentType.value ?? undefined,
       experienceLevel: experienceLevel.value ?? undefined,
+      salaryMin: salaryMin.value ?? undefined,
+      salaryMax: salaryMax.value ?? undefined,
     })
   } catch { /* silent */ } finally {
     loading.value = false
@@ -93,6 +100,8 @@ function clearFilters(): void {
   employmentType.value = null
   experienceLevel.value = null
   remoteOnly.value = false
+  salaryMin.value = null
+  salaryMax.value = null
   fetchJobs()
 }
 
@@ -197,6 +206,31 @@ function formatRelativeDate(dateStr: string): string {
                 >
                   {{ opt.label }}
                 </button>
+              </div>
+            </div>
+
+            <!-- Salary Range -->
+            <div>
+              <h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">{{ t('jobBoard.salaryRange') }}</h3>
+              <div class="space-y-2">
+                <InputNumber
+                  v-model="salaryMin"
+                  :placeholder="t('jobBoard.minSalary')"
+                  :min="0"
+                  mode="decimal"
+                  :use-grouping="true"
+                  class="w-full"
+                  input-class="w-full text-sm"
+                />
+                <InputNumber
+                  v-model="salaryMax"
+                  :placeholder="t('jobBoard.maxSalary')"
+                  :min="0"
+                  mode="decimal"
+                  :use-grouping="true"
+                  class="w-full"
+                  input-class="w-full text-sm"
+                />
               </div>
             </div>
           </div>

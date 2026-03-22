@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.postgres",
     # Third-party
     "rest_framework",
     "corsheaders",
@@ -113,6 +114,15 @@ CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = "UTC"
+
+from celery.schedules import crontab  # noqa: E402
+
+CELERY_BEAT_SCHEDULE = {
+    "check-expired-trials": {
+        "task": "apps.subscriptions.tasks.check_expired_trials",
+        "schedule": crontab(hour=0, minute=15),
+    },
+}
 
 # MinIO / S3 storage
 AWS_ACCESS_KEY_ID = os.environ.get("MINIO_ACCESS_KEY", "")

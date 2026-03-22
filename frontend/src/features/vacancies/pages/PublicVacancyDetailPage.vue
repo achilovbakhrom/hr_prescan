@@ -8,11 +8,16 @@ import { vacancyService } from '../services/vacancy.service'
 import { EMPLOYMENT_LABELS, EXPERIENCE_LABELS, formatSalaryRange, formatDate } from '../composables/useVacancyLabels'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { Vacancy } from '../types/vacancy.types'
+import type { EmployerCompany } from '@/features/employers/types/employer.types'
+
+interface VacancyWithEmployer extends Vacancy {
+  employer?: EmployerCompany
+}
 
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
-const vacancy = ref<Vacancy | null>(null)
+const vacancy = ref<VacancyWithEmployer | null>(null)
 const loading = ref(false)
 const error = ref<string | null>(null)
 const isShareRoute = computed(() => route.name === 'job-share')
@@ -78,6 +83,37 @@ onMounted(async () => {
           <Tag v-for="skill in vacancy.skills" :key="skill" :value="skill" severity="secondary" />
         </div>
       </div>
+      <!-- Employer profile card -->
+      <div v-if="vacancy.employer" class="mb-6 rounded-xl border border-gray-200 bg-gray-50 p-5">
+        <div class="flex items-center gap-4">
+          <div
+            v-if="vacancy.employer.logo"
+            class="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white"
+          >
+            <img :src="vacancy.employer.logo" :alt="vacancy.employer.name" class="h-full w-full object-contain" />
+          </div>
+          <div v-else class="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+            <i class="pi pi-building text-2xl"></i>
+          </div>
+          <div class="min-w-0">
+            <h3 class="text-lg font-semibold text-gray-900">{{ vacancy.employer.name }}</h3>
+            <p v-if="vacancy.employer.industry" class="text-sm text-gray-500">{{ vacancy.employer.industry }}</p>
+            <a
+              v-if="vacancy.employer.website"
+              :href="vacancy.employer.website"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-sm text-blue-600 hover:underline"
+            >
+              {{ vacancy.employer.website }}
+            </a>
+          </div>
+        </div>
+        <p v-if="vacancy.employer.description" class="mt-3 whitespace-pre-line text-sm text-gray-600">
+          {{ vacancy.employer.description }}
+        </p>
+      </div>
+
       <div class="mb-6">
         <h2 class="mb-2 text-lg font-semibold">{{ t('vacancies.form.description') }}</h2>
         <p class="whitespace-pre-line text-gray-700">{{ vacancy.description }}</p>
