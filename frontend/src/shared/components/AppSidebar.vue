@@ -136,7 +136,8 @@ function isActive(path: string): boolean {
     <div class="border-t border-gray-100 px-2 py-3">
       <button
         type="button"
-        class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium text-violet-600 transition-colors hover:bg-violet-50"
+        class="flex w-full items-center gap-3 rounded-xl bg-gradient-to-r from-violet-500 to-indigo-600 px-3 py-2.5 text-[13px] font-medium text-white shadow-sm transition-all hover:shadow-md hover:brightness-110 active:scale-[0.98]"
+        :class="collapsed ? 'justify-center' : ''"
         :title="collapsed ? t('aiAssistant.title') : undefined"
         @click="aiAssistant.toggle()"
       >
