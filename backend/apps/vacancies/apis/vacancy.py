@@ -16,6 +16,7 @@ from apps.vacancies.services import (
     parse_company_info_from_url,
     pause_vacancy,
     publish_vacancy,
+    soft_delete_vacancy,
     update_vacancy,
 )
 
@@ -119,8 +120,9 @@ class VacancyListCreateApi(APIView):
 
 class VacancyDetailApi(APIView):
     """
-    GET /api/hr/vacancies/{id}/ — vacancy detail with criteria + questions
-    PUT /api/hr/vacancies/{id}/ — update vacancy
+    GET    /api/hr/vacancies/{id}/ — vacancy detail with criteria + questions
+    PUT    /api/hr/vacancies/{id}/ — update vacancy
+    DELETE /api/hr/vacancies/{id}/ — soft-delete an archived vacancy
     """
 
     permission_classes = [IsHRManager | IsAdmin]
@@ -175,6 +177,16 @@ class VacancyDetailApi(APIView):
 
         vacancy = update_vacancy(vacancy=vacancy, data=serializer.validated_data)
         return Response(VacancyDetailOutputSerializer(vacancy).data, status=status.HTTP_200_OK)
+
+    def delete(self, request: Request, vacancy_id: str) -> Response:
+        vacancy = get_vacancy_by_id(vacancy_id=vacancy_id, company=request.user.company)
+        if vacancy is None:
+            return Response({"detail": "Vacancy not found."}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            soft_delete_vacancy(vacancy=vacancy)
+        except ApplicationError as e:
+            return Response({"detail": e.message}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class VacancyStatusApi(APIView):

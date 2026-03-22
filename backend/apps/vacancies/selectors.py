@@ -10,6 +10,7 @@ def get_company_vacancies(
     *,
     company: Company,
     status: str | None = None,
+    include_deleted: bool = False,
 ) -> QuerySet[Vacancy]:
     """Return vacancies for a company, optionally filtered by status."""
     qs = (
@@ -42,6 +43,8 @@ def get_company_vacancies(
             ),
         )
     )
+    if not include_deleted:
+        qs = qs.filter(is_deleted=False)
     if status:
         qs = qs.filter(status=status)
     return qs
@@ -83,6 +86,7 @@ def get_public_vacancies(
         .filter(
             status=Vacancy.Status.PUBLISHED,
             visibility=Vacancy.Visibility.PUBLIC,
+            is_deleted=False,
         )
         .select_related("company")
     )
