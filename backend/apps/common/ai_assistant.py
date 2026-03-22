@@ -43,7 +43,7 @@ TOOL_DEFINITIONS = [
     # --- Vacancies ---
     {"type": "function", "function": {"name": "list_vacancies", "description": "List company vacancies, optionally filtered by status", "parameters": {"type": "object", "properties": {"status": {"type": "string", "enum": ["draft", "published", "paused", "archived"], "description": "Filter by vacancy status"}}}}},
     {"type": "function", "function": {"name": "create_vacancy", "description": "Create a new job vacancy", "parameters": {"type": "object", "properties": {"title": {"type": "string", "description": "Job title"}, "description": {"type": "string", "description": "Job description"}, "employer_name": {"type": "string", "description": "Employer company name to attach"}, "salary_min": {"type": "number"}, "salary_max": {"type": "number"}, "salary_currency": {"type": "string", "default": "USD"}, "location": {"type": "string"}, "is_remote": {"type": "boolean"}, "employment_type": {"type": "string", "enum": ["full_time", "part_time", "contract", "internship"]}, "experience_level": {"type": "string", "enum": ["junior", "middle", "senior", "lead", "director"]}, "skills": {"type": "array", "items": {"type": "string"}}}, "required": ["title"]}}},
-    {"type": "function", "function": {"name": "update_vacancy", "description": "Update an existing vacancy's fields", "parameters": {"type": "object", "properties": {"vacancy_title": {"type": "string", "description": "Title of vacancy to update"}, "updates": {"type": "object", "description": "Fields to update: title, description, salary_min, salary_max, location, etc."}}, "required": ["vacancy_title", "updates"]}}},
+    {"type": "function", "function": {"name": "update_vacancy", "description": "Update an existing vacancy's fields. IMPORTANT: You MUST include the 'updates' parameter with the new values. Example: vacancy_title='React Developer', updates={'title': 'Senior React Developer'}", "parameters": {"type": "object", "properties": {"vacancy_title": {"type": "string", "description": "Current title of vacancy to find"}, "updates": {"type": "object", "description": "Object with fields to change. Available fields: title, description, requirements, responsibilities, skills, salary_min, salary_max, salary_currency, location, is_remote, employment_type, experience_level, deadline, visibility, interview_enabled, cv_required", "properties": {"title": {"type": "string"}, "description": {"type": "string"}, "salary_min": {"type": "number"}, "salary_max": {"type": "number"}, "location": {"type": "string"}, "is_remote": {"type": "boolean"}}}}, "required": ["vacancy_title", "updates"]}}},
     {"type": "function", "function": {"name": "publish_vacancy", "description": "Publish a draft or paused vacancy", "parameters": {"type": "object", "properties": {"vacancy_title": {"type": "string"}}, "required": ["vacancy_title"]}}},
     {"type": "function", "function": {"name": "pause_vacancy", "description": "Pause a published vacancy", "parameters": {"type": "object", "properties": {"vacancy_title": {"type": "string"}}, "required": ["vacancy_title"]}}},
     {"type": "function", "function": {"name": "archive_vacancy", "description": "Archive a published or paused vacancy", "parameters": {"type": "object", "properties": {"vacancy_title": {"type": "string"}}, "required": ["vacancy_title"]}}},
@@ -359,10 +359,16 @@ def _handle_update_vacancy(*, user, params):
 
     vacancy = _resolve_vacancy(company=user.company, title=params.get("vacancy_title", ""))
     updates = params.get("updates", {})
+    if not updates:
+        return {
+            "success": False,
+            "message": f"No updates provided for vacancy '{vacancy.title}'. You must pass the 'updates' parameter with fields to change, e.g. updates={{\"title\": \"New Title\"}}.",
+            "data": {"id": str(vacancy.id), "title": vacancy.title},
+        }
     vacancy = update_vacancy(vacancy=vacancy, data=updates)
     return {
         "success": True,
-        "message": f"Updated vacancy '{vacancy.title}'.",
+        "message": f"Updated vacancy '{vacancy.title}'. Changed: {', '.join(updates.keys())}.",
         "data": {"id": str(vacancy.id), "title": vacancy.title},
         "action": "update_vacancy",
     }
