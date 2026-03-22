@@ -58,7 +58,7 @@ function goToJobDetail(id: string): void {
       <!-- Jobs list -->
       <div v-else-if="jobs.length > 0" class="scroll-animate space-y-3">
         <div
-          v-for="job in jobs.slice(0, 6)"
+          v-for="job in jobs.slice(0, 10)"
           :key="job.id"
           class="flex cursor-pointer items-center justify-between rounded-xl border border-gray-100 bg-white p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-gray-200 hover:shadow-lg hover:shadow-gray-100/50"
           @click="goToJobDetail(job.id)"
