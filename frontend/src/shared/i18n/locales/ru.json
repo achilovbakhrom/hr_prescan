@@ -641,6 +641,7 @@
     "orCreateNew": "или создайте новую",
     "namePlaceholder": "например, ТехКорп",
     "urlPlaceholder": "https://company.com/about",
+    "websiteUrl": "URL сайта",
     "fetchFromUrl": "Загрузить с URL",
     "uploadFile": "Загрузить и распознать"
   },

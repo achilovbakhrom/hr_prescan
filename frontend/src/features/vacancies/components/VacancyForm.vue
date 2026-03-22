@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
 import Dropdown from 'primevue/dropdown'
@@ -13,16 +12,15 @@ import Button from 'primevue/button'
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
 import FileUpload from 'primevue/fileupload'
+import Dialog from 'primevue/dialog'
+import SelectButton from 'primevue/selectbutton'
 import { getEmploymentOptions, getExperienceOptions, CURRENCY_OPTIONS, getVisibilityOptions, getInterviewModeOptions } from '../constants/formOptions'
-import { vacancyService } from '../services/vacancy.service'
 import { extractErrorMessage } from '@/shared/api/errors'
 import { employerService } from '@/features/employers/services/employer.service'
-import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { EmployerCompany } from '@/features/employers/types/employer.types'
 import type { CreateVacancyRequest, EmploymentType, ExperienceLevel, InterviewMode, VacancyVisibility } from '../types/vacancy.types'
 
 const { t } = useI18n()
-const router = useRouter()
 
 const employmentOptions = computed(() => getEmploymentOptions(t))
 const experienceOptions = computed(() => getExperienceOptions(t))
@@ -74,44 +72,78 @@ onMounted(async () => {
   }
 })
 
-const parsingFile = ref(false)
-const parsingUrl = ref(false)
-const parseError = ref('')
-const websiteUrl = ref('')
+// --- Create Employer Dialog ---
+const showCreateDialog = ref(false)
+const createMode = ref<'manual' | 'file' | 'website'>('manual')
+const createModeOptions = computed(() => [
+  { label: t('employers.manual'), value: 'manual' },
+  { label: t('employers.file'), value: 'file' },
+  { label: t('employers.fromWebsite'), value: 'website' },
+])
+const newEmployerName = ref('')
+const newEmployerIndustry = ref('')
+const newEmployerWebsite = ref('')
+const newEmployerDescription = ref('')
+const newEmployerUrl = ref('')
+const creatingEmployer = ref(false)
+const createError = ref('')
 
-async function handleFileUpload(event: { files: File[] }): void {
+function openCreateDialog(): void {
+  newEmployerName.value = ''
+  newEmployerIndustry.value = ''
+  newEmployerWebsite.value = ''
+  newEmployerDescription.value = ''
+  newEmployerUrl.value = ''
+  createMode.value = 'manual'
+  createError.value = ''
+  showCreateDialog.value = true
+}
+
+async function handleCreateEmployer(): Promise<void> {
+  if (!newEmployerName.value) return
+  creatingEmployer.value = true
+  createError.value = ''
+  try {
+    let employer: EmployerCompany
+    if (createMode.value === 'file') {
+      // File mode handled separately via handleCreateFromFile
+      return
+    } else if (createMode.value === 'website') {
+      employer = await employerService.createFromUrl(newEmployerName.value, newEmployerUrl.value)
+    } else {
+      employer = await employerService.create({
+        name: newEmployerName.value,
+        industry: newEmployerIndustry.value,
+        website: newEmployerWebsite.value,
+        description: newEmployerDescription.value,
+      })
+    }
+    employersList.value.push(employer)
+    employerId.value = employer.id
+    showCreateDialog.value = false
+  } catch (err: unknown) {
+    createError.value = extractErrorMessage(err)
+  } finally {
+    creatingEmployer.value = false
+  }
+}
+
+async function handleCreateFromFile(event: { files: File[] }): Promise<void> {
   const file = event.files?.[0]
-  if (!file) return
-
-  parsingFile.value = true
-  parseError.value = ''
+  if (!file || !newEmployerName.value) return
+  creatingEmployer.value = true
+  createError.value = ''
   try {
-    companyInfo.value = await vacancyService.parseCompanyFile(file)
+    const employer = await employerService.createFromFile(newEmployerName.value, file)
+    employersList.value.push(employer)
+    employerId.value = employer.id
+    showCreateDialog.value = false
   } catch (err: unknown) {
-    parseError.value = extractErrorMessage(err)
+    createError.value = extractErrorMessage(err)
   } finally {
-    parsingFile.value = false
+    creatingEmployer.value = false
   }
 }
-
-async function handleUrlParse(): Promise<void> {
-  if (!websiteUrl.value) return
-
-  parsingUrl.value = true
-  parseError.value = ''
-  try {
-    companyInfo.value = await vacancyService.parseCompanyUrl(websiteUrl.value)
-  } catch (err: unknown) {
-    parseError.value = extractErrorMessage(err)
-  } finally {
-    parsingUrl.value = false
-  }
-}
-
-const isParsing = ref(false)
-watch([parsingFile, parsingUrl], () => {
-  isParsing.value = parsingFile.value || parsingUrl.value
-})
 
 watch(() => props.initialData, (d) => {
   if (!d) return
@@ -234,20 +266,10 @@ function handleSave(): void {
         </div>
       </TabPanel>
 
-      <!-- Tab 2: Company Info -->
+      <!-- Tab 2: Company -->
       <TabPanel :header="t('vacancies.form.companyInfo')">
         <div class="space-y-4 py-2">
-          <div class="rounded-lg border border-blue-200 bg-blue-50/40 p-4">
-            <div class="flex items-center gap-2">
-              <i class="pi pi-building text-blue-600"></i>
-              <span class="text-sm font-semibold text-blue-800">{{ t('vacancies.form.companyInfoLabel') }}</span>
-            </div>
-            <p class="mt-2 text-sm text-gray-600">
-              {{ t('vacancies.form.companyInfoHint') }}
-            </p>
-          </div>
-
-          <!-- Employer dropdown -->
+          <!-- Employer dropdown + Add New -->
           <div>
             <label class="mb-1 block text-sm font-medium">{{ t('employers.selectEmployer') }}</label>
             <div class="flex gap-2">
@@ -259,100 +281,127 @@ function handleSave(): void {
                 :placeholder="t('employers.selectEmployer')"
                 :loading="loadingEmployers"
                 show-clear
+                filter
                 class="flex-1"
               />
               <Button
                 type="button"
-                :label="t('employers.createNew')"
                 icon="pi pi-plus"
+                :label="t('employers.createNew')"
                 severity="secondary"
                 size="small"
-                @click="router.push({ name: ROUTE_NAMES.EMPLOYER_CREATE })"
+                @click="openCreateDialog"
               />
             </div>
           </div>
 
           <!-- Selected employer preview -->
-          <div
-            v-if="selectedEmployer"
-            class="rounded-lg border border-gray-200 bg-gray-50 p-4"
-          >
-            <div class="mb-2 flex items-center gap-2">
-              <div
-                v-if="selectedEmployer.logo"
-                class="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white"
-              >
+          <div v-if="selectedEmployer" class="rounded-xl border border-gray-200 bg-gray-50 p-4">
+            <div class="flex items-center gap-3">
+              <div v-if="selectedEmployer.logo" class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white ring-1 ring-gray-200">
                 <img :src="selectedEmployer.logo" :alt="selectedEmployer.name" class="h-full w-full object-contain" />
               </div>
-              <div v-else class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-                <i class="pi pi-building text-sm"></i>
+              <div v-else class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+                <i class="pi pi-building"></i>
               </div>
-              <div>
+              <div class="min-w-0 flex-1">
                 <p class="font-semibold text-gray-900">{{ selectedEmployer.name }}</p>
                 <p v-if="selectedEmployer.industry" class="text-xs text-gray-500">{{ selectedEmployer.industry }}</p>
+                <a v-if="selectedEmployer.website" :href="selectedEmployer.website" target="_blank" class="text-xs text-blue-500 hover:underline">{{ selectedEmployer.website }}</a>
               </div>
             </div>
-            <p v-if="selectedEmployer.description" class="whitespace-pre-line text-sm text-gray-600">
-              {{ selectedEmployer.description }}
+            <p v-if="selectedEmployer.description" class="mt-3 whitespace-pre-line text-sm leading-relaxed text-gray-600">
+              {{ selectedEmployer.description.length > 300 ? selectedEmployer.description.slice(0, 300) + '...' : selectedEmployer.description }}
             </p>
           </div>
 
-          <!-- Fallback: manual company info -->
-          <div v-if="!employerId" class="border-t border-gray-100 pt-4">
-            <p class="mb-3 text-sm text-gray-500">{{ t('employers.orCreateNew') }}</p>
-
-            <!-- Option 1: Website URL -->
-            <div>
-              <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.fillFromWebsite') }}</label>
-              <p class="mb-2 text-xs text-gray-400">{{ t('vacancies.form.websiteHint') }}</p>
-              <div class="flex gap-2">
-                <InputText v-model="websiteUrl" class="flex-1" :placeholder="t('vacancies.form.websitePlaceholder')" :disabled="isParsing" />
-                <Button
-                  type="button"
-                  :label="t('vacancies.form.fetch')"
-                  icon="pi pi-globe"
-                  size="small"
-                  :loading="parsingUrl"
-                  :disabled="!websiteUrl || isParsing"
-                  @click="handleUrlParse"
-                />
-              </div>
-            </div>
-
-            <!-- Option 2: File upload -->
-            <div class="mt-4">
-              <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.uploadDocument') }}</label>
-              <p class="mb-2 text-xs text-gray-400">{{ t('vacancies.form.uploadHint') }}</p>
-              <div class="flex items-center gap-3">
-                <FileUpload
-                  mode="basic"
-                  accept=".pdf,.docx,.doc,.txt"
-                  :max-file-size="10000000"
-                  :choose-label="t('vacancies.form.uploadParse')"
-                  :auto="true"
-                  :custom-upload="true"
-                  @uploader="handleFileUpload"
-                  :disabled="isParsing"
-                  class="text-sm"
-                />
-                <span v-if="parsingFile" class="flex items-center gap-2 text-sm text-gray-500">
-                  <i class="pi pi-spinner pi-spin"></i> {{ t('vacancies.form.parsingFile') }}
-                </span>
-              </div>
-            </div>
-
-            <p v-if="parseError" class="mt-2 text-sm text-red-500">{{ parseError }}</p>
-
-            <!-- Result textarea -->
-            <div class="mt-4">
-              <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.companyDescription') }}</label>
-              <p class="mb-2 text-xs text-gray-400">{{ t('vacancies.form.companyDescriptionHint') }}</p>
-              <Textarea v-model="companyInfo" class="w-full" rows="8" :placeholder="t('vacancies.form.companyInfoPlaceholder')" />
-            </div>
+          <!-- Empty state -->
+          <div v-else class="rounded-xl border border-dashed border-gray-200 py-10 text-center">
+            <i class="pi pi-building mb-2 text-3xl text-gray-300"></i>
+            <p class="text-sm text-gray-500">{{ t('employers.selectEmployer') }}</p>
+            <p class="mt-1 text-xs text-gray-400">{{ t('employers.orCreateNew') }}</p>
           </div>
-
         </div>
       </TabPanel>
+
+      <!-- Create Employer Dialog -->
+      <Dialog
+        v-model:visible="showCreateDialog"
+        :header="t('employers.create')"
+        modal
+        :style="{ width: '500px' }"
+        :breakpoints="{ '640px': '95vw' }"
+      >
+        <div class="space-y-4">
+          <!-- Source toggle -->
+          <SelectButton v-model="createMode" :options="createModeOptions" option-label="label" option-value="value" class="w-full" />
+
+          <!-- Name (always required) -->
+          <div>
+            <label class="mb-1 block text-sm font-medium">{{ t('employers.name') }} <span class="text-red-500">*</span></label>
+            <InputText v-model="newEmployerName" class="w-full" :placeholder="t('employers.namePlaceholder')" />
+          </div>
+
+          <!-- Manual fields -->
+          <template v-if="createMode === 'manual'">
+            <div>
+              <label class="mb-1 block text-sm font-medium">{{ t('employers.industry') }}</label>
+              <InputText v-model="newEmployerIndustry" class="w-full" />
+            </div>
+            <div>
+              <label class="mb-1 block text-sm font-medium">{{ t('employers.website') }}</label>
+              <InputText v-model="newEmployerWebsite" class="w-full" placeholder="https://" />
+            </div>
+            <div>
+              <label class="mb-1 block text-sm font-medium">{{ t('employers.description') }}</label>
+              <Textarea v-model="newEmployerDescription" class="w-full" rows="4" />
+            </div>
+          </template>
+
+          <!-- Website parsing -->
+          <template v-if="createMode === 'website'">
+            <div>
+              <label class="mb-1 block text-sm font-medium">{{ t('employers.websiteUrl') }}</label>
+              <InputText v-model="newEmployerUrl" class="w-full" :placeholder="t('employers.urlPlaceholder')" />
+              <p class="mt-1 text-xs text-gray-400">AI will extract company info from this page</p>
+            </div>
+          </template>
+
+          <!-- File parsing -->
+          <template v-if="createMode === 'file'">
+            <div>
+              <label class="mb-1 block text-sm font-medium">{{ t('employers.uploadFile') }}</label>
+              <p class="mb-2 text-xs text-gray-400">PDF, DOCX, or TXT. AI will extract company info.</p>
+              <FileUpload
+                mode="basic"
+                accept=".pdf,.docx,.doc,.txt"
+                :max-file-size="10000000"
+                :choose-label="t('employers.uploadFile')"
+                :auto="true"
+                :custom-upload="true"
+                :disabled="creatingEmployer"
+                @uploader="handleCreateFromFile"
+              />
+            </div>
+          </template>
+
+          <p v-if="createError" class="text-sm text-red-500">{{ createError }}</p>
+        </div>
+
+        <template #footer>
+          <div class="flex justify-end gap-2">
+            <Button :label="t('common.cancel')" severity="secondary" text @click="showCreateDialog = false" />
+            <Button
+              v-if="createMode !== 'file'"
+              :label="t('common.save')"
+              icon="pi pi-check"
+              :loading="creatingEmployer"
+              :disabled="!newEmployerName"
+              @click="handleCreateEmployer"
+            />
+          </div>
+        </template>
+      </Dialog>
 
       <!-- Tab 3: Prescanning -->
       <TabPanel :header="t('vacancies.form.prescanning')">
