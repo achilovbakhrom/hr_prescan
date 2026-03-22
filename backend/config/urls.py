@@ -33,6 +33,10 @@ from apps.notifications.urls import (
     hr_candidate_urlpatterns as notification_hr_candidate_urlpatterns,
     notification_urlpatterns,
 )
+from apps.integrations.urls import (
+    hr_telegram_urlpatterns,
+    telegram_urlpatterns,
+)
 from apps.vacancies.urls import employer_urlpatterns as employer_hr_urlpatterns
 from apps.vacancies.urls import hr_urlpatterns as vacancy_hr_urlpatterns
 from apps.vacancies.urls import public_urlpatterns as vacancy_public_urlpatterns
@@ -68,6 +72,9 @@ urlpatterns = [
     # Subscriptions
     path("api/subscriptions/", include((subscription_public_urlpatterns, "subscriptions"))),
     path("api/hr/subscription/", include((subscription_hr_urlpatterns, "hr-subscription"))),
+    # Telegram integration
+    path("api/telegram/", include((telegram_urlpatterns, "telegram"))),
+    path("api/hr/telegram/", include((hr_telegram_urlpatterns, "hr-telegram"))),
     # Admin panel
     path("api/admin-panel/", include((admin_urlpatterns, "admin-panel"))),
     # API documentation

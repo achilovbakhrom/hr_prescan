@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "apps.interviews",
     "apps.notifications",
     "apps.subscriptions",
+    "apps.integrations",
 ]
 
 MIDDLEWARE = [
@@ -279,3 +280,7 @@ GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
 # OpenAI
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 OPENAI_CHAT_MODEL = os.environ.get("OPENAI_CHAT_MODEL", "gpt-4o-mini")
+
+# Telegram bot
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+TELEGRAM_WEBHOOK_SECRET = os.environ.get("TELEGRAM_WEBHOOK_SECRET", "")
