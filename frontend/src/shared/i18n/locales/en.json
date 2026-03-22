@@ -641,6 +641,7 @@
     "orCreateNew": "or create a new one",
     "namePlaceholder": "e.g. TechCorp Inc.",
     "urlPlaceholder": "https://company.com/about",
+    "websiteUrl": "Website URL",
     "fetchFromUrl": "Fetch from URL",
     "uploadFile": "Upload & Parse"
   },
