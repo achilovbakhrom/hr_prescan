@@ -30,7 +30,16 @@ When the user asks to create a vacancy, do NOT create it immediately. Instead, c
 5. After creating, offer to generate prescanning questions.
 
 For other creation operations (employer, etc.), follow a similar pattern — ask for required fields first.
-For quick operations (list, status changes, delete), execute immediately without asking extra questions.
+For quick operations (list, single status changes), execute immediately without asking extra questions.
+
+DESTRUCTIVE OPERATIONS — ALWAYS CONFIRM FIRST:
+Before executing these actions, ALWAYS ask "Are you sure?" and wait for confirmation:
+- delete_vacancy: "Are you sure you want to delete vacancy 'X'? This cannot be undone."
+- delete_employer: "Are you sure you want to delete employer 'X'?"
+- archive_vacancy: "Are you sure you want to archive vacancy 'X'? This will expire all pending sessions."
+- bulk_update_status: "This will move N candidates from X to Y. Are you sure?"
+- cancel_interview: "Are you sure you want to cancel the interview for X?"
+Only execute the tool AFTER the user confirms (says yes/sure/ok/confirm/да).
 
 If the conversation history is provided in context, use it to understand the ongoing discussion.
 """
@@ -194,10 +203,28 @@ def process_ai_command(*, user, message, context=None):
                         "content": json.dumps(result, default=str),
                     })
             else:
-                # GPT is done — return final text response
+                # GPT is done — check if any tool actually failed
+                has_errors = any(
+                    a.get("result", {}).get("error") or a.get("result", {}).get("success") is False
+                    for a in actions_taken
+                )
+                gpt_message = msg.content or "Done."
+
+                # If tools failed but GPT said success, append error details
+                if has_errors:
+                    error_details = []
+                    for a in actions_taken:
+                        err = a.get("result", {}).get("error")
+                        if err:
+                            error_details.append(f"- {a['tool']}: {err}")
+                        elif a.get("result", {}).get("success") is False:
+                            error_details.append(f"- {a['tool']}: {a['result'].get('message', 'failed')}")
+                    if error_details:
+                        gpt_message += "\n\n⚠️ Some actions encountered errors:\n" + "\n".join(error_details)
+
                 return {
-                    "success": True,
-                    "message": msg.content or "Done.",
+                    "success": not has_errors,
+                    "message": gpt_message,
                     "actions": actions_taken,
                 }
 
@@ -222,35 +249,41 @@ def process_ai_command(*, user, message, context=None):
 # ---------------------------------------------------------------------------
 
 def _resolve_vacancy(*, company, title):
-    """Find a vacancy by fuzzy title match within the company."""
+    """Find a vacancy by fuzzy title match. Raises if ambiguous or not found."""
     from apps.vacancies.models import Vacancy
 
-    vacancy = (
+    matches = list(
         Vacancy.objects
         .filter(company=company, is_deleted=False, title__icontains=title)
-        .first()
+        .values_list("id", "title")[:10]
     )
-    if vacancy is None:
+    if not matches:
         raise ApplicationError(f"Vacancy matching '{title}' not found.")
-    return vacancy
+    if len(matches) > 1:
+        names = ", ".join(f'"{m[1]}"' for m in matches)
+        raise ApplicationError(f"Multiple vacancies match '{title}': {names}. Please be more specific.")
+    return Vacancy.objects.get(id=matches[0][0])
 
 
 def _resolve_employer(*, company, name):
-    """Find an employer by fuzzy name match within the company."""
+    """Find an employer by fuzzy name match. Raises if ambiguous or not found."""
     from apps.vacancies.models import EmployerCompany
 
-    employer = (
+    matches = list(
         EmployerCompany.objects
         .filter(company=company, name__icontains=name)
-        .first()
+        .values_list("id", "name")[:10]
     )
-    if employer is None:
+    if not matches:
         raise ApplicationError(f"Employer matching '{name}' not found.")
-    return employer
+    if len(matches) > 1:
+        names = ", ".join(f'"{m[1]}"' for m in matches)
+        raise ApplicationError(f"Multiple employers match '{name}': {names}. Please be more specific.")
+    return EmployerCompany.objects.get(id=matches[0][0])
 
 
 def _resolve_application(*, company, candidate_email_or_name, vacancy_title=None):
-    """Find an application by candidate email or name, optionally scoped to a vacancy."""
+    """Find an application by candidate email or name. Raises if ambiguous."""
     from apps.applications.models import Application
     from django.db.models import Q
 
@@ -263,12 +296,15 @@ def _resolve_application(*, company, candidate_email_or_name, vacancy_title=None
         qs = qs.filter(vacancy__title__icontains=vacancy_title)
 
     # Try email match first, then name
-    app = qs.filter(candidate_email__icontains=candidate_email_or_name).first()
-    if app is None:
-        app = qs.filter(candidate_name__icontains=candidate_email_or_name).first()
-    if app is None:
+    matches = list(qs.filter(candidate_email__icontains=candidate_email_or_name).values_list("id", "candidate_name", "candidate_email")[:10])
+    if not matches:
+        matches = list(qs.filter(candidate_name__icontains=candidate_email_or_name).values_list("id", "candidate_name", "candidate_email")[:10])
+    if not matches:
         raise ApplicationError(f"Candidate matching '{candidate_email_or_name}' not found.")
-    return app
+    if len(matches) > 1:
+        names = ", ".join(f'{m[1]} ({m[2]})' for m in matches)
+        raise ApplicationError(f"Multiple candidates match '{candidate_email_or_name}': {names}. Please be more specific (use email).")
+    return Application.objects.select_related("vacancy").get(id=matches[0][0])
 
 
 def _resolve_interview_for_candidate(*, company, candidate_email_or_name):
@@ -298,6 +334,7 @@ def _handle_list_vacancies(*, user, params):
     from apps.vacancies.selectors import get_company_vacancies
 
     vacancies = get_company_vacancies(company=user.company, status=params.get("status"))
+    total = vacancies.count()
     data = [
         {
             "id": str(v.id),
@@ -307,9 +344,12 @@ def _handle_list_vacancies(*, user, params):
         }
         for v in vacancies[:20]
     ]
+    msg = f"Found {total} vacanc{'y' if total == 1 else 'ies'}."
+    if total > 20:
+        msg += f" Showing first 20."
     return {
         "success": True,
-        "message": f"Found {len(data)} vacanc{'y' if len(data) == 1 else 'ies'}.",
+        "message": msg,
         "data": data,
         "action": "list_vacancies",
     }
