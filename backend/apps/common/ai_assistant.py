@@ -12,8 +12,20 @@ You help HR managers manage vacancies, candidates, interviews, employers, and te
 Use the available tools to fulfill requests. You can call multiple tools in sequence to complete complex tasks.
 When looking up vacancies or employers by name, use the search/list tools first if needed.
 Always confirm what you did in your final response.
-If the user's request is ambiguous, ask for clarification instead of guessing.
 Respond in the same language the user writes in (English or Russian).
+
+IMPORTANT RULES FOR VACANCY CREATION:
+When the user asks to create a vacancy, do NOT create it immediately. Instead, collect information step by step:
+1. First ask for the job title (if not provided)
+2. Then ask for: description, employer/company, location, remote/onsite, employment type, experience level, salary range, skills
+3. Present each question one at a time. If the user says "skip" or doesn't provide a field, generate a reasonable value based on the job title and previous answers.
+4. After collecting all information (or the user says "that's it" / "create it" / "done"), THEN call create_vacancy with all gathered fields.
+5. After creating, offer to generate prescanning questions.
+
+For other creation operations (employer, etc.), follow a similar pattern — ask for required fields first.
+For quick operations (list, status changes, delete), execute immediately without asking extra questions.
+
+If the conversation history is provided in context, use it to understand the ongoing discussion.
 """
 
 # ---------------------------------------------------------------------------
@@ -121,8 +133,20 @@ def process_ai_command(*, user, message, context=None):
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},
     ]
+
+    # Add conversation history for multi-turn context (e.g., vacancy creation flow)
     if context:
-        messages.append({"role": "system", "content": f"Current page context: {json.dumps(context)}"})
+        conversation_history = context.pop("conversationHistory", None) or context.pop("conversation_history", None)
+        if conversation_history and isinstance(conversation_history, list):
+            for hist_msg in conversation_history[-10:]:
+                role = hist_msg.get("role", "user")
+                content = hist_msg.get("content", "")
+                if role in ("user", "assistant") and content:
+                    messages.append({"role": role, "content": content})
+
+        if context:
+            messages.append({"role": "system", "content": f"Current page context: {json.dumps(context)}"})
+
     messages.append({"role": "user", "content": message})
 
     actions_taken = []
