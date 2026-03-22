@@ -56,7 +56,7 @@ function goToJobDetail(id: string): void {
       </div>
 
       <!-- Jobs list -->
-      <div v-else-if="jobs.length > 0" class="scroll-animate space-y-3">
+      <div v-else-if="jobs.length > 0" class="space-y-3">
         <div
           v-for="job in jobs.slice(0, 10)"
           :key="job.id"
@@ -84,7 +84,7 @@ function goToJobDetail(id: string): void {
       </div>
 
       <!-- Empty state -->
-      <div v-else class="scroll-animate rounded-2xl border border-dashed border-gray-200 py-16 text-center">
+      <div v-else class="rounded-2xl border border-dashed border-gray-200 py-16 text-center">
         <i class="pi pi-briefcase mb-3 text-4xl text-gray-300"></i>
         <p class="text-gray-500">{{ t('landing.noJobsYet') }}</p>
         <p class="mt-1 text-sm text-gray-400">{{ t('landing.noJobsCheckBack') }}</p>
