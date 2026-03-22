@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import ProgressBar from 'primevue/progressbar'
+import { apiClient } from '@/shared/api/client'
 import { candidateService } from '../services/candidate.service'
+import VoiceMessageBubble from '@/features/interviews/components/VoiceMessageBubble.vue'
 
 const props = defineProps<{
   candidateId: string
@@ -12,6 +14,9 @@ interface ChatMessage {
   role: 'ai' | 'candidate'
   text: string
   timestamp: string
+  messageType?: 'text' | 'voice'
+  audioUrl?: string
+  duration?: number
 }
 
 interface InterviewScore {
@@ -55,16 +60,43 @@ function formatTime(ts: string): string {
   return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
+const audioBlobUrls = ref<Record<number, string>>({})
+
+async function loadAudioBlob(messageIndex: number): Promise<void> {
+  if (!interview.value || audioBlobUrls.value[messageIndex]) return
+  try {
+    const response = await apiClient.get(
+      `/hr/interviews/${interview.value.id}/voice/${messageIndex}/audio/`,
+      { responseType: 'blob' }
+    )
+    audioBlobUrls.value[messageIndex] = URL.createObjectURL(response.data as Blob)
+  } catch {
+    // Audio not available
+  }
+}
+
 onMounted(async () => {
   loading.value = true
   try {
     const data = await candidateService.getCandidateInterview(props.candidateId, props.sessionType) as unknown as InterviewData
     interview.value = data
+
+    if (data.chatHistory) {
+      data.chatHistory.forEach((msg: ChatMessage, idx: number) => {
+        if (msg.messageType === 'voice') {
+          loadAudioBlob(idx)
+        }
+      })
+    }
   } catch {
     error.value = 'Interview data not available yet.'
   } finally {
     loading.value = false
   }
+})
+
+onBeforeUnmount(() => {
+  Object.values(audioBlobUrls.value).forEach(url => URL.revokeObjectURL(url))
 })
 </script>
 
@@ -165,7 +197,21 @@ onMounted(async () => {
             class="max-w-[75%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed"
             :class="msg.role === 'ai' ? 'rounded-tl-md bg-white border border-gray-200 text-gray-800' : 'rounded-tr-md bg-blue-600 text-white'"
           >
-            <p class="whitespace-pre-wrap">{{ msg.text }}</p>
+            <!-- Voice message -->
+            <template v-if="msg.messageType === 'voice'">
+              <div class="mb-1 flex items-center gap-1 text-[10px] opacity-70">
+                <i class="pi pi-microphone"></i> Voice message
+              </div>
+              <VoiceMessageBubble
+                :audio-url="audioBlobUrls[idx] || ''"
+                :duration="msg.duration || 0"
+                :transcript="msg.text"
+              />
+            </template>
+            <!-- Text message -->
+            <template v-else>
+              <p class="whitespace-pre-wrap">{{ msg.text }}</p>
+            </template>
             <p class="mt-1 text-[10px] opacity-50">{{ formatTime(msg.timestamp) }}</p>
           </div>
         </div>

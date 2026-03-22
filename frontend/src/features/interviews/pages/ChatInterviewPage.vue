@@ -4,17 +4,21 @@ import { useRoute, useRouter } from 'vue-router'
 import Button from 'primevue/button'
 import { interviewService } from '../services/interview.service'
 import type { ChatMessage, InterviewDetail } from '../types/interview.types'
+import VoiceRecordButton from '../components/VoiceRecordButton.vue'
+import VoiceMessageBubble from '../components/VoiceMessageBubble.vue'
 
 const route = useRoute()
 const router = useRouter()
 const token = route.params.token as string
 const showLeaveConfirm = ref(false)
 const isMinimized = ref(false)
+const isClosed = ref(false)
 
 const interview = ref<InterviewDetail | null>(null)
 const messages = ref<ChatMessage[]>([])
 const inputMessage = ref('')
 const sending = ref(false)
+const sendingVoice = ref(false)
 const loading = ref(true)
 const isTyping = ref(false)
 const isCompleted = ref(false)
@@ -174,6 +178,76 @@ function formatTime(timestamp: string): string {
   return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
+function getAudioUrl(index: number): string {
+  return interviewService.getVoiceAudioUrl(token, index)
+}
+
+async function handleVoiceRecorded(blob: Blob, voiceDuration: number): Promise<void> {
+  if (sendingVoice.value || isCompleted.value) return
+
+  sendingVoice.value = true
+
+  messages.value.push({
+    role: 'candidate',
+    text: 'Transcribing...',
+    timestamp: new Date().toISOString(),
+    messageType: 'voice',
+    duration: voiceDuration,
+  })
+
+  await nextTick()
+  scrollToBottom()
+
+  isTyping.value = true
+  await nextTick()
+  scrollToBottom()
+
+  try {
+    const result = await interviewService.sendVoiceMessage(token, blob, voiceDuration)
+
+    // Update placeholder with real transcript (audioUrl uses getAudioUrl(idx) in template)
+    const lastCandidateIdx = messages.value.length - 1
+    const lastCandidateMsg = messages.value[lastCandidateIdx]
+    if (lastCandidateMsg && lastCandidateMsg.role === 'candidate') {
+      lastCandidateMsg.text = result.candidateTranscript
+    }
+
+    isTyping.value = false
+    messages.value.push(result.aiMessage)
+
+    if (result.aiMessage.text.includes('[INTERVIEW_COMPLETE]') || result.aiMessage.text.includes('[END]')) {
+      isCompleted.value = true
+      const lastMsg = messages.value[messages.value.length - 1]
+      lastMsg.text = lastMsg.text.replace(/\[INTERVIEW_COMPLETE\]/g, '').replace(/\[END\]/g, '').trim()
+    }
+
+    try {
+      const updated = await interviewService.getInterviewByToken(token)
+      if (updated.status === 'completed') {
+        isCompleted.value = true
+      }
+    } catch {
+      // non-critical
+    }
+  } catch {
+    isTyping.value = false
+    // Remove the placeholder message
+    const lastIdx = messages.value.length - 1
+    if (messages.value[lastIdx]?.role === 'candidate' && messages.value[lastIdx]?.text === 'Transcribing...') {
+      messages.value.pop()
+    }
+    messages.value.push({
+      role: 'ai',
+      text: 'Sorry, there was an error processing your voice message. Please try again.',
+      timestamp: new Date().toISOString(),
+    })
+  } finally {
+    sendingVoice.value = false
+    await nextTick()
+    scrollToBottom()
+  }
+}
+
 function handleClose(): void {
   if (isCompleted.value) {
     router.push('/jobs')
@@ -250,7 +324,7 @@ function handleClose(): void {
     <template v-else-if="interview">
       <!-- Minimized bar -->
       <div
-        v-if="isMinimized"
+        v-if="isMinimized && !isClosed"
         class="fixed bottom-0 left-0 right-0 z-50 cursor-pointer border-t border-gray-200 bg-white px-4 py-3 shadow-lg transition-all hover:bg-gray-50"
         @click="isMinimized = false"
       >
@@ -269,6 +343,15 @@ function handleClose(): void {
               {{ messages.length }}
             </span>
             <i class="pi pi-chevron-up text-gray-400"></i>
+            <Button
+              icon="pi pi-times"
+              severity="secondary"
+              text
+              rounded
+              size="small"
+              title="Close"
+              @click.stop="isClosed = true"
+            />
           </div>
         </div>
       </div>
@@ -360,7 +443,29 @@ function handleClose(): void {
                 </div>
               </div>
 
-              <!-- Candidate message -->
+              <!-- Candidate voice message -->
+              <div v-else-if="msg.messageType === 'voice'" class="max-w-[80%]">
+                <div class="rounded-2xl rounded-tr-sm bg-blue-600 px-4 py-3 shadow-sm">
+                  <!-- Still transcribing — show placeholder -->
+                  <div v-if="msg.text === 'Transcribing...'" class="flex items-center gap-2 text-white/80">
+                    <i class="pi pi-spinner pi-spin text-xs"></i>
+                    <span class="text-[13px]">Transcribing voice message...</span>
+                  </div>
+                  <!-- Transcribed — show playable voice bubble -->
+                  <VoiceMessageBubble
+                    v-else
+                    :audio-url="getAudioUrl(idx)"
+                    :duration="msg.duration || 0"
+                    :transcript="msg.text"
+                  />
+                </div>
+                <span class="mt-1 block pr-1 text-right text-[10px] text-gray-400">
+                  {{ formatTime(msg.timestamp) }}
+                  <i class="pi pi-microphone ml-0.5 text-blue-400" style="font-size: 8px"></i>
+                </span>
+              </div>
+
+              <!-- Candidate text message -->
               <div v-else class="max-w-[80%]">
                 <div class="rounded-2xl rounded-tr-sm bg-blue-600 px-4 py-3 shadow-sm">
                   <p class="whitespace-pre-wrap text-[13px] leading-relaxed text-white">{{ msg.text }}</p>
@@ -426,11 +531,17 @@ function handleClose(): void {
                 rows="1"
                 class="w-full resize-none rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 pr-4 text-sm transition-colors placeholder:text-gray-400 focus:border-blue-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100"
                 placeholder="Type your answer..."
-                :disabled="sending"
+                :disabled="sending || sendingVoice"
                 @keydown="handleKeyDown"
               ></textarea>
             </div>
+            <VoiceRecordButton
+              v-if="!inputMessage.trim()"
+              :disabled="sending || sendingVoice || isCompleted"
+              @recorded="handleVoiceRecorded"
+            />
             <button
+              v-else
               class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-all"
               :class="canSend ? 'bg-blue-600 text-white shadow-md hover:bg-blue-700 hover:shadow-lg' : 'bg-gray-200 text-gray-400'"
               :disabled="!canSend"

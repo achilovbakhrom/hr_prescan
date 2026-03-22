@@ -8,6 +8,7 @@ from apps.interviews.apis import (
     HRApplicationInterviewApi,
     HRInterviewDetailApi,
     HRInterviewListApi,
+    HRVoiceMessageAudioApi,
     IntegrityFlagsApi,
     InterviewRecordingApi,
     InterviewRoomJoinApi,
@@ -17,6 +18,8 @@ from apps.interviews.apis import (
     ResetInterviewApi,
     ScheduleHumanInterviewApi,
     StartInterviewApi,
+    VoiceChatMessageApi,
+    VoiceMessageAudioApi,
 )
 
 # HR candidate-scoped URLs — mounted at /api/hr/candidates/
@@ -75,6 +78,11 @@ hr_interview_urlpatterns = [
         IntegrityFlagsApi.as_view(),
         name="interview-integrity-flags",
     ),
+    path(
+        "<uuid:interview_id>/voice/<int:message_index>/audio/",
+        HRVoiceMessageAudioApi.as_view(),
+        name="hr-voice-message-audio",
+    ),
 ]
 
 # Public URLs — mounted at /api/public/
@@ -103,6 +111,16 @@ public_urlpatterns = [
         "interview/<uuid:token>/chat/history/",
         ChatHistoryApi.as_view(),
         name="chat-history",
+    ),
+    path(
+        "interview/<uuid:token>/chat/voice/",
+        VoiceChatMessageApi.as_view(),
+        name="voice-chat-message",
+    ),
+    path(
+        "interview/<uuid:token>/chat/voice/<int:message_index>/audio/",
+        VoiceMessageAudioApi.as_view(),
+        name="voice-message-audio",
     ),
 ]
 
