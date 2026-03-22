@@ -324,85 +324,6 @@ function handleSave(): void {
         </div>
       </TabPanel>
 
-      <!-- Create Employer Dialog -->
-      <Dialog
-        v-model:visible="showCreateDialog"
-        :header="t('employers.create')"
-        modal
-        :style="{ width: '500px' }"
-        :breakpoints="{ '640px': '95vw' }"
-      >
-        <div class="space-y-4">
-          <!-- Source toggle -->
-          <SelectButton v-model="createMode" :options="createModeOptions" option-label="label" option-value="value" class="w-full" />
-
-          <!-- Name (always required) -->
-          <div>
-            <label class="mb-1 block text-sm font-medium">{{ t('employers.name') }} <span class="text-red-500">*</span></label>
-            <InputText v-model="newEmployerName" class="w-full" :placeholder="t('employers.namePlaceholder')" />
-          </div>
-
-          <!-- Manual fields -->
-          <template v-if="createMode === 'manual'">
-            <div>
-              <label class="mb-1 block text-sm font-medium">{{ t('employers.industry') }}</label>
-              <InputText v-model="newEmployerIndustry" class="w-full" />
-            </div>
-            <div>
-              <label class="mb-1 block text-sm font-medium">{{ t('employers.website') }}</label>
-              <InputText v-model="newEmployerWebsite" class="w-full" placeholder="https://" />
-            </div>
-            <div>
-              <label class="mb-1 block text-sm font-medium">{{ t('employers.description') }}</label>
-              <Textarea v-model="newEmployerDescription" class="w-full" rows="4" />
-            </div>
-          </template>
-
-          <!-- Website parsing -->
-          <template v-if="createMode === 'website'">
-            <div>
-              <label class="mb-1 block text-sm font-medium">{{ t('employers.websiteUrl') }}</label>
-              <InputText v-model="newEmployerUrl" class="w-full" :placeholder="t('employers.urlPlaceholder')" />
-              <p class="mt-1 text-xs text-gray-400">AI will extract company info from this page</p>
-            </div>
-          </template>
-
-          <!-- File parsing -->
-          <template v-if="createMode === 'file'">
-            <div>
-              <label class="mb-1 block text-sm font-medium">{{ t('employers.uploadFile') }}</label>
-              <p class="mb-2 text-xs text-gray-400">PDF, DOCX, or TXT. AI will extract company info.</p>
-              <FileUpload
-                mode="basic"
-                accept=".pdf,.docx,.doc,.txt"
-                :max-file-size="10000000"
-                :choose-label="t('employers.uploadFile')"
-                :auto="true"
-                :custom-upload="true"
-                :disabled="creatingEmployer"
-                @uploader="handleCreateFromFile"
-              />
-            </div>
-          </template>
-
-          <p v-if="createError" class="text-sm text-red-500">{{ createError }}</p>
-        </div>
-
-        <template #footer>
-          <div class="flex justify-end gap-2">
-            <Button :label="t('common.cancel')" severity="secondary" text @click="showCreateDialog = false" />
-            <Button
-              v-if="createMode !== 'file'"
-              :label="t('common.save')"
-              icon="pi pi-check"
-              :loading="creatingEmployer"
-              :disabled="!newEmployerName"
-              @click="handleCreateEmployer"
-            />
-          </div>
-        </template>
-      </Dialog>
-
       <!-- Tab 3: Prescanning -->
       <TabPanel :header="t('vacancies.form.prescanning')">
         <div class="space-y-4 py-2">
@@ -489,4 +410,78 @@ function handleSave(): void {
       <Button type="submit" :label="t('common.save')" icon="pi pi-check" :loading="loading" :disabled="!canSave" />
     </div>
   </form>
+
+  <!-- Create Employer Dialog (outside form to avoid TabView swallowing it) -->
+  <Dialog
+    v-model:visible="showCreateDialog"
+    :header="t('employers.create')"
+    modal
+    :style="{ width: '500px' }"
+    :breakpoints="{ '640px': '95vw' }"
+  >
+    <div class="space-y-4">
+      <SelectButton v-model="createMode" :options="createModeOptions" option-label="label" option-value="value" class="w-full" />
+
+      <div>
+        <label class="mb-1 block text-sm font-medium">{{ t('employers.name') }} <span class="text-red-500">*</span></label>
+        <InputText v-model="newEmployerName" class="w-full" :placeholder="t('employers.namePlaceholder')" />
+      </div>
+
+      <template v-if="createMode === 'manual'">
+        <div>
+          <label class="mb-1 block text-sm font-medium">{{ t('employers.industry') }}</label>
+          <InputText v-model="newEmployerIndustry" class="w-full" />
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium">{{ t('employers.website') }}</label>
+          <InputText v-model="newEmployerWebsite" class="w-full" placeholder="https://" />
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium">{{ t('employers.description') }}</label>
+          <Textarea v-model="newEmployerDescription" class="w-full" rows="4" />
+        </div>
+      </template>
+
+      <template v-if="createMode === 'website'">
+        <div>
+          <label class="mb-1 block text-sm font-medium">{{ t('employers.websiteUrl') }}</label>
+          <InputText v-model="newEmployerUrl" class="w-full" :placeholder="t('employers.urlPlaceholder')" />
+          <p class="mt-1 text-xs text-gray-400">AI will extract company info from this page</p>
+        </div>
+      </template>
+
+      <template v-if="createMode === 'file'">
+        <div>
+          <label class="mb-1 block text-sm font-medium">{{ t('employers.uploadFile') }}</label>
+          <p class="mb-2 text-xs text-gray-400">PDF, DOCX, or TXT. AI will extract company info.</p>
+          <FileUpload
+            mode="basic"
+            accept=".pdf,.docx,.doc,.txt"
+            :max-file-size="10000000"
+            :choose-label="t('employers.uploadFile')"
+            :auto="true"
+            :custom-upload="true"
+            :disabled="creatingEmployer"
+            @uploader="handleCreateFromFile"
+          />
+        </div>
+      </template>
+
+      <p v-if="createError" class="text-sm text-red-500">{{ createError }}</p>
+    </div>
+
+    <template #footer>
+      <div class="flex justify-end gap-2">
+        <Button :label="t('common.cancel')" severity="secondary" text @click="showCreateDialog = false" />
+        <Button
+          v-if="createMode !== 'file'"
+          :label="t('common.save')"
+          icon="pi pi-check"
+          :loading="creatingEmployer"
+          :disabled="!newEmployerName"
+          @click="handleCreateEmployer"
+        />
+      </div>
+    </template>
+  </Dialog>
 </template>
