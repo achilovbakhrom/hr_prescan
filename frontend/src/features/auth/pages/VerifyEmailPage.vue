@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import Message from 'primevue/message'
 import { authService } from '../services/auth.service'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 
 const route = useRoute()
+const { t } = useI18n()
 
 const loading = ref(true)
 const success = ref(false)
@@ -39,31 +41,30 @@ onMounted(async () => {
     <div class="w-full max-w-md rounded-lg bg-white p-8 text-center shadow-md">
       <div v-if="loading" class="flex flex-col items-center gap-4">
         <i class="pi pi-spin pi-spinner text-4xl text-blue-600"></i>
-        <p class="text-gray-600">Verifying your email...</p>
+        <p class="text-gray-600">{{ t('auth.verifyEmail.verifying') }}</p>
       </div>
 
       <template v-else-if="success">
         <h1 class="mb-4 text-2xl font-bold text-green-700">
-          Email Verified
+          {{ t('auth.verifyEmail.success') }}
         </h1>
         <p class="mb-6 text-gray-600">
-          Your email has been successfully verified. You can now sign in to
-          your account.
+          {{ t('auth.verifyEmail.success') }}
         </p>
         <RouterLink :to="{ name: ROUTE_NAMES.LOGIN }">
-          <Button label="Go to Login" class="w-full" />
+          <Button :label="t('auth.verifyEmail.goToLogin')" class="w-full" />
         </RouterLink>
       </template>
 
       <template v-else>
         <h1 class="mb-4 text-2xl font-bold text-red-700">
-          Verification Failed
+          {{ t('auth.verifyEmail.error') }}
         </h1>
         <Message v-if="errorMessage" severity="error" class="mb-4">
           {{ errorMessage }}
         </Message>
         <RouterLink :to="{ name: ROUTE_NAMES.LOGIN }">
-          <Button label="Go to Login" severity="secondary" class="w-full" />
+          <Button :label="t('auth.verifyEmail.goToLogin')" severity="secondary" class="w-full" />
         </RouterLink>
       </template>
     </div>

@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Tag from 'primevue/tag'
 import Button from 'primevue/button'
+
+const { t } = useI18n()
 
 interface MatchDetails {
   overall?: number
@@ -99,7 +102,7 @@ function contactHref(label: string, value: string): string | undefined {
       <p class="text-xs text-gray-400">Click to download</p>
     </div>
     <Button
-      label="Download"
+      :label="t('candidates.cv')"
       icon="pi pi-download"
       size="small"
       outlined
@@ -129,7 +132,7 @@ function contactHref(label: string, value: string): string | undefined {
         <span class="text-xl font-bold">{{ props.matchScore }}%</span>
       </div>
       <div class="flex-1">
-        <p class="text-sm font-semibold text-gray-700">CV Match Score</p>
+        <p class="text-sm font-semibold text-gray-700">{{ t('candidates.matchScore') }}</p>
         <p v-if="props.matchDetails?.notes" class="mt-0.5 text-xs text-gray-500">{{ props.matchDetails.notes }}</p>
       </div>
     </div>

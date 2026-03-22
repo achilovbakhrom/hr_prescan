@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
 import Message from 'primevue/message'
@@ -7,6 +8,7 @@ import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { authService } from '@/features/auth/services/auth.service'
 import type { PendingInvitation } from '@/shared/types/auth.types'
 
+const { t } = useI18n()
 const authStore = useAuthStore()
 
 const firstName = ref('')
@@ -68,7 +70,7 @@ function formatDate(dateStr: string): string {
 
 <template>
   <div class="mx-auto max-w-2xl space-y-6">
-    <h1 class="text-2xl font-bold text-gray-900">My Profile</h1>
+    <h1 class="text-2xl font-bold text-gray-900">{{ t('settings.profile.title') }}</h1>
 
     <Message v-if="successMessage" severity="success" class="mb-4" :closable="true" @close="successMessage = null">
       {{ successMessage }}
@@ -138,23 +140,23 @@ function formatDate(dateStr: string): string {
       <form class="flex flex-col gap-4" @submit.prevent>
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div class="flex flex-col gap-1">
-            <label for="firstName" class="text-sm font-medium text-gray-700">First Name</label>
+            <label for="firstName" class="text-sm font-medium text-gray-700">{{ t('settings.profile.firstName') }}</label>
             <InputText id="firstName" v-model="firstName" class="w-full" disabled />
           </div>
           <div class="flex flex-col gap-1">
-            <label for="lastName" class="text-sm font-medium text-gray-700">Last Name</label>
+            <label for="lastName" class="text-sm font-medium text-gray-700">{{ t('settings.profile.lastName') }}</label>
             <InputText id="lastName" v-model="lastName" class="w-full" disabled />
           </div>
         </div>
 
         <div class="flex flex-col gap-1">
-          <label for="email" class="text-sm font-medium text-gray-700">Email</label>
+          <label for="email" class="text-sm font-medium text-gray-700">{{ t('settings.profile.email') }}</label>
           <InputText id="email" v-model="email" class="w-full" disabled />
           <small class="text-gray-400">Email cannot be changed</small>
         </div>
 
         <div class="flex flex-col gap-1">
-          <label for="phone" class="text-sm font-medium text-gray-700">Phone</label>
+          <label for="phone" class="text-sm font-medium text-gray-700">{{ t('settings.profile.phone') }}</label>
           <InputText id="phone" v-model="phone" class="w-full" disabled />
         </div>
       </form>
@@ -165,7 +167,7 @@ function formatDate(dateStr: string): string {
           <p>
             Email verified:
             <span :class="authStore.user?.emailVerified ? 'text-green-600' : 'text-red-600'">
-              {{ authStore.user?.emailVerified ? 'Yes' : 'No' }}
+              {{ authStore.user?.emailVerified ? t('common.yes') : t('common.no') }}
             </span>
           </p>
           <p v-if="authStore.user?.company">

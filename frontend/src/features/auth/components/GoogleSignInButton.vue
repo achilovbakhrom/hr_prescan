@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 const emit = defineEmits<{
   success: [credential: string]
   error: [message: string]
 }>()
 
+const { t } = useI18n()
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as string
 const loading = ref(false)
 const ready = ref(false)
@@ -161,6 +163,6 @@ onMounted(() => {
         class="opacity-75"
       />
     </svg>
-    <span>Continue with Google</span>
+    <span>{{ t('auth.signInWithGoogle') }}</span>
   </button>
 </template>

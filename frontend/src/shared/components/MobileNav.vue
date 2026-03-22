@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { USER_ROLES } from '@/shared/constants/roles'
+import LanguageSwitcher from '@/shared/components/LanguageSwitcher.vue'
 import type { UserRole } from '@/shared/types/auth.types'
 
 interface NavItem {
@@ -22,92 +24,93 @@ const emit = defineEmits<{
 
 const route = useRoute()
 const authStore = useAuthStore()
+const { t } = useI18n()
 
-const navItems: NavItem[] = [
+const navItems = computed<NavItem[]>(() => [
   {
-    label: 'Dashboard',
+    label: t('nav.dashboard'),
     icon: 'pi pi-home',
     to: '/dashboard',
     roles: [USER_ROLES.ADMIN, USER_ROLES.HR, USER_ROLES.CANDIDATE],
   },
   {
-    label: 'Admin Dashboard',
+    label: t('nav.admin'),
     icon: 'pi pi-shield',
     to: '/admin',
     roles: [USER_ROLES.ADMIN],
   },
   {
-    label: 'Companies',
+    label: t('nav.companies'),
     icon: 'pi pi-building',
     to: '/admin/companies',
     roles: [USER_ROLES.ADMIN],
   },
   {
-    label: 'Users',
+    label: t('nav.users'),
     icon: 'pi pi-users',
     to: '/admin/users',
     roles: [USER_ROLES.ADMIN],
   },
   {
-    label: 'Analytics',
+    label: t('nav.analytics'),
     icon: 'pi pi-chart-bar',
     to: '/admin/analytics',
     roles: [USER_ROLES.ADMIN],
   },
   {
-    label: 'Plans',
+    label: t('nav.plans'),
     icon: 'pi pi-list',
     to: '/admin/plans',
     roles: [USER_ROLES.ADMIN],
   },
   {
-    label: 'Vacancies',
+    label: t('nav.vacancies'),
     icon: 'pi pi-briefcase',
     to: '/vacancies',
     roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
   },
   {
-    label: 'Interviews',
+    label: t('nav.interviews'),
     icon: 'pi pi-calendar',
     to: '/interviews',
     roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
   },
   {
-    label: 'Team',
+    label: t('nav.team'),
     icon: 'pi pi-users',
     to: '/settings/team',
     roles: [USER_ROLES.ADMIN],
   },
   {
-    label: 'Company',
+    label: t('settings.company.title'),
     icon: 'pi pi-cog',
     to: '/settings/company',
     roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
   },
   {
-    label: 'Subscription',
+    label: t('nav.subscription'),
     icon: 'pi pi-credit-card',
     to: '/subscription',
     roles: [USER_ROLES.ADMIN],
   },
   {
-    label: 'My Applications',
+    label: t('nav.myApplications'),
     icon: 'pi pi-file',
     to: '/my-applications',
     roles: [USER_ROLES.CANDIDATE],
   },
   {
-    label: 'Browse Jobs',
+    label: t('nav.browseJobs'),
     icon: 'pi pi-search',
     to: '/jobs',
     roles: [USER_ROLES.CANDIDATE],
   },
-]
+])
 
 const filteredItems = computed(() => {
   const userRole = authStore.user?.role
   if (!userRole) return []
-  return navItems.filter((item) => item.roles.includes(userRole))
+  return navItems.value.filter((item) => item.roles.includes(userRole))
 })
 
 function isActive(path: string): boolean {
@@ -209,6 +212,11 @@ watch(
             </li>
           </ul>
         </nav>
+
+        <!-- Language switcher -->
+        <div class="border-t border-gray-200 px-4 py-3">
+          <LanguageSwitcher />
+        </div>
 
         <!-- User info footer -->
         <div

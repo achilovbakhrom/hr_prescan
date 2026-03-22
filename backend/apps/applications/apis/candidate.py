@@ -4,6 +4,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.common.messages import MSG_APPLICATION_NOT_FOUND
 from apps.applications.selectors import (
     get_candidate_application_by_id,
     get_candidate_applications,
@@ -41,7 +42,7 @@ class CandidateApplicationDetailApi(APIView):
         )
         if application is None:
             return Response(
-                {"detail": "Application not found."},
+                {"detail": str(MSG_APPLICATION_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 

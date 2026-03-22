@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import UsageMeter from '../components/UsageMeter.vue'
 import PlanCard from '../components/PlanCard.vue'
 import { useSubscriptionStore } from '../stores/subscription.store'
 import type { BillingPeriod } from '../types/subscription.types'
 
+const { t } = useI18n()
 const subscriptionStore = useSubscriptionStore()
 const showCancelConfirm = ref(false)
 const upgradePeriod = ref<BillingPeriod>('monthly')
@@ -31,7 +33,7 @@ onMounted(async () => {
 
 <template>
   <div class="space-y-6">
-    <h1 class="text-2xl font-bold">Subscription</h1>
+    <h1 class="text-2xl font-bold">{{ t('subscriptions.title') }}</h1>
 
     <div v-if="subscriptionStore.loading" class="py-12 text-center">
       <i class="pi pi-spinner pi-spin text-3xl text-gray-400"></i>
@@ -45,7 +47,7 @@ onMounted(async () => {
       >
         <div class="flex items-start justify-between">
           <div>
-            <h2 class="text-lg font-semibold">Current Plan</h2>
+            <h2 class="text-lg font-semibold">{{ t('subscriptions.currentPlan') }}</h2>
             <p class="mt-1 text-2xl font-bold text-blue-600">
               {{ subscriptionStore.currentSubscription.plan.name }}
             </p>
@@ -109,25 +111,25 @@ onMounted(async () => {
         v-if="subscriptionStore.usage"
         class="rounded-lg border border-gray-200 bg-white p-6"
       >
-        <h2 class="mb-4 text-lg font-semibold">Usage</h2>
+        <h2 class="mb-4 text-lg font-semibold">{{ t('subscriptions.usage') }}</h2>
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <UsageMeter
-            label="Vacancies"
+            :label="t('subscriptions.vacanciesUsed')"
             :used="subscriptionStore.usage.vacancies.used"
             :limit="subscriptionStore.usage.vacancies.limit"
           />
           <UsageMeter
-            label="Interviews"
+            :label="t('subscriptions.interviewsUsed')"
             :used="subscriptionStore.usage.interviews.used"
             :limit="subscriptionStore.usage.interviews.limit"
           />
           <UsageMeter
-            label="HR Users"
+            :label="t('subscriptions.hrUsersUsed')"
             :used="subscriptionStore.usage.hrUsers.used"
             :limit="subscriptionStore.usage.hrUsers.limit"
           />
           <UsageMeter
-            label="Storage"
+            :label="t('subscriptions.storageUsed')"
             :used="subscriptionStore.usage.storage.usedGb"
             :limit="subscriptionStore.usage.storage.limitGb"
             unit="GB"

@@ -13,6 +13,13 @@ from openai import OpenAI
 from apps.accounts.models import User
 from apps.applications.models import Application
 from apps.common.exceptions import ApplicationError
+from apps.common.messages import (
+    MSG_ALREADY_APPLIED,
+    MSG_CV_REQUIRED,
+    MSG_STATUS_TRANSITION_INVALID,
+    MSG_VACANCY_NOT_ACCEPTING,
+    MSG_VACANCY_NOT_FOUND,
+)
 from apps.interviews.models import Interview
 from apps.vacancies.models import Vacancy
 
@@ -125,13 +132,13 @@ def submit_application(
     try:
         vacancy = Vacancy.objects.get(id=vacancy_id)
     except Vacancy.DoesNotExist:
-        raise ApplicationError("Vacancy not found.")
+        raise ApplicationError(str(MSG_VACANCY_NOT_FOUND))
 
     if vacancy.status != Vacancy.Status.PUBLISHED:
-        raise ApplicationError("This vacancy is not accepting applications.")
+        raise ApplicationError(str(MSG_VACANCY_NOT_ACCEPTING))
 
     if vacancy.cv_required and not cv_file_path:
-        raise ApplicationError("A CV is required for this vacancy.")
+        raise ApplicationError(str(MSG_CV_REQUIRED))
 
     try:
         application = Application.objects.create(
@@ -144,7 +151,7 @@ def submit_application(
             cv_original_filename=cv_original_filename,
         )
     except IntegrityError:
-        raise ApplicationError("You have already applied to this vacancy.")
+        raise ApplicationError(str(MSG_ALREADY_APPLIED))
 
     if cv_file_path:
         from django.db import transaction
@@ -206,7 +213,7 @@ def update_application_status(
 
     if status not in allowed:
         raise ApplicationError(
-            f"Cannot transition from '{current}' to '{status}'."
+            str(MSG_STATUS_TRANSITION_INVALID).format(current=current, target=status)
         )
 
     # Reset to Applied = full pipeline restart
@@ -489,7 +496,9 @@ def bulk_move_by_filter(
     # Validate transition
     allowed = _STATUS_TRANSITIONS.get(from_status, set())
     if to_status not in allowed:
-        raise ApplicationError(f"Cannot transition from '{from_status}' to '{to_status}'.")
+        raise ApplicationError(
+            str(MSG_STATUS_TRANSITION_INVALID).format(current=from_status, target=to_status)
+        )
 
     qs = Application.objects.filter(
         vacancy_id=vacancy_id,

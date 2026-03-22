@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   visible: boolean
@@ -44,7 +47,7 @@ function handleSubmit(): void {
 <template>
   <Dialog
     :visible="visible"
-    header="Invite HR Member"
+    :header="t('settings.team.invite')"
     :modal="true"
     :style="{ width: '450px' }"
     @update:visible="!$event && emit('hide')"
@@ -52,7 +55,7 @@ function handleSubmit(): void {
     <form class="flex flex-col gap-4" @submit.prevent="handleSubmit">
       <div class="flex flex-col gap-1">
         <label for="inviteEmail" class="text-sm font-medium text-gray-700">
-          Email Address
+          {{ t('settings.team.email') }}
         </label>
         <InputText
           id="inviteEmail"
@@ -70,13 +73,13 @@ function handleSubmit(): void {
       <div class="flex justify-end gap-2">
         <Button
           type="button"
-          label="Cancel"
+          :label="t('common.cancel')"
           severity="secondary"
           @click="emit('hide')"
         />
         <Button
           type="submit"
-          label="Send Invitation"
+          :label="t('settings.team.send')"
           :loading="loading"
         />
       </div>

@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import PlanCard from '../components/PlanCard.vue'
 import { useSubscriptionStore } from '../stores/subscription.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { BillingPeriod } from '../types/subscription.types'
 
+const { t } = useI18n()
 const router = useRouter()
 const subscriptionStore = useSubscriptionStore()
 const billingPeriod = ref<BillingPeriod>('monthly')
@@ -26,7 +28,7 @@ onMounted(() => subscriptionStore.fetchPlans())
   <div class="mx-auto max-w-6xl px-4 py-16">
     <div class="text-center">
       <h1 class="text-4xl font-bold text-gray-900">
-        Choose Your Plan
+        {{ t('subscriptions.choosePlan') }}
       </h1>
       <p class="mt-4 text-lg text-gray-600">
         Scale your hiring process with the right plan for your team
@@ -35,13 +37,13 @@ onMounted(() => subscriptionStore.fetchPlans())
 
     <div class="mt-8 flex items-center justify-center gap-2">
       <Button
-        label="Monthly"
+        :label="t('subscriptions.monthly')"
         :outlined="billingPeriod !== 'monthly'"
         size="small"
         @click="togglePeriod('monthly')"
       />
       <Button
-        label="Yearly"
+        :label="t('subscriptions.yearly')"
         :outlined="billingPeriod !== 'yearly'"
         size="small"
         @click="togglePeriod('yearly')"
@@ -50,7 +52,7 @@ onMounted(() => subscriptionStore.fetchPlans())
         v-if="billingPeriod === 'yearly'"
         class="ml-2 text-sm font-medium text-green-600"
       >
-        Save up to 20%
+        {{ t('subscriptions.saveUpTo') }}
       </span>
     </div>
 

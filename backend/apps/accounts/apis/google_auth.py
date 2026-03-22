@@ -14,6 +14,7 @@ from django.conf import settings
 from apps.accounts.models import User
 from apps.accounts.serializers import UserOutputSerializer
 from apps.applications.services import bind_existing_applications
+from apps.common.messages import MSG_ACCOUNT_DEACTIVATED, MSG_GOOGLE_NO_EMAIL, MSG_INVALID_GOOGLE_TOKEN
 
 logger = logging.getLogger(__name__)
 
@@ -45,14 +46,14 @@ class GoogleAuthApi(APIView):
             )
         except ValueError:
             return Response(
-                {"detail": "Invalid Google token."},
+                {"detail": str(MSG_INVALID_GOOGLE_TOKEN)},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
 
         email = idinfo.get("email")
         if not email:
             return Response(
-                {"detail": "Google account has no email."},
+                {"detail": str(MSG_GOOGLE_NO_EMAIL)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -71,7 +72,7 @@ class GoogleAuthApi(APIView):
             bind_existing_applications(user=user)
         elif not user.is_active:
             return Response(
-                {"detail": "Account is deactivated."},
+                {"detail": str(MSG_ACCOUNT_DEACTIVATED)},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
@@ -27,6 +28,7 @@ import ApplicationStatusBadge from '@/features/candidates/components/Application
 import type { Application, ApplicationStatus } from '@/shared/types/candidate.types'
 import type { CreateVacancyRequest, VacancyStatus } from '../types/vacancy.types'
 
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const confirm = useConfirm()
@@ -59,32 +61,32 @@ const searchQuery = ref('')
 const selectedCandidates = ref<Application[]>([])
 let searchTimeout: ReturnType<typeof setTimeout> | null = null
 
-const statusOptions = [
-  { label: 'All Statuses', value: undefined },
-  { label: 'Applied', value: 'applied' },
-  { label: 'Prescanned', value: 'prescanned' },
-  { label: 'Interviewed', value: 'interviewed' },
-  { label: 'Shortlisted', value: 'shortlisted' },
-  { label: 'Hired', value: 'hired' },
-  { label: 'Rejected', value: 'rejected' },
-  { label: 'Expired', value: 'expired' },
-  { label: 'Archived', value: 'archived' },
-]
+const statusOptions = computed(() => [
+  { label: t('vacancies.allStatuses'), value: undefined },
+  { label: t('candidates.status.applied'), value: 'applied' },
+  { label: t('candidates.status.prescanned'), value: 'prescanned' },
+  { label: t('candidates.status.interviewed'), value: 'interviewed' },
+  { label: t('candidates.status.shortlisted'), value: 'shortlisted' },
+  { label: t('candidates.status.hired'), value: 'hired' },
+  { label: t('candidates.status.rejected'), value: 'rejected' },
+  { label: t('candidates.status.expired'), value: 'expired' },
+  { label: t('candidates.status.archived'), value: 'archived' },
+])
 
-const orderingOptions = [
-  { label: 'Newest first', value: '-created_at' },
-  { label: 'Oldest first', value: 'created_at' },
-  { label: 'Highest score', value: '-match_score' },
-  { label: 'Lowest score', value: 'match_score' },
-]
+const orderingOptions = computed(() => [
+  { label: t('candidates.ordering.newest'), value: '-created_at' },
+  { label: t('candidates.ordering.oldest'), value: 'created_at' },
+  { label: t('candidates.ordering.highestScore'), value: '-match_score' },
+  { label: t('candidates.ordering.lowestScore'), value: 'match_score' },
+])
 
-const bulkActionOptions = [
-  { label: 'Shortlist', value: 'shortlisted' as ApplicationStatus },
-  { label: 'Hire', value: 'hired' as ApplicationStatus },
-  { label: 'Reject', value: 'rejected' as ApplicationStatus },
-  { label: 'Archive', value: 'archived' as ApplicationStatus },
-  { label: 'Reset to Applied', value: 'applied' as ApplicationStatus },
-]
+const bulkActionOptions = computed(() => [
+  { label: t('candidates.actions.shortlist'), value: 'shortlisted' as ApplicationStatus },
+  { label: t('candidates.actions.hire'), value: 'hired' as ApplicationStatus },
+  { label: t('candidates.actions.reject'), value: 'rejected' as ApplicationStatus },
+  { label: t('candidates.actions.archive'), value: 'archived' as ApplicationStatus },
+  { label: t('candidates.actions.reset'), value: 'applied' as ApplicationStatus },
+])
 
 // --- Kanban batch action handlers ---
 
@@ -440,7 +442,7 @@ async function handleUpdate(data: CreateVacancyRequest): Promise<void> {
       <div class="min-w-0 flex-1">
         <div class="flex flex-wrap items-center gap-2">
           <h1 class="truncate text-base font-bold sm:text-lg md:text-2xl">
-            {{ vacancy?.title ?? 'Loading...' }}
+            {{ vacancy?.title ?? t('common.loading') }}
           </h1>
           <VacancyStatusBadge v-if="vacancy" :status="vacancy.status" />
         </div>
@@ -460,14 +462,14 @@ async function handleUpdate(data: CreateVacancyRequest): Promise<void> {
       <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
         <Button
           v-if="vacancy.status === 'draft'"
-          label="Publish"
+          :label="t('vacancies.actions.publish')"
           icon="pi pi-send"
           size="small"
           @click="handleStatusChange('published')"
         />
         <Button
           v-if="vacancy.status === 'published'"
-          label="Pause"
+          :label="t('vacancies.actions.pause')"
           icon="pi pi-pause"
           severity="warn"
           size="small"
@@ -475,7 +477,7 @@ async function handleUpdate(data: CreateVacancyRequest): Promise<void> {
         />
         <Button
           v-if="vacancy.status === 'paused'"
-          label="Resume"
+          :label="t('vacancies.actions.resume')"
           icon="pi pi-play"
           severity="success"
           size="small"
@@ -483,7 +485,7 @@ async function handleUpdate(data: CreateVacancyRequest): Promise<void> {
         />
         <Button
           v-if="vacancy.status === 'published' || vacancy.status === 'paused'"
-          label="Archive"
+          :label="t('vacancies.actions.archive')"
           icon="pi pi-inbox"
           severity="secondary"
           size="small"
@@ -491,7 +493,7 @@ async function handleUpdate(data: CreateVacancyRequest): Promise<void> {
           @click="handleStatusChange('archived')"
         />
         <Button
-          :label="linkCopied ? 'Copied!' : 'Copy Link'"
+          :label="linkCopied ? t('common.copied') : t('common.copyLink')"
           :icon="linkCopied ? 'pi pi-check' : 'pi pi-link'"
           :severity="linkCopied ? 'success' : 'secondary'"
           size="small"
@@ -504,7 +506,7 @@ async function handleUpdate(data: CreateVacancyRequest): Promise<void> {
       <TabView v-model:activeIndex="activeTab" scrollable>
         <TabPanel value="0">
           <template #header>
-            <span class="text-xs sm:text-sm">Overview</span>
+            <span class="text-xs sm:text-sm">{{ t('candidates.overview') }}</span>
           </template>
           <div class="space-y-4 py-3 sm:py-4">
             <VacancyOverview :vacancy="vacancy" />
@@ -520,13 +522,13 @@ async function handleUpdate(data: CreateVacancyRequest): Promise<void> {
         <!-- Prescanning tab: sub-tabs for questions & criteria -->
         <TabPanel value="1">
           <template #header>
-            <span class="text-xs sm:text-sm"><i class="pi pi-comments mr-1"></i>Prescanning</span>
+            <span class="text-xs sm:text-sm"><i class="pi pi-comments mr-1"></i>{{ t('vacancies.form.prescanning') }}</span>
           </template>
           <div class="py-3 sm:py-4">
             <TabView>
               <TabPanel value="0">
                 <template #header>
-                  <span class="text-xs sm:text-sm"><i class="pi pi-list mr-1"></i>Questions</span>
+                  <span class="text-xs sm:text-sm"><i class="pi pi-list mr-1"></i>{{ t('vacancies.questions') }}</span>
                 </template>
                 <div class="py-3">
                   <QuestionList
@@ -541,7 +543,7 @@ async function handleUpdate(data: CreateVacancyRequest): Promise<void> {
               </TabPanel>
               <TabPanel value="1">
                 <template #header>
-                  <span class="text-xs sm:text-sm"><i class="pi pi-chart-bar mr-1"></i>Criteria</span>
+                  <span class="text-xs sm:text-sm"><i class="pi pi-chart-bar mr-1"></i>{{ t('vacancies.criteria') }}</span>
                 </template>
                 <div class="py-3">
                   <CriteriaList
@@ -560,13 +562,13 @@ async function handleUpdate(data: CreateVacancyRequest): Promise<void> {
         <!-- Interview tab: sub-tabs for questions & criteria (only when enabled) -->
         <TabPanel v-if="vacancy.interviewEnabled" value="2">
           <template #header>
-            <span class="text-xs sm:text-sm"><i class="pi pi-video mr-1"></i>Interview</span>
+            <span class="text-xs sm:text-sm"><i class="pi pi-video mr-1"></i>{{ t('vacancies.form.interview') }}</span>
           </template>
           <div class="py-3 sm:py-4">
             <TabView>
               <TabPanel value="0">
                 <template #header>
-                  <span class="text-xs sm:text-sm"><i class="pi pi-list mr-1"></i>Questions</span>
+                  <span class="text-xs sm:text-sm"><i class="pi pi-list mr-1"></i>{{ t('vacancies.questions') }}</span>
                 </template>
                 <div class="py-3">
                   <QuestionList
@@ -581,7 +583,7 @@ async function handleUpdate(data: CreateVacancyRequest): Promise<void> {
               </TabPanel>
               <TabPanel value="1">
                 <template #header>
-                  <span class="text-xs sm:text-sm"><i class="pi pi-chart-bar mr-1"></i>Criteria</span>
+                  <span class="text-xs sm:text-sm"><i class="pi pi-chart-bar mr-1"></i>{{ t('vacancies.criteria') }}</span>
                 </template>
                 <div class="py-3">
                   <CriteriaList
@@ -600,7 +602,7 @@ async function handleUpdate(data: CreateVacancyRequest): Promise<void> {
         <!-- Candidates tab (always last) -->
         <TabPanel :value="String(candidatesTabIndex)">
           <template #header>
-            <span class="text-xs sm:text-sm">Candidates</span>
+            <span class="text-xs sm:text-sm">{{ t('candidates.title') }}</span>
             <span
               v-if="candidateStore.candidates.length"
               class="ml-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-blue-500 px-1 text-[9px] font-bold text-white sm:h-5 sm:min-w-5 sm:px-1.5 sm:text-[10px]"
@@ -634,7 +636,7 @@ async function handleUpdate(data: CreateVacancyRequest): Promise<void> {
                 <InputIcon class="pi pi-search" />
                 <InputText
                   v-model="searchQuery"
-                  placeholder="Search..."
+                  :placeholder="t('common.search')"
                   class="w-full"
                   @input="onSearchInput"
                 />
@@ -647,7 +649,7 @@ async function handleUpdate(data: CreateVacancyRequest): Promise<void> {
                   :options="statusOptions"
                   option-label="label"
                   option-value="value"
-                  placeholder="Status"
+                  :placeholder="t('common.status')"
                   class="hidden shrink-0 sm:flex"
                 />
                 <Dropdown
@@ -710,7 +712,7 @@ async function handleUpdate(data: CreateVacancyRequest): Promise<void> {
               <Column selection-mode="multiple" header-style="width: 3rem" />
 
               <!-- Candidate -->
-              <Column header="Candidate" sortable sort-field="candidateName" style="min-width: 200px">
+              <Column :header="t('candidates.title')" sortable sort-field="candidateName" style="min-width: 200px">
                 <template #body="{ data }">
                   <div
                     class="flex cursor-pointer items-center gap-2.5"
@@ -728,14 +730,14 @@ async function handleUpdate(data: CreateVacancyRequest): Promise<void> {
               </Column>
 
               <!-- Status -->
-              <Column header="Status" sortable sort-field="status" style="min-width: 120px">
+              <Column :header="t('common.status')" sortable sort-field="status" style="min-width: 120px">
                 <template #body="{ data }">
                   <ApplicationStatusBadge :status="(data as Application).status" />
                 </template>
               </Column>
 
               <!-- Overall -->
-              <Column header="Overall" sortable sort-field="matchScore" style="min-width: 80px">
+              <Column :header="t('candidates.overallScore')" sortable sort-field="matchScore" style="min-width: 80px">
                 <template #body="{ data }">
                   <span
                     v-if="getTableOverallScore(data as Application) != null"
@@ -762,7 +764,7 @@ async function handleUpdate(data: CreateVacancyRequest): Promise<void> {
               </Column>
 
               <!-- Prescan -->
-              <Column header="Prescan" style="min-width: 80px">
+              <Column :header="t('candidates.prescanScore')" style="min-width: 80px">
                 <template #body="{ data }">
                   <span
                     v-if="(data as Application).prescanningScore != null"
@@ -776,7 +778,7 @@ async function handleUpdate(data: CreateVacancyRequest): Promise<void> {
               </Column>
 
               <!-- Interview (conditional) -->
-              <Column v-if="vacancy?.interviewEnabled" header="Interview" style="min-width: 80px">
+              <Column v-if="vacancy?.interviewEnabled" :header="t('candidates.interviewScore')" style="min-width: 80px">
                 <template #body="{ data }">
                   <span
                     v-if="(data as Application).interviewScore != null"
@@ -790,7 +792,7 @@ async function handleUpdate(data: CreateVacancyRequest): Promise<void> {
               </Column>
 
               <!-- Applied date -->
-              <Column header="Applied" sortable sort-field="createdAt" style="min-width: 100px">
+              <Column :header="t('candidates.status.applied')" sortable sort-field="createdAt" style="min-width: 100px">
                 <template #body="{ data }">
                   <span class="text-xs text-gray-500">{{ formatDate((data as Application).createdAt) }}</span>
                 </template>

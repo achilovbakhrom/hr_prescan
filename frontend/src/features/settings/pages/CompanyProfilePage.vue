@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
 import Select from 'primevue/select'
@@ -9,6 +10,7 @@ import Message from 'primevue/message'
 import { useSettingsStore } from '../stores/settings.store'
 import type { CompanySize } from '@/shared/types/auth.types'
 
+const { t } = useI18n()
 const settingsStore = useSettingsStore()
 
 const name = ref('')
@@ -87,7 +89,7 @@ async function handleSave(): Promise<void> {
 
 <template>
   <div class="mx-auto max-w-3xl p-6">
-    <h1 class="mb-6 text-2xl font-bold text-gray-900">Company Profile</h1>
+    <h1 class="mb-6 text-2xl font-bold text-gray-900">{{ t('settings.company.title') }}</h1>
 
     <Message v-if="successMessage" severity="success" class="mb-4">
       {{ successMessage }}
@@ -111,7 +113,7 @@ async function handleSave(): Promise<void> {
     >
       <div class="flex flex-col gap-1">
         <label class="mb-2 text-sm font-medium text-gray-700">
-          Company Logo
+          {{ t('settings.company.logo') }}
         </label>
         <FileUpload
           mode="basic"
@@ -126,7 +128,7 @@ async function handleSave(): Promise<void> {
 
       <div class="flex flex-col gap-1">
         <label for="name" class="text-sm font-medium text-gray-700">
-          Company Name
+          {{ t('settings.company.name') }}
         </label>
         <InputText
           id="name"
@@ -142,7 +144,7 @@ async function handleSave(): Promise<void> {
 
       <div class="flex flex-col gap-1">
         <label for="industry" class="text-sm font-medium text-gray-700">
-          Industry
+          {{ t('settings.company.industry') }}
         </label>
         <InputText
           id="industry"
@@ -158,7 +160,7 @@ async function handleSave(): Promise<void> {
 
       <div class="flex flex-col gap-1">
         <label for="size" class="text-sm font-medium text-gray-700">
-          Company Size
+          {{ t('settings.company.size') }}
         </label>
         <Select
           id="size"
@@ -177,7 +179,7 @@ async function handleSave(): Promise<void> {
 
       <div class="flex flex-col gap-1">
         <label for="country" class="text-sm font-medium text-gray-700">
-          Country
+          {{ t('settings.company.country') }}
         </label>
         <InputText
           id="country"
@@ -193,7 +195,7 @@ async function handleSave(): Promise<void> {
 
       <div class="flex flex-col gap-1">
         <label for="website" class="text-sm font-medium text-gray-700">
-          Website
+          {{ t('settings.company.website') }}
         </label>
         <InputText
           id="website"
@@ -205,7 +207,7 @@ async function handleSave(): Promise<void> {
 
       <div class="flex flex-col gap-1">
         <label for="description" class="text-sm font-medium text-gray-700">
-          Description
+          {{ t('settings.company.description') }}
         </label>
         <Textarea
           id="description"
@@ -219,7 +221,7 @@ async function handleSave(): Promise<void> {
       <div class="flex justify-end pt-2">
         <Button
           type="submit"
-          label="Save Changes"
+          :label="t('settings.company.save')"
           :loading="settingsStore.loading"
         />
       </div>

@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 
 const COOKIE_CONSENT_KEY = 'hr_prescan_cookie_consent'
 
 type ConsentState = 'accepted' | 'declined' | null
 
+const { t } = useI18n()
 const visible = ref(false)
 
 onMounted(() => {
@@ -52,28 +54,26 @@ function decline(): void {
       >
         <div class="flex-1">
           <p class="text-sm leading-relaxed text-gray-700">
-            We use cookies to enhance your experience, analyze site traffic, and
-            serve personalized content. By clicking "Accept All", you consent to
-            our use of cookies.
+            {{ t('cookies.message') }}
             <RouterLink
               to="/privacy"
               class="ml-1 font-medium text-blue-600 hover:underline"
               @click="visible = false"
             >
-              Privacy Policy
+              {{ t('cookies.learnMore') }}
             </RouterLink>
           </p>
         </div>
         <div class="flex shrink-0 items-center gap-3">
           <Button
-            label="Decline"
+            :label="t('cookies.decline')"
             text
             severity="secondary"
             size="small"
             @click="decline"
           />
           <Button
-            label="Accept All"
+            :label="t('cookies.accept')"
             size="small"
             @click="accept"
           />

@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
 import Button from 'primevue/button'
 import { candidateService } from '../services/candidate.service'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   visible: boolean
@@ -54,7 +57,7 @@ async function handleSend(): Promise<void> {
 <template>
   <Dialog
     :visible="props.visible"
-    header="Send Email"
+    :header="t('candidates.actions.sendEmail')"
     :modal="true"
     :closable="true"
     :style="{ width: '500px' }"
@@ -97,13 +100,13 @@ async function handleSend(): Promise<void> {
     <template #footer>
       <div v-if="!sent" class="flex justify-end gap-2">
         <Button
-          label="Cancel"
+          :label="t('common.cancel')"
           severity="secondary"
           text
           @click="emit('close')"
         />
         <Button
-          label="Send"
+          :label="t('interviews.chat.send')"
           icon="pi pi-send"
           :loading="sending"
           :disabled="!subject.trim() || !body.trim()"

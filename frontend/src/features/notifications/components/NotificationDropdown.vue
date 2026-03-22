@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import { useNotificationStore } from '../stores/notification.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { Notification, NotificationType } from '../types/notification.types'
+
+const { t } = useI18n()
 
 const emit = defineEmits<{
   close: []
@@ -112,13 +115,13 @@ onUnmounted(() => {
     class="absolute right-0 top-full z-50 mt-2 w-80 rounded-lg border border-gray-200 bg-white shadow-lg"
   >
     <div class="flex items-center justify-between border-b border-gray-100 px-4 py-3">
-      <span class="text-sm font-semibold text-gray-900">Notifications</span>
+      <span class="text-sm font-semibold text-gray-900">{{ t('notifications.title') }}</span>
       <button
         v-if="notificationStore.unreadCount > 0"
         class="text-xs text-blue-600 hover:text-blue-800"
         @click="handleMarkAllAsRead"
       >
-        Mark all as read
+        {{ t('notifications.markAllRead') }}
       </button>
     </div>
 
@@ -127,7 +130,7 @@ onUnmounted(() => {
         v-if="recentNotifications.length === 0"
         class="px-4 py-8 text-center text-sm text-gray-500"
       >
-        No notifications yet
+        {{ t('notifications.noNotifications') }}
       </div>
 
       <button
@@ -161,7 +164,7 @@ onUnmounted(() => {
 
     <div class="border-t border-gray-100 px-4 py-2">
       <Button
-        label="View all"
+        :label="t('common.viewAll')"
         text
         size="small"
         class="w-full"

@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useAdminStore } from '../stores/admin.store'
 
+const { t } = useI18n()
 const adminStore = useAdminStore()
 
 onMounted(() => adminStore.fetchAnalytics())
@@ -9,7 +11,7 @@ onMounted(() => adminStore.fetchAnalytics())
 
 <template>
   <div class="space-y-6">
-    <h1 class="text-2xl font-bold">Platform Analytics</h1>
+    <h1 class="text-2xl font-bold">{{ t('nav.analytics') }}</h1>
 
     <div v-if="adminStore.loading" class="py-12 text-center">
       <i class="pi pi-spinner pi-spin text-3xl text-gray-400"></i>
@@ -21,7 +23,7 @@ onMounted(() => adminStore.fetchAnalytics())
           <div class="flex items-center gap-3">
             <i class="pi pi-building text-2xl text-blue-500"></i>
             <div>
-              <p class="text-sm text-gray-500">Total Companies</p>
+              <p class="text-sm text-gray-500">{{ t('admin.dashboard.totalCompanies') }}</p>
               <p class="text-2xl font-bold">
                 {{ adminStore.analytics.totalCompanies }}
               </p>
@@ -33,7 +35,7 @@ onMounted(() => adminStore.fetchAnalytics())
           <div class="flex items-center gap-3">
             <i class="pi pi-users text-2xl text-green-500"></i>
             <div>
-              <p class="text-sm text-gray-500">Total Users</p>
+              <p class="text-sm text-gray-500">{{ t('admin.dashboard.totalUsers') }}</p>
               <p class="text-2xl font-bold">
                 {{ adminStore.analytics.totalUsers }}
               </p>
@@ -45,7 +47,7 @@ onMounted(() => adminStore.fetchAnalytics())
           <div class="flex items-center gap-3">
             <i class="pi pi-video text-2xl text-purple-500"></i>
             <div>
-              <p class="text-sm text-gray-500">Total Interviews</p>
+              <p class="text-sm text-gray-500">{{ t('admin.dashboard.totalInterviews') }}</p>
               <p class="text-2xl font-bold">
                 {{ adminStore.analytics.totalInterviews }}
               </p>
@@ -69,7 +71,7 @@ onMounted(() => adminStore.fetchAnalytics())
           <div class="flex items-center gap-3">
             <i class="pi pi-dollar text-2xl text-emerald-500"></i>
             <div>
-              <p class="text-sm text-gray-500">Monthly Revenue</p>
+              <p class="text-sm text-gray-500">{{ t('admin.dashboard.monthlyRevenue') }}</p>
               <p class="text-2xl font-bold">
                 ${{ adminStore.analytics.monthlyRevenue.toLocaleString() }}
               </p>

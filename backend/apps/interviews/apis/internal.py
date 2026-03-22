@@ -16,6 +16,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.common.messages import MSG_INTERVIEW_NOT_FOUND, MSG_INTERVIEW_RESULTS_SAVED, MSG_INVALID_INTERNAL_KEY
 from apps.interviews.models import Interview
 from apps.interviews.services import complete_session, create_integrity_flags, save_interview_scores
 
@@ -34,7 +35,7 @@ def _validate_internal_key(request: Request) -> bool:
 
 def _forbidden_response() -> Response:
     return Response(
-        {"detail": "Invalid or missing internal API key."},
+        {"detail": str(MSG_INVALID_INTERNAL_KEY)},
         status=status.HTTP_403_FORBIDDEN,
     )
 
@@ -99,7 +100,7 @@ class InternalInterviewContextApi(APIView):
 
         if interview is None:
             return Response(
-                {"detail": "Interview not found."},
+                {"detail": str(MSG_INTERVIEW_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -173,7 +174,7 @@ class InternalInterviewResultsApi(APIView):
 
         if interview is None:
             return Response(
-                {"detail": "Interview not found."},
+                {"detail": str(MSG_INTERVIEW_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -229,6 +230,6 @@ class InternalInterviewResultsApi(APIView):
         )
 
         return Response(
-            {"detail": "Interview results saved successfully."},
+            {"detail": str(MSG_INTERVIEW_RESULTS_SAVED)},
             status=status.HTTP_200_OK,
         )

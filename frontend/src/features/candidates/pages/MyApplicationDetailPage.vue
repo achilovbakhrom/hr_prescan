@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import { useCandidateStore } from '../stores/candidate.store'
 import ApplicationStatusBadge from '../components/ApplicationStatusBadge.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
+
+const { t } = useI18n()
 
 const route = useRoute()
 const router = useRouter()
@@ -40,7 +43,7 @@ function stepIndex(status: string): number {
       >
         <i class="pi pi-arrow-left text-lg"></i>
       </button>
-      <h1 class="text-2xl font-bold">Application Details</h1>
+      <h1 class="text-2xl font-bold">{{ t('candidates.overview') }}</h1>
     </div>
 
     <div v-if="candidateStore.loading" class="py-12 text-center">
@@ -94,7 +97,7 @@ function stepIndex(status: string): number {
 
       <!-- Vacancy Info -->
       <div class="rounded-lg border border-gray-200 bg-white p-4">
-        <h2 class="mb-2 text-sm font-semibold text-gray-600">Vacancy</h2>
+        <h2 class="mb-2 text-sm font-semibold text-gray-600">{{ t('nav.vacancies') }}</h2>
         <p class="text-lg font-medium">{{ application.vacancyTitle }}</p>
         <p class="text-sm text-gray-500">
           Applied on {{ formatDate(application.createdAt) }}
@@ -103,7 +106,7 @@ function stepIndex(status: string): number {
 
       <!-- Match Score -->
       <div class="rounded-lg border border-gray-200 bg-white p-4">
-        <h2 class="mb-2 text-sm font-semibold text-gray-600">Match Score</h2>
+        <h2 class="mb-2 text-sm font-semibold text-gray-600">{{ t('candidates.matchScore') }}</h2>
         <p v-if="application.matchScore !== null" class="text-3xl font-bold text-blue-600">
           {{ application.matchScore }}%
         </p>
@@ -115,7 +118,7 @@ function stepIndex(status: string): number {
       <!-- CV Download -->
       <div class="rounded-lg border border-gray-200 bg-white p-4">
         <h2 class="mb-2 text-sm font-semibold text-gray-600">
-          Uploaded Resume
+          {{ t('candidates.cv') }}
         </h2>
         <Button
           v-if="application.cvFile"

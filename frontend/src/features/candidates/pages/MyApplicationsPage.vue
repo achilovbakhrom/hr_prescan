@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import { useCandidateStore } from '../stores/candidate.store'
 import ApplicationStatusBadge from '../components/ApplicationStatusBadge.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { Application } from '../types/candidate.types'
+
+const { t } = useI18n()
 
 const router = useRouter()
 const candidateStore = useCandidateStore()
@@ -24,7 +27,7 @@ function formatDate(dateStr: string): string {
 
 <template>
   <div class="space-y-4">
-    <h1 class="text-2xl font-bold">My Applications</h1>
+    <h1 class="text-2xl font-bold">{{ t('nav.myApplications') }}</h1>
 
     <p v-if="candidateStore.error" class="text-sm text-red-600">
       {{ candidateStore.error }}
@@ -38,22 +41,22 @@ function formatDate(dateStr: string): string {
       class="cursor-pointer"
       @row-click="(e) => viewDetail(e.data)"
     >
-      <Column field="vacancyTitle" header="Vacancy" sortable />
-      <Column header="Status">
+      <Column field="vacancyTitle" :header="t('nav.vacancies')" sortable />
+      <Column :header="t('common.status')">
         <template #body="{ data }">
           <ApplicationStatusBadge :status="(data as Application).status" />
         </template>
       </Column>
-      <Column header="Match Score" sortable sort-field="matchScore">
+      <Column :header="t('candidates.matchScore')" sortable sort-field="matchScore">
         <template #body="{ data }">
           {{
             (data as Application).matchScore !== null
               ? `${(data as Application).matchScore}%`
-              : 'Pending'
+              : t('interviews.status.pending')
           }}
         </template>
       </Column>
-      <Column header="Applied" sortable sort-field="createdAt">
+      <Column :header="t('common.createdAt')" sortable sort-field="createdAt">
         <template #body="{ data }">
           {{ formatDate((data as Application).createdAt) }}
         </template>

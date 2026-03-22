@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
 import Button from 'primevue/button'
@@ -17,6 +18,7 @@ import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { CompanySize } from '../types/auth.types'
 
 const authStore = useAuthStore()
+const { t } = useI18n()
 
 const companyName = ref('')
 const industry = ref('')
@@ -133,7 +135,7 @@ async function handleSubmit(): Promise<void> {
 
       <template v-else>
         <h1 class="mb-6 text-center text-2xl font-bold text-gray-900">
-          Register Your Company
+          {{ t('auth.companyRegister.title') }}
         </h1>
 
         <Message v-if="errorMessage" severity="error" class="mb-4">
@@ -142,8 +144,8 @@ async function handleSubmit(): Promise<void> {
 
         <Stepper v-model:value="activeStep" linear>
           <StepList>
-            <Step value="1">Company Info</Step>
-            <Step value="2">Admin Account</Step>
+            <Step value="1">{{ t('auth.companyRegister.step1') }}</Step>
+            <Step value="2">{{ t('auth.companyRegister.step2') }}</Step>
           </StepList>
           <StepPanels>
             <StepPanel value="1">
@@ -176,12 +178,12 @@ async function handleSubmit(): Promise<void> {
         </Stepper>
 
         <p class="mt-4 text-center text-sm text-gray-600">
-          Already have an account?
+          {{ t('auth.register.hasAccount') }}
           <RouterLink
             :to="{ name: ROUTE_NAMES.LOGIN }"
             class="font-medium text-blue-600 hover:text-blue-500"
           >
-            Login
+            {{ t('auth.register.signIn') }}
           </RouterLink>
         </p>
       </template>

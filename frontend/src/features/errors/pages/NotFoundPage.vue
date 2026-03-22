@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 
+const { t } = useI18n()
 const router = useRouter()
 
 function goHome(): void {
@@ -21,20 +23,19 @@ function goBack(): void {
     <div class="text-center">
       <p class="text-8xl font-extrabold text-blue-600">404</p>
       <h1 class="mt-4 text-3xl font-bold tracking-tight text-gray-900">
-        Page not found
+        {{ t('errors.notFound') }}
       </h1>
       <p class="mt-4 text-lg text-gray-600">
-        Sorry, we couldn't find the page you're looking for. It may have been
-        moved, deleted, or never existed.
+        {{ t('errors.notFoundDesc') }}
       </p>
       <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
         <Button
-          label="Go to Dashboard"
+          :label="t('errors.goHome')"
           icon="pi pi-home"
           @click="goHome"
         />
         <Button
-          label="Go Back"
+          :label="t('errors.goBack')"
           icon="pi pi-arrow-left"
           text
           severity="secondary"

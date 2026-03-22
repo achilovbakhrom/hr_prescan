@@ -10,6 +10,16 @@ from apps.accounts.selectors import get_pending_invitations_for_email, get_user_
 from apps.accounts.serializers import PendingInvitationOutputSerializer, UserOutputSerializer
 from apps.accounts.services import accept_invitation_existing_user, register_user, verify_email
 from apps.common.exceptions import ApplicationError
+from apps.common.messages import (
+    MSG_ACCOUNT_DEACTIVATED,
+    MSG_EMAIL_VERIFIED,
+    MSG_INVALID_CREDENTIALS,
+    MSG_INVALID_TOKEN,
+    MSG_INVALID_REFRESH_TOKEN,
+    MSG_INVITATION_ACCEPTED_COMPANY,
+    MSG_LOGOUT_SUCCESS,
+    MSG_REGISTRATION_SUCCESS,
+)
 
 
 class RegisterApi(APIView):
@@ -33,7 +43,7 @@ class RegisterApi(APIView):
             return Response({"detail": e.message}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(
-            {"detail": "Registration successful. Please verify your email.", "user": UserOutputSerializer(user).data},
+            {"detail": str(MSG_REGISTRATION_SUCCESS), "user": UserOutputSerializer(user).data},
             status=status.HTTP_201_CREATED,
         )
 
@@ -55,13 +65,13 @@ class LoginApi(APIView):
 
         if user is None or not user.check_password(serializer.validated_data["password"]):
             return Response(
-                {"detail": "Invalid email or password."},
+                {"detail": str(MSG_INVALID_CREDENTIALS)},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
 
         if not user.is_active:
             return Response(
-                {"detail": "Account is deactivated."},
+                {"detail": str(MSG_ACCOUNT_DEACTIVATED)},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
 
@@ -96,11 +106,11 @@ class LogoutApi(APIView):
             token.blacklist()
         except (TokenError, InvalidToken):
             return Response(
-                {"detail": "Invalid or expired token."},
+                {"detail": str(MSG_INVALID_TOKEN)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        return Response({"detail": "Logout successful."}, status=status.HTTP_200_OK)
+        return Response({"detail": str(MSG_LOGOUT_SUCCESS)}, status=status.HTTP_200_OK)
 
 
 class TokenRefreshApi(APIView):
@@ -119,7 +129,7 @@ class TokenRefreshApi(APIView):
             refresh = RefreshToken(serializer.validated_data["refresh"])
         except (TokenError, InvalidToken):
             return Response(
-                {"detail": "Invalid or expired refresh token."},
+                {"detail": str(MSG_INVALID_REFRESH_TOKEN)},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
 
@@ -149,7 +159,7 @@ class VerifyEmailApi(APIView):
         except ApplicationError as e:
             return Response({"detail": e.message}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({"detail": "Email verified successfully."}, status=status.HTTP_200_OK)
+        return Response({"detail": str(MSG_EMAIL_VERIFIED)}, status=status.HTTP_200_OK)
 
 
 class MeApi(APIView):
@@ -200,7 +210,7 @@ class AcceptCompanyInvitationApi(APIView):
 
         return Response(
             {
-                "detail": "Invitation accepted. You are now part of the company.",
+                "detail": str(MSG_INVITATION_ACCEPTED_COMPANY),
                 "user": UserOutputSerializer(user).data,
             },
             status=status.HTTP_200_OK,

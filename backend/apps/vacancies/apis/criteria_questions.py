@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.permissions import IsAdmin, IsHRManager
+from apps.common.messages import MSG_CRITERIA_NOT_FOUND, MSG_QUESTION_NOT_FOUND, MSG_VACANCY_NOT_FOUND
 from apps.vacancies.models import ScreeningStep
 from apps.vacancies.selectors import get_vacancy_by_id, get_vacancy_criteria, get_vacancy_questions
 from apps.vacancies.serializers import InterviewQuestionOutputSerializer, VacancyCriteriaOutputSerializer
@@ -39,7 +40,7 @@ class VacancyCriteriaListCreateApi(APIView):
     def get(self, request: Request, vacancy_id: str) -> Response:
         vacancy = get_vacancy_by_id(vacancy_id=vacancy_id, company=request.user.company)
         if vacancy is None:
-            return Response({"detail": "Vacancy not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": str(MSG_VACANCY_NOT_FOUND)}, status=status.HTTP_404_NOT_FOUND)
 
         step = request.query_params.get("step")
         criteria = get_vacancy_criteria(vacancy=vacancy, step=step)
@@ -51,7 +52,7 @@ class VacancyCriteriaListCreateApi(APIView):
     def post(self, request: Request, vacancy_id: str) -> Response:
         vacancy = get_vacancy_by_id(vacancy_id=vacancy_id, company=request.user.company)
         if vacancy is None:
-            return Response({"detail": "Vacancy not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": str(MSG_VACANCY_NOT_FOUND)}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -80,11 +81,11 @@ class VacancyCriteriaDetailApi(APIView):
     def put(self, request: Request, vacancy_id: str, criteria_id: str) -> Response:
         vacancy = get_vacancy_by_id(vacancy_id=vacancy_id, company=request.user.company)
         if vacancy is None:
-            return Response({"detail": "Vacancy not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": str(MSG_VACANCY_NOT_FOUND)}, status=status.HTTP_404_NOT_FOUND)
 
         criteria = vacancy.criteria.filter(id=criteria_id).first()
         if criteria is None:
-            return Response({"detail": "Criteria not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": str(MSG_CRITERIA_NOT_FOUND)}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -98,11 +99,11 @@ class VacancyCriteriaDetailApi(APIView):
     def delete(self, request: Request, vacancy_id: str, criteria_id: str) -> Response:
         vacancy = get_vacancy_by_id(vacancy_id=vacancy_id, company=request.user.company)
         if vacancy is None:
-            return Response({"detail": "Vacancy not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": str(MSG_VACANCY_NOT_FOUND)}, status=status.HTTP_404_NOT_FOUND)
 
         criteria = vacancy.criteria.filter(id=criteria_id).first()
         if criteria is None:
-            return Response({"detail": "Criteria not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": str(MSG_CRITERIA_NOT_FOUND)}, status=status.HTTP_404_NOT_FOUND)
 
         delete_vacancy_criteria(criteria=criteria)
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -128,7 +129,7 @@ class VacancyQuestionListCreateApi(APIView):
     def get(self, request: Request, vacancy_id: str) -> Response:
         vacancy = get_vacancy_by_id(vacancy_id=vacancy_id, company=request.user.company)
         if vacancy is None:
-            return Response({"detail": "Vacancy not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": str(MSG_VACANCY_NOT_FOUND)}, status=status.HTTP_404_NOT_FOUND)
 
         step = request.query_params.get("step")
         questions = get_vacancy_questions(vacancy=vacancy, active_only=False, step=step)
@@ -140,7 +141,7 @@ class VacancyQuestionListCreateApi(APIView):
     def post(self, request: Request, vacancy_id: str) -> Response:
         vacancy = get_vacancy_by_id(vacancy_id=vacancy_id, company=request.user.company)
         if vacancy is None:
-            return Response({"detail": "Vacancy not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": str(MSG_VACANCY_NOT_FOUND)}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -169,11 +170,11 @@ class VacancyQuestionDetailApi(APIView):
     def put(self, request: Request, vacancy_id: str, question_id: str) -> Response:
         vacancy = get_vacancy_by_id(vacancy_id=vacancy_id, company=request.user.company)
         if vacancy is None:
-            return Response({"detail": "Vacancy not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": str(MSG_VACANCY_NOT_FOUND)}, status=status.HTTP_404_NOT_FOUND)
 
         question = vacancy.questions.filter(id=question_id).first()
         if question is None:
-            return Response({"detail": "Question not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": str(MSG_QUESTION_NOT_FOUND)}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -187,11 +188,11 @@ class VacancyQuestionDetailApi(APIView):
     def delete(self, request: Request, vacancy_id: str, question_id: str) -> Response:
         vacancy = get_vacancy_by_id(vacancy_id=vacancy_id, company=request.user.company)
         if vacancy is None:
-            return Response({"detail": "Vacancy not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": str(MSG_VACANCY_NOT_FOUND)}, status=status.HTTP_404_NOT_FOUND)
 
         question = vacancy.questions.filter(id=question_id).first()
         if question is None:
-            return Response({"detail": "Question not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": str(MSG_QUESTION_NOT_FOUND)}, status=status.HTTP_404_NOT_FOUND)
 
         delete_interview_question(question=question)
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -212,7 +213,7 @@ class GenerateQuestionsApi(APIView):
     def post(self, request: Request, vacancy_id: str) -> Response:
         vacancy = get_vacancy_by_id(vacancy_id=vacancy_id, company=request.user.company)
         if vacancy is None:
-            return Response({"detail": "Vacancy not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": str(MSG_VACANCY_NOT_FOUND)}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

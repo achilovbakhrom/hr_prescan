@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 interface MatchDetails {
   overall?: number
@@ -97,7 +100,7 @@ const scoreBreakdownLabel = computed(() => {
     <div class="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-4">
       <!-- CV Match -->
       <div class="rounded-xl border border-gray-200 bg-white p-3 text-center sm:p-5">
-        <p class="mb-1 text-[9px] font-semibold text-gray-500 uppercase tracking-wide sm:mb-2 sm:text-xs">CV Match</p>
+        <p class="mb-1 text-[9px] font-semibold text-gray-500 uppercase tracking-wide sm:mb-2 sm:text-xs">{{ t('candidates.matchScore') }}</p>
         <div v-if="cvScore !== null">
           <p class="text-xl font-bold sm:text-3xl" :class="scoreTextColor(cvScore)">{{ cvScore }}%</p>
           <p class="mt-1 hidden text-xs text-gray-400 sm:block">Based on resume analysis</p>
@@ -107,7 +110,7 @@ const scoreBreakdownLabel = computed(() => {
 
       <!-- Prescanning Score -->
       <div class="rounded-xl border border-gray-200 bg-white p-3 text-center sm:p-5">
-        <p class="mb-1 text-[9px] font-semibold text-gray-500 uppercase tracking-wide sm:mb-2 sm:text-xs">Prescanning</p>
+        <p class="mb-1 text-[9px] font-semibold text-gray-500 uppercase tracking-wide sm:mb-2 sm:text-xs">{{ t('candidates.prescanning') }}</p>
         <div v-if="props.prescanningScore !== null">
           <p class="text-xl font-bold sm:text-3xl" :class="scoreTextColor(prescanningScoreNorm!)">{{ props.prescanningScore }}/10</p>
           <p class="mt-1 hidden text-xs text-gray-400 sm:block">AI prescanning result</p>
@@ -117,7 +120,7 @@ const scoreBreakdownLabel = computed(() => {
 
       <!-- Interview Score -->
       <div class="rounded-xl border border-gray-200 bg-white p-3 text-center sm:p-5">
-        <p class="mb-1 text-[9px] font-semibold text-gray-500 uppercase tracking-wide sm:mb-2 sm:text-xs">Interview</p>
+        <p class="mb-1 text-[9px] font-semibold text-gray-500 uppercase tracking-wide sm:mb-2 sm:text-xs">{{ t('candidates.interview') }}</p>
         <div v-if="props.interviewScore !== null">
           <p class="text-xl font-bold sm:text-3xl" :class="scoreTextColor(interviewScoreNorm!)">{{ props.interviewScore }}/10</p>
           <p class="mt-1 hidden text-xs text-gray-400 sm:block">AI interview result</p>
@@ -127,7 +130,7 @@ const scoreBreakdownLabel = computed(() => {
 
       <!-- Combined -->
       <div class="rounded-xl border-2 bg-white p-3 text-center sm:p-5" :class="combinedScore !== null ? 'border-blue-200' : 'border-gray-200'">
-        <p class="mb-1 text-[9px] font-semibold text-gray-500 uppercase tracking-wide sm:mb-2 sm:text-xs">Overall</p>
+        <p class="mb-1 text-[9px] font-semibold text-gray-500 uppercase tracking-wide sm:mb-2 sm:text-xs">{{ t('candidates.overallScore') }}</p>
         <div v-if="combinedScore !== null">
           <p class="text-xl font-bold sm:text-3xl" :class="scoreTextColor(combinedScore)">{{ combinedScore }}%</p>
           <p class="mt-1 hidden text-xs text-gray-400 sm:block">Combined score</p>

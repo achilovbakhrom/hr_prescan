@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Textarea from 'primevue/textarea'
 import Button from 'primevue/button'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   notes: string
@@ -28,7 +31,7 @@ function handleSave(): void {
 
 <template>
   <div class="space-y-3">
-    <h3 class="text-sm font-semibold text-gray-600">HR Notes</h3>
+    <h3 class="text-sm font-semibold text-gray-600">{{ t('candidates.notes') }}</h3>
     <Textarea
       v-model="localNotes"
       rows="6"
@@ -38,7 +41,7 @@ function handleSave(): void {
     />
     <div class="flex justify-end">
       <Button
-        label="Save Notes"
+        :label="t('common.save')"
         icon="pi pi-save"
         size="small"
         :loading="props.loading"
