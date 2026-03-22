@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { useAudioRecorder } from '../composables/useAudioRecorder'
 import Button from 'primevue/button'
+
+const { t } = useI18n()
 
 const emit = defineEmits<{ recorded: [blob: Blob, duration: number] }>()
 
@@ -36,13 +39,13 @@ async function handleStop(): Promise<void> {
     text
     :disabled="disabled"
     class="transition-all hover:scale-110 hover:!text-blue-500"
-    v-tooltip.top="'Send voice message'"
+    v-tooltip.top="t('interviews.chat.voiceMessage')"
     @click="startRecording"
   />
 
   <!-- Recording: timer + stop + cancel -->
   <div v-else class="flex items-center gap-2">
-    <span class="flex items-center gap-1.5 text-sm text-red-600">
+    <span class="flex items-center gap-1.5 text-sm text-red-600" :title="t('interviews.recording')">
       <span class="relative flex h-2 w-2">
         <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
         <span class="relative inline-flex h-2 w-2 animate-pulse rounded-full bg-red-500"></span>

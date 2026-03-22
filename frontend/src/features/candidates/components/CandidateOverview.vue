@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import ApplicationStatusBadge from './ApplicationStatusBadge.vue'
 import type {
   ApplicationDetail,
 } from '../types/candidate.types'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   candidate: ApplicationDetail
@@ -58,25 +61,25 @@ const recommendation = computed(() => {
   <div class="space-y-4">
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
       <div>
-        <p class="text-sm text-gray-500">Name</p>
+        <p class="text-sm text-gray-500">{{ t('candidates.application.name') }}</p>
         <p class="font-medium">{{ props.candidate.candidateName }}</p>
       </div>
       <div>
-        <p class="text-sm text-gray-500">Email</p>
+        <p class="text-sm text-gray-500">{{ t('candidates.application.email') }}</p>
         <p class="font-medium">{{ props.candidate.candidateEmail }}</p>
       </div>
       <div>
-        <p class="text-sm text-gray-500">Phone</p>
+        <p class="text-sm text-gray-500">{{ t('candidates.application.phone') }}</p>
         <p class="font-medium">
           {{ props.candidate.candidatePhone || 'Not provided' }}
         </p>
       </div>
       <div>
-        <p class="text-sm text-gray-500">Vacancy</p>
+        <p class="text-sm text-gray-500">{{ t('nav.vacancies') }}</p>
         <p class="font-medium">{{ props.candidate.vacancyTitle }}</p>
       </div>
       <div>
-        <p class="text-sm text-gray-500">Applied</p>
+        <p class="text-sm text-gray-500">{{ t('common.createdAt') }}</p>
         <p class="font-medium">
           {{ new Date(props.candidate.createdAt).toLocaleDateString() }}
         </p>
@@ -98,7 +101,7 @@ const recommendation = computed(() => {
     <!-- Scores -->
     <div class="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
       <div class="rounded-lg border border-gray-200 bg-gray-50 p-2 text-center sm:p-3">
-        <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide sm:text-[10px]">CV Match</p>
+        <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide sm:text-[10px]">{{ t('candidates.matchScore') }}</p>
         <p v-if="props.candidate.matchScore !== null" class="mt-0.5 text-base font-bold sm:mt-1 sm:text-lg" :class="scoreColor(props.candidate.matchScore)">
           {{ props.candidate.matchScore }}%
         </p>
@@ -108,21 +111,21 @@ const recommendation = computed(() => {
         <p v-else class="mt-0.5 text-base text-gray-300 sm:mt-1 sm:text-lg">—</p>
       </div>
       <div class="rounded-lg border border-gray-200 bg-gray-50 p-2 text-center sm:p-3">
-        <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide sm:text-[10px]">Prescanning</p>
+        <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide sm:text-[10px]">{{ t('candidates.prescanning') }}</p>
         <p v-if="props.prescanningScore != null" class="mt-0.5 text-base font-bold sm:mt-1 sm:text-lg" :class="scoreColor(props.prescanningScore * 10)">
           {{ props.prescanningScore }}/10
         </p>
         <p v-else class="mt-0.5 text-base text-gray-300 sm:mt-1 sm:text-lg">—</p>
       </div>
       <div class="rounded-lg border border-gray-200 bg-gray-50 p-2 text-center sm:p-3">
-        <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide sm:text-[10px]">Interview</p>
+        <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide sm:text-[10px]">{{ t('candidates.interview') }}</p>
         <p v-if="props.interviewScore != null" class="mt-0.5 text-base font-bold sm:mt-1 sm:text-lg" :class="scoreColor(props.interviewScore * 10)">
           {{ props.interviewScore }}/10
         </p>
         <p v-else class="mt-0.5 text-base text-gray-300 sm:mt-1 sm:text-lg">—</p>
       </div>
       <div class="rounded-lg border-2 p-2 text-center sm:p-3" :class="overallScore !== null ? 'border-blue-200 bg-blue-50' : 'border-gray-200 bg-gray-50'">
-        <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide sm:text-[10px]">Overall</p>
+        <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide sm:text-[10px]">{{ t('candidates.overallScore') }}</p>
         <p v-if="overallScore !== null" class="mt-0.5 text-base font-bold sm:mt-1 sm:text-lg" :class="scoreColor(overallScore)">
           {{ overallScore }}%
         </p>
@@ -144,7 +147,7 @@ const recommendation = computed(() => {
 
     <div class="flex flex-wrap items-center gap-3">
       <div>
-        <p class="mb-1 text-sm text-gray-500">Status</p>
+        <p class="mb-1 text-sm text-gray-500">{{ t('common.status') }}</p>
         <ApplicationStatusBadge :status="props.candidate.status" />
       </div>
     </div>

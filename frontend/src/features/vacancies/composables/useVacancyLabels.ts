@@ -1,4 +1,27 @@
+import { useI18n } from 'vue-i18n'
+import { computed } from 'vue'
 import type { Vacancy } from '../types/vacancy.types'
+
+export function useEmploymentLabels() {
+  const { t } = useI18n()
+  return computed<Record<string, string>>(() => ({
+    full_time: t('vacancies.employment.fullTime'),
+    part_time: t('vacancies.employment.partTime'),
+    contract: t('vacancies.employment.contract'),
+    internship: t('vacancies.employment.internship'),
+  }))
+}
+
+export function useExperienceLabels() {
+  const { t } = useI18n()
+  return computed<Record<string, string>>(() => ({
+    junior: t('vacancies.experience.junior'),
+    middle: t('vacancies.experience.middle'),
+    senior: t('vacancies.experience.senior'),
+    lead: t('vacancies.experience.lead'),
+    director: t('vacancies.experience.director'),
+  }))
+}
 
 export const EMPLOYMENT_LABELS: Record<string, string> = {
   full_time: 'Full Time',

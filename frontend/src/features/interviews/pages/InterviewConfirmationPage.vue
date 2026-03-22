@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import { useInterviewStore } from '../stores/interview.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
+
+const { t } = useI18n()
 
 const route = useRoute()
 const router = useRouter()
@@ -57,7 +60,7 @@ function handleGoToInterview(): void {
     >
       <i class="pi pi-check-circle mb-4 text-5xl text-green-500"></i>
       <h1 class="mb-2 text-2xl font-bold text-gray-900">
-        Interview Scheduled!
+        {{ t('interviews.status.scheduled') }}!
       </h1>
       <p class="mb-6 text-gray-600">
         Your interview has been confirmed. Here are the details:

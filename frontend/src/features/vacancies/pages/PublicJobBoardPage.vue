@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import InputText from 'primevue/inputtext'
 import IconField from 'primevue/iconfield'
@@ -11,6 +12,7 @@ import { ROUTE_NAMES } from '@/shared/constants/routes'
 import { EMPLOYMENT_LABELS, EXPERIENCE_LABELS, formatSalaryRange } from '../composables/useVacancyLabels'
 import type { Vacancy } from '../types/vacancy.types'
 
+const { t } = useI18n()
 const router = useRouter()
 const jobs = ref<Vacancy[]>([])
 const loading = ref(false)
@@ -22,20 +24,20 @@ const employmentType = ref<string | null>(null)
 const experienceLevel = ref<string | null>(null)
 const remoteOnly = ref(false)
 
-const employmentOptions = [
-  { value: 'full_time', label: 'Full Time', icon: 'pi pi-clock' },
-  { value: 'part_time', label: 'Part Time', icon: 'pi pi-hourglass' },
-  { value: 'contract', label: 'Contract', icon: 'pi pi-file' },
-  { value: 'internship', label: 'Internship', icon: 'pi pi-graduation-cap' },
-]
+const employmentOptions = computed(() => [
+  { value: 'full_time', label: t('vacancies.employment.fullTime'), icon: 'pi pi-clock' },
+  { value: 'part_time', label: t('vacancies.employment.partTime'), icon: 'pi pi-hourglass' },
+  { value: 'contract', label: t('vacancies.employment.contract'), icon: 'pi pi-file' },
+  { value: 'internship', label: t('vacancies.employment.internship'), icon: 'pi pi-graduation-cap' },
+])
 
-const experienceOptions = [
-  { value: 'junior', label: 'Junior' },
-  { value: 'middle', label: 'Middle' },
-  { value: 'senior', label: 'Senior' },
-  { value: 'lead', label: 'Lead' },
-  { value: 'director', label: 'Director' },
-]
+const experienceOptions = computed(() => [
+  { value: 'junior', label: t('vacancies.experience.junior') },
+  { value: 'middle', label: t('vacancies.experience.middle') },
+  { value: 'senior', label: t('vacancies.experience.senior') },
+  { value: 'lead', label: t('vacancies.experience.lead') },
+  { value: 'director', label: t('vacancies.experience.director') },
+])
 
 const activeFilterCount = computed(() => {
   let count = 0
@@ -116,7 +118,7 @@ function formatRelativeDate(dateStr: string): string {
     <!-- Search Hero -->
     <div class="border-b border-gray-100 bg-white">
       <div class="mx-auto max-w-6xl px-6 py-8">
-        <h1 class="mb-1 text-2xl font-bold text-gray-900">Find Your Next Job</h1>
+        <h1 class="mb-1 text-2xl font-bold text-gray-900">{{ t('jobBoard.title') }}</h1>
         <p class="mb-5 text-sm text-gray-500">{{ jobs.length }} open positions</p>
 
         <div class="flex gap-3">
@@ -125,7 +127,7 @@ function formatRelativeDate(dateStr: string): string {
             <InputText
               v-model="search"
               class="w-full"
-              placeholder="Job title, skill, or keyword..."
+              :placeholder="t('jobBoard.searchPlaceholder')"
               @keyup.enter="fetchJobs"
             />
           </IconField>
@@ -134,11 +136,11 @@ function formatRelativeDate(dateStr: string): string {
             <InputText
               v-model="locationFilter"
               class="w-full"
-              placeholder="Location..."
+              :placeholder="t('jobBoard.locationPlaceholder')"
               @keyup.enter="fetchJobs"
             />
           </IconField>
-          <Button label="Search" icon="pi pi-search" :loading="loading" @click="fetchJobs" />
+          <Button :label="t('common.search')" icon="pi pi-search" :loading="loading" @click="fetchJobs" />
         </div>
       </div>
     </div>
@@ -151,8 +153,8 @@ function formatRelativeDate(dateStr: string): string {
           <div class="sticky top-4 space-y-6">
             <!-- Active filters -->
             <div v-if="activeFilterCount > 0" class="flex items-center justify-between">
-              <span class="text-xs font-medium text-gray-500">{{ activeFilterCount }} filter(s) active</span>
-              <button class="text-xs text-blue-600 hover:underline" @click="clearFilters">Clear all</button>
+              <span class="text-xs font-medium text-gray-500">{{ activeFilterCount }} {{ t('jobBoard.activeFilters') }}</span>
+              <button class="text-xs text-blue-600 hover:underline" @click="clearFilters">{{ t('jobBoard.clearAll') }}</button>
             </div>
 
             <!-- Remote toggle -->
@@ -163,13 +165,13 @@ function formatRelativeDate(dateStr: string): string {
                 @click="toggleRemote"
               >
                 <i class="pi pi-globe text-sm"></i>
-                Remote Only
+                {{ t('jobBoard.remoteOnly') }}
               </button>
             </div>
 
             <!-- Employment Type -->
             <div>
-              <h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">Employment Type</h3>
+              <h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">{{ t('vacancies.form.employmentType') }}</h3>
               <div class="space-y-1">
                 <button
                   v-for="opt in employmentOptions" :key="opt.value"
@@ -185,7 +187,7 @@ function formatRelativeDate(dateStr: string): string {
 
             <!-- Experience Level -->
             <div>
-              <h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">Experience Level</h3>
+              <h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">{{ t('vacancies.form.experienceLevel') }}</h3>
               <div class="space-y-1">
                 <button
                   v-for="opt in experienceOptions" :key="opt.value"
@@ -207,7 +209,7 @@ function formatRelativeDate(dateStr: string): string {
             :class="remoteOnly ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600'"
             @click="toggleRemote"
           >
-            Remote
+            {{ t('vacancies.overview.remote') }}
           </button>
           <button
             v-for="opt in employmentOptions" :key="opt.value"
@@ -256,7 +258,7 @@ function formatRelativeDate(dateStr: string): string {
                 <span v-if="job.location" class="flex items-center gap-1 text-sm text-gray-500">
                   <i class="pi pi-map-marker text-xs"></i>{{ job.location }}
                 </span>
-                <Tag v-if="job.isRemote" value="Remote" severity="info" class="text-xs" />
+                <Tag v-if="job.isRemote" :value="t('vacancies.overview.remote')" severity="info" class="text-xs" />
                 <span class="rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
                   {{ EMPLOYMENT_LABELS[job.employmentType] || job.employmentType }}
                 </span>
@@ -293,9 +295,9 @@ function formatRelativeDate(dateStr: string): string {
             <div class="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
               <i class="pi pi-search text-2xl text-gray-400"></i>
             </div>
-            <p class="mt-4 font-medium text-gray-600">No jobs found</p>
-            <p class="mt-1 text-sm text-gray-400">Try adjusting your filters or search terms</p>
-            <Button v-if="activeFilterCount > 0" label="Clear Filters" text size="small" class="mt-3" @click="clearFilters" />
+            <p class="mt-4 font-medium text-gray-600">{{ t('jobBoard.noJobs') }}</p>
+            <p class="mt-1 text-sm text-gray-400">{{ t('jobBoard.noJobsHint') }}</p>
+            <Button v-if="activeFilterCount > 0" :label="t('common.clearFilters')" text size="small" class="mt-3" @click="clearFilters" />
           </div>
         </div>
       </div>

@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import Menu from 'primevue/menu'
 import Dialog from 'primevue/dialog'
 import InputNumber from 'primevue/inputnumber'
 import Button from 'primevue/button'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { Application, ApplicationStatus } from '../types/candidate.types'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   candidates: Application[]
@@ -34,20 +37,20 @@ interface KanbanColumn {
   dotColor: string
 }
 
-const columns: KanbanColumn[] = [
-  { status: 'applied', label: 'Applied', color: 'text-blue-700', bgColor: 'bg-blue-50', borderColor: 'border-blue-200', dotColor: 'bg-blue-500' },
-  { status: 'prescanned', label: 'Prescanned', color: 'text-teal-700', bgColor: 'bg-teal-50', borderColor: 'border-teal-200', dotColor: 'bg-teal-500' },
-  { status: 'interviewed', label: 'Interviewed', color: 'text-emerald-700', bgColor: 'bg-emerald-50', borderColor: 'border-emerald-200', dotColor: 'bg-emerald-500' },
-  { status: 'shortlisted', label: 'Shortlisted', color: 'text-violet-700', bgColor: 'bg-violet-50', borderColor: 'border-violet-200', dotColor: 'bg-violet-500' },
-  { status: 'hired', label: 'Hired', color: 'text-green-700', bgColor: 'bg-green-50', borderColor: 'border-green-200', dotColor: 'bg-green-500' },
-  { status: 'rejected', label: 'Rejected', color: 'text-red-700', bgColor: 'bg-red-50', borderColor: 'border-red-200', dotColor: 'bg-red-500' },
-  { status: 'archived', label: 'Archived', color: 'text-gray-600', bgColor: 'bg-gray-100', borderColor: 'border-gray-200', dotColor: 'bg-gray-400' },
-]
+const columns = computed<KanbanColumn[]>(() => [
+  { status: 'applied', label: t('candidates.status.applied'), color: 'text-blue-700', bgColor: 'bg-blue-50', borderColor: 'border-blue-200', dotColor: 'bg-blue-500' },
+  { status: 'prescanned', label: t('candidates.status.prescanned'), color: 'text-teal-700', bgColor: 'bg-teal-50', borderColor: 'border-teal-200', dotColor: 'bg-teal-500' },
+  { status: 'interviewed', label: t('candidates.status.interviewed'), color: 'text-emerald-700', bgColor: 'bg-emerald-50', borderColor: 'border-emerald-200', dotColor: 'bg-emerald-500' },
+  { status: 'shortlisted', label: t('candidates.status.shortlisted'), color: 'text-violet-700', bgColor: 'bg-violet-50', borderColor: 'border-violet-200', dotColor: 'bg-violet-500' },
+  { status: 'hired', label: t('candidates.status.hired'), color: 'text-green-700', bgColor: 'bg-green-50', borderColor: 'border-green-200', dotColor: 'bg-green-500' },
+  { status: 'rejected', label: t('candidates.status.rejected'), color: 'text-red-700', bgColor: 'bg-red-50', borderColor: 'border-red-200', dotColor: 'bg-red-500' },
+  { status: 'archived', label: t('candidates.status.archived'), color: 'text-gray-600', bgColor: 'bg-gray-100', borderColor: 'border-gray-200', dotColor: 'bg-gray-400' },
+])
 
 const visibleColumns = computed(() =>
   props.interviewEnabled
-    ? columns
-    : columns.filter((c) => c.status !== 'interviewed'),
+    ? columns.value
+    : columns.value.filter((c) => c.status !== 'interviewed'),
 )
 
 // --- Column menu ---
@@ -179,7 +182,7 @@ function getCandidatesForColumn(status: ApplicationStatus): Application[] {
 
 const columnCounts = computed(() => {
   const counts: Record<string, number> = {}
-  for (const col of columns) {
+  for (const col of columns.value) {
     counts[col.status] = getCandidatesForColumn(col.status).length
   }
   return counts
@@ -381,7 +384,7 @@ function onDragOver(event: DragEvent): void {
           v-if="getCandidatesForColumn(column.status).length === 0"
           class="flex flex-1 items-center justify-center rounded-lg border border-dashed border-gray-200 py-6"
         >
-          <p class="text-xs text-gray-400">No candidates</p>
+          <p class="text-xs text-gray-400">{{ t('candidates.noCandidates') }}</p>
         </div>
       </div>
     </div>
@@ -396,8 +399,8 @@ function onDragOver(event: DragEvent): void {
       <InputNumber v-model="thresholdValue" :min="0" :max="thresholdMax" show-buttons class="w-full" />
     </div>
     <template #footer>
-      <Button label="Cancel" severity="secondary" text @click="showThresholdDialog = false" />
-      <Button label="Confirm" @click="confirmThreshold" />
+      <Button :label="t('common.cancel')" severity="secondary" text @click="showThresholdDialog = false" />
+      <Button :label="t('common.confirm')" @click="confirmThreshold" />
     </template>
   </Dialog>
 
@@ -408,8 +411,8 @@ function onDragOver(event: DragEvent): void {
       <InputNumber v-model="daysValue" :min="1" :max="365" show-buttons suffix=" days" class="w-full" />
     </div>
     <template #footer>
-      <Button label="Cancel" severity="secondary" text @click="showDaysDialog = false" />
-      <Button label="Confirm" severity="danger" @click="confirmDays" />
+      <Button :label="t('common.cancel')" severity="secondary" text @click="showDaysDialog = false" />
+      <Button :label="t('common.confirm')" severity="danger" @click="confirmDays" />
     </template>
   </Dialog>
 </template>

@@ -20,6 +20,7 @@ from django.utils import timezone
 
 from openai import OpenAI
 
+from apps.common.messages import MSG_EVALUATION_MALFORMED
 from apps.interviews.models import Interview
 
 logger = logging.getLogger(__name__)
@@ -494,7 +495,7 @@ Respond with ONLY valid JSON in this exact format:
         complete_session(
             interview=interview,
             overall_score=Decimal("0"),
-            ai_summary="AI evaluation completed but the scoring response was malformed. HR should review the conversation transcript manually.",
+            ai_summary=str(MSG_EVALUATION_MALFORMED),
             transcript=interview.chat_history or [],
             ai_decision=ai_decision,
         )

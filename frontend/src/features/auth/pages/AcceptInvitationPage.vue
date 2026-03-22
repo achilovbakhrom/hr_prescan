@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
 import Button from 'primevue/button'
@@ -11,6 +12,7 @@ import { ROUTE_NAMES } from '@/shared/constants/routes'
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+const { t } = useI18n()
 
 const token = ref((route.query.token as string) || '')
 const firstName = ref('')
@@ -70,7 +72,7 @@ async function handleSubmit(): Promise<void> {
   <div class="flex flex-1 items-center justify-center py-12">
     <div class="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
       <h1 class="mb-6 text-center text-2xl font-bold text-gray-900">
-        Accept Invitation
+        {{ t('auth.acceptInvitation.title') }}
       </h1>
 
       <Message v-if="!token" severity="error" class="mb-4">
@@ -92,7 +94,7 @@ async function handleSubmit(): Promise<void> {
               for="firstName"
               class="text-sm font-medium text-gray-700"
             >
-              First Name
+              {{ t('auth.acceptInvitation.firstName') }}
             </label>
             <InputText
               id="firstName"
@@ -111,7 +113,7 @@ async function handleSubmit(): Promise<void> {
 
           <div class="flex flex-col gap-1">
             <label for="lastName" class="text-sm font-medium text-gray-700">
-              Last Name
+              {{ t('auth.acceptInvitation.lastName') }}
             </label>
             <InputText
               id="lastName"
@@ -128,7 +130,7 @@ async function handleSubmit(): Promise<void> {
 
         <div class="flex flex-col gap-1">
           <label for="password" class="text-sm font-medium text-gray-700">
-            Password
+            {{ t('auth.acceptInvitation.password') }}
           </label>
           <Password
             v-model="password"
@@ -140,7 +142,7 @@ async function handleSubmit(): Promise<void> {
             input-class="w-full"
           />
           <small v-if="submitted && errors.password" class="text-red-500">
-            Password must be at least 8 characters.
+            {{ t('auth.register.passwordTooShort') }}
           </small>
         </div>
 
@@ -149,7 +151,7 @@ async function handleSubmit(): Promise<void> {
             for="confirmPassword"
             class="text-sm font-medium text-gray-700"
           >
-            Confirm Password
+            {{ t('auth.register.confirmPassword') }}
           </label>
           <Password
             v-model="confirmPassword"
@@ -165,25 +167,25 @@ async function handleSubmit(): Promise<void> {
             v-if="submitted && errors.confirmPassword"
             class="text-red-500"
           >
-            Passwords do not match.
+            {{ t('auth.register.passwordMismatch') }}
           </small>
         </div>
 
         <Button
           type="submit"
-          label="Accept Invitation"
+          :label="t('auth.acceptInvitation.submit')"
           :loading="authStore.loading"
           class="mt-2 w-full"
         />
       </form>
 
       <p class="mt-4 text-center text-sm text-gray-600">
-        Already have an account?
+        {{ t('auth.register.hasAccount') }}
         <RouterLink
           :to="{ name: ROUTE_NAMES.LOGIN }"
           class="font-medium text-blue-600 hover:text-blue-500"
         >
-          Login
+          {{ t('auth.register.signIn') }}
         </RouterLink>
       </p>
     </div>

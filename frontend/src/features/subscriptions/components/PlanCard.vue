@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import type { SubscriptionPlan, BillingPeriod } from '../types/subscription.types'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   plan: SubscriptionPlan
@@ -66,7 +69,7 @@ const isHighlighted = computed(() => props.plan.tier === 'professional')
     </ul>
 
     <Button
-      :label="isCurrentPlan ? 'Current Plan' : 'Get Started'"
+      :label="isCurrentPlan ? t('subscriptions.currentPlan') : t('landing.hero.getStarted')"
       :disabled="isCurrentPlan"
       :outlined="!isHighlighted && !isCurrentPlan"
       class="mt-6 w-full"

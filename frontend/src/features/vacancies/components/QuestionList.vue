@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Button from 'primevue/button'
@@ -7,6 +8,8 @@ import InputText from 'primevue/inputtext'
 import Dialog from 'primevue/dialog'
 import Tag from 'primevue/tag'
 import type { InterviewQuestion } from '../types/vacancy.types'
+
+const { t } = useI18n()
 
 defineProps<{ questions: InterviewQuestion[]; loading?: boolean }>()
 const emit = defineEmits<{
@@ -46,10 +49,10 @@ function handleSubmit(): void {
 <template>
   <div>
     <div class="mb-4 flex items-center justify-between">
-      <h3 class="text-lg font-semibold">Interview Questions</h3>
+      <h3 class="text-lg font-semibold">{{ t('vacancies.questions') }}</h3>
       <div class="flex gap-2">
-        <Button label="Generate with AI" icon="pi pi-sparkles" severity="info" size="small" :loading="loading" @click="emit('generate')" />
-        <Button label="Add Question" icon="pi pi-plus" size="small" @click="openAdd" />
+        <Button :label="t('vacancies.generateQuestions')" icon="pi pi-sparkles" severity="info" size="small" :loading="loading" @click="emit('generate')" />
+        <Button :label="t('vacancies.addQuestion')" icon="pi pi-plus" size="small" @click="openAdd" />
       </div>
     </div>
     <DataTable :value="questions" :loading="loading" striped-rows>
@@ -61,7 +64,7 @@ function handleSubmit(): void {
           <Tag :value="data.source === 'ai_generated' ? 'AI' : 'Manual'" :severity="data.source === 'ai_generated' ? 'info' : 'secondary'" />
         </template>
       </Column>
-      <Column header="Actions" style="width: 120px">
+      <Column :header="t('common.actions')" style="width: 120px">
         <template #body="{ data }">
           <div class="flex gap-1">
             <Button icon="pi pi-pencil" severity="secondary" text size="small" @click="openEdit(data)" />
@@ -73,7 +76,7 @@ function handleSubmit(): void {
         <div class="py-8 text-center text-gray-500">No questions yet. Add manually or generate with AI.</div>
       </template>
     </DataTable>
-    <Dialog v-model:visible="showDialog" :header="isEditing ? 'Edit Question' : 'Add Question'" :style="{ width: '500px' }" modal>
+    <Dialog v-model:visible="showDialog" :header="isEditing ? 'Edit Question' : t('vacancies.addQuestion')" :style="{ width: '500px' }" modal>
       <div class="space-y-4">
         <div><label class="mb-1 block text-sm font-medium">Question *</label>
           <InputText v-model="formText" class="w-full" placeholder="Enter question text" /></div>
@@ -81,8 +84,8 @@ function handleSubmit(): void {
           <InputText v-model="formCategory" class="w-full" placeholder="e.g. Technical, Behavioral" /></div>
       </div>
       <template #footer>
-        <Button label="Cancel" severity="secondary" text @click="showDialog = false" />
-        <Button :label="isEditing ? 'Save' : 'Add'" :disabled="!formText.trim()" @click="handleSubmit" />
+        <Button :label="t('common.cancel')" severity="secondary" text @click="showDialog = false" />
+        <Button :label="isEditing ? t('common.save') : 'Add'" :disabled="!formText.trim()" @click="handleSubmit" />
       </template>
     </Dialog>
   </div>

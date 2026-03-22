@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
 import FileUpload from 'primevue/fileupload'
@@ -9,6 +10,8 @@ import { vacancyService } from '@/features/vacancies/services/vacancy.service'
 import { useCandidateStore } from '../stores/candidate.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { Vacancy } from '@/shared/types/vacancy.types'
+
+const { t } = useI18n()
 
 const route = useRoute()
 const router = useRouter()
@@ -120,7 +123,7 @@ async function copyLink(): Promise<void> {
           <div class="rounded-lg border border-green-200 bg-green-50 p-4">
             <div class="flex items-center gap-2">
               <i class="pi pi-check-circle text-green-600"></i>
-              <p class="font-medium text-green-800">Application submitted successfully!</p>
+              <p class="font-medium text-green-800">{{ t('candidates.application.success') }}</p>
             </div>
           </div>
 
@@ -135,7 +138,7 @@ async function copyLink(): Promise<void> {
             </p>
 
             <Button
-              label="Start Prescanning Now"
+              :label="t('candidates.application.startPrescanning')"
               icon="pi pi-play"
               class="mb-4 w-full"
               size="large"
@@ -153,7 +156,7 @@ async function copyLink(): Promise<void> {
                   @focus="($event.target as HTMLInputElement).select()"
                 />
                 <Button
-                  :label="linkCopied ? 'Copied!' : 'Copy'"
+                  :label="linkCopied ? t('common.copied') : t('common.copyLink')"
                   :icon="linkCopied ? 'pi pi-check' : 'pi pi-copy'"
                   :severity="linkCopied ? 'success' : 'secondary'"
                   size="small"
@@ -195,7 +198,7 @@ async function copyLink(): Promise<void> {
           <i class="pi pi-arrow-left mr-1"></i> Back to job details
         </RouterLink>
 
-        <h1 class="mb-1 text-2xl font-bold">Apply for Position</h1>
+        <h1 class="mb-1 text-2xl font-bold">{{ t('candidates.application.title') }}</h1>
         <p v-if="vacancy" class="mb-6 text-gray-600">{{ vacancy.title }}</p>
 
         <p v-if="candidateStore.error" class="mb-4 text-sm text-red-600">
@@ -204,25 +207,25 @@ async function copyLink(): Promise<void> {
 
         <form class="space-y-5" @submit.prevent="handleSubmit">
           <div>
-            <label class="mb-1 block text-sm font-medium">Full Name *</label>
+            <label class="mb-1 block text-sm font-medium">{{ t('candidates.application.name') }} *</label>
             <InputText v-model="name" class="w-full" placeholder="John Doe" :invalid="!!errors.name" />
             <small v-if="errors.name" class="text-red-500">{{ errors.name }}</small>
           </div>
 
           <div>
-            <label class="mb-1 block text-sm font-medium">Email *</label>
+            <label class="mb-1 block text-sm font-medium">{{ t('candidates.application.email') }} *</label>
             <InputText v-model="email" type="email" class="w-full" placeholder="john@example.com" :invalid="!!errors.email" />
             <small v-if="errors.email" class="text-red-500">{{ errors.email }}</small>
           </div>
 
           <div>
-            <label class="mb-1 block text-sm font-medium">Phone</label>
+            <label class="mb-1 block text-sm font-medium">{{ t('candidates.application.phone') }}</label>
             <InputText v-model="phone" class="w-full" placeholder="+1 234 567 890" />
           </div>
 
           <div>
             <label class="mb-1 block text-sm font-medium">
-              CV / Resume
+              {{ t('candidates.application.uploadCv') }}
               <span v-if="vacancy?.cvRequired" class="text-red-500">*</span>
             </label>
             <FileUpload
@@ -238,7 +241,7 @@ async function copyLink(): Promise<void> {
 
           <Button
             type="submit"
-            label="Submit Application"
+            :label="t('candidates.application.submit')"
             icon="pi pi-send"
             class="w-full"
             :loading="candidateStore.loading"
@@ -260,7 +263,7 @@ async function copyLink(): Promise<void> {
               <i class="pi pi-comments text-sm text-white"></i>
             </div>
             <div>
-              <p class="text-sm font-semibold text-white">AI Prescanning</p>
+              <p class="text-sm font-semibold text-white">{{ t('interviews.chat.aiPrescanning') }}</p>
               <p class="text-xs text-blue-100">Answer a few questions to get started</p>
             </div>
           </div>
@@ -308,7 +311,7 @@ async function copyLink(): Promise<void> {
             <i class="pi pi-comments text-white"></i>
           </div>
           <div>
-            <p class="text-sm font-medium text-gray-900">AI Prescanning</p>
+            <p class="text-sm font-medium text-gray-900">{{ t('interviews.chat.aiPrescanning') }}</p>
             <p class="text-xs text-gray-500">Click to open prescanning chat</p>
           </div>
         </div>

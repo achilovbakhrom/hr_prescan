@@ -1,16 +1,16 @@
-export const EMPLOYMENT_OPTIONS = [
-  { label: 'Full Time', value: 'full_time' },
-  { label: 'Part Time', value: 'part_time' },
-  { label: 'Contract', value: 'contract' },
-  { label: 'Internship', value: 'internship' },
+export const getEmploymentOptions = (t: (key: string) => string) => [
+  { label: t('vacancies.employment.fullTime'), value: 'full_time' },
+  { label: t('vacancies.employment.partTime'), value: 'part_time' },
+  { label: t('vacancies.employment.contract'), value: 'contract' },
+  { label: t('vacancies.employment.internship'), value: 'internship' },
 ]
 
-export const EXPERIENCE_OPTIONS = [
-  { label: 'Junior', value: 'junior' },
-  { label: 'Middle', value: 'middle' },
-  { label: 'Senior', value: 'senior' },
-  { label: 'Lead', value: 'lead' },
-  { label: 'Director', value: 'director' },
+export const getExperienceOptions = (t: (key: string) => string) => [
+  { label: t('vacancies.experience.junior'), value: 'junior' },
+  { label: t('vacancies.experience.middle'), value: 'middle' },
+  { label: t('vacancies.experience.senior'), value: 'senior' },
+  { label: t('vacancies.experience.lead'), value: 'lead' },
+  { label: t('vacancies.experience.director'), value: 'director' },
 ]
 
 export const CURRENCY_OPTIONS = [
@@ -20,12 +20,12 @@ export const CURRENCY_OPTIONS = [
   { label: 'UZS', value: 'UZS' },
 ]
 
-export const VISIBILITY_OPTIONS = [
-  { label: 'Public', value: 'public' },
-  { label: 'Private', value: 'private' },
+export const getVisibilityOptions = (t: (key: string) => string) => [
+  { label: t('vacancies.visibility.public'), value: 'public' },
+  { label: t('vacancies.visibility.private'), value: 'private' },
 ]
 
-export const INTERVIEW_MODE_OPTIONS = [
-  { label: 'Chat', value: 'chat' },
-  { label: 'Meet (Video)', value: 'meet' },
+export const getInterviewModeOptions = (t: (key: string) => string) => [
+  { label: t('vacancies.interviewMode.chat'), value: 'chat' },
+  { label: t('vacancies.interviewMode.meet'), value: 'meet' },
 ]

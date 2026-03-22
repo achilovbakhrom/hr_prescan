@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
 import Button from 'primevue/button'
@@ -11,6 +12,7 @@ import { ROUTE_NAMES } from '@/shared/constants/routes'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const { t } = useI18n()
 
 const email = ref('')
 const password = ref('')
@@ -66,7 +68,7 @@ function handleGoogleError(msg: string): void {
   <div class="flex flex-1 items-center justify-center py-12">
     <div class="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
       <h1 class="mb-6 text-center text-2xl font-bold text-gray-900">
-        Sign In
+        {{ t('auth.login.title') }}
       </h1>
 
       <Message v-if="errorMessage" severity="error" class="mb-4">
@@ -87,7 +89,7 @@ function handleGoogleError(msg: string): void {
       <form class="flex flex-col gap-4" @submit.prevent="handleLogin">
         <div class="flex flex-col gap-1">
           <label for="email" class="text-sm font-medium text-gray-700">
-            Email
+            {{ t('auth.login.email') }}
           </label>
           <InputText
             id="email"
@@ -104,7 +106,7 @@ function handleGoogleError(msg: string): void {
 
         <div class="flex flex-col gap-1">
           <label for="password" class="text-sm font-medium text-gray-700">
-            Password
+            {{ t('auth.login.password') }}
           </label>
           <Password
             v-model="password"
@@ -123,19 +125,19 @@ function handleGoogleError(msg: string): void {
 
         <Button
           type="submit"
-          label="Sign In"
+          :label="t('auth.login.submit')"
           :loading="authStore.loading"
           class="mt-2 w-full"
         />
       </form>
 
       <p class="mt-4 text-center text-sm text-gray-600">
-        Don't have an account?
+        {{ t('auth.login.noAccount') }}
         <RouterLink
           :to="{ name: ROUTE_NAMES.REGISTER }"
           class="font-medium text-blue-600 hover:text-blue-500"
         >
-          Register
+          {{ t('auth.login.register') }}
         </RouterLink>
       </p>
 

@@ -7,6 +7,23 @@ from openai import OpenAI
 
 from apps.accounts.models import Company, User
 from apps.common.exceptions import ApplicationError
+from apps.common.messages import (
+    MSG_AI_COMPANY_INFO_FAILED,
+    MSG_AI_QUESTIONS_FAILED,
+    MSG_CANNOT_CHANGE_MODE,
+    MSG_FILE_EXTRACT_FAILED,
+    MSG_INTERNAL_URL_NOT_ALLOWED,
+    MSG_INVALID_URL,
+    MSG_NO_INTERVIEW_QUESTIONS,
+    MSG_NO_PRESCANNING_QUESTIONS,
+    MSG_ONLY_ARCHIVED_DELETE,
+    MSG_ONLY_DRAFT_PAUSED_PUBLISH,
+    MSG_ONLY_PUBLISHED_PAUSE,
+    MSG_ONLY_PUBLISHED_PAUSED_ARCHIVE,
+    MSG_URL_RESOLVE_FAILED,
+    MSG_WEBSITE_EXTRACT_FAILED,
+    MSG_WEBSITE_FETCH_FAILED,
+)
 from apps.vacancies.models import InterviewQuestion, ScreeningStep, Vacancy, VacancyCriteria
 
 logger = logging.getLogger(__name__)
@@ -59,9 +76,7 @@ def update_vacancy(*, vacancy: Vacancy, data: dict) -> Vacancy:
     # Guard: interview_mode cannot be changed once applications exist
     if "interview_mode" in data and data["interview_mode"] != vacancy.interview_mode:
         if vacancy.applications.exists():
-            raise ApplicationError(
-                "Cannot change interview mode after applications have been submitted."
-            )
+            raise ApplicationError(str(MSG_CANNOT_CHANGE_MODE))
 
     update_fields: list[str] = []
 
@@ -84,13 +99,13 @@ def publish_vacancy(*, vacancy: Vacancy) -> Vacancy:
     Lifecycle: draft → published ↔ paused → archived. Cannot go back to draft.
     """
     if vacancy.status not in (Vacancy.Status.DRAFT, Vacancy.Status.PAUSED):
-        raise ApplicationError("Only draft or paused vacancies can be published.")
+        raise ApplicationError(str(MSG_ONLY_DRAFT_PAUSED_PUBLISH))
 
     if not vacancy.questions.filter(is_active=True, step=ScreeningStep.PRESCANNING).exists():
-        raise ApplicationError("Cannot publish a vacancy without active prescanning questions.")
+        raise ApplicationError(str(MSG_NO_PRESCANNING_QUESTIONS))
 
     if vacancy.interview_enabled and not vacancy.questions.filter(is_active=True, step=ScreeningStep.INTERVIEW).exists():
-        raise ApplicationError("Cannot publish a vacancy with interview enabled but no active interview questions.")
+        raise ApplicationError(str(MSG_NO_INTERVIEW_QUESTIONS))
 
     vacancy.status = Vacancy.Status.PUBLISHED
     vacancy.save(update_fields=["status", "updated_at"])
@@ -100,7 +115,7 @@ def publish_vacancy(*, vacancy: Vacancy) -> Vacancy:
 def pause_vacancy(*, vacancy: Vacancy) -> Vacancy:
     """Pause a published vacancy. Can be resumed (published again)."""
     if vacancy.status != Vacancy.Status.PUBLISHED:
-        raise ApplicationError("Only published vacancies can be paused.")
+        raise ApplicationError(str(MSG_ONLY_PUBLISHED_PAUSE))
 
     vacancy.status = Vacancy.Status.PAUSED
     vacancy.save(update_fields=["status", "updated_at"])
@@ -113,7 +128,7 @@ def archive_vacancy(*, vacancy: Vacancy) -> Vacancy:
     Allowed from published or paused. Terminal state — cannot go back.
     """
     if vacancy.status not in (Vacancy.Status.PUBLISHED, Vacancy.Status.PAUSED):
-        raise ApplicationError("Only published or paused vacancies can be archived.")
+        raise ApplicationError(str(MSG_ONLY_PUBLISHED_PAUSED_ARCHIVE))
 
     vacancy.status = Vacancy.Status.ARCHIVED
     vacancy.save(update_fields=["status", "updated_at"])
@@ -129,7 +144,7 @@ def archive_vacancy(*, vacancy: Vacancy) -> Vacancy:
 def soft_delete_vacancy(*, vacancy: Vacancy) -> Vacancy:
     """Soft-delete an archived vacancy. Only archived vacancies can be deleted."""
     if vacancy.status != Vacancy.Status.ARCHIVED:
-        raise ApplicationError("Only archived vacancies can be deleted.")
+        raise ApplicationError(str(MSG_ONLY_ARCHIVED_DELETE))
     vacancy.is_deleted = True
     vacancy.save(update_fields=["is_deleted", "updated_at"])
     return vacancy
@@ -305,7 +320,7 @@ def generate_interview_questions(
         questions_data = data.get("questions", [])
     except Exception:
         logger.exception("Failed to generate questions with AI for vacancy %s", vacancy.id)
-        raise ApplicationError("Failed to generate questions. Please try again.")
+        raise ApplicationError(str(MSG_AI_QUESTIONS_FAILED))
 
     max_order = vacancy.questions.filter(step=step).aggregate(
         max_order=models.Max("order")
@@ -340,7 +355,7 @@ def parse_company_info_from_file(*, file_obj) -> str:
         text = file_bytes.decode("utf-8", errors="ignore")
 
     if not text.strip():
-        raise ApplicationError("Could not extract text from the uploaded file.")
+        raise ApplicationError(str(MSG_FILE_EXTRACT_FAILED))
 
     return _generate_company_info_with_ai(text=text, source_label="document")
 
@@ -375,21 +390,21 @@ def _validate_url_not_internal(url: str) -> None:
     parsed = urlparse(url)
     hostname = parsed.hostname
     if not hostname:
-        raise ApplicationError("Invalid URL.")
+        raise ApplicationError(str(MSG_INVALID_URL))
 
     # Block obvious internal hostnames
     blocked_hostnames = {"localhost", "127.0.0.1", "::1", "0.0.0.0", "metadata.google.internal"}
     if hostname.lower() in blocked_hostnames:
-        raise ApplicationError("Internal URLs are not allowed.")
+        raise ApplicationError(str(MSG_INTERNAL_URL_NOT_ALLOWED))
 
     try:
         resolved_ip = socket.getaddrinfo(hostname, None, socket.AF_UNSPEC, socket.SOCK_STREAM)[0][4][0]
         ip = ipaddress.ip_address(resolved_ip)
     except (socket.gaierror, ValueError) as exc:
-        raise ApplicationError("Could not resolve the URL hostname.") from exc
+        raise ApplicationError(str(MSG_URL_RESOLVE_FAILED)) from exc
 
     if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved:
-        raise ApplicationError("Internal or private URLs are not allowed.")
+        raise ApplicationError(str(MSG_INTERNAL_URL_NOT_ALLOWED))
 
 
 def parse_company_info_from_url(*, url: str) -> str:
@@ -405,7 +420,7 @@ def parse_company_info_from_url(*, url: str) -> str:
         }, allow_redirects=True)
         response.raise_for_status()
     except requests.RequestException as exc:
-        raise ApplicationError(f"Could not fetch the website: {exc}") from exc
+        raise ApplicationError(str(MSG_WEBSITE_FETCH_FAILED)) from exc
 
     soup = BeautifulSoup(response.text, "html.parser")
 
@@ -416,7 +431,7 @@ def parse_company_info_from_url(*, url: str) -> str:
     text = soup.get_text(separator="\n", strip=True)
 
     if not text.strip():
-        raise ApplicationError("Could not extract text from the website.")
+        raise ApplicationError(str(MSG_WEBSITE_EXTRACT_FAILED))
 
     return _generate_company_info_with_ai(text=text, source_label="website")
 
@@ -451,4 +466,4 @@ def _generate_company_info_with_ai(*, text: str, source_label: str = "document")
         return response.choices[0].message.content.strip()
     except Exception:
         logger.exception("Failed to generate company info with AI from %s", source_label)
-        raise ApplicationError(f"Failed to generate company info from {source_label}. Please try again.")
+        raise ApplicationError(str(MSG_AI_COMPANY_INFO_FAILED))

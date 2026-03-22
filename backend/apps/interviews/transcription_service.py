@@ -15,6 +15,7 @@ from django.conf import settings
 from openai import OpenAI
 
 from apps.common.exceptions import ApplicationError
+from apps.common.messages import MSG_AUDIO_TRANSCRIPTION_FAILED
 
 logger = logging.getLogger(__name__)
 
@@ -56,6 +57,6 @@ def transcribe_audio(*, file_bytes: bytes, filename: str = "audio.webm") -> str:
         )
     except Exception as e:
         logger.error("Whisper transcription failed: %s", e)
-        raise ApplicationError(f"Audio transcription failed: {e}")
+        raise ApplicationError(str(MSG_AUDIO_TRANSCRIPTION_FAILED))
 
     return transcript.text

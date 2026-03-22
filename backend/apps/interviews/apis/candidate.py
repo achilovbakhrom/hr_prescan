@@ -9,6 +9,20 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.common.exceptions import ApplicationError
+from apps.common.messages import (
+    MSG_AUDIO_FILE_REQUIRED,
+    MSG_AUDIO_FILE_TOO_LARGE,
+    MSG_AUDIO_NOT_FOUND,
+    MSG_CHAT_HISTORY_ONLY,
+    MSG_CHAT_ONLY,
+    MSG_INVALID_AUDIO_FILE_TYPE,
+    MSG_INVALID_AUDIO_URL,
+    MSG_INTERVIEW_NOT_FOUND,
+    MSG_MESSAGE_INDEX_OUT_OF_RANGE,
+    MSG_NO_AUDIO_FILE,
+    MSG_VACANCY_NOT_ACCEPTING_INTERVIEWS,
+    MSG_VOICE_ONLY,
+)
 from apps.interviews.models import Interview
 from apps.interviews.selectors import get_interview_by_id, get_interview_by_token, get_interview_for_candidate
 from apps.interviews.serializers import CandidateInterviewOutputSerializer, PublicInterviewOutputSerializer
@@ -39,7 +53,7 @@ class CandidateInterviewApi(APIView):
         )
         if interview is None:
             return Response(
-                {"detail": "Interview not found."},
+                {"detail": str(MSG_INTERVIEW_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -63,7 +77,7 @@ class InterviewRoomJoinApi(APIView):
         interview = get_interview_by_id(interview_id=interview_id)
         if interview is None:
             return Response(
-                {"detail": "Interview not found."},
+                {"detail": str(MSG_INTERVIEW_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -81,7 +95,7 @@ class InterviewRoomJoinApi(APIView):
             vacancy = interview.application.vacancy
             if vacancy.status == "archived":
                 return Response(
-                    {"detail": "This vacancy is no longer accepting interviews."},
+                    {"detail": str(MSG_VACANCY_NOT_ACCEPTING_INTERVIEWS)},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
@@ -121,7 +135,7 @@ class PublicInterviewApi(APIView):
         interview = get_interview_by_token(interview_token=token)
         if interview is None:
             return Response(
-                {"detail": "Interview not found."},
+                {"detail": str(MSG_INTERVIEW_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -144,7 +158,7 @@ class StartInterviewApi(APIView):
         interview = get_interview_by_token(interview_token=token)
         if interview is None:
             return Response(
-                {"detail": "Interview not found."},
+                {"detail": str(MSG_INTERVIEW_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -180,13 +194,13 @@ class ChatMessageApi(APIView):
         interview = get_interview_by_token(interview_token=token)
         if interview is None:
             return Response(
-                {"detail": "Interview not found."},
+                {"detail": str(MSG_INTERVIEW_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
         if interview.screening_mode != Interview.ScreeningMode.CHAT:
             return Response(
-                {"detail": "Chat is only available for chat-mode interviews."},
+                {"detail": str(MSG_CHAT_ONLY)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -238,13 +252,13 @@ class ChatHistoryApi(APIView):
         interview = get_interview_by_token(interview_token=token)
         if interview is None:
             return Response(
-                {"detail": "Interview not found."},
+                {"detail": str(MSG_INTERVIEW_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
         if interview.screening_mode != Interview.ScreeningMode.CHAT:
             return Response(
-                {"detail": "Chat history is only available for chat-mode interviews."},
+                {"detail": str(MSG_CHAT_HISTORY_ONLY)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -266,13 +280,13 @@ class VoiceChatMessageApi(APIView):
         interview = get_interview_by_token(interview_token=token)
         if interview is None:
             return Response(
-                {"detail": "Interview not found."},
+                {"detail": str(MSG_INTERVIEW_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
         if interview.screening_mode != Interview.ScreeningMode.CHAT:
             return Response(
-                {"detail": "Voice messages are only available for chat-mode interviews."},
+                {"detail": str(MSG_VOICE_ONLY)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -286,20 +300,20 @@ class VoiceChatMessageApi(APIView):
         audio_file = request.FILES.get("audio_file")
         if not audio_file:
             return Response(
-                {"detail": "audio_file is required."},
+                {"detail": str(MSG_AUDIO_FILE_REQUIRED)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         if audio_file.size > self.MAX_AUDIO_SIZE:
             return Response(
-                {"detail": "Audio file exceeds maximum size of 10 MB."},
+                {"detail": str(MSG_AUDIO_FILE_TOO_LARGE)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         content_type = audio_file.content_type or ""
         if not content_type.startswith("audio/"):
             return Response(
-                {"detail": "Invalid file type. Only audio files are accepted."},
+                {"detail": str(MSG_INVALID_AUDIO_FILE_TYPE)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -354,7 +368,7 @@ class VoiceMessageAudioApi(APIView):
         interview = get_interview_by_token(interview_token=token)
         if interview is None:
             return Response(
-                {"detail": "Interview not found."},
+                {"detail": str(MSG_INTERVIEW_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -362,7 +376,7 @@ class VoiceMessageAudioApi(APIView):
 
         if message_index < 0 or message_index >= len(chat_history):
             return Response(
-                {"detail": "Message index out of range."},
+                {"detail": str(MSG_MESSAGE_INDEX_OUT_OF_RANGE)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -370,14 +384,14 @@ class VoiceMessageAudioApi(APIView):
 
         if message.get("message_type") != "voice" or not message.get("audio_url"):
             return Response(
-                {"detail": "This message does not have an associated audio file."},
+                {"detail": str(MSG_NO_AUDIO_FILE)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
         audio_url = message["audio_url"]
         if not audio_url.startswith("voice-messages/"):
             return Response(
-                {"detail": "Invalid audio URL."},
+                {"detail": str(MSG_INVALID_AUDIO_URL)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -391,7 +405,7 @@ class VoiceMessageAudioApi(APIView):
             )
         except Exception:
             return Response(
-                {"detail": "Audio file not found."},
+                {"detail": str(MSG_AUDIO_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 

@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import { useAdminStore } from '../stores/admin.store'
 
+const { t } = useI18n()
 const adminStore = useAdminStore()
 
 onMounted(() => adminStore.fetchPlans())
@@ -11,7 +13,7 @@ onMounted(() => adminStore.fetchPlans())
 
 <template>
   <div class="space-y-4">
-    <h1 class="text-2xl font-bold">Subscription Plans</h1>
+    <h1 class="text-2xl font-bold">{{ t('nav.plans') }}</h1>
 
     <DataTable
       :value="adminStore.plans"

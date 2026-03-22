@@ -1,8 +1,11 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Tag from 'primevue/tag'
 import type { Invitation } from '../types/settings.types'
+
+const { t } = useI18n()
 
 defineProps<{
   invitations: Invitation[]
@@ -33,8 +36,8 @@ function getStatusLabel(invitation: Invitation): string {
 
 <template>
   <DataTable :value="invitations" striped-rows>
-    <Column field="email" header="Email" />
-    <Column header="Status">
+    <Column field="email" :header="t('admin.users.email')" />
+    <Column :header="t('common.status')">
       <template #body="{ data }">
         <Tag
           :value="getStatusLabel(data as Invitation)"

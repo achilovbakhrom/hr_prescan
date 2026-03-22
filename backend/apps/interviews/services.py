@@ -10,6 +10,7 @@ from livekit.api import AccessToken, VideoGrants
 
 from apps.applications.models import Application
 from apps.common.exceptions import ApplicationError
+from apps.common.messages import MSG_INTERVIEW_NOT_FOUND
 from apps.interviews.models import Interview, InterviewIntegrityFlag, InterviewScore
 from apps.vacancies.models import Vacancy
 
@@ -277,7 +278,7 @@ def create_integrity_flags(
     try:
         interview = Interview.objects.get(id=interview_id)
     except Interview.DoesNotExist:
-        raise ApplicationError(f"Interview {interview_id} not found.")
+        raise ApplicationError(str(MSG_INTERVIEW_NOT_FOUND))
 
     flag_objects = [
         InterviewIntegrityFlag(

@@ -6,6 +6,72 @@ export type MessageSchema = typeof en
 
 const LOCALE_STORAGE_KEY = 'hr_prescan_locale'
 
+const datetimeFormats = {
+  en: {
+    short: {
+      year: 'numeric' as const,
+      month: 'short' as const,
+      day: 'numeric' as const,
+    },
+    long: {
+      year: 'numeric' as const,
+      month: 'long' as const,
+      day: 'numeric' as const,
+      hour: '2-digit' as const,
+      minute: '2-digit' as const,
+    },
+  },
+  ru: {
+    short: {
+      year: 'numeric' as const,
+      month: 'short' as const,
+      day: 'numeric' as const,
+    },
+    long: {
+      year: 'numeric' as const,
+      month: 'long' as const,
+      day: 'numeric' as const,
+      hour: '2-digit' as const,
+      minute: '2-digit' as const,
+    },
+  },
+}
+
+const numberFormats = {
+  en: {
+    currency: {
+      style: 'currency' as const,
+      currency: 'USD',
+    },
+    decimal: {
+      style: 'decimal' as const,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    },
+    percent: {
+      style: 'percent' as const,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 1,
+    },
+  },
+  ru: {
+    currency: {
+      style: 'currency' as const,
+      currency: 'RUB',
+    },
+    decimal: {
+      style: 'decimal' as const,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    },
+    percent: {
+      style: 'percent' as const,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 1,
+    },
+  },
+}
+
 function getDefaultLocale(): string {
   const stored = localStorage.getItem(LOCALE_STORAGE_KEY)
   if (stored === 'en' || stored === 'ru') return stored
@@ -24,6 +90,8 @@ export const i18n = createI18n<[MessageSchema], 'en' | 'ru'>({
     en,
     ru,
   },
+  datetimeFormats,
+  numberFormats,
 })
 
 export function setLocale(locale: 'en' | 'ru'): void {

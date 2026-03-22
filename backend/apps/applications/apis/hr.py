@@ -22,6 +22,12 @@ from apps.applications.services import (
     update_application_status,
 )
 from apps.common.exceptions import ApplicationError
+from apps.common.messages import (
+    MSG_APPLICATION_NOT_FOUND,
+    MSG_NO_CV_UPLOADED,
+    MSG_NOT_IN_COMPANY,
+    MSG_VACANCY_NOT_FOUND,
+)
 from apps.vacancies.selectors import get_vacancy_by_id
 
 
@@ -58,14 +64,14 @@ class HRApplicationListApi(APIView):
         company = request.user.company
         if company is None:
             return Response(
-                {"detail": "You are not associated with a company."},
+                {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
         vacancy = get_vacancy_by_id(vacancy_id=vacancy_id, company=company)
         if vacancy is None:
             return Response(
-                {"detail": "Vacancy not found."},
+                {"detail": str(MSG_VACANCY_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -97,7 +103,7 @@ class HRApplicationDetailApi(APIView):
         company = request.user.company
         if company is None:
             return Response(
-                {"detail": "You are not associated with a company."},
+                {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -106,7 +112,7 @@ class HRApplicationDetailApi(APIView):
         )
         if application is None:
             return Response(
-                {"detail": "Application not found."},
+                {"detail": str(MSG_APPLICATION_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -128,7 +134,7 @@ class HRApplicationStatusApi(APIView):
         company = request.user.company
         if company is None:
             return Response(
-                {"detail": "You are not associated with a company."},
+                {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -137,7 +143,7 @@ class HRApplicationStatusApi(APIView):
         )
         if application is None:
             return Response(
-                {"detail": "Application not found."},
+                {"detail": str(MSG_APPLICATION_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -174,7 +180,7 @@ class HRApplicationNotesApi(APIView):
         company = request.user.company
         if company is None:
             return Response(
-                {"detail": "You are not associated with a company."},
+                {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -183,7 +189,7 @@ class HRApplicationNotesApi(APIView):
         )
         if application is None:
             return Response(
-                {"detail": "Application not found."},
+                {"detail": str(MSG_APPLICATION_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -210,7 +216,7 @@ class HRCvDownloadApi(APIView):
         company = request.user.company
         if company is None:
             return Response(
-                {"detail": "You are not associated with a company."},
+                {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -219,13 +225,13 @@ class HRCvDownloadApi(APIView):
         )
         if application is None:
             return Response(
-                {"detail": "Application not found."},
+                {"detail": str(MSG_APPLICATION_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
         if not application.cv_file:
             return Response(
-                {"detail": "No CV uploaded for this application."},
+                {"detail": str(MSG_NO_CV_UPLOADED)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -278,7 +284,7 @@ class HRBatchMoveApi(APIView):
     def post(self, request: Request, vacancy_id: str) -> Response:
         vacancy = get_vacancy_by_id(vacancy_id=vacancy_id, company=request.user.company)
         if vacancy is None:
-            return Response({"detail": "Vacancy not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": str(MSG_VACANCY_NOT_FOUND)}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

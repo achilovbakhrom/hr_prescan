@@ -6,6 +6,13 @@ from rest_framework.views import APIView
 
 from apps.accounts.permissions import IsAdmin, IsHRManager
 from apps.common.exceptions import ApplicationError
+from apps.common.messages import (
+    MSG_COMPANY_REGISTERED,
+    MSG_INVITATION_ACCEPTED,
+    MSG_INVITATION_SENT,
+    MSG_NOT_IN_COMPANY,
+    MSG_USER_NOT_FOUND,
+)
 from apps.accounts.selectors import get_company_invitations, get_company_users, get_user_by_id
 from apps.accounts.serializers import (
     AcceptInvitationInputSerializer,
@@ -43,7 +50,7 @@ class CompanyRegisterApi(APIView):
 
         return Response(
             {
-                "detail": "Company registered successfully. Please verify your email.",
+                "detail": str(MSG_COMPANY_REGISTERED),
                 "company": CompanyOutputSerializer(company).data,
                 "user": UserOutputSerializer(user).data,
             },
@@ -63,7 +70,7 @@ class CompanyProfileApi(APIView):
         company = request.user.company
         if company is None:
             return Response(
-                {"detail": "You are not associated with a company."},
+                {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
             )
         return Response(CompanyOutputSerializer(company).data, status=status.HTTP_200_OK)
@@ -72,7 +79,7 @@ class CompanyProfileApi(APIView):
         company = request.user.company
         if company is None:
             return Response(
-                {"detail": "You are not associated with a company."},
+                {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -104,7 +111,7 @@ class InviteHRApi(APIView):
 
         return Response(
             {
-                "detail": "Invitation sent successfully.",
+                "detail": str(MSG_INVITATION_SENT),
                 "invitation": InvitationOutputSerializer(invitation).data,
             },
             status=status.HTTP_201_CREATED,
@@ -135,7 +142,7 @@ class AcceptInvitationApi(APIView):
 
         return Response(
             {
-                "detail": "Invitation accepted. You can now log in.",
+                "detail": str(MSG_INVITATION_ACCEPTED),
                 "user": UserOutputSerializer(user).data,
             },
             status=status.HTTP_201_CREATED,
@@ -151,7 +158,7 @@ class TeamListApi(APIView):
         company = request.user.company
         if company is None:
             return Response(
-                {"detail": "You are not associated with a company."},
+                {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -174,7 +181,7 @@ class TeamMemberDetailApi(APIView):
         target_user = get_user_by_id(user_id=user_id)
         if target_user is None:
             return Response(
-                {"detail": "User not found."},
+                {"detail": str(MSG_USER_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 

@@ -8,6 +8,19 @@ from rest_framework.views import APIView
 from apps.accounts.permissions import IsAdmin, IsHRManager
 from apps.applications.selectors import get_application_by_id
 from apps.common.exceptions import ApplicationError
+from apps.common.messages import (
+    MSG_APPLICATION_NOT_FOUND,
+    MSG_AUDIO_NOT_FOUND,
+    MSG_INTERVIEW_NOT_FOUND,
+    MSG_INVALID_AUDIO_URL,
+    MSG_MESSAGE_INDEX_OUT_OF_RANGE,
+    MSG_NO_AUDIO_FILE,
+    MSG_NO_RECORDING,
+    MSG_NO_SESSION_FOUND,
+    MSG_NOT_IN_COMPANY,
+    MSG_RECORDING_ONLY_COMPLETED,
+    MSG_TRANSCRIPT_ONLY_COMPLETED,
+)
 from apps.interviews.models import Interview
 from apps.interviews.selectors import (
     get_company_interviews,
@@ -41,7 +54,7 @@ class HRApplicationInterviewApi(APIView):
         company = request.user.company
         if company is None:
             return Response(
-                {"detail": "You are not associated with a company."},
+                {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -50,7 +63,7 @@ class HRApplicationInterviewApi(APIView):
         )
         if application is None:
             return Response(
-                {"detail": "Application not found."},
+                {"detail": str(MSG_APPLICATION_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -73,7 +86,7 @@ class HRApplicationInterviewApi(APIView):
         interview = sessions_qs.first()
         if interview is None:
             return Response(
-                {"detail": "No session found for this application."},
+                {"detail": str(MSG_NO_SESSION_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -97,7 +110,7 @@ class ScheduleHumanInterviewApi(APIView):
         company = request.user.company
         if company is None:
             return Response(
-                {"detail": "You are not associated with a company."},
+                {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -106,7 +119,7 @@ class ScheduleHumanInterviewApi(APIView):
         )
         if application is None:
             return Response(
-                {"detail": "Application not found."},
+                {"detail": str(MSG_APPLICATION_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -137,7 +150,7 @@ class HRInterviewListApi(APIView):
         company = request.user.company
         if company is None:
             return Response(
-                {"detail": "You are not associated with a company."},
+                {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -164,7 +177,7 @@ class HRInterviewDetailApi(APIView):
         company = request.user.company
         if company is None:
             return Response(
-                {"detail": "You are not associated with a company."},
+                {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -173,7 +186,7 @@ class HRInterviewDetailApi(APIView):
         )
         if interview is None:
             return Response(
-                {"detail": "Interview not found."},
+                {"detail": str(MSG_INTERVIEW_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -192,7 +205,7 @@ class CancelInterviewApi(APIView):
         company = request.user.company
         if company is None:
             return Response(
-                {"detail": "You are not associated with a company."},
+                {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -201,7 +214,7 @@ class CancelInterviewApi(APIView):
         )
         if interview is None:
             return Response(
-                {"detail": "Interview not found."},
+                {"detail": str(MSG_INTERVIEW_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -232,7 +245,7 @@ class ResetInterviewApi(APIView):
         company = request.user.company
         if company is None:
             return Response(
-                {"detail": "You are not associated with a company."},
+                {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -241,7 +254,7 @@ class ResetInterviewApi(APIView):
         )
         if interview is None:
             return Response(
-                {"detail": "Interview not found."},
+                {"detail": str(MSG_INTERVIEW_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -268,7 +281,7 @@ class ObserverTokenApi(APIView):
         company = request.user.company
         if company is None:
             return Response(
-                {"detail": "You are not associated with a company."},
+                {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -277,7 +290,7 @@ class ObserverTokenApi(APIView):
         )
         if interview is None:
             return Response(
-                {"detail": "Interview not found."},
+                {"detail": str(MSG_INTERVIEW_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -301,7 +314,7 @@ class InterviewTranscriptApi(APIView):
         company = request.user.company
         if company is None:
             return Response(
-                {"detail": "You are not associated with a company."},
+                {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -310,13 +323,13 @@ class InterviewTranscriptApi(APIView):
         )
         if interview is None:
             return Response(
-                {"detail": "Interview not found."},
+                {"detail": str(MSG_INTERVIEW_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
         if interview.status != Interview.Status.COMPLETED:
             return Response(
-                {"detail": "Transcript is only available for completed interviews."},
+                {"detail": str(MSG_TRANSCRIPT_ONLY_COMPLETED)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -338,7 +351,7 @@ class InterviewRecordingApi(APIView):
         company = request.user.company
         if company is None:
             return Response(
-                {"detail": "You are not associated with a company."},
+                {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -347,19 +360,19 @@ class InterviewRecordingApi(APIView):
         )
         if interview is None:
             return Response(
-                {"detail": "Interview not found."},
+                {"detail": str(MSG_INTERVIEW_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
         if interview.status != Interview.Status.COMPLETED:
             return Response(
-                {"detail": "Recording is only available for completed interviews."},
+                {"detail": str(MSG_RECORDING_ONLY_COMPLETED)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         if not interview.recording_path:
             return Response(
-                {"detail": "No recording available for this interview."},
+                {"detail": str(MSG_NO_RECORDING)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -386,14 +399,14 @@ class IntegrityFlagsApi(APIView):
         company = request.user.company
         if company is None:
             return Response(
-                {"detail": "You are not associated with a company."},
+                {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
         flags = get_integrity_flags(interview_id=interview_id, company=company)
         if flags is None:
             return Response(
-                {"detail": "Interview not found."},
+                {"detail": str(MSG_INTERVIEW_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -417,7 +430,7 @@ class HRVoiceMessageAudioApi(APIView):
         interview = get_interview_by_id(interview_id=interview_id, company=company)
         if interview is None:
             return Response(
-                {"detail": "Interview not found."},
+                {"detail": str(MSG_INTERVIEW_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -425,7 +438,7 @@ class HRVoiceMessageAudioApi(APIView):
 
         if message_index < 0 or message_index >= len(chat_history):
             return Response(
-                {"detail": "Message index out of range."},
+                {"detail": str(MSG_MESSAGE_INDEX_OUT_OF_RANGE)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -433,14 +446,14 @@ class HRVoiceMessageAudioApi(APIView):
 
         if message.get("message_type") != "voice" or not message.get("audio_url"):
             return Response(
-                {"detail": "This message does not have an associated audio file."},
+                {"detail": str(MSG_NO_AUDIO_FILE)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
         audio_url = message["audio_url"]
         if not audio_url.startswith("voice-messages/"):
             return Response(
-                {"detail": "Invalid audio URL."},
+                {"detail": str(MSG_INVALID_AUDIO_URL)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -454,7 +467,7 @@ class HRVoiceMessageAudioApi(APIView):
             )
         except Exception:
             return Response(
-                {"detail": "Audio file not found."},
+                {"detail": str(MSG_AUDIO_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 

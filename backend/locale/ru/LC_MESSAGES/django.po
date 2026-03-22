@@ -1,0 +1,337 @@
+# Russian translations for HR PreScan.
+# Copyright (C) 2024 HR PreScan
+# This file is distributed under the same license as the HR PreScan package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: HR PreScan 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-01-01 00:00+0000\n"
+"PO-Revision-Date: 2024-01-01 00:00+0000\n"
+"Last-Translator: HR PreScan Team\n"
+"Language-Team: Russian\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#: apps/common/messages.py
+msgid "Not found."
+msgstr "Не найдено."
+
+#: apps/common/messages.py
+msgid "You do not have permission to perform this action."
+msgstr "У вас нет прав для выполнения этого действия."
+
+#: apps/common/messages.py
+msgid "User with this email already exists."
+msgstr "Пользователь с таким email уже существует."
+
+#: apps/common/messages.py
+msgid "Invalid email or password."
+msgstr "Неверный email или пароль."
+
+#: apps/common/messages.py
+msgid "Account is deactivated."
+msgstr "Аккаунт деактивирован."
+
+#: apps/common/messages.py
+msgid "Email is already verified."
+msgstr "Email уже подтверждён."
+
+#: apps/common/messages.py
+msgid "Invalid or expired verification token."
+msgstr "Недействительный или просроченный токен подтверждения."
+
+#: apps/common/messages.py
+msgid "Registration successful. Please verify your email."
+msgstr "Регистрация прошла успешно. Пожалуйста, подтвердите ваш email."
+
+#: apps/common/messages.py
+msgid "Email verified successfully."
+msgstr "Email успешно подтверждён."
+
+#: apps/common/messages.py
+msgid "Logout successful."
+msgstr "Выход выполнен успешно."
+
+#: apps/common/messages.py
+msgid "Invalid or expired token."
+msgstr "Недействительный или просроченный токен."
+
+#: apps/common/messages.py
+msgid "Invalid or expired refresh token."
+msgstr "Недействительный или просроченный токен обновления."
+
+#: apps/common/messages.py
+msgid "Invalid Google token."
+msgstr "Недействительный токен Google."
+
+#: apps/common/messages.py
+msgid "Google account has no email."
+msgstr "У аккаунта Google нет email."
+
+#: apps/common/messages.py
+msgid "You are not associated with a company."
+msgstr "Вы не привязаны к компании."
+
+#: apps/common/messages.py
+msgid "Company registered successfully. Please verify your email."
+msgstr "Компания успешно зарегистрирована. Пожалуйста, подтвердите ваш email."
+
+#: apps/common/messages.py
+msgid "Invitation sent successfully."
+msgstr "Приглашение успешно отправлено."
+
+#: apps/common/messages.py
+msgid "An invitation has already been sent to this email."
+msgstr "Приглашение на этот email уже отправлено."
+
+#: apps/common/messages.py
+msgid "Invitation accepted. You can now log in."
+msgstr "Приглашение принято. Теперь вы можете войти."
+
+#: apps/common/messages.py
+msgid "Invitation accepted. You are now part of the company."
+msgstr "Приглашение принято. Теперь вы являетесь частью компании."
+
+#: apps/common/messages.py
+msgid "Invalid invitation token."
+msgstr "Недействительный токен приглашения."
+
+#: apps/common/messages.py
+msgid "This invitation has already been accepted."
+msgstr "Это приглашение уже было принято."
+
+#: apps/common/messages.py
+msgid "This invitation has expired."
+msgstr "Срок действия приглашения истёк."
+
+#: apps/common/messages.py
+msgid "This invitation was sent to a different email."
+msgstr "Это приглашение было отправлено на другой email."
+
+#: apps/common/messages.py
+msgid "User not found."
+msgstr "Пользователь не найден."
+
+#: apps/common/messages.py
+msgid "Only admins can deactivate users."
+msgstr "Только администраторы могут деактивировать пользователей."
+
+#: apps/common/messages.py
+msgid "Only admins can activate users."
+msgstr "Только администраторы могут активировать пользователей."
+
+#: apps/common/messages.py
+msgid "You can only manage users in your own company."
+msgstr "Вы можете управлять только пользователями своей компании."
+
+#: apps/common/messages.py
+msgid "You cannot deactivate yourself."
+msgstr "Вы не можете деактивировать себя."
+
+#: apps/common/messages.py
+msgid "User is already deactivated."
+msgstr "Пользователь уже деактивирован."
+
+#: apps/common/messages.py
+msgid "User is already active."
+msgstr "Пользователь уже активен."
+
+#: apps/common/messages.py
+msgid "Vacancy not found."
+msgstr "Вакансия не найдена."
+
+#: apps/common/messages.py
+msgid "This vacancy is not accepting applications."
+msgstr "Эта вакансия не принимает заявки."
+
+#: apps/common/messages.py
+msgid "A CV is required for this vacancy."
+msgstr "Для этой вакансии требуется резюме."
+
+#: apps/common/messages.py
+msgid "You have already applied to this vacancy."
+msgstr "Вы уже подали заявку на эту вакансию."
+
+#: apps/common/messages.py
+msgid "Cannot change interview mode after applications have been submitted."
+msgstr "Невозможно изменить режим интервью после подачи заявок."
+
+#: apps/common/messages.py
+msgid "Only draft or paused vacancies can be published."
+msgstr "Публиковать можно только черновые или приостановленные вакансии."
+
+#: apps/common/messages.py
+msgid "Cannot publish a vacancy without active prescanning questions."
+msgstr "Невозможно опубликовать вакансию без активных вопросов прескрининга."
+
+#: apps/common/messages.py
+msgid "Cannot publish a vacancy with interview enabled but no active interview questions."
+msgstr "Невозможно опубликовать вакансию с включённым интервью, но без активных вопросов для интервью."
+
+#: apps/common/messages.py
+msgid "Only published vacancies can be paused."
+msgstr "Приостановить можно только опубликованные вакансии."
+
+#: apps/common/messages.py
+msgid "Only published or paused vacancies can be archived."
+msgstr "Архивировать можно только опубликованные или приостановленные вакансии."
+
+#: apps/common/messages.py
+msgid "Only archived vacancies can be deleted."
+msgstr "Удалить можно только архивные вакансии."
+
+#: apps/common/messages.py
+msgid "Could not extract text from the uploaded file."
+msgstr "Не удалось извлечь текст из загруженного файла."
+
+#: apps/common/messages.py
+msgid "Failed to generate company info. Please try again."
+msgstr "Не удалось сгенерировать информацию о компании. Пожалуйста, попробуйте снова."
+
+#: apps/common/messages.py
+msgid "Internal or private URLs are not allowed."
+msgstr "Внутренние или частные URL-адреса не допускаются."
+
+#: apps/common/messages.py
+msgid "Invalid URL."
+msgstr "Недействительный URL."
+
+#: apps/common/messages.py
+msgid "Could not resolve the URL hostname."
+msgstr "Не удалось определить имя хоста URL."
+
+#: apps/common/messages.py
+msgid "Could not fetch the website."
+msgstr "Не удалось загрузить веб-сайт."
+
+#: apps/common/messages.py
+msgid "Could not extract text from the website."
+msgstr "Не удалось извлечь текст с веб-сайта."
+
+#: apps/common/messages.py
+msgid "Failed to generate questions. Please try again."
+msgstr "Не удалось сгенерировать вопросы. Пожалуйста, попробуйте снова."
+
+#: apps/common/messages.py
+msgid "Criteria not found."
+msgstr "Критерий не найден."
+
+#: apps/common/messages.py
+msgid "Question not found."
+msgstr "Вопрос не найден."
+
+#: apps/common/messages.py
+msgid "Application not found."
+msgstr "Заявка не найдена."
+
+#: apps/common/messages.py
+msgid "Cannot transition from '{current}' to '{target}'."
+msgstr "Невозможно перевести из статуса '{current}' в '{target}'."
+
+#: apps/common/messages.py
+msgid "No CV uploaded for this application."
+msgstr "Резюме для этой заявки не загружено."
+
+#: apps/common/messages.py
+msgid "Interview not found."
+msgstr "Интервью не найдено."
+
+#: apps/common/messages.py
+msgid "This session is not a chat-mode session."
+msgstr "Эта сессия не является чат-сессией."
+
+#: apps/common/messages.py
+msgid "This session is not currently in progress."
+msgstr "Эта сессия в данный момент не активна."
+
+#: apps/common/messages.py
+msgid "No file uploaded."
+msgstr "Файл не загружен."
+
+#: apps/common/messages.py
+msgid "File too large. Maximum size is 10MB."
+msgstr "Файл слишком большой. Максимальный размер — 10 МБ."
+
+#: apps/common/messages.py
+msgid "Unsupported file type."
+msgstr "Неподдерживаемый тип файла."
+
+#: apps/common/messages.py
+msgid "Audio transcription failed."
+msgstr "Ошибка транскрипции аудио."
+
+#: apps/common/messages.py
+msgid "Audio file not found."
+msgstr "Аудиофайл не найден."
+
+#: apps/common/messages.py
+msgid "Invalid audio URL."
+msgstr "Недействительный URL аудио."
+
+#: apps/common/messages.py
+msgid "This message does not have an associated audio file."
+msgstr "У этого сообщения нет связанного аудиофайла."
+
+#: apps/common/messages.py
+msgid "Message index out of range."
+msgstr "Индекс сообщения вне допустимого диапазона."
+
+#: apps/common/messages.py
+msgid "AI evaluation completed but the scoring response was malformed. HR should review the conversation transcript manually."
+msgstr "Оценка ИИ завершена, но ответ с баллами был некорректным. HR-специалисту следует вручную проверить стенограмму разговора."
+
+#: apps/common/messages.py
+msgid "No session found for this application."
+msgstr "Сессия для этой заявки не найдена."
+
+#: apps/common/messages.py
+msgid "Chat is only available for chat-mode interviews."
+msgstr "Чат доступен только для интервью в режиме чата."
+
+#: apps/common/messages.py
+msgid "Chat history is only available for chat-mode interviews."
+msgstr "История чата доступна только для интервью в режиме чата."
+
+#: apps/common/messages.py
+msgid "Voice messages are only available for chat-mode interviews."
+msgstr "Голосовые сообщения доступны только для интервью в режиме чата."
+
+#: apps/common/messages.py
+msgid "This vacancy is no longer accepting interviews."
+msgstr "Эта вакансия больше не принимает интервью."
+
+#: apps/common/messages.py
+msgid "Transcript is only available for completed interviews."
+msgstr "Стенограмма доступна только для завершённых интервью."
+
+#: apps/common/messages.py
+msgid "Recording is only available for completed interviews."
+msgstr "Запись доступна только для завершённых интервью."
+
+#: apps/common/messages.py
+msgid "No recording available for this interview."
+msgstr "Запись для этого интервью недоступна."
+
+#: apps/common/messages.py
+msgid "audio_file is required."
+msgstr "Поле audio_file обязательно."
+
+#: apps/common/messages.py
+msgid "Audio file exceeds maximum size of 10 MB."
+msgstr "Размер аудиофайла превышает максимально допустимые 10 МБ."
+
+#: apps/common/messages.py
+msgid "Invalid file type. Only audio files are accepted."
+msgstr "Недопустимый тип файла. Принимаются только аудиофайлы."
+
+#: apps/common/messages.py
+msgid "Interview results saved successfully."
+msgstr "Результаты интервью успешно сохранены."
+
+#: apps/common/messages.py
+msgid "Invalid or missing internal API key."
+msgstr "Недействительный или отсутствующий внутренний API-ключ."

@@ -5,6 +5,13 @@ from rest_framework.views import APIView
 
 from apps.accounts.permissions import IsAdmin, IsHRManager
 from apps.common.exceptions import ApplicationError
+from apps.common.messages import (
+    MSG_FILE_TOO_LARGE,
+    MSG_NO_FILE_UPLOADED,
+    MSG_NOT_IN_COMPANY,
+    MSG_UNSUPPORTED_FILE_TYPE,
+    MSG_VACANCY_NOT_FOUND,
+)
 from apps.vacancies.models import Vacancy
 from apps.vacancies.selectors import get_company_vacancies, get_vacancy_by_id
 from apps.vacancies.serializers import VacancyDetailOutputSerializer, VacancyListOutputSerializer
@@ -82,7 +89,7 @@ class VacancyListCreateApi(APIView):
         company = request.user.company
         if company is None:
             return Response(
-                {"detail": "You are not associated with a company."},
+                {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -102,7 +109,7 @@ class VacancyListCreateApi(APIView):
         company = request.user.company
         if company is None:
             return Response(
-                {"detail": "You are not associated with a company."},
+                {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -163,14 +170,14 @@ class VacancyDetailApi(APIView):
     def get(self, request: Request, vacancy_id: str) -> Response:
         vacancy = get_vacancy_by_id(vacancy_id=vacancy_id, company=request.user.company)
         if vacancy is None:
-            return Response({"detail": "Vacancy not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": str(MSG_VACANCY_NOT_FOUND)}, status=status.HTTP_404_NOT_FOUND)
 
         return Response(VacancyDetailOutputSerializer(vacancy).data, status=status.HTTP_200_OK)
 
     def put(self, request: Request, vacancy_id: str) -> Response:
         vacancy = get_vacancy_by_id(vacancy_id=vacancy_id, company=request.user.company)
         if vacancy is None:
-            return Response({"detail": "Vacancy not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": str(MSG_VACANCY_NOT_FOUND)}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -181,7 +188,7 @@ class VacancyDetailApi(APIView):
     def delete(self, request: Request, vacancy_id: str) -> Response:
         vacancy = get_vacancy_by_id(vacancy_id=vacancy_id, company=request.user.company)
         if vacancy is None:
-            return Response({"detail": "Vacancy not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": str(MSG_VACANCY_NOT_FOUND)}, status=status.HTTP_404_NOT_FOUND)
         try:
             soft_delete_vacancy(vacancy=vacancy)
         except ApplicationError as e:
@@ -200,7 +207,7 @@ class VacancyStatusApi(APIView):
     def patch(self, request: Request, vacancy_id: str) -> Response:
         vacancy = get_vacancy_by_id(vacancy_id=vacancy_id, company=request.user.company)
         if vacancy is None:
-            return Response({"detail": "Vacancy not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": str(MSG_VACANCY_NOT_FOUND)}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -229,7 +236,7 @@ class ParseCompanyFileApi(APIView):
         file_obj = request.FILES.get("file")
         if not file_obj:
             return Response(
-                {"detail": "No file uploaded."},
+                {"detail": str(MSG_NO_FILE_UPLOADED)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -237,13 +244,13 @@ class ParseCompanyFileApi(APIView):
         ext = file_obj.name.rsplit(".", 1)[-1].lower() if "." in file_obj.name else ""
         if ext not in allowed_extensions:
             return Response(
-                {"detail": f"Unsupported file type. Allowed: {', '.join(allowed_extensions)}"},
+                {"detail": str(MSG_UNSUPPORTED_FILE_TYPE)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         if file_obj.size > 10 * 1024 * 1024:  # 10MB limit
             return Response(
-                {"detail": "File too large. Maximum size is 10MB."},
+                {"detail": str(MSG_FILE_TOO_LARGE)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
