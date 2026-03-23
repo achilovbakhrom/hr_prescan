@@ -58,7 +58,7 @@ function stepIndex(status: string): number {
       <!-- Status Timeline -->
       <div class="rounded-lg border border-gray-200 bg-white p-4">
         <h2 class="mb-3 text-sm font-semibold text-gray-600">
-          Application Progress
+          {{ t('candidates.myApplication.progress') }}
         </h2>
         <div
           v-if="application.status !== 'rejected'"
@@ -100,7 +100,7 @@ function stepIndex(status: string): number {
         <h2 class="mb-2 text-sm font-semibold text-gray-600">{{ t('nav.vacancies') }}</h2>
         <p class="text-lg font-medium">{{ application.vacancyTitle }}</p>
         <p class="text-sm text-gray-500">
-          Applied on {{ formatDate(application.createdAt) }}
+          {{ t('candidates.myApplication.appliedOn') }} {{ formatDate(application.createdAt) }}
         </p>
       </div>
 
@@ -111,7 +111,7 @@ function stepIndex(status: string): number {
           {{ application.matchScore }}%
         </p>
         <p v-else class="text-gray-400">
-          Your CV is being analyzed. Match score will appear here soon.
+          {{ t('candidates.myApplication.cvBeingAnalyzed') }}
         </p>
       </div>
 
@@ -122,7 +122,7 @@ function stepIndex(status: string): number {
         </h2>
         <Button
           v-if="application.cvFile"
-          :label="application.cvOriginalFilename || 'Download CV'"
+          :label="application.cvOriginalFilename || t('candidates.myApplication.downloadCv')"
           icon="pi pi-download"
           size="small"
           outlined
@@ -130,7 +130,7 @@ function stepIndex(status: string): number {
           as="a"
           target="_blank"
         />
-        <p v-else class="text-sm text-gray-400">No CV uploaded</p>
+        <p v-else class="text-sm text-gray-400">{{ t('candidates.myApplication.noCvUploaded') }}</p>
       </div>
     </template>
   </div>

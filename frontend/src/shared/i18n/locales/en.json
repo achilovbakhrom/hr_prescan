@@ -72,7 +72,14 @@
       "register": "Sign up",
       "forgotPassword": "Forgot password?",
       "invalidCredentials": "Invalid email or password",
-      "accountDeactivated": "Account is deactivated"
+      "accountDeactivated": "Account is deactivated",
+      "orSignInWithEmail": "or sign in with email",
+      "emailPlaceholder": "Enter your email",
+      "emailInvalid": "Please enter a valid email address.",
+      "passwordPlaceholder": "Enter your password",
+      "passwordRequired": "Password is required.",
+      "wantToHire": "Want to hire?",
+      "registerCompany": "Register your company"
     },
     "register": {
       "title": "Create Account",
@@ -237,7 +244,27 @@
     "createVacancy": "Create Vacancy",
     "viewCandidates": "View Candidates",
     "noRecentApplications": "No recent applications",
-    "noUpcomingInterviews": "No upcoming interviews"
+    "noUpcomingInterviews": "No upcoming interviews",
+    "subtitle": "Here's what's happening today",
+    "stats": {
+      "active": "active",
+      "draft": "draft",
+      "completed": "completed",
+      "aiInterviewsDone": "AI interviews done",
+      "allTime": "All time",
+      "applications": "Applications",
+      "min": "min"
+    },
+    "table": {
+      "candidate": "Candidate",
+      "vacancy": "Vacancy",
+      "score": "Score",
+      "date": "Date",
+      "dateTime": "Date/Time"
+    },
+    "scheduledInterviewsHint": "Scheduled interviews will appear here",
+    "trackApplications": "Track your application status",
+    "viewEditProfile": "View and edit your profile"
   },
   "vacancies": {
     "title": "Vacancies",
@@ -365,6 +392,8 @@
     "noVacancies": "No vacancies yet",
     "noVacanciesHint": "Create your first vacancy to start receiving applications",
     "noArchivedVacancies": "No archived vacancies",
+    "noArchivedVacanciesHint": "Archived vacancies will appear here",
+    "shown": "{count} shown",
     "shareLink": "Share Link",
     "questions": "Competencies",
     "criteria": "Criteria",
@@ -428,7 +457,25 @@
       "submitting": "Submitting...",
       "success": "Application submitted successfully!",
       "startPrescanning": "Start Prescanning Now",
-      "doItLater": "I'll do it later"
+      "doItLater": "I'll do it later",
+      "prescanReady": "Your Prescanning is Ready",
+      "prescanReadyHint": "You can start your AI prescanning chat now, or do it later using the link below.",
+      "prescanLink": "Prescanning Link",
+      "linkSentToEmail": "We've also sent the prescanning link to your email.",
+      "tip": "Tip",
+      "tipText": "Create an account to track your application status and access your interview results.",
+      "createAccount": "Create an account",
+      "browseMoreJobs": "Browse more jobs",
+      "backToJob": "Back to job details",
+      "chooseCv": "Choose CV",
+      "acceptedFormats": "Accepted formats: PDF, DOCX (max 10MB)",
+      "answerQuestions": "Answer a few questions to get started",
+      "clickToOpenChat": "Click to open prescanning chat",
+      "validation": {
+        "nameRequired": "Name is required",
+        "emailRequired": "Email is required",
+        "emailInvalid": "Invalid email format"
+      }
     },
     "dialogs": {
       "bulkConfirmHeader": "Confirm Bulk Action",
@@ -445,7 +492,73 @@
     "matchScore": "Match Score",
     "prescanScore": "Prescan Score",
     "interviewScore": "Interview Score",
-    "overallScore": "Overall Score"
+    "overallScore": "Overall Score",
+    "overviewDetails": {
+      "notProvided": "Not provided",
+      "combinedScore": "Combined score"
+    },
+    "cvData": {
+      "file": "CV File",
+      "clickToDownload": "Click to download",
+      "analyzing": "Analyzing CV...",
+      "analyzingHint": "Extracting skills, experience, and calculating match score. This takes about 20 seconds.",
+      "extracting": "Extracting skills, experience, education and calculating match score.",
+      "matchingSkills": "Matching Skills",
+      "missingSkills": "Missing Skills",
+      "notParsed": "CV data not yet parsed",
+      "summary": "Summary",
+      "contacts": "Contacts",
+      "skills": "Skills",
+      "experience": "Experience",
+      "education": "Education",
+      "inField": "in",
+      "languages": "Languages",
+      "certifications": "Certifications",
+      "years": "years"
+    },
+    "recommendation": {
+      "moveForward": "Recommend to move forward",
+      "consider": "Consider for next round",
+      "notRecommended": "Not recommended to proceed",
+      "strong": "Strong Candidate \u2014 Recommend to move forward",
+      "moderate": "Moderate Candidate \u2014 Consider for next round",
+      "weak": "Weak Candidate \u2014 Not recommended to proceed"
+    },
+    "matchScoreView": {
+      "noAnalysis": "Analysis will be available after CV processing and prescanning/interview completion.",
+      "basedOnResume": "Based on resume analysis",
+      "aiPrescanResult": "AI prescanning result",
+      "aiInterviewResult": "AI interview result",
+      "combinedAssessment": "Combined Assessment",
+      "notRecommendedLabel": "Not Recommended",
+      "considerLabel": "Consider",
+      "recommendedLabel": "Recommended"
+    },
+    "messageThread": {
+      "noMessages": "No messages yet",
+      "placeholder": "Type a message..."
+    },
+    "email": {
+      "sentSuccess": "Email sent successfully",
+      "to": "To",
+      "subject": "Subject",
+      "subjectPlaceholder": "Email subject",
+      "body": "Body",
+      "bodyPlaceholder": "Email body"
+    },
+    "myApplication": {
+      "progress": "Application Progress",
+      "appliedOn": "Applied on",
+      "cvBeingAnalyzed": "Your CV is being analyzed. Match score will appear here soon.",
+      "downloadCv": "Download CV",
+      "noCvUploaded": "No CV uploaded"
+    },
+    "board": "Board",
+    "sort": "Sort",
+    "selected": "{count} selected",
+    "bulkActions": "Bulk Actions",
+    "noMatchingCandidates": "No candidates matching \"{query}\"",
+    "noCandidatesApplied": "No candidates have applied yet"
   },
   "interviews": {
     "title": "Interviews",
@@ -460,6 +573,8 @@
       "aiPrescanning": "AI Prescanning",
       "aiInterview": "AI Interview",
       "chatScreening": "Chat-based screening",
+      "online": "Online",
+      "typeYourAnswer": "Type your answer...",
       "minimize": "Minimize",
       "expand": "Expand",
       "close": "Close"
@@ -494,7 +609,159 @@
       "camera": "Camera",
       "microphone": "Microphone",
       "join": "Join Interview",
-      "permissionDenied": "Camera/microphone access denied"
+      "permissionDenied": "Camera/microphone access denied",
+      "prepareTitle": "Prepare for Your Interview",
+      "position": "Position",
+      "scheduled": "Scheduled",
+      "duration": "Duration",
+      "durationMinutes": "{minutes} minutes",
+      "allowCameraAccess": "Click the button below to allow camera and microphone access.",
+      "allowCameraMic": "Allow Camera & Microphone",
+      "beforeYouJoin": "Before you join",
+      "stableConnection": "Ensure you have a stable internet connection",
+      "quietRoom": "Use a well-lit, quiet room",
+      "faceVisible": "Keep your face visible throughout the interview",
+      "aiConducted": "The interview will be conducted by an AI agent",
+      "speakClearly": "Speak clearly and take your time answering",
+      "allowCameraMicAccess": "Allow camera and microphone access"
+    },
+    "postInterview": {
+      "title": "Interview Complete",
+      "thankYou": "Thank you for completing your interview. Your responses have been recorded.",
+      "resultsByEmail": "You will receive your results via email. Our team will review your interview and get back to you soon.",
+      "backToDashboard": "Back to Dashboard"
+    },
+    "inInterview": {
+      "aiInterviewer": "AI Interviewer",
+      "connecting": "Connecting...",
+      "leaveTitle": "Leave Interview?",
+      "leaveMessage": "Are you sure you want to leave? The interview will end and cannot be restarted.",
+      "leaveButton": "Leave Interview"
+    },
+    "integrity": {
+      "overallScore": "Overall Integrity Score",
+      "flagsDetected": "Based on {count} flag(s) detected",
+      "noFlags": "No integrity flags detected. The interview passed all checks.",
+      "details": "Details",
+      "recorded": "Recorded:",
+      "flagLabels": {
+        "face_not_visible": "Face Not Visible",
+        "multiple_faces": "Multiple Faces",
+        "gaze_deviation": "Gaze Deviation",
+        "audio_anomaly": "Audio Anomaly",
+        "cv_inconsistency": "CV Inconsistency"
+      },
+      "flagDetails": {
+        "face_not_visible": "The candidate's face was not visible in the video feed.",
+        "multiple_faces": "More than one person was detected in the video frame.",
+        "gaze_deviation": "The candidate's gaze deviated significantly from the camera.",
+        "audio_anomaly": "Unusual audio patterns were detected during the interview.",
+        "cv_inconsistency": "Discrepancies were found between the candidate's CV and interview answers."
+      },
+      "scoreLabels": {
+        "good": "Good",
+        "fair": "Fair",
+        "poor": "Poor",
+        "critical": "Critical"
+      }
+    },
+    "recordingPlayer": {
+      "title": "Interview Recording",
+      "videoUnsupported": "Your browser does not support the video element.",
+      "audioUnsupported": "Your browser does not support the audio element.",
+      "noRecording": "No recording available."
+    },
+    "candidatePage": {
+      "thankYou": "Thank You!",
+      "completedMessage": "Your interview has been completed. We will review your responses and get back to you soon.",
+      "yourInterview": "Your Interview",
+      "instructions": "Instructions",
+      "cameraMicTest": "Camera & Microphone Test",
+      "deviceTestNote": "Device testing will be available when LiveKit is integrated.",
+      "joinInterview": "Join Interview"
+    },
+    "chatPage": {
+      "preparing": "Preparing your interview...",
+      "interviewCompleted": "Interview Completed",
+      "browseMoreJobs": "Browse more jobs",
+      "linkExpired": "Link Expired",
+      "vacancyClosed": "Vacancy Closed",
+      "somethingWentWrong": "Something Went Wrong",
+      "inProgress": "AI Interview in progress - click to expand",
+      "leaveTitle": "Leave interview?",
+      "leaveMessage": "Your progress is saved. You can return anytime using the same link.",
+      "leaveButton": "Leave",
+      "today": "Today",
+      "interviewComplete": "Interview Complete!",
+      "thankYouReview": "Thank you for your time. We'll review your responses and be in touch.",
+      "createAccount": "Create Account to Track Status",
+      "browseJobs": "Browse More Jobs",
+      "enterHint": "Press Enter to send, Shift+Enter for new line",
+      "stayButton": "Stay"
+    },
+    "confirmationPage": {
+      "confirmed": "Your interview has been confirmed. Here are the details:",
+      "date": "Date",
+      "time": "Time",
+      "downloadCalendar": "Download Calendar Invite",
+      "goToRoom": "Go to Interview Room"
+    },
+    "detailPage": {
+      "title": "Interview Details",
+      "openRoom": "Open Room",
+      "watchLive": "Watch Live",
+      "roomLink": "Interview Room Link",
+      "roomLinkHint": "Share this link with the candidate to join the AI interview.",
+      "recordingPath": "Recording Path",
+      "playbackNote": "Audio/video playback will be available in a future release.",
+      "noRecording": "No recording available.",
+      "tabScores": "Scores",
+      "tabTranscript": "Transcript",
+      "tabIntegrity": "Integrity",
+      "tabRecording": "Recording"
+    },
+    "gatewayPage": {
+      "loading": "Loading your interview...",
+      "interviewCompleted": "Interview Completed",
+      "completedMessage": "You have already completed this interview. Your responses are being reviewed.",
+      "browseMoreJobs": "Browse more jobs",
+      "linkExpired": "Link Expired",
+      "vacancyClosed": "Vacancy Closed",
+      "somethingWentWrong": "Something Went Wrong"
+    },
+    "roomPage": {
+      "aiVideoInterview": "AI Video Interview",
+      "beforeYouJoin": "Before you join:",
+      "stableConnection": "Stable internet connection",
+      "quietRoom": "Quiet, well-lit room",
+      "allowCameraMic": "Allow camera & microphone",
+      "faceVisible": "Keep your face visible",
+      "checkDevicesJoin": "Check devices & join",
+      "cannotJoin": "Interview is {status}. Cannot join.",
+      "readyToJoin": "Ready to join?",
+      "joinNow": "Join now",
+      "goBack": "Go back",
+      "joiningInterview": "Joining interview...",
+      "somethingWentWrong": "Something went wrong",
+      "aiInterview": "AI Interview",
+      "connected": "Connected",
+      "you": "You",
+      "unmute": "Unmute",
+      "mute": "Mute",
+      "turnOnCamera": "Turn on camera",
+      "turnOffCamera": "Turn off camera",
+      "leaveInterview": "Leave interview",
+      "leave": "Leave",
+      "duration": "Duration:",
+      "thankYou": "Thank you! Your responses are being reviewed by our AI. You'll receive results shortly."
+    },
+    "observerPage": {
+      "title": "Live Interview Observer",
+      "notInProgress": "This interview is not currently in progress. You can only observe live interviews.",
+      "observerMode": "Observer Mode",
+      "listeningAudio": "Listening to interview audio",
+      "audioOnlyNote": "Observer mode - audio only, no video or mic published",
+      "leaveObservation": "Leave Observation"
     }
   },
   "settings": {
@@ -506,7 +773,17 @@
       "email": "Email",
       "phone": "Phone",
       "save": "Save Changes",
-      "saved": "Profile updated successfully"
+      "saved": "Profile updated successfully",
+      "emailCannotChange": "Email cannot be changed",
+      "accountInfo": "Account Info",
+      "emailVerified": "Email verified:",
+      "companyLabel": "Company:",
+      "noCompany": "Not associated with any company",
+      "pendingInvitations": "Pending Invitations ({count})",
+      "invitedBy": "Invited by {name}",
+      "expires": "Expires {date}",
+      "accept": "Accept",
+      "acceptInvitationHint": "Accepting an invitation will switch you to that company."
     },
     "company": {
       "title": "Company Profile",
@@ -517,7 +794,25 @@
       "website": "Website",
       "description": "Description",
       "logo": "Logo",
-      "save": "Save Changes"
+      "save": "Save Changes",
+      "loadingProfile": "Loading company profile...",
+      "uploadLogo": "Upload Logo",
+      "logoComingSoon": "Logo upload coming soon.",
+      "namePlaceholder": "Enter company name",
+      "nameRequired": "Company name is required.",
+      "industryPlaceholder": "e.g. Technology, Healthcare, Finance",
+      "industryRequired": "Industry is required.",
+      "sizePlaceholder": "Select company size",
+      "sizeRequired": "Company size is required.",
+      "countryPlaceholder": "Enter country",
+      "countryRequired": "Country is required.",
+      "descriptionPlaceholder": "Tell us about your company",
+      "updateSuccess": "Company profile updated successfully.",
+      "updateError": "Failed to update profile. Please try again.",
+      "sizeSmall": "1-50 employees",
+      "sizeMedium": "51-200 employees",
+      "sizeLarge": "201-1000 employees",
+      "sizeEnterprise": "1000+ employees"
     },
     "team": {
       "title": "Team Management",
@@ -554,7 +849,18 @@
     "vacanciesUsed": "Vacancies",
     "interviewsUsed": "AI Sessions",
     "storageUsed": "Storage",
-    "hrUsersUsed": "HR Users"
+    "hrUsersUsed": "HR Users",
+    "billed": "Billed {period}",
+    "statusActive": "Active",
+    "statusCancelled": "Cancelled",
+    "currentPeriod": "Current period:",
+    "cancelSubscription": "Cancel Subscription",
+    "areYouSure": "Are you sure?",
+    "yesCancel": "Yes, cancel",
+    "keepPlan": "Keep plan",
+    "availablePlans": "Available Plans",
+    "billingHistory": "Billing History",
+    "billingHistoryComingSoon": "Billing history will be available soon."
   },
   "admin": {
     "title": "Admin Panel",
@@ -583,6 +889,16 @@
       "role": "Role",
       "company": "Company",
       "status": "Status"
+    },
+    "analytics": {
+      "activeSubscriptions": "Active Subscriptions",
+      "revenueTrend": "Revenue Trend",
+      "interviewVolume": "Interview Volume",
+      "subscriptionDistribution": "Subscription Distribution",
+      "userRegistrations": "User Registrations",
+      "chartPlaceholder": "Chart placeholder",
+      "revenueChartSoon": "Revenue Chart (coming soon)",
+      "userGrowthChartSoon": "User Growth Chart (coming soon)"
     }
   },
   "notifications": {
@@ -662,7 +978,8 @@
     "noJobsHint": "Try adjusting your filters or search terms",
     "apply": "Apply Now",
     "viewDetails": "View Details",
-    "postedOn": "Posted"
+    "postedOn": "Posted",
+    "openPositions": "{count} open positions"
   },
   "telegram": {
     "title": "Telegram",

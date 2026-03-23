@@ -62,11 +62,11 @@ function onFileSelect(event: FileUploadSelectEvent): void {
 
 function validate(): boolean {
   errors.value = {}
-  if (!name.value.trim()) errors.value.name = 'Name is required'
+  if (!name.value.trim()) errors.value.name = t('candidates.application.validation.nameRequired')
   if (!email.value.trim()) {
-    errors.value.email = 'Email is required'
+    errors.value.email = t('candidates.application.validation.emailRequired')
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
-    errors.value.email = 'Invalid email format'
+    errors.value.email = t('candidates.application.validation.emailInvalid')
   }
   return Object.keys(errors.value).length === 0
 }
@@ -131,10 +131,9 @@ async function copyLink(): Promise<void> {
             <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
               <i class="pi pi-comments text-3xl text-blue-600"></i>
             </div>
-            <h2 class="mb-2 text-xl font-bold text-gray-900">Your Prescanning is Ready</h2>
+            <h2 class="mb-2 text-xl font-bold text-gray-900">{{ t('candidates.application.prescanReady') }}</h2>
             <p class="mb-6 text-sm text-gray-500">
-              You can start your AI prescanning chat now,
-              or do it later using the link below.
+              {{ t('candidates.application.prescanReadyHint') }}
             </p>
 
             <Button
@@ -146,7 +145,7 @@ async function copyLink(): Promise<void> {
             />
 
             <div class="mb-6 rounded-lg border border-gray-200 bg-gray-50 p-3">
-              <label class="mb-1 block text-xs font-medium text-gray-500">Prescanning Link</label>
+              <label class="mb-1 block text-xs font-medium text-gray-500">{{ t('candidates.application.prescanLink') }}</label>
               <div class="flex items-center gap-2">
                 <input
                   type="text"
@@ -167,26 +166,26 @@ async function copyLink(): Promise<void> {
 
             <p class="mb-4 text-sm text-gray-500">
               <i class="pi pi-envelope mr-1"></i>
-              We've also sent the prescanning link to your email.
+              {{ t('candidates.application.linkSentToEmail') }}
             </p>
 
             <div class="rounded-lg border border-blue-100 bg-blue-50 p-4">
               <p class="text-sm text-blue-800">
                 <i class="pi pi-user-plus mr-1"></i>
-                <strong>Tip:</strong> Create an account to track your application status and access your interview results.
+                <strong>{{ t('candidates.application.tip') }}:</strong> {{ t('candidates.application.tipText') }}
               </p>
               <RouterLink
                 to="/register"
                 class="mt-2 inline-block text-sm font-medium text-blue-600 hover:underline"
               >
-                Create an account
+                {{ t('candidates.application.createAccount') }}
               </RouterLink>
             </div>
           </div>
 
           <div class="text-center">
             <RouterLink to="/jobs" class="text-sm text-gray-500 hover:text-gray-700">
-              Browse more jobs
+              {{ t('candidates.application.browseMoreJobs') }}
             </RouterLink>
           </div>
         </div>
@@ -195,7 +194,7 @@ async function copyLink(): Promise<void> {
       <!-- Step 1: Application form -->
       <template v-else>
         <RouterLink :to="`/jobs/${vacancyId}`" class="mb-4 inline-flex items-center text-sm text-gray-500 hover:text-gray-700">
-          <i class="pi pi-arrow-left mr-1"></i> Back to job details
+          <i class="pi pi-arrow-left mr-1"></i> {{ t('candidates.application.backToJob') }}
         </RouterLink>
 
         <h1 class="mb-1 text-2xl font-bold">{{ t('candidates.application.title') }}</h1>
@@ -236,11 +235,11 @@ async function copyLink(): Promise<void> {
               mode="basic"
               accept=".pdf,.docx"
               :max-file-size="10000000"
-              choose-label="Choose CV"
+              :choose-label="t('candidates.application.chooseCv')"
               :auto="false"
               @select="onFileSelect"
             />
-            <small class="text-gray-400">Accepted formats: PDF, DOCX (max 10MB)</small>
+            <small class="text-gray-400">{{ t('candidates.application.acceptedFormats') }}</small>
           </div>
 
           <Button
@@ -268,7 +267,7 @@ async function copyLink(): Promise<void> {
             </div>
             <div>
               <p class="text-sm font-semibold text-white">{{ t('interviews.chat.aiPrescanning') }}</p>
-              <p class="text-xs text-blue-100">Answer a few questions to get started</p>
+              <p class="text-xs text-blue-100">{{ t('candidates.application.answerQuestions') }}</p>
             </div>
           </div>
           <div class="flex items-center gap-1">
@@ -316,7 +315,7 @@ async function copyLink(): Promise<void> {
           </div>
           <div>
             <p class="text-sm font-medium text-gray-900">{{ t('interviews.chat.aiPrescanning') }}</p>
-            <p class="text-xs text-gray-500">Click to open prescanning chat</p>
+            <p class="text-xs text-gray-500">{{ t('candidates.application.clickToOpenChat') }}</p>
           </div>
         </div>
         <div class="flex items-center gap-2">

@@ -51,22 +51,22 @@ onMounted(() => {
 
 <template>
   <div class="space-y-6">
-    <h1 class="text-2xl font-bold text-gray-900">Prepare for Your Interview</h1>
+    <h1 class="text-2xl font-bold text-gray-900">{{ t('interviews.preCheck.prepareTitle') }}</h1>
 
     <!-- Interview Info -->
     <div class="rounded-lg border border-gray-200 bg-white p-6">
       <dl class="space-y-3 text-sm">
         <div class="flex justify-between">
-          <dt class="text-gray-500">Position</dt>
+          <dt class="text-gray-500">{{ t('interviews.preCheck.position') }}</dt>
           <dd class="font-medium">{{ interview.vacancyTitle }}</dd>
         </div>
         <div class="flex justify-between">
-          <dt class="text-gray-500">Scheduled</dt>
+          <dt class="text-gray-500">{{ t('interviews.preCheck.scheduled') }}</dt>
           <dd class="font-medium">{{ formatDate(interview.createdAt) }}</dd>
         </div>
         <div class="flex justify-between">
-          <dt class="text-gray-500">Duration</dt>
-          <dd class="font-medium">{{ interview.durationMinutes }} minutes</dd>
+          <dt class="text-gray-500">{{ t('interviews.preCheck.duration') }}</dt>
+          <dd class="font-medium">{{ t('interviews.preCheck.durationMinutes', { minutes: interview.durationMinutes }) }}</dd>
         </div>
       </dl>
     </div>
@@ -105,10 +105,10 @@ onMounted(() => {
       <div v-else class="py-8 text-center">
         <i class="pi pi-video mb-3 text-4xl text-gray-300"></i>
         <p class="mb-4 text-sm text-gray-500">
-          Click the button below to allow camera and microphone access.
+          {{ t('interviews.preCheck.allowCameraAccess') }}
         </p>
         <Button
-          label="Allow Camera & Microphone"
+          :label="t('interviews.preCheck.allowCameraMic')"
           icon="pi pi-shield"
           severity="secondary"
           @click="requestPermissions"
@@ -119,14 +119,14 @@ onMounted(() => {
     <!-- Instructions -->
     <div class="rounded-lg border border-blue-100 bg-blue-50 p-6">
       <h3 class="mb-3 text-sm font-semibold text-blue-800">
-        Before you join
+        {{ t('interviews.preCheck.beforeYouJoin') }}
       </h3>
       <ul class="list-inside list-disc space-y-1 text-sm text-blue-700">
-        <li>Ensure you have a stable internet connection</li>
-        <li>Use a well-lit, quiet room</li>
-        <li>Keep your face visible throughout the interview</li>
-        <li>The interview will be conducted by an AI agent</li>
-        <li>Speak clearly and take your time answering</li>
+        <li>{{ t('interviews.preCheck.stableConnection') }}</li>
+        <li>{{ t('interviews.preCheck.quietRoom') }}</li>
+        <li>{{ t('interviews.preCheck.faceVisible') }}</li>
+        <li>{{ t('interviews.preCheck.aiConducted') }}</li>
+        <li>{{ t('interviews.preCheck.speakClearly') }}</li>
       </ul>
     </div>
 

@@ -87,7 +87,7 @@ function formatDate(dateStr: string): string {
     <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div>
         <h1 class="text-lg font-bold text-gray-900 md:text-xl">{{ t('vacancies.title') }}</h1>
-        <p class="mt-0.5 text-sm text-gray-500">{{ filteredVacancies.length }} shown</p>
+        <p class="mt-0.5 text-sm text-gray-500">{{ t('vacancies.shown', { count: filteredVacancies.length }) }}</p>
       </div>
       <Button :label="t('vacancies.create')" icon="pi pi-plus" size="small" @click="navigateToCreate" />
     </div>
@@ -202,7 +202,7 @@ function formatDate(dateStr: string): string {
       </div>
       <template v-if="activeTab === 'archived'">
         <p class="mt-4 text-sm font-medium text-gray-600">{{ t('vacancies.noArchivedVacancies') }}</p>
-        <p class="mt-1 text-sm text-gray-400">Archived vacancies will appear here</p>
+        <p class="mt-1 text-sm text-gray-400">{{ t('vacancies.noArchivedVacanciesHint') }}</p>
       </template>
       <template v-else>
         <p class="mt-4 text-sm font-medium text-gray-600">{{ t('vacancies.noVacancies') }}</p>

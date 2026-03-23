@@ -59,7 +59,7 @@ onMounted(() => adminStore.fetchAnalytics())
           <div class="flex items-center gap-3">
             <i class="pi pi-credit-card text-2xl text-yellow-500"></i>
             <div>
-              <p class="text-sm text-gray-500">Active Subscriptions</p>
+              <p class="text-sm text-gray-500">{{ t('admin.analytics.activeSubscriptions') }}</p>
               <p class="text-2xl font-bold">
                 {{ adminStore.analytics.activeSubscriptions }}
               </p>
@@ -83,27 +83,27 @@ onMounted(() => adminStore.fetchAnalytics())
       <!-- Charts Placeholders -->
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div class="rounded-lg border border-gray-200 bg-white p-6">
-          <h2 class="mb-4 text-lg font-semibold">Revenue Trend</h2>
+          <h2 class="mb-4 text-lg font-semibold">{{ t('admin.analytics.revenueTrend') }}</h2>
           <div class="flex h-48 items-center justify-center rounded bg-gray-50">
-            <p class="text-gray-400">Chart placeholder</p>
+            <p class="text-gray-400">{{ t('admin.analytics.chartPlaceholder') }}</p>
           </div>
         </div>
         <div class="rounded-lg border border-gray-200 bg-white p-6">
-          <h2 class="mb-4 text-lg font-semibold">Interview Volume</h2>
+          <h2 class="mb-4 text-lg font-semibold">{{ t('admin.analytics.interviewVolume') }}</h2>
           <div class="flex h-48 items-center justify-center rounded bg-gray-50">
-            <p class="text-gray-400">Chart placeholder</p>
+            <p class="text-gray-400">{{ t('admin.analytics.chartPlaceholder') }}</p>
           </div>
         </div>
         <div class="rounded-lg border border-gray-200 bg-white p-6">
-          <h2 class="mb-4 text-lg font-semibold">Subscription Distribution</h2>
+          <h2 class="mb-4 text-lg font-semibold">{{ t('admin.analytics.subscriptionDistribution') }}</h2>
           <div class="flex h-48 items-center justify-center rounded bg-gray-50">
-            <p class="text-gray-400">Chart placeholder</p>
+            <p class="text-gray-400">{{ t('admin.analytics.chartPlaceholder') }}</p>
           </div>
         </div>
         <div class="rounded-lg border border-gray-200 bg-white p-6">
-          <h2 class="mb-4 text-lg font-semibold">User Registrations</h2>
+          <h2 class="mb-4 text-lg font-semibold">{{ t('admin.analytics.userRegistrations') }}</h2>
           <div class="flex h-48 items-center justify-center rounded bg-gray-50">
-            <p class="text-gray-400">Chart placeholder</p>
+            <p class="text-gray-400">{{ t('admin.analytics.chartPlaceholder') }}</p>
           </div>
         </div>
       </div>

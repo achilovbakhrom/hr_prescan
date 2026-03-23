@@ -82,7 +82,7 @@ function handleGoogleError(msg: string): void {
 
       <div class="mb-4 flex items-center gap-3">
         <div class="h-px flex-1 bg-gray-200"></div>
-        <span class="text-xs text-gray-400">or sign in with email</span>
+        <span class="text-xs text-gray-400">{{ t('auth.login.orSignInWithEmail') }}</span>
         <div class="h-px flex-1 bg-gray-200"></div>
       </div>
 
@@ -95,12 +95,12 @@ function handleGoogleError(msg: string): void {
             id="email"
             v-model="email"
             type="email"
-            placeholder="Enter your email"
+            :placeholder="t('auth.login.emailPlaceholder')"
             :invalid="submitted && emailInvalid"
             class="w-full"
           />
           <small v-if="submitted && emailInvalid" class="text-red-500">
-            Please enter a valid email address.
+            {{ t('auth.login.emailInvalid') }}
           </small>
         </div>
 
@@ -111,7 +111,7 @@ function handleGoogleError(msg: string): void {
           <Password
             v-model="password"
             input-id="password"
-            placeholder="Enter your password"
+            :placeholder="t('auth.login.passwordPlaceholder')"
             :feedback="false"
             toggle-mask
             :invalid="submitted && passwordInvalid"
@@ -119,7 +119,7 @@ function handleGoogleError(msg: string): void {
             input-class="w-full"
           />
           <small v-if="submitted && passwordInvalid" class="text-red-500">
-            Password is required.
+            {{ t('auth.login.passwordRequired') }}
           </small>
         </div>
 
@@ -142,12 +142,12 @@ function handleGoogleError(msg: string): void {
       </p>
 
       <p class="mt-2 text-center text-sm text-gray-600">
-        Want to hire?
+        {{ t('auth.login.wantToHire') }}
         <RouterLink
           :to="{ name: ROUTE_NAMES.COMPANY_REGISTER }"
           class="font-medium text-blue-600 hover:text-blue-500"
         >
-          Register your company
+          {{ t('auth.login.registerCompany') }}
         </RouterLink>
       </p>
     </div>

@@ -128,7 +128,7 @@ async function handleUnlink(): Promise<void> {
       <div class="mb-3 flex items-center gap-2">
         <i class="pi pi-envelope text-blue-600"></i>
         <h2 class="text-base font-semibold text-blue-900">
-          Pending Invitations ({{ invitations.length }})
+          {{ t('settings.profile.pendingInvitations', { count: invitations.length }) }}
         </h2>
       </div>
       <div class="space-y-3">
@@ -143,12 +143,12 @@ async function handleUnlink(): Promise<void> {
               {{ inv.company.industry }} &middot; {{ inv.company.country }}
             </p>
             <p class="mt-1 text-xs text-gray-400">
-              Invited by {{ inv.invitedByName }} &middot; {{ formatDate(inv.createdAt) }}
-              &middot; Expires {{ formatDate(inv.expiresAt) }}
+              {{ t('settings.profile.invitedBy', { name: inv.invitedByName }) }} &middot; {{ formatDate(inv.createdAt) }}
+              &middot; {{ t('settings.profile.expires', { date: formatDate(inv.expiresAt) }) }}
             </p>
           </div>
           <Button
-            label="Accept"
+            :label="t('settings.profile.accept')"
             icon="pi pi-check"
             size="small"
             :loading="acceptingToken === inv.token"
@@ -157,7 +157,7 @@ async function handleUnlink(): Promise<void> {
         </div>
       </div>
       <p class="mt-3 text-xs text-blue-700">
-        Accepting an invitation will switch you to that company.
+        {{ t('settings.profile.acceptInvitationHint') }}
       </p>
     </div>
 
@@ -193,7 +193,7 @@ async function handleUnlink(): Promise<void> {
         <div class="flex flex-col gap-1">
           <label for="email" class="text-sm font-medium text-gray-700">{{ t('settings.profile.email') }}</label>
           <InputText id="email" v-model="email" class="w-full" disabled />
-          <small class="text-gray-400">Email cannot be changed</small>
+          <small class="text-gray-400">{{ t('settings.profile.emailCannotChange') }}</small>
         </div>
 
         <div class="flex flex-col gap-1">
@@ -203,19 +203,19 @@ async function handleUnlink(): Promise<void> {
       </form>
 
       <div class="mt-6 border-t border-gray-200 pt-4">
-        <h3 class="mb-2 text-sm font-medium text-gray-700">Account Info</h3>
+        <h3 class="mb-2 text-sm font-medium text-gray-700">{{ t('settings.profile.accountInfo') }}</h3>
         <div class="space-y-1 text-sm text-gray-500">
           <p>
-            Email verified:
+            {{ t('settings.profile.emailVerified') }}
             <span :class="authStore.user?.emailVerified ? 'text-green-600' : 'text-red-600'">
               {{ authStore.user?.emailVerified ? t('common.yes') : t('common.no') }}
             </span>
           </p>
           <p v-if="authStore.user?.company">
-            Company: <span class="font-medium text-gray-900">{{ authStore.user.company.name }}</span>
+            {{ t('settings.profile.companyLabel') }} <span class="font-medium text-gray-900">{{ authStore.user.company.name }}</span>
           </p>
           <p v-else class="text-gray-400">
-            Not associated with any company
+            {{ t('settings.profile.noCompany') }}
           </p>
         </div>
       </div>

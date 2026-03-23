@@ -24,10 +24,10 @@ const successMessage = ref<string | null>(null)
 const errorMessage = ref<string | null>(null)
 
 const sizeOptions = [
-  { label: '1-50 employees', value: 'small' as CompanySize },
-  { label: '51-200 employees', value: 'medium' as CompanySize },
-  { label: '201-1000 employees', value: 'large' as CompanySize },
-  { label: '1000+ employees', value: 'enterprise' as CompanySize },
+  { label: t('settings.company.sizeSmall'), value: 'small' as CompanySize },
+  { label: t('settings.company.sizeMedium'), value: 'medium' as CompanySize },
+  { label: t('settings.company.sizeLarge'), value: 'large' as CompanySize },
+  { label: t('settings.company.sizeEnterprise'), value: 'enterprise' as CompanySize },
 ]
 
 const errors = ref({
@@ -77,12 +77,12 @@ async function handleSave(): Promise<void> {
       website: website.value.trim() || null,
       description: description.value.trim() || null,
     })
-    successMessage.value = 'Company profile updated successfully.'
+    successMessage.value = t('settings.company.updateSuccess')
   } catch (err: unknown) {
     errorMessage.value =
       err instanceof Error
         ? err.message
-        : 'Failed to update profile. Please try again.'
+        : t('settings.company.updateError')
   }
 }
 </script>
@@ -103,7 +103,7 @@ async function handleSave(): Promise<void> {
       v-if="settingsStore.loading && !settingsStore.companyProfile"
       class="py-12 text-center text-gray-500"
     >
-      Loading company profile...
+      {{ t('settings.company.loadingProfile') }}
     </div>
 
     <form
@@ -119,11 +119,11 @@ async function handleSave(): Promise<void> {
           mode="basic"
           accept="image/*"
           :max-file-size="2000000"
-          choose-label="Upload Logo"
+          :choose-label="t('settings.company.uploadLogo')"
           class="w-auto"
           disabled
         />
-        <small class="text-gray-500">Logo upload coming soon.</small>
+        <small class="text-gray-500">{{ t('settings.company.logoComingSoon') }}</small>
       </div>
 
       <div class="flex flex-col gap-1">
@@ -133,12 +133,12 @@ async function handleSave(): Promise<void> {
         <InputText
           id="name"
           v-model="name"
-          placeholder="Enter company name"
+          :placeholder="t('settings.company.namePlaceholder')"
           :invalid="submitted && errors.name"
           class="w-full"
         />
         <small v-if="submitted && errors.name" class="text-red-500">
-          Company name is required.
+          {{ t('settings.company.nameRequired') }}
         </small>
       </div>
 
@@ -149,12 +149,12 @@ async function handleSave(): Promise<void> {
         <InputText
           id="industry"
           v-model="industry"
-          placeholder="e.g. Technology, Healthcare, Finance"
+          :placeholder="t('settings.company.industryPlaceholder')"
           :invalid="submitted && errors.industry"
           class="w-full"
         />
         <small v-if="submitted && errors.industry" class="text-red-500">
-          Industry is required.
+          {{ t('settings.company.industryRequired') }}
         </small>
       </div>
 
@@ -168,12 +168,12 @@ async function handleSave(): Promise<void> {
           :options="sizeOptions"
           option-label="label"
           option-value="value"
-          placeholder="Select company size"
+          :placeholder="t('settings.company.sizePlaceholder')"
           :invalid="submitted && errors.size"
           class="w-full"
         />
         <small v-if="submitted && errors.size" class="text-red-500">
-          Company size is required.
+          {{ t('settings.company.sizeRequired') }}
         </small>
       </div>
 
@@ -184,12 +184,12 @@ async function handleSave(): Promise<void> {
         <InputText
           id="country"
           v-model="country"
-          placeholder="Enter country"
+          :placeholder="t('settings.company.countryPlaceholder')"
           :invalid="submitted && errors.country"
           class="w-full"
         />
         <small v-if="submitted && errors.country" class="text-red-500">
-          Country is required.
+          {{ t('settings.company.countryRequired') }}
         </small>
       </div>
 
@@ -212,7 +212,7 @@ async function handleSave(): Promise<void> {
         <Textarea
           id="description"
           v-model="description"
-          placeholder="Tell us about your company"
+          :placeholder="t('settings.company.descriptionPlaceholder')"
           rows="4"
           class="w-full"
         />

@@ -68,7 +68,7 @@ async function handleWatchLive(): Promise<void> {
       >
         <i class="pi pi-arrow-left text-lg"></i>
       </button>
-      <h1 class="text-lg font-bold md:text-2xl">Interview Details</h1>
+      <h1 class="text-lg font-bold md:text-2xl">{{ t('interviews.detailPage.title') }}</h1>
     </div>
 
     <p v-if="interviewStore.error" class="text-sm text-red-600">
@@ -101,7 +101,7 @@ async function handleWatchLive(): Promise<void> {
             <InterviewStatusBadge :status="interview.status" />
             <Button
               v-if="isScheduled || isInProgress"
-              label="Open Room"
+              :label="t('interviews.detailPage.openRoom')"
               icon="pi pi-external-link"
               size="small"
               severity="info"
@@ -118,7 +118,7 @@ async function handleWatchLive(): Promise<void> {
             />
             <Button
               v-if="isInProgress"
-              label="Watch Live"
+              :label="t('interviews.detailPage.watchLive')"
               icon="pi pi-eye"
               size="small"
               @click="handleWatchLive"
@@ -126,11 +126,11 @@ async function handleWatchLive(): Promise<void> {
           </div>
         </div>
         <div v-if="isScheduled || isInProgress" class="mt-4 rounded border border-blue-100 bg-blue-50 p-3">
-          <p class="text-sm font-medium text-blue-800">Interview Room Link</p>
+          <p class="text-sm font-medium text-blue-800">{{ t('interviews.detailPage.roomLink') }}</p>
           <p class="mt-1 text-sm text-blue-600">
             {{ roomUrl }}
           </p>
-          <p class="mt-1 text-xs text-blue-500">Share this link with the candidate to join the AI interview.</p>
+          <p class="mt-1 text-xs text-blue-500">{{ t('interviews.detailPage.roomLinkHint') }}</p>
         </div>
         <p
           v-if="interview.aiSummary"
@@ -141,39 +141,39 @@ async function handleWatchLive(): Promise<void> {
       </div>
 
       <TabView v-model:activeIndex="activeTab">
-        <TabPanel value="0" header="Scores">
+        <TabPanel value="0" :header="t('interviews.detailPage.tabScores')">
           <div class="py-4">
             <InterviewScoresView :scores="interview.scores" />
           </div>
         </TabPanel>
-        <TabPanel value="1" header="Transcript">
+        <TabPanel value="1" :header="t('interviews.detailPage.tabTranscript')">
           <div class="py-4">
             <TranscriptView :transcript="interview.transcript" />
           </div>
         </TabPanel>
-        <TabPanel value="2" header="Integrity">
+        <TabPanel value="2" :header="t('interviews.detailPage.tabIntegrity')">
           <div class="py-4">
             <IntegrityFlagsView :flags="interview.integrityFlags" />
           </div>
         </TabPanel>
-        <TabPanel value="3" header="Recording">
+        <TabPanel value="3" :header="t('interviews.detailPage.tabRecording')">
           <div class="py-4">
             <div
               v-if="interview.recordingPath"
               class="rounded-lg border border-gray-200 p-6"
             >
               <p class="mb-2 text-sm font-medium text-gray-700">
-                Recording Path
+                {{ t('interviews.detailPage.recordingPath') }}
               </p>
               <code class="text-sm text-gray-600">
                 {{ interview.recordingPath }}
               </code>
               <p class="mt-4 text-xs text-gray-400">
-                Audio/video playback will be available in a future release.
+                {{ t('interviews.detailPage.playbackNote') }}
               </p>
             </div>
             <p v-else class="text-sm text-gray-500">
-              No recording available.
+              {{ t('interviews.detailPage.noRecording') }}
             </p>
           </div>
         </TabPanel>

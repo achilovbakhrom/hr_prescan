@@ -288,25 +288,25 @@ function getInitials(name: string): string {
           <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-blue-500/20">
             <i class="pi pi-video text-3xl text-blue-400"></i>
           </div>
-          <h2 class="mb-1 text-xl font-medium text-white">AI Video Interview</h2>
+          <h2 class="mb-1 text-xl font-medium text-white">{{ t('interviews.roomPage.aiVideoInterview') }}</h2>
           <p class="mb-1 text-sm text-gray-400">{{ interview.vacancyTitle }}</p>
           <p class="mb-6 text-xs text-gray-500">
             {{ interview.durationMinutes }} min
           </p>
 
           <div class="mb-6 rounded-xl bg-[#3c4043] p-4 text-left text-sm text-gray-300">
-            <p class="mb-2 font-medium text-white">Before you join:</p>
+            <p class="mb-2 font-medium text-white">{{ t('interviews.roomPage.beforeYouJoin') }}</p>
             <ul class="space-y-1.5 text-gray-400">
-              <li class="flex items-start gap-2"><i class="pi pi-wifi mt-0.5 text-xs text-green-400"></i> Stable internet connection</li>
-              <li class="flex items-start gap-2"><i class="pi pi-volume-up mt-0.5 text-xs text-green-400"></i> Quiet, well-lit room</li>
-              <li class="flex items-start gap-2"><i class="pi pi-camera mt-0.5 text-xs text-green-400"></i> Allow camera & microphone</li>
-              <li class="flex items-start gap-2"><i class="pi pi-user mt-0.5 text-xs text-green-400"></i> Keep your face visible</li>
+              <li class="flex items-start gap-2"><i class="pi pi-wifi mt-0.5 text-xs text-green-400"></i> {{ t('interviews.roomPage.stableConnection') }}</li>
+              <li class="flex items-start gap-2"><i class="pi pi-volume-up mt-0.5 text-xs text-green-400"></i> {{ t('interviews.roomPage.quietRoom') }}</li>
+              <li class="flex items-start gap-2"><i class="pi pi-camera mt-0.5 text-xs text-green-400"></i> {{ t('interviews.roomPage.allowCameraMic') }}</li>
+              <li class="flex items-start gap-2"><i class="pi pi-user mt-0.5 text-xs text-green-400"></i> {{ t('interviews.roomPage.faceVisible') }}</li>
             </ul>
           </div>
 
           <Button
             v-if="canJoin"
-            label="Check devices & join"
+            :label="t('interviews.roomPage.checkDevicesJoin')"
             icon="pi pi-arrow-right"
             icon-pos="right"
             class="w-full"
@@ -314,7 +314,7 @@ function getInitials(name: string): string {
             @click="startPreview"
           />
           <p v-else class="text-sm text-yellow-400">
-            Interview is {{ interview.status.replace(/_/g, ' ') }}. Cannot join.
+            {{ t('interviews.roomPage.cannotJoin', { status: interview.status.replace(/_/g, ' ') }) }}
           </p>
         </div>
       </div>
@@ -363,10 +363,10 @@ function getInitials(name: string): string {
 
         <!-- Join panel -->
         <div class="w-72 shrink-0 text-center">
-          <h2 class="mb-1 text-xl font-medium text-white">Ready to join?</h2>
+          <h2 class="mb-1 text-xl font-medium text-white">{{ t('interviews.roomPage.readyToJoin') }}</h2>
           <p class="mb-6 text-sm text-gray-400">{{ interview.vacancyTitle }}</p>
           <Button
-            label="Join now"
+            :label="t('interviews.roomPage.joinNow')"
             icon="pi pi-video"
             class="w-full"
             size="large"
@@ -376,7 +376,7 @@ function getInitials(name: string): string {
             class="mt-3 text-sm text-gray-400 hover:text-white"
             @click="stopPreview(); connectionState = 'idle'"
           >
-            Go back
+            {{ t('interviews.roomPage.goBack') }}
           </button>
         </div>
       </div>
@@ -385,7 +385,7 @@ function getInitials(name: string): string {
       <div v-else-if="connectionState === 'connecting'" class="flex flex-1 items-center justify-center">
         <div class="text-center">
           <i class="pi pi-spinner pi-spin mb-4 text-5xl text-blue-400"></i>
-          <p class="text-lg text-white">Joining interview...</p>
+          <p class="text-lg text-white">{{ t('interviews.roomPage.joiningInterview') }}</p>
         </div>
       </div>
 
@@ -395,7 +395,7 @@ function getInitials(name: string): string {
           <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-500/20">
             <i class="pi pi-exclamation-triangle text-2xl text-red-400"></i>
           </div>
-          <h2 class="mb-2 text-lg font-medium text-white">Something went wrong</h2>
+          <h2 class="mb-2 text-lg font-medium text-white">{{ t('interviews.roomPage.somethingWentWrong') }}</h2>
           <p class="mb-6 text-sm text-gray-400">{{ errorMessage }}</p>
           <div class="flex justify-center gap-3">
             <Button :label="t('errors.goBack')" severity="secondary" outlined @click="connectionState = 'idle'" />
@@ -410,13 +410,13 @@ function getInitials(name: string): string {
         <header class="flex items-center justify-between px-4 py-2">
           <div class="flex items-center gap-3">
             <span class="text-sm font-medium text-white">{{ interview.vacancyTitle }}</span>
-            <span class="rounded bg-[#3c4043] px-2 py-0.5 text-xs text-gray-300">AI Interview</span>
+            <span class="rounded bg-[#3c4043] px-2 py-0.5 text-xs text-gray-300">{{ t('interviews.roomPage.aiInterview') }}</span>
           </div>
           <div class="flex items-center gap-3">
             <span class="font-mono text-sm text-gray-400">{{ formattedTime }}</span>
             <span class="flex items-center gap-1.5 text-xs text-green-400">
               <span class="h-1.5 w-1.5 rounded-full bg-green-400"></span>
-              Connected
+              {{ t('interviews.roomPage.connected') }}
             </span>
           </div>
         </header>
@@ -470,7 +470,7 @@ function getInitials(name: string): string {
               </div>
             </div>
             <div class="absolute bottom-2 left-2 flex items-center gap-1.5 rounded-md bg-black/60 px-2 py-0.5 text-xs text-white backdrop-blur-sm">
-              <span>You</span>
+              <span>{{ t('interviews.roomPage.you') }}</span>
               <i v-if="isMuted" class="pi pi-microphone-slash text-red-400" style="font-size: 0.65rem"></i>
             </div>
           </div>
@@ -483,7 +483,7 @@ function getInitials(name: string): string {
             <button
               class="flex h-12 w-12 items-center justify-center rounded-full transition-colors"
               :class="isMuted ? 'bg-red-500 text-white' : 'bg-[#3c4043] text-white hover:bg-[#4a4d50]'"
-              :title="isMuted ? 'Unmute' : 'Mute'"
+              :title="isMuted ? t('interviews.roomPage.unmute') : t('interviews.roomPage.mute')"
               @click="toggleMute"
             >
               <i :class="isMuted ? 'pi pi-microphone-slash' : 'pi pi-microphone'" class="text-lg"></i>
@@ -493,7 +493,7 @@ function getInitials(name: string): string {
             <button
               class="flex h-12 w-12 items-center justify-center rounded-full transition-colors"
               :class="isCameraOff ? 'bg-red-500 text-white' : 'bg-[#3c4043] text-white hover:bg-[#4a4d50]'"
-              :title="isCameraOff ? 'Turn on camera' : 'Turn off camera'"
+              :title="isCameraOff ? t('interviews.roomPage.turnOnCamera') : t('interviews.roomPage.turnOffCamera')"
               @click="toggleCamera"
             >
               <i :class="isCameraOff ? 'pi pi-eye-slash' : 'pi pi-eye'" class="text-lg"></i>
@@ -502,11 +502,11 @@ function getInitials(name: string): string {
             <!-- Leave -->
             <button
               class="ml-4 flex h-12 w-28 items-center justify-center gap-2 rounded-full bg-red-500 text-white transition-colors hover:bg-red-600"
-              title="Leave interview"
+              :title="t('interviews.roomPage.leaveInterview')"
               @click="leaveInterview"
             >
               <i class="pi pi-phone text-lg" style="transform: rotate(135deg)"></i>
-              <span class="text-sm font-medium">Leave</span>
+              <span class="text-sm font-medium">{{ t('interviews.roomPage.leave') }}</span>
             </button>
           </div>
         </div>
@@ -519,10 +519,9 @@ function getInitials(name: string): string {
             <i class="pi pi-check text-3xl text-green-400"></i>
           </div>
           <h2 class="mb-2 text-xl font-medium text-white">{{ t('interviews.status.completed') }}</h2>
-          <p class="mb-1 text-gray-400">Duration: {{ formattedTime }}</p>
+          <p class="mb-1 text-gray-400">{{ t('interviews.roomPage.duration') }} {{ formattedTime }}</p>
           <p class="mb-6 text-sm text-gray-500">
-            Thank you! Your responses are being reviewed by our AI.
-            You'll receive results shortly.
+            {{ t('interviews.roomPage.thankYou') }}
           </p>
           <Button :label="t('errors.goHome')" icon="pi pi-home" class="w-full" @click="router.push('/')" />
         </div>

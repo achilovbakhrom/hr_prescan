@@ -58,7 +58,7 @@ async function handleLeave(): Promise<void> {
       <button class="text-gray-500 hover:text-gray-700" @click="router.back()">
         <i class="pi pi-arrow-left text-lg"></i>
       </button>
-      <h1 class="text-2xl font-bold">Live Interview Observer</h1>
+      <h1 class="text-2xl font-bold">{{ t('interviews.observerPage.title') }}</h1>
     </div>
 
     <p v-if="interviewStore.error" class="text-sm text-red-600">
@@ -83,11 +83,10 @@ async function handleLeave(): Promise<void> {
       >
         <i class="pi pi-info-circle mb-3 text-3xl text-yellow-500"></i>
         <p class="text-gray-700">
-          This interview is not currently in progress. You can only observe live
-          interviews.
+          {{ t('interviews.observerPage.notInProgress') }}
         </p>
         <p class="mt-2 text-sm text-gray-500">
-          Status: {{ interview.status }}
+          {{ t('common.status') }}: {{ interview.status }}
         </p>
       </div>
 
@@ -99,7 +98,7 @@ async function handleLeave(): Promise<void> {
           <div class="flex items-center gap-4">
             <ConnectionStatus :state="connectionState" />
             <span class="rounded bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700">
-              Observer Mode
+              {{ t('interviews.observerPage.observerMode') }}
             </span>
           </div>
           <div class="text-sm text-gray-600">
@@ -120,17 +119,17 @@ async function handleLeave(): Promise<void> {
               <i class="pi pi-headphones text-3xl text-gray-400"></i>
             </div>
             <p class="text-sm text-gray-400">
-              Listening to interview audio
+              {{ t('interviews.observerPage.listeningAudio') }}
             </p>
             <p class="mt-1 text-xs text-gray-500">
-              Observer mode - audio only, no video or mic published
+              {{ t('interviews.observerPage.audioOnlyNote') }}
             </p>
           </div>
         </div>
 
         <div class="flex justify-center">
           <Button
-            label="Leave Observation"
+            :label="t('interviews.observerPage.leaveObservation')"
             icon="pi pi-sign-out"
             severity="secondary"
             @click="handleLeave"

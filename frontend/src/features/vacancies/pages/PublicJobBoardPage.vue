@@ -128,7 +128,7 @@ function formatRelativeDate(dateStr: string): string {
     <div class="border-b border-gray-100 bg-white">
       <div class="mx-auto max-w-6xl px-6 py-8">
         <h1 class="mb-1 text-2xl font-bold text-gray-900">{{ t('jobBoard.title') }}</h1>
-        <p class="mb-5 text-sm text-gray-500">{{ jobs.length }} open positions</p>
+        <p class="mb-5 text-sm text-gray-500">{{ t('jobBoard.openPositions', { count: jobs.length }) }}</p>
 
         <div class="flex gap-3">
           <IconField class="flex-1">

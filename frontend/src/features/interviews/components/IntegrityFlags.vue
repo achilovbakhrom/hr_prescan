@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Tag from 'primevue/tag'
 import type { IntegrityFlag, FlagType, Severity } from '../types/integrity.types'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   flags: IntegrityFlag[]
@@ -152,9 +155,9 @@ function getSeverityConfig(severity: Severity): SeverityConfig {
     <!-- Overall integrity score banner -->
     <div class="flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-5 py-4">
       <div>
-        <p class="text-sm font-medium text-gray-500">Overall Integrity Score</p>
+        <p class="text-sm font-medium text-gray-500">{{ t('interviews.integrity.overallScore') }}</p>
         <p class="mt-0.5 text-xs text-gray-400">
-          Based on {{ flags.length }} flag{{ flags.length !== 1 ? 's' : '' }} detected
+          {{ t('interviews.integrity.flagsDetected', { count: flags.length }) }}
         </p>
       </div>
       <div class="text-right">
@@ -162,13 +165,13 @@ function getSeverityConfig(severity: Severity): SeverityConfig {
           {{ integrityScore }}
         </span>
         <span class="ml-1 text-sm text-gray-400">/100</span>
-        <p class="mt-0.5 text-xs font-medium" :class="scoreColor">{{ scoreLabel }}</p>
+        <p class="mt-0.5 text-xs font-medium" :class="scoreColor">{{ t(`interviews.integrity.scoreLabels.${scoreLabel.toLowerCase()}`) }}</p>
       </div>
     </div>
 
     <!-- No flags state -->
     <p v-if="flags.length === 0" class="py-2 text-center text-sm text-gray-500">
-      No integrity flags detected. The interview passed all checks.
+      {{ t('interviews.integrity.noFlags') }}
     </p>
 
     <!-- Flag list -->
@@ -193,7 +196,7 @@ function getSeverityConfig(severity: Severity): SeverityConfig {
         <div class="min-w-0 flex-1">
           <div class="flex flex-wrap items-center gap-2">
             <span class="text-sm font-semibold text-gray-800">
-              {{ getFlagMeta(flag.flagType).label }}
+              {{ t(`interviews.integrity.flagLabels.${flag.flagType}`, getFlagMeta(flag.flagType).label) }}
             </span>
             <Tag
               :value="getSeverityConfig(flag.severity).label"
@@ -229,13 +232,13 @@ function getSeverityConfig(severity: Severity): SeverityConfig {
         class="border-t px-4 py-3 text-sm text-gray-700"
         :class="getSeverityConfig(flag.severity).borderClass"
       >
-        <p class="mb-2 font-medium text-gray-500">Details</p>
+        <p class="mb-2 font-medium text-gray-500">{{ t('interviews.integrity.details') }}</p>
         <p class="leading-relaxed">{{ flag.description }}</p>
         <p class="mt-2 text-xs text-gray-400">
-          {{ getFlagMeta(flag.flagType).detail }}
+          {{ t(`interviews.integrity.flagDetails.${flag.flagType}`, getFlagMeta(flag.flagType).detail) }}
         </p>
         <p v-if="flag.createdAt" class="mt-2 text-xs text-gray-400">
-          Recorded: {{ new Date(flag.createdAt).toLocaleString() }}
+          {{ t('interviews.integrity.recorded') }} {{ new Date(flag.createdAt).toLocaleString() }}
         </p>
       </div>
     </div>

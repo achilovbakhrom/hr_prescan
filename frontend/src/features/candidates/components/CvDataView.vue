@@ -98,8 +98,8 @@ function contactHref(label: string, value: string): string | undefined {
   <div v-if="props.cvFile" class="mb-4 flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3">
     <i class="pi pi-file-pdf text-2xl text-red-500"></i>
     <div class="min-w-0 flex-1">
-      <p class="truncate text-sm font-medium text-gray-700">{{ props.cvFilename || 'CV File' }}</p>
-      <p class="text-xs text-gray-400">Click to download</p>
+      <p class="truncate text-sm font-medium text-gray-700">{{ props.cvFilename || t('candidates.cvData.file') }}</p>
+      <p class="text-xs text-gray-400">{{ t('candidates.cvData.clickToDownload') }}</p>
     </div>
     <Button
       :label="t('candidates.cv')"
@@ -117,8 +117,8 @@ function contactHref(label: string, value: string): string | undefined {
   >
     <i class="pi pi-spinner pi-spin text-lg text-blue-500"></i>
     <div>
-      <p class="text-sm font-medium text-blue-800">Analyzing CV...</p>
-      <p class="text-xs text-blue-600">Extracting skills, experience, education and calculating match score.</p>
+      <p class="text-sm font-medium text-blue-800">{{ t('candidates.cvData.analyzing') }}</p>
+      <p class="text-xs text-blue-600">{{ t('candidates.cvData.extracting') }}</p>
     </div>
   </div>
 
@@ -150,13 +150,13 @@ function contactHref(label: string, value: string): string | undefined {
 
     <div v-if="props.matchDetails?.matching_skills?.length || props.matchDetails?.missing_skills?.length" class="mt-3 space-y-2">
       <div v-if="props.matchDetails?.matching_skills?.length">
-        <p class="mb-1 text-xs font-medium text-gray-500">Matching Skills</p>
+        <p class="mb-1 text-xs font-medium text-gray-500">{{ t('candidates.cvData.matchingSkills') }}</p>
         <div class="flex flex-wrap gap-1">
           <Tag v-for="s in props.matchDetails.matching_skills" :key="s" :value="s" severity="success" class="!text-[10px]" />
         </div>
       </div>
       <div v-if="props.matchDetails?.missing_skills?.length">
-        <p class="mb-1 text-xs font-medium text-gray-500">Missing Skills</p>
+        <p class="mb-1 text-xs font-medium text-gray-500">{{ t('candidates.cvData.missingSkills') }}</p>
         <div class="flex flex-wrap gap-1">
           <Tag v-for="s in props.matchDetails.missing_skills" :key="s" :value="s" severity="danger" class="!text-[10px]" />
         </div>
@@ -166,22 +166,22 @@ function contactHref(label: string, value: string): string | undefined {
 
   <div v-if="!hasData" class="py-8 text-center text-gray-400">
     <i class="pi pi-file mb-2 text-3xl"></i>
-    <p>CV data not yet parsed</p>
+    <p>{{ t('candidates.cvData.notParsed') }}</p>
   </div>
 
   <div v-if="hasData" class="space-y-6">
     <!-- Summary -->
     <div v-if="summary">
-      <h3 class="mb-2 text-sm font-semibold text-gray-600">Summary</h3>
+      <h3 class="mb-2 text-sm font-semibold text-gray-600">{{ t('candidates.cvData.summary') }}</h3>
       <p class="rounded-lg border border-gray-100 bg-gray-50 p-3 text-sm text-gray-700">
         {{ summary }}
-        <span v-if="experienceYears" class="ml-1 text-gray-400">({{ experienceYears }}+ years)</span>
+        <span v-if="experienceYears" class="ml-1 text-gray-400">({{ experienceYears }}+ {{ t('candidates.cvData.years') }})</span>
       </p>
     </div>
 
     <!-- Contacts -->
     <div v-if="contacts.length">
-      <h3 class="mb-2 text-sm font-semibold text-gray-600">Contacts</h3>
+      <h3 class="mb-2 text-sm font-semibold text-gray-600">{{ t('candidates.cvData.contacts') }}</h3>
       <div class="grid grid-cols-1 gap-2 md:grid-cols-2">
         <a
           v-for="c in contacts"
@@ -203,7 +203,7 @@ function contactHref(label: string, value: string): string | undefined {
 
     <!-- Skills -->
     <div v-if="skills.length">
-      <h3 class="mb-2 text-sm font-semibold text-gray-600">Skills</h3>
+      <h3 class="mb-2 text-sm font-semibold text-gray-600">{{ t('candidates.cvData.skills') }}</h3>
       <div class="flex flex-wrap gap-2">
         <Tag
           v-for="skill in skills"
@@ -216,7 +216,7 @@ function contactHref(label: string, value: string): string | undefined {
 
     <!-- Experience -->
     <div v-if="experience.length">
-      <h3 class="mb-2 text-sm font-semibold text-gray-600">Experience</h3>
+      <h3 class="mb-2 text-sm font-semibold text-gray-600">{{ t('candidates.cvData.experience') }}</h3>
       <div class="space-y-3 border-l-2 border-blue-200 pl-4">
         <div
           v-for="(entry, idx) in experience"
@@ -240,14 +240,14 @@ function contactHref(label: string, value: string): string | undefined {
 
     <!-- Education -->
     <div v-if="education.length">
-      <h3 class="mb-2 text-sm font-semibold text-gray-600">Education</h3>
+      <h3 class="mb-2 text-sm font-semibold text-gray-600">{{ t('candidates.cvData.education') }}</h3>
       <div class="space-y-3">
         <div
           v-for="(entry, idx) in education"
           :key="idx"
           class="rounded border border-gray-100 bg-gray-50 p-3"
         >
-          <p class="font-medium">{{ entry.degree }}<template v-if="entry.field"> in {{ entry.field }}</template></p>
+          <p class="font-medium">{{ entry.degree }}<template v-if="entry.field"> {{ t('candidates.cvData.inField') }} {{ entry.field }}</template></p>
           <p class="text-sm text-gray-600">
             {{ entry.institution }}
             <span v-if="entry.year" class="text-gray-400">
@@ -260,7 +260,7 @@ function contactHref(label: string, value: string): string | undefined {
 
     <!-- Languages -->
     <div v-if="languages.length">
-      <h3 class="mb-2 text-sm font-semibold text-gray-600">Languages</h3>
+      <h3 class="mb-2 text-sm font-semibold text-gray-600">{{ t('candidates.cvData.languages') }}</h3>
       <div class="flex flex-wrap gap-2">
         <span
           v-for="(lang, idx) in languages"
@@ -274,7 +274,7 @@ function contactHref(label: string, value: string): string | undefined {
 
     <!-- Certifications -->
     <div v-if="certifications.length">
-      <h3 class="mb-2 text-sm font-semibold text-gray-600">Certifications</h3>
+      <h3 class="mb-2 text-sm font-semibold text-gray-600">{{ t('candidates.cvData.certifications') }}</h3>
       <ul class="list-inside list-disc space-y-1 text-sm text-gray-700">
         <li v-for="(cert, idx) in certifications" :key="idx">{{ cert }}</li>
       </ul>

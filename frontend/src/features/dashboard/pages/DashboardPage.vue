@@ -103,7 +103,7 @@ function goToInterview(interview: Interview): void {
         {{ greeting }}, {{ authStore.user?.firstName ?? 'User' }}
       </h1>
       <p class="mt-1 text-sm text-gray-500">
-        Here's what's happening today
+        {{ t('dashboard.subtitle') }}
       </p>
     </div>
 
@@ -130,7 +130,7 @@ function goToInterview(interview: Interview): void {
             <span class="text-2xl font-bold text-gray-900">{{ totalVacancies }}</span>
           </div>
           <p class="mt-3 text-sm font-medium text-gray-500">{{ t('dashboard.activeVacancies') }}</p>
-          <p class="mt-0.5 text-xs text-blue-600">{{ activeVacancies }} active, {{ draftVacancies }} draft</p>
+          <p class="mt-0.5 text-xs text-blue-600">{{ activeVacancies }} {{ t('dashboard.stats.active') }}, {{ draftVacancies }} {{ t('dashboard.stats.draft') }}</p>
         </div>
 
         <div
@@ -144,7 +144,7 @@ function goToInterview(interview: Interview): void {
             <span class="text-2xl font-bold text-gray-900">{{ scheduledInterviews }}</span>
           </div>
           <p class="mt-3 text-sm font-medium text-gray-500">{{ t('dashboard.pendingInterviews') }}</p>
-          <p class="mt-0.5 text-xs text-amber-600">{{ completedInterviews }} completed</p>
+          <p class="mt-0.5 text-xs text-amber-600">{{ completedInterviews }} {{ t('dashboard.stats.completed') }}</p>
         </div>
 
         <div class="rounded-xl border border-gray-100 bg-white p-5">
@@ -155,7 +155,7 @@ function goToInterview(interview: Interview): void {
             <span class="text-2xl font-bold text-gray-900">{{ completedInterviews }}</span>
           </div>
           <p class="mt-3 text-sm font-medium text-gray-500">{{ t('dashboard.completedInterviews') }}</p>
-          <p class="mt-0.5 text-xs text-emerald-600">AI interviews done</p>
+          <p class="mt-0.5 text-xs text-emerald-600">{{ t('dashboard.stats.aiInterviewsDone') }}</p>
         </div>
 
         <div class="rounded-xl border border-gray-100 bg-white p-5">
@@ -166,7 +166,7 @@ function goToInterview(interview: Interview): void {
             <span class="text-2xl font-bold text-gray-900">{{ interviewStore.interviews.length }}</span>
           </div>
           <p class="mt-3 text-sm font-medium text-gray-500">{{ t('interviews.title') }}</p>
-          <p class="mt-0.5 text-xs text-violet-600">All time</p>
+          <p class="mt-0.5 text-xs text-violet-600">{{ t('dashboard.stats.allTime') }}</p>
         </div>
       </div>
 
@@ -245,7 +245,7 @@ function goToInterview(interview: Interview): void {
               </div>
               <div class="text-right">
                 <p class="text-sm font-medium text-gray-700">{{ formatDateTime(interview.createdAt) }}</p>
-                <p class="text-xs text-gray-400">{{ interview.durationMinutes }} min</p>
+                <p class="text-xs text-gray-400">{{ interview.durationMinutes }} {{ t('dashboard.stats.min') }}</p>
               </div>
             </div>
           </div>
@@ -255,7 +255,7 @@ function goToInterview(interview: Interview): void {
               <i class="pi pi-calendar text-xl text-gray-400"></i>
             </div>
             <p class="mt-3 text-sm text-gray-500">{{ t('dashboard.noUpcomingInterviews') }}</p>
-            <p class="text-xs text-gray-400">Scheduled interviews will appear here</p>
+            <p class="text-xs text-gray-400">{{ t('dashboard.scheduledInterviewsHint') }}</p>
           </div>
         </div>
       </div>
@@ -272,7 +272,7 @@ function goToInterview(interview: Interview): void {
             </div>
             <span class="text-2xl font-bold text-gray-900">{{ totalApplications }}</span>
           </div>
-          <p class="mt-3 text-sm font-medium text-gray-500">Applications</p>
+          <p class="mt-3 text-sm font-medium text-gray-500">{{ t('dashboard.stats.applications') }}</p>
         </div>
 
         <div class="rounded-xl border border-gray-100 bg-white p-5">
@@ -317,7 +317,7 @@ function goToInterview(interview: Interview): void {
             <i class="pi pi-list text-lg text-emerald-600"></i>
           </div>
           <h3 class="text-base font-semibold text-gray-900">{{ t('nav.myApplications') }}</h3>
-          <p class="mt-1 text-sm text-gray-500">Track your application status</p>
+          <p class="mt-1 text-sm text-gray-500">{{ t('dashboard.trackApplications') }}</p>
         </div>
 
         <div
@@ -328,7 +328,7 @@ function goToInterview(interview: Interview): void {
             <i class="pi pi-user text-lg text-violet-600"></i>
           </div>
           <h3 class="text-base font-semibold text-gray-900">{{ t('nav.profile') }}</h3>
-          <p class="mt-1 text-sm text-gray-500">View and edit your profile</p>
+          <p class="mt-1 text-sm text-gray-500">{{ t('dashboard.viewEditProfile') }}</p>
         </div>
       </div>
     </template>

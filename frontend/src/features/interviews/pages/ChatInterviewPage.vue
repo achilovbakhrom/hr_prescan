@@ -266,7 +266,7 @@ function handleClose(): void {
     <div v-if="loading" class="flex flex-1 items-center justify-center">
       <div class="text-center">
         <div class="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600"></div>
-        <p class="text-sm text-gray-500">Preparing your interview...</p>
+        <p class="text-sm text-gray-500">{{ t('interviews.chatPage.preparing') }}</p>
       </div>
     </div>
 
@@ -278,7 +278,7 @@ function handleClose(): void {
             <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
               <i class="pi pi-check text-3xl text-green-600"></i>
             </div>
-            <h1 class="mb-2 text-xl font-bold text-gray-900">Interview Completed</h1>
+            <h1 class="mb-2 text-xl font-bold text-gray-900">{{ t('interviews.chatPage.interviewCompleted') }}</h1>
             <p class="mb-6 text-sm text-gray-500">
               {{ t('interviews.states.completed') }}
             </p>
@@ -286,7 +286,7 @@ function handleClose(): void {
               to="/jobs"
               class="inline-block rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
             >
-              Browse more jobs
+              {{ t('interviews.chatPage.browseMoreJobs') }}
             </RouterLink>
           </div>
         </template>
@@ -295,9 +295,9 @@ function handleClose(): void {
             <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-yellow-100">
               <i class="pi pi-clock text-3xl text-yellow-600"></i>
             </div>
-            <h1 class="mb-2 text-xl font-bold text-gray-900">Link Expired</h1>
+            <h1 class="mb-2 text-xl font-bold text-gray-900">{{ t('interviews.chatPage.linkExpired') }}</h1>
             <p class="mb-6 text-sm text-gray-500">{{ errorMessage || t('interviews.states.expired') }}</p>
-            <RouterLink to="/jobs" class="text-sm font-medium text-blue-600 hover:underline">Browse more jobs</RouterLink>
+            <RouterLink to="/jobs" class="text-sm font-medium text-blue-600 hover:underline">{{ t('interviews.chatPage.browseMoreJobs') }}</RouterLink>
           </div>
         </template>
         <template v-else-if="errorState === 'closed'">
@@ -305,9 +305,9 @@ function handleClose(): void {
             <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
               <i class="pi pi-ban text-3xl text-gray-400"></i>
             </div>
-            <h1 class="mb-2 text-xl font-bold text-gray-900">Vacancy Closed</h1>
+            <h1 class="mb-2 text-xl font-bold text-gray-900">{{ t('interviews.chatPage.vacancyClosed') }}</h1>
             <p class="mb-6 text-sm text-gray-500">{{ errorMessage || t('interviews.states.closed') }}</p>
-            <RouterLink to="/jobs" class="text-sm font-medium text-blue-600 hover:underline">Browse more jobs</RouterLink>
+            <RouterLink to="/jobs" class="text-sm font-medium text-blue-600 hover:underline">{{ t('interviews.chatPage.browseMoreJobs') }}</RouterLink>
           </div>
         </template>
         <template v-else>
@@ -315,7 +315,7 @@ function handleClose(): void {
             <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
               <i class="pi pi-exclamation-triangle text-3xl text-red-400"></i>
             </div>
-            <h1 class="mb-2 text-xl font-bold text-gray-900">Something Went Wrong</h1>
+            <h1 class="mb-2 text-xl font-bold text-gray-900">{{ t('interviews.chatPage.somethingWentWrong') }}</h1>
             <p class="mb-6 text-sm text-gray-500">{{ errorMessage }}</p>
             <Button :label="t('errors.tryAgain')" icon="pi pi-refresh" rounded @click="$router.go(0)" />
           </div>
@@ -341,7 +341,7 @@ function handleClose(): void {
               <p v-if="(interview as any).employerName || (interview as any).companyName" class="text-xs text-gray-500">
                 <i class="pi pi-building mr-0.5"></i>{{ (interview as any).employerName || (interview as any).companyName }}
               </p>
-              <p class="text-xs text-gray-500">AI Interview in progress - click to expand</p>
+              <p class="text-xs text-gray-500">{{ t('interviews.chatPage.inProgress') }}</p>
             </div>
           </div>
           <div class="flex items-center gap-2">
@@ -407,18 +407,18 @@ function handleClose(): void {
             <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-yellow-100">
               <i class="pi pi-exclamation-triangle text-xl text-yellow-600"></i>
             </div>
-            <h2 class="mb-2 text-lg font-semibold text-gray-900">Leave interview?</h2>
+            <h2 class="mb-2 text-lg font-semibold text-gray-900">{{ t('interviews.chatPage.leaveTitle') }}</h2>
             <p class="mb-5 text-sm text-gray-500">
-              Your progress is saved. You can return anytime using the same link.
+              {{ t('interviews.chatPage.leaveMessage') }}
             </p>
             <div class="flex gap-3">
               <Button
-                :label="t('candidates.interview')"
+                :label="t('interviews.chatPage.stayButton')"
                 class="flex-1"
                 @click="showLeaveConfirm = false"
               />
               <Button
-                label="Leave"
+                :label="t('interviews.chatPage.leaveButton')"
                 severity="secondary"
                 outlined
                 class="flex-1"
@@ -434,7 +434,7 @@ function handleClose(): void {
             <!-- Date header -->
             <div class="flex items-center justify-center">
               <span class="rounded-full bg-gray-200 px-3 py-1 text-[10px] font-medium text-gray-500">
-                Today
+                {{ t('interviews.chatPage.today') }}
               </span>
             </div>
 
@@ -510,22 +510,22 @@ function handleClose(): void {
             <div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-green-100">
               <i class="pi pi-check text-2xl text-green-600"></i>
             </div>
-            <h2 class="mb-1 text-lg font-semibold text-gray-900">Interview Complete!</h2>
+            <h2 class="mb-1 text-lg font-semibold text-gray-900">{{ t('interviews.chatPage.interviewComplete') }}</h2>
             <p class="mb-4 text-sm text-gray-500">
-              Thank you for your time. We'll review your responses and be in touch.
+              {{ t('interviews.chatPage.thankYouReview') }}
             </p>
             <div class="flex justify-center gap-3">
               <RouterLink
                 to="/register"
                 class="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
               >
-                Create Account to Track Status
+                {{ t('interviews.chatPage.createAccount') }}
               </RouterLink>
               <RouterLink
                 to="/jobs"
                 class="rounded-xl border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
               >
-                Browse More Jobs
+                {{ t('interviews.chatPage.browseJobs') }}
               </RouterLink>
             </div>
           </div>
@@ -561,7 +561,7 @@ function handleClose(): void {
             </button>
           </div>
           <p class="mx-auto mt-1.5 max-w-3xl text-center text-[10px] text-gray-400">
-            Press Enter to send, Shift+Enter for new line
+            {{ t('interviews.chatPage.enterHint') }}
           </p>
         </div>
       </template>

@@ -352,14 +352,14 @@ function handleSoftDeleteAll(status: ApplicationStatus): void {
           :class="candidateViewMode === 'kanban' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:text-gray-700'"
           @click="candidateViewMode = 'kanban'"
         >
-          <i class="pi pi-th-large sm:mr-1.5"></i><span class="hidden sm:inline">Board</span>
+          <i class="pi pi-th-large sm:mr-1.5"></i><span class="hidden sm:inline">{{ t('candidates.board') }}</span>
         </button>
         <button
           class="rounded-md px-2.5 py-1 text-xs font-medium transition-colors sm:px-3 sm:py-1.5 sm:text-sm"
           :class="candidateViewMode === 'table' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:text-gray-700'"
           @click="candidateViewMode = 'table'"
         >
-          <i class="pi pi-list sm:mr-1.5"></i><span class="hidden sm:inline">Table</span>
+          <i class="pi pi-list sm:mr-1.5"></i><span class="hidden sm:inline">{{ t('candidates.table') }}</span>
         </button>
       </div>
 
@@ -389,20 +389,20 @@ function handleSoftDeleteAll(status: ApplicationStatus): void {
           :options="orderingOptions"
           option-label="label"
           option-value="value"
-          placeholder="Sort"
+          :placeholder="t('candidates.sort')"
           class="hidden shrink-0 sm:flex"
         />
       </template>
 
       <!-- Bulk actions (when selected) -->
       <template v-if="selectedCandidates.length > 0">
-        <span class="hidden shrink-0 text-xs text-gray-500 sm:inline">{{ selectedCandidates.length }} selected</span>
+        <span class="hidden shrink-0 text-xs text-gray-500 sm:inline">{{ t('candidates.selected', { count: selectedCandidates.length }) }}</span>
         <Dropdown
           :model-value="null"
           :options="bulkActionOptions"
           option-label="label"
           option-value="value"
-          placeholder="Bulk Actions"
+          :placeholder="t('candidates.bulkActions')"
           class="shrink-0"
           @change="handleBulkAction"
         />
@@ -550,8 +550,8 @@ function handleSoftDeleteAll(status: ApplicationStatus): void {
       <template #empty>
         <div class="py-8 text-center text-gray-500">
           <i class="pi pi-users mb-2 text-3xl"></i>
-          <p v-if="searchQuery">No candidates matching "{{ searchQuery }}"</p>
-          <p v-else>No candidates have applied yet</p>
+          <p v-if="searchQuery">{{ t('candidates.noMatchingCandidates', { query: searchQuery }) }}</p>
+          <p v-else>{{ t('candidates.noCandidatesApplied') }}</p>
         </div>
       </template>
     </DataTable>
