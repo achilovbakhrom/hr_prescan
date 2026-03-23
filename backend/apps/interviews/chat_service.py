@@ -1,5 +1,5 @@
 """
-AI chat screening service — handles conversation with candidates via OpenAI.
+AI chat screening service — handles conversation with candidates via Gemini.
 
 Supports two session types:
 - Prescanning: lighter, quicker initial screening (always chat mode)
@@ -17,8 +17,8 @@ import logging
 
 from django.conf import settings
 from django.utils import timezone
-
-from openai import OpenAI
+from google import genai
+from google.genai import types
 
 from apps.common.messages import MSG_EVALUATION_MALFORMED
 from apps.interviews.models import Interview
@@ -29,8 +29,8 @@ SESSION_COMPLETE_ADVANCE = "[SESSION_ADVANCE]"
 SESSION_COMPLETE_REJECT = "[SESSION_REJECT]"
 
 
-def _get_client() -> OpenAI:
-    return OpenAI(api_key=settings.OPENAI_API_KEY)
+def _get_client() -> genai.Client:
+    return genai.Client(api_key=settings.GOOGLE_API_KEY)
 
 
 def _build_system_prompt(interview: Interview) -> str:
@@ -39,13 +39,15 @@ def _build_system_prompt(interview: Interview) -> str:
     vacancy = application.vacancy
     step = interview.session_type  # "prescanning" or "interview"
 
-    # Filter questions and criteria by step
-    questions = list(
+    # Filter competencies and criteria by step
+    competencies = list(
         vacancy.questions.filter(is_active=True, step=step)
         .order_by("order")
-        .values_list("text", flat=True)
+        .values_list("text", "category")
     )
-    questions_text = "\n".join(f"- {q}" for q in questions) if questions else "No specific questions defined."
+    competencies_text = "\n".join(
+        f"- [{cat}] {text}" for text, cat in competencies
+    ) if competencies else "No specific competencies defined."
 
     criteria = list(
         vacancy.criteria.filter(step=step)
@@ -121,11 +123,23 @@ Include a brief company introduction in your greeting (1-2 sentences based on th
 - Skills needed: {', '.join(vacancy.skills) if vacancy.skills else 'Not specified'}
 - Experience level: {vacancy.get_experience_level_display()}
 {cv_section}{additional_prompt}
-## Prepared Questions
-{questions_text}
+## Competencies to Evaluate
+Each competency below is a skill goal you need to assess. Do NOT read these to the candidate.
+Instead, design your own questions and follow-ups to figure out whether the candidate truly
+has this knowledge or skill. Probe naturally — like a real conversation, not a checklist.
 
-## Evaluation Criteria
+{competencies_text}
+
+## Evaluation Criteria (for scoring)
 {criteria_text}
+
+## HOW TO EVALUATE COMPETENCIES
+- For each competency, come up with your own questions that test whether the candidate actually knows the topic.
+- Start with an open-ended question, then dig deeper based on their answer.
+- If the candidate gives a surface-level answer, ask follow-ups to check real understanding.
+- If the candidate clearly doesn't know a topic, don't push — move on gracefully.
+- You don't have to cover every competency — prioritize the most important ones and adapt based on the conversation flow.
+- It's okay to combine related competencies into one line of questioning.
 
 ## CRITICAL — Ending the Session and Making a Decision
 When you have enough information to make a decision:
@@ -143,6 +157,7 @@ Respond in the same language the candidate uses. If they write in Russian, respo
 - Be human and warm, not robotic
 - Use simple, clear language
 - Don't repeat information the candidate already knows
+- Never mention "competencies" or "skill goals" to the candidate — just have a natural conversation
 """
 
 
@@ -155,16 +170,15 @@ def _prescanning_behavior(vacancy, company_info: str) -> str:
 - This is a QUICK initial screening — keep it light and efficient
 - Ask ONE question at a time, wait for response
 - Keep your messages SHORT (2-3 sentences max)
-- Focus on basic fit: motivation, availability, general qualifications
 - Be conversational and friendly — this is the candidate's first impression
 - Typically ask 4-6 questions total
 
-## Prescanning Rules
+## Prescanning Approach
 1. Greet the candidate briefly{' and introduce the company' if company_info else ''}, then ask them to introduce themselves
-2. Work through the prepared questions, adapting based on answers
-3. Quickly assess basic fit — don't probe deeply (that's for the interview step)
-4. Cover the evaluation criteria through your questions
-5. If clearly unqualified after 2-3 questions, wrap up politely
+2. For each competency you need to assess, come up with a natural question that checks whether the candidate has the skill — don't read competency descriptions aloud
+3. If the candidate's answer is vague, ask a short follow-up to check real understanding
+4. Keep it light — you're checking basic fit, not conducting a deep technical interview
+5. If clearly unqualified after 2-3 exchanges, wrap up politely
 
 ## Decision Criteria
 - ADVANCE: Candidate shows basic fit, motivation, and relevant background
@@ -180,19 +194,19 @@ def _interview_behavior(vacancy, company_info: str) -> str:
 - This is a DEEPER evaluation — be more demanding and probing
 - Ask ONE question at a time, wait for response
 - Keep your messages concise but substantive (2-4 sentences)
-- Prefix each question with "Q:" to clearly mark it
 - Ask follow-up questions to probe depth of knowledge
 - Challenge vague answers — ask for specifics, examples, numbers
 - Present practical scenarios or cases when appropriate
 - Typically ask 6-10 questions total (including follow-ups)
 
-## Interview Rules
+## Interview Approach
 1. Greet the candidate briefly and explain this is the interview stage
-2. Work through the prepared questions with rigor
-3. Probe deeper — ask for concrete examples, technical details, real-world scenarios
-4. Cover all evaluation criteria thoroughly
+2. For each competency, design your own questions that test real understanding — not surface knowledge
+3. Start broad, then drill down: e.g., ask about their experience with a topic, then ask them to explain a specific concept or walk through a real scenario
+4. If a candidate claims expertise, verify it — ask them to explain trade-offs, edge cases, or how they solved a real problem
 5. Test claims from their CV or prescanning answers
-6. If clearly unqualified, wrap up politely after 4-5 questions
+6. Cover the most important competencies thoroughly — it's okay to skip less critical ones if time is limited
+7. If clearly unqualified, wrap up politely after 4-5 questions
 
 ## Decision Criteria
 - ADVANCE: Candidate demonstrates strong skills, clear thinking, and domain expertise
@@ -206,17 +220,28 @@ def generate_greeting(interview: Interview) -> str:
 
     step_label = "prescanning" if interview.session_type == Interview.SessionType.PRESCANNING else "interview"
 
-    response = client.chat.completions.create(
-        model=settings.OPENAI_CHAT_MODEL,
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": f"[SYSTEM: The candidate has just opened the {step_label} chat. Send a brief, warm greeting (2-3 sentences). Introduce yourself and the company briefly if company info is available. Then ask the candidate to tell you about themselves.]"},
+    response = client.models.generate_content(
+        model=settings.GEMINI_MODEL,
+        contents=[
+            types.Content(
+                role="user",
+                parts=[types.Part(text=
+                    f"[SYSTEM: The candidate has just opened the {step_label} chat. "
+                    "Send a brief, warm greeting (2-3 sentences). Introduce yourself and "
+                    "the company briefly if company info is available. Then ask the candidate "
+                    "to tell you about themselves.]"
+                )],
+            ),
         ],
-        max_tokens=300,
-        temperature=0.7,
+        config=types.GenerateContentConfig(
+            thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
+            system_instruction=system_prompt,
+            max_output_tokens=300,
+            temperature=0.7,
+        ),
     )
 
-    greeting = response.choices[0].message.content or ""
+    greeting = response.text or ""
     # Remove completion markers from greeting (safety check)
     greeting = greeting.replace(SESSION_COMPLETE_ADVANCE, "").replace(SESSION_COMPLETE_REJECT, "").strip()
     return greeting
@@ -224,7 +249,7 @@ def generate_greeting(interview: Interview) -> str:
 
 def _get_ai_response_and_update_history(interview: Interview, candidate_entry: dict) -> dict:
     """
-    Shared helper: append candidate entry to history, call OpenAI, handle
+    Shared helper: append candidate entry to history, call Gemini, handle
     completion markers, save, and run evaluation if complete.
 
     Args:
@@ -242,25 +267,31 @@ def _get_ai_response_and_update_history(interview: Interview, candidate_entry: d
     client = _get_client()
     system_prompt = _build_system_prompt(interview)
 
-    # Build conversation history for OpenAI
+    # Build conversation history for Gemini
     chat_history = list(interview.chat_history or [])
     chat_history.append(candidate_entry)
 
-    # Convert our chat history to OpenAI message format
-    openai_messages = [{"role": "system", "content": system_prompt}]
+    # Convert our chat history to Gemini content format
+    gemini_contents = []
     for msg in chat_history:
-        role = "assistant" if msg["role"] == "ai" else "user"
-        openai_messages.append({"role": role, "content": msg["text"]})
+        role = "model" if msg["role"] == "ai" else "user"
+        gemini_contents.append(
+            types.Content(role=role, parts=[types.Part(text=msg["text"])])
+        )
 
-    # Call OpenAI
-    response = client.chat.completions.create(
-        model=settings.OPENAI_CHAT_MODEL,
-        messages=openai_messages,
-        max_tokens=400,
-        temperature=0.7,
+    # Call Gemini
+    response = client.models.generate_content(
+        model=settings.GEMINI_MODEL,
+        contents=gemini_contents,
+        config=types.GenerateContentConfig(
+            thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
+            system_instruction=system_prompt,
+            max_output_tokens=400,
+            temperature=0.7,
+        ),
     )
 
-    raw_ai_text = response.choices[0].message.content or ""
+    raw_ai_text = response.text or ""
 
     # Check if session is complete and determine AI decision
     is_complete = SESSION_COMPLETE_ADVANCE in raw_ai_text or SESSION_COMPLETE_REJECT in raw_ai_text
@@ -398,7 +429,7 @@ def process_voice_message(*, interview: Interview, audio_file, duration: float) 
 
 def evaluate_chat_interview(interview: Interview, *, ai_decision: str = "advance") -> None:
     """
-    Evaluate a completed chat session using GPT.
+    Evaluate a completed chat session using Gemini.
 
     Analyzes the full transcript and scores the candidate on each
     step-specific criteria. Saves scores, overall score, AI summary,
@@ -476,18 +507,24 @@ Respond with ONLY valid JSON in this exact format:
   "summary": "Overall assessment of the candidate in 2-3 sentences."
 }}"""
 
-    response = client.chat.completions.create(
-        model=settings.OPENAI_CHAT_MODEL,
-        messages=[
-            {"role": "system", "content": "You are an expert HR evaluator. Respond only with valid JSON."},
-            {"role": "user", "content": eval_prompt},
+    response = client.models.generate_content(
+        model=settings.GEMINI_MODEL,
+        contents=[
+            types.Content(
+                role="user",
+                parts=[types.Part(text=eval_prompt)],
+            ),
         ],
-        max_tokens=1500,
-        temperature=0.3,
-        response_format={"type": "json_object"},
+        config=types.GenerateContentConfig(
+            thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
+            system_instruction="You are an expert HR evaluator. Respond only with valid JSON.",
+            max_output_tokens=1500,
+            temperature=0.3,
+            response_mime_type="application/json",
+        ),
     )
 
-    raw = response.choices[0].message.content or "{}"
+    raw = response.text or "{}"
     try:
         result = json.loads(raw)
     except json.JSONDecodeError:

@@ -30,8 +30,9 @@ const description = ref('')
 const fileUrl = ref('')
 const saving = ref(false)
 
-async function handleFileUpload(event: { files: File[] }): Promise<void> {
-  const file = event.files?.[0]
+async function handleFileUpload(event: { files: File | File[] }): Promise<void> {
+  const files = Array.isArray(event.files) ? event.files : [event.files]
+  const file = files[0]
   if (!file || !name.value) return
 
   saving.value = true

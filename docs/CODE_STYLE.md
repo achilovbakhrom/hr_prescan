@@ -115,7 +115,7 @@ backend/
 │   ├── livekit.py
 │   ├── storage.py
 │   ├── email.py
-│   ├── openai_client.py
+│   ├── gemini_client.py
 │   ├── deepgram_client.py
 │   └── elevenlabs_client.py
 │

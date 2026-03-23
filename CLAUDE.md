@@ -18,7 +18,7 @@ All detailed docs live in `docs/`:
 
 - **Backend:** Django, DRF, Celery, PostgreSQL, Redis, RabbitMQ
 - **Frontend:** Vue 3, TypeScript, Pinia, PrimeVue, Tailwind CSS
-- **AI Interview:** LiveKit + Deepgram STT + GPT-4o + ElevenLabs TTS
+- **AI Interview:** LiveKit + Deepgram STT + Gemini 3.0 Flash + ElevenLabs TTS
 - **Storage:** MinIO (S3-compatible)
 - **Deployment:** Docker Compose, GitHub Actions CI/CD
 

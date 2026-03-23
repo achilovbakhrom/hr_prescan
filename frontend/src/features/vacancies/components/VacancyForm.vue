@@ -128,8 +128,9 @@ async function handleCreateEmployer(): Promise<void> {
   }
 }
 
-async function handleCreateFromFile(event: { files: File[] }): Promise<void> {
-  const file = event.files?.[0]
+async function handleCreateFromFile(event: { files: File | File[] }): Promise<void> {
+  const files = Array.isArray(event.files) ? event.files : [event.files]
+  const file = files[0]
   if (!file || !newEmployerName.value) return
   creatingEmployer.value = true
   createError.value = ''
@@ -198,7 +199,7 @@ function handleSave(): void {
   <form @submit.prevent="handleSave">
     <TabView v-model:activeIndex="activeTab">
       <!-- Tab 1: Basic Info (job details + location + salary) -->
-      <TabPanel :header="t('vacancies.form.basicInfo')">
+      <TabPanel value="0" :header="t('vacancies.form.basicInfo')">
         <div class="space-y-4 py-2">
 
           <div>
@@ -267,7 +268,7 @@ function handleSave(): void {
       </TabPanel>
 
       <!-- Tab 2: Company -->
-      <TabPanel :header="t('vacancies.form.companyInfo')">
+      <TabPanel value="1" :header="t('vacancies.form.companyInfo')">
         <div class="space-y-4 py-2">
           <!-- Employer dropdown + Add New -->
           <div>
@@ -325,7 +326,7 @@ function handleSave(): void {
       </TabPanel>
 
       <!-- Tab 3: Prescanning -->
-      <TabPanel :header="t('vacancies.form.prescanning')">
+      <TabPanel value="2" :header="t('vacancies.form.prescanning')">
         <div class="space-y-4 py-2">
           <div class="rounded-lg border border-teal-200 bg-teal-50/40 p-4">
             <div class="flex items-center gap-2">
@@ -347,7 +348,7 @@ function handleSave(): void {
       </TabPanel>
 
       <!-- Tab 4: Interview -->
-      <TabPanel :header="t('vacancies.form.interview')">
+      <TabPanel value="3" :header="t('vacancies.form.interview')">
         <div class="space-y-4 py-2">
           <div class="flex items-center justify-between rounded-lg border border-emerald-200 bg-emerald-50/40 p-4">
             <div>
@@ -384,7 +385,7 @@ function handleSave(): void {
       </TabPanel>
 
       <!-- Tab 5: Settings -->
-      <TabPanel :header="t('vacancies.form.settings')">
+      <TabPanel value="4" :header="t('vacancies.form.settings')">
         <div class="space-y-5 py-2">
           <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>

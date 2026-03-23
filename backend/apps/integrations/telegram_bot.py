@@ -2,7 +2,8 @@ import logging
 
 import requests
 from django.conf import settings
-from openai import OpenAI
+from google import genai
+from google.genai import types
 
 logger = logging.getLogger(__name__)
 
@@ -218,7 +219,7 @@ def _try_link_code(*, chat_id, telegram_id, telegram_username, text):
 
 
 def _transcribe_voice(file_id):
-    """Download Telegram voice message and transcribe with Whisper."""
+    """Download Telegram voice message and transcribe with Gemini."""
     if not file_id:
         return None
 
@@ -234,14 +235,20 @@ def _transcribe_voice(file_id):
         audio_resp = requests.get(file_url)
         audio_bytes = audio_resp.content
 
-        # Transcribe with Whisper
-        client = OpenAI()
-        transcript = client.audio.transcriptions.create(
-            model="whisper-1",
-            file=("voice.ogg", audio_bytes, "audio/ogg"),
-            timeout=30.0,
+        # Transcribe with Gemini
+        client = genai.Client(api_key=settings.GOOGLE_API_KEY)
+        response = client.models.generate_content(
+            model=settings.GEMINI_MODEL,
+            contents=[
+                types.Part.from_bytes(data=audio_bytes, mime_type="audio/ogg"),
+                "Transcribe this audio accurately. The speaker may use Russian, English, "
+                "or a mix. Return only the transcription text, nothing else.",
+            ],
+            config=types.GenerateContentConfig(
+                thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
+            ),
         )
-        return transcript.text.strip()
+        return response.text.strip()
     except Exception as e:
         logger.error("Telegram voice transcription error: %s", e)
         return None

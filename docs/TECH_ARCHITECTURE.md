@@ -14,7 +14,7 @@
 | AI Agent | LiveKit Agents (VoicePipelineAgent) | STT → LLM → TTS orchestration |
 | STT | Deepgram Nova-3 | Real-time speech-to-text |
 | TTS | ElevenLabs Flash v2.5 | Text-to-speech (natural voice) |
-| LLM | GPT-4.5.5 mini (OpenAI) | Conversation logic, evaluation |
+| LLM | Gemini 3.0 Flash (Google) | Conversation logic, evaluation |
 | Deployment | Docker Compose | All services, zero-downtime |
 
 ---
@@ -56,7 +56,7 @@
 | 6 | **Celery Worker** | Same as Django | — | Async task execution |
 | 7 | **Celery Beat** | Same as Django | — | Scheduled task dispatcher |
 | 8 | **LiveKit Server** | livekit/livekit-server | 7880, 7881 | WebRTC SFU, room management |
-| 9 | **LiveKit Agent** | Custom (Python) | — | AI interviewer (Deepgram + GPT + ElevenLabs) |
+| 9 | **LiveKit Agent** | Custom (Python) | — | AI interviewer (Deepgram + Gemini + ElevenLabs) |
 | 10 | **MinIO** | minio/minio | 9000, 9001 | S3-compatible object storage |
 
 ---
@@ -93,7 +93,7 @@
     └─────────┘ └──────────┘ └──────────┘ └──────────┘
                               │  │  │
                      Deepgram─┘  │  └─ElevenLabs
-                            OpenAI
+                         Google Gemini
 ```
 
 ### Communication Protocols
@@ -107,7 +107,7 @@
 | Browser | LiveKit Server | WebRTC | HR silent observer mode |
 | LiveKit Server | LiveKit Agent | Internal audio stream | Candidate audio to AI agent |
 | LiveKit Agent | Deepgram | WebSocket | Real-time speech-to-text |
-| LiveKit Agent | OpenAI | HTTPS | GPT-4.5.5 mini for conversation |
+| LiveKit Agent | Google Gemini | HTTPS | Gemini 3.0 Flash for conversation |
 | LiveKit Agent | ElevenLabs | HTTPS | Text-to-speech response |
 | Django API | RabbitMQ | AMQP | Dispatch async tasks to Celery |
 | Django API | RabbitMQ | AMQP | Send messages to LiveKit Agent (create room, start interview) |
@@ -136,9 +136,9 @@ Candidate speaks
        │ audio stream
        ▼
 ┌──────────────┐                  ┌──────────────┐
-│  LiveKit     │    HTTPS         │  OpenAI      │
-│  Agent       │ ──────────────►  │  GPT-4.5.5   │
-│  (Voice      │                  │  mini        │
+│  LiveKit     │    HTTPS         │  Google      │
+│  Agent       │ ──────────────►  │  Gemini 2.5  │
+│  (Voice      │                  │  Flash       │
 │  Pipeline    │  ◄────────────── │  (LLM)       │
 │  Agent)      │    response text └──────────────┘
 │              │
@@ -158,7 +158,7 @@ Candidate hears AI response
 |------|---------|---------|
 | Voice Activity Detection | LiveKit (built-in) | ~50ms |
 | Speech-to-Text | Deepgram Nova-3 | ~150-300ms |
-| LLM Response | GPT-4.5.5 mini | ~100-300ms |
+| LLM Response | Gemini 3.0 Flash | ~100-300ms |
 | Text-to-Speech | ElevenLabs Flash v2.5 | ~75ms |
 | **Total end-to-end** | | **~400-750ms** |
 
@@ -173,8 +173,8 @@ agent = VoicePipelineAgent(
         interim_results=True,
         endpointing=300,            # ms silence before finalizing
     ),
-    llm=OpenAILLM(
-        model="gpt-4.5.5-mini",
+    llm=GoogleLLM(
+        model="gemini-3-flash-preview",
         system_prompt="...",        # Interview instructions, vacancy context, CV data
     ),
     tts=ElevenLabsTTS(
@@ -232,7 +232,7 @@ Candidate              LiveKit Server        LiveKit Agent         Django API
     │  4. Candidate speaks  │                      │                    │
     │ ─────────────────────►│ ── audio stream ────►│                    │
     │                       │                      │── Deepgram (STT)   │
-    │                       │                      │── GPT (think)      │
+    │                       │                      │── Gemini (think)    │
     │                       │                      │── ElevenLabs (TTS) │
     │◄── AI voice response ─│◄── audio stream ────│                    │
     │                       │                      │                    │
@@ -493,7 +493,7 @@ LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET
 
 # External AI Services
 DEEPGRAM_API_KEY
-OPENAI_API_KEY
+GOOGLE_API_KEY
 ELEVENLABS_API_KEY
 
 # Email
@@ -513,7 +513,7 @@ DJANGO_SECRET_KEY, DEBUG, ALLOWED_HOSTS, CORS_ORIGINS
 | Service | Purpose | Pricing Model |
 |---------|---------|---------------|
 | **Deepgram** | Speech-to-text | $0.0092/min (multilingual streaming) |
-| **OpenAI** | LLM conversation | Per token (GPT-4.5.5 mini) |
+| **Google Gemini** | LLM conversation | Per token (Gemini 3.0 Flash) |
 | **ElevenLabs** | Text-to-speech | Per character (~$150/M chars) |
 | **Google OAuth** | Social login | Free |
 | **SMTP Provider** | Email delivery | Per email (SendGrid, Mailgun, etc.) |
@@ -523,6 +523,6 @@ DJANGO_SECRET_KEY, DEBUG, ALLOWED_HOSTS, CORS_ORIGINS
 | Service | Cost |
 |---------|------|
 | Deepgram STT | ~$0.28 |
-| OpenAI GPT | ~$0.05-0.15 |
+| Google Gemini | ~$0.05-0.15 |
 | ElevenLabs TTS | ~$0.10-0.30 |
 | **Total** | **~$0.43-0.73** |

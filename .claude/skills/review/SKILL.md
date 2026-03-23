@@ -36,7 +36,14 @@ Before reviewing, read:
 - `docs/CODE_STYLE.md` if it exists
 - `docs/BUSINESS_LOGIC.md` for domain context
 
-### 3. Backend Review (GRASP Principles)
+### 3. Linter Awareness
+
+The backend uses **Ruff** (not Flake8) for linting and formatting. Ruff config lives in `backend/pyproject.toml` under `[tool.ruff]`. When reviewing:
+- Suggest Ruff rule codes (e.g., `# noqa: S101`), not Flake8 codes
+- Format suggestions should reference `ruff format`, not `black` or `autopep8`
+- Import sorting is handled by Ruff's isort (`I` rules), not standalone isort
+
+### 4. Backend Review (GRASP Principles)
 
 Review backend Python/Django code against these criteria:
 
@@ -75,7 +82,7 @@ Review backend Python/Django code against these criteria:
 - Permission classes on all views
 - Proper status code usage in responses
 
-### 4. Frontend Review (Feature-Sliced Design)
+### 5. Frontend Review (Feature-Sliced Design)
 
 Review frontend Vue/TypeScript code against FSD principles:
 
@@ -114,7 +121,7 @@ Review frontend Vue/TypeScript code against FSD principles:
 - Computed properties for derived state (not methods)
 - Watchers used sparingly and with clear purpose
 
-### 5. Security Review (Both Layers)
+### 6. Security Review (Both Layers)
 
 - Authentication: all protected endpoints require auth
 - Authorization: role-based access enforced (HR can't access admin endpoints)
@@ -125,7 +132,7 @@ Review frontend Vue/TypeScript code against FSD principles:
 - File uploads: validated file types and sizes
 - SQL injection: using ORM, no raw SQL with user input
 
-### 6. Performance Review
+### 7. Performance Review
 
 **Backend:**
 - N+1 queries (missing `select_related`/`prefetch_related`)
@@ -140,7 +147,7 @@ Review frontend Vue/TypeScript code against FSD principles:
 - Unoptimized watchers (watching entire objects vs specific properties)
 - API calls without debouncing on user input
 
-### 7. Report
+### 8. Report
 
 Output a structured report:
 
@@ -164,7 +171,7 @@ Output a structured report:
 - Overall assessment: [GOOD / NEEDS WORK / CRITICAL ISSUES]
 ```
 
-### 8. Fix (if --fix flag)
+### 9. Fix (if --fix flag)
 
 If `--fix` was provided:
 - Fix all critical issues

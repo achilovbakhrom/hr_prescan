@@ -5,8 +5,10 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
+import Textarea from 'primevue/textarea'
 import Dialog from 'primevue/dialog'
 import Tag from 'primevue/tag'
+import Select from 'primevue/select'
 import type { InterviewQuestion } from '../types/vacancy.types'
 
 const { t } = useI18n()
@@ -24,6 +26,13 @@ const isEditing = ref(false)
 const editId = ref('')
 const formText = ref('')
 const formCategory = ref('')
+
+const categoryOptions = [
+  { label: 'Hard Skill', value: 'Hard Skill' },
+  { label: 'Soft Skill', value: 'Soft Skill' },
+  { label: 'Domain Knowledge', value: 'Domain Knowledge' },
+  { label: 'Cultural Fit', value: 'Cultural Fit' },
+]
 
 function openAdd(): void {
   isEditing.value = false; editId.value = ''; formText.value = ''; formCategory.value = ''
@@ -57,8 +66,16 @@ function handleSubmit(): void {
     </div>
     <DataTable :value="questions" :loading="loading" striped-rows>
       <Column field="order" header="#" style="width: 50px" />
-      <Column field="text" header="Question" />
-      <Column field="category" header="Category" style="width: 150px" />
+      <Column field="text" header="Competency">
+        <template #body="{ data }">
+          <span class="text-sm">{{ data.text }}</span>
+        </template>
+      </Column>
+      <Column field="category" header="Category" style="width: 160px">
+        <template #body="{ data }">
+          <Tag v-if="data.category" :value="data.category" severity="secondary" />
+        </template>
+      </Column>
       <Column field="source" header="Source" style="width: 120px">
         <template #body="{ data }">
           <Tag :value="data.source === 'ai_generated' ? 'AI' : 'Manual'" :severity="data.source === 'ai_generated' ? 'info' : 'secondary'" />
@@ -73,15 +90,15 @@ function handleSubmit(): void {
         </template>
       </Column>
       <template #empty>
-        <div class="py-8 text-center text-gray-500">No questions yet. Add manually or generate with AI.</div>
+        <div class="py-8 text-center text-gray-500">No competencies yet. Add manually or generate with AI.</div>
       </template>
     </DataTable>
-    <Dialog v-model:visible="showDialog" :header="isEditing ? 'Edit Question' : t('vacancies.addQuestion')" :style="{ width: '500px' }" modal>
+    <Dialog v-model:visible="showDialog" :header="isEditing ? 'Edit Competency' : t('vacancies.addQuestion')" :style="{ width: '500px' }" modal>
       <div class="space-y-4">
-        <div><label class="mb-1 block text-sm font-medium">Question *</label>
-          <InputText v-model="formText" class="w-full" placeholder="Enter question text" /></div>
+        <div><label class="mb-1 block text-sm font-medium">Competency *</label>
+          <Textarea v-model="formText" class="w-full" rows="3" placeholder="e.g. Candidate should demonstrate proficiency with React hooks" /></div>
         <div><label class="mb-1 block text-sm font-medium">Category</label>
-          <InputText v-model="formCategory" class="w-full" placeholder="e.g. Technical, Behavioral" /></div>
+          <Select v-model="formCategory" :options="categoryOptions" option-label="label" option-value="value" class="w-full" placeholder="Select category" /></div>
       </div>
       <template #footer>
         <Button :label="t('common.cancel')" severity="secondary" text @click="showDialog = false" />

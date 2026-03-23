@@ -8,7 +8,8 @@ from botocore.config import Config as BotoConfig
 from django.conf import settings
 from django.db import IntegrityError, transaction
 from django.db.models import Q
-from openai import OpenAI
+from google import genai
+from google.genai import types
 
 from apps.accounts.models import User
 from apps.applications.models import Application
@@ -288,10 +289,10 @@ def process_cv_text(*, application_id: UUID) -> None:
 
 
 def _extract_text_from_pdf(file_bytes: bytes) -> str:
-    """Extract text from PDF bytes using PyPDF2."""
-    import PyPDF2
+    """Extract text from PDF bytes using pypdf."""
+    import pypdf
 
-    reader = PyPDF2.PdfReader(io.BytesIO(file_bytes))
+    reader = pypdf.PdfReader(io.BytesIO(file_bytes))
     pages = []
     for page in reader.pages:
         text = page.extract_text()
@@ -309,7 +310,7 @@ def _extract_text_from_docx(file_bytes: bytes) -> str:
 
 
 def analyze_cv_with_ai(*, application_id: UUID) -> None:
-    """AI analysis of CV to extract structured data using OpenAI."""
+    """AI analysis of CV to extract structured data using Gemini."""
     import json as _json
 
     try:
@@ -322,44 +323,46 @@ def analyze_cv_with_ai(*, application_id: UUID) -> None:
         logger.warning("analyze_cv_with_ai: no cv_parsed_text for %s, skipping", application_id)
         return
 
-    logger.info("analyze_cv_with_ai: calling OpenAI for application %s", application_id)
-    client = OpenAI()
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        temperature=0.2,
-        response_format={"type": "json_object"},
-        messages=[
-            {
-                "role": "system",
-                "content": (
-                    "You are a CV/resume parser. Extract structured data from the CV text. "
-                    "Return JSON with these fields:\n"
-                    '- "contacts": {email, phone, location, linkedin, github, website, telegram} (strings, null if not found)\n'
-                    '- "skills": list of technical and soft skills\n'
-                    '- "experience_years": estimated total years of professional experience (number)\n'
-                    '- "experience": list of {company, role, duration, description}\n'
-                    '- "education": list of {degree, field, institution, year}\n'
-                    '- "languages": list of {language, level} (e.g. English - Fluent)\n'
-                    '- "certifications": list of strings (certifications, courses)\n'
-                    '- "summary": 2-3 sentence professional summary\n'
-                    "If any field cannot be determined, use empty list, empty object, or null."
-                ),
-            },
-            {
-                "role": "user",
-                "content": f"Parse this CV:\n\n{application.cv_parsed_text[:8000]}",
-            },
+    logger.info("analyze_cv_with_ai: calling Gemini for application %s", application_id)
+    client = genai.Client(api_key=settings.GOOGLE_API_KEY)
+    response = client.models.generate_content(
+        model=settings.GEMINI_MODEL,
+        contents=[
+            types.Content(
+                role="user",
+                parts=[types.Part(text=
+                    f"Parse this CV:\n\n{application.cv_parsed_text[:8000]}"
+                )],
+            ),
         ],
+        config=types.GenerateContentConfig(
+            thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
+            system_instruction=(
+                "You are a CV/resume parser. Extract structured data from the CV text. "
+                "Return JSON with these fields:\n"
+                '- "contacts": {email, phone, location, linkedin, github, website, telegram} (strings, null if not found)\n'
+                '- "skills": list of technical and soft skills\n'
+                '- "experience_years": estimated total years of professional experience (number)\n'
+                '- "experience": list of {company, role, duration, description}\n'
+                '- "education": list of {degree, field, institution, year}\n'
+                '- "languages": list of {language, level} (e.g. English - Fluent)\n'
+                '- "certifications": list of strings (certifications, courses)\n'
+                '- "summary": 2-3 sentence professional summary\n'
+                "If any field cannot be determined, use empty list, empty object, or null."
+            ),
+            temperature=0.2,
+            response_mime_type="application/json",
+        ),
     )
 
-    parsed = _json.loads(response.choices[0].message.content)
+    parsed = _json.loads(response.text)
     application.cv_parsed_data = parsed
     application.save(update_fields=["cv_parsed_data", "updated_at"])
     logger.info("analyze_cv_with_ai: saved parsed data for application %s", application_id)
 
 
 def calculate_match_score(*, application_id: UUID) -> None:
-    """Compare CV against vacancy requirements and compute match score using OpenAI."""
+    """Compare CV against vacancy requirements and compute match score using Gemini."""
     import json as _json
 
     try:
@@ -377,39 +380,39 @@ def calculate_match_score(*, application_id: UUID) -> None:
         logger.warning("calculate_match_score: no cv_text for %s, skipping", application_id)
         return
 
-    logger.info("calculate_match_score: calling OpenAI for application %s", application_id)
-    client = OpenAI()
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        temperature=0.2,
-        response_format={"type": "json_object"},
-        messages=[
-            {
-                "role": "system",
-                "content": (
-                    "You are an HR matching expert. Compare a candidate's CV against a job vacancy "
-                    "and provide a match score. Return JSON with:\n"
-                    '- "overall": number 0-100 (overall match percentage)\n'
-                    '- "criteria_scores": {technical_skills: 0-100, experience_relevance: 0-100, education_fit: 0-100}\n'
-                    '- "notes": brief explanation of the match assessment\n'
-                    '- "matching_skills": list of skills that match the vacancy\n'
-                    '- "missing_skills": list of required skills the candidate lacks'
-                ),
-            },
-            {
-                "role": "user",
-                "content": (
+    logger.info("calculate_match_score: calling Gemini for application %s", application_id)
+    client = genai.Client(api_key=settings.GOOGLE_API_KEY)
+    response = client.models.generate_content(
+        model=settings.GEMINI_MODEL,
+        contents=[
+            types.Content(
+                role="user",
+                parts=[types.Part(text=
                     f"VACANCY: {vacancy.title}\n"
                     f"Requirements: {vacancy.requirements or 'N/A'}\n"
                     f"Skills needed: {', '.join(vacancy.skills) if vacancy.skills else 'N/A'}\n"
                     f"Experience level: {vacancy.experience_level}\n\n"
                     f"CANDIDATE CV SUMMARY:\n{cv_text[:4000]}"
-                ),
-            },
+                )],
+            ),
         ],
+        config=types.GenerateContentConfig(
+            thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
+            system_instruction=(
+                "You are an HR matching expert. Compare a candidate's CV against a job vacancy "
+                "and provide a match score. Return JSON with:\n"
+                '- "overall": number 0-100 (overall match percentage)\n'
+                '- "criteria_scores": {technical_skills: 0-100, experience_relevance: 0-100, education_fit: 0-100}\n'
+                '- "notes": brief explanation of the match assessment\n'
+                '- "matching_skills": list of skills that match the vacancy\n'
+                '- "missing_skills": list of required skills the candidate lacks'
+            ),
+            temperature=0.2,
+            response_mime_type="application/json",
+        ),
     )
 
-    match_data = _json.loads(response.choices[0].message.content)
+    match_data = _json.loads(response.text)
     application.match_score = round(float(match_data.get("overall", 0)), 2)
     application.match_details = match_data
     application.save(

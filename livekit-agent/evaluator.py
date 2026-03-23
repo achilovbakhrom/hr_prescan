@@ -5,7 +5,8 @@ import logging
 import os
 
 import httpx
-from openai import AsyncOpenAI
+from google import genai
+from google.genai import types
 
 logger = logging.getLogger("interview-agent")
 
@@ -36,19 +37,24 @@ async def evaluate_interview(
     if integrity_flags is None:
         integrity_flags = []
 
-    client = AsyncOpenAI()
+    client = genai.Client(api_key=os.environ.get("GOOGLE_API_KEY", ""))
 
     # -- Step 1: Score the interview --
     prompt = _build_evaluation_prompt(transcript=transcript, criteria=criteria)
 
-    response = await client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "system", "content": prompt}],
-        response_format={"type": "json_object"},
-        temperature=0.3,
+    response = await client.aio.models.generate_content(
+        model=os.environ.get("GEMINI_MODEL", "gemini-3-flash-preview"),
+        contents=[
+            types.Content(role="user", parts=[types.Part(text=prompt)]),
+        ],
+        config=types.GenerateContentConfig(
+            thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
+            response_mime_type="application/json",
+            temperature=0.3,
+        ),
     )
 
-    evaluation = json.loads(response.choices[0].message.content)
+    evaluation = json.loads(response.text)
 
     # -- Step 2: CV consistency check --
     cv_flags = await _check_cv_consistency(
@@ -82,7 +88,7 @@ async def evaluate_interview(
 
 async def _check_cv_consistency(
     *,
-    client: AsyncOpenAI,
+    client: genai.Client,
     transcript: list[dict],
     cv_summary: str,
 ) -> list[dict]:
@@ -124,14 +130,19 @@ async def _check_cv_consistency(
     )
 
     try:
-        response = await client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "system", "content": prompt}],
-            response_format={"type": "json_object"},
-            temperature=0.2,
+        response = await client.aio.models.generate_content(
+            model=os.environ.get("GEMINI_MODEL", "gemini-3-flash-preview"),
+            contents=[
+                types.Content(role="user", parts=[types.Part(text=prompt)]),
+            ],
+            config=types.GenerateContentConfig(
+                thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
+                response_mime_type="application/json",
+                temperature=0.2,
+            ),
         )
 
-        result = json.loads(response.choices[0].message.content)
+        result = json.loads(response.text)
         flags: list[dict] = []
 
         if result.get("inconsistencies_found") and result.get("inconsistencies"):

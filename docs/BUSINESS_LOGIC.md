@@ -664,7 +664,7 @@ Archived → Applied (restore)
 - Completed sessions cannot be reset
 
 ### 16.5 AI Service Unavailable
-- Before connecting the candidate, the system performs a health check on the AI service (OpenAI for chat, LiveKit agent for meet)
+- Before connecting the candidate, the system performs a health check on the AI service (Google Gemini for chat, LiveKit agent for meet)
 - If the service is unavailable, the candidate sees: "Our interviewer is temporarily unavailable. Please try again in a few minutes."
 - System notifies the admin of the outage
 - The session status remains "pending" so the candidate can try again later

@@ -22,9 +22,16 @@ function saveHistory(msgs: AIMessage[]): void {
 const isOpen = ref(false)
 const messages = ref<AIMessage[]>(loadHistory())
 const sending = ref(false)
+let skipSave = false
 
 // Persist on every change
-watch(messages, (val) => saveHistory(val), { deep: true })
+watch(messages, (val) => {
+  if (skipSave) {
+    skipSave = false
+    return
+  }
+  saveHistory(val)
+}, { deep: true })
 
 export function useAIAssistant() {
   const route = useRoute()
@@ -97,7 +104,8 @@ export function useAIAssistant() {
   }
 
   function clearHistory() {
-    messages.value = []
+    skipSave = true
+    messages.value.splice(0, messages.value.length)
     localStorage.removeItem(STORAGE_KEY)
   }
 

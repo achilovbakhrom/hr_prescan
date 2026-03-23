@@ -21,6 +21,9 @@ function scrollToBottom() {
 }
 
 watch(() => messages.value.length, scrollToBottom)
+watch(isOpen, (open) => {
+  if (open) scrollToBottom()
+})
 
 async function handleSend() {
   const text = inputText.value.trim()
@@ -106,7 +109,7 @@ function formatMessage(text: string): string {
             rounded
             size="small"
             @click="clearHistory"
-            v-tooltip.left="t('aiAssistant.clearHistory')"
+            :title="t('aiAssistant.clearHistory')"
           />
           <Button
             type="button"

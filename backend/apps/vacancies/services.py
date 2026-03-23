@@ -2,8 +2,10 @@ import io
 import json
 import logging
 
+from django.conf import settings
 from django.db import models, transaction
-from openai import OpenAI
+from google import genai
+from google.genai import types
 
 from apps.accounts.models import Company, User
 from apps.common.exceptions import ApplicationError
@@ -17,7 +19,6 @@ from apps.common.messages import (
     MSG_INVALID_URL,
     MSG_NO_INTERVIEW_QUESTIONS,
     MSG_NO_PRESCANNING_QUESTIONS,
-    MSG_ONLY_ARCHIVED_DELETE,
     MSG_ONLY_DRAFT_PAUSED_PUBLISH,
     MSG_ONLY_PUBLISHED_PAUSE,
     MSG_ONLY_PUBLISHED_PAUSED_ARCHIVE,
@@ -35,7 +36,12 @@ DEFAULT_CRITERIA = [
     {"name": "Communication", "description": "Clarity of expression and listening skills", "weight": 2, "order": 1},
     {"name": "Problem Solving", "description": "Analytical thinking and creative solutions", "weight": 3, "order": 2},
     {"name": "Cultural Fit", "description": "Alignment with company values and team dynamics", "weight": 2, "order": 3},
-    {"name": "Experience Relevance", "description": "Relevance of prior experience to the role", "weight": 2, "order": 4},
+    {
+        "name": "Experience Relevance",
+        "description": "Relevance of prior experience to the role",
+        "weight": 2,
+        "order": 4,
+    },
 ]
 
 
@@ -71,18 +77,32 @@ def update_vacancy(*, vacancy: Vacancy, data: dict) -> Vacancy:
     interview_mode can only be changed if the vacancy has no applications.
     """
     allowed_fields = {
-        "title", "description", "requirements", "responsibilities",
-        "skills", "salary_min", "salary_max", "salary_currency",
-        "location", "is_remote", "employment_type", "experience_level",
-        "deadline", "visibility", "interview_duration",
-        "interview_mode", "interview_enabled", "cv_required", "company_info",
-        "prescanning_prompt", "interview_prompt",
+        "title",
+        "description",
+        "requirements",
+        "responsibilities",
+        "skills",
+        "salary_min",
+        "salary_max",
+        "salary_currency",
+        "location",
+        "is_remote",
+        "employment_type",
+        "experience_level",
+        "deadline",
+        "visibility",
+        "interview_duration",
+        "interview_mode",
+        "interview_enabled",
+        "cv_required",
+        "company_info",
+        "prescanning_prompt",
+        "interview_prompt",
     }
 
     # Guard: interview_mode cannot be changed once applications exist
-    if "interview_mode" in data and data["interview_mode"] != vacancy.interview_mode:
-        if vacancy.applications.exists():
-            raise ApplicationError(str(MSG_CANNOT_CHANGE_MODE))
+    if "interview_mode" in data and data["interview_mode"] != vacancy.interview_mode and vacancy.applications.exists():
+        raise ApplicationError(str(MSG_CANNOT_CHANGE_MODE))
 
     update_fields: list[str] = []
 
@@ -118,7 +138,10 @@ def publish_vacancy(*, vacancy: Vacancy) -> Vacancy:
     if not vacancy.questions.filter(is_active=True, step=ScreeningStep.PRESCANNING).exists():
         raise ApplicationError(str(MSG_NO_PRESCANNING_QUESTIONS))
 
-    if vacancy.interview_enabled and not vacancy.questions.filter(is_active=True, step=ScreeningStep.INTERVIEW).exists():
+    if (
+        vacancy.interview_enabled
+        and not vacancy.questions.filter(is_active=True, step=ScreeningStep.INTERVIEW).exists()
+    ):
         raise ApplicationError(str(MSG_NO_INTERVIEW_QUESTIONS))
 
     vacancy.status = Vacancy.Status.PUBLISHED
@@ -190,9 +213,7 @@ def add_vacancy_criteria(
     step: str = ScreeningStep.PRESCANNING,
 ) -> VacancyCriteria:
     """Add a custom evaluation criteria to a vacancy."""
-    max_order = vacancy.criteria.filter(step=step).aggregate(
-        max_order=models.Max("order")
-    )["max_order"] or 0
+    max_order = vacancy.criteria.filter(step=step).aggregate(max_order=models.Max("order"))["max_order"] or 0
 
     return VacancyCriteria.objects.create(
         vacancy=vacancy,
@@ -237,9 +258,7 @@ def add_interview_question(
     step: str = ScreeningStep.PRESCANNING,
 ) -> InterviewQuestion:
     """Add a question to a vacancy for the specified step."""
-    max_order = vacancy.questions.filter(step=step).aggregate(
-        max_order=models.Max("order")
-    )["max_order"] or 0
+    max_order = vacancy.questions.filter(step=step).aggregate(max_order=models.Max("order"))["max_order"] or 0
 
     return InterviewQuestion.objects.create(
         vacancy=vacancy,
@@ -274,71 +293,73 @@ def delete_interview_question(*, question: InterviewQuestion) -> None:
     question.delete()
 
 
-def generate_interview_questions(
-    *, vacancy: Vacancy, step: str = ScreeningStep.PRESCANNING
-) -> list[InterviewQuestion]:
-    """Generate questions using OpenAI based on vacancy details and step type."""
+def generate_interview_questions(*, vacancy: Vacancy, step: str = ScreeningStep.PRESCANNING) -> list[InterviewQuestion]:
+    """Generate questions using Gemini based on vacancy details and step type."""
     skills_text = ", ".join(vacancy.skills) if vacancy.skills else "not specified"
     criteria = list(vacancy.criteria.filter(step=step).values_list("name", flat=True))
     criteria_text = ", ".join(criteria) if criteria else "general assessment"
 
     if step == ScreeningStep.PRESCANNING:
         step_instruction = (
-            "Generate prescanning questions for a QUICK initial AI screening. "
-            "Questions should be lighter — focus on basic fit, motivation, "
-            "and general qualifications. Generate 4-7 questions."
+            "Generate 4-7 competencies for a QUICK initial AI prescanning. "
+            "Focus on foundational skills, basic fit, motivation, and general "
+            "qualifications the candidate must demonstrate."
         )
     else:
         step_instruction = (
-            "Generate interview questions for a RIGOROUS AI interview. "
-            "Questions should be tougher — test technical depth, real-world scenarios, "
-            "and domain expertise. Generate 7-10 questions."
+            "Generate 7-10 competencies for a RIGOROUS AI interview. "
+            "Focus on deeper technical skills, real-world problem solving, "
+            "domain expertise, and advanced knowledge the candidate must demonstrate."
         )
 
     try:
-        client = OpenAI()
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            temperature=0.8,
-            response_format={"type": "json_object"},
-            messages=[
-                {
-                    "role": "system",
-                    "content": (
-                        f"You are an expert HR interviewer. {step_instruction}\n"
-                        "Questions should be:\n"
-                        "- Specific to the role and required skills\n"
-                        "- A mix of technical, behavioral, and situational questions\n"
-                        "- Open-ended (not yes/no)\n"
-                        "- Concise (1-2 sentences max)\n\n"
-                        "Return JSON with a 'questions' array. Each item has:\n"
-                        '- "text": the question\n'
-                        '- "category": one of Technical, Behavioral, Situational, Experience, Problem Solving'
-                    ),
-                },
-                {
-                    "role": "user",
-                    "content": (
+        client = genai.Client(api_key=settings.GOOGLE_API_KEY)
+        response = client.models.generate_content(
+            model=settings.GEMINI_MODEL,
+            contents=[
+                types.Content(
+                    role="user",
+                    parts=[types.Part(text=
                         f"Role: {vacancy.title}\n"
                         f"Experience level: {vacancy.experience_level}\n"
                         f"Description: {vacancy.description[:1000]}\n"
                         f"Requirements: {(vacancy.requirements or 'N/A')[:1000]}\n"
                         f"Skills: {skills_text}\n"
                         f"Evaluation criteria: {criteria_text}"
-                    ),
-                },
+                    )],
+                ),
             ],
+            config=types.GenerateContentConfig(
+                thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
+                system_instruction=(
+                    f"You are an expert HR interviewer. {step_instruction}\n\n"
+                    "Each competency is a SKILL GOAL — something the AI interviewer "
+                    "should evaluate the candidate on. These are NOT literal questions. "
+                    "The AI interviewer will decide how to probe each competency through "
+                    "its own follow-up questions during the conversation.\n\n"
+                    "Write each competency as a clear goal statement. Examples:\n"
+                    '- "Candidate should demonstrate proficiency with React hooks (useState, useEffect, custom hooks)"\n'
+                    '- "Candidate should show understanding of RESTful API design and best practices"\n'
+                    '- "Candidate should be able to explain their approach to handling tight deadlines"\n'
+                    '- "Candidate should demonstrate knowledge of financial reporting standards"\n\n'
+                    "Make competencies specific to the role, not generic. "
+                    "Write in natural, human-like language.\n\n"
+                    "Return JSON with a 'competencies' array. Each item has:\n"
+                    '- "text": the competency goal (1-2 sentences)\n'
+                    '- "category": one of "Hard Skill", "Soft Skill", "Domain Knowledge", "Cultural Fit"'
+                ),
+                temperature=0.8,
+                response_mime_type="application/json",
+            ),
         )
 
-        data = json.loads(response.choices[0].message.content)
-        questions_data = data.get("questions", [])
+        data = json.loads(response.text)
+        questions_data = data.get("competencies", data.get("questions", []))
     except Exception:
         logger.exception("Failed to generate questions with AI for vacancy %s", vacancy.id)
         raise ApplicationError(str(MSG_AI_QUESTIONS_FAILED))
 
-    max_order = vacancy.questions.filter(step=step).aggregate(
-        max_order=models.Max("order")
-    )["max_order"] or 0
+    max_order = vacancy.questions.filter(step=step).aggregate(max_order=models.Max("order"))["max_order"] or 0
 
     created_questions: list[InterviewQuestion] = []
     for i, q in enumerate(questions_data, start=1):
@@ -357,39 +378,39 @@ def generate_interview_questions(
 
 def generate_vacancy_keywords(*, vacancy: Vacancy) -> list[str]:
     """Generate search keywords using AI for a vacancy."""
-    client = OpenAI()
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        temperature=0.3,
-        response_format={"type": "json_object"},
-        messages=[
-            {
-                "role": "system",
-                "content": (
-                    "Generate 20-30 search keywords for this job vacancy. "
-                    "Include ALL of these categories:\n"
-                    "- Job title synonyms and variations\n"
-                    "- Broad field/industry terms (e.g. 'programming', 'software development', 'IT')\n"
-                    "- Related roles and specializations\n"
-                    "- Key skills and technologies mentioned\n"
-                    "- Industry jargon and abbreviations\n"
-                    "- Common search terms a job seeker would use\n"
-                    "Generate keywords in BOTH English and Russian. "
-                    'Return JSON: {"keywords": ["keyword1", "keyword2", ...]}'
-                ),
-            },
-            {
-                "role": "user",
-                "content": (
+    client = genai.Client(api_key=settings.GOOGLE_API_KEY)
+    response = client.models.generate_content(
+        model=settings.GEMINI_MODEL,
+        contents=[
+            types.Content(
+                role="user",
+                parts=[types.Part(text=
                     f"Title: {vacancy.title}\n"
                     f"Description: {vacancy.description[:2000]}\n"
                     f"Requirements: {(vacancy.requirements or 'N/A')[:1000]}\n"
                     f"Skills: {', '.join(vacancy.skills) if vacancy.skills else 'N/A'}"
-                ),
-            },
+                )],
+            ),
         ],
+        config=types.GenerateContentConfig(
+            thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
+            system_instruction=(
+                "Generate 20-30 search keywords for this job vacancy. "
+                "Include ALL of these categories:\n"
+                "- Job title synonyms and variations\n"
+                "- Broad field/industry terms (e.g. 'programming', 'software development', 'IT')\n"
+                "- Related roles and specializations\n"
+                "- Key skills and technologies mentioned\n"
+                "- Industry jargon and abbreviations\n"
+                "- Common search terms a job seeker would use\n"
+                "Generate keywords in BOTH English and Russian. "
+                'Return JSON: {"keywords": ["keyword1", "keyword2", ...]}'
+            ),
+            temperature=0.3,
+            response_mime_type="application/json",
+        ),
     )
-    data = json.loads(response.choices[0].message.content)
+    data = json.loads(response.text)
     keywords = data.get("keywords", [])
     vacancy.keywords = keywords
     vacancy.save(update_fields=["keywords", "updated_at"])
@@ -444,10 +465,10 @@ def parse_company_info_from_file(*, file_obj) -> str:
 
 
 def _extract_text_from_pdf(file_bytes: bytes) -> str:
-    """Extract text from PDF bytes using PyPDF2."""
-    import PyPDF2
+    """Extract text from PDF bytes using pypdf."""
+    import pypdf
 
-    reader = PyPDF2.PdfReader(io.BytesIO(file_bytes))
+    reader = pypdf.PdfReader(io.BytesIO(file_bytes))
     pages = []
     for page in reader.pages:
         text = page.extract_text()
@@ -498,9 +519,14 @@ def parse_company_info_from_url(*, url: str) -> str:
     _validate_url_not_internal(url)
 
     try:
-        response = requests.get(url, timeout=10, headers={
-            "User-Agent": "Mozilla/5.0 (compatible; HRPreScan/1.0)",
-        }, allow_redirects=True)
+        response = requests.get(
+            url,
+            timeout=10,
+            headers={
+                "User-Agent": "Mozilla/5.0 (compatible; HRPreScan/1.0)",
+            },
+            allow_redirects=True,
+        )
         response.raise_for_status()
     except requests.RequestException as exc:
         raise ApplicationError(str(MSG_WEBSITE_FETCH_FAILED)) from exc
@@ -522,31 +548,33 @@ def parse_company_info_from_url(*, url: str) -> str:
 def _generate_company_info_with_ai(*, text: str, source_label: str = "document") -> str:
     """Use AI to generate a company info summary from extracted text."""
     try:
-        client = OpenAI()
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            temperature=0.3,
-            messages=[
-                {
-                    "role": "system",
-                    "content": (
-                        "You are an AI assistant helping HR managers prepare company descriptions "
-                        "for AI-powered candidate interviews. Given the content extracted from a "
-                        f"company {source_label}, write a concise "
-                        "company introduction (3-5 paragraphs) that an AI interviewer can use to "
-                        "introduce the company to candidates.\n\n"
-                        "Include: what the company does, industry, mission/values, culture, "
-                        "notable achievements or products, and team size if available.\n"
-                        "Tone: professional but friendly. Write in third person."
-                    ),
-                },
-                {
-                    "role": "user",
-                    "content": f"Generate a company info summary from this {source_label}:\n\n{text[:6000]}",
-                },
+        client = genai.Client(api_key=settings.GOOGLE_API_KEY)
+        response = client.models.generate_content(
+            model=settings.GEMINI_MODEL,
+            contents=[
+                types.Content(
+                    role="user",
+                    parts=[types.Part(text=
+                        f"Generate a company info summary from this {source_label}:\n\n{text[:6000]}"
+                    )],
+                ),
             ],
+            config=types.GenerateContentConfig(
+                thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
+                system_instruction=(
+                    "You are an AI assistant helping HR managers prepare company descriptions "
+                    "for AI-powered candidate interviews. Given the content extracted from a "
+                    f"company {source_label}, write a concise "
+                    "company introduction (3-5 paragraphs) that an AI interviewer can use to "
+                    "introduce the company to candidates.\n\n"
+                    "Include: what the company does, industry, mission/values, culture, "
+                    "notable achievements or products, and team size if available.\n"
+                    "Tone: professional but friendly. Write in third person."
+                ),
+                temperature=0.3,
+            ),
         )
-        return response.choices[0].message.content.strip()
+        return response.text.strip()
     except Exception:
         logger.exception("Failed to generate company info with AI from %s", source_label)
         raise ApplicationError(str(MSG_AI_COMPANY_INFO_FAILED))
@@ -555,6 +583,7 @@ def _generate_company_info_with_ai(*, text: str, source_label: str = "document")
 # ---------------------------------------------------------------------------
 # Employer Company services
 # ---------------------------------------------------------------------------
+
 
 def create_employer(*, company: Company, name: str, **kwargs: object) -> EmployerCompany:
     """Create a manually-entered employer company."""
