@@ -4,7 +4,8 @@
        up-monitoring up-management up-all \
        clean reset-db backup-db \
        local-setup local-infra local-backend local-frontend local-stop \
-       local-test local-test-backend local-test-frontend local-test-e2e
+       local-test local-test-backend local-test-frontend local-test-e2e \
+       local-telegram local-telegram-webhook
 
 # ─── General ──────────────────────────────────────────────────────────────────
 
@@ -195,6 +196,9 @@ local-shell: ## Django shell (local)
 
 local-telegram: ## Run Telegram bot in polling mode (local dev)
 	cd backend && $(VENV)/python manage.py run_telegram_bot
+
+local-telegram-webhook: ## Start ngrok tunnel + register Telegram webhook (local dev)
+	./deploy/scripts/telegram-ngrok.sh 8000
 
 local-stop: ## Stop everything (infra + background processes)
 	@echo "Stopping background processes..."

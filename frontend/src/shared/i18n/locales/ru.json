@@ -81,6 +81,13 @@
       "wantToHire": "Хотите нанимать?",
       "registerCompany": "Зарегистрируйте компанию"
     },
+    "telegram": {
+      "signIn": "Войти через Telegram",
+      "waiting": "Ожидание Telegram...",
+      "openApp": "Откройте Telegram и нажмите Start в боте для входа.",
+      "expired": "Ссылка для входа истекла. Попробуйте снова.",
+      "requestFailed": "Не удалось начать вход через Telegram. Попробуйте снова."
+    },
     "register": {
       "title": "Создание аккаунта",
       "firstName": "Имя",
@@ -128,7 +135,24 @@
       "submit": "Принять и создать аккаунт",
       "success": "Приглашение принято! Теперь вы можете войти."
     },
-    "signInWithGoogle": "Войти через Google"
+    "signInWithGoogle": "Войти через Google",
+    "signInWithTelegram": "Войти через Telegram",
+    "chooseRole": {
+      "title": "Как вы хотите использовать PreScreen AI?",
+      "candidate": "Ищу работу",
+      "candidateDescription": "Просматривайте вакансии и проходите AI-интервью",
+      "company": "Нанимаю сотрудников",
+      "companyDescription": "Публикуйте вакансии и проводите AI-скрининг кандидатов",
+      "companyFormTitle": "Расскажите о вашей компании",
+      "companyName": "Название компании",
+      "industry": "Отрасль",
+      "size": "Размер компании",
+      "country": "Страна",
+      "email": "Ваш email",
+      "emailHint": "Обязательно для аккаунта компании",
+      "submit": "Завершить настройку",
+      "back": "Назад"
+    }
   },
   "landing": {
     "hero": {

@@ -26,4 +26,10 @@ export const authRoutes: RouteRecordRaw[] = [
     component: () => import('./pages/CompanyRegisterPage.vue'),
     meta: { requiresAuth: false },
   },
+  {
+    path: '/choose-role',
+    name: ROUTE_NAMES.CHOOSE_ROLE,
+    component: () => import('./pages/ChooseRolePage.vue'),
+    meta: { requiresAuth: false },
+  },
 ]

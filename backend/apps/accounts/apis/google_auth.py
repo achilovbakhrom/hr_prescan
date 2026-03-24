@@ -68,6 +68,8 @@ class GoogleAuthApi(APIView):
                 role=User.Role.CANDIDATE,
                 email_verified=True,
             )
+            user.onboarding_completed = False
+            user.save(update_fields=["onboarding_completed", "updated_at"])
             logger.info("Created new user via Google auth: %s", email)
             bind_existing_applications(user=user)
         elif not user.is_active:

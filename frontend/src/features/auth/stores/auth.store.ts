@@ -4,6 +4,7 @@ import { extractErrorMessage } from '@/shared/api/errors'
 import { authService } from '../services/auth.service'
 import type {
   AcceptInvitationRequest,
+  CompleteCompanySetupRequest,
   User,
   AuthTokens,
   LoginRequest,
@@ -72,6 +73,12 @@ export const useAuthStore = defineStore('auth', () => {
     } finally {
       loading.value = false
     }
+  }
+
+  async function telegramLogin(data: { tokens: AuthTokens; user: User }): Promise<void> {
+    tokens.value = data.tokens
+    user.value = data.user
+    saveTokens(data.tokens)
   }
 
   async function register(data: RegisterRequest): Promise<void> {
@@ -154,6 +161,33 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function completeCompanySetup(data: CompleteCompanySetupRequest): Promise<void> {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await authService.completeCompanySetup(data)
+      tokens.value = response.tokens
+      user.value = response.user
+      saveTokens(response.tokens)
+    } catch (err: unknown) {
+      const message = extractErrorMessage(err)
+      error.value = message
+      throw new Error(message)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function completeOnboarding(): Promise<void> {
+    loading.value = true
+    try {
+      const response = await authService.completeOnboarding()
+      user.value = response.user
+    } finally {
+      loading.value = false
+    }
+  }
+
   async function initAuth(): Promise<void> {
     const stored = loadTokens()
     if (!stored?.access) {
@@ -172,11 +206,14 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated,
     login,
     googleLogin,
+    telegramLogin,
     register,
     logout,
     refreshAccessToken,
     acceptInvitation,
     registerCompany,
+    completeCompanySetup,
+    completeOnboarding,
     fetchUser,
     initAuth,
   }

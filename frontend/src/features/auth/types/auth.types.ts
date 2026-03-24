@@ -35,11 +35,19 @@ export interface AcceptInvitationRequest {
 
 export interface RegisterCompanyRequest {
   companyName: string
-  industry: string
+  industries: string[]
   size: CompanySize
   country: string
   adminEmail: string
   adminPassword: string
   adminFirstName: string
   adminLastName: string
+}
+
+export interface CompleteCompanySetupRequest {
+  companyName: string
+  industries: string[]
+  size: CompanySize
+  country: string
+  email?: string
 }

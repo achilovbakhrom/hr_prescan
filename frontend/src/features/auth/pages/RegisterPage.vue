@@ -7,6 +7,7 @@ import Password from 'primevue/password'
 import Button from 'primevue/button'
 import Message from 'primevue/message'
 import GoogleSignInButton from '../components/GoogleSignInButton.vue'
+import TelegramSignInButton from '../components/TelegramSignInButton.vue'
 import { useAuthStore } from '../stores/auth.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 
@@ -66,7 +67,11 @@ async function handleGoogleSuccess(credential: string): Promise<void> {
   errorMessage.value = null
   try {
     await authStore.googleLogin(credential)
-    await router.push({ name: ROUTE_NAMES.DASHBOARD })
+    if (authStore.user?.onboardingCompleted === false) {
+      await router.push({ name: ROUTE_NAMES.CHOOSE_ROLE })
+    } else {
+      await router.push({ name: ROUTE_NAMES.DASHBOARD })
+    }
   } catch (err: unknown) {
     errorMessage.value =
       err instanceof Error ? err.message : 'Google sign-in failed.'
@@ -74,6 +79,25 @@ async function handleGoogleSuccess(credential: string): Promise<void> {
 }
 
 function handleGoogleError(msg: string): void {
+  errorMessage.value = msg
+}
+
+async function handleTelegramSuccess(data: Parameters<typeof authStore.telegramLogin>[0]): Promise<void> {
+  errorMessage.value = null
+  try {
+    await authStore.telegramLogin(data)
+    if (authStore.user?.onboardingCompleted === false) {
+      await router.push({ name: ROUTE_NAMES.CHOOSE_ROLE })
+    } else {
+      await router.push({ name: ROUTE_NAMES.DASHBOARD })
+    }
+  } catch (err: unknown) {
+    errorMessage.value =
+      err instanceof Error ? err.message : 'Telegram sign-in failed.'
+  }
+}
+
+function handleTelegramError(msg: string): void {
   errorMessage.value = msg
 }
 </script>
@@ -112,6 +136,11 @@ function handleGoogleError(msg: string): void {
         <GoogleSignInButton
           @success="handleGoogleSuccess"
           @error="handleGoogleError"
+        />
+
+        <TelegramSignInButton
+          @success="handleTelegramSuccess"
+          @error="handleTelegramError"
         />
 
         <div class="mb-4 flex items-center gap-3">

@@ -115,23 +115,23 @@ onMounted(async () => {
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <UsageMeter
             :label="t('subscriptions.vacanciesUsed')"
-            :used="subscriptionStore.usage.vacancies.used"
-            :limit="subscriptionStore.usage.vacancies.limit"
+            :used="subscriptionStore.usage?.vacancies?.used ?? 0"
+            :limit="subscriptionStore.usage?.vacancies?.limit ?? 0"
           />
           <UsageMeter
             :label="t('subscriptions.interviewsUsed')"
-            :used="subscriptionStore.usage.interviews.used"
-            :limit="subscriptionStore.usage.interviews.limit"
+            :used="subscriptionStore.usage?.interviews?.used ?? 0"
+            :limit="subscriptionStore.usage?.interviews?.limit ?? 0"
           />
           <UsageMeter
             :label="t('subscriptions.hrUsersUsed')"
-            :used="subscriptionStore.usage.hrUsers.used"
-            :limit="subscriptionStore.usage.hrUsers.limit"
+            :used="subscriptionStore.usage?.hrUsers?.used ?? 0"
+            :limit="subscriptionStore.usage?.hrUsers?.limit ?? 0"
           />
           <UsageMeter
             :label="t('subscriptions.storageUsed')"
-            :used="subscriptionStore.usage.storage.usedGb"
-            :limit="subscriptionStore.usage.storage.limitGb"
+            :used="subscriptionStore.usage?.storage?.usedGb ?? 0"
+            :limit="subscriptionStore.usage?.storage?.limitGb ?? 0"
             unit="GB"
           />
         </div>

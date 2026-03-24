@@ -81,6 +81,13 @@
       "wantToHire": "Want to hire?",
       "registerCompany": "Register your company"
     },
+    "telegram": {
+      "signIn": "Sign in with Telegram",
+      "waiting": "Waiting for Telegram...",
+      "openApp": "Open Telegram and press Start in the bot to sign in.",
+      "expired": "Login link expired. Please try again.",
+      "requestFailed": "Failed to start Telegram sign-in. Please try again."
+    },
     "register": {
       "title": "Create Account",
       "firstName": "First Name",
@@ -128,7 +135,24 @@
       "submit": "Accept & Create Account",
       "success": "Invitation accepted! You can now sign in."
     },
-    "signInWithGoogle": "Sign in with Google"
+    "signInWithGoogle": "Sign in with Google",
+    "signInWithTelegram": "Sign in with Telegram",
+    "chooseRole": {
+      "title": "How would you like to use PreScreen AI?",
+      "candidate": "I'm looking for a job",
+      "candidateDescription": "Browse job openings and participate in AI interviews",
+      "company": "I'm hiring",
+      "companyDescription": "Post vacancies and screen candidates with AI",
+      "companyFormTitle": "Tell us about your company",
+      "companyName": "Company Name",
+      "industry": "Industry",
+      "size": "Company Size",
+      "country": "Country",
+      "email": "Your Email",
+      "emailHint": "Required for company account",
+      "submit": "Complete Setup",
+      "back": "Back"
+    }
   },
   "landing": {
     "hero": {

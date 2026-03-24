@@ -113,6 +113,11 @@ router.beforeEach(async (to) => {
     return { name: ROUTE_NAMES.DASHBOARD }
   }
 
+  // Redirect to role picker if onboarding not completed
+  if (authStore.isAuthenticated && authStore.user?.onboardingCompleted === false && to.name !== ROUTE_NAMES.CHOOSE_ROLE) {
+    return { name: ROUTE_NAMES.CHOOSE_ROLE }
+  }
+
   const allowedRoles = to.meta.roles
   if (allowedRoles && authStore.user) {
     if (!allowedRoles.includes(authStore.user.role)) {

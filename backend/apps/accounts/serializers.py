@@ -4,12 +4,16 @@ from apps.accounts.models import Company, Invitation, User
 
 
 class CompanyOutputSerializer(serializers.ModelSerializer):
+    industries = serializers.SlugRelatedField(
+        many=True, read_only=True, slug_field="slug",
+    )
+
     class Meta:
         model = Company
         fields = [
             "id",
             "name",
-            "industry",
+            "industries",
             "size",
             "country",
             "logo",
@@ -40,6 +44,7 @@ class UserOutputSerializer(serializers.ModelSerializer):
             "company",
             "is_active",
             "email_verified",
+            "onboarding_completed",
             "created_at",
             "updated_at",
         ]
@@ -49,7 +54,10 @@ class UserOutputSerializer(serializers.ModelSerializer):
 class CompanyRegisterInputSerializer(serializers.Serializer):
     # Company fields
     company_name = serializers.CharField(max_length=255)
-    industry = serializers.CharField(max_length=255)
+    industries = serializers.ListField(
+        child=serializers.SlugField(max_length=50),
+        required=False, default=list,
+    )
     size = serializers.ChoiceField(choices=Company.Size.choices)
     country = serializers.CharField(max_length=100)
     website = serializers.URLField(max_length=500, required=False, allow_blank=True)
@@ -64,7 +72,10 @@ class CompanyRegisterInputSerializer(serializers.Serializer):
 
 class CompanyProfileInputSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=255, required=False)
-    industry = serializers.CharField(max_length=255, required=False)
+    industries = serializers.ListField(
+        child=serializers.SlugField(max_length=50),
+        required=False,
+    )
     size = serializers.ChoiceField(choices=Company.Size.choices, required=False)
     country = serializers.CharField(max_length=100, required=False)
     website = serializers.URLField(max_length=500, required=False, allow_blank=True)

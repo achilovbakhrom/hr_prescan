@@ -23,7 +23,11 @@ class Company(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
-    industry = models.CharField(max_length=255)
+    industries = models.ManyToManyField(
+        "common.Industry",
+        blank=True,
+        related_name="companies",
+    )
     size = models.CharField(max_length=20, choices=Size.choices)
     country = models.CharField(max_length=100)
     logo = models.ImageField(upload_to="company_logos/", null=True, blank=True)
@@ -106,6 +110,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     email_verified = models.BooleanField(default=False)
+
+    # Onboarding — False for new social auth users until they pick a role
+    onboarding_completed = models.BooleanField(default=True)
 
     # Telegram integration
     telegram_id = models.BigIntegerField(unique=True, null=True, blank=True)

@@ -6,9 +6,10 @@ from apps.accounts.models import Company, User
 
 @admin.register(Company)
 class CompanyAdmin(admin.ModelAdmin):
-    list_display = ["name", "industry", "size", "country", "subscription_status", "created_at"]
+    list_display = ["name", "size", "country", "subscription_status", "created_at"]
     list_filter = ["size", "subscription_status"]
-    search_fields = ["name", "industry", "country"]
+    search_fields = ["name", "country"]
+    filter_horizontal = ["industries"]
     readonly_fields = ["id", "created_at", "updated_at"]
 
 

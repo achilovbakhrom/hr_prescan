@@ -140,7 +140,7 @@ async function handleUnlink(): Promise<void> {
           <div>
             <p class="font-medium text-gray-900">{{ inv.company.name }}</p>
             <p class="text-sm text-gray-500">
-              {{ inv.company.industry }} &middot; {{ inv.company.country }}
+              {{ inv.company.industries?.join(', ') }} &middot; {{ inv.company.country }}
             </p>
             <p class="mt-1 text-xs text-gray-400">
               {{ t('settings.profile.invitedBy', { name: inv.invitedByName }) }} &middot; {{ formatDate(inv.createdAt) }}

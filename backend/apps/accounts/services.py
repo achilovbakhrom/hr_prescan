@@ -107,36 +107,32 @@ def verify_email(*, token: str) -> User:
     return user
 
 
-@transaction.atomic
-def create_company_with_admin(
+def _create_company_with_trial(
     *,
     company_name: str,
-    industry: str,
+    industries: list[str] | None = None,
     size: str,
     country: str,
-    admin_email: str,
-    admin_password: str,
-    admin_first_name: str,
-    admin_last_name: str,
     website: str | None = None,
     description: str | None = None,
-) -> tuple[Company, User]:
-    """Create a company and its admin user in a single transaction.
-
-    The company starts on a 14-day free trial with Professional-tier limits.
-    """
+) -> Company:
+    """Create a Company with a 14-day Professional trial."""
+    from apps.common.models import Industry
     from apps.subscriptions.models import CompanySubscription, SubscriptionPlan
 
     now = timezone.now()
 
     company = Company.objects.create(
         name=company_name,
-        industry=industry,
         size=size,
         country=country,
         website=website or "",
         description=description or "",
     )
+
+    if industries:
+        industry_objs = Industry.objects.filter(slug__in=industries)
+        company.industries.set(industry_objs)
 
     # Activate 14-day trial
     company.trial_ends_at = now + timedelta(days=TRIAL_DURATION_DAYS)
@@ -165,6 +161,36 @@ def create_company_with_admin(
             company.id,
         )
 
+    return company
+
+
+@transaction.atomic
+def create_company_with_admin(
+    *,
+    company_name: str,
+    industries: list[str] | None = None,
+    size: str,
+    country: str,
+    admin_email: str,
+    admin_password: str,
+    admin_first_name: str,
+    admin_last_name: str,
+    website: str | None = None,
+    description: str | None = None,
+) -> tuple[Company, User]:
+    """Create a company and its admin user in a single transaction.
+
+    The company starts on a 14-day free trial with Professional-tier limits.
+    """
+    company = _create_company_with_trial(
+        company_name=company_name,
+        industries=industries,
+        size=size,
+        country=country,
+        website=website,
+        description=description,
+    )
+
     user = create_user(
         email=admin_email,
         password=admin_password,
@@ -179,10 +205,56 @@ def create_company_with_admin(
     return company, user
 
 
+@transaction.atomic
+def complete_company_setup(
+    *,
+    user: User,
+    company_name: str,
+    industries: list[str] | None = None,
+    size: str,
+    country: str,
+    email: str | None = None,
+) -> Company:
+    """Upgrade a social-auth candidate to company admin."""
+    if email:
+        if User.objects.filter(email=email).exclude(id=user.id).exists():
+            raise ApplicationError("A user with this email already exists.")
+        user.email = email
+
+    company = _create_company_with_trial(
+        company_name=company_name,
+        industries=industries,
+        size=size,
+        country=country,
+    )
+
+    user.role = User.Role.ADMIN
+    user.company = company
+    user.onboarding_completed = True
+    user.save(update_fields=["email", "role", "company", "onboarding_completed", "updated_at"])
+
+    return company
+
+
+def complete_onboarding(*, user: User) -> User:
+    """Mark onboarding as completed (user chose to stay as candidate)."""
+    user.onboarding_completed = True
+    user.save(update_fields=["onboarding_completed", "updated_at"])
+    return user
+
+
 def update_company_profile(*, company: Company, data: dict) -> Company:
-    """Update company fields (name, industry, size, country, website, description, logo)."""
-    allowed_fields = {"name", "industry", "size", "country", "website", "description", "logo"}
+    """Update company fields (name, industries, size, country, website, description, logo)."""
+    from apps.common.models import Industry
+
+    allowed_fields = {"name", "size", "country", "website", "description", "logo"}
     update_fields = []
+
+    # Handle M2M industries separately
+    if "industries" in data:
+        industry_slugs = data.pop("industries")
+        industry_objs = Industry.objects.filter(slug__in=industry_slugs)
+        company.industries.set(industry_objs)
 
     for field, value in data.items():
         if field in allowed_fields:

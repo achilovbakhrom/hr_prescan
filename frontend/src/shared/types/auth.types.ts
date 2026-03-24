@@ -7,6 +7,7 @@ export interface User {
   role: UserRole
   company: Company | null
   emailVerified: boolean
+  onboardingCompleted: boolean
 }
 
 export type UserRole = 'admin' | 'hr' | 'candidate'
@@ -14,7 +15,7 @@ export type UserRole = 'admin' | 'hr' | 'candidate'
 export interface Company {
   id: string
   name: string
-  industry: string
+  industries: string[]
   size: CompanySize
   country: string
   logo: string | null

@@ -1,6 +1,7 @@
 import { apiClient } from '@/shared/api/client'
 import type {
   AcceptInvitationRequest,
+  CompleteCompanySetupRequest,
   LoginRequest,
   LoginResponse,
   PendingInvitation,
@@ -61,6 +62,16 @@ export const authService = {
 
   async acceptCompanyInvitation(token: string): Promise<{ user: User }> {
     const response = await apiClient.post<{ user: User }>('/auth/accept-company-invitation', { token })
+    return response.data
+  },
+
+  async completeCompanySetup(data: CompleteCompanySetupRequest): Promise<LoginResponse> {
+    const response = await apiClient.post<LoginResponse>('/auth/complete-company-setup', data)
+    return response.data
+  },
+
+  async completeOnboarding(): Promise<{ user: User }> {
+    const response = await apiClient.post<{ user: User }>('/auth/complete-onboarding')
     return response.data
   },
 }

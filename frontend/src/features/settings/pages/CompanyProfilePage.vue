@@ -7,6 +7,8 @@ import Select from 'primevue/select'
 import Button from 'primevue/button'
 import FileUpload from 'primevue/fileupload'
 import Message from 'primevue/message'
+import CountryAutocomplete from '@/shared/components/CountryAutocomplete.vue'
+import IndustryAutocomplete from '@/shared/components/IndustryAutocomplete.vue'
 import { useSettingsStore } from '../stores/settings.store'
 import type { CompanySize } from '@/shared/types/auth.types'
 
@@ -14,7 +16,7 @@ const { t } = useI18n()
 const settingsStore = useSettingsStore()
 
 const name = ref('')
-const industry = ref('')
+const industries = ref<string[]>([])
 const size = ref<CompanySize | null>(null)
 const country = ref('')
 const website = ref('')
@@ -32,7 +34,6 @@ const sizeOptions = [
 
 const errors = ref({
   name: false,
-  industry: false,
   size: false,
   country: false,
 })
@@ -41,7 +42,7 @@ function populateForm(): void {
   const profile = settingsStore.companyProfile
   if (!profile) return
   name.value = profile.name
-  industry.value = profile.industry
+  industries.value = profile.industries ?? []
   size.value = profile.size
   country.value = profile.country
   website.value = profile.website ?? ''
@@ -55,7 +56,6 @@ onMounted(async () => {
 
 function validate(): boolean {
   errors.value.name = !name.value.trim()
-  errors.value.industry = !industry.value.trim()
   errors.value.size = !size.value
   errors.value.country = !country.value.trim()
   return !Object.values(errors.value).some(Boolean)
@@ -71,7 +71,7 @@ async function handleSave(): Promise<void> {
   try {
     await settingsStore.updateProfile({
       name: name.value,
-      industry: industry.value,
+      industries: industries.value,
       size: size.value!,
       country: country.value,
       website: website.value.trim() || null,
@@ -146,16 +146,7 @@ async function handleSave(): Promise<void> {
         <label for="industry" class="text-sm font-medium text-gray-700">
           {{ t('settings.company.industry') }}
         </label>
-        <InputText
-          id="industry"
-          v-model="industry"
-          :placeholder="t('settings.company.industryPlaceholder')"
-          :invalid="submitted && errors.industry"
-          class="w-full"
-        />
-        <small v-if="submitted && errors.industry" class="text-red-500">
-          {{ t('settings.company.industryRequired') }}
-        </small>
+        <IndustryAutocomplete v-model="industries" />
       </div>
 
       <div class="flex flex-col gap-1">
@@ -181,12 +172,9 @@ async function handleSave(): Promise<void> {
         <label for="country" class="text-sm font-medium text-gray-700">
           {{ t('settings.company.country') }}
         </label>
-        <InputText
-          id="country"
+        <CountryAutocomplete
           v-model="country"
-          :placeholder="t('settings.company.countryPlaceholder')"
           :invalid="submitted && errors.country"
-          class="w-full"
         />
         <small v-if="submitted && errors.country" class="text-red-500">
           {{ t('settings.company.countryRequired') }}

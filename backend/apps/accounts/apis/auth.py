@@ -8,7 +8,14 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.accounts.selectors import get_pending_invitations_for_email, get_user_by_email
 from apps.accounts.serializers import PendingInvitationOutputSerializer, UserOutputSerializer
-from apps.accounts.services import accept_invitation_existing_user, register_user, verify_email
+from apps.accounts.models import Company, User
+from apps.accounts.services import (
+    accept_invitation_existing_user,
+    complete_company_setup,
+    complete_onboarding,
+    register_user,
+    verify_email,
+)
 from apps.common.exceptions import ApplicationError
 from apps.common.messages import (
     MSG_ACCOUNT_DEACTIVATED,
@@ -215,3 +222,65 @@ class AcceptCompanyInvitationApi(APIView):
             },
             status=status.HTTP_200_OK,
         )
+
+
+class CompleteCompanySetupApi(APIView):
+    """POST /api/auth/complete-company-setup/ — upgrade social auth user to company admin."""
+
+    permission_classes = [IsAuthenticated]
+
+    class InputSerializer(serializers.Serializer):
+        company_name = serializers.CharField(max_length=255)
+        industries = serializers.ListField(
+            child=serializers.SlugField(max_length=50),
+            required=False, default=list,
+        )
+        size = serializers.ChoiceField(choices=Company.Size.choices)
+        country = serializers.CharField(max_length=2)
+        email = serializers.EmailField(required=False)
+
+    def post(self, request: Request) -> Response:
+        if request.user.role != User.Role.CANDIDATE or request.user.company is not None:
+            return Response(
+                {"detail": "Only candidates without a company can use this."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer = self.InputSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+
+        # Require email if user has synthetic telegram email
+        if request.user.email.endswith("@telegram.local") and not data.get("email"):
+            return Response(
+                {"detail": "Email is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            company = complete_company_setup(user=request.user, **data)
+        except ApplicationError as e:
+            return Response({"detail": e.message}, status=status.HTTP_400_BAD_REQUEST)
+
+        request.user.refresh_from_db()
+        refresh = RefreshToken.for_user(request.user)
+
+        return Response(
+            {
+                "tokens": {
+                    "access": str(refresh.access_token),
+                    "refresh": str(refresh),
+                },
+                "user": UserOutputSerializer(request.user).data,
+            },
+        )
+
+
+class CompleteOnboardingApi(APIView):
+    """POST /api/auth/complete-onboarding/ — mark onboarding as done (stay as candidate)."""
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request: Request) -> Response:
+        complete_onboarding(user=request.user)
+        return Response({"user": UserOutputSerializer(request.user).data})

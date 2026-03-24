@@ -2,7 +2,7 @@ import type { CompanySize, UserRole, User } from '@/shared/types/auth.types'
 
 export interface CompanyProfileUpdate {
   name: string
-  industry: string
+  industries: string[]
   size: CompanySize
   country: string
   website: string | null

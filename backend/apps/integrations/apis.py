@@ -3,8 +3,10 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.accounts.permissions import IsAdmin, IsHRManager
+from apps.accounts.serializers import UserOutputSerializer
 
 
 class TelegramWebhookApi(APIView):
@@ -24,6 +26,68 @@ class TelegramWebhookApi(APIView):
         process_telegram_update.delay(request.data)
 
         return Response({"ok": True}, status=status.HTTP_200_OK)
+
+
+class TelegramAuthRequestApi(APIView):
+    """POST /api/telegram/auth/request/ — generate a login code for bot-based auth."""
+
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        from apps.integrations.models import TelegramAuthCode
+
+        auth_code = TelegramAuthCode.generate()
+        bot_username = settings.TELEGRAM_BOT_USERNAME.lstrip("@")
+        link_url = f"https://t.me/{bot_username}?start=login_{auth_code.code}"
+        return Response({
+            "code": auth_code.code,
+            "link_url": link_url,
+            "expires_at": auth_code.expires_at.isoformat(),
+        })
+
+
+class TelegramAuthCheckApi(APIView):
+    """GET /api/telegram/auth/check/<code>/ — poll to check if auth is complete."""
+
+    permission_classes = [AllowAny]
+
+    def get(self, request, code):
+        from django.utils import timezone
+
+        from apps.integrations.models import TelegramAuthCode
+
+        auth_code = TelegramAuthCode.objects.filter(code=code).first()
+
+        if auth_code is None:
+            return Response(
+                {"detail": "Invalid code."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        if auth_code.is_expired and not auth_code.is_authenticated:
+            return Response(
+                {"detail": "Code expired."},
+                status=status.HTTP_410_GONE,
+            )
+
+        if not auth_code.is_authenticated:
+            return Response({"status": "pending"})
+
+        # Authenticated — return JWT tokens
+        user = auth_code.authenticated_user
+        refresh = RefreshToken.for_user(user)
+
+        # Delete the used code
+        auth_code.delete()
+
+        return Response({
+            "status": "authenticated",
+            "tokens": {
+                "access": str(refresh.access_token),
+                "refresh": str(refresh),
+            },
+            "user": UserOutputSerializer(user).data,
+        })
 
 
 class TelegramLinkCodeApi(APIView):

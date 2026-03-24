@@ -21,7 +21,7 @@ const authStore = useAuthStore()
 const { t } = useI18n()
 
 const companyName = ref('')
-const industry = ref('')
+const industries = ref<string[]>([])
 const size = ref<CompanySize | null>(null)
 const country = ref('')
 const adminFirstName = ref('')
@@ -45,7 +45,6 @@ const adminStepSubmitted = ref(false)
 
 const companyErrors = ref({
   companyName: false,
-  industry: false,
   size: false,
   country: false,
 })
@@ -61,7 +60,6 @@ const adminErrors = ref({
 function validateCompanyStep(): boolean {
   companyStepSubmitted.value = true
   companyErrors.value.companyName = !companyName.value.trim()
-  companyErrors.value.industry = !industry.value.trim()
   companyErrors.value.size = !size.value
   companyErrors.value.country = !country.value.trim()
   return !Object.values(companyErrors.value).some(Boolean)
@@ -92,7 +90,7 @@ async function handleSubmit(): Promise<void> {
   try {
     await authStore.registerCompany({
       companyName: companyName.value,
-      industry: industry.value,
+      industries: industries.value,
       size: size.value!,
       country: country.value,
       adminEmail: adminEmail.value,
@@ -151,7 +149,7 @@ async function handleSubmit(): Promise<void> {
             <StepPanel value="1">
               <CompanyInfoStep
                 v-model:company-name="companyName"
-                v-model:industry="industry"
+                v-model:industries="industries"
                 v-model:size="size"
                 v-model:country="country"
                 :submitted="companyStepSubmitted"

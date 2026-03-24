@@ -2,6 +2,8 @@
 import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
 import Button from 'primevue/button'
+import CountryAutocomplete from '@/shared/components/CountryAutocomplete.vue'
+import IndustryAutocomplete from '@/shared/components/IndustryAutocomplete.vue'
 import type { CompanySize } from '../types/auth.types'
 
 interface SizeOption {
@@ -11,13 +13,12 @@ interface SizeOption {
 
 defineProps<{
   companyName: string
-  industry: string
+  industries: string[]
   size: CompanySize | null
   country: string
   submitted: boolean
   errors: {
     companyName: boolean
-    industry: boolean
     size: boolean
     country: boolean
   }
@@ -26,7 +27,7 @@ defineProps<{
 
 const emit = defineEmits<{
   'update:companyName': [value: string]
-  'update:industry': [value: string]
+  'update:industries': [value: string[]]
   'update:size': [value: CompanySize | null]
   'update:country': [value: string]
   next: []
@@ -56,17 +57,10 @@ const emit = defineEmits<{
       <label for="industry" class="text-sm font-medium text-gray-700">
         Industry
       </label>
-      <InputText
-        id="industry"
-        :model-value="industry"
-        placeholder="e.g. Technology, Healthcare, Finance"
-        :invalid="submitted && errors.industry"
-        class="w-full"
-        @update:model-value="emit('update:industry', $event as string)"
+      <IndustryAutocomplete
+        :model-value="industries"
+        @update:model-value="emit('update:industries', $event)"
       />
-      <small v-if="submitted && errors.industry" class="text-red-500">
-        Industry is required.
-      </small>
     </div>
 
     <div class="flex flex-col gap-1">
@@ -93,13 +87,10 @@ const emit = defineEmits<{
       <label for="country" class="text-sm font-medium text-gray-700">
         Country
       </label>
-      <InputText
-        id="country"
+      <CountryAutocomplete
         :model-value="country"
-        placeholder="Enter country"
         :invalid="submitted && errors.country"
-        class="w-full"
-        @update:model-value="emit('update:country', $event as string)"
+        @update:model-value="emit('update:country', $event)"
       />
       <small v-if="submitted && errors.country" class="text-red-500">
         Country is required.
