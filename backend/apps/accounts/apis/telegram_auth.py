@@ -127,6 +127,8 @@ class TelegramAuthApi(APIView):
         )
 
         bot_token = settings.TELEGRAM_BOT_TOKEN
+        if not bot_token:
+            return False
         secret_key = hashlib.sha256(bot_token.encode()).digest()
         computed_hash = hmac.new(
             secret_key,

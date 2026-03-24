@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import { apiClient } from '@/shared/api/client'
@@ -85,6 +85,8 @@ function startPolling(code: string): void {
     }
   }, 5000)
 }
+
+onUnmounted(() => stopPolling())
 
 function stopPolling(): void {
   polling.value = false

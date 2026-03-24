@@ -77,3 +77,11 @@ class TelegramAuthCode(BaseModel):
             code=token,
             expires_at=timezone.now() + timedelta(minutes=5),
         )
+
+    @staticmethod
+    def cleanup_expired():
+        """Delete expired, unauthenticated codes to prevent DB bloat."""
+        TelegramAuthCode.objects.filter(
+            is_authenticated=False,
+            expires_at__lt=timezone.now(),
+        ).delete()

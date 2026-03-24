@@ -2,6 +2,7 @@ from django.conf import settings
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -32,12 +33,23 @@ class TelegramAuthRequestApi(APIView):
     """POST /api/telegram/auth/request/ — generate a login code for bot-based auth."""
 
     permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "auth"
 
     def post(self, request):
         from apps.integrations.models import TelegramAuthCode
 
-        auth_code = TelegramAuthCode.generate()
         bot_username = settings.TELEGRAM_BOT_USERNAME.lstrip("@")
+        if not bot_username:
+            return Response(
+                {"detail": "Telegram bot is not configured."},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+
+        # Clean up expired codes older than 10 minutes
+        TelegramAuthCode.cleanup_expired()
+
+        auth_code = TelegramAuthCode.generate()
         link_url = f"https://t.me/{bot_username}?start=login_{auth_code.code}"
         return Response({
             "code": auth_code.code,
@@ -50,8 +62,11 @@ class TelegramAuthCheckApi(APIView):
     """GET /api/telegram/auth/check/<code>/ — poll to check if auth is complete."""
 
     permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "auth"
 
     def get(self, request, code):
+        from django.db import transaction
         from django.utils import timezone
 
         from apps.integrations.models import TelegramAuthCode
@@ -73,12 +88,22 @@ class TelegramAuthCheckApi(APIView):
         if not auth_code.is_authenticated:
             return Response({"status": "pending"})
 
-        # Authenticated — return JWT tokens
-        user = auth_code.authenticated_user
-        refresh = RefreshToken.for_user(user)
+        # Atomic check-and-delete to prevent double token issuance
+        with transaction.atomic():
+            locked = (
+                TelegramAuthCode.objects.filter(id=auth_code.id, is_authenticated=True)
+                .select_for_update()
+                .first()
+            )
+            if locked is None:
+                return Response(
+                    {"detail": "Invalid code."},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
 
-        # Delete the used code
-        auth_code.delete()
+            user = locked.authenticated_user
+            refresh = RefreshToken.for_user(user)
+            locked.delete()
 
         return Response({
             "status": "authenticated",
