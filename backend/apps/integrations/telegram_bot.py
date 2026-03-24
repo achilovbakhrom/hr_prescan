@@ -49,9 +49,15 @@ def handle_update(update_data):
     if not text:
         return
 
-    # Handle /start command
-    if text == "/start":
-        _handle_start(chat_id=chat_id, telegram_id=telegram_id)
+    # Handle /start command (with optional deep-link payload)
+    if text == "/start" or text.startswith("/start "):
+        payload = text[7:].strip() if text.startswith("/start ") else ""
+        _handle_start(
+            chat_id=chat_id,
+            telegram_id=telegram_id,
+            telegram_username=telegram_username,
+            payload=payload,
+        )
         return
 
     # Handle /help command
@@ -92,8 +98,8 @@ def handle_update(update_data):
     send_message(chat_id=chat_id, text=response_text, parse_mode="Markdown")
 
 
-def _handle_start(*, chat_id, telegram_id):
-    """Handle the /start command."""
+def _handle_start(*, chat_id, telegram_id, telegram_username="", payload=""):
+    """Handle the /start command, optionally auto-linking via deep-link payload."""
     from apps.accounts.models import User
 
     user = User.objects.filter(telegram_id=telegram_id).first()
@@ -105,16 +111,27 @@ def _handle_start(*, chat_id, telegram_id):
                 "Type your request or /help to see what I can do."
             ),
         )
-    else:
-        send_message(
+        return
+
+    # If a deep-link payload is present, try to auto-link
+    if payload:
+        _try_deep_link(
             chat_id=chat_id,
-            text=(
-                "Welcome to PreScreen AI!\n\n"
-                "To connect your account, go to Settings -> Telegram in the web app "
-                "and send me the 6-digit link code.\n\n"
-                "Don't have an account? Visit https://prescreenai.com to get started."
-            ),
+            telegram_id=telegram_id,
+            telegram_username=telegram_username,
+            token=payload,
         )
+        return
+
+    send_message(
+        chat_id=chat_id,
+        text=(
+            "Welcome to PreScreen AI!\n\n"
+            "To connect your account, go to Settings -> Telegram in the web app "
+            "and click the Connect button.\n\n"
+            "Don't have an account? Visit https://prescreenai.com to get started."
+        ),
+    )
 
 
 def _handle_help(*, chat_id, telegram_id):
@@ -136,44 +153,18 @@ def _handle_help(*, chat_id, telegram_id):
     )
 
 
-def _try_link_code(*, chat_id, telegram_id, telegram_username, text):
-    """Try to interpret the message as a link code."""
+def _try_deep_link(*, chat_id, telegram_id, telegram_username, token):
+    """Auto-link account using a deep-link token from /start payload."""
+    from django.db import IntegrityError, transaction
     from django.utils import timezone
 
     from apps.integrations.models import TelegramLinkCode
-
-    code = text.strip()
-    if not code.isdigit() or len(code) != 6:
-        send_message(
-            chat_id=chat_id,
-            text=(
-                "Your Telegram account is not linked yet.\n\n"
-                "To connect, go to Settings -> Telegram in the web app "
-                "and send me the 6-digit code."
-            ),
-        )
-        return
-
-    # Rate limit: max 5 link attempts per telegram_id per 10 minutes
-    from django.core.cache import cache
-
-    rate_key = f"tg_link_attempts:{telegram_id}"
-    attempts = cache.get(rate_key, 0)
-    if attempts >= 5:
-        send_message(
-            chat_id=chat_id,
-            text="Too many attempts. Please wait a few minutes and try again.",
-        )
-        return
-    cache.set(rate_key, attempts + 1, timeout=600)
-
-    from django.db import transaction, IntegrityError
 
     try:
         with transaction.atomic():
             link = (
                 TelegramLinkCode.objects.filter(
-                    code=code, is_used=False, expires_at__gt=timezone.now()
+                    code=token, is_used=False, expires_at__gt=timezone.now()
                 )
                 .select_related("user")
                 .select_for_update()
@@ -183,16 +174,17 @@ def _try_link_code(*, chat_id, telegram_id, telegram_username, text):
             if link is None:
                 send_message(
                     chat_id=chat_id,
-                    text="Invalid or expired code. Please generate a new one from Settings -> Telegram.",
+                    text=(
+                        "This link has expired or is invalid.\n\n"
+                        "Please generate a new one from Settings -> Telegram."
+                    ),
                 )
                 return
 
-            # Validate telegram_id
             if not isinstance(telegram_id, int) or telegram_id <= 0:
                 send_message(chat_id=chat_id, text="Invalid Telegram account.")
                 return
 
-            # Link the account
             user = link.user
             user.telegram_id = telegram_id
             user.telegram_username = telegram_username
@@ -214,6 +206,18 @@ def _try_link_code(*, chat_id, telegram_id, telegram_username, text):
             f"Connected as {user.email}"
             + (f" ({company_name})" if company_name else "")
             + "\n\nYou can now manage your HR tasks here. Type /help to see what I can do."
+        ),
+    )
+
+
+def _try_link_code(*, chat_id, telegram_id, telegram_username, text):
+    """Handle messages from unlinked users."""
+    send_message(
+        chat_id=chat_id,
+        text=(
+            "Your Telegram account is not linked yet.\n\n"
+            "To connect, go to Settings -> Telegram in the web app "
+            "and click the Connect button."
         ),
     )
 

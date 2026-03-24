@@ -25,7 +25,7 @@ const acceptingToken = ref<string | null>(null)
 
 const telegramLinked = ref(false)
 const telegramUsername = ref('')
-const linkCode = ref('')
+const telegramLinkUrl = ref('')
 const generatingCode = ref(false)
 
 onMounted(() => {
@@ -88,7 +88,7 @@ async function handleGenerateCode(): Promise<void> {
   generatingCode.value = true
   try {
     const result = await settingsService.generateTelegramLinkCode()
-    linkCode.value = result.code
+    telegramLinkUrl.value = result.linkUrl
   } catch {
     errorMessage.value = 'Failed to generate Telegram link code'
   } finally {
@@ -101,7 +101,7 @@ async function handleUnlink(): Promise<void> {
     await settingsService.unlinkTelegram()
     telegramLinked.value = false
     telegramUsername.value = ''
-    linkCode.value = ''
+    telegramLinkUrl.value = ''
     successMessage.value = t('telegram.disconnected')
   } catch {
     errorMessage.value = 'Failed to disconnect Telegram'
@@ -244,11 +244,17 @@ async function handleUnlink(): Promise<void> {
 
       <!-- Not connected state -->
       <div v-else>
-        <div v-if="linkCode" class="text-center">
-          <p class="text-sm text-gray-600 mb-3">{{ t('telegram.linkCodeHint') }}</p>
-          <div class="inline-flex items-center gap-3 rounded-xl bg-gray-50 px-6 py-4 mb-3">
-            <span class="text-3xl font-bold tracking-[0.3em] text-gray-900">{{ linkCode }}</span>
-          </div>
+        <div v-if="telegramLinkUrl" class="text-center">
+          <p class="text-sm text-gray-600 mb-3">{{ t('telegram.deepLinkHint') }}</p>
+          <a
+            :href="telegramLinkUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 rounded-xl bg-blue-500 px-6 py-3 text-white font-semibold hover:bg-blue-600 transition-colors mb-3"
+          >
+            <i class="pi pi-send"></i>
+            {{ t('telegram.openBot') }}
+          </a>
           <p class="text-xs text-gray-400">{{ t('telegram.linkCodeExpires') }}</p>
         </div>
         <div v-else class="text-center">

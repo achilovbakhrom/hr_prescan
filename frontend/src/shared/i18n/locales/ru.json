@@ -988,10 +988,10 @@
     "notConnected": "Telegram не подключён",
     "connect": "Подключить Telegram",
     "disconnect": "Отключить",
-    "linkCode": "Код привязки",
-    "linkCodeHint": "Отправьте этот код боту @PreScreenAI_bot в Telegram",
-    "linkCodeExpires": "Действует 10 минут",
-    "generating": "Генерация кода...",
+    "deepLinkHint": "Нажмите кнопку ниже, чтобы открыть Telegram и подключиться автоматически",
+    "openBot": "Открыть в Telegram",
+    "linkCodeExpires": "Ссылка действует 10 минут",
+    "generating": "Генерация ссылки...",
     "disconnected": "Telegram отключён"
   },
   "aiAssistant": {

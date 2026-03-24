@@ -988,10 +988,10 @@
     "notConnected": "Your Telegram account is not connected",
     "connect": "Connect Telegram",
     "disconnect": "Disconnect",
-    "linkCode": "Your link code",
-    "linkCodeHint": "Send this code to @PreScreenAI_bot on Telegram",
-    "linkCodeExpires": "Expires in 10 minutes",
-    "generating": "Generating code...",
+    "deepLinkHint": "Click the button below to open Telegram and connect automatically",
+    "openBot": "Open in Telegram",
+    "linkCodeExpires": "Link expires in 10 minutes",
+    "generating": "Generating link...",
     "disconnected": "Telegram disconnected"
   },
   "aiAssistant": {

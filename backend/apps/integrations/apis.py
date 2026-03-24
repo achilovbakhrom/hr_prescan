@@ -27,7 +27,7 @@ class TelegramWebhookApi(APIView):
 
 
 class TelegramLinkCodeApi(APIView):
-    """GET /api/hr/telegram/link-code/ — generate a 6-digit link code."""
+    """GET /api/hr/telegram/link-code/ — generate a deep link for Telegram."""
 
     permission_classes = [IsHRManager | IsAdmin]
 
@@ -35,8 +35,10 @@ class TelegramLinkCodeApi(APIView):
         from apps.integrations.models import TelegramLinkCode
 
         link = TelegramLinkCode.generate(user=request.user)
+        bot_username = settings.TELEGRAM_BOT_USERNAME.lstrip("@")
+        link_url = f"https://t.me/{bot_username}?start={link.code}"
         return Response({
-            "code": link.code,
+            "link_url": link_url,
             "expires_at": link.expires_at.isoformat(),
         })
 

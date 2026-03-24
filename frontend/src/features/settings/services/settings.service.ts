@@ -55,7 +55,7 @@ export const settingsService = {
     return response.data
   },
 
-  async generateTelegramLinkCode(): Promise<{ code: string; expiresAt: string }> {
+  async generateTelegramLinkCode(): Promise<{ linkUrl: string; expiresAt: string }> {
     const response = await apiClient.get('/hr/telegram/link-code')
     return response.data
   },
