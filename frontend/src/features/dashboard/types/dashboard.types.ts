@@ -24,3 +24,26 @@ export interface UpcomingInterview {
   createdAt: string
   status: string
 }
+
+export interface RecommendedVacancy {
+  id: string
+  title: string
+  companyName: string
+  location: string
+  isRemote: boolean
+  employmentType: string
+  experienceLevel: string
+  createdAt: string
+}
+
+export interface CandidateDashboardStats {
+  totalApplications: number
+  applied: number
+  prescanned: number
+  interviewed: number
+  shortlisted: number
+  hired: number
+  rejected: number
+  profileCompleteness: number
+  recommendedVacancies: RecommendedVacancy[]
+}

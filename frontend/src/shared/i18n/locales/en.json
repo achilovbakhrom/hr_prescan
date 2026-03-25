@@ -36,7 +36,10 @@
     "error": "An unexpected error occurred",
     "success": "Success",
     "or": "or",
-    "required_field": "This field is required"
+    "required_field": "This field is required",
+    "skills": "Skills",
+    "language": "Language",
+    "educationLevel": "Education Level"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -60,7 +63,9 @@
     "signOut": "Sign Out",
     "forEmployers": "For Employers",
     "browseJobs": "Browse Jobs",
-    "myApplications": "My Applications"
+    "myApplications": "My Applications",
+    "cvBuilder": "CV Builder",
+    "hrAnalytics": "Analytics"
   },
   "auth": {
     "login": {
@@ -288,7 +293,45 @@
     },
     "scheduledInterviewsHint": "Scheduled interviews will appear here",
     "trackApplications": "Track your application status",
-    "viewEditProfile": "View and edit your profile"
+    "viewEditProfile": "View and edit your profile",
+    "candidate": {
+      "profileCompleteness": "Profile Completeness",
+      "completeProfileHint": "Complete your profile to improve job matches",
+      "total": "Total Applications",
+      "applied": "Applied",
+      "inProgress": "In Progress",
+      "shortlisted": "Shortlisted",
+      "hired": "Hired",
+      "editCv": "Edit CV",
+      "recommendedJobs": "Recommended Jobs",
+      "noRecommendations": "No recommendations yet",
+      "noRecommendationsHint": "New job openings will appear here"
+    }
+  },
+  "analytics": {
+    "title": "Analytics",
+    "subtitle": "Company-level hiring analytics and insights",
+    "totalApplications": "Total Applications",
+    "totalInterviews": "Total Interviews",
+    "completionRate": "Completion Rate",
+    "avgInterviewScore": "Avg. Interview Score",
+    "hiringFunnel": "Hiring Funnel",
+    "vacancyPerformance": "Top Vacancies by Applications",
+    "noData": "No application data yet",
+    "noVacancies": "No published vacancies yet",
+    "funnel": {
+      "applied": "Applied",
+      "prescanned": "Prescanned",
+      "interviewed": "Interviewed",
+      "shortlisted": "Shortlisted",
+      "hired": "Hired",
+      "rejected": "Rejected"
+    },
+    "table": {
+      "vacancy": "Vacancy",
+      "applications": "Applications",
+      "avgScore": "Avg. Score"
+    }
   },
   "vacancies": {
     "title": "Vacancies",
@@ -922,7 +965,10 @@
       "userRegistrations": "User Registrations",
       "chartPlaceholder": "Chart placeholder",
       "revenueChartSoon": "Revenue Chart (coming soon)",
-      "userGrowthChartSoon": "User Growth Chart (coming soon)"
+      "userGrowthChartSoon": "User Growth Chart (coming soon)",
+      "candidates": "Candidates",
+      "hrManagers": "HR Managers",
+      "admins": "Admins"
     }
   },
   "notifications": {
@@ -1024,8 +1070,174 @@
     "placeholder": "Ask me anything...",
     "welcome": "How can I help you?",
     "welcomeHint": "I can manage vacancies, candidates, interviews, companies, and more. Just ask in natural language.",
+    "welcomeHintCandidate": "I can help you search for jobs, improve your CV, track applications, and prepare for interviews.",
     "sending": "Thinking...",
     "error": "Something went wrong. Please try again.",
-    "clearHistory": "Clear history"
+    "clearHistory": "Clear history",
+    "hints": {
+      "searchJobs": "Search for jobs",
+      "improveCv": "Help improve my CV",
+      "myApplications": "My applications",
+      "listVacancies": "List my vacancies",
+      "dashboardStats": "Show dashboard stats",
+      "help": "Help"
+    }
+  },
+  "cvBuilder": {
+    "title": "CV Builder",
+    "tabs": {
+      "personal": "Personal Info",
+      "experience": "Experience",
+      "education": "Education",
+      "skills": "Skills",
+      "languages": "Languages",
+      "certifications": "Certifications"
+    },
+    "completeness": {
+      "title": "Profile Completeness",
+      "personal": "Personal Info",
+      "summary": "Summary",
+      "experience": "Experience",
+      "education": "Education",
+      "skills": "Skills",
+      "languages": "Languages"
+    },
+    "personal": {
+      "headline": "Headline",
+      "headlinePlaceholder": "e.g. Senior Frontend Developer",
+      "summary": "Summary",
+      "summaryPlaceholder": "Tell us about yourself...",
+      "location": "Location",
+      "locationPlaceholder": "e.g. New York, USA",
+      "dateOfBirth": "Date of Birth",
+      "dateOfBirthPlaceholder": "Select date",
+      "linkedinUrl": "LinkedIn",
+      "githubUrl": "GitHub",
+      "websiteUrl": "Website",
+      "salaryMin": "Min Salary",
+      "salaryMinPlaceholder": "Minimum",
+      "salaryMax": "Max Salary",
+      "salaryMaxPlaceholder": "Maximum",
+      "currency": "Currency",
+      "currencyPlaceholder": "Select currency",
+      "employmentType": "Employment Type",
+      "employmentTypePlaceholder": "Select type",
+      "openToWork": "Open to Work",
+      "saveSuccess": "Personal info updated successfully"
+    },
+    "employmentTypes": {
+      "fullTime": "Full Time",
+      "partTime": "Part Time",
+      "contract": "Contract",
+      "internship": "Internship"
+    },
+    "experience": {
+      "add": "Add Experience",
+      "addTitle": "Add Work Experience",
+      "editTitle": "Edit Work Experience",
+      "companyName": "Company Name",
+      "position": "Position",
+      "employmentType": "Employment Type",
+      "employmentTypePlaceholder": "Select type",
+      "location": "Location",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "currentlyWorking": "I currently work here",
+      "description": "Description",
+      "present": "Present",
+      "empty": "No work experience added yet",
+      "addSuccess": "Work experience added successfully",
+      "updateSuccess": "Work experience updated successfully",
+      "deleteSuccess": "Work experience deleted successfully"
+    },
+    "education": {
+      "add": "Add Education",
+      "addTitle": "Add Education",
+      "editTitle": "Edit Education",
+      "institution": "Institution",
+      "degree": "Degree",
+      "educationLevel": "Education Level",
+      "fieldOfStudy": "Field of Study",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "description": "Description",
+      "empty": "No education added yet",
+      "addSuccess": "Education added successfully",
+      "updateSuccess": "Education updated successfully",
+      "deleteSuccess": "Education deleted successfully"
+    },
+    "skills": {
+      "selectSkills": "Search and select skills",
+      "empty": "No skills added yet",
+      "saveSuccess": "Skills updated successfully"
+    },
+    "languages": {
+      "add": "Add Language",
+      "addTitle": "Add Language",
+      "editTitle": "Edit Language",
+      "language": "Language",
+      "proficiency": "Proficiency",
+      "proficiencyPlaceholder": "Select level",
+      "empty": "No languages added yet",
+      "addSuccess": "Language added successfully",
+      "updateSuccess": "Language updated successfully",
+      "deleteSuccess": "Language deleted successfully"
+    },
+    "proficiencies": {
+      "beginner": "Beginner",
+      "elementary": "Elementary",
+      "intermediate": "Intermediate",
+      "upperIntermediate": "Upper Intermediate",
+      "advanced": "Advanced",
+      "native": "Native"
+    },
+    "certifications": {
+      "add": "Add Certification",
+      "addTitle": "Add Certification",
+      "editTitle": "Edit Certification",
+      "name": "Certification Name",
+      "issuingOrganization": "Issuing Organization",
+      "issueDate": "Issue Date",
+      "expiryDate": "Expiry Date",
+      "credentialUrl": "Credential URL",
+      "viewCredential": "View Credential",
+      "issued": "Issued",
+      "expires": "Expires",
+      "empty": "No certifications added yet",
+      "addSuccess": "Certification added successfully",
+      "updateSuccess": "Certification updated successfully",
+      "deleteSuccess": "Certification deleted successfully"
+    },
+    "improveWithAi": "Improve with AI",
+    "cvParse": {
+      "title": "Upload & Parse CV",
+      "description": "Upload your existing CV (PDF or DOCX) and our AI will automatically fill in your profile.",
+      "chooseFile": "Choose File",
+      "parseButton": "Parse with AI",
+      "parsing": "Parsing your CV with AI...",
+      "success": "CV parsed successfully! Your profile has been updated."
+    },
+    "cvGenerate": {
+      "title": "Generate PDF",
+      "description": "Choose a template and generate a professional PDF from your profile data.",
+      "cvName": "CV Name",
+      "cvNamePlaceholder": "e.g. My CV",
+      "generateButton": "Generate PDF",
+      "success": "PDF generated successfully!",
+      "templates": {
+        "classic": {
+          "name": "Classic",
+          "description": "Traditional single-column, professional serif style"
+        },
+        "modern": {
+          "name": "Modern",
+          "description": "Two-column layout with sidebar, modern sans-serif"
+        },
+        "minimal": {
+          "name": "Minimal",
+          "description": "Clean design with lots of whitespace, monochrome"
+        }
+      }
+    }
   }
 }

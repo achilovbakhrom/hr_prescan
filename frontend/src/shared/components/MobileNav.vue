@@ -77,6 +77,12 @@ const navItems = computed<NavItem[]>(() => [
     roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
   },
   {
+    label: t('nav.hrAnalytics'),
+    icon: 'pi pi-chart-bar',
+    to: '/analytics',
+    roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
+  },
+  {
     label: t('nav.team'),
     icon: 'pi pi-users',
     to: '/settings/team',
@@ -104,6 +110,12 @@ const navItems = computed<NavItem[]>(() => [
     label: t('nav.browseJobs'),
     icon: 'pi pi-search',
     to: '/jobs',
+    roles: [USER_ROLES.CANDIDATE],
+  },
+  {
+    label: t('nav.cvBuilder'),
+    icon: 'pi pi-id-card',
+    to: '/cv-builder',
     roles: [USER_ROLES.CANDIDATE],
   },
 ])

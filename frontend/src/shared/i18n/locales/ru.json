@@ -36,7 +36,10 @@
     "error": "Произошла непредвиденная ошибка",
     "success": "Успешно",
     "or": "или",
-    "required_field": "Это поле обязательно"
+    "required_field": "Это поле обязательно",
+    "skills": "Навыки",
+    "language": "Язык",
+    "educationLevel": "Уровень образования"
   },
   "nav": {
     "dashboard": "Панель управления",
@@ -60,7 +63,9 @@
     "signOut": "Выйти",
     "forEmployers": "Работодателям",
     "browseJobs": "Поиск вакансий",
-    "myApplications": "Мои заявки"
+    "myApplications": "Мои заявки",
+    "cvBuilder": "Конструктор CV",
+    "hrAnalytics": "Аналитика"
   },
   "auth": {
     "login": {
@@ -288,7 +293,45 @@
     },
     "scheduledInterviewsHint": "Запланированные собеседования появятся здесь",
     "trackApplications": "Отслеживайте статус ваших заявок",
-    "viewEditProfile": "Просмотр и редактирование профиля"
+    "viewEditProfile": "Просмотр и редактирование профиля",
+    "candidate": {
+      "profileCompleteness": "Заполненность профиля",
+      "completeProfileHint": "Заполните профиль для лучшего подбора вакансий",
+      "total": "Всего заявок",
+      "applied": "Поданные",
+      "inProgress": "В процессе",
+      "shortlisted": "В шорт-листе",
+      "hired": "Приняты",
+      "editCv": "Редактировать CV",
+      "recommendedJobs": "Рекомендуемые вакансии",
+      "noRecommendations": "Пока нет рекомендаций",
+      "noRecommendationsHint": "Новые вакансии появятся здесь"
+    }
+  },
+  "analytics": {
+    "title": "Аналитика",
+    "subtitle": "Аналитика найма на уровне компании",
+    "totalApplications": "Всего заявок",
+    "totalInterviews": "Всего собеседований",
+    "completionRate": "Процент завершения",
+    "avgInterviewScore": "Средний балл собеседования",
+    "hiringFunnel": "Воронка найма",
+    "vacancyPerformance": "Топ вакансий по заявкам",
+    "noData": "Данных о заявках пока нет",
+    "noVacancies": "Опубликованных вакансий пока нет",
+    "funnel": {
+      "applied": "Подали заявку",
+      "prescanned": "Прескрининг",
+      "interviewed": "Собеседование",
+      "shortlisted": "В шорт-листе",
+      "hired": "Наняты",
+      "rejected": "Отклонены"
+    },
+    "table": {
+      "vacancy": "Вакансия",
+      "applications": "Заявки",
+      "avgScore": "Средний балл"
+    }
   },
   "vacancies": {
     "title": "Вакансии",
@@ -922,7 +965,10 @@
       "userRegistrations": "Регистрации пользователей",
       "chartPlaceholder": "Заглушка графика",
       "revenueChartSoon": "График дохода (скоро)",
-      "userGrowthChartSoon": "График роста пользователей (скоро)"
+      "userGrowthChartSoon": "График роста пользователей (скоро)",
+      "candidates": "Кандидаты",
+      "hrManagers": "HR-менеджеры",
+      "admins": "Администраторы"
     }
   },
   "notifications": {
@@ -1024,8 +1070,174 @@
     "placeholder": "Спросите что угодно...",
     "welcome": "Чем могу помочь?",
     "welcomeHint": "Я могу управлять вакансиями, кандидатами, интервью, компаниями и многим другим. Просто спросите на естественном языке.",
+    "welcomeHintCandidate": "Я могу помочь найти вакансии, улучшить CV, отслеживать заявки и подготовиться к интервью.",
     "sending": "Думаю...",
     "error": "Что-то пошло не так. Попробуйте ещё раз.",
-    "clearHistory": "Очистить историю"
+    "clearHistory": "Очистить историю",
+    "hints": {
+      "searchJobs": "Поиск вакансий",
+      "improveCv": "Помочь улучшить CV",
+      "myApplications": "Мои заявки",
+      "listVacancies": "Список вакансий",
+      "dashboardStats": "Статистика дашборда",
+      "help": "Помощь"
+    }
+  },
+  "cvBuilder": {
+    "title": "Конструктор CV",
+    "tabs": {
+      "personal": "Личные данные",
+      "experience": "Опыт работы",
+      "education": "Образование",
+      "skills": "Навыки",
+      "languages": "Языки",
+      "certifications": "Сертификаты"
+    },
+    "completeness": {
+      "title": "Полнота профиля",
+      "personal": "Личные данные",
+      "summary": "О себе",
+      "experience": "Опыт работы",
+      "education": "Образование",
+      "skills": "Навыки",
+      "languages": "Языки"
+    },
+    "personal": {
+      "headline": "Заголовок",
+      "headlinePlaceholder": "например, Senior Frontend Developer",
+      "summary": "О себе",
+      "summaryPlaceholder": "Расскажите о себе...",
+      "location": "Местоположение",
+      "locationPlaceholder": "например, Москва, Россия",
+      "dateOfBirth": "Дата рождения",
+      "dateOfBirthPlaceholder": "Выберите дату",
+      "linkedinUrl": "LinkedIn",
+      "githubUrl": "GitHub",
+      "websiteUrl": "Сайт",
+      "salaryMin": "Мин. зарплата",
+      "salaryMinPlaceholder": "Минимум",
+      "salaryMax": "Макс. зарплата",
+      "salaryMaxPlaceholder": "Максимум",
+      "currency": "Валюта",
+      "currencyPlaceholder": "Выберите валюту",
+      "employmentType": "Тип занятости",
+      "employmentTypePlaceholder": "Выберите тип",
+      "openToWork": "Открыт к предложениям",
+      "saveSuccess": "Личные данные успешно обновлены"
+    },
+    "employmentTypes": {
+      "fullTime": "Полная занятость",
+      "partTime": "Частичная занятость",
+      "contract": "Контракт",
+      "internship": "Стажировка"
+    },
+    "experience": {
+      "add": "Добавить опыт",
+      "addTitle": "Добавить опыт работы",
+      "editTitle": "Редактировать опыт работы",
+      "companyName": "Название компании",
+      "position": "Должность",
+      "employmentType": "Тип занятости",
+      "employmentTypePlaceholder": "Выберите тип",
+      "location": "Местоположение",
+      "startDate": "Дата начала",
+      "endDate": "Дата окончания",
+      "currentlyWorking": "Работаю здесь сейчас",
+      "description": "Описание",
+      "present": "По настоящее время",
+      "empty": "Опыт работы пока не добавлен",
+      "addSuccess": "Опыт работы успешно добавлен",
+      "updateSuccess": "Опыт работы успешно обновлён",
+      "deleteSuccess": "Опыт работы успешно удалён"
+    },
+    "education": {
+      "add": "Добавить образование",
+      "addTitle": "Добавить образование",
+      "editTitle": "Редактировать образование",
+      "institution": "Учебное заведение",
+      "degree": "Степень",
+      "educationLevel": "Уровень образования",
+      "fieldOfStudy": "Направление",
+      "startDate": "Дата начала",
+      "endDate": "Дата окончания",
+      "description": "Описание",
+      "empty": "Образование пока не добавлено",
+      "addSuccess": "Образование успешно добавлено",
+      "updateSuccess": "Образование успешно обновлено",
+      "deleteSuccess": "Образование успешно удалено"
+    },
+    "skills": {
+      "selectSkills": "Найдите и выберите навыки",
+      "empty": "Навыки пока не добавлены",
+      "saveSuccess": "Навыки успешно обновлены"
+    },
+    "languages": {
+      "add": "Добавить язык",
+      "addTitle": "Добавить язык",
+      "editTitle": "Редактировать язык",
+      "language": "Язык",
+      "proficiency": "Уровень владения",
+      "proficiencyPlaceholder": "Выберите уровень",
+      "empty": "Языки пока не добавлены",
+      "addSuccess": "Язык успешно добавлен",
+      "updateSuccess": "Язык успешно обновлён",
+      "deleteSuccess": "Язык успешно удалён"
+    },
+    "proficiencies": {
+      "beginner": "Начальный",
+      "elementary": "Элементарный",
+      "intermediate": "Средний",
+      "upperIntermediate": "Выше среднего",
+      "advanced": "Продвинутый",
+      "native": "Родной"
+    },
+    "certifications": {
+      "add": "Добавить сертификат",
+      "addTitle": "Добавить сертификат",
+      "editTitle": "Редактировать сертификат",
+      "name": "Название сертификата",
+      "issuingOrganization": "Организация",
+      "issueDate": "Дата выдачи",
+      "expiryDate": "Срок действия",
+      "credentialUrl": "URL документа",
+      "viewCredential": "Посмотреть документ",
+      "issued": "Выдан",
+      "expires": "Истекает",
+      "empty": "Сертификаты пока не добавлены",
+      "addSuccess": "Сертификат успешно добавлен",
+      "updateSuccess": "Сертификат успешно обновлён",
+      "deleteSuccess": "Сертификат успешно удалён"
+    },
+    "improveWithAi": "Улучшить с ИИ",
+    "cvParse": {
+      "title": "Загрузить и распарсить CV",
+      "description": "Загрузите существующее CV (PDF или DOCX) и наш ИИ автоматически заполнит ваш профиль.",
+      "chooseFile": "Выбрать файл",
+      "parseButton": "Распарсить с ИИ",
+      "parsing": "Парсим ваше CV с помощью ИИ...",
+      "success": "CV успешно распарсено! Ваш профиль обновлён."
+    },
+    "cvGenerate": {
+      "title": "Генерация PDF",
+      "description": "Выберите шаблон и сгенерируйте профессиональный PDF из данных вашего профиля.",
+      "cvName": "Название CV",
+      "cvNamePlaceholder": "например, Моё CV",
+      "generateButton": "Сгенерировать PDF",
+      "success": "PDF успешно сгенерирован!",
+      "templates": {
+        "classic": {
+          "name": "Классический",
+          "description": "Традиционный одноколоночный, профессиональный стиль"
+        },
+        "modern": {
+          "name": "Современный",
+          "description": "Двухколоночный макет с боковой панелью"
+        },
+        "minimal": {
+          "name": "Минимальный",
+          "description": "Чистый дизайн с большим количеством пространства"
+        }
+      }
+    }
   }
 }

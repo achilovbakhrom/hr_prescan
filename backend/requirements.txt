@@ -80,3 +80,4 @@ pytest-django>=4.8,<5.0
 pytest-cov>=6.0,<8.0
 factory-boy>=3.3,<4.0
 faker>=37.0,<41.0
+weasyprint>=68.0,<70.0

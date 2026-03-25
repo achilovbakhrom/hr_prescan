@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 
-from apps.accounts.urls import hr_urlpatterns
+from apps.accounts.urls import candidate_profile_urlpatterns, hr_urlpatterns
 from apps.common.urls_admin import admin_urlpatterns
 from apps.subscriptions.urls import (
     hr_urlpatterns as subscription_hr_urlpatterns,
@@ -27,8 +27,14 @@ from apps.interviews.urls import (
 )
 from apps.common.apis import HRDashboardApi
 from apps.common.apis_ai import AIAssistantApi
+from apps.common.apis_candidate_ai import CandidateAIAssistantApi
+from apps.common.apis_candidate_dashboard import CandidateDashboardApi
+from apps.common.apis_hr_analytics import HRAnalyticsApi
 from apps.common.apis_country import CountryListApi
+from apps.common.apis_education_level import EducationLevelListApi
 from apps.common.apis_industry import IndustryListApi
+from apps.common.apis_language import LanguageListApi
+from apps.common.apis_skill import SkillListApi
 from apps.notifications.urls import (
     candidate_urlpatterns as notification_candidate_urlpatterns,
     hr_bulk_urlpatterns as notification_hr_bulk_urlpatterns,
@@ -64,12 +70,19 @@ urlpatterns = [
     path("api/hr/interviews/", include((hr_interview_urlpatterns, "hr-interviews"))),
     path("api/hr/dashboard/", HRDashboardApi.as_view(), name="hr-dashboard"),
     path("api/hr/ai-assistant/", AIAssistantApi.as_view(), name="hr-ai-assistant"),
+    path("api/hr/analytics/", HRAnalyticsApi.as_view(), name="hr-analytics"),
     path("api/notifications/", include((notification_urlpatterns, "notifications"))),
     path("api/public/countries/", CountryListApi.as_view(), name="public-countries"),
     path("api/public/industries/", IndustryListApi.as_view(), name="public-industries"),
+    path("api/public/skills/", SkillListApi.as_view(), name="public-skills"),
+    path("api/public/languages/", LanguageListApi.as_view(), name="public-languages"),
+    path("api/public/education-levels/", EducationLevelListApi.as_view(), name="public-education-levels"),
     path("api/public/vacancies/", include((vacancy_public_urlpatterns, "public-vacancies"))),
     path("api/public/vacancies/", include((application_public_urlpatterns, "public-applications"))),
     path("api/public/", include((interview_public_urlpatterns, "public-interviews"))),
+    path("api/candidate/ai-assistant/", CandidateAIAssistantApi.as_view(), name="candidate-ai-assistant"),
+    path("api/candidate/dashboard/", CandidateDashboardApi.as_view(), name="candidate-dashboard"),
+    path("api/candidate/profile/", include((candidate_profile_urlpatterns, "candidate-profile"))),
     path("api/candidate/", include((application_candidate_urlpatterns, "candidate"))),
     path("api/candidate/", include((interview_candidate_urlpatterns, "candidate-interviews"))),
     path("api/candidate/", include((notification_candidate_urlpatterns, "candidate-messages"))),

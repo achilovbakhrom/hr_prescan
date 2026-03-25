@@ -41,6 +41,12 @@ export const ROUTE_NAMES = {
   ADMIN_ANALYTICS: 'admin-analytics',
   ADMIN_PLANS: 'admin-plans',
 
+  // HR Analytics
+  HR_ANALYTICS: 'hr-analytics',
+
+  // CV Builder
+  CV_BUILDER: 'cv-builder',
+
   // Employers
   EMPLOYER_LIST: 'employer-list',
   EMPLOYER_CREATE: 'employer-create',

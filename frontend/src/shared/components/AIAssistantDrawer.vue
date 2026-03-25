@@ -1,13 +1,31 @@
 <script setup lang="ts">
-import { ref, nextTick, watch, onMounted, onUnmounted } from 'vue'
+import { ref, nextTick, watch, onMounted, onUnmounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import Textarea from 'primevue/textarea'
 import { useAIAssistant } from '../composables/useAIAssistant'
+import { useAuthStore } from '@/features/auth/stores/auth.store'
 
 const { t } = useI18n()
+const authStore = useAuthStore()
 const { isOpen, messages, sending, close, toggle, sendMessage, clearHistory } =
   useAIAssistant()
+
+const isCandidate = computed(() => authStore.user?.role === 'candidate')
+
+const quickHints = computed(() =>
+  isCandidate.value
+    ? [
+        t('aiAssistant.hints.searchJobs'),
+        t('aiAssistant.hints.improveCv'),
+        t('aiAssistant.hints.myApplications'),
+      ]
+    : [
+        t('aiAssistant.hints.listVacancies'),
+        t('aiAssistant.hints.dashboardStats'),
+        t('aiAssistant.hints.help'),
+      ],
+)
 
 const inputText = ref('')
 const messagesContainer = ref<HTMLElement | null>(null)
@@ -139,16 +157,12 @@ function formatMessage(text: string): string {
             {{ t('aiAssistant.welcome') }}
           </p>
           <p class="mt-1 max-w-[260px] text-xs text-gray-400">
-            {{ t('aiAssistant.welcomeHint') }}
+            {{ isCandidate ? t('aiAssistant.welcomeHintCandidate') : t('aiAssistant.welcomeHint') }}
           </p>
           <!-- Quick actions -->
           <div class="mt-4 flex flex-wrap justify-center gap-2">
             <button
-              v-for="hint in [
-                'List my vacancies',
-                'Show dashboard stats',
-                'Help',
-              ]"
+              v-for="hint in quickHints"
               :key="hint"
               class="rounded-full border border-gray-200 px-3 py-1.5 text-xs text-gray-600 transition-colors hover:border-violet-300 hover:bg-violet-50 hover:text-violet-700"
               @click="sendMessage(hint)"

@@ -2,6 +2,7 @@ import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { sendAICommand, type AIMessage, type FrontendAction } from '../api/aiAssistant'
 import { extractErrorMessage } from '../api/errors'
+import { useAuthStore } from '@/features/auth/stores/auth.store'
 
 const STORAGE_KEY = 'prescreen_ai_assistant_history'
 const MAX_MESSAGES = 200 // 100 prompts × 2 (user + assistant)
@@ -60,6 +61,8 @@ export function useAIAssistant() {
   async function sendMessage(text: string) {
     if (!text.trim() || sending.value) return
 
+    const authStore = useAuthStore()
+
     messages.value.push({
       role: 'user',
       content: text,
@@ -82,7 +85,8 @@ export function useAIAssistant() {
         context.conversationHistory = recentHistory
       }
 
-      const response = await sendAICommand(text, context)
+      const userRole = authStore.user?.role
+      const response = await sendAICommand(text, context, userRole)
       messages.value.push({
         role: 'assistant',
         content: response.message,

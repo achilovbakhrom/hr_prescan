@@ -40,6 +40,7 @@ const sections = computed<NavSection[]>(() => [
       { label: t('nav.vacancies'), icon: 'pi pi-briefcase', to: '/vacancies', roles: [USER_ROLES.ADMIN, USER_ROLES.HR] },
       { label: t('employers.title'), icon: 'pi pi-building', to: '/employers', roles: [USER_ROLES.ADMIN, USER_ROLES.HR] },
       { label: t('nav.interviews'), icon: 'pi pi-video', to: '/interviews', roles: [USER_ROLES.ADMIN, USER_ROLES.HR] },
+      { label: t('nav.hrAnalytics'), icon: 'pi pi-chart-bar', to: '/analytics', roles: [USER_ROLES.ADMIN, USER_ROLES.HR] },
     ],
   },
   {
@@ -47,6 +48,7 @@ const sections = computed<NavSection[]>(() => [
     items: [
       { label: t('nav.browseJobs'), icon: 'pi pi-search', to: '/jobs', roles: [USER_ROLES.CANDIDATE] },
       { label: t('nav.myApplications'), icon: 'pi pi-file', to: '/my-applications', roles: [USER_ROLES.CANDIDATE] },
+      { label: t('nav.cvBuilder'), icon: 'pi pi-id-card', to: '/cv-builder', roles: [USER_ROLES.CANDIDATE] },
     ],
   },
   {
