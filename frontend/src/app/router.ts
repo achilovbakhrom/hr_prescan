@@ -22,7 +22,7 @@ import {
   subscriptionRoutes,
   publicSubscriptionRoutes,
 } from '@/features/subscriptions/routes'
-import { cvBuilderRoutes } from '@/features/cv-builder/routes'
+import { cvBuilderRoutes, publicCvRoutes } from '@/features/cv-builder/routes'
 import { adminRoutes } from '@/features/admin/routes'
 import { employerRoutes } from '@/features/employers/routes'
 import { landingRoutes } from '@/features/landing/routes'
@@ -56,6 +56,7 @@ const routes: RouteRecordRaw[] = [
       ...publicSubscriptionRoutes,
       ...candidateInterviewRoutes,
       ...legalRoutes,
+      ...publicCvRoutes,
     ],
   },
 

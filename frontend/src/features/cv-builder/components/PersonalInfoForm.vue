@@ -26,6 +26,7 @@ const websiteUrl = ref('')
 const desiredSalaryMin = ref<number | null>(null)
 const desiredSalaryMax = ref<number | null>(null)
 const desiredSalaryCurrency = ref('')
+const desiredSalaryNegotiable = ref(false)
 const desiredEmploymentType = ref('')
 const isOpenToWork = ref(false)
 const successMessage = ref<string | null>(null)
@@ -68,6 +69,7 @@ function populateForm(): void {
   desiredSalaryMin.value = p.desiredSalaryMin
   desiredSalaryMax.value = p.desiredSalaryMax
   desiredSalaryCurrency.value = p.desiredSalaryCurrency ?? ''
+  desiredSalaryNegotiable.value = p.desiredSalaryNegotiable ?? false
   desiredEmploymentType.value = p.desiredEmploymentType ?? ''
   isOpenToWork.value = p.isOpenToWork ?? false
 }
@@ -122,6 +124,7 @@ async function handleSave(): Promise<void> {
       desiredSalaryMin: desiredSalaryMin.value,
       desiredSalaryMax: desiredSalaryMax.value,
       desiredSalaryCurrency: desiredSalaryCurrency.value || undefined,
+      desiredSalaryNegotiable: desiredSalaryNegotiable.value,
       desiredEmploymentType: desiredEmploymentType.value || undefined,
       isOpenToWork: isOpenToWork.value,
     })
@@ -268,7 +271,14 @@ defineExpose({ save: handleSave })
         </div>
       </div>
 
-      <div class="grid grid-cols-1 gap-5 sm:grid-cols-3">
+      <div class="flex items-center gap-3">
+        <ToggleSwitch v-model="desiredSalaryNegotiable" />
+        <label class="text-sm font-medium text-gray-700">
+          {{ t('cvBuilder.personal.salaryNegotiable') }}
+        </label>
+      </div>
+
+      <div v-if="!desiredSalaryNegotiable" class="grid grid-cols-1 gap-5 sm:grid-cols-3">
         <div class="flex flex-col gap-1">
           <label for="salaryMin" class="text-sm font-medium text-gray-700">
             {{ t('cvBuilder.personal.salaryMin') }}

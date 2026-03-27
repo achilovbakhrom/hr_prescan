@@ -46,6 +46,8 @@ export const ROUTE_NAMES = {
 
   // CV Builder
   CV_BUILDER: 'cv-builder',
+  MY_CVS: 'my-cvs',
+  PUBLIC_CV: 'public-cv',
 
   // Employers
   EMPLOYER_LIST: 'employer-list',

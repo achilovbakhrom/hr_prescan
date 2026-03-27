@@ -85,6 +85,17 @@ function handleMenuToggle(): void {
       <RouterLink to="/" class="text-xl font-bold text-gray-900 hover:text-blue-600">
         PreScreen AI
       </RouterLink>
+      <!-- Browse Jobs link -->
+      <a
+        href="/jobs"
+        target="_blank"
+        rel="noopener"
+        class="ml-1 flex items-center gap-1.5 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 transition-colors hover:border-blue-200 hover:bg-blue-100 sm:ml-2"
+      >
+        <i class="pi pi-search text-[10px]"></i>
+        <span class="hidden sm:inline">{{ t('nav.browseJobs') }}</span>
+        <span class="sm:hidden">{{ t('nav.jobs') }}</span>
+      </a>
       <!-- Current company -->
       <span
         v-if="authStore.user?.company"

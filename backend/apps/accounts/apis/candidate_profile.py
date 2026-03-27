@@ -1,5 +1,6 @@
 from rest_framework import serializers, status
 from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -103,8 +104,10 @@ class CandidateProfileApi(APIView):
         desired_salary_min = serializers.DecimalField(max_digits=12, decimal_places=2)
         desired_salary_max = serializers.DecimalField(max_digits=12, decimal_places=2)
         desired_salary_currency = serializers.CharField()
+        desired_salary_negotiable = serializers.BooleanField()
         desired_employment_type = serializers.CharField()
         is_open_to_work = serializers.BooleanField()
+        share_token = serializers.CharField()
         photo = serializers.CharField()
         skills = serializers.SerializerMethodField()
         cvs = serializers.SerializerMethodField()
@@ -171,6 +174,7 @@ class CandidateProfileApi(APIView):
             max_digits=12, decimal_places=2, required=False, allow_null=True,
         )
         desired_salary_currency = serializers.CharField(max_length=3, required=False)
+        desired_salary_negotiable = serializers.BooleanField(required=False)
         desired_employment_type = serializers.ChoiceField(
             choices=CandidateProfile.EmploymentType.choices,
             required=False, allow_blank=True,
@@ -823,6 +827,16 @@ class CandidateCVListCreateApi(APIView):
         file = serializers.CharField()
         is_active = serializers.BooleanField()
         created_at = serializers.DateTimeField()
+        download_url = serializers.SerializerMethodField()
+
+        def get_download_url(self, obj):
+            if not obj.file:
+                return None
+            from apps.applications.services import generate_cv_download_url
+            try:
+                return generate_cv_download_url(cv_file_path=obj.file)
+            except Exception:
+                return None
 
     def get(self, request: Request) -> Response:
         profile = get_or_create_candidate_profile(user=request.user)
@@ -894,7 +908,7 @@ class CandidateCVDetailApi(APIView):
 
 
 class CandidateCVActivateApi(APIView):
-    """POST /api/candidate/profile/cvs/<id>/activate/ — activate this CV, deactivate others."""
+    """POST /api/candidate/profile/cvs/<id>/activate/ — toggle CV active state."""
 
     permission_classes = [IsCandidate]
 
@@ -905,8 +919,13 @@ class CandidateCVActivateApi(APIView):
         except CandidateCV.DoesNotExist:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        cv.activate()
-        return Response({"detail": "CV activated.", "id": str(cv.id)}, status=status.HTTP_200_OK)
+        if cv.is_active:
+            cv.is_active = False
+            cv.save(update_fields=["is_active", "updated_at"])
+            return Response({"detail": "CV deactivated.", "id": str(cv.id), "is_active": False})
+        else:
+            cv.activate()
+            return Response({"detail": "CV activated.", "id": str(cv.id), "is_active": True})
 
 
 # ---------------------------------------------------------------------------
@@ -1094,3 +1113,80 @@ class CvAiGenerateApi(APIView):
             CandidateProfileApi.OutputSerializer(profile).data,
             status=status.HTTP_201_CREATED,
         )
+
+
+# ---------------------------------------------------------------------------
+# Public CV View
+# ---------------------------------------------------------------------------
+
+
+class PublicCvViewApi(APIView):
+    """GET /api/cv/<share_token>/ — public CV view for anyone."""
+
+    permission_classes = [AllowAny]
+
+    class OutputSerializer(serializers.Serializer):
+        headline = serializers.CharField()
+        summary = serializers.CharField()
+        location = serializers.CharField()
+        linkedin_url = serializers.CharField()
+        github_url = serializers.CharField()
+        website_url = serializers.CharField()
+        is_open_to_work = serializers.BooleanField()
+        skills = serializers.SerializerMethodField()
+        work_experiences = serializers.SerializerMethodField()
+        educations = serializers.SerializerMethodField()
+        languages = serializers.SerializerMethodField()
+        certifications = serializers.SerializerMethodField()
+        first_name = serializers.SerializerMethodField()
+        last_name = serializers.SerializerMethodField()
+
+        def get_first_name(self, obj):
+            return obj.user.first_name
+
+        def get_last_name(self, obj):
+            return obj.user.last_name
+
+        def get_skills(self, obj):
+            return CandidateProfileApi.SkillOutputSerializer(obj.skills.all(), many=True).data
+
+        def get_work_experiences(self, obj):
+            return CandidateProfileApi.WorkExperienceOutputSerializer(
+                obj.work_experiences.all(), many=True,
+            ).data
+
+        def get_educations(self, obj):
+            return CandidateProfileApi.EducationOutputSerializer(
+                obj.educations.all(), many=True,
+            ).data
+
+        def get_languages(self, obj):
+            return CandidateProfileApi.LanguageOutputSerializer(
+                obj.languages.all(), many=True,
+            ).data
+
+        def get_certifications(self, obj):
+            return CandidateProfileApi.CertificationOutputSerializer(
+                obj.certifications.all(), many=True,
+            ).data
+
+    def get(self, request: Request, token: str) -> Response:
+        from rest_framework.permissions import AllowAny  # noqa: F811
+
+        try:
+            profile = (
+                CandidateProfile.objects
+                .select_related("user")
+                .prefetch_related(
+                    "skills",
+                    "work_experiences",
+                    "educations__education_level",
+                    "languages__language",
+                    "certifications",
+                )
+                .get(share_token=token, is_open_to_work=True)
+            )
+        except CandidateProfile.DoesNotExist:
+            return Response({"detail": "CV not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response(self.OutputSerializer(profile).data)

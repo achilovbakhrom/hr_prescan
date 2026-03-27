@@ -7,6 +7,7 @@ from django.http import JsonResponse
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 
+from apps.accounts.apis import PublicCvViewApi
 from apps.accounts.urls import candidate_profile_urlpatterns, hr_urlpatterns
 from apps.common.urls_admin import admin_urlpatterns
 from apps.subscriptions.urls import (
@@ -77,6 +78,7 @@ urlpatterns = [
     path("api/public/skills/", SkillListApi.as_view(), name="public-skills"),
     path("api/public/languages/", LanguageListApi.as_view(), name="public-languages"),
     path("api/public/education-levels/", EducationLevelListApi.as_view(), name="public-education-levels"),
+    path("api/cv/<str:token>/", PublicCvViewApi.as_view(), name="public-cv-view"),
     path("api/public/vacancies/", include((vacancy_public_urlpatterns, "public-vacancies"))),
     path("api/public/vacancies/", include((application_public_urlpatterns, "public-applications"))),
     path("api/public/", include((interview_public_urlpatterns, "public-interviews"))),

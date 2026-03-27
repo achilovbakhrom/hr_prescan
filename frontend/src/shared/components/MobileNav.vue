@@ -107,15 +107,9 @@ const navItems = computed<NavItem[]>(() => [
     roles: [USER_ROLES.CANDIDATE],
   },
   {
-    label: t('nav.browseJobs'),
-    icon: 'pi pi-search',
-    to: '/jobs',
-    roles: [USER_ROLES.CANDIDATE],
-  },
-  {
-    label: t('nav.cvBuilder'),
-    icon: 'pi pi-id-card',
-    to: '/cv-builder',
+    label: t('nav.myCvs'),
+    icon: 'pi pi-file-pdf',
+    to: '/my-cvs',
     roles: [USER_ROLES.CANDIDATE],
   },
 ])

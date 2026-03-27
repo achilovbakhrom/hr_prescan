@@ -46,9 +46,8 @@ const sections = computed<NavSection[]>(() => [
   {
     title: t('candidates.title'),
     items: [
-      { label: t('nav.browseJobs'), icon: 'pi pi-search', to: '/jobs', roles: [USER_ROLES.CANDIDATE] },
       { label: t('nav.myApplications'), icon: 'pi pi-file', to: '/my-applications', roles: [USER_ROLES.CANDIDATE] },
-      { label: t('nav.cvBuilder'), icon: 'pi pi-id-card', to: '/cv-builder', roles: [USER_ROLES.CANDIDATE] },
+      { label: t('nav.myCvs'), icon: 'pi pi-file-pdf', to: '/my-cvs', roles: [USER_ROLES.CANDIDATE] },
     ],
   },
   {

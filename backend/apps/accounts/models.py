@@ -165,16 +165,24 @@ class CandidateProfile(models.Model):
         max_digits=12, decimal_places=2, null=True, blank=True,
     )
     desired_salary_currency = models.CharField(max_length=3, default="USD")
+    desired_salary_negotiable = models.BooleanField(default=False)
     desired_employment_type = models.CharField(
         max_length=20, choices=EmploymentType.choices, blank=True, default="",
     )
     is_open_to_work = models.BooleanField(default=True)
+    share_token = models.CharField(max_length=64, unique=True, blank=True, default="")
 
     skills = models.ManyToManyField("common.Skill", blank=True, related_name="candidate_profiles")
     photo = models.CharField(max_length=500, blank=True, default="")  # MinIO path
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        if not self.share_token:
+            import secrets
+            self.share_token = secrets.token_urlsafe(24)
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return f"Profile: {self.user.email}"

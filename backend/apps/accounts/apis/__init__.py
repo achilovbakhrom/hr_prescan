@@ -35,6 +35,7 @@ from apps.accounts.apis.candidate_profile import (
     CvGeneratePdfApi,
     CvImproveSectionApi,
     CvParseApi,
+    PublicCvViewApi,
     EducationDetailApi,
     EducationListCreateApi,
     ProfileCompletenessApi,
@@ -80,4 +81,5 @@ __all__ = [
     "CvGeneratePdfApi",
     "CvImproveSectionApi",
     "CvParseApi",
+    "PublicCvViewApi",
 ]

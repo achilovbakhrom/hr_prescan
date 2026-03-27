@@ -64,8 +64,10 @@
     "signOut": "Sign Out",
     "forEmployers": "For Employers",
     "browseJobs": "Browse Jobs",
+    "jobs": "Jobs",
     "myApplications": "My Applications",
     "cvBuilder": "CV Builder",
+    "myCvs": "My CVs",
     "hrAnalytics": "Analytics"
   },
   "auth": {
@@ -1115,6 +1117,7 @@
       "linkedinUrl": "LinkedIn",
       "githubUrl": "GitHub",
       "websiteUrl": "Website",
+      "salaryNegotiable": "Salary is negotiable",
       "salaryMin": "Min Salary",
       "salaryMinPlaceholder": "Minimum",
       "salaryMax": "Max Salary",
@@ -1261,6 +1264,48 @@
           "description": "Clean design with lots of whitespace, monochrome"
         }
       }
+    }
+  },
+  "publicCv": {
+    "notFound": "CV not found",
+    "notFoundHint": "This CV may be private or the link is invalid.",
+    "summary": "About",
+    "experience": "Work Experience",
+    "education": "Education",
+    "skills": "Skills",
+    "languages": "Languages",
+    "certifications": "Certifications",
+    "present": "Present"
+  },
+  "myCvs": {
+    "title": "My CVs",
+    "goToBuilder": "CV Builder",
+    "empty": "No CVs yet",
+    "emptyHint": "Go to the CV Builder to create your first CV and generate a PDF.",
+    "active": "Active",
+    "activated": "CV activated successfully.",
+    "deleted": "CV deleted.",
+    "deleteConfirm": "Are you sure you want to delete \"{name}\"?",
+    "download": "Download",
+    "activate": "Set as active",
+    "inactive": "Inactive",
+    "deactivated": "CV deactivated.",
+    "view": "View CV",
+    "activeLabel": "Active CV",
+    "noActiveCv": "No active CV. Generate a PDF and activate it to make it visible to employers.",
+    "cvIsVisible": "Your CV is publicly visible",
+    "cvIsHidden": "Your CV is hidden from public view",
+    "cvVisible": "Your CV is now publicly visible.",
+    "cvHidden": "Your CV is now hidden.",
+    "loadError": "Failed to load CVs.",
+    "generatedPdfs": "Generated PDFs",
+    "profileCard": {
+      "noHeadline": "No headline set"
+    },
+    "templates": {
+      "classic": "Classic",
+      "modern": "Modern",
+      "minimal": "Minimal"
     }
   }
 }

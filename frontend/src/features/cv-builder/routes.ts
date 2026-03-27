@@ -9,4 +9,19 @@ export const cvBuilderRoutes: RouteRecordRaw[] = [
     component: () => import('./pages/CvBuilderPage.vue'),
     meta: { requiresAuth: true, roles: [USER_ROLES.CANDIDATE] },
   },
+  {
+    path: '/my-cvs',
+    name: ROUTE_NAMES.MY_CVS,
+    component: () => import('./pages/MyCvsPage.vue'),
+    meta: { requiresAuth: true, roles: [USER_ROLES.CANDIDATE] },
+  },
+]
+
+export const publicCvRoutes: RouteRecordRaw[] = [
+  {
+    path: '/cv/:token',
+    name: ROUTE_NAMES.PUBLIC_CV,
+    component: () => import('./pages/PublicCvPage.vue'),
+    meta: { requiresAuth: false },
+  },
 ]

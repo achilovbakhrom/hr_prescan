@@ -63,6 +63,7 @@ export interface CvFile {
   file: string
   isActive: boolean
   createdAt: string
+  downloadUrl: string | null
 }
 
 export interface CompletenessSection {
@@ -91,8 +92,10 @@ export interface CandidateProfile {
   desiredSalaryMin: number | null
   desiredSalaryMax: number | null
   desiredSalaryCurrency: string
+  desiredSalaryNegotiable: boolean
   desiredEmploymentType: string
   isOpenToWork: boolean
+  shareToken: string
   photo: string | null
   skills: SkillItem[]
   workExperiences: WorkExperience[]
@@ -114,6 +117,7 @@ export interface ProfileUpdatePayload {
   desiredSalaryMin?: number | null
   desiredSalaryMax?: number | null
   desiredSalaryCurrency?: string
+  desiredSalaryNegotiable?: boolean
   desiredEmploymentType?: string
   isOpenToWork?: boolean
 }
@@ -160,6 +164,23 @@ export interface CvChatMessage {
 export interface CvChatResponse {
   status: 'continue' | 'ready'
   message: string
+}
+
+export interface PublicCvProfile {
+  firstName: string
+  lastName: string
+  headline: string
+  summary: string
+  location: string
+  linkedinUrl: string
+  githubUrl: string
+  websiteUrl: string
+  isOpenToWork: boolean
+  skills: SkillItem[]
+  workExperiences: WorkExperience[]
+  educations: Education[]
+  languages: LanguageEntry[]
+  certifications: Certification[]
 }
 
 export interface CvGenerateResult {

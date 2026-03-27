@@ -64,8 +64,10 @@
     "signOut": "Выйти",
     "forEmployers": "Работодателям",
     "browseJobs": "Поиск вакансий",
+    "jobs": "Вакансии",
     "myApplications": "Мои заявки",
     "cvBuilder": "Конструктор CV",
+    "myCvs": "Мои CV",
     "hrAnalytics": "Аналитика"
   },
   "auth": {
@@ -1115,6 +1117,7 @@
       "linkedinUrl": "LinkedIn",
       "githubUrl": "GitHub",
       "websiteUrl": "Сайт",
+      "salaryNegotiable": "Зарплата договорная",
       "salaryMin": "Мин. зарплата",
       "salaryMinPlaceholder": "Минимум",
       "salaryMax": "Макс. зарплата",
@@ -1261,6 +1264,48 @@
           "description": "Чистый дизайн с большим количеством пространства"
         }
       }
+    }
+  },
+  "publicCv": {
+    "notFound": "CV не найдено",
+    "notFoundHint": "Это CV может быть скрыто или ссылка недействительна.",
+    "summary": "О себе",
+    "experience": "Опыт работы",
+    "education": "Образование",
+    "skills": "Навыки",
+    "languages": "Языки",
+    "certifications": "Сертификаты",
+    "present": "По настоящее время"
+  },
+  "myCvs": {
+    "title": "Мои CV",
+    "goToBuilder": "Конструктор CV",
+    "empty": "CV пока нет",
+    "emptyHint": "Перейдите в конструктор CV, чтобы создать первое CV и сгенерировать PDF.",
+    "active": "Активное",
+    "activated": "CV успешно активировано.",
+    "deleted": "CV удалено.",
+    "deleteConfirm": "Вы уверены, что хотите удалить \"{name}\"?",
+    "download": "Скачать",
+    "activate": "Сделать активным",
+    "inactive": "Неактивное",
+    "deactivated": "CV деактивировано.",
+    "view": "Просмотреть CV",
+    "activeLabel": "Активное CV",
+    "noActiveCv": "Нет активного CV. Сгенерируйте PDF и активируйте его, чтобы работодатели могли его видеть.",
+    "cvIsVisible": "Ваше CV доступно публично",
+    "cvIsHidden": "Ваше CV скрыто от публичного просмотра",
+    "cvVisible": "Ваше CV теперь доступно публично.",
+    "cvHidden": "Ваше CV теперь скрыто.",
+    "loadError": "Не удалось загрузить CV.",
+    "generatedPdfs": "Сгенерированные PDF",
+    "profileCard": {
+      "noHeadline": "Заголовок не указан"
+    },
+    "templates": {
+      "classic": "Классический",
+      "modern": "Современный",
+      "minimal": "Минимальный"
     }
   }
 }

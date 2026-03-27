@@ -11,7 +11,9 @@ import type {
   CertificationPayload,
   ProfileUpdatePayload,
   Completeness,
+  CvFile,
   CvGenerateResult,
+  PublicCvProfile,
   CvChatMessage,
   CvChatResponse,
 } from '../types/cv-builder.types'
@@ -96,6 +98,32 @@ export const cvBuilderService = {
 
   async deleteCertification(id: string): Promise<void> {
     await apiClient.delete(`${BASE}/certifications/${id}`)
+  },
+
+  // Public CV view
+  async getPublicCv(token: string): Promise<PublicCvProfile> {
+    const { data } = await apiClient.get<PublicCvProfile>(`/cv/${token}`)
+    return data
+  },
+
+  // CV Management
+  async listCvs(): Promise<CvFile[]> {
+    const { data } = await apiClient.get<CvFile[]>(`${BASE}/cvs`)
+    return data
+  },
+
+  async toggleCvActive(id: string): Promise<{ isActive: boolean }> {
+    const { data } = await apiClient.post<{ isActive: boolean }>(`${BASE}/cvs/${id}/activate`)
+    return data
+  },
+
+  async deleteCv(id: string): Promise<void> {
+    await apiClient.delete(`${BASE}/cvs/${id}`)
+  },
+
+  async renameCv(id: string, name: string): Promise<CvFile> {
+    const { data } = await apiClient.patch<CvFile>(`${BASE}/cvs/${id}`, { name })
+    return data
   },
 
   // CV PDF Generation
