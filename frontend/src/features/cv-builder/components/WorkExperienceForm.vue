@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
@@ -9,6 +9,8 @@ import Checkbox from 'primevue/checkbox'
 import Button from 'primevue/button'
 import Message from 'primevue/message'
 import { useCvBuilderStore } from '../stores/cv-builder.store'
+import { ApiValidationError } from '@/shared/api/errors'
+import type { FieldErrors } from '@/shared/api/errors'
 import type { WorkExperience, WorkExperiencePayload } from '../types/cv-builder.types'
 
 const { t } = useI18n()
@@ -18,6 +20,7 @@ const showForm = ref(false)
 const editingId = ref<string | null>(null)
 const successMessage = ref<string | null>(null)
 const errorMessage = ref<string | null>(null)
+const fieldErrors = ref<FieldErrors>({})
 
 const companyName = ref('')
 const position = ref('')
@@ -37,6 +40,14 @@ const employmentTypeOptions = [
 ]
 
 const experiences = computed(() => store.profile?.workExperiences ?? [])
+
+function hasError(field: string): boolean {
+  return field in fieldErrors.value
+}
+
+function fieldError(field: string): string {
+  return fieldErrors.value[field] ?? ''
+}
 
 function formatDate(date: Date | null): string {
   if (!date) return ''
@@ -67,6 +78,7 @@ function resetForm(): void {
   isCurrent.value = false
   description.value = ''
   editingId.value = null
+  fieldErrors.value = {}
 }
 
 function openAddForm(): void {
@@ -84,6 +96,7 @@ function openEditForm(exp: WorkExperience): void {
   isCurrent.value = exp.isCurrent
   description.value = exp.description
   editingId.value = exp.id
+  fieldErrors.value = {}
   showForm.value = true
 }
 
@@ -118,9 +131,18 @@ async function handleImproveDescription(): Promise<void> {
   }
 }
 
+async function scrollToFirstError(): Promise<void> {
+  await nextTick()
+  const firstInvalid = document.querySelector('.p-invalid, [data-field-error="true"]')
+  if (firstInvalid) {
+    firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
+}
+
 async function handleSave(): Promise<void> {
   successMessage.value = null
   errorMessage.value = null
+  fieldErrors.value = {}
 
   try {
     if (editingId.value) {
@@ -133,7 +155,13 @@ async function handleSave(): Promise<void> {
     showForm.value = false
     resetForm()
   } catch (err: unknown) {
-    errorMessage.value = err instanceof Error ? err.message : t('common.error')
+    if (err instanceof ApiValidationError) {
+      fieldErrors.value = err.fieldErrors
+      errorMessage.value = err.message
+    } else {
+      errorMessage.value = err instanceof Error ? err.message : t('common.error')
+    }
+    scrollToFirstError()
   }
 }
 
@@ -233,16 +261,18 @@ async function handleDelete(id: string): Promise<void> {
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div class="flex flex-col gap-1">
           <label for="expCompany" class="text-sm font-medium text-gray-700">
-            {{ t('cvBuilder.experience.companyName') }}
+            {{ t('cvBuilder.experience.companyName') }} <span class="text-red-500">*</span>
           </label>
-          <InputText id="expCompany" v-model="companyName" class="w-full" />
+          <InputText id="expCompany" v-model="companyName" class="w-full" :invalid="hasError('companyName')" />
+          <small v-if="hasError('companyName')" class="text-red-500">{{ fieldError('companyName') }}</small>
         </div>
 
         <div class="flex flex-col gap-1">
           <label for="expPosition" class="text-sm font-medium text-gray-700">
-            {{ t('cvBuilder.experience.position') }}
+            {{ t('cvBuilder.experience.position') }} <span class="text-red-500">*</span>
           </label>
-          <InputText id="expPosition" v-model="position" class="w-full" />
+          <InputText id="expPosition" v-model="position" class="w-full" :invalid="hasError('position')" />
+          <small v-if="hasError('position')" class="text-red-500">{{ fieldError('position') }}</small>
         </div>
       </div>
 
@@ -259,21 +289,24 @@ async function handleDelete(id: string): Promise<void> {
             optionValue="value"
             :placeholder="t('cvBuilder.experience.employmentTypePlaceholder')"
             class="w-full"
+            :invalid="hasError('employmentType')"
           />
+          <small v-if="hasError('employmentType')" class="text-red-500">{{ fieldError('employmentType') }}</small>
         </div>
 
         <div class="flex flex-col gap-1">
           <label for="expLocation" class="text-sm font-medium text-gray-700">
             {{ t('cvBuilder.experience.location') }}
           </label>
-          <InputText id="expLocation" v-model="location" class="w-full" />
+          <InputText id="expLocation" v-model="location" class="w-full" :invalid="hasError('location')" />
+          <small v-if="hasError('location')" class="text-red-500">{{ fieldError('location') }}</small>
         </div>
       </div>
 
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div class="flex flex-col gap-1">
           <label for="expStartDate" class="text-sm font-medium text-gray-700">
-            {{ t('cvBuilder.experience.startDate') }}
+            {{ t('cvBuilder.experience.startDate') }} <span class="text-red-500">*</span>
           </label>
           <DatePicker
             id="expStartDate"
@@ -281,7 +314,9 @@ async function handleDelete(id: string): Promise<void> {
             dateFormat="yy-mm-dd"
             showIcon
             class="w-full"
+            :invalid="hasError('startDate')"
           />
+          <small v-if="hasError('startDate')" class="text-red-500">{{ fieldError('startDate') }}</small>
         </div>
 
         <div class="flex flex-col gap-1">
@@ -295,7 +330,9 @@ async function handleDelete(id: string): Promise<void> {
             showIcon
             :disabled="isCurrent"
             class="w-full"
+            :invalid="hasError('endDate')"
           />
+          <small v-if="hasError('endDate')" class="text-red-500">{{ fieldError('endDate') }}</small>
         </div>
       </div>
 
@@ -322,7 +359,8 @@ async function handleDelete(id: string): Promise<void> {
             @click="handleImproveDescription"
           />
         </div>
-        <Textarea id="expDescription" v-model="description" rows="3" class="w-full" />
+        <Textarea id="expDescription" v-model="description" rows="3" class="w-full" :invalid="hasError('description')" />
+        <small v-if="hasError('description')" class="text-red-500">{{ fieldError('description') }}</small>
       </div>
 
       <div class="flex justify-end gap-2">

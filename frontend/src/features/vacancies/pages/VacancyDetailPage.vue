@@ -129,7 +129,7 @@ async function handleUpdate(data: CreateVacancyRequest): Promise<void> {
       </div>
     </div>
 
-    <p v-if="vacancyStore.error" class="text-sm text-red-600">
+    <p v-if="vacancyStore.error && Object.keys(vacancyStore.fieldErrors).length === 0" class="text-sm text-red-600">
       {{ vacancyStore.error }}
     </p>
 
@@ -194,6 +194,8 @@ async function handleUpdate(data: CreateVacancyRequest): Promise<void> {
             <VacancyForm
               :initial-data="editFormData"
               :loading="vacancyStore.loading"
+              :field-errors="vacancyStore.fieldErrors"
+              :error-message="vacancyStore.error"
               @save="handleUpdate"
             />
           </div>

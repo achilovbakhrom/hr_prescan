@@ -10,16 +10,16 @@ logger = logging.getLogger(__name__)
 TELEGRAM_API = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}"
 
 
-def send_message(*, chat_id, text, parse_mode="Markdown"):
+def send_message(*, chat_id, text, parse_mode="Markdown", reply_markup=None):
     """Send a message to a Telegram chat."""
-    requests.post(
-        f"{TELEGRAM_API}/sendMessage",
-        json={
-            "chat_id": chat_id,
-            "text": text,
-            "parse_mode": parse_mode,
-        },
-    )
+    payload = {
+        "chat_id": chat_id,
+        "text": text,
+        "parse_mode": parse_mode,
+    }
+    if reply_markup:
+        payload["reply_markup"] = reply_markup
+    requests.post(f"{TELEGRAM_API}/sendMessage", json=payload)
 
 
 def handle_update(update_data):
@@ -232,9 +232,16 @@ def _handle_login_code(*, chat_id, telegram_id, telegram_username, first_name, l
         send_message(chat_id=chat_id, text="Something went wrong. Please try again.")
         return
 
+    frontend_url = settings.FRONTEND_URL.rstrip("/")
     send_message(
         chat_id=chat_id,
-        text=f"You're now signed in as {user.first_name or user.email}. You can return to the website.",
+        text=f"You're now signed in as {user.first_name or user.email}. Tap the button below to continue.",
+        reply_markup={
+            "inline_keyboard": [[{
+                "text": "Open Website",
+                "url": frontend_url,
+            }]],
+        },
     )
 
 

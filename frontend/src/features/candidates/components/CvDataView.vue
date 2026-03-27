@@ -173,10 +173,10 @@ function contactHref(label: string, value: string): string | undefined {
     <!-- Summary -->
     <div v-if="summary">
       <h3 class="mb-2 text-sm font-semibold text-gray-600">{{ t('candidates.cvData.summary') }}</h3>
-      <p class="rounded-lg border border-gray-100 bg-gray-50 p-3 text-sm text-gray-700">
-        {{ summary }}
+      <div class="rounded-lg border border-gray-100 bg-gray-50 p-3 text-sm text-gray-700">
+        <div class="prose prose-sm max-w-none" v-html="summary"></div>
         <span v-if="experienceYears" class="ml-1 text-gray-400">({{ experienceYears }}+ {{ t('candidates.cvData.years') }})</span>
-      </p>
+      </div>
     </div>
 
     <!-- Contacts -->

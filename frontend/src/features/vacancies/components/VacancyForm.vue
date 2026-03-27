@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
+import Editor from 'primevue/editor'
 import Dropdown from 'primevue/dropdown'
 import InputNumber from 'primevue/inputnumber'
 import Calendar from 'primevue/calendar'
@@ -14,8 +15,11 @@ import TabPanel from 'primevue/tabpanel'
 import FileUpload from 'primevue/fileupload'
 import Dialog from 'primevue/dialog'
 import SelectButton from 'primevue/selectbutton'
+import Message from 'primevue/message'
 import { getEmploymentOptions, getExperienceOptions, CURRENCY_OPTIONS, getVisibilityOptions, getInterviewModeOptions } from '../constants/formOptions'
 import { extractErrorMessage } from '@/shared/api/errors'
+import { ApiValidationError } from '@/shared/api/errors'
+import type { FieldErrors } from '@/shared/api/errors'
 import { employerService } from '@/features/employers/services/employer.service'
 import type { EmployerCompany } from '@/features/employers/types/employer.types'
 import type { CreateVacancyRequest, EmploymentType, ExperienceLevel, InterviewMode, VacancyVisibility } from '../types/vacancy.types'
@@ -27,7 +31,12 @@ const experienceOptions = computed(() => getExperienceOptions(t))
 const visibilityOptions = computed(() => getVisibilityOptions(t))
 const interviewModeOptions = computed(() => getInterviewModeOptions(t))
 
-const props = defineProps<{ initialData?: Partial<CreateVacancyRequest>; loading?: boolean }>()
+const props = defineProps<{
+  initialData?: Partial<CreateVacancyRequest>
+  loading?: boolean
+  fieldErrors?: FieldErrors
+  errorMessage?: string | null
+}>()
 const emit = defineEmits<{ save: [data: CreateVacancyRequest] }>()
 
 const activeTab = ref(0)
@@ -60,6 +69,44 @@ const loadingEmployers = ref(false)
 const selectedEmployer = computed(() =>
   employersList.value.find((e) => e.id === employerId.value) ?? null,
 )
+
+// Field error helpers
+const errors = computed<FieldErrors>(() => props.fieldErrors ?? {})
+
+function hasError(field: string): boolean {
+  return field in errors.value
+}
+
+function fieldError(field: string): string {
+  return errors.value[field] ?? ''
+}
+
+// Map fields to tab indices for auto-switch
+const FIELD_TAB_MAP: Record<string, number> = {
+  title: 0, description: 0, requirements: 0, responsibilities: 0,
+  skills: 0, salaryMin: 0, salaryMax: 0, salaryCurrency: 0,
+  location: 0, isRemote: 0, employmentType: 0, experienceLevel: 0, deadline: 0,
+  employerId: 1, companyInfo: 1,
+  prescanningPrompt: 2,
+  interviewEnabled: 3, interviewMode: 3, interviewDuration: 3, interviewPrompt: 3,
+  visibility: 4, cvRequired: 4,
+}
+
+// When field errors change, switch to the tab containing the first error
+watch(errors, (errs) => {
+  if (!errs || Object.keys(errs).length === 0) return
+  const firstField = Object.keys(errs)[0]
+  const tabIndex = FIELD_TAB_MAP[firstField]
+  if (tabIndex !== undefined) {
+    activeTab.value = tabIndex
+  }
+  nextTick(() => {
+    const firstInvalid = document.querySelector('.p-invalid, [data-field-error="true"]')
+    if (firstInvalid) {
+      firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  })
+})
 
 onMounted(async () => {
   loadingEmployers.value = true
@@ -197,6 +244,10 @@ function handleSave(): void {
 
 <template>
   <form @submit.prevent="handleSave">
+    <Message v-if="errorMessage" severity="error" class="mb-4">
+      {{ errorMessage }}
+    </Message>
+
     <TabView v-model:activeIndex="activeTab">
       <!-- Tab 1: Basic Info (job details + location + salary) -->
       <TabPanel value="0" :header="t('vacancies.form.basicInfo')">
@@ -204,29 +255,39 @@ function handleSave(): void {
 
           <div>
             <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.title') }} <span class="text-red-500">*</span></label>
-            <InputText v-model="title" class="w-full" :placeholder="t('vacancies.form.titlePlaceholder')" />
+            <InputText v-model="title" class="w-full" :placeholder="t('vacancies.form.titlePlaceholder')" :invalid="hasError('title')" />
+            <small v-if="hasError('title')" class="text-red-500">{{ fieldError('title') }}</small>
           </div>
           <div>
             <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.description') }} <span class="text-red-500">*</span></label>
-            <Textarea v-model="description" class="w-full" rows="5" :placeholder="t('vacancies.form.descriptionPlaceholder')" />
+            <Editor
+              v-model="description"
+              editorStyle="height: 200px"
+              :class="{ 'border border-red-500 rounded-md': hasError('description') }"
+            />
+            <small v-if="hasError('description')" class="text-red-500">{{ fieldError('description') }}</small>
           </div>
           <div>
             <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.requirements') }}</label>
-            <Textarea v-model="requirements" class="w-full" rows="3" :placeholder="t('vacancies.form.requirementsPlaceholder')" />
+            <Textarea v-model="requirements" class="w-full" rows="3" :placeholder="t('vacancies.form.requirementsPlaceholder')" :invalid="hasError('requirements')" />
+            <small v-if="hasError('requirements')" class="text-red-500">{{ fieldError('requirements') }}</small>
           </div>
           <div>
             <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.responsibilities') }}</label>
-            <Textarea v-model="responsibilities" class="w-full" rows="3" :placeholder="t('vacancies.form.responsibilitiesPlaceholder')" />
+            <Textarea v-model="responsibilities" class="w-full" rows="3" :placeholder="t('vacancies.form.responsibilitiesPlaceholder')" :invalid="hasError('responsibilities')" />
+            <small v-if="hasError('responsibilities')" class="text-red-500">{{ fieldError('responsibilities') }}</small>
           </div>
           <div>
             <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.skills') }}</label>
             <Chips v-model="skills" class="w-full" :placeholder="t('vacancies.form.skillsPlaceholder')" />
+            <small v-if="hasError('skills')" class="text-red-500">{{ fieldError('skills') }}</small>
           </div>
 
           <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.location') }}</label>
-              <InputText v-model="location" class="w-full" :placeholder="t('vacancies.form.locationPlaceholder')" />
+              <InputText v-model="location" class="w-full" :placeholder="t('vacancies.form.locationPlaceholder')" :invalid="hasError('location')" />
+              <small v-if="hasError('location')" class="text-red-500">{{ fieldError('location') }}</small>
             </div>
             <div class="flex items-end gap-3 pb-1">
               <label class="text-sm font-medium">{{ t('vacancies.form.remote') }}</label>
@@ -236,27 +297,32 @@ function handleSave(): void {
           <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.employmentType') }}</label>
-              <Dropdown v-model="employmentType" :options="employmentOptions" option-label="label" option-value="value" class="w-full" />
+              <Dropdown v-model="employmentType" :options="employmentOptions" option-label="label" option-value="value" class="w-full" :invalid="hasError('employmentType')" />
+              <small v-if="hasError('employmentType')" class="text-red-500">{{ fieldError('employmentType') }}</small>
             </div>
             <div>
               <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.experienceLevel') }}</label>
-              <Dropdown v-model="experienceLevel" :options="experienceOptions" option-label="label" option-value="value" class="w-full" />
+              <Dropdown v-model="experienceLevel" :options="experienceOptions" option-label="label" option-value="value" class="w-full" :invalid="hasError('experienceLevel')" />
+              <small v-if="hasError('experienceLevel')" class="text-red-500">{{ fieldError('experienceLevel') }}</small>
             </div>
           </div>
           <div>
             <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.deadline') }}</label>
-            <Calendar v-model="deadline" class="w-full md:w-1/2" date-format="yy-mm-dd" :show-icon="true" />
+            <Calendar v-model="deadline" class="w-full md:w-1/2" date-format="yy-mm-dd" :show-icon="true" :invalid="hasError('deadline')" />
+            <small v-if="hasError('deadline')" class="text-red-500">{{ fieldError('deadline') }}</small>
           </div>
 
           <h4 class="pt-2 text-sm font-semibold text-gray-700">{{ t('vacancies.form.compensation') }}</h4>
           <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div>
               <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.salaryMin') }}</label>
-              <InputNumber v-model="salaryMin" class="w-full" />
+              <InputNumber v-model="salaryMin" class="w-full" :invalid="hasError('salaryMin')" />
+              <small v-if="hasError('salaryMin')" class="text-red-500">{{ fieldError('salaryMin') }}</small>
             </div>
             <div>
               <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.salaryMax') }}</label>
-              <InputNumber v-model="salaryMax" class="w-full" />
+              <InputNumber v-model="salaryMax" class="w-full" :invalid="hasError('salaryMax')" />
+              <small v-if="hasError('salaryMax')" class="text-red-500">{{ fieldError('salaryMax') }}</small>
             </div>
             <div>
               <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.currency') }}</label>
@@ -341,7 +407,8 @@ function handleSave(): void {
           <div>
             <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.prescanningPrompt') }} ({{ t('common.optional') }})</label>
             <p class="mb-2 text-xs text-gray-400">{{ t('vacancies.form.prescanningPromptHint') }}</p>
-            <Textarea v-model="prescanningPrompt" class="w-full" rows="5" :placeholder="t('vacancies.form.prescanningPromptPlaceholder')" />
+            <Textarea v-model="prescanningPrompt" class="w-full" rows="5" :placeholder="t('vacancies.form.prescanningPromptPlaceholder')" :invalid="hasError('prescanningPrompt')" />
+            <small v-if="hasError('prescanningPrompt')" class="text-red-500">{{ fieldError('prescanningPrompt') }}</small>
           </div>
 
         </div>
@@ -367,17 +434,20 @@ function handleSave(): void {
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
                 <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.interviewMode') }}</label>
-                <Dropdown v-model="interviewMode" :options="interviewModeOptions" option-label="label" option-value="value" class="w-full" />
+                <Dropdown v-model="interviewMode" :options="interviewModeOptions" option-label="label" option-value="value" class="w-full" :invalid="hasError('interviewMode')" />
+                <small v-if="hasError('interviewMode')" class="text-red-500">{{ fieldError('interviewMode') }}</small>
               </div>
               <div v-if="interviewMode === 'meet'">
                 <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.interviewDuration') }}</label>
-                <InputNumber v-model="interviewDuration" class="w-full" :min="10" :max="120" :step="5" />
+                <InputNumber v-model="interviewDuration" class="w-full" :min="10" :max="120" :step="5" :invalid="hasError('interviewDuration')" />
+                <small v-if="hasError('interviewDuration')" class="text-red-500">{{ fieldError('interviewDuration') }}</small>
               </div>
             </div>
             <div>
               <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.interviewPrompt') }} ({{ t('common.optional') }})</label>
               <p class="mb-2 text-xs text-gray-400">{{ t('vacancies.form.interviewPromptHint') }}</p>
-              <Textarea v-model="interviewPrompt" class="w-full" rows="5" :placeholder="t('vacancies.form.interviewPromptPlaceholder')" />
+              <Textarea v-model="interviewPrompt" class="w-full" rows="5" :placeholder="t('vacancies.form.interviewPromptPlaceholder')" :invalid="hasError('interviewPrompt')" />
+              <small v-if="hasError('interviewPrompt')" class="text-red-500">{{ fieldError('interviewPrompt') }}</small>
             </div>
           </div>
 
@@ -390,7 +460,8 @@ function handleSave(): void {
           <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.visibility') }}</label>
-              <Dropdown v-model="visibility" :options="visibilityOptions" option-label="label" option-value="value" class="w-full" />
+              <Dropdown v-model="visibility" :options="visibilityOptions" option-label="label" option-value="value" class="w-full" :invalid="hasError('visibility')" />
+              <small v-if="hasError('visibility')" class="text-red-500">{{ fieldError('visibility') }}</small>
               <p class="mt-1 text-xs text-gray-400">{{ t('vacancies.form.visibilityPublicHint') }}</p>
             </div>
             <div class="flex items-start gap-3 pt-6">

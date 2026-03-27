@@ -236,7 +236,7 @@
     <!-- Summary -->
     {% if profile.summary %}
     <h2>Profile</h2>
-    <p class="summary-text">{{ profile.summary }}</p>
+    <div class="summary-text">{{ profile.summary|safe }}</div>
     {% endif %}
 
     <!-- Experience -->

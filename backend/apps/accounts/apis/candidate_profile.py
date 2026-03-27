@@ -6,6 +6,8 @@ from rest_framework.views import APIView
 
 from apps.accounts.cv_services import (
     calculate_profile_completeness,
+    cv_chat_generate,
+    cv_chat_next_message,
     generate_cv_pdf,
     get_or_create_candidate_profile,
     improve_cv_section,
@@ -1019,3 +1021,68 @@ class CvImproveSectionApi(APIView):
 
         improved = improve_cv_section(**serializer.validated_data)
         return Response({"improved": improved}, status=status.HTTP_200_OK)
+
+
+# ---------------------------------------------------------------------------
+# CV AI Chat — conversational CV generation
+# ---------------------------------------------------------------------------
+
+
+class _MessageSerializer(serializers.Serializer):
+    role = serializers.ChoiceField(choices=["user", "assistant"])
+    content = serializers.CharField()
+
+
+class CvAiChatApi(APIView):
+    """POST /api/candidate/profile/cv/ai-chat/ — conversational CV builder.
+
+    Send messages array. AI returns next question or status=ready when done.
+    """
+
+    permission_classes = [IsCandidate]
+
+    class InputSerializer(serializers.Serializer):
+        messages = _MessageSerializer(many=True)
+
+    def post(self, request: Request) -> Response:
+        serializer = self.InputSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        result = cv_chat_next_message(messages=serializer.validated_data["messages"])
+        return Response(result, status=status.HTTP_200_OK)
+
+
+class CvAiGenerateApi(APIView):
+    """POST /api/candidate/profile/cv/ai-generate/ — generate CV from chat conversation."""
+
+    permission_classes = [IsCandidate]
+
+    class InputSerializer(serializers.Serializer):
+        messages = _MessageSerializer(many=True)
+
+    def post(self, request: Request) -> Response:
+        serializer = self.InputSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        profile = cv_chat_generate(
+            user=request.user,
+            messages=serializer.validated_data["messages"],
+        )
+
+        profile = (
+            CandidateProfile.objects
+            .select_related("user")
+            .prefetch_related(
+                "skills",
+                "work_experiences",
+                "educations__education_level",
+                "languages__language",
+                "certifications",
+                "cvs",
+            )
+            .get(pk=profile.pk)
+        )
+        return Response(
+            CandidateProfileApi.OutputSerializer(profile).data,
+            status=status.HTTP_201_CREATED,
+        )

@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Tabs from 'primevue/tabs'
 import TabList from 'primevue/tablist'
 import Tab from 'primevue/tab'
 import TabPanels from 'primevue/tabpanels'
 import TabPanel from 'primevue/tabpanel'
+import Button from 'primevue/button'
+import Message from 'primevue/message'
 import ProfileCompleteness from '../components/ProfileCompleteness.vue'
 import PersonalInfoForm from '../components/PersonalInfoForm.vue'
 import WorkExperienceForm from '../components/WorkExperienceForm.vue'
@@ -15,21 +17,49 @@ import LanguagesForm from '../components/LanguagesForm.vue'
 import CertificationsForm from '../components/CertificationsForm.vue'
 import CvUploadParser from '../components/CvUploadParser.vue'
 import CvTemplateSelector from '../components/CvTemplateSelector.vue'
+import AiCvGenerator from '../components/AiCvGenerator.vue'
 import { useCvBuilderStore } from '../stores/cv-builder.store'
 
 const { t } = useI18n()
 const store = useCvBuilderStore()
+const activeTab = ref('0')
+const personalFormRef = ref<InstanceType<typeof PersonalInfoForm> | null>(null)
 
 onMounted(async () => {
   await store.fetchProfile()
 })
+
+function switchToTab(tab: string): void {
+  activeTab.value = tab
+}
+
+function handleSave(): void {
+  if (activeTab.value === '0' && personalFormRef.value) {
+    personalFormRef.value.save()
+  }
+}
 </script>
 
 <template>
   <div class="mx-auto max-w-4xl">
-    <h1 class="mb-6 text-2xl font-bold text-gray-900">
-      {{ t('cvBuilder.title') }}
-    </h1>
+    <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <h1 class="text-2xl font-bold text-gray-900">
+        {{ t('cvBuilder.title') }}
+      </h1>
+      <div v-if="store.profile" class="flex flex-wrap items-center gap-2">
+        <CvUploadParser />
+        <AiCvGenerator />
+        <span class="hidden h-6 w-px bg-gray-200 sm:inline-block"></span>
+        <CvTemplateSelector />
+        <Button
+          :label="t('common.save')"
+          icon="pi pi-check"
+          size="small"
+          :loading="store.saving"
+          @click="handleSave"
+        />
+      </div>
+    </div>
 
     <div
       v-if="store.loading && !store.profile"
@@ -39,16 +69,18 @@ onMounted(async () => {
     </div>
 
     <template v-else-if="store.profile">
-      <!-- CV Upload Parser -->
-      <CvUploadParser class="mb-6" />
-
       <ProfileCompleteness
         :completeness="store.profile.completeness"
         class="mb-6"
       />
 
+      <!-- Global store error (non-field) -->
+      <Message v-if="store.error && Object.keys(store.fieldErrors).length === 0" severity="error" class="mb-4">
+        {{ store.error }}
+      </Message>
+
       <div class="rounded-lg bg-white shadow-sm">
-        <Tabs value="0">
+        <Tabs :value="activeTab" @update:value="(v: string | number) => activeTab = String(v)">
           <TabList>
             <Tab value="0">
               <span class="hidden sm:inline">{{ t('cvBuilder.tabs.personal') }}</span>
@@ -78,7 +110,7 @@ onMounted(async () => {
           <TabPanels>
             <TabPanel value="0">
               <div class="p-4 sm:p-6">
-                <PersonalInfoForm />
+                <PersonalInfoForm ref="personalFormRef" @switch-tab="switchToTab" />
               </div>
             </TabPanel>
             <TabPanel value="1">
@@ -109,9 +141,6 @@ onMounted(async () => {
           </TabPanels>
         </Tabs>
       </div>
-
-      <!-- CV Template Selector / PDF Generation -->
-      <CvTemplateSelector class="mt-6" />
     </template>
 
     <div v-else-if="store.error" class="py-12 text-center text-red-500">

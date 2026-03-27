@@ -149,6 +149,11 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 20,
     "EXCEPTION_HANDLER": "rest_framework.views.exception_handler",
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_THROTTLE_RATES": {
+        "auth": "10/minute",
+        "ai_scoring": "20/hour",
+        "file_upload": "30/hour",
+    },
 }
 
 # drf-spectacular — OpenAPI / Swagger
@@ -286,3 +291,6 @@ TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_BOT_USERNAME = os.environ.get("TELEGRAM_BOT_USERNAME", "")
 TELEGRAM_WEBHOOK_SECRET = os.environ.get("TELEGRAM_WEBHOOK_SECRET", "")
 TELEGRAM_WEBHOOK_URL = os.environ.get("TELEGRAM_WEBHOOK_URL", "")
+
+# Frontend URL (for Telegram bot "Open website" button, etc.)
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:5173")

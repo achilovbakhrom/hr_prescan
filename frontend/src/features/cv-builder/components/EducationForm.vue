@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
@@ -8,6 +8,8 @@ import Button from 'primevue/button'
 import Message from 'primevue/message'
 import EducationLevelSelect from '@/shared/components/EducationLevelSelect.vue'
 import { useCvBuilderStore } from '../stores/cv-builder.store'
+import { ApiValidationError } from '@/shared/api/errors'
+import type { FieldErrors } from '@/shared/api/errors'
 import type { Education, EducationPayload } from '../types/cv-builder.types'
 
 const { t } = useI18n()
@@ -17,6 +19,7 @@ const showForm = ref(false)
 const editingId = ref<string | null>(null)
 const successMessage = ref<string | null>(null)
 const errorMessage = ref<string | null>(null)
+const fieldErrors = ref<FieldErrors>({})
 
 const institution = ref('')
 const degree = ref('')
@@ -27,6 +30,14 @@ const endDate = ref<Date | null>(null)
 const description = ref('')
 
 const educations = computed(() => store.profile?.educations ?? [])
+
+function hasError(field: string): boolean {
+  return field in fieldErrors.value
+}
+
+function fieldError(field: string): string {
+  return fieldErrors.value[field] ?? ''
+}
 
 function formatDate(date: Date | null): string {
   if (!date) return ''
@@ -51,6 +62,7 @@ function resetForm(): void {
   endDate.value = null
   description.value = ''
   editingId.value = null
+  fieldErrors.value = {}
 }
 
 function openAddForm(): void {
@@ -67,6 +79,7 @@ function openEditForm(edu: Education): void {
   endDate.value = edu.endDate ? new Date(edu.endDate) : null
   description.value = edu.description
   editingId.value = edu.id
+  fieldErrors.value = {}
   showForm.value = true
 }
 
@@ -87,9 +100,18 @@ function buildPayload(): EducationPayload {
   }
 }
 
+async function scrollToFirstError(): Promise<void> {
+  await nextTick()
+  const firstInvalid = document.querySelector('.p-invalid, [data-field-error="true"]')
+  if (firstInvalid) {
+    firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
+}
+
 async function handleSave(): Promise<void> {
   successMessage.value = null
   errorMessage.value = null
+  fieldErrors.value = {}
 
   try {
     if (editingId.value) {
@@ -102,7 +124,13 @@ async function handleSave(): Promise<void> {
     showForm.value = false
     resetForm()
   } catch (err: unknown) {
-    errorMessage.value = err instanceof Error ? err.message : t('common.error')
+    if (err instanceof ApiValidationError) {
+      fieldErrors.value = err.fieldErrors
+      errorMessage.value = err.message
+    } else {
+      errorMessage.value = err instanceof Error ? err.message : t('common.error')
+    }
+    scrollToFirstError()
   }
 }
 
@@ -203,16 +231,18 @@ async function handleDelete(id: string): Promise<void> {
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div class="flex flex-col gap-1">
           <label for="eduInstitution" class="text-sm font-medium text-gray-700">
-            {{ t('cvBuilder.education.institution') }}
+            {{ t('cvBuilder.education.institution') }} <span class="text-red-500">*</span>
           </label>
-          <InputText id="eduInstitution" v-model="institution" class="w-full" />
+          <InputText id="eduInstitution" v-model="institution" class="w-full" :invalid="hasError('institution')" />
+          <small v-if="hasError('institution')" class="text-red-500">{{ fieldError('institution') }}</small>
         </div>
 
         <div class="flex flex-col gap-1">
           <label for="eduDegree" class="text-sm font-medium text-gray-700">
             {{ t('cvBuilder.education.degree') }}
           </label>
-          <InputText id="eduDegree" v-model="degree" class="w-full" />
+          <InputText id="eduDegree" v-model="degree" class="w-full" :invalid="hasError('degree')" />
+          <small v-if="hasError('degree')" class="text-red-500">{{ fieldError('degree') }}</small>
         </div>
       </div>
 
@@ -222,13 +252,15 @@ async function handleDelete(id: string): Promise<void> {
             {{ t('cvBuilder.education.educationLevel') }}
           </label>
           <EducationLevelSelect v-model="educationLevel" />
+          <small v-if="hasError('educationLevel')" class="text-red-500">{{ fieldError('educationLevel') }}</small>
         </div>
 
         <div class="flex flex-col gap-1">
           <label for="eduFieldOfStudy" class="text-sm font-medium text-gray-700">
             {{ t('cvBuilder.education.fieldOfStudy') }}
           </label>
-          <InputText id="eduFieldOfStudy" v-model="fieldOfStudy" class="w-full" />
+          <InputText id="eduFieldOfStudy" v-model="fieldOfStudy" class="w-full" :invalid="hasError('fieldOfStudy')" />
+          <small v-if="hasError('fieldOfStudy')" class="text-red-500">{{ fieldError('fieldOfStudy') }}</small>
         </div>
       </div>
 
@@ -243,7 +275,9 @@ async function handleDelete(id: string): Promise<void> {
             dateFormat="yy-mm-dd"
             showIcon
             class="w-full"
+            :invalid="hasError('startDate')"
           />
+          <small v-if="hasError('startDate')" class="text-red-500">{{ fieldError('startDate') }}</small>
         </div>
 
         <div class="flex flex-col gap-1">
@@ -256,7 +290,9 @@ async function handleDelete(id: string): Promise<void> {
             dateFormat="yy-mm-dd"
             showIcon
             class="w-full"
+            :invalid="hasError('endDate')"
           />
+          <small v-if="hasError('endDate')" class="text-red-500">{{ fieldError('endDate') }}</small>
         </div>
       </div>
 
@@ -264,7 +300,8 @@ async function handleDelete(id: string): Promise<void> {
         <label for="eduDescription" class="text-sm font-medium text-gray-700">
           {{ t('cvBuilder.education.description') }}
         </label>
-        <Textarea id="eduDescription" v-model="description" rows="3" class="w-full" />
+        <Textarea id="eduDescription" v-model="description" rows="3" class="w-full" :invalid="hasError('description')" />
+        <small v-if="hasError('description')" class="text-red-500">{{ fieldError('description') }}</small>
       </div>
 
       <div class="flex justify-end gap-2">

@@ -112,27 +112,27 @@ async function copyLink(): Promise<void> {
 <template>
   <div class="relative">
     <!-- Main content -->
-    <div class="mx-auto max-w-2xl px-4 py-8">
+    <div class="mx-auto max-w-2xl px-4 py-6 sm:py-8">
       <div v-if="vacancyLoading" class="py-12 text-center">
         <i class="pi pi-spinner pi-spin text-3xl text-gray-400"></i>
       </div>
 
       <!-- Step 2: Interview Ready -->
       <template v-else-if="step === 'ready'">
-        <div class="space-y-6">
-          <div class="rounded-lg border border-green-200 bg-green-50 p-4">
+        <div class="space-y-4 sm:space-y-6">
+          <div class="rounded-lg border border-green-200 bg-green-50 p-3 sm:p-4">
             <div class="flex items-center gap-2">
               <i class="pi pi-check-circle text-green-600"></i>
-              <p class="font-medium text-green-800">{{ t('candidates.application.success') }}</p>
+              <p class="text-sm font-medium text-green-800 sm:text-base">{{ t('candidates.application.success') }}</p>
             </div>
           </div>
 
-          <div class="rounded-lg border border-gray-200 bg-white p-8 text-center">
-            <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
-              <i class="pi pi-comments text-3xl text-blue-600"></i>
+          <div class="rounded-lg border border-gray-200 bg-white p-5 text-center sm:p-8">
+            <div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 sm:mb-4 sm:h-16 sm:w-16">
+              <i class="pi pi-comments text-2xl text-blue-600 sm:text-3xl"></i>
             </div>
-            <h2 class="mb-2 text-xl font-bold text-gray-900">{{ t('candidates.application.prescanReady') }}</h2>
-            <p class="mb-6 text-sm text-gray-500">
+            <h2 class="mb-2 text-lg font-bold text-gray-900 sm:text-xl">{{ t('candidates.application.prescanReady') }}</h2>
+            <p class="mb-4 text-xs text-gray-500 sm:mb-6 sm:text-sm">
               {{ t('candidates.application.prescanReadyHint') }}
             </p>
 
@@ -144,14 +144,14 @@ async function copyLink(): Promise<void> {
               @click="startPrescanning"
             />
 
-            <div class="mb-6 rounded-lg border border-gray-200 bg-gray-50 p-3">
+            <div class="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-3 sm:mb-6">
               <label class="mb-1 block text-xs font-medium text-gray-500">{{ t('candidates.application.prescanLink') }}</label>
-              <div class="flex items-center gap-2">
+              <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
                 <input
                   type="text"
                   readonly
                   :value="prescanUrl"
-                  class="flex-1 rounded border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700"
+                  class="w-full rounded border border-gray-200 bg-white px-3 py-2 text-xs text-gray-700 sm:flex-1 sm:text-sm"
                   @focus="($event.target as HTMLInputElement).select()"
                 />
                 <Button
@@ -159,24 +159,25 @@ async function copyLink(): Promise<void> {
                   :icon="linkCopied ? 'pi pi-check' : 'pi pi-copy'"
                   :severity="linkCopied ? 'success' : 'secondary'"
                   size="small"
+                  class="w-full sm:w-auto"
                   @click="copyLink"
                 />
               </div>
             </div>
 
-            <p class="mb-4 text-sm text-gray-500">
+            <p class="mb-3 text-xs text-gray-500 sm:mb-4 sm:text-sm">
               <i class="pi pi-envelope mr-1"></i>
               {{ t('candidates.application.linkSentToEmail') }}
             </p>
 
-            <div class="rounded-lg border border-blue-100 bg-blue-50 p-4">
-              <p class="text-sm text-blue-800">
+            <div class="rounded-lg border border-blue-100 bg-blue-50 p-3 text-left sm:p-4">
+              <p class="text-xs text-blue-800 sm:text-sm">
                 <i class="pi pi-user-plus mr-1"></i>
                 <strong>{{ t('candidates.application.tip') }}:</strong> {{ t('candidates.application.tipText') }}
               </p>
               <RouterLink
                 to="/register"
-                class="mt-2 inline-block text-sm font-medium text-blue-600 hover:underline"
+                class="mt-2 inline-block text-xs font-medium text-blue-600 hover:underline sm:text-sm"
               >
                 {{ t('candidates.application.createAccount') }}
               </RouterLink>
@@ -184,7 +185,7 @@ async function copyLink(): Promise<void> {
           </div>
 
           <div class="text-center">
-            <RouterLink to="/jobs" class="text-sm text-gray-500 hover:text-gray-700">
+            <RouterLink to="/jobs" class="text-xs text-gray-500 hover:text-gray-700 sm:text-sm">
               {{ t('candidates.application.browseMoreJobs') }}
             </RouterLink>
           </div>
@@ -197,18 +198,18 @@ async function copyLink(): Promise<void> {
           <i class="pi pi-arrow-left mr-1"></i> {{ t('candidates.application.backToJob') }}
         </RouterLink>
 
-        <h1 class="mb-1 text-2xl font-bold">{{ t('candidates.application.title') }}</h1>
-        <p v-if="vacancy" class="mb-1 text-gray-600">{{ vacancy.title }}</p>
-        <p v-if="vacancy && ((vacancy as any).employer?.name || (vacancy as any).companyName)" class="mb-6 text-sm text-gray-500">
+        <h1 class="mb-1 text-xl font-bold sm:text-2xl">{{ t('candidates.application.title') }}</h1>
+        <p v-if="vacancy" class="mb-1 text-sm text-gray-600 sm:text-base">{{ vacancy.title }}</p>
+        <p v-if="vacancy && ((vacancy as any).employer?.name || (vacancy as any).companyName)" class="mb-4 text-xs text-gray-500 sm:mb-6 sm:text-sm">
           <i class="pi pi-building mr-1"></i>{{ (vacancy as any).employer?.name || (vacancy as any).companyName }}
         </p>
-        <div v-else class="mb-6"></div>
+        <div v-else class="mb-4 sm:mb-6"></div>
 
         <p v-if="candidateStore.error" class="mb-4 text-sm text-red-600">
           {{ candidateStore.error }}
         </p>
 
-        <form class="space-y-5" @submit.prevent="handleSubmit">
+        <form class="space-y-4 sm:space-y-5" @submit.prevent="handleSubmit">
           <div>
             <label class="mb-1 block text-sm font-medium">{{ t('candidates.application.name') }} *</label>
             <InputText v-model="name" class="w-full" placeholder="John Doe" :invalid="!!errors.name" />
@@ -256,29 +257,28 @@ async function copyLink(): Promise<void> {
     <!-- Chat overlay -->
     <div
       v-if="showChatOverlay && prescanToken"
-      class="fixed inset-0 z-50 flex flex-col items-center justify-end sm:justify-center bg-black/30 backdrop-blur-sm"
+      class="fixed inset-0 z-50 flex flex-col bg-black/30 backdrop-blur-sm sm:items-center sm:justify-center sm:p-4"
     >
-      <div class="flex w-full max-w-3xl flex-1 sm:flex-initial sm:h-[85vh] flex-col overflow-hidden rounded-t-3xl sm:rounded-2xl bg-white shadow-2xl">
+      <div class="flex h-full w-full flex-col overflow-hidden bg-white sm:h-[85vh] sm:max-h-[700px] sm:max-w-3xl sm:rounded-2xl sm:shadow-2xl">
         <!-- Overlay header -->
-        <div class="flex items-center justify-between bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-3">
-          <div class="flex items-center gap-3">
-            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 ring-2 ring-white/30">
-              <i class="pi pi-comments text-sm text-white"></i>
+        <div class="flex items-center justify-between bg-gradient-to-r from-blue-600 to-blue-700 px-3 py-2.5 sm:px-4 sm:py-3">
+          <div class="flex items-center gap-2 sm:gap-3">
+            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 ring-2 ring-white/30 sm:h-10 sm:w-10">
+              <i class="pi pi-comments text-xs text-white sm:text-sm"></i>
             </div>
-            <div>
-              <p class="text-sm font-semibold text-white">{{ t('interviews.chat.aiPrescanning') }}</p>
-              <p class="text-xs text-blue-100">{{ t('candidates.application.answerQuestions') }}</p>
+            <div class="min-w-0">
+              <p class="truncate text-xs font-semibold text-white sm:text-sm">{{ t('interviews.chat.aiPrescanning') }}</p>
+              <p class="hidden text-xs text-blue-100 sm:block">{{ t('candidates.application.answerQuestions') }}</p>
             </div>
           </div>
-          <div class="flex items-center gap-1">
+          <div class="flex items-center gap-0.5 sm:gap-1">
             <Button
               icon="pi pi-external-link"
               severity="secondary"
               text
               rounded
               size="small"
-              class="!text-white/70 hover:!text-white hover:!bg-white/10"
-              title="Open full screen"
+              class="!h-8 !w-8 !text-white/70 hover:!bg-white/10 hover:!text-white sm:!h-9 sm:!w-9"
               @click="openInFullScreen"
             />
             <Button
@@ -287,8 +287,7 @@ async function copyLink(): Promise<void> {
               text
               rounded
               size="small"
-              class="!text-white/70 hover:!text-white hover:!bg-white/10"
-              title="Minimize"
+              class="!h-8 !w-8 !text-white/70 hover:!bg-white/10 hover:!text-white sm:!h-9 sm:!w-9"
               @click="showChatOverlay = false"
             />
           </div>
@@ -296,7 +295,7 @@ async function copyLink(): Promise<void> {
         <!-- Embedded chat iframe -->
         <iframe
           :src="chatUrl"
-          class="flex-1 border-0"
+          class="min-h-0 flex-1 border-0"
           allow="microphone; camera"
         ></iframe>
       </div>
@@ -305,28 +304,28 @@ async function copyLink(): Promise<void> {
     <!-- Minimized chat bar (shown when overlay is closed but interview started) -->
     <div
       v-if="!showChatOverlay && step === 'ready' && prescanToken && !prescanDismissed"
-      class="fixed bottom-0 left-0 right-0 z-40 cursor-pointer border-t border-gray-200 bg-white px-4 py-3 shadow-lg transition-all hover:bg-gray-50"
+      class="fixed bottom-0 left-0 right-0 z-40 cursor-pointer border-t border-gray-200 bg-white px-3 py-2.5 shadow-lg transition-all hover:bg-gray-50 sm:px-4 sm:py-3"
       @click="showChatOverlay = true"
     >
       <div class="mx-auto flex max-w-3xl items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600">
-            <i class="pi pi-comments text-white"></i>
+        <div class="flex items-center gap-2 sm:gap-3">
+          <div class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 sm:h-10 sm:w-10">
+            <i class="pi pi-comments text-xs text-white sm:text-sm"></i>
           </div>
-          <div>
-            <p class="text-sm font-medium text-gray-900">{{ t('interviews.chat.aiPrescanning') }}</p>
-            <p class="text-xs text-gray-500">{{ t('candidates.application.clickToOpenChat') }}</p>
+          <div class="min-w-0">
+            <p class="truncate text-xs font-medium text-gray-900 sm:text-sm">{{ t('interviews.chat.aiPrescanning') }}</p>
+            <p class="hidden text-xs text-gray-500 sm:block">{{ t('candidates.application.clickToOpenChat') }}</p>
           </div>
         </div>
-        <div class="flex items-center gap-2">
-          <i class="pi pi-chevron-up text-gray-400"></i>
+        <div class="flex items-center gap-1 sm:gap-2">
+          <i class="pi pi-chevron-up text-xs text-gray-400 sm:text-sm"></i>
           <Button
             icon="pi pi-times"
             severity="secondary"
             text
             rounded
             size="small"
-            title="Dismiss"
+            class="!h-8 !w-8 sm:!h-9 sm:!w-9"
             @click.stop="prescanDismissed = true"
           />
         </div>

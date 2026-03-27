@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import InputText from 'primevue/inputtext'
-import Textarea from 'primevue/textarea'
+import Editor from 'primevue/editor'
 import InputNumber from 'primevue/inputnumber'
 import Select from 'primevue/select'
 import DatePicker from 'primevue/datepicker'
@@ -10,6 +10,8 @@ import ToggleSwitch from 'primevue/toggleswitch'
 import Button from 'primevue/button'
 import Message from 'primevue/message'
 import { useCvBuilderStore } from '../stores/cv-builder.store'
+import { ApiValidationError } from '@/shared/api/errors'
+import type { FieldErrors } from '@/shared/api/errors'
 
 const { t } = useI18n()
 const store = useCvBuilderStore()
@@ -28,6 +30,7 @@ const desiredEmploymentType = ref('')
 const isOpenToWork = ref(false)
 const successMessage = ref<string | null>(null)
 const errorMessage = ref<string | null>(null)
+const fieldErrors = ref<FieldErrors>({})
 const improvingSection = ref(false)
 
 const currencyOptions = [
@@ -43,6 +46,14 @@ const employmentTypeOptions = [
   { label: t('cvBuilder.employmentTypes.contract'), value: 'contract' },
   { label: t('cvBuilder.employmentTypes.internship'), value: 'internship' },
 ]
+
+function hasError(field: string): boolean {
+  return field in fieldErrors.value
+}
+
+function fieldError(field: string): string {
+  return fieldErrors.value[field] ?? ''
+}
 
 function populateForm(): void {
   const p = store.profile
@@ -86,9 +97,18 @@ async function handleImproveSummary(): Promise<void> {
   }
 }
 
+async function scrollToFirstError(): Promise<void> {
+  await nextTick()
+  const firstInvalid = document.querySelector('.p-invalid, [data-field-error="true"]')
+  if (firstInvalid) {
+    firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
+}
+
 async function handleSave(): Promise<void> {
   successMessage.value = null
   errorMessage.value = null
+  fieldErrors.value = {}
 
   try {
     await store.updateProfile({
@@ -107,10 +127,17 @@ async function handleSave(): Promise<void> {
     })
     successMessage.value = t('cvBuilder.personal.saveSuccess')
   } catch (err: unknown) {
-    errorMessage.value =
-      err instanceof Error ? err.message : t('common.error')
+    if (err instanceof ApiValidationError) {
+      fieldErrors.value = err.fieldErrors
+      errorMessage.value = err.message
+    } else {
+      errorMessage.value = err instanceof Error ? err.message : t('common.error')
+    }
+    scrollToFirstError()
   }
 }
+
+defineExpose({ save: handleSave })
 </script>
 
 <template>
@@ -135,7 +162,9 @@ async function handleSave(): Promise<void> {
           v-model="headline"
           :placeholder="t('cvBuilder.personal.headlinePlaceholder')"
           class="w-full"
+          :invalid="hasError('headline')"
         />
+        <small v-if="hasError('headline')" class="text-red-500">{{ fieldError('headline') }}</small>
       </div>
 
       <div class="flex flex-col gap-1">
@@ -154,13 +183,13 @@ async function handleSave(): Promise<void> {
             @click="handleImproveSummary"
           />
         </div>
-        <Textarea
-          id="summary"
+        <Editor
           v-model="summary"
-          :placeholder="t('cvBuilder.personal.summaryPlaceholder')"
-          rows="4"
-          class="w-full"
+          :data-field-error="hasError('summary') || undefined"
+          editorStyle="height: 150px"
+          :class="{ 'border border-red-500 rounded-md': hasError('summary') }"
         />
+        <small v-if="hasError('summary')" class="text-red-500">{{ fieldError('summary') }}</small>
       </div>
 
       <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
@@ -173,7 +202,9 @@ async function handleSave(): Promise<void> {
             v-model="location"
             :placeholder="t('cvBuilder.personal.locationPlaceholder')"
             class="w-full"
+            :invalid="hasError('location')"
           />
+          <small v-if="hasError('location')" class="text-red-500">{{ fieldError('location') }}</small>
         </div>
 
         <div class="flex flex-col gap-1">
@@ -187,7 +218,9 @@ async function handleSave(): Promise<void> {
             :placeholder="t('cvBuilder.personal.dateOfBirthPlaceholder')"
             showIcon
             class="w-full"
+            :invalid="hasError('dateOfBirth')"
           />
+          <small v-if="hasError('dateOfBirth')" class="text-red-500">{{ fieldError('dateOfBirth') }}</small>
         </div>
       </div>
 
@@ -201,7 +234,9 @@ async function handleSave(): Promise<void> {
             v-model="linkedinUrl"
             placeholder="https://linkedin.com/in/..."
             class="w-full"
+            :invalid="hasError('linkedinUrl')"
           />
+          <small v-if="hasError('linkedinUrl')" class="text-red-500">{{ fieldError('linkedinUrl') }}</small>
         </div>
 
         <div class="flex flex-col gap-1">
@@ -213,7 +248,9 @@ async function handleSave(): Promise<void> {
             v-model="githubUrl"
             placeholder="https://github.com/..."
             class="w-full"
+            :invalid="hasError('githubUrl')"
           />
+          <small v-if="hasError('githubUrl')" class="text-red-500">{{ fieldError('githubUrl') }}</small>
         </div>
 
         <div class="flex flex-col gap-1">
@@ -225,7 +262,9 @@ async function handleSave(): Promise<void> {
             v-model="websiteUrl"
             placeholder="https://..."
             class="w-full"
+            :invalid="hasError('websiteUrl')"
           />
+          <small v-if="hasError('websiteUrl')" class="text-red-500">{{ fieldError('websiteUrl') }}</small>
         </div>
       </div>
 
@@ -239,7 +278,9 @@ async function handleSave(): Promise<void> {
             v-model="desiredSalaryMin"
             :placeholder="t('cvBuilder.personal.salaryMinPlaceholder')"
             class="w-full"
+            :invalid="hasError('desiredSalaryMin')"
           />
+          <small v-if="hasError('desiredSalaryMin')" class="text-red-500">{{ fieldError('desiredSalaryMin') }}</small>
         </div>
 
         <div class="flex flex-col gap-1">
@@ -251,7 +292,9 @@ async function handleSave(): Promise<void> {
             v-model="desiredSalaryMax"
             :placeholder="t('cvBuilder.personal.salaryMaxPlaceholder')"
             class="w-full"
+            :invalid="hasError('desiredSalaryMax')"
           />
+          <small v-if="hasError('desiredSalaryMax')" class="text-red-500">{{ fieldError('desiredSalaryMax') }}</small>
         </div>
 
         <div class="flex flex-col gap-1">
@@ -266,7 +309,9 @@ async function handleSave(): Promise<void> {
             optionValue="value"
             :placeholder="t('cvBuilder.personal.currencyPlaceholder')"
             class="w-full"
+            :invalid="hasError('desiredSalaryCurrency')"
           />
+          <small v-if="hasError('desiredSalaryCurrency')" class="text-red-500">{{ fieldError('desiredSalaryCurrency') }}</small>
         </div>
       </div>
 
@@ -283,7 +328,9 @@ async function handleSave(): Promise<void> {
             optionValue="value"
             :placeholder="t('cvBuilder.personal.employmentTypePlaceholder')"
             class="w-full"
+            :invalid="hasError('desiredEmploymentType')"
           />
+          <small v-if="hasError('desiredEmploymentType')" class="text-red-500">{{ fieldError('desiredEmploymentType') }}</small>
         </div>
 
         <div class="flex items-center gap-3 pt-6">
@@ -294,13 +341,6 @@ async function handleSave(): Promise<void> {
         </div>
       </div>
 
-      <div class="flex justify-end pt-2">
-        <Button
-          type="submit"
-          :label="t('common.save')"
-          :loading="store.saving"
-        />
-      </div>
     </form>
   </div>
 </template>

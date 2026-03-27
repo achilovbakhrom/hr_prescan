@@ -137,7 +137,7 @@
 {% if profile.summary %}
 <div class="section">
   <h2>Professional Summary</h2>
-  <p class="summary">{{ profile.summary }}</p>
+  <div class="summary">{{ profile.summary|safe }}</div>
 </div>
 {% endif %}
 

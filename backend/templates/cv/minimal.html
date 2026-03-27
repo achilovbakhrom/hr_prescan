@@ -179,7 +179,7 @@
 {% if profile.summary %}
 <div class="section">
   <div class="section-title">About</div>
-  <p class="summary-text">{{ profile.summary }}</p>
+  <div class="summary-text">{{ profile.summary|safe }}</div>
 </div>
 <hr class="divider">
 {% endif %}

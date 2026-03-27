@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import { extractErrorMessage } from '@/shared/api/errors'
+import { extractApiError, type FieldErrors } from '@/shared/api/errors'
 import { vacancyService } from '../services/vacancy.service'
 import type {
   Vacancy,
@@ -17,16 +17,32 @@ export const useVacancyStore = defineStore('vacancy', () => {
   const currentVacancy = ref<VacancyDetail | null>(null)
   const loading = ref(false)
   const error = ref<string | null>(null)
+  const fieldErrors = ref<FieldErrors>({})
+
+  function clearErrors(): void {
+    error.value = null
+    fieldErrors.value = {}
+  }
+
+  function handleError(err: unknown): never {
+    const apiError = extractApiError(err)
+    error.value = apiError.message
+    if ('fieldErrors' in apiError) {
+      fieldErrors.value = (apiError as { fieldErrors: FieldErrors }).fieldErrors
+    }
+    throw apiError
+  }
 
   async function fetchVacancies(params?: {
     status?: string
   }): Promise<void> {
     loading.value = true
-    error.value = null
+    clearErrors()
     try {
       vacancies.value = await vacancyService.list(params)
     } catch (err: unknown) {
-      error.value = extractErrorMessage(err)
+      const apiError = extractApiError(err)
+      error.value = apiError.message
     } finally {
       loading.value = false
     }
@@ -34,15 +50,14 @@ export const useVacancyStore = defineStore('vacancy', () => {
 
   async function createVacancy(data: CreateVacancyRequest): Promise<Vacancy> {
     loading.value = true
-    error.value = null
+    clearErrors()
     try {
       const vacancy = await vacancyService.create(data)
       vacancies.value.unshift(vacancy)
       return vacancy
     } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
+      loading.value = false
+      handleError(err)
     } finally {
       loading.value = false
     }
@@ -53,19 +68,18 @@ export const useVacancyStore = defineStore('vacancy', () => {
       await vacancyService.deleteVacancy(id)
       vacancies.value = vacancies.value.filter(v => v.id !== id)
     } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
+      handleError(err)
     }
   }
 
   async function fetchVacancyDetail(id: string): Promise<void> {
     loading.value = true
-    error.value = null
+    clearErrors()
     try {
       currentVacancy.value = await vacancyService.getDetail(id)
     } catch (err: unknown) {
-      error.value = extractErrorMessage(err)
+      const apiError = extractApiError(err)
+      error.value = apiError.message
     } finally {
       loading.value = false
     }
@@ -76,7 +90,7 @@ export const useVacancyStore = defineStore('vacancy', () => {
     data: UpdateVacancyRequest,
   ): Promise<void> {
     loading.value = true
-    error.value = null
+    clearErrors()
     try {
       const updated = await vacancyService.update(id, data)
       if (currentVacancy.value?.id === id) {
@@ -87,9 +101,8 @@ export const useVacancyStore = defineStore('vacancy', () => {
         vacancies.value[index] = updated
       }
     } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
+      loading.value = false
+      handleError(err)
     } finally {
       loading.value = false
     }
@@ -111,9 +124,7 @@ export const useVacancyStore = defineStore('vacancy', () => {
         vacancies.value[index] = updated
       }
     } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
+      handleError(err)
     } finally {
       loading.value = false
     }
@@ -130,9 +141,7 @@ export const useVacancyStore = defineStore('vacancy', () => {
         currentVacancy.value.criteriaCount += 1
       }
     } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
+      handleError(err)
     }
   }
 
@@ -156,9 +165,7 @@ export const useVacancyStore = defineStore('vacancy', () => {
         }
       }
     } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
+      handleError(err)
     }
   }
 
@@ -174,9 +181,7 @@ export const useVacancyStore = defineStore('vacancy', () => {
         currentVacancy.value.criteriaCount -= 1
       }
     } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
+      handleError(err)
     }
   }
 
@@ -191,9 +196,7 @@ export const useVacancyStore = defineStore('vacancy', () => {
         currentVacancy.value.questionsCount += 1
       }
     } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
+      handleError(err)
     }
   }
 
@@ -217,9 +220,7 @@ export const useVacancyStore = defineStore('vacancy', () => {
         }
       }
     } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
+      handleError(err)
     }
   }
 
@@ -235,9 +236,7 @@ export const useVacancyStore = defineStore('vacancy', () => {
         currentVacancy.value.questionsCount -= 1
       }
     } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
+      handleError(err)
     }
   }
 
@@ -251,9 +250,7 @@ export const useVacancyStore = defineStore('vacancy', () => {
         currentVacancy.value.questionsCount += questions.length
       }
     } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
+      handleError(err)
     } finally {
       loading.value = false
     }
@@ -264,6 +261,8 @@ export const useVacancyStore = defineStore('vacancy', () => {
     currentVacancy,
     loading,
     error,
+    fieldErrors,
+    clearErrors,
     fetchVacancies,
     createVacancy,
     deleteVacancy,

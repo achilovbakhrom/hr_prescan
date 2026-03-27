@@ -1,10 +1,12 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import { extractErrorMessage } from '@/shared/api/errors'
+import { extractApiError, type FieldErrors } from '@/shared/api/errors'
 import { cvBuilderService } from '../services/cv-builder.service'
 import type {
   CandidateProfile,
   CvGenerateResult,
+  CvChatMessage,
+  CvChatResponse,
   ProfileUpdatePayload,
   WorkExperiencePayload,
   EducationPayload,
@@ -20,14 +22,30 @@ export const useCvBuilderStore = defineStore('cvBuilder', () => {
   const generating = ref(false)
   const improving = ref(false)
   const error = ref<string | null>(null)
+  const fieldErrors = ref<FieldErrors>({})
+
+  function clearErrors(): void {
+    error.value = null
+    fieldErrors.value = {}
+  }
+
+  function handleError(err: unknown): never {
+    const apiError = extractApiError(err)
+    error.value = apiError.message
+    if ('fieldErrors' in apiError) {
+      fieldErrors.value = (apiError as { fieldErrors: FieldErrors }).fieldErrors
+    }
+    throw apiError
+  }
 
   async function fetchProfile(): Promise<void> {
     loading.value = true
-    error.value = null
+    clearErrors()
     try {
       profile.value = await cvBuilderService.getProfile()
     } catch (err: unknown) {
-      error.value = extractErrorMessage(err)
+      const apiError = extractApiError(err)
+      error.value = apiError.message
     } finally {
       loading.value = false
     }
@@ -35,14 +53,13 @@ export const useCvBuilderStore = defineStore('cvBuilder', () => {
 
   async function updateProfile(data: ProfileUpdatePayload): Promise<void> {
     saving.value = true
-    error.value = null
+    clearErrors()
     try {
       await cvBuilderService.updateProfile(data)
       await fetchProfile()
     } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
+      saving.value = false
+      handleError(err)
     } finally {
       saving.value = false
     }
@@ -50,14 +67,13 @@ export const useCvBuilderStore = defineStore('cvBuilder', () => {
 
   async function updateSkills(skills: string[]): Promise<void> {
     saving.value = true
-    error.value = null
+    clearErrors()
     try {
       await cvBuilderService.updateSkills(skills)
       await fetchProfile()
     } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
+      saving.value = false
+      handleError(err)
     } finally {
       saving.value = false
     }
@@ -66,14 +82,13 @@ export const useCvBuilderStore = defineStore('cvBuilder', () => {
   // Work Experiences
   async function createWorkExperience(data: WorkExperiencePayload): Promise<void> {
     saving.value = true
-    error.value = null
+    clearErrors()
     try {
       await cvBuilderService.createWorkExperience(data)
       await fetchProfile()
     } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
+      saving.value = false
+      handleError(err)
     } finally {
       saving.value = false
     }
@@ -81,14 +96,13 @@ export const useCvBuilderStore = defineStore('cvBuilder', () => {
 
   async function updateWorkExperience(id: string, data: WorkExperiencePayload): Promise<void> {
     saving.value = true
-    error.value = null
+    clearErrors()
     try {
       await cvBuilderService.updateWorkExperience(id, data)
       await fetchProfile()
     } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
+      saving.value = false
+      handleError(err)
     } finally {
       saving.value = false
     }
@@ -96,14 +110,13 @@ export const useCvBuilderStore = defineStore('cvBuilder', () => {
 
   async function deleteWorkExperience(id: string): Promise<void> {
     saving.value = true
-    error.value = null
+    clearErrors()
     try {
       await cvBuilderService.deleteWorkExperience(id)
       await fetchProfile()
     } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
+      saving.value = false
+      handleError(err)
     } finally {
       saving.value = false
     }
@@ -112,14 +125,13 @@ export const useCvBuilderStore = defineStore('cvBuilder', () => {
   // Educations
   async function createEducation(data: EducationPayload): Promise<void> {
     saving.value = true
-    error.value = null
+    clearErrors()
     try {
       await cvBuilderService.createEducation(data)
       await fetchProfile()
     } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
+      saving.value = false
+      handleError(err)
     } finally {
       saving.value = false
     }
@@ -127,14 +139,13 @@ export const useCvBuilderStore = defineStore('cvBuilder', () => {
 
   async function updateEducation(id: string, data: EducationPayload): Promise<void> {
     saving.value = true
-    error.value = null
+    clearErrors()
     try {
       await cvBuilderService.updateEducation(id, data)
       await fetchProfile()
     } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
+      saving.value = false
+      handleError(err)
     } finally {
       saving.value = false
     }
@@ -142,14 +153,13 @@ export const useCvBuilderStore = defineStore('cvBuilder', () => {
 
   async function deleteEducation(id: string): Promise<void> {
     saving.value = true
-    error.value = null
+    clearErrors()
     try {
       await cvBuilderService.deleteEducation(id)
       await fetchProfile()
     } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
+      saving.value = false
+      handleError(err)
     } finally {
       saving.value = false
     }
@@ -158,14 +168,13 @@ export const useCvBuilderStore = defineStore('cvBuilder', () => {
   // Languages
   async function createLanguage(data: LanguagePayload): Promise<void> {
     saving.value = true
-    error.value = null
+    clearErrors()
     try {
       await cvBuilderService.createLanguage(data)
       await fetchProfile()
     } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
+      saving.value = false
+      handleError(err)
     } finally {
       saving.value = false
     }
@@ -173,14 +182,13 @@ export const useCvBuilderStore = defineStore('cvBuilder', () => {
 
   async function updateLanguage(id: string, data: LanguagePayload): Promise<void> {
     saving.value = true
-    error.value = null
+    clearErrors()
     try {
       await cvBuilderService.updateLanguage(id, data)
       await fetchProfile()
     } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
+      saving.value = false
+      handleError(err)
     } finally {
       saving.value = false
     }
@@ -188,14 +196,13 @@ export const useCvBuilderStore = defineStore('cvBuilder', () => {
 
   async function deleteLanguage(id: string): Promise<void> {
     saving.value = true
-    error.value = null
+    clearErrors()
     try {
       await cvBuilderService.deleteLanguage(id)
       await fetchProfile()
     } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
+      saving.value = false
+      handleError(err)
     } finally {
       saving.value = false
     }
@@ -204,14 +211,13 @@ export const useCvBuilderStore = defineStore('cvBuilder', () => {
   // Certifications
   async function createCertification(data: CertificationPayload): Promise<void> {
     saving.value = true
-    error.value = null
+    clearErrors()
     try {
       await cvBuilderService.createCertification(data)
       await fetchProfile()
     } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
+      saving.value = false
+      handleError(err)
     } finally {
       saving.value = false
     }
@@ -219,14 +225,13 @@ export const useCvBuilderStore = defineStore('cvBuilder', () => {
 
   async function updateCertification(id: string, data: CertificationPayload): Promise<void> {
     saving.value = true
-    error.value = null
+    clearErrors()
     try {
       await cvBuilderService.updateCertification(id, data)
       await fetchProfile()
     } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
+      saving.value = false
+      handleError(err)
     } finally {
       saving.value = false
     }
@@ -234,14 +239,13 @@ export const useCvBuilderStore = defineStore('cvBuilder', () => {
 
   async function deleteCertification(id: string): Promise<void> {
     saving.value = true
-    error.value = null
+    clearErrors()
     try {
       await cvBuilderService.deleteCertification(id)
       await fetchProfile()
     } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
+      saving.value = false
+      handleError(err)
     } finally {
       saving.value = false
     }
@@ -253,15 +257,14 @@ export const useCvBuilderStore = defineStore('cvBuilder', () => {
     name?: string,
   ): Promise<CvGenerateResult> {
     generating.value = true
-    error.value = null
+    clearErrors()
     try {
       const result = await cvBuilderService.generatePdf(template, name)
       await fetchProfile()
       return result
     } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
+      generating.value = false
+      handleError(err)
     } finally {
       generating.value = false
     }
@@ -270,13 +273,12 @@ export const useCvBuilderStore = defineStore('cvBuilder', () => {
   // CV Parsing (AI)
   async function parseCv(file: File): Promise<void> {
     parsing.value = true
-    error.value = null
+    clearErrors()
     try {
       profile.value = await cvBuilderService.parseCv(file)
     } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
+      parsing.value = false
+      handleError(err)
     } finally {
       parsing.value = false
     }
@@ -289,16 +291,37 @@ export const useCvBuilderStore = defineStore('cvBuilder', () => {
     jobTitle?: string,
   ): Promise<string> {
     improving.value = true
-    error.value = null
+    clearErrors()
     try {
       const improved = await cvBuilderService.improveCvSection(section, content, jobTitle)
       return improved
     } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
+      improving.value = false
+      handleError(err)
     } finally {
       improving.value = false
+    }
+  }
+
+  // AI CV Chat — conversational generation
+  async function cvAiChat(messages: CvChatMessage[]): Promise<CvChatResponse> {
+    try {
+      return await cvBuilderService.cvAiChat(messages)
+    } catch (err: unknown) {
+      handleError(err)
+    }
+  }
+
+  async function cvAiGenerate(messages: CvChatMessage[]): Promise<void> {
+    generating.value = true
+    clearErrors()
+    try {
+      profile.value = await cvBuilderService.cvAiGenerate(messages)
+    } catch (err: unknown) {
+      generating.value = false
+      handleError(err)
+    } finally {
+      generating.value = false
     }
   }
 
@@ -310,6 +333,8 @@ export const useCvBuilderStore = defineStore('cvBuilder', () => {
     generating,
     improving,
     error,
+    fieldErrors,
+    clearErrors,
     fetchProfile,
     updateProfile,
     updateSkills,
@@ -328,5 +353,7 @@ export const useCvBuilderStore = defineStore('cvBuilder', () => {
     generatePdf,
     parseCv,
     improveCvSection,
+    cvAiChat,
+    cvAiGenerate,
   }
 })

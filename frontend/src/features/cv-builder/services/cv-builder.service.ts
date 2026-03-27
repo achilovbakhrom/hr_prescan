@@ -12,6 +12,8 @@ import type {
   ProfileUpdatePayload,
   Completeness,
   CvGenerateResult,
+  CvChatMessage,
+  CvChatResponse,
 } from '../types/cv-builder.types'
 
 const BASE = '/candidate/profile'
@@ -113,6 +115,17 @@ export const cvBuilderService = {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
     return data
+  },
+
+  // CV AI Chat — conversational CV generation
+  async cvAiChat(messages: CvChatMessage[]): Promise<CvChatResponse> {
+    const { data } = await apiClient.post<CvChatResponse>(`${BASE}/cv/ai-chat`, { messages })
+    return data
+  },
+
+  async cvAiGenerate(messages: CvChatMessage[]): Promise<CandidateProfile> {
+    const { data: profile } = await apiClient.post<CandidateProfile>(`${BASE}/cv/ai-generate`, { messages })
+    return profile
   },
 
   // CV Section Improvement (AI)

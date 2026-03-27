@@ -152,6 +152,16 @@ export interface CertificationPayload {
   credentialUrl: string
 }
 
+export interface CvChatMessage {
+  role: 'user' | 'assistant'
+  content: string
+}
+
+export interface CvChatResponse {
+  status: 'continue' | 'ready'
+  message: string
+}
+
 export interface CvGenerateResult {
   id: string
   name: string

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Select from 'primevue/select'
 import Button from 'primevue/button'
@@ -7,6 +7,8 @@ import Tag from 'primevue/tag'
 import Message from 'primevue/message'
 import LanguageAutocomplete from '@/shared/components/LanguageAutocomplete.vue'
 import { useCvBuilderStore } from '../stores/cv-builder.store'
+import { ApiValidationError } from '@/shared/api/errors'
+import type { FieldErrors } from '@/shared/api/errors'
 import type { LanguageEntry, LanguagePayload } from '../types/cv-builder.types'
 
 const { t } = useI18n()
@@ -16,6 +18,7 @@ const showForm = ref(false)
 const editingId = ref<string | null>(null)
 const successMessage = ref<string | null>(null)
 const errorMessage = ref<string | null>(null)
+const fieldErrors = ref<FieldErrors>({})
 
 const languageCode = ref('')
 const proficiency = ref('')
@@ -30,6 +33,14 @@ const proficiencyOptions = [
 ]
 
 const languages = computed(() => store.profile?.languages ?? [])
+
+function hasError(field: string): boolean {
+  return field in fieldErrors.value
+}
+
+function fieldError(field: string): string {
+  return fieldErrors.value[field] ?? ''
+}
 
 function getProficiencyLabel(value: string): string {
   const opt = proficiencyOptions.find((o) => o.value === value)
@@ -47,6 +58,7 @@ function resetForm(): void {
   languageCode.value = ''
   proficiency.value = ''
   editingId.value = null
+  fieldErrors.value = {}
 }
 
 function openAddForm(): void {
@@ -58,6 +70,7 @@ function openEditForm(entry: LanguageEntry): void {
   languageCode.value = entry.language.code
   proficiency.value = entry.proficiency
   editingId.value = entry.id
+  fieldErrors.value = {}
   showForm.value = true
 }
 
@@ -73,9 +86,18 @@ function buildPayload(): LanguagePayload {
   }
 }
 
+async function scrollToFirstError(): Promise<void> {
+  await nextTick()
+  const firstInvalid = document.querySelector('.p-invalid, [data-field-error="true"]')
+  if (firstInvalid) {
+    firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
+}
+
 async function handleSave(): Promise<void> {
   successMessage.value = null
   errorMessage.value = null
+  fieldErrors.value = {}
 
   try {
     if (editingId.value) {
@@ -88,7 +110,13 @@ async function handleSave(): Promise<void> {
     showForm.value = false
     resetForm()
   } catch (err: unknown) {
-    errorMessage.value = err instanceof Error ? err.message : t('common.error')
+    if (err instanceof ApiValidationError) {
+      fieldErrors.value = err.fieldErrors
+      errorMessage.value = err.message
+    } else {
+      errorMessage.value = err instanceof Error ? err.message : t('common.error')
+    }
+    scrollToFirstError()
   }
 }
 
@@ -179,14 +207,15 @@ async function handleDelete(id: string): Promise<void> {
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div class="flex flex-col gap-1">
           <label class="text-sm font-medium text-gray-700">
-            {{ t('cvBuilder.languages.language') }}
+            {{ t('cvBuilder.languages.language') }} <span class="text-red-500">*</span>
           </label>
           <LanguageAutocomplete v-model="languageCode" />
+          <small v-if="hasError('language')" class="text-red-500">{{ fieldError('language') }}</small>
         </div>
 
         <div class="flex flex-col gap-1">
           <label for="langProficiency" class="text-sm font-medium text-gray-700">
-            {{ t('cvBuilder.languages.proficiency') }}
+            {{ t('cvBuilder.languages.proficiency') }} <span class="text-red-500">*</span>
           </label>
           <Select
             id="langProficiency"
@@ -196,9 +225,14 @@ async function handleDelete(id: string): Promise<void> {
             optionValue="value"
             :placeholder="t('cvBuilder.languages.proficiencyPlaceholder')"
             class="w-full"
+            :invalid="hasError('proficiency')"
           />
+          <small v-if="hasError('proficiency')" class="text-red-500">{{ fieldError('proficiency') }}</small>
         </div>
       </div>
+
+      <!-- Non-field errors (e.g. "This language has already been added") -->
+      <small v-if="hasError('nonFieldErrors')" class="text-red-500">{{ fieldError('nonFieldErrors') }}</small>
 
       <div class="flex justify-end gap-2">
         <Button

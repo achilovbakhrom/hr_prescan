@@ -73,10 +73,6 @@ REST_FRAMEWORK.update(  # noqa: F405
         "DEFAULT_THROTTLE_RATES": {
             "anon": "60/minute",
             "user": "300/minute",
-            # Fine-grained scopes defined per view with ScopedRateThrottle:
-            "auth": "10/minute",
-            "ai_scoring": "20/hour",
-            "file_upload": "30/hour",
         },
     }
 )
