@@ -360,6 +360,8 @@ RULES:
 
     parsed = json.loads(text)
 
+    from django.db import transaction
+
     from apps.accounts.models import (
         CandidateLanguage,
         Certification,
@@ -367,13 +369,13 @@ RULES:
         WorkExperience,
     )
 
-    WorkExperience.objects.filter(profile=profile).delete()
-    Education.objects.filter(profile=profile).delete()
-    CandidateLanguage.objects.filter(profile=profile).delete()
-    Certification.objects.filter(profile=profile).delete()
-    profile.skills.clear()
-
-    _populate_profile_from_parsed(profile=profile, data=parsed)
+    with transaction.atomic():
+        WorkExperience.objects.filter(profile=profile).delete()
+        Education.objects.filter(profile=profile).delete()
+        CandidateLanguage.objects.filter(profile=profile).delete()
+        Certification.objects.filter(profile=profile).delete()
+        profile.skills.clear()
+        _populate_profile_from_parsed(profile=profile, data=parsed)
 
     return profile
 

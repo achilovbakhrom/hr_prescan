@@ -965,6 +965,14 @@ class CvParseApi(APIView):
         if not cv_file:
             return Response({"detail": "No file provided."}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Validate file size (10 MB max)
+        max_size = 10 * 1024 * 1024
+        if cv_file.size > max_size:
+            return Response(
+                {"detail": "File too large. Maximum 10 MB."},
+                status=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            )
+
         # Validate file type
         ext = cv_file.name.rsplit(".", 1)[-1].lower() if "." in cv_file.name else ""
         if ext not in ("pdf", "docx"):
