@@ -144,6 +144,7 @@ class InternalInterviewContextApi(APIView):
             "company_name": company.name,
             "duration_minutes": interview.duration_minutes,
             "cv_summary": interview.application.cv_parsed_text or "No CV data available.",
+            "language": interview.language,
             "questions": questions,
             "criteria": criteria,
             "custom_prompt": custom_prompt,

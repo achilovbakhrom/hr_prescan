@@ -84,6 +84,8 @@ class ApplicationDetailOutputSerializer(serializers.ModelSerializer):
             "cv_parsed_data",
             "match_score",
             "match_details",
+            "match_notes_translations",
+            "cv_summary_translations",
             "prescan_token",
             "interview_token",
             "interview_enabled",

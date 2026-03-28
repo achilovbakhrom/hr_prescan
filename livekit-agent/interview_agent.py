@@ -99,6 +99,7 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
                 transcript=transcript,
                 criteria=context.criteria,
                 cv_summary=context.cv_summary,
+                language=context.language,
                 integrity_flags=integrity_flags,
             )
         except Exception:

@@ -1,4 +1,4 @@
-import type { CompanySize, UserRole, User } from '@/shared/types/auth.types'
+import type { CompanySize, HRPermission, UserRole, User } from '@/shared/types/auth.types'
 
 export interface CompanyProfileUpdate {
   name: string
@@ -12,6 +12,7 @@ export interface CompanyProfileUpdate {
 export interface Invitation {
   id: string
   email: string
+  permissions: HRPermission[]
   invitedBy: User
   isAccepted: boolean
   expiresAt: string
@@ -24,10 +25,12 @@ export interface TeamMember {
   firstName: string
   lastName: string
   role: UserRole
+  hrPermissions: HRPermission[]
   isActive: boolean
   createdAt: string
 }
 
 export interface InviteHRRequest {
   email: string
+  permissions: HRPermission[]
 }

@@ -106,18 +106,6 @@ def _handle_start(*, chat_id, telegram_id, telegram_username="", first_name="", 
     """Handle the /start command, optionally auto-linking via deep-link payload."""
     from apps.accounts.models import User
 
-    # If payload starts with "login_", it's a bot-based sign-in flow
-    if payload.startswith("login_"):
-        _handle_login_code(
-            chat_id=chat_id,
-            telegram_id=telegram_id,
-            telegram_username=telegram_username,
-            first_name=first_name,
-            last_name=last_name,
-            code=payload[6:],  # strip "login_" prefix
-        )
-        return
-
     user = User.objects.filter(telegram_id=telegram_id).first()
     if user:
         send_message(
@@ -166,82 +154,6 @@ def _handle_help(*, chat_id, telegram_id):
             "Just describe what you need in natural language!\n"
             "You can also send voice messages."
         ),
-    )
-
-
-def _handle_login_code(*, chat_id, telegram_id, telegram_username, first_name, last_name, code):
-    """Handle bot-based sign-in: find/create user and mark auth code as authenticated."""
-    from django.db import transaction
-    from django.utils import timezone
-
-    from apps.accounts.models import User
-    from apps.applications.services import bind_existing_applications
-    from apps.integrations.models import TelegramAuthCode
-
-    try:
-        with transaction.atomic():
-            auth_code = (
-                TelegramAuthCode.objects.filter(
-                    code=code, is_authenticated=False, expires_at__gt=timezone.now()
-                )
-                .select_for_update()
-                .first()
-            )
-
-            if auth_code is None:
-                send_message(
-                    chat_id=chat_id,
-                    text="This login link has expired or is invalid. Please try again from the website.",
-                )
-                return
-
-            # Find or create user by telegram_id
-            user = User.objects.filter(telegram_id=telegram_id).first()
-
-            if user is None:
-                user = User.objects.create_user(
-                    email=f"tg_{telegram_id}@telegram.local",
-                    password=None,
-                    first_name=first_name,
-                    last_name=last_name,
-                    role=User.Role.CANDIDATE,
-                    email_verified=True,
-                )
-                user.telegram_id = telegram_id
-                user.telegram_username = telegram_username
-                user.onboarding_completed = False
-                user.save(update_fields=["telegram_id", "telegram_username", "onboarding_completed", "updated_at"])
-                logger.info("Created new user via Telegram bot auth: tg_id=%s", telegram_id)
-                bind_existing_applications(user=user)
-            elif not user.is_active:
-                send_message(chat_id=chat_id, text="Your account has been deactivated.")
-                return
-            else:
-                # Update username if changed
-                if user.telegram_username != telegram_username and telegram_username:
-                    user.telegram_username = telegram_username
-                    user.save(update_fields=["telegram_username", "updated_at"])
-
-            # Mark code as authenticated
-            auth_code.authenticated_user = user
-            auth_code.is_authenticated = True
-            auth_code.save(update_fields=["authenticated_user", "is_authenticated", "updated_at"])
-
-    except Exception:
-        logger.exception("Error handling Telegram login code")
-        send_message(chat_id=chat_id, text="Something went wrong. Please try again.")
-        return
-
-    frontend_url = settings.FRONTEND_URL.rstrip("/")
-    send_message(
-        chat_id=chat_id,
-        text=f"You're now signed in as {user.first_name or user.email}. Tap the button below to continue.",
-        reply_markup={
-            "inline_keyboard": [[{
-                "text": "Open Website",
-                "url": frontend_url,
-            }]],
-        },
     )
 
 

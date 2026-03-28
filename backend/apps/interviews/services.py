@@ -171,6 +171,7 @@ def complete_session(
     interview: Interview,
     overall_score: Decimal,
     ai_summary: str,
+    ai_summary_translations: dict | None = None,
     transcript: list,
     recording_path: str = "",
     ai_decision: str = "advance",
@@ -193,17 +194,22 @@ def complete_session(
     interview.ai_summary = ai_summary
     interview.transcript = transcript
     interview.recording_path = recording_path
-    interview.save(
-        update_fields=[
-            "status",
-            "completed_at",
-            "overall_score",
-            "ai_summary",
-            "transcript",
-            "recording_path",
-            "updated_at",
-        ]
-    )
+
+    update_fields = [
+        "status",
+        "completed_at",
+        "overall_score",
+        "ai_summary",
+        "transcript",
+        "recording_path",
+        "updated_at",
+    ]
+
+    if ai_summary_translations is not None:
+        interview.ai_summary_translations = ai_summary_translations
+        update_fields.append("ai_summary_translations")
+
+    interview.save(update_fields=update_fields)
 
     application = interview.application
 

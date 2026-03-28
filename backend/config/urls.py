@@ -30,6 +30,7 @@ from apps.common.apis import HRDashboardApi
 from apps.common.apis_ai import AIAssistantApi
 from apps.common.apis_candidate_ai import CandidateAIAssistantApi
 from apps.common.apis_candidate_dashboard import CandidateDashboardApi
+from apps.common.apis_translate import TranslateAIContentApi
 from apps.common.apis_hr_analytics import HRAnalyticsApi
 from apps.common.apis_country import CountryListApi
 from apps.common.apis_education_level import EducationLevelListApi
@@ -72,6 +73,7 @@ urlpatterns = [
     path("api/hr/dashboard/", HRDashboardApi.as_view(), name="hr-dashboard"),
     path("api/hr/ai-assistant/", AIAssistantApi.as_view(), name="hr-ai-assistant"),
     path("api/hr/analytics/", HRAnalyticsApi.as_view(), name="hr-analytics"),
+    path("api/hr/translate/", TranslateAIContentApi.as_view(), name="hr-translate"),
     path("api/notifications/", include((notification_urlpatterns, "notifications"))),
     path("api/public/countries/", CountryListApi.as_view(), name="public-countries"),
     path("api/public/industries/", IndustryListApi.as_view(), name="public-industries"),

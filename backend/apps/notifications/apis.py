@@ -4,7 +4,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.accounts.permissions import IsAdmin, IsHRManager
+from apps.accounts.permissions import HasHRPermission, HRPermissions, IsAdmin, IsHRManager
 from apps.applications.models import Application
 from apps.common.exceptions import ApplicationError
 from apps.notifications.models import Notification
@@ -96,7 +96,8 @@ class HRMessageListApi(APIView):
     POST /api/hr/candidates/{application_id}/messages/ — send a message to candidate
     """
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_CANDIDATES
 
     def get(self, request: Request, application_id: str) -> Response:
         application = self._get_application(request, application_id)
@@ -190,7 +191,8 @@ class CandidateMessageListApi(APIView):
 class SendCandidateEmailApi(APIView):
     """POST /api/hr/candidates/{application_id}/email/ — send email to candidate."""
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_CANDIDATES
 
     def post(self, request: Request, application_id: str) -> Response:
         try:
@@ -226,7 +228,8 @@ class SendCandidateEmailApi(APIView):
 class BulkStatusUpdateApi(APIView):
     """POST /api/hr/candidates/bulk-status/ — update multiple applications at once."""
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_CANDIDATES
 
     def post(self, request: Request) -> Response:
         serializer = BulkStatusUpdateInputSerializer(data=request.data)

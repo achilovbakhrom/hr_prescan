@@ -5,6 +5,7 @@ import ProgressBar from 'primevue/progressbar'
 import { apiClient } from '@/shared/api/client'
 import { candidateService } from '../services/candidate.service'
 import VoiceMessageBubble from '@/features/interviews/components/VoiceMessageBubble.vue'
+import TranslatableText from '@/shared/components/TranslatableText.vue'
 
 const { t } = useI18n()
 
@@ -28,6 +29,7 @@ interface InterviewScore {
   criteriaName: string
   score: number
   aiNotes: string
+  aiNotesTranslations: Record<string, string>
 }
 
 interface InterviewData {
@@ -35,6 +37,7 @@ interface InterviewData {
   status: string
   overallScore: number | null
   aiSummary: string
+  aiSummaryTranslations: Record<string, string>
   chatHistory: ChatMessage[]
   scores: InterviewScore[]
   createdAt: string
@@ -152,7 +155,18 @@ onBeforeUnmount(() => {
         <!-- AI Summary -->
         <div v-if="interview.aiSummary" class="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
           <p class="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">{{ t('interviews.aiAssessment') }}</p>
-          <p class="text-sm text-gray-700 leading-relaxed">{{ interview.aiSummary }}</p>
+          <TranslatableText
+            :text="interview.aiSummary"
+            :translations="interview.aiSummaryTranslations || {}"
+            model="interview"
+            :object-id="interview.id"
+            field="ai_summary"
+            @translated="(tr) => interview.aiSummaryTranslations = tr"
+          >
+            <template #default="{ text }">
+              <p class="text-sm text-gray-700 leading-relaxed">{{ text }}</p>
+            </template>
+          </TranslatableText>
         </div>
 
         <!-- Per-criteria scores -->
@@ -170,7 +184,19 @@ onBeforeUnmount(() => {
               </span>
             </div>
             <ProgressBar :value="score.score * 10" :show-value="false" style="height: 6px" />
-            <p v-if="score.aiNotes" class="mt-1.5 text-xs text-gray-500">{{ score.aiNotes }}</p>
+            <TranslatableText
+              v-if="score.aiNotes"
+              :text="score.aiNotes"
+              :translations="score.aiNotesTranslations || {}"
+              model="interview_score"
+              :object-id="score.id"
+              field="ai_notes"
+              @translated="(tr) => score.aiNotesTranslations = tr"
+            >
+              <template #default="{ text }">
+                <p class="mt-1.5 text-xs text-gray-500">{{ text }}</p>
+              </template>
+            </TranslatableText>
           </div>
         </div>
 

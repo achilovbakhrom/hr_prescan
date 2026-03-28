@@ -28,9 +28,11 @@ from apps.accounts.apis import (
     LoginApi,
     LogoutApi,
     MeApi,
+    MyCompaniesApi,
     MyInvitationsApi,
     ProfileCompletenessApi,
     RegisterApi,
+    SwitchCompanyApi,
     TeamListApi,
     TeamMemberDetailApi,
     TelegramAuthApi,
@@ -56,6 +58,8 @@ auth_urlpatterns = [
     path("accept-company-invitation/", AcceptCompanyInvitationApi.as_view(), name="accept-company-invitation"),
     path("complete-company-setup/", CompleteCompanySetupApi.as_view(), name="complete-company-setup"),
     path("complete-onboarding/", CompleteOnboardingApi.as_view(), name="complete-onboarding"),
+    path("my-companies/", MyCompaniesApi.as_view(), name="my-companies"),
+    path("switch-company/", SwitchCompanyApi.as_view(), name="switch-company"),
 ]
 
 # HR URLs — mounted at /api/hr/company/

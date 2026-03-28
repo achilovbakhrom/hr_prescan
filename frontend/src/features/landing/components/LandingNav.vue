@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
+import Menu from 'primevue/menu'
+import type { MenuItem } from 'primevue/menuitem'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import LanguageSwitcher from '@/shared/components/LanguageSwitcher.vue'
@@ -12,6 +14,28 @@ const router = useRouter()
 const authStore = useAuthStore()
 const { t } = useI18n()
 const mobileOpen = ref(false)
+const userMenu = ref<InstanceType<typeof Menu> | null>(null)
+
+const menuItems = computed<MenuItem[]>(() => [
+  {
+    label: t('nav.profile'),
+    icon: 'pi pi-user',
+    command: () => router.push({ name: ROUTE_NAMES.PROFILE }),
+  },
+  { separator: true },
+  {
+    label: t('nav.logout'),
+    icon: 'pi pi-sign-out',
+    command: async () => {
+      await authStore.logout()
+      await router.push({ name: ROUTE_NAMES.LOGIN })
+    },
+  },
+])
+
+function toggleUserMenu(event: Event): void {
+  userMenu.value?.toggle(event)
+}
 
 function scrollTo(id: string): void {
   mobileOpen.value = false
@@ -61,9 +85,20 @@ const navLinks = [
             class="hidden sm:flex"
             @click="router.push({ name: ROUTE_NAMES.DASHBOARD })"
           />
-          <div class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-medium text-blue-700">
-            {{ authStore.user?.firstName?.charAt(0) }}{{ authStore.user?.lastName?.charAt(0) }}
-          </div>
+          <button
+            type="button"
+            class="flex items-center gap-2 rounded-lg px-2 py-1 transition-colors hover:bg-gray-100"
+            @click="toggleUserMenu"
+          >
+            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-medium text-blue-700">
+              {{ authStore.user?.firstName?.charAt(0) }}{{ authStore.user?.lastName?.charAt(0) }}
+            </div>
+            <span class="hidden text-sm font-medium text-gray-700 sm:inline">
+              {{ authStore.user?.firstName }}
+            </span>
+            <i class="pi pi-chevron-down hidden text-xs text-gray-400 sm:inline"></i>
+          </button>
+          <Menu ref="userMenu" :model="menuItems" :popup="true" />
         </template>
         <template v-else>
           <Button
@@ -130,6 +165,22 @@ const navLinks = [
               :label="t('nav.dashboard')"
               icon="pi pi-th-large"
               @click="router.push({ name: ROUTE_NAMES.DASHBOARD }); mobileOpen = false"
+            />
+            <Button
+              :label="t('nav.profile')"
+              icon="pi pi-user"
+              text
+              severity="secondary"
+              class="justify-start"
+              @click="router.push({ name: ROUTE_NAMES.PROFILE }); mobileOpen = false"
+            />
+            <Button
+              :label="t('nav.logout')"
+              icon="pi pi-sign-out"
+              text
+              severity="secondary"
+              class="justify-start"
+              @click="authStore.logout().then(() => { router.push({ name: ROUTE_NAMES.LOGIN }); mobileOpen = false })"
             />
           </template>
         </div>

@@ -18,6 +18,7 @@ export type StepType = 'prescanning' | 'interview'
 export interface VacancyDetail extends Vacancy {
   prescanningPrompt: string
   interviewPrompt: string
+  prescanningLanguage: string
   criteria: VacancyCriteria[]
   questions: InterviewQuestion[]
   createdByEmail: string
@@ -67,6 +68,7 @@ export interface CreateVacancyRequest {
   employerId?: string
   prescanningPrompt?: string
   interviewPrompt?: string
+  prescanningLanguage?: string
 }
 
 export interface UpdateVacancyRequest extends Partial<CreateVacancyRequest> {}

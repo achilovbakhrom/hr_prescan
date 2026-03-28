@@ -40,7 +40,9 @@
     "required_field": "This field is required",
     "skills": "Skills",
     "language": "Language",
-    "educationLevel": "Education Level"
+    "educationLevel": "Education Level",
+    "translate": "Translate",
+    "translating": "Translating..."
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -91,10 +93,8 @@
     },
     "telegram": {
       "signIn": "Sign in with Telegram",
-      "waiting": "Waiting for Telegram...",
-      "openApp": "Open Telegram and press Start in the bot to sign in.",
-      "expired": "Login link expired. Please try again.",
-      "requestFailed": "Failed to start Telegram sign-in. Please try again."
+      "signingIn": "Signing in...",
+      "requestFailed": "Telegram sign-in failed. Please try again."
     },
     "register": {
       "title": "Create Account",
@@ -407,6 +407,8 @@
       "prescanningPrompt": "Additional Instructions for AI",
       "prescanningPromptHint": "Guide the AI's behavior during prescanning. It already knows the vacancy details.",
       "prescanningPromptPlaceholder": "e.g. Focus on their experience with microservices architecture...",
+      "prescanningLanguage": "Prescanning Language",
+      "prescanningLanguageHint": "Language the AI agent will use during prescanning",
       "interviewOptional": "Second-step AI Interview",
       "interviewHint": "Enable a deeper interview for candidates who passed prescanning.",
       "interviewMode": "Interview Mode",
@@ -590,9 +592,9 @@
       "moveForward": "Recommend to move forward",
       "consider": "Consider for next round",
       "notRecommended": "Not recommended to proceed",
-      "strong": "Strong Candidate \u2014 Recommend to move forward",
-      "moderate": "Moderate Candidate \u2014 Consider for next round",
-      "weak": "Weak Candidate \u2014 Not recommended to proceed"
+      "strong": "Strong Candidate — Recommend to move forward",
+      "moderate": "Moderate Candidate — Consider for next round",
+      "weak": "Weak Candidate — Not recommended to proceed"
     },
     "matchScoreView": {
       "noAnalysis": "Analysis will be available after CV processing and prescanning/interview completion.",
@@ -1307,5 +1309,23 @@
       "modern": "Modern",
       "minimal": "Minimal"
     }
+  },
+  "permissions": {
+    "title": "Permissions",
+    "manageVacancies": "Manage Vacancies",
+    "manageVacanciesDesc": "Create, edit, publish, and archive vacancies",
+    "manageCandidates": "Manage Candidates",
+    "manageCandidatesDesc": "View candidates, change status, reject, hire",
+    "manageInterviews": "Manage Interviews",
+    "manageInterviewsDesc": "Schedule, view, and cancel interviews",
+    "manageTeam": "Manage Team",
+    "manageTeamDesc": "Invite users and manage permissions",
+    "viewAnalytics": "View Analytics",
+    "viewAnalyticsDesc": "Access HR analytics dashboard",
+    "manageSettings": "Manage Settings",
+    "manageSettingsDesc": "Company settings and subscription",
+    "selectPermissions": "Select permissions for this user",
+    "allPermissions": "All permissions (Company Admin)",
+    "noPermissions": "No permissions assigned"
   }
 }

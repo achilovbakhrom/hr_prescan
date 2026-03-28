@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Tag from 'primevue/tag'
 import Button from 'primevue/button'
+import TranslatableText from '@/shared/components/TranslatableText.vue'
 
 const { t } = useI18n()
 
@@ -20,6 +21,9 @@ const props = defineProps<{
   cvFilename?: string
   matchScore?: number | null
   matchDetails?: MatchDetails | null
+  matchNotesTranslations?: Record<string, string>
+  cvSummaryTranslations?: Record<string, string>
+  applicationId?: string
 }>()
 
 const emit = defineEmits<{
@@ -133,7 +137,19 @@ function contactHref(label: string, value: string): string | undefined {
       </div>
       <div class="flex-1">
         <p class="text-sm font-semibold text-gray-700">{{ t('candidates.matchScore') }}</p>
-        <p v-if="props.matchDetails?.notes" class="mt-0.5 text-xs text-gray-500">{{ props.matchDetails.notes }}</p>
+        <TranslatableText
+          v-if="props.matchDetails?.notes && props.applicationId"
+          :text="props.matchDetails.notes"
+          :translations="props.matchNotesTranslations || {}"
+          model="application"
+          :object-id="props.applicationId"
+          field="match_notes"
+        >
+          <template #default="{ text }">
+            <p class="mt-0.5 text-xs text-gray-500">{{ text }}</p>
+          </template>
+        </TranslatableText>
+        <p v-else-if="props.matchDetails?.notes" class="mt-0.5 text-xs text-gray-500">{{ props.matchDetails.notes }}</p>
       </div>
     </div>
 
@@ -174,7 +190,19 @@ function contactHref(label: string, value: string): string | undefined {
     <div v-if="summary">
       <h3 class="mb-2 text-sm font-semibold text-gray-600">{{ t('candidates.cvData.summary') }}</h3>
       <div class="rounded-lg border border-gray-100 bg-gray-50 p-3 text-sm text-gray-700">
-        <div class="prose prose-sm max-w-none" v-html="summary"></div>
+        <TranslatableText
+          v-if="props.applicationId"
+          :text="summary"
+          :translations="props.cvSummaryTranslations || {}"
+          model="application"
+          :object-id="props.applicationId"
+          field="cv_summary"
+        >
+          <template #default="{ text }">
+            <div class="prose prose-sm max-w-none">{{ text }}</div>
+          </template>
+        </TranslatableText>
+        <div v-else class="prose prose-sm max-w-none" v-html="summary"></div>
         <span v-if="experienceYears" class="ml-1 text-gray-400">({{ experienceYears }}+ {{ t('candidates.cvData.years') }})</span>
       </div>
     </div>

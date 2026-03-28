@@ -94,6 +94,11 @@ class Vacancy(BaseModel):
     company_info = models.TextField(blank=True, default="")  # Optional company description for AI interview intro
     prescanning_prompt = models.TextField(blank=True, default="")  # Additional instructions for prescanning AI agent
     interview_prompt = models.TextField(blank=True, default="")  # Additional instructions for interview AI agent
+    prescanning_language = models.CharField(
+        max_length=10,
+        choices=[("en", "English"), ("ru", "Russian"), ("uz", "Uzbek")],
+        default="en",
+    )
     employer = models.ForeignKey(
         "vacancies.EmployerCompany",
         on_delete=models.SET_NULL,
@@ -134,6 +139,7 @@ class EmployerCompany(BaseModel):
     logo = models.URLField(blank=True)
     website = models.URLField(blank=True)
     description = models.TextField(blank=True)
+    description_translations = models.JSONField(default=dict, blank=True)
     source = models.CharField(
         max_length=10,
         choices=Source.choices,

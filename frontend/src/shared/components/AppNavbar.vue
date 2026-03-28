@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import Menu from 'primevue/menu'
 import Badge from 'primevue/badge'
+import Select from 'primevue/select'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { authService } from '@/features/auth/services/auth.service'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
@@ -69,6 +70,14 @@ function handleMenuToggle(): void {
     emit('toggleMobileNav')
   }
 }
+
+const activeCompanyId = computed(() => authStore.user?.company?.id ?? null)
+
+async function handleCompanySwitch(companyId: string): Promise<void> {
+  if (companyId === activeCompanyId.value) return
+  await authStore.switchCompany(companyId)
+  router.push({ name: ROUTE_NAMES.DASHBOARD })
+}
 </script>
 
 <template>
@@ -96,9 +105,19 @@ function handleMenuToggle(): void {
         <span class="hidden sm:inline">{{ t('nav.browseJobs') }}</span>
         <span class="sm:hidden">{{ t('nav.jobs') }}</span>
       </a>
-      <!-- Current company -->
+      <!-- Company switcher / badge -->
+      <Select
+        v-if="authStore.hasMultipleCompanies"
+        :model-value="activeCompanyId"
+        :options="authStore.companies"
+        option-label="company.name"
+        option-value="company.id"
+        class="hidden !text-xs sm:inline-flex"
+        :pt="{ root: { class: '!py-1 !px-2 !min-w-0 max-w-48' }, label: { class: '!text-xs !py-0' } }"
+        @update:model-value="handleCompanySwitch"
+      />
       <span
-        v-if="authStore.user?.company"
+        v-else-if="authStore.user?.company"
         class="hidden rounded-md bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600 sm:inline"
       >
         {{ authStore.user.company.name }}

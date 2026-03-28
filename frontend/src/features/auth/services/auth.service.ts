@@ -1,4 +1,5 @@
 import { apiClient } from '@/shared/api/client'
+import type { CompanyMembership } from '@/shared/types/auth.types'
 import type {
   AcceptInvitationRequest,
   CompleteCompanySetupRequest,
@@ -55,6 +56,19 @@ export const authService = {
     return response.data
   },
 
+  async telegramAuth(data: {
+    id: number
+    first_name: string
+    last_name: string
+    username: string
+    photo_url: string
+    auth_date: number
+    hash: string
+  }): Promise<LoginResponse> {
+    const response = await apiClient.post<LoginResponse>('/auth/telegram/', data)
+    return response.data
+  },
+
   async getMyInvitations(): Promise<PendingInvitation[]> {
     const response = await apiClient.get<PendingInvitation[]>('/auth/my-invitations')
     return response.data
@@ -72,6 +86,16 @@ export const authService = {
 
   async completeOnboarding(): Promise<{ user: User }> {
     const response = await apiClient.post<{ user: User }>('/auth/complete-onboarding')
+    return response.data
+  },
+
+  async getMyCompanies(): Promise<CompanyMembership[]> {
+    const response = await apiClient.get<CompanyMembership[]>('/auth/my-companies')
+    return response.data
+  },
+
+  async switchCompany(companyId: string): Promise<User> {
+    const response = await apiClient.post<User>('/auth/switch-company', { companyId })
     return response.data
   },
 }

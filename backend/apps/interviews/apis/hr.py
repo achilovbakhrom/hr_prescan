@@ -5,7 +5,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.accounts.permissions import IsAdmin, IsHRManager
+from apps.accounts.permissions import HasHRPermission, HRPermissions
 from apps.applications.selectors import get_application_by_id
 from apps.common.exceptions import ApplicationError
 from apps.common.messages import (
@@ -48,7 +48,8 @@ class HRApplicationInterviewApi(APIView):
     retrieve a specific session.
     """
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_INTERVIEWS
 
     def get(self, request: Request, application_id: str) -> Response:
         company = request.user.company
@@ -99,7 +100,8 @@ class HRApplicationInterviewApi(APIView):
 class ScheduleHumanInterviewApi(APIView):
     """POST /api/hr/candidates/{application_id}/schedule-human-interview/"""
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_INTERVIEWS
 
     class InputSerializer(serializers.Serializer):
         scheduled_at = serializers.DateTimeField()
@@ -139,7 +141,8 @@ class ScheduleHumanInterviewApi(APIView):
 class HRInterviewListApi(APIView):
     """GET /api/hr/interviews/"""
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_INTERVIEWS
 
     class FilterSerializer(serializers.Serializer):
         status = serializers.ChoiceField(
@@ -171,7 +174,8 @@ class HRInterviewListApi(APIView):
 class HRInterviewDetailApi(APIView):
     """GET /api/hr/interviews/{id}/"""
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_INTERVIEWS
 
     def get(self, request: Request, interview_id: str) -> Response:
         company = request.user.company
@@ -199,7 +203,8 @@ class HRInterviewDetailApi(APIView):
 class CancelInterviewApi(APIView):
     """POST /api/hr/interviews/{id}/cancel/"""
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_INTERVIEWS
 
     def post(self, request: Request, interview_id: str) -> Response:
         company = request.user.company
@@ -239,7 +244,8 @@ class ResetInterviewApi(APIView):
     and cancels the old one.
     """
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_INTERVIEWS
 
     def post(self, request: Request, interview_id: str) -> Response:
         company = request.user.company
@@ -275,7 +281,8 @@ class ResetInterviewApi(APIView):
 class ObserverTokenApi(APIView):
     """GET /api/hr/interviews/{id}/observer-token/"""
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_INTERVIEWS
 
     def get(self, request: Request, interview_id: str) -> Response:
         company = request.user.company
@@ -308,7 +315,8 @@ class ObserverTokenApi(APIView):
 class InterviewTranscriptApi(APIView):
     """GET /api/hr/interviews/{id}/transcript/ — timestamped transcript."""
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_INTERVIEWS
 
     def get(self, request: Request, interview_id: str) -> Response:
         company = request.user.company
@@ -345,7 +353,8 @@ class InterviewTranscriptApi(APIView):
 class InterviewRecordingApi(APIView):
     """GET /api/hr/interviews/{id}/recording/ — recording path / presigned URL."""
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_INTERVIEWS
 
     def get(self, request: Request, interview_id: str) -> Response:
         company = request.user.company
@@ -393,7 +402,8 @@ class IntegrityFlagsApi(APIView):
     Only available for HR managers and admins scoped to their company.
     """
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_INTERVIEWS
 
     def get(self, request: Request, interview_id: str) -> Response:
         company = request.user.company
@@ -423,7 +433,8 @@ class IntegrityFlagsApi(APIView):
 class HRVoiceMessageAudioApi(APIView):
     """GET /api/hr/interviews/{interview_id}/voice/{message_index}/audio/ — HR plays voice message."""
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_INTERVIEWS
 
     def get(self, request: Request, interview_id: str, message_index: int) -> Response:
         company = request.user.company

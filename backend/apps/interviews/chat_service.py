@@ -25,6 +25,13 @@ from apps.interviews.models import Interview
 
 logger = logging.getLogger(__name__)
 
+LANGUAGE_NAMES = {"en": "English", "ru": "Russian", "uz": "Uzbek"}
+
+
+def _language_name(code: str) -> str:
+    return LANGUAGE_NAMES.get(code, "English")
+
+
 SESSION_COMPLETE_ADVANCE = "[SESSION_ADVANCE]"
 SESSION_COMPLETE_REJECT = "[SESSION_REJECT]"
 
@@ -67,7 +74,7 @@ def _build_system_prompt(interview: Interview) -> str:
 - Skills: {', '.join(cv_data.get('skills', [])) or 'Not available'}
 - Experience: {cv_data.get('experience_years', 'Unknown')} years
 - Education: {cv_data.get('education', 'Not available')}
-- Languages: {', '.join(cv_data.get('languages', [])) or 'Not available'}
+- Languages: {', '.join(lang if isinstance(lang, str) else f"{lang.get('language', '')} ({lang.get('level', '')})" for lang in cv_data.get('languages', [])) or 'Not available'}
 - Summary: {cv_data.get('summary', 'Not available')}
 
 Use this CV data to ask targeted follow-up questions and verify claims.
@@ -150,7 +157,7 @@ When you have enough information to make a decision:
 - The marker must be the last thing in your message
 
 ## Language
-Respond in the same language the candidate uses. If they write in Russian, respond in Russian. If in English, respond in English.
+You MUST respond ONLY in {_language_name(interview.language)}. All your messages must be in {_language_name(interview.language)}.
 
 ## Style
 - Keep messages under 100 words
@@ -317,13 +324,10 @@ def _get_ai_response_and_update_history(interview: Interview, candidate_entry: d
     interview.chat_history = chat_history
     update_fields = ["chat_history", "updated_at"]
 
-    if is_complete:
-        interview.status = Interview.Status.COMPLETED
-        update_fields.append("status")
-
     interview.save(update_fields=update_fields)
 
     # If complete, run evaluation and update application status
+    # Note: complete_session() handles the status transition to COMPLETED
     if is_complete:
         logger.info("Chat session %s (%s) completed, running evaluation...", interview.id, interview.session_type)
 
@@ -496,6 +500,7 @@ def evaluate_chat_interview(interview: Interview, *, ai_decision: str = "advance
 ## Your Task
 Score the candidate on EACH criteria (1-10 scale) and provide a brief note explaining each score.
 Also provide an overall summary (2-3 sentences) and an overall weighted score (1-10).
+Write all notes and the summary in {_language_name(interview.language)}.
 
 Respond with ONLY valid JSON in this exact format:
 {{
@@ -543,6 +548,7 @@ Respond with ONLY valid JSON in this exact format:
         return
 
     # Save scores
+    lang = interview.language or "en"
     valid_criteria_ids = {str(c["id"]) for c in criteria_list}
     score_objects = []
     for score_data in result.get("scores", []):
@@ -556,6 +562,7 @@ Respond with ONLY valid JSON in this exact format:
                 criteria_id=cid,
                 score=score_val,
                 ai_notes=score_data.get("notes", ""),
+                ai_notes_translations={lang: score_data.get("notes", "")},
             )
         )
 
@@ -567,11 +574,15 @@ Respond with ONLY valid JSON in this exact format:
     overall_decimal = Decimal(str(min(10, max(0, float(overall)))))
     summary = result.get("summary", "")
 
+    # Store translation for the original language
+    interview.ai_summary_translations = {lang: summary}
+
     # Complete the session — this updates application status and creates interview if needed
     complete_session(
         interview=interview,
         overall_score=overall_decimal,
         ai_summary=summary,
+        ai_summary_translations=interview.ai_summary_translations,
         transcript=interview.chat_history or [],
         ai_decision=ai_decision,
     )

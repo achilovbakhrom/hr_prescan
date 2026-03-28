@@ -98,6 +98,7 @@ def update_vacancy(*, vacancy: Vacancy, data: dict) -> Vacancy:
         "company_info",
         "prescanning_prompt",
         "interview_prompt",
+        "prescanning_language",
     }
 
     # Guard: interview_mode cannot be changed once applications exist
@@ -461,7 +462,8 @@ def parse_company_info_from_file(*, file_obj) -> str:
     if not text.strip():
         raise ApplicationError(str(MSG_FILE_EXTRACT_FAILED))
 
-    return _generate_company_info_with_ai(text=text, source_label="document")
+    description, _ = _generate_company_info_with_ai(text=text, source_label="document")
+    return description
 
 
 def _extract_text_from_pdf(file_bytes: bytes) -> str:
@@ -542,11 +544,15 @@ def parse_company_info_from_url(*, url: str) -> str:
     if not text.strip():
         raise ApplicationError(str(MSG_WEBSITE_EXTRACT_FAILED))
 
-    return _generate_company_info_with_ai(text=text, source_label="website")
+    description, _ = _generate_company_info_with_ai(text=text, source_label="website")
+    return description
 
 
-def _generate_company_info_with_ai(*, text: str, source_label: str = "document") -> str:
-    """Use AI to generate a company info summary from extracted text."""
+def _generate_company_info_with_ai(*, text: str, source_label: str = "document") -> tuple[str, str]:
+    """Use AI to generate a company info summary from extracted text.
+
+    Returns (description, detected_language_code).
+    """
     try:
         client = genai.Client(api_key=settings.GOOGLE_API_KEY)
         response = client.models.generate_content(
@@ -567,6 +573,9 @@ def _generate_company_info_with_ai(*, text: str, source_label: str = "document")
                     f"company {source_label}, write a concise "
                     "company introduction (3-5 paragraphs) that an AI interviewer can use to "
                     "introduce the company to candidates.\n\n"
+                    "Write in the same language as the source content. "
+                    "If the source is in Russian, write in Russian. If in English, write in English. "
+                    "If in Uzbek, write in Uzbek.\n\n"
                     "Include: what the company does, industry, mission/values, culture, "
                     "notable achievements or products, and team size if available.\n"
                     "Tone: professional but friendly. Write in third person."
@@ -574,10 +583,31 @@ def _generate_company_info_with_ai(*, text: str, source_label: str = "document")
                 temperature=0.3,
             ),
         )
-        return response.text.strip()
+        description = response.text.strip()
+        # Simple language detection heuristic
+        detected_lang = _detect_language(description)
+        return description, detected_lang
     except Exception:
         logger.exception("Failed to generate company info with AI from %s", source_label)
         raise ApplicationError(str(MSG_AI_COMPANY_INFO_FAILED))
+
+
+def _detect_language(text: str) -> str:
+    """Simple heuristic to detect content language from text."""
+    if not text:
+        return "en"
+    # Count Cyrillic characters
+    cyrillic_count = sum(1 for c in text[:500] if "\u0400" <= c <= "\u04ff")
+    total_alpha = sum(1 for c in text[:500] if c.isalpha())
+    if total_alpha > 0 and cyrillic_count / total_alpha > 0.3:
+        return "ru"
+    # Check for Uzbek-specific characters (o', g', sh, ch patterns are common in Latin Uzbek)
+    uz_markers = ["o'", "g'", "sh", "ch", "ng"]
+    lower_text = text[:500].lower()
+    uz_count = sum(lower_text.count(m) for m in uz_markers)
+    if uz_count >= 3:
+        return "uz"
+    return "en"
 
 
 # ---------------------------------------------------------------------------
@@ -593,10 +623,12 @@ def create_employer(*, company: Company, name: str, **kwargs: object) -> Employe
 def create_employer_from_file(*, company: Company, name: str, file_obj: object) -> EmployerCompany:
     """Create an employer company with description parsed from an uploaded file."""
     description = parse_company_info_from_file(file_obj=file_obj)
+    detected_lang = _detect_language(description)
     return EmployerCompany.objects.create(
         company=company,
         name=name,
         description=description,
+        description_translations={detected_lang: description},
         source=EmployerCompany.Source.FILE,
     )
 
@@ -604,10 +636,12 @@ def create_employer_from_file(*, company: Company, name: str, file_obj: object) 
 def create_employer_from_url(*, company: Company, name: str, url: str) -> EmployerCompany:
     """Create an employer company with description parsed from a website URL."""
     description = parse_company_info_from_url(url=url)
+    detected_lang = _detect_language(description)
     return EmployerCompany.objects.create(
         company=company,
         name=name,
         description=description,
+        description_translations={detected_lang: description},
         source=EmployerCompany.Source.WEBSITE,
     )
 

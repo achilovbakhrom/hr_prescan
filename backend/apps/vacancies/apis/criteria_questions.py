@@ -3,7 +3,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.accounts.permissions import IsAdmin, IsHRManager
+from apps.accounts.permissions import HasHRPermission, HRPermissions
 from apps.common.messages import MSG_CRITERIA_NOT_FOUND, MSG_QUESTION_NOT_FOUND, MSG_VACANCY_NOT_FOUND
 from apps.vacancies.models import ScreeningStep
 from apps.vacancies.selectors import get_vacancy_by_id, get_vacancy_criteria, get_vacancy_questions
@@ -25,7 +25,8 @@ class VacancyCriteriaListCreateApi(APIView):
     POST /api/hr/vacancies/{id}/criteria/ — add criteria
     """
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_VACANCIES
 
     class InputSerializer(serializers.Serializer):
         name = serializers.CharField(max_length=255)
@@ -70,7 +71,8 @@ class VacancyCriteriaDetailApi(APIView):
     DELETE /api/hr/vacancies/{id}/criteria/{criteria_id}/ — delete
     """
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_VACANCIES
 
     class InputSerializer(serializers.Serializer):
         name = serializers.CharField(max_length=255, required=False)
@@ -115,7 +117,8 @@ class VacancyQuestionListCreateApi(APIView):
     POST /api/hr/vacancies/{id}/questions/ — add question
     """
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_VACANCIES
 
     class InputSerializer(serializers.Serializer):
         text = serializers.CharField()
@@ -159,7 +162,8 @@ class VacancyQuestionDetailApi(APIView):
     DELETE /api/hr/vacancies/{id}/questions/{question_id}/ — delete
     """
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_VACANCIES
 
     class InputSerializer(serializers.Serializer):
         text = serializers.CharField(required=False)
@@ -201,7 +205,8 @@ class VacancyQuestionDetailApi(APIView):
 class GenerateQuestionsApi(APIView):
     """POST /api/hr/vacancies/{id}/questions/generate/ — AI-generate questions."""
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_VACANCIES
 
     class InputSerializer(serializers.Serializer):
         step = serializers.ChoiceField(

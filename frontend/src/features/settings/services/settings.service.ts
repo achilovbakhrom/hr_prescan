@@ -22,11 +22,11 @@ export const settingsService = {
   },
 
   async inviteHR(data: InviteHRRequest): Promise<Invitation> {
-    const response = await apiClient.post<Invitation>(
+    const response = await apiClient.post<{ invitation: Invitation }>(
       '/hr/company/invite',
       data,
     )
-    return response.data
+    return response.data.invitation
   },
 
   async getTeam(): Promise<TeamMember[]> {
@@ -39,9 +39,15 @@ export const settingsService = {
     return response.data
   },
 
+  async cancelInvitation(invitationId: string): Promise<void> {
+    await apiClient.delete('/hr/company/invite', {
+      data: { invitationId },
+    })
+  },
+
   async updateTeamMember(
     userId: string,
-    data: { isActive: boolean },
+    data: { isActive?: boolean; hrPermissions?: string[] },
   ): Promise<TeamMember> {
     const response = await apiClient.patch<TeamMember>(
       `/hr/company/team/${userId}`,

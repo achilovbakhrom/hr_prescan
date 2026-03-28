@@ -8,6 +8,7 @@ import Button from 'primevue/button'
 import Tag from 'primevue/tag'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import { useEmployerStore } from '../stores/employer.store'
+import TranslatableText from '@/shared/components/TranslatableText.vue'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -157,7 +158,18 @@ function sourceLabel(source: string): string {
         </div>
         <div v-if="employerStore.currentEmployer.description">
           <p class="text-sm text-gray-500">{{ t('employers.description') }}</p>
-          <p class="whitespace-pre-line text-gray-700">{{ employerStore.currentEmployer.description }}</p>
+          <TranslatableText
+            :text="employerStore.currentEmployer.description"
+            :translations="employerStore.currentEmployer.descriptionTranslations || {}"
+            model="employer"
+            :object-id="employerStore.currentEmployer.id"
+            field="description"
+            @translated="(tr) => { if (employerStore.currentEmployer) employerStore.currentEmployer.descriptionTranslations = tr }"
+          >
+            <template #default="{ text }">
+              <p class="whitespace-pre-line text-gray-700">{{ text }}</p>
+            </template>
+          </TranslatableText>
         </div>
       </div>
 

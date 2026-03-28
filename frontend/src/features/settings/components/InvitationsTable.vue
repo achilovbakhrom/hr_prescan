@@ -3,12 +3,17 @@ import { useI18n } from 'vue-i18n'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Tag from 'primevue/tag'
+import Button from 'primevue/button'
 import type { Invitation } from '../types/settings.types'
 
 const { t } = useI18n()
 
 defineProps<{
   invitations: Invitation[]
+}>()
+
+const emit = defineEmits<{
+  cancel: [invitationId: string]
 }>()
 
 function formatDate(dateString: string): string {
@@ -53,6 +58,19 @@ function getStatusLabel(invitation: Invitation): string {
     <Column header="Expires">
       <template #body="{ data }">
         {{ formatDate((data as Invitation).expiresAt) }}
+      </template>
+    </Column>
+    <Column :header="t('common.actions')">
+      <template #body="{ data }">
+        <Button
+          v-if="!(data as Invitation).isAccepted"
+          icon="pi pi-times"
+          severity="danger"
+          text
+          size="small"
+          :label="t('common.cancel')"
+          @click="emit('cancel', (data as Invitation).id)"
+        />
       </template>
     </Column>
   </DataTable>

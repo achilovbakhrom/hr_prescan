@@ -7,6 +7,7 @@ export interface InterviewScore {
   criteriaName: string
   score: number
   aiNotes: string
+  aiNotesTranslations: Record<string, string>
 }
 
 export interface IntegrityFlag {

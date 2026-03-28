@@ -81,7 +81,7 @@ onMounted(async () => {
             icon="pi pi-send"
             size="large"
             class="w-full sm:w-auto"
-            @click="router.push(`/jobs/${route.params.id || route.params.token}/apply`)"
+            @click="router.push(`/jobs/${vacancy!.id}/apply`)"
           />
         </div>
 

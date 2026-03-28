@@ -6,13 +6,14 @@ import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { USER_ROLES } from '@/shared/constants/roles'
 import LanguageSwitcher from '@/shared/components/LanguageSwitcher.vue'
 import AppLogo from '@/shared/components/AppLogo.vue'
-import type { UserRole } from '@/shared/types/auth.types'
+import type { HRPermission, UserRole } from '@/shared/types/auth.types'
 
 interface NavItem {
   label: string
   icon: string
   to: string
   roles: UserRole[]
+  permission?: HRPermission
 }
 
 const props = defineProps<{
@@ -27,6 +28,14 @@ const route = useRoute()
 const authStore = useAuthStore()
 const { t } = useI18n()
 
+function hasPermission(permission?: HRPermission): boolean {
+  if (!permission) return true
+  const user = authStore.user
+  if (!user) return false
+  if (user.role === 'admin') return true
+  return (user.hrPermissions || []).includes(permission)
+}
+
 const navItems = computed<NavItem[]>(() => [
   {
     label: t('nav.dashboard'),
@@ -35,64 +44,39 @@ const navItems = computed<NavItem[]>(() => [
     roles: [USER_ROLES.ADMIN, USER_ROLES.HR, USER_ROLES.CANDIDATE],
   },
   {
-    label: t('nav.admin'),
-    icon: 'pi pi-shield',
-    to: '/admin',
-    roles: [USER_ROLES.ADMIN],
-  },
-  {
-    label: t('nav.companies'),
-    icon: 'pi pi-building',
-    to: '/admin/companies',
-    roles: [USER_ROLES.ADMIN],
-  },
-  {
-    label: t('nav.users'),
-    icon: 'pi pi-users',
-    to: '/admin/users',
-    roles: [USER_ROLES.ADMIN],
-  },
-  {
-    label: t('nav.analytics'),
-    icon: 'pi pi-chart-bar',
-    to: '/admin/analytics',
-    roles: [USER_ROLES.ADMIN],
-  },
-  {
-    label: t('nav.plans'),
-    icon: 'pi pi-list',
-    to: '/admin/plans',
-    roles: [USER_ROLES.ADMIN],
-  },
-  {
     label: t('nav.vacancies'),
     icon: 'pi pi-briefcase',
     to: '/vacancies',
     roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
+    permission: 'manage_vacancies',
   },
   {
     label: t('nav.interviews'),
     icon: 'pi pi-calendar',
     to: '/interviews',
     roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
+    permission: 'manage_interviews',
   },
   {
     label: t('nav.hrAnalytics'),
     icon: 'pi pi-chart-bar',
     to: '/analytics',
     roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
+    permission: 'view_analytics',
   },
   {
     label: t('nav.team'),
     icon: 'pi pi-users',
     to: '/settings/team',
-    roles: [USER_ROLES.ADMIN],
+    roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
+    permission: 'manage_team',
   },
   {
     label: t('settings.company.title'),
     icon: 'pi pi-cog',
     to: '/settings/company',
     roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
+    permission: 'manage_settings',
   },
   {
     label: t('nav.subscription'),
@@ -117,13 +101,12 @@ const navItems = computed<NavItem[]>(() => [
 const filteredItems = computed(() => {
   const userRole = authStore.user?.role
   if (!userRole) return []
-  return navItems.value.filter((item) => item.roles.includes(userRole))
+  return navItems.value.filter((item) =>
+    item.roles.includes(userRole) && hasPermission(item.permission),
+  )
 })
 
 function isActive(path: string): boolean {
-  if (path === '/admin') {
-    return route.path === '/admin'
-  }
   return route.path === path || route.path.startsWith(path + '/')
 }
 

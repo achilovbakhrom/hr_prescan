@@ -3,7 +3,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.accounts.permissions import IsAdmin, IsHRManager
+from apps.accounts.permissions import HasHRPermission, HRPermissions
 from apps.common.exceptions import ApplicationError
 from apps.common.messages import (
     MSG_EMPLOYER_NOT_FOUND,
@@ -35,7 +35,8 @@ class VacancyListCreateApi(APIView):
     POST /api/hr/vacancies/ — create a vacancy
     """
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_VACANCIES
 
     class InputSerializer(serializers.Serializer):
         title = serializers.CharField(max_length=255)
@@ -79,6 +80,11 @@ class VacancyListCreateApi(APIView):
         company_info = serializers.CharField(required=False, allow_blank=True, default="")
         prescanning_prompt = serializers.CharField(required=False, allow_blank=True, default="")
         interview_prompt = serializers.CharField(required=False, allow_blank=True, default="")
+        prescanning_language = serializers.ChoiceField(
+            choices=[("en", "English"), ("ru", "Russian"), ("uz", "Uzbek")],
+            required=False,
+            default="en",
+        )
         employer_id = serializers.UUIDField(required=False, allow_null=True)
 
     class FilterSerializer(serializers.Serializer):
@@ -148,7 +154,8 @@ class VacancyDetailApi(APIView):
     DELETE /api/hr/vacancies/{id}/ — soft-delete an archived vacancy
     """
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_VACANCIES
 
     class InputSerializer(serializers.Serializer):
         title = serializers.CharField(max_length=255, required=False)
@@ -182,6 +189,10 @@ class VacancyDetailApi(APIView):
         company_info = serializers.CharField(required=False, allow_blank=True)
         prescanning_prompt = serializers.CharField(required=False, allow_blank=True)
         interview_prompt = serializers.CharField(required=False, allow_blank=True)
+        prescanning_language = serializers.ChoiceField(
+            choices=[("en", "English"), ("ru", "Russian"), ("uz", "Uzbek")],
+            required=False,
+        )
         employer_id = serializers.UUIDField(required=False, allow_null=True)
 
     def get(self, request: Request, vacancy_id: str) -> Response:
@@ -234,7 +245,8 @@ class VacancyDetailApi(APIView):
 class VacancyStatusApi(APIView):
     """PATCH /api/hr/vacancies/{id}/status/ — change vacancy status."""
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_VACANCIES
 
     class InputSerializer(serializers.Serializer):
         action = serializers.ChoiceField(choices=["publish", "pause", "archive"])
@@ -264,7 +276,8 @@ class VacancyStatusApi(APIView):
 class ParseCompanyFileApi(APIView):
     """POST /api/hr/vacancies/parse-company-file/ — extract company info from uploaded file."""
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_VACANCIES
     parser_classes = [MultiPartParser]
 
     def post(self, request: Request) -> Response:
@@ -300,7 +313,8 @@ class ParseCompanyFileApi(APIView):
 class ParseCompanyUrlApi(APIView):
     """POST /api/hr/vacancies/parse-company-url/ — extract company info from a website URL."""
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_VACANCIES
 
     class InputSerializer(serializers.Serializer):
         url = serializers.URLField()
@@ -320,7 +334,8 @@ class ParseCompanyUrlApi(APIView):
 class VacancyRegenerateKeywordsApi(APIView):
     """POST /api/hr/vacancies/{id}/regenerate-keywords/ — regenerate AI search keywords."""
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_VACANCIES
 
     def post(self, request: Request, vacancy_id: str) -> Response:
         vacancy = get_vacancy_by_id(vacancy_id=vacancy_id, company=request.user.company)

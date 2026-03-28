@@ -23,6 +23,7 @@ export interface Interview {
   status: InterviewStatus
   livekitRoomName: string
   overallScore: number | null
+  language: string
   createdAt: string
 }
 
@@ -42,6 +43,8 @@ export interface InterviewDetail extends Interview {
   transcript: TranscriptEntry[]
   chatHistory: ChatMessage[]
   aiSummary: string
+  aiSummaryTranslations: Record<string, string>
+  language: string
   scores: InterviewScore[]
   integrityFlags: IntegrityFlag[]
   updatedAt: string

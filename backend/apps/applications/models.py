@@ -45,6 +45,8 @@ class Application(BaseModel):
         max_digits=5, decimal_places=2, null=True, blank=True,
     )  # 0-100
     match_details = models.JSONField(default=dict, blank=True)  # per-criteria match breakdown
+    match_notes_translations = models.JSONField(default=dict, blank=True)
+    cv_summary_translations = models.JSONField(default=dict, blank=True)
 
     status = models.CharField(
         max_length=30,

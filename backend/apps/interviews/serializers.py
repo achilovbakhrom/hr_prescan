@@ -16,6 +16,7 @@ class InterviewScoreOutputSerializer(serializers.ModelSerializer):
             "criteria_name",
             "score",
             "ai_notes",
+            "ai_notes_translations",
         ]
         read_only_fields = fields
 
@@ -57,6 +58,7 @@ class InterviewOutputSerializer(serializers.ModelSerializer):
             "duration_minutes",
             "status",
             "overall_score",
+            "language",
             "created_at",
         ]
         read_only_fields = fields
@@ -98,6 +100,8 @@ class InterviewDetailOutputSerializer(serializers.ModelSerializer):
             "chat_history",
             "overall_score",
             "ai_summary",
+            "ai_summary_translations",
+            "language",
             "scores",
             "integrity_flags",
             "created_at",

@@ -166,6 +166,7 @@ def submit_application(
         session_type=Interview.SessionType.PRESCANNING,
         screening_mode=Interview.ScreeningMode.CHAT,
         status=Interview.Status.PENDING,
+        language=vacancy.prescanning_language,
     )
 
     return {
@@ -190,6 +191,7 @@ def create_interview_session(*, application: Application) -> Interview | None:
         "session_type": Interview.SessionType.INTERVIEW,
         "screening_mode": vacancy.interview_mode,
         "status": Interview.Status.PENDING,
+        "language": vacancy.prescanning_language,
     }
     if vacancy.interview_mode == Interview.ScreeningMode.MEET:
         interview_kwargs["duration_minutes"] = vacancy.interview_duration
@@ -339,6 +341,8 @@ def analyze_cv_with_ai(*, application_id: UUID) -> None:
             thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
             system_instruction=(
                 "You are a CV/resume parser. Extract structured data from the CV text. "
+                "Write the summary and all descriptions in the SAME language as the CV content. "
+                "If the CV is in Russian, output in Russian. If in English, output in English. If in Uzbek, output in Uzbek. "
                 "Return JSON with these fields:\n"
                 '- "contacts": {email, phone, location, linkedin, github, website, telegram} (strings, null if not found)\n'
                 '- "skills": list of technical and soft skills\n'
@@ -348,6 +352,7 @@ def analyze_cv_with_ai(*, application_id: UUID) -> None:
                 '- "languages": list of {language, level} (e.g. English - Fluent)\n'
                 '- "certifications": list of strings (certifications, courses)\n'
                 '- "summary": 2-3 sentence professional summary\n'
+                '- "content_language": detected language code of the CV (en, ru, or uz)\n'
                 "If any field cannot be determined, use empty list, empty object, or null."
             ),
             temperature=0.2,
@@ -357,7 +362,10 @@ def analyze_cv_with_ai(*, application_id: UUID) -> None:
 
     parsed = _json.loads(response.text)
     application.cv_parsed_data = parsed
-    application.save(update_fields=["cv_parsed_data", "updated_at"])
+    detected_lang = parsed.get("content_language", "en")
+    summary = parsed.get("summary", "")
+    application.cv_summary_translations = {detected_lang: summary} if summary else {}
+    application.save(update_fields=["cv_parsed_data", "cv_summary_translations", "updated_at"])
     logger.info("analyze_cv_with_ai: saved parsed data for application %s", application_id)
 
 
@@ -400,12 +408,15 @@ def calculate_match_score(*, application_id: UUID) -> None:
             thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
             system_instruction=(
                 "You are an HR matching expert. Compare a candidate's CV against a job vacancy "
-                "and provide a match score. Return JSON with:\n"
+                "and provide a match score. "
+                "Write the notes in the same language as the CV content. "
+                "Return JSON with:\n"
                 '- "overall": number 0-100 (overall match percentage)\n'
                 '- "criteria_scores": {technical_skills: 0-100, experience_relevance: 0-100, education_fit: 0-100}\n'
                 '- "notes": brief explanation of the match assessment\n'
                 '- "matching_skills": list of skills that match the vacancy\n'
-                '- "missing_skills": list of required skills the candidate lacks'
+                '- "missing_skills": list of required skills the candidate lacks\n'
+                '- "content_language": detected language code of the CV (en, ru, or uz)'
             ),
             temperature=0.2,
             response_mime_type="application/json",
@@ -415,8 +426,11 @@ def calculate_match_score(*, application_id: UUID) -> None:
     match_data = _json.loads(response.text)
     application.match_score = round(float(match_data.get("overall", 0)), 2)
     application.match_details = match_data
+    detected_lang = match_data.get("content_language", "en")
+    notes = match_data.get("notes", "")
+    application.match_notes_translations = {detected_lang: notes} if notes else {}
     application.save(
-        update_fields=["match_score", "match_details", "updated_at"]
+        update_fields=["match_score", "match_details", "match_notes_translations", "updated_at"]
     )
     logger.info("calculate_match_score: score=%.1f for application %s", application.match_score, application_id)
 

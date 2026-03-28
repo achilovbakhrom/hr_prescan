@@ -17,6 +17,8 @@ from apps.accounts.apis.company import (
     CompanyProfileApi,
     CompanyRegisterApi,
     InviteHRApi,
+    MyCompaniesApi,
+    SwitchCompanyApi,
     TeamListApi,
     TeamMemberDetailApi,
 )
@@ -62,6 +64,8 @@ __all__ = [
     "InviteHRApi",
     "TeamListApi",
     "TeamMemberDetailApi",
+    "MyCompaniesApi",
+    "SwitchCompanyApi",
     "CandidateLanguageDetailApi",
     "CandidateLanguageListCreateApi",
     "CandidateProfileApi",

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from apps.accounts.models import Company, Invitation, User
+from apps.accounts.permissions import HRPermissions
 
 
 class CompanyOutputSerializer(serializers.ModelSerializer):
@@ -42,6 +43,7 @@ class UserOutputSerializer(serializers.ModelSerializer):
             "phone",
             "role",
             "company",
+            "hr_permissions",
             "is_active",
             "email_verified",
             "onboarding_completed",
@@ -85,6 +87,11 @@ class CompanyProfileInputSerializer(serializers.Serializer):
 
 class InviteHRInputSerializer(serializers.Serializer):
     email = serializers.EmailField()
+    permissions = serializers.ListField(
+        child=serializers.ChoiceField(choices=HRPermissions.ALL),
+        required=False,
+        default=list,
+    )
 
 
 class AcceptInvitationInputSerializer(serializers.Serializer):
@@ -103,6 +110,7 @@ class InvitationOutputSerializer(serializers.ModelSerializer):
             "id",
             "email",
             "invited_by_email",
+            "permissions",
             "token",
             "is_accepted",
             "expires_at",
@@ -132,4 +140,8 @@ class PendingInvitationOutputSerializer(serializers.ModelSerializer):
 
 
 class TeamMemberUpdateSerializer(serializers.Serializer):
-    is_active = serializers.BooleanField()
+    is_active = serializers.BooleanField(required=False)
+    hr_permissions = serializers.ListField(
+        child=serializers.ChoiceField(choices=HRPermissions.ALL),
+        required=False,
+    )

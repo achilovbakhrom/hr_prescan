@@ -114,6 +114,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     # Onboarding — False for new social auth users until they pick a role
     onboarding_completed = models.BooleanField(default=True)
 
+    # HR granular permissions (only applies when role="hr")
+    # Admin role always has all permissions regardless of this field.
+    hr_permissions = models.JSONField(default=list, blank=True)
+
     # Telegram integration
     telegram_id = models.BigIntegerField(unique=True, null=True, blank=True)
     telegram_username = models.CharField(max_length=255, blank=True, default="")
@@ -135,6 +139,26 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def full_name(self) -> str:
         return f"{self.first_name} {self.last_name}".strip()
+
+
+class CompanyMembership(models.Model):
+    """Tracks which companies a user belongs to, with per-company role & permissions."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="memberships")
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="memberships")
+    role = models.CharField(max_length=20, choices=User.Role.choices, default=User.Role.HR)
+    hr_permissions = models.JSONField(default=list, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["user", "company"], name="unique_user_company"),
+        ]
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"{self.user.email} @ {self.company.name} ({self.role})"
 
 
 class CandidateProfile(models.Model):
@@ -352,6 +376,7 @@ class Invitation(models.Model):
         related_name="sent_invitations",
     )
     token = models.UUIDField(unique=True, default=uuid.uuid4)
+    permissions = models.JSONField(default=list, blank=True)
     is_accepted = models.BooleanField(default=False)
     expires_at = models.DateTimeField(default=_default_invitation_expiry)
 

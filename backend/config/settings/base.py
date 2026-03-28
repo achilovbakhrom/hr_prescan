@@ -190,6 +190,7 @@ USE_TZ = True
 LANGUAGES = [
     ("en", "English"),
     ("ru", "Russian"),
+    ("uz", "Uzbek"),
 ]
 
 LOCALE_PATHS = [

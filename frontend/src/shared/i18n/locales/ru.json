@@ -40,7 +40,9 @@
     "required_field": "Это поле обязательно",
     "skills": "Навыки",
     "language": "Язык",
-    "educationLevel": "Уровень образования"
+    "educationLevel": "Уровень образования",
+    "translate": "Перевести",
+    "translating": "Перевод..."
   },
   "nav": {
     "dashboard": "Панель управления",
@@ -91,10 +93,8 @@
     },
     "telegram": {
       "signIn": "Войти через Telegram",
-      "waiting": "Ожидание Telegram...",
-      "openApp": "Откройте Telegram и нажмите Start в боте для входа.",
-      "expired": "Ссылка для входа истекла. Попробуйте снова.",
-      "requestFailed": "Не удалось начать вход через Telegram. Попробуйте снова."
+      "signingIn": "Выполняется вход...",
+      "requestFailed": "Не удалось войти через Telegram. Попробуйте снова."
     },
     "register": {
       "title": "Создание аккаунта",
@@ -407,6 +407,8 @@
       "prescanningPrompt": "Дополнительные инструкции для ИИ",
       "prescanningPromptHint": "Направляйте поведение ИИ во время прескрининга. Он уже знает детали вакансии.",
       "prescanningPromptPlaceholder": "например, Уделите внимание опыту работы с микросервисной архитектурой...",
+      "prescanningLanguage": "Язык прескрининга",
+      "prescanningLanguageHint": "Язык, на котором ИИ-агент будет вести прескрининг",
       "interviewOptional": "Второй этап — ИИ-собеседование",
       "interviewHint": "Включите углублённое собеседование для кандидатов, прошедших прескрининг.",
       "interviewMode": "Формат собеседования",
@@ -1307,5 +1309,23 @@
       "modern": "Современный",
       "minimal": "Минимальный"
     }
+  },
+  "permissions": {
+    "title": "Права доступа",
+    "manageVacancies": "Управление вакансиями",
+    "manageVacanciesDesc": "Создание, редактирование, публикация и архивирование вакансий",
+    "manageCandidates": "Управление кандидатами",
+    "manageCandidatesDesc": "Просмотр кандидатов, изменение статуса, отклонение, найм",
+    "manageInterviews": "Управление интервью",
+    "manageInterviewsDesc": "Планирование, просмотр и отмена интервью",
+    "manageTeam": "Управление командой",
+    "manageTeamDesc": "Приглашение пользователей и управление правами",
+    "viewAnalytics": "Просмотр аналитики",
+    "viewAnalyticsDesc": "Доступ к панели HR аналитики",
+    "manageSettings": "Управление настройками",
+    "manageSettingsDesc": "Настройки компании и подписки",
+    "selectPermissions": "Выберите права для этого пользователя",
+    "allPermissions": "Все права (Админ компании)",
+    "noPermissions": "Нет назначенных прав"
   }
 }

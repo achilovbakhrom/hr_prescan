@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ApplicationStatusBadge from './ApplicationStatusBadge.vue'
+import TranslatableText from '@/shared/components/TranslatableText.vue'
 import type {
   ApplicationDetail,
 } from '../types/candidate.types'
@@ -14,6 +15,8 @@ const props = defineProps<{
   prescanningScore?: number | null
   interviewScore?: number | null
   aiSummary?: string | null
+  aiSummaryTranslations?: Record<string, string>
+  aiSummaryInterviewId?: string
 }>()
 
 const overallScore = computed(() => {
@@ -140,7 +143,19 @@ const recommendation = computed(() => {
         <i class="pi mt-0.5 text-lg" :class="recommendation.icon"></i>
         <div>
           <p class="font-semibold">{{ recommendation.label }}</p>
-          <p v-if="props.aiSummary" class="mt-1 text-sm opacity-80">{{ props.aiSummary }}</p>
+          <TranslatableText
+            v-if="props.aiSummary && props.aiSummaryInterviewId"
+            :text="props.aiSummary"
+            :translations="props.aiSummaryTranslations || {}"
+            model="interview"
+            :object-id="props.aiSummaryInterviewId"
+            field="ai_summary"
+          >
+            <template #default="{ text }">
+              <p class="mt-1 text-sm opacity-80">{{ text }}</p>
+            </template>
+          </TranslatableText>
+          <p v-else-if="props.aiSummary" class="mt-1 text-sm opacity-80">{{ props.aiSummary }}</p>
         </div>
       </div>
     </div>

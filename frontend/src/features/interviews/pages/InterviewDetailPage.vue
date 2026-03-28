@@ -11,6 +11,7 @@ import InterviewStatusBadge from '../components/InterviewStatusBadge.vue'
 import InterviewScoresView from '../components/InterviewScoresView.vue'
 import TranscriptView from '../components/TranscriptView.vue'
 import IntegrityFlagsView from '../components/IntegrityFlagsView.vue'
+import TranslatableText from '@/shared/components/TranslatableText.vue'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -132,12 +133,21 @@ async function handleWatchLive(): Promise<void> {
           </p>
           <p class="mt-1 text-xs text-blue-500">{{ t('interviews.detailPage.roomLinkHint') }}</p>
         </div>
-        <p
+        <TranslatableText
           v-if="interview.aiSummary"
-          class="mt-4 rounded bg-gray-50 p-3 text-sm text-gray-700"
+          :text="interview.aiSummary"
+          :translations="interview.aiSummaryTranslations || {}"
+          model="interview"
+          :object-id="interview.id"
+          field="ai_summary"
+          @translated="(t) => interview.aiSummaryTranslations = t"
         >
-          {{ interview.aiSummary }}
-        </p>
+          <template #default="{ text }">
+            <p class="mt-4 rounded bg-gray-50 p-3 text-sm text-gray-700">
+              {{ text }}
+            </p>
+          </template>
+        </TranslatableText>
       </div>
 
       <TabView v-model:activeIndex="activeTab">

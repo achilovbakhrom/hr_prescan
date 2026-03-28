@@ -7,6 +7,7 @@ import InviteHRDialog from '../components/InviteHRDialog.vue'
 import InvitationsTable from '../components/InvitationsTable.vue'
 import TeamMembersTable from '../components/TeamMembersTable.vue'
 import { useSettingsStore } from '../stores/settings.store'
+import type { HRPermission } from '@/shared/types/auth.types'
 
 const { t } = useI18n()
 const settingsStore = useSettingsStore()
@@ -22,11 +23,11 @@ onMounted(async () => {
   ])
 })
 
-async function handleInvite(email: string): Promise<void> {
+async function handleInvite(email: string, permissions: HRPermission[]): Promise<void> {
   successMessage.value = null
   errorMessage.value = null
   try {
-    await settingsStore.inviteHR({ email })
+    await settingsStore.inviteHR({ email, permissions })
     showInviteDialog.value = false
     successMessage.value = `Invitation sent to ${email}.`
   } catch (err: unknown) {
@@ -34,6 +35,30 @@ async function handleInvite(email: string): Promise<void> {
       err instanceof Error
         ? err.message
         : 'Failed to send invitation. Please try again.'
+  }
+}
+
+async function handleUpdatePermissions(userId: string, permissions: HRPermission[]): Promise<void> {
+  errorMessage.value = null
+  try {
+    await settingsStore.updateMemberPermissions(userId, permissions)
+  } catch (err: unknown) {
+    errorMessage.value =
+      err instanceof Error
+        ? err.message
+        : 'Failed to update permissions. Please try again.'
+  }
+}
+
+async function handleCancelInvitation(invitationId: string): Promise<void> {
+  errorMessage.value = null
+  try {
+    await settingsStore.cancelInvitation(invitationId)
+  } catch (err: unknown) {
+    errorMessage.value =
+      err instanceof Error
+        ? err.message
+        : 'Failed to cancel invitation.'
   }
 }
 
@@ -84,7 +109,10 @@ async function handleToggleActive(userId: string): Promise<void> {
         <h2 class="mb-4 text-lg font-semibold text-gray-900">
           {{ t('settings.team.invitations') }}
         </h2>
-        <InvitationsTable :invitations="settingsStore.invitations" />
+        <InvitationsTable
+          :invitations="settingsStore.invitations"
+          @cancel="handleCancelInvitation"
+        />
       </div>
 
       <div class="rounded-lg bg-white p-6 shadow-sm">
@@ -92,6 +120,7 @@ async function handleToggleActive(userId: string): Promise<void> {
         <TeamMembersTable
           :members="settingsStore.team"
           @toggle-active="handleToggleActive"
+          @update-permissions="handleUpdatePermissions"
         />
       </div>
     </template>

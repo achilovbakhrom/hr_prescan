@@ -19,12 +19,16 @@ SEVERITY_HIGH = "high"
 SEVERITY_MEDIUM = "medium"
 
 
+LANGUAGE_NAMES = {"en": "English", "ru": "Russian", "uz": "Uzbek"}
+
+
 async def evaluate_interview(
     *,
     interview_id: str,
     transcript: list[dict],
     criteria: list[dict],
     cv_summary: str = "",
+    language: str = "en",
     integrity_flags: list[dict] | None = None,
 ) -> dict:
     """Evaluate the candidate based on the interview transcript.
@@ -40,7 +44,7 @@ async def evaluate_interview(
     client = genai.Client(api_key=os.environ.get("GOOGLE_API_KEY", ""))
 
     # -- Step 1: Score the interview --
-    prompt = _build_evaluation_prompt(transcript=transcript, criteria=criteria)
+    prompt = _build_evaluation_prompt(transcript=transcript, criteria=criteria, language=language)
 
     response = await client.aio.models.generate_content(
         model=os.environ.get("GEMINI_MODEL", "gemini-3-flash-preview"),
@@ -186,6 +190,7 @@ def _build_evaluation_prompt(
     *,
     transcript: list[dict],
     criteria: list[dict],
+    language: str = "en",
 ) -> str:
     """Build the LLM prompt for post-interview evaluation."""
     transcript_text = "\n".join(
@@ -196,8 +201,11 @@ def _build_evaluation_prompt(
         for c in criteria
     )
 
+    lang_name = LANGUAGE_NAMES.get(language, "English")
+
     return (
         "Evaluate this interview transcript. Score each criterion from 1-10.\n"
+        f"Write all notes and the summary in {lang_name}.\n"
         "\n"
         "## Criteria\n"
         f"{criteria_text}\n"

@@ -3,7 +3,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.accounts.permissions import IsAdmin, IsHRManager
+from apps.accounts.permissions import HasHRPermission, HRPermissions, IsAdmin, IsHRManager
 from apps.applications.models import Application
 from apps.applications.selectors import (
     get_application_by_id,
@@ -34,7 +34,8 @@ from apps.vacancies.selectors import get_vacancy_by_id
 class HRApplicationListApi(APIView):
     """GET /api/hr/vacancies/{vacancy_id}/candidates/ — list applications for a vacancy."""
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_CANDIDATES
 
     class FilterSerializer(serializers.Serializer):
         status = serializers.ChoiceField(
@@ -97,7 +98,8 @@ class HRApplicationListApi(APIView):
 class HRApplicationDetailApi(APIView):
     """GET /api/hr/candidates/{id}/ — application detail for HR."""
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_CANDIDATES
 
     def get(self, request: Request, application_id: str) -> Response:
         company = request.user.company
@@ -125,7 +127,8 @@ class HRApplicationDetailApi(APIView):
 class HRApplicationStatusApi(APIView):
     """PATCH /api/hr/candidates/{id}/status/ — update application status."""
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_CANDIDATES
 
     class InputSerializer(serializers.Serializer):
         status = serializers.ChoiceField(choices=Application.Status.choices)
@@ -171,7 +174,8 @@ class HRApplicationStatusApi(APIView):
 class HRApplicationNotesApi(APIView):
     """POST /api/hr/candidates/{id}/notes/ — add HR note to application."""
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_CANDIDATES
 
     class InputSerializer(serializers.Serializer):
         note = serializers.CharField()
@@ -210,7 +214,8 @@ class HRApplicationNotesApi(APIView):
 class HRCvDownloadApi(APIView):
     """GET /api/hr/candidates/{id}/cv-download/ — get presigned URL for CV download."""
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_CANDIDATES
 
     def get(self, request: Request, application_id: str) -> Response:
         company = request.user.company
@@ -245,7 +250,8 @@ class HRCvDownloadApi(APIView):
 class HRBulkStatusApi(APIView):
     """PATCH /api/hr/candidates/bulk-status — bulk update status by IDs."""
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_CANDIDATES
 
     class InputSerializer(serializers.Serializer):
         application_ids = serializers.ListField(child=serializers.UUIDField())
@@ -266,7 +272,8 @@ class HRBulkStatusApi(APIView):
 class HRBatchMoveApi(APIView):
     """POST /api/hr/vacancies/{vacancy_id}/candidates/batch-move — filtered batch move."""
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_CANDIDATES
 
     class InputSerializer(serializers.Serializer):
         from_status = serializers.ChoiceField(choices=Application.Status.choices)
@@ -311,7 +318,8 @@ class HRBatchMoveApi(APIView):
 class HRSoftDeleteApi(APIView):
     """POST /api/hr/candidates/soft-delete — soft delete archived candidates."""
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_CANDIDATES
 
     class InputSerializer(serializers.Serializer):
         application_ids = serializers.ListField(child=serializers.UUIDField())

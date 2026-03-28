@@ -4,7 +4,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.accounts.permissions import IsAdmin, IsHRManager
+from apps.accounts.permissions import HasHRPermission, HRPermissions
 from apps.common.exceptions import ApplicationError
 from apps.common.messages import (
     MSG_EMPLOYER_NOT_FOUND,
@@ -30,7 +30,8 @@ class EmployerCompanyListCreateApi(APIView):
     POST /api/hr/employers/ — create an employer company (manual)
     """
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_VACANCIES
 
     class InputSerializer(serializers.Serializer):
         name = serializers.CharField(max_length=255)
@@ -77,7 +78,8 @@ class EmployerCompanyDetailApi(APIView):
     DELETE /api/hr/employers/{id}/ — delete employer (only if no linked vacancies)
     """
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_VACANCIES
 
     class InputSerializer(serializers.Serializer):
         name = serializers.CharField(max_length=255, required=False)
@@ -156,7 +158,8 @@ class EmployerCompanyDetailApi(APIView):
 class ParseEmployerFileApi(APIView):
     """POST /api/hr/employers/parse-file/ — create employer from uploaded file."""
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_VACANCIES
     parser_classes = [MultiPartParser]
 
     class InputSerializer(serializers.Serializer):
@@ -212,7 +215,8 @@ class ParseEmployerFileApi(APIView):
 class ParseEmployerUrlApi(APIView):
     """POST /api/hr/employers/parse-url/ — create employer from website URL."""
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_VACANCIES
 
     class InputSerializer(serializers.Serializer):
         name = serializers.CharField(max_length=255)

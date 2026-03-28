@@ -2,6 +2,8 @@
 
 from context import InterviewContext
 
+LANGUAGE_NAMES = {"en": "English", "ru": "Russian", "uz": "Uzbek"}
+
 
 def build_system_prompt(*, context: InterviewContext) -> str:
     """Build the system prompt for the AI interviewer persona."""
@@ -44,8 +46,8 @@ def build_system_prompt(*, context: InterviewContext) -> str:
         "5. Keep track of time — wrap up when approaching the time limit.\n"
         "6. Thank the candidate and explain next steps.\n"
         "7. Speak naturally and professionally.\n"
-        "8. If the candidate speaks in Russian, respond in Russian. "
-        "If in English, respond in English.\n"
+        f"8. You MUST conduct this entire interview in {LANGUAGE_NAMES.get(context.language, 'English')}. "
+        f"All your questions and responses must be in {LANGUAGE_NAMES.get(context.language, 'English')}.\n"
         "9. Do NOT reveal your evaluation scores or notes during the interview.\n"
         "10. Never mention 'competencies' or 'skill goals' — just have a natural conversation.\n"
         "\n"

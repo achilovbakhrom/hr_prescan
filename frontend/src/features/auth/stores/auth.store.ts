@@ -2,6 +2,7 @@ import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { extractErrorMessage } from '@/shared/api/errors'
 import { authService } from '../services/auth.service'
+import type { CompanyMembership } from '@/shared/types/auth.types'
 import type {
   AcceptInvitationRequest,
   CompleteCompanySetupRequest,
@@ -36,10 +37,12 @@ function clearTokens(): void {
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
   const tokens = ref<AuthTokens | null>(loadTokens())
+  const companies = ref<CompanyMembership[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
 
   const isAuthenticated = computed(() => !!tokens.value?.access && !!user.value)
+  const hasMultipleCompanies = computed(() => companies.value.length > 1)
 
   async function login(data: LoginRequest): Promise<void> {
     loading.value = true
@@ -188,6 +191,28 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function fetchCompanies(): Promise<void> {
+    try {
+      companies.value = await authService.getMyCompanies()
+    } catch {
+      companies.value = []
+    }
+  }
+
+  async function switchCompany(companyId: string): Promise<void> {
+    loading.value = true
+    error.value = null
+    try {
+      user.value = await authService.switchCompany(companyId)
+    } catch (err: unknown) {
+      const message = extractErrorMessage(err)
+      error.value = message
+      throw new Error(message)
+    } finally {
+      loading.value = false
+    }
+  }
+
   async function initAuth(): Promise<void> {
     const stored = loadTokens()
     if (!stored?.access) {
@@ -196,14 +221,19 @@ export const useAuthStore = defineStore('auth', () => {
     }
     tokens.value = stored
     await fetchUser()
+    if (user.value) {
+      await fetchCompanies()
+    }
   }
 
   return {
     user,
     tokens,
+    companies,
     loading,
     error,
     isAuthenticated,
+    hasMultipleCompanies,
     login,
     googleLogin,
     telegramLogin,
@@ -215,6 +245,8 @@ export const useAuthStore = defineStore('auth', () => {
     completeCompanySetup,
     completeOnboarding,
     fetchUser,
+    fetchCompanies,
+    switchCompany,
     initAuth,
   }
 })

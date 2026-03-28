@@ -24,6 +24,7 @@ export interface Vacancy {
   interviewMode: InterviewMode
   interviewEnabled: boolean
   cvRequired: boolean
+  prescanningLanguage: string
   companyInfo: string
   shareToken: string
   interviewDuration: number

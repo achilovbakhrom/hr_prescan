@@ -3,7 +3,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.accounts.permissions import IsAdmin, IsHRManager
+from apps.accounts.permissions import HasHRPermission, HRPermissions, IsAdmin, IsHRManager
 from apps.common.messages import MSG_NOT_IN_COMPANY
 from apps.common.selectors import get_company_analytics
 
@@ -11,7 +11,8 @@ from apps.common.selectors import get_company_analytics
 class HRAnalyticsApi(APIView):
     """GET /api/hr/analytics/ — company-level hiring analytics for HR."""
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.VIEW_ANALYTICS
 
     def get(self, request: Request) -> Response:
         company = request.user.company

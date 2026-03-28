@@ -57,6 +57,7 @@ const deadline = ref<Date | null>(props.initialData?.deadline ? new Date(props.i
 const visibility = ref<VacancyVisibility>(props.initialData?.visibility ?? 'public')
 const cvRequired = ref(props.initialData?.cvRequired ?? false)
 const prescanningPrompt = ref(props.initialData?.prescanningPrompt ?? '')
+const prescanningLanguage = ref(props.initialData?.prescanningLanguage ?? 'en')
 const interviewEnabled = ref(props.initialData?.interviewEnabled ?? false)
 const interviewMode = ref<InterviewMode>(props.initialData?.interviewMode ?? 'chat')
 const interviewDuration = ref(props.initialData?.interviewDuration ?? 30)
@@ -206,6 +207,7 @@ watch(() => props.initialData, (d) => {
   visibility.value = d.visibility ?? 'public'
   cvRequired.value = d.cvRequired ?? false
   prescanningPrompt.value = d.prescanningPrompt ?? ''
+  prescanningLanguage.value = d.prescanningLanguage ?? 'en'
   interviewEnabled.value = d.interviewEnabled ?? false
   interviewMode.value = d.interviewMode ?? 'chat'
   interviewDuration.value = d.interviewDuration ?? 30
@@ -231,6 +233,7 @@ function handleSave(): void {
     visibility: visibility.value,
     cvRequired: cvRequired.value,
     prescanningPrompt: prescanningPrompt.value || undefined,
+    prescanningLanguage: prescanningLanguage.value,
     interviewEnabled: interviewEnabled.value,
     interviewMode: interviewMode.value,
     interviewDuration: interviewDuration.value,
@@ -402,6 +405,22 @@ function handleSave(): void {
             <p class="mt-2 text-sm text-gray-600">
               {{ t('vacancies.form.prescanningHint') }}
             </p>
+          </div>
+
+          <div>
+            <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.prescanningLanguage') }}</label>
+            <p class="mb-2 text-xs text-gray-400">{{ t('vacancies.form.prescanningLanguageHint') }}</p>
+            <Dropdown
+              v-model="prescanningLanguage"
+              :options="[
+                { label: 'English', value: 'en' },
+                { label: 'Русский', value: 'ru' },
+                { label: `O'zbekcha`, value: 'uz' },
+              ]"
+              option-label="label"
+              option-value="value"
+              class="w-full sm:w-60"
+            />
           </div>
 
           <div>

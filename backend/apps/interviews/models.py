@@ -63,6 +63,12 @@ class Interview(BaseModel):
         max_digits=4, decimal_places=2, null=True, blank=True,
     )
     ai_summary = models.TextField(blank=True)
+    language = models.CharField(
+        max_length=10,
+        choices=[("en", "English"), ("ru", "Russian"), ("uz", "Uzbek")],
+        default="en",
+    )
+    ai_summary_translations = models.JSONField(default=dict, blank=True)
 
     class Meta:
         ordering = ["-created_at"]
@@ -88,6 +94,7 @@ class InterviewScore(BaseModel):
         validators=[MinValueValidator(1), MaxValueValidator(10)],
     )
     ai_notes = models.TextField(blank=True)
+    ai_notes_translations = models.JSONField(default=dict, blank=True)
 
     class Meta:
         unique_together = ["interview", "criteria"]

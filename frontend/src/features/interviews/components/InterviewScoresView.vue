@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import ProgressBar from 'primevue/progressbar'
+import TranslatableText from '@/shared/components/TranslatableText.vue'
 import type { InterviewScore } from '../types/interview.types'
 
 defineProps<{
@@ -41,9 +42,19 @@ function scoreColor(score: number): string {
         style="height: 8px"
       />
 
-      <p v-if="score.aiNotes" class="text-xs text-gray-500">
-        {{ score.aiNotes }}
-      </p>
+      <TranslatableText
+        v-if="score.aiNotes"
+        :text="score.aiNotes"
+        :translations="score.aiNotesTranslations || {}"
+        model="interview_score"
+        :object-id="score.id"
+        field="ai_notes"
+        @translated="(tr) => score.aiNotesTranslations = tr"
+      >
+        <template #default="{ text }">
+          <p class="text-xs text-gray-500">{{ text }}</p>
+        </template>
+      </TranslatableText>
     </div>
   </div>
 </template>
