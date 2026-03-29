@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from django.contrib.postgres.search import SearchQuery, SearchRank, TrigramSimilarity
-from django.db.models import Count, F, Q, QuerySet, Value
+from django.db.models import Count, F, Q, QuerySet
 from django.db.models.functions import Greatest
 
 from apps.accounts.models import Company

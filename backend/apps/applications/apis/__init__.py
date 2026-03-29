@@ -2,15 +2,17 @@ from apps.applications.apis.candidate import (
     CandidateApplicationDetailApi,
     CandidateApplicationListApi,
 )
-from apps.applications.apis.hr import (
-    HRApplicationDetailApi,
-    HRApplicationListApi,
+from apps.applications.apis.hr_actions import (
     HRApplicationNotesApi,
     HRApplicationStatusApi,
     HRBatchMoveApi,
     HRBulkStatusApi,
-    HRCvDownloadApi,
     HRSoftDeleteApi,
+)
+from apps.applications.apis.hr_list import (
+    HRApplicationDetailApi,
+    HRApplicationListApi,
+    HRCvDownloadApi,
 )
 from apps.applications.apis.public import SubmitApplicationApi
 

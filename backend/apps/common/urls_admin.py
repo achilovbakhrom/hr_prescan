@@ -1,11 +1,10 @@
 from django.urls import path
 
-from apps.common.apis_admin import (
+from apps.common.apis_admin_management import AdminPlanDetailApi, AdminPlanManagementApi
+from apps.common.apis_admin_stats import (
     AdminAnalyticsApi,
     AdminCompanyDetailApi,
     AdminCompanyListApi,
-    AdminPlanDetailApi,
-    AdminPlanManagementApi,
     AdminUserDetailApi,
     AdminUserListApi,
 )

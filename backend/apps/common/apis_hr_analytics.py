@@ -3,7 +3,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.accounts.permissions import HasHRPermission, HRPermissions, IsAdmin, IsHRManager
+from apps.accounts.permissions import HasHRPermission, HRPermissions
 from apps.common.messages import MSG_NOT_IN_COMPANY
 from apps.common.selectors import get_company_analytics
 

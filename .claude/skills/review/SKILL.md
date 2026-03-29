@@ -36,14 +36,52 @@ Before reviewing, read:
 - `docs/CODE_STYLE.md` if it exists
 - `docs/BUSINESS_LOGIC.md` for domain context
 
-### 3. Linter Awareness
+### 3. File Size Check (CRITICAL — run first)
 
-The backend uses **Ruff** (not Flake8) for linting and formatting. Ruff config lives in `backend/pyproject.toml` under `[tool.ruff]`. When reviewing:
+**Hard limit: 200 lines per file.** Any file exceeding 200 lines is a **Critical Issue**.
+
+Run these checks:
+- Backend: `find backend/apps -name "*.py" ! -path "*/migrations/*" -exec wc -l {} + | sort -rn | head -20` — flag any file over 200 lines
+- Frontend: `find frontend/src -name "*.vue" -o -name "*.ts" | xargs wc -l | sort -rn | head -20` — flag any file over 200 lines
+
+For each oversized file, recommend a split strategy:
+- **API files**: split by resource (e.g., `apis/profile.py`, `apis/education.py`, `apis/work_experience.py`)
+- **Service files**: split by domain concern (e.g., `services/vacancy_crud.py`, `services/vacancy_ai.py`)
+- **AI assistants**: extract tool definitions, handlers by domain, and utilities into separate modules
+- **Vue components**: extract sub-components, composables, or split page sections
+- **Store files**: extract actions into composables if store exceeds limit
+
+### 4. Run Linters (Automated Checks)
+
+Before the manual review, run automated linters to catch low-hanging fruit:
+
+**Backend (Ruff):**
+Run `cd backend && ruff check --select F401,F811,UP,B,DJ .` on the files in scope to catch:
+- `F401` — unused imports
+- `F811` — redefined unused variables
+- `UP` — deprecated Python patterns (old-style typing, unnecessary `# coding`, `typing.Optional` → `X | None`, etc.)
+- `B` — bugbear (mutable default args, assertions, etc.)
+- `DJ` — Django-specific issues
+
+If reviewing a specific path, pass that path instead of `.`. Report all findings as **Warnings** in the review output.
+
+If `--fix` flag is set, run `ruff check --fix --select F401,F811,UP .` to auto-fix unused imports and deprecated patterns.
+
+**Frontend (TypeScript):**
+Run `cd frontend && npx vue-tsc --noEmit 2>&1 | head -80` to catch TypeScript errors including unused imports and type issues. If `vue-tsc` is not available, run `npx tsc --noEmit --pretty 2>&1 | head -80` as fallback.
+
+Additionally, search for common deprecated patterns:
+- `defineComponent()` in `<script setup>` files (unnecessary)
+- `@/` imports that could use relative paths within the same feature
+- Unused `ref`, `computed`, `watch` imports from Vue
+
+**Linter Config:**
+- Ruff config lives in `backend/pyproject.toml` under `[tool.ruff]`
 - Suggest Ruff rule codes (e.g., `# noqa: S101`), not Flake8 codes
 - Format suggestions should reference `ruff format`, not `black` or `autopep8`
 - Import sorting is handled by Ruff's isort (`I` rules), not standalone isort
 
-### 4. Backend Review (GRASP Principles)
+### 5. Backend Review (GRASP Principles)
 
 Review backend Python/Django code against these criteria:
 
@@ -66,9 +104,15 @@ Review backend Python/Django code against these criteria:
 - URLs: clean RESTful structure
 - Migrations: no data loss, reversible where possible
 
+**Dead Code & Deprecated Patterns (HIGH PRIORITY — check every file):**
+- **Unused imports** — imports that are not referenced anywhere in the file. Flag every one. These are auto-fixable with `ruff check --fix --select F401`.
+- **Unused variables/functions** — defined but never used. Check for functions, classes, constants that have no callers.
+- **Deprecated Python patterns** — `typing.Optional[X]` → `X | None`, `typing.List[X]` → `list[X]`, `typing.Dict` → `dict`, `typing.Tuple` → `tuple`, `typing.Union[X, Y]` → `X | Y`. These are auto-fixable with `ruff check --fix --select UP`.
+- **Deprecated Django patterns** — `django.conf.urls.url()` → `path()`, `@login_required` on API views (use permission classes), `JSONField` from `django.contrib.postgres` (use `django.db.models.JSONField`).
+- **Stale commented-out code** — commented imports, commented function bodies, TODO/FIXME without context.
+
 **Code Quality:**
 - DRY — duplicated logic?
-- Dead code — unused imports, functions, variables?
 - Naming — clear, consistent, Pythonic?
 - Error handling — using `ApplicationError` consistently? Catching too broad?
 - Type hints — present and correct?
@@ -82,7 +126,7 @@ Review backend Python/Django code against these criteria:
 - Permission classes on all views
 - Proper status code usage in responses
 
-### 5. Frontend Review (Feature-Sliced Design)
+### 6. Frontend Review (Feature-Sliced Design)
 
 Review frontend Vue/TypeScript code against FSD principles:
 
@@ -102,6 +146,13 @@ Review frontend Vue/TypeScript code against FSD principles:
 - `routes.ts` — route definitions
 - `constants/` — feature-specific constants
 
+**Dead Code & Deprecated Patterns (HIGH PRIORITY — check every file):**
+- **Unused imports** — Vue/TS imports not referenced in `<script setup>` or `<template>`. Common: importing a component/type/util that was removed from the template but the import remains.
+- **Unused variables** — `const`/`ref`/`computed` defined but never used in template or script.
+- **Deprecated Vue patterns** — `defineComponent()` inside `<script setup>` (unnecessary), Options API in new code, `this.$refs` instead of template refs, `@click.native` (removed in Vue 3).
+- **Deprecated TypeScript patterns** — `as any`, `// @ts-ignore` (use `// @ts-expect-error`), `enum` where `as const` object suffices.
+- **Stale commented-out code** — commented imports, commented template blocks, TODO/FIXME without context.
+
 **Code Quality:**
 - **TypeScript strictness** — no `any`, proper interfaces, discriminated unions for status types
 - **Component size** — components over 300 lines should be split
@@ -109,7 +160,6 @@ Review frontend Vue/TypeScript code against FSD principles:
 - **Reactivity** — proper use of `ref`, `computed`, `watch`. No reactivity loss.
 - **PrimeVue usage** — using PrimeVue components correctly, not reimplementing
 - **Tailwind** — consistent utility classes, no conflicting styles
-- **Dead code** — unused imports, unreachable code, commented-out blocks
 - **Naming** — PascalCase components, camelCase functions/variables, kebab-case files
 - **Error handling** — API errors caught and displayed, loading states
 
@@ -121,7 +171,7 @@ Review frontend Vue/TypeScript code against FSD principles:
 - Computed properties for derived state (not methods)
 - Watchers used sparingly and with clear purpose
 
-### 6. Security Review (Both Layers)
+### 7. Security Review (Both Layers)
 
 - Authentication: all protected endpoints require auth
 - Authorization: role-based access enforced (HR can't access admin endpoints)
@@ -132,7 +182,7 @@ Review frontend Vue/TypeScript code against FSD principles:
 - File uploads: validated file types and sizes
 - SQL injection: using ORM, no raw SQL with user input
 
-### 7. Performance Review
+### 8. Performance Review
 
 **Backend:**
 - N+1 queries (missing `select_related`/`prefetch_related`)
@@ -147,7 +197,7 @@ Review frontend Vue/TypeScript code against FSD principles:
 - Unoptimized watchers (watching entire objects vs specific properties)
 - API calls without debouncing on user input
 
-### 8. Report
+### 9. Report
 
 Output a structured report:
 
@@ -171,7 +221,7 @@ Output a structured report:
 - Overall assessment: [GOOD / NEEDS WORK / CRITICAL ISSUES]
 ```
 
-### 9. Fix (if --fix flag)
+### 10. Fix (if --fix flag)
 
 If `--fix` was provided:
 - Fix all critical issues

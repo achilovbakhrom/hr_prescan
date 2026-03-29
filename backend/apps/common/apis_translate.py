@@ -6,7 +6,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.accounts.permissions import HasHRPermission, IsAdmin, IsHRManager
+from apps.accounts.permissions import HasHRPermission
 from apps.common.services_translation import TRANSLATABLE_FIELDS, batch_translate_vacancy_items, translate_ai_content
 
 # Simple in-memory rate limiter: max 50 requests per user per hour

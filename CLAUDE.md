@@ -59,6 +59,7 @@ All detailed docs live in `docs/`:
 - Use `select_related` / `prefetch_related` to avoid N+1 queries.
 - Use `@transaction.atomic` for multi-model operations.
 - Permission classes on every API view.
+- **File size limit: 200 lines max per file.** If a file exceeds 200 lines, split it. For APIs: split by resource (e.g., `apis/profile.py`, `apis/education.py`). For services: split by domain concern. For AI assistants: extract handlers into separate modules. No exceptions — refactor before adding more code to an oversized file.
 
 ### Frontend — Feature-Sliced Design (FSD)
 
@@ -73,6 +74,7 @@ All detailed docs live in `docs/`:
 - `<script setup>` with typed `defineProps` / `defineEmits`.
 - PrimeVue for UI components, Tailwind for utility styling.
 - **Mobile responsiveness**: every UI change must be tested and work on mobile (375px+). Use Tailwind responsive prefixes (`sm:`, `md:`, `lg:`). Mobile-first approach — default styles for mobile, override for larger screens.
+- **File size limit: 200 lines max per Vue component / TS file.** If a component exceeds 200 lines, extract sub-components or composables. Pages compose from smaller components — they should not contain large inline logic.
 
 ## Mandatory Rules
 

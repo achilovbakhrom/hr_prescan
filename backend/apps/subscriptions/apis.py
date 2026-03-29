@@ -4,7 +4,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.accounts.permissions import HasHRPermission, HRPermissions, IsAdmin, IsHRManager
+from apps.accounts.permissions import HasHRPermission, HRPermissions, IsAdmin
 from apps.subscriptions.models import CompanySubscription, SubscriptionPlan
 from apps.subscriptions.selectors import get_all_plans, get_company_subscription, get_plan_by_tier
 from apps.subscriptions.services import (

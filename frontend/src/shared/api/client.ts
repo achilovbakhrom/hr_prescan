@@ -1,7 +1,4 @@
-import axios, {
-  type AxiosResponse,
-  type InternalAxiosRequestConfig,
-} from 'axios'
+import axios, { type AxiosResponse, type InternalAxiosRequestConfig } from 'axios'
 
 const TOKENS_KEY = 'hr_prescan_tokens'
 

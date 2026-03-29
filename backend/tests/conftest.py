@@ -1,9 +1,7 @@
 import pytest
 
 from tests.factories import (
-    ApplicationFactory,
     CompanyFactory,
-    InterviewFactory,
     UserFactory,
     VacancyFactory,
 )

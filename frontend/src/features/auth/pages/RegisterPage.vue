@@ -2,12 +2,11 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import InputText from 'primevue/inputtext'
-import Password from 'primevue/password'
-import Button from 'primevue/button'
 import Message from 'primevue/message'
 import GoogleSignInButton from '../components/GoogleSignInButton.vue'
 import TelegramSignInButton from '../components/TelegramSignInButton.vue'
+import RegisterFormFields from '../components/RegisterFormFields.vue'
+import RegisterSuccess from '../components/RegisterSuccess.vue'
 import { useAuthStore } from '../stores/auth.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 
@@ -24,13 +23,7 @@ const errorMessage = ref<string | null>(null)
 const submitted = ref(false)
 const registered = ref(false)
 
-const errors = ref({
-  firstName: false,
-  lastName: false,
-  email: false,
-  password: false,
-  confirmPassword: false,
-})
+const errors = ref({ firstName: false, lastName: false, email: false, password: false, confirmPassword: false })
 
 function validate(): boolean {
   errors.value.firstName = !firstName.value.trim()
@@ -42,106 +35,42 @@ function validate(): boolean {
 }
 
 async function handleRegister(): Promise<void> {
-  submitted.value = true
-  errorMessage.value = null
-
+  submitted.value = true; errorMessage.value = null
   if (!validate()) return
-
   try {
-    await authStore.register({
-      email: email.value,
-      password: password.value,
-      firstName: firstName.value,
-      lastName: lastName.value,
-    })
+    await authStore.register({ email: email.value, password: password.value, firstName: firstName.value, lastName: lastName.value })
     registered.value = true
-  } catch (err: unknown) {
-    errorMessage.value =
-      err instanceof Error
-        ? err.message
-        : 'Registration failed. Please try again.'
-  }
+  } catch (err: unknown) { errorMessage.value = err instanceof Error ? err.message : 'Registration failed. Please try again.' }
 }
 
 async function handleGoogleSuccess(credential: string): Promise<void> {
   errorMessage.value = null
   try {
     await authStore.googleLogin(credential)
-    if (authStore.user?.onboardingCompleted === false) {
-      await router.push({ name: ROUTE_NAMES.CHOOSE_ROLE })
-    } else {
-      await router.push({ name: ROUTE_NAMES.DASHBOARD })
-    }
-  } catch (err: unknown) {
-    errorMessage.value =
-      err instanceof Error ? err.message : 'Google sign-in failed.'
-  }
-}
-
-function handleGoogleError(msg: string): void {
-  errorMessage.value = msg
+    await router.push(authStore.user?.onboardingCompleted === false ? { name: ROUTE_NAMES.CHOOSE_ROLE } : { name: ROUTE_NAMES.DASHBOARD })
+  } catch (err: unknown) { errorMessage.value = err instanceof Error ? err.message : 'Google sign-in failed.' }
 }
 
 async function handleTelegramSuccess(data: Parameters<typeof authStore.telegramLogin>[0]): Promise<void> {
   errorMessage.value = null
   try {
     await authStore.telegramLogin(data)
-    if (authStore.user?.onboardingCompleted === false) {
-      await router.push({ name: ROUTE_NAMES.CHOOSE_ROLE })
-    } else {
-      await router.push({ name: ROUTE_NAMES.DASHBOARD })
-    }
-  } catch (err: unknown) {
-    errorMessage.value =
-      err instanceof Error ? err.message : 'Telegram sign-in failed.'
-  }
-}
-
-function handleTelegramError(msg: string): void {
-  errorMessage.value = msg
+    await router.push(authStore.user?.onboardingCompleted === false ? { name: ROUTE_NAMES.CHOOSE_ROLE } : { name: ROUTE_NAMES.DASHBOARD })
+  } catch (err: unknown) { errorMessage.value = err instanceof Error ? err.message : 'Telegram sign-in failed.' }
 }
 </script>
 
 <template>
   <div class="flex flex-1 items-center justify-center py-12">
     <div class="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
-      <template v-if="registered">
-        <div class="text-center">
-          <h1 class="mb-4 text-2xl font-bold text-gray-900">
-            Check Your Email
-          </h1>
-          <p class="mb-6 text-gray-600">
-            We've sent a verification link to
-            <strong>{{ email }}</strong>. Please check your inbox and click the
-            link to activate your account.
-          </p>
-          <RouterLink
-            :to="{ name: ROUTE_NAMES.LOGIN }"
-            class="font-medium text-blue-600 hover:text-blue-500"
-          >
-            Back to Login
-          </RouterLink>
-        </div>
-      </template>
+      <RegisterSuccess v-if="registered" :email="email" />
 
       <template v-else>
-        <h1 class="mb-6 text-center text-2xl font-bold text-gray-900">
-          {{ t('auth.register.title') }}
-        </h1>
+        <h1 class="mb-6 text-center text-2xl font-bold text-gray-900">{{ t('auth.register.title') }}</h1>
+        <Message v-if="errorMessage" severity="error" class="mb-4">{{ errorMessage }}</Message>
 
-        <Message v-if="errorMessage" severity="error" class="mb-4">
-          {{ errorMessage }}
-        </Message>
-
-        <GoogleSignInButton
-          @success="handleGoogleSuccess"
-          @error="handleGoogleError"
-        />
-
-        <TelegramSignInButton
-          @success="handleTelegramSuccess"
-          @error="handleTelegramError"
-        />
+        <GoogleSignInButton @success="handleGoogleSuccess" @error="(msg: string) => errorMessage = msg" />
+        <TelegramSignInButton @success="handleTelegramSuccess" @error="(msg: string) => errorMessage = msg" />
 
         <div class="mb-4 flex items-center gap-3">
           <div class="h-px flex-1 bg-gray-200"></div>
@@ -149,133 +78,15 @@ function handleTelegramError(msg: string): void {
           <div class="h-px flex-1 bg-gray-200"></div>
         </div>
 
-        <form class="flex flex-col gap-4" @submit.prevent="handleRegister">
-          <div class="grid grid-cols-2 gap-4">
-            <div class="flex flex-col gap-1">
-              <label
-                for="firstName"
-                class="text-sm font-medium text-gray-700"
-              >
-                {{ t('auth.register.firstName') }}
-              </label>
-              <InputText
-                id="firstName"
-                v-model="firstName"
-                placeholder="First name"
-                :invalid="submitted && errors.firstName"
-                class="w-full"
-              />
-              <small
-                v-if="submitted && errors.firstName"
-                class="text-red-500"
-              >
-                First name is required.
-              </small>
-            </div>
-
-            <div class="flex flex-col gap-1">
-              <label for="lastName" class="text-sm font-medium text-gray-700">
-                {{ t('auth.register.lastName') }}
-              </label>
-              <InputText
-                id="lastName"
-                v-model="lastName"
-                placeholder="Last name"
-                :invalid="submitted && errors.lastName"
-                class="w-full"
-              />
-              <small v-if="submitted && errors.lastName" class="text-red-500">
-                Last name is required.
-              </small>
-            </div>
-          </div>
-
-          <div class="flex flex-col gap-1">
-            <label for="email" class="text-sm font-medium text-gray-700">
-              {{ t('auth.register.email') }}
-            </label>
-            <InputText
-              id="email"
-              v-model="email"
-              type="email"
-              placeholder="Enter your email"
-              :invalid="submitted && errors.email"
-              class="w-full"
-            />
-            <small v-if="submitted && errors.email" class="text-red-500">
-              Please enter a valid email address.
-            </small>
-          </div>
-
-          <div class="flex flex-col gap-1">
-            <label for="password" class="text-sm font-medium text-gray-700">
-              {{ t('auth.register.password') }}
-            </label>
-            <Password
-              v-model="password"
-              input-id="password"
-              placeholder="Minimum 8 characters"
-              toggle-mask
-              :invalid="submitted && errors.password"
-              class="w-full"
-              input-class="w-full"
-            />
-            <small v-if="submitted && errors.password" class="text-red-500">
-              {{ t('auth.register.passwordTooShort') }}
-            </small>
-          </div>
-
-          <div class="flex flex-col gap-1">
-            <label
-              for="confirmPassword"
-              class="text-sm font-medium text-gray-700"
-            >
-              {{ t('auth.register.confirmPassword') }}
-            </label>
-            <Password
-              v-model="confirmPassword"
-              input-id="confirmPassword"
-              placeholder="Confirm your password"
-              :feedback="false"
-              toggle-mask
-              :invalid="submitted && errors.confirmPassword"
-              class="w-full"
-              input-class="w-full"
-            />
-            <small
-              v-if="submitted && errors.confirmPassword"
-              class="text-red-500"
-            >
-              {{ t('auth.register.passwordMismatch') }}
-            </small>
-          </div>
-
-          <Button
-            type="submit"
-            :label="t('auth.register.submit')"
-            :loading="authStore.loading"
-            class="mt-2 w-full"
-          />
-        </form>
+        <RegisterFormFields v-model:first-name="firstName" v-model:last-name="lastName" v-model:email="email" v-model:password="password" v-model:confirm-password="confirmPassword" :submitted="submitted" :errors="errors" :loading="authStore.loading" @submit="handleRegister" />
 
         <p class="mt-4 text-center text-sm text-gray-600">
           {{ t('auth.register.hasAccount') }}
-          <RouterLink
-            :to="{ name: ROUTE_NAMES.LOGIN }"
-            class="font-medium text-blue-600 hover:text-blue-500"
-          >
-            {{ t('auth.register.signIn') }}
-          </RouterLink>
+          <RouterLink :to="{ name: ROUTE_NAMES.LOGIN }" class="font-medium text-blue-600 hover:text-blue-500">{{ t('auth.register.signIn') }}</RouterLink>
         </p>
-
         <p class="mt-2 text-center text-sm text-gray-600">
           Want to hire?
-          <RouterLink
-            :to="{ name: ROUTE_NAMES.COMPANY_REGISTER }"
-            class="font-medium text-blue-600 hover:text-blue-500"
-          >
-            Register your company
-          </RouterLink>
+          <RouterLink :to="{ name: ROUTE_NAMES.COMPANY_REGISTER }" class="font-medium text-blue-600 hover:text-blue-500">Register your company</RouterLink>
         </p>
       </template>
     </div>

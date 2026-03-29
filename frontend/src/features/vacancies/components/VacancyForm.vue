@@ -1,35 +1,22 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, nextTick } from 'vue'
+import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import InputText from 'primevue/inputtext'
-import Textarea from 'primevue/textarea'
-import Editor from 'primevue/editor'
-import Dropdown from 'primevue/dropdown'
-import InputNumber from 'primevue/inputnumber'
-import Calendar from 'primevue/calendar'
-import ToggleSwitch from 'primevue/toggleswitch'
-import Chips from 'primevue/chips'
 import Button from 'primevue/button'
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
-import FileUpload from 'primevue/fileupload'
-import Dialog from 'primevue/dialog'
-import SelectButton from 'primevue/selectbutton'
 import Message from 'primevue/message'
-import { getEmploymentOptions, getExperienceOptions, CURRENCY_OPTIONS, getVisibilityOptions, getInterviewModeOptions } from '../constants/formOptions'
-import { extractErrorMessage } from '@/shared/api/errors'
-import { ApiValidationError } from '@/shared/api/errors'
 import type { FieldErrors } from '@/shared/api/errors'
-import { employerService } from '@/features/employers/services/employer.service'
 import type { EmployerCompany } from '@/features/employers/types/employer.types'
-import type { CreateVacancyRequest, EmploymentType, ExperienceLevel, InterviewMode, VacancyVisibility } from '../types/vacancy.types'
+import type { CreateVacancyRequest } from '../types/vacancy.types'
+import { useVacancyForm } from '../composables/useVacancyForm'
+import VacancyBasicInfoTab from './VacancyBasicInfoTab.vue'
+import VacancyCompanyTab from './VacancyCompanyTab.vue'
+import VacancyPrescanningTab from './VacancyPrescanningTab.vue'
+import VacancyInterviewTab from './VacancyInterviewTab.vue'
+import VacancySettingsTab from './VacancySettingsTab.vue'
+import CreateEmployerDialog from './CreateEmployerDialog.vue'
 
 const { t } = useI18n()
-
-const employmentOptions = computed(() => getEmploymentOptions(t))
-const experienceOptions = computed(() => getExperienceOptions(t))
-const visibilityOptions = computed(() => getVisibilityOptions(t))
-const interviewModeOptions = computed(() => getInterviewModeOptions(t))
 
 const props = defineProps<{
   initialData?: Partial<CreateVacancyRequest>
@@ -39,210 +26,26 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{ save: [data: CreateVacancyRequest] }>()
 
-const activeTab = ref(0)
-
-const title = ref(props.initialData?.title ?? '')
-const description = ref(props.initialData?.description ?? '')
-const requirements = ref(props.initialData?.requirements ?? '')
-const responsibilities = ref(props.initialData?.responsibilities ?? '')
-const skills = ref<string[]>(props.initialData?.skills ?? [])
-const salaryMin = ref<number | null>(props.initialData?.salaryMin ?? null)
-const salaryMax = ref<number | null>(props.initialData?.salaryMax ?? null)
-const salaryCurrency = ref(props.initialData?.salaryCurrency ?? 'USD')
-const location = ref(props.initialData?.location ?? '')
-const isRemote = ref(props.initialData?.isRemote ?? false)
-const employmentType = ref<EmploymentType>(props.initialData?.employmentType ?? 'full_time')
-const experienceLevel = ref<ExperienceLevel>(props.initialData?.experienceLevel ?? 'middle')
-const deadline = ref<Date | null>(props.initialData?.deadline ? new Date(props.initialData.deadline) : null)
-const visibility = ref<VacancyVisibility>(props.initialData?.visibility ?? 'public')
-const cvRequired = ref(props.initialData?.cvRequired ?? false)
-const prescanningPrompt = ref(props.initialData?.prescanningPrompt ?? '')
-const prescanningLanguage = ref(props.initialData?.prescanningLanguage ?? 'en')
-const interviewEnabled = ref(props.initialData?.interviewEnabled ?? false)
-const interviewMode = ref<InterviewMode>(props.initialData?.interviewMode ?? 'chat')
-const interviewDuration = ref(props.initialData?.interviewDuration ?? 30)
-const interviewPrompt = ref(props.initialData?.interviewPrompt ?? '')
-const companyInfo = ref(props.initialData?.companyInfo ?? '')
-const employerId = ref<string | null>(props.initialData?.employerId ?? null)
-const employersList = ref<EmployerCompany[]>([])
-const loadingEmployers = ref(false)
-
-const selectedEmployer = computed(() =>
-  employersList.value.find((e) => e.id === employerId.value) ?? null,
+const form = useVacancyForm(
+  () => props.initialData,
+  () => props.fieldErrors,
 )
 
-// Field error helpers
-const errors = computed<FieldErrors>(() => props.fieldErrors ?? {})
+watch(
+  () => props.initialData,
+  (d) => { if (d) form.syncFromInitialData(d) },
+)
 
-function hasError(field: string): boolean {
-  return field in errors.value
-}
-
-function fieldError(field: string): string {
-  return errors.value[field] ?? ''
-}
-
-// Map fields to tab indices for auto-switch
-const FIELD_TAB_MAP: Record<string, number> = {
-  title: 0, description: 0, requirements: 0, responsibilities: 0,
-  skills: 0, salaryMin: 0, salaryMax: 0, salaryCurrency: 0,
-  location: 0, isRemote: 0, employmentType: 0, experienceLevel: 0, deadline: 0,
-  employerId: 1, companyInfo: 1,
-  prescanningPrompt: 2,
-  interviewEnabled: 3, interviewMode: 3, interviewDuration: 3, interviewPrompt: 3,
-  visibility: 4, cvRequired: 4,
-}
-
-// When field errors change, switch to the tab containing the first error
-watch(errors, (errs) => {
-  if (!errs || Object.keys(errs).length === 0) return
-  const firstField = Object.keys(errs)[0]
-  const tabIndex = FIELD_TAB_MAP[firstField]
-  if (tabIndex !== undefined) {
-    activeTab.value = tabIndex
-  }
-  nextTick(() => {
-    const firstInvalid = document.querySelector('.p-invalid, [data-field-error="true"]')
-    if (firstInvalid) {
-      firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    }
-  })
-})
-
-onMounted(async () => {
-  loadingEmployers.value = true
-  try {
-    employersList.value = await employerService.list()
-  } catch {
-    // silent — dropdown will just be empty
-  } finally {
-    loadingEmployers.value = false
-  }
-})
-
-// --- Create Employer Dialog ---
 const showCreateDialog = ref(false)
-const createMode = ref<'manual' | 'file' | 'website'>('manual')
-const createModeOptions = computed(() => [
-  { label: t('employers.manual'), value: 'manual' },
-  { label: t('employers.file'), value: 'file' },
-  { label: t('employers.fromWebsite'), value: 'website' },
-])
-const newEmployerName = ref('')
-const newEmployerIndustry = ref('')
-const newEmployerWebsite = ref('')
-const newEmployerDescription = ref('')
-const newEmployerUrl = ref('')
-const creatingEmployer = ref(false)
-const createError = ref('')
 
-function openCreateDialog(): void {
-  newEmployerName.value = ''
-  newEmployerIndustry.value = ''
-  newEmployerWebsite.value = ''
-  newEmployerDescription.value = ''
-  newEmployerUrl.value = ''
-  createMode.value = 'manual'
-  createError.value = ''
-  showCreateDialog.value = true
+function handleEmployerCreated(employer: EmployerCompany): void {
+  form.employersList.value.push(employer)
+  form.employerId.value = employer.id
 }
-
-async function handleCreateEmployer(): Promise<void> {
-  if (!newEmployerName.value) return
-  creatingEmployer.value = true
-  createError.value = ''
-  try {
-    let employer: EmployerCompany
-    if (createMode.value === 'file') {
-      // File mode handled separately via handleCreateFromFile
-      return
-    } else if (createMode.value === 'website') {
-      employer = await employerService.createFromUrl(newEmployerName.value, newEmployerUrl.value)
-    } else {
-      employer = await employerService.create({
-        name: newEmployerName.value,
-        industry: newEmployerIndustry.value,
-        website: newEmployerWebsite.value,
-        description: newEmployerDescription.value,
-      })
-    }
-    employersList.value.push(employer)
-    employerId.value = employer.id
-    showCreateDialog.value = false
-  } catch (err: unknown) {
-    createError.value = extractErrorMessage(err)
-  } finally {
-    creatingEmployer.value = false
-  }
-}
-
-async function handleCreateFromFile(event: { files: File | File[] }): Promise<void> {
-  const files = Array.isArray(event.files) ? event.files : [event.files]
-  const file = files[0]
-  if (!file || !newEmployerName.value) return
-  creatingEmployer.value = true
-  createError.value = ''
-  try {
-    const employer = await employerService.createFromFile(newEmployerName.value, file)
-    employersList.value.push(employer)
-    employerId.value = employer.id
-    showCreateDialog.value = false
-  } catch (err: unknown) {
-    createError.value = extractErrorMessage(err)
-  } finally {
-    creatingEmployer.value = false
-  }
-}
-
-watch(() => props.initialData, (d) => {
-  if (!d) return
-  title.value = d.title ?? ''; description.value = d.description ?? ''
-  requirements.value = d.requirements ?? ''; responsibilities.value = d.responsibilities ?? ''
-  skills.value = d.skills ?? []; salaryMin.value = d.salaryMin ?? null
-  salaryMax.value = d.salaryMax ?? null; salaryCurrency.value = d.salaryCurrency ?? 'USD'
-  location.value = d.location ?? ''; isRemote.value = d.isRemote ?? false
-  employmentType.value = d.employmentType ?? 'full_time'
-  experienceLevel.value = d.experienceLevel ?? 'middle'
-  deadline.value = d.deadline ? new Date(d.deadline) : null
-  visibility.value = d.visibility ?? 'public'
-  cvRequired.value = d.cvRequired ?? false
-  prescanningPrompt.value = d.prescanningPrompt ?? ''
-  prescanningLanguage.value = d.prescanningLanguage ?? 'en'
-  interviewEnabled.value = d.interviewEnabled ?? false
-  interviewMode.value = d.interviewMode ?? 'chat'
-  interviewDuration.value = d.interviewDuration ?? 30
-  interviewPrompt.value = d.interviewPrompt ?? ''
-  companyInfo.value = d.companyInfo ?? ''
-  employerId.value = d.employerId ?? null
-})
-
-const canSave = ref(true)
-watch([title, description], () => {
-  canSave.value = Boolean(title.value && description.value)
-})
 
 function handleSave(): void {
-  emit('save', {
-    title: title.value, description: description.value,
-    requirements: requirements.value || undefined, responsibilities: responsibilities.value || undefined,
-    skills: skills.value.length > 0 ? skills.value : undefined,
-    salaryMin: salaryMin.value, salaryMax: salaryMax.value, salaryCurrency: salaryCurrency.value,
-    location: location.value || undefined, isRemote: isRemote.value,
-    employmentType: employmentType.value, experienceLevel: experienceLevel.value,
-    deadline: deadline.value ? deadline.value.toISOString().split('T')[0] : null,
-    visibility: visibility.value,
-    cvRequired: cvRequired.value,
-    prescanningPrompt: prescanningPrompt.value || undefined,
-    prescanningLanguage: prescanningLanguage.value,
-    interviewEnabled: interviewEnabled.value,
-    interviewMode: interviewMode.value,
-    interviewDuration: interviewDuration.value,
-    interviewPrompt: interviewPrompt.value || undefined,
-    companyInfo: companyInfo.value || undefined,
-    employerId: employerId.value || undefined,
-  })
+  emit('save', form.buildPayload())
 }
-
 </script>
 
 <template>
@@ -251,328 +54,71 @@ function handleSave(): void {
       {{ errorMessage }}
     </Message>
 
-    <TabView v-model:activeIndex="activeTab">
-      <!-- Tab 1: Basic Info (job details + location + salary) -->
+    <TabView v-model:activeIndex="form.activeTab.value">
       <TabPanel value="0" :header="t('vacancies.form.basicInfo')">
-        <div class="space-y-4 py-2">
-
-          <div>
-            <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.title') }} <span class="text-red-500">*</span></label>
-            <InputText v-model="title" class="w-full" :placeholder="t('vacancies.form.titlePlaceholder')" :invalid="hasError('title')" />
-            <small v-if="hasError('title')" class="text-red-500">{{ fieldError('title') }}</small>
-          </div>
-          <div>
-            <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.description') }} <span class="text-red-500">*</span></label>
-            <Editor
-              v-model="description"
-              editorStyle="height: 200px"
-              :class="{ 'border border-red-500 rounded-md': hasError('description') }"
-            />
-            <small v-if="hasError('description')" class="text-red-500">{{ fieldError('description') }}</small>
-          </div>
-          <div>
-            <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.requirements') }}</label>
-            <Textarea v-model="requirements" class="w-full" rows="3" :placeholder="t('vacancies.form.requirementsPlaceholder')" :invalid="hasError('requirements')" />
-            <small v-if="hasError('requirements')" class="text-red-500">{{ fieldError('requirements') }}</small>
-          </div>
-          <div>
-            <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.responsibilities') }}</label>
-            <Textarea v-model="responsibilities" class="w-full" rows="3" :placeholder="t('vacancies.form.responsibilitiesPlaceholder')" :invalid="hasError('responsibilities')" />
-            <small v-if="hasError('responsibilities')" class="text-red-500">{{ fieldError('responsibilities') }}</small>
-          </div>
-          <div>
-            <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.skills') }}</label>
-            <Chips v-model="skills" class="w-full" :placeholder="t('vacancies.form.skillsPlaceholder')" />
-            <small v-if="hasError('skills')" class="text-red-500">{{ fieldError('skills') }}</small>
-          </div>
-
-          <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div>
-              <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.location') }}</label>
-              <InputText v-model="location" class="w-full" :placeholder="t('vacancies.form.locationPlaceholder')" :invalid="hasError('location')" />
-              <small v-if="hasError('location')" class="text-red-500">{{ fieldError('location') }}</small>
-            </div>
-            <div class="flex items-end gap-3 pb-1">
-              <label class="text-sm font-medium">{{ t('vacancies.form.remote') }}</label>
-              <ToggleSwitch v-model="isRemote" />
-            </div>
-          </div>
-          <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div>
-              <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.employmentType') }}</label>
-              <Dropdown v-model="employmentType" :options="employmentOptions" option-label="label" option-value="value" class="w-full" :invalid="hasError('employmentType')" />
-              <small v-if="hasError('employmentType')" class="text-red-500">{{ fieldError('employmentType') }}</small>
-            </div>
-            <div>
-              <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.experienceLevel') }}</label>
-              <Dropdown v-model="experienceLevel" :options="experienceOptions" option-label="label" option-value="value" class="w-full" :invalid="hasError('experienceLevel')" />
-              <small v-if="hasError('experienceLevel')" class="text-red-500">{{ fieldError('experienceLevel') }}</small>
-            </div>
-          </div>
-          <div>
-            <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.deadline') }}</label>
-            <Calendar v-model="deadline" class="w-full md:w-1/2" date-format="yy-mm-dd" :show-icon="true" :invalid="hasError('deadline')" />
-            <small v-if="hasError('deadline')" class="text-red-500">{{ fieldError('deadline') }}</small>
-          </div>
-
-          <h4 class="pt-2 text-sm font-semibold text-gray-700">{{ t('vacancies.form.compensation') }}</h4>
-          <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <div>
-              <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.salaryMin') }}</label>
-              <InputNumber v-model="salaryMin" class="w-full" :invalid="hasError('salaryMin')" />
-              <small v-if="hasError('salaryMin')" class="text-red-500">{{ fieldError('salaryMin') }}</small>
-            </div>
-            <div>
-              <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.salaryMax') }}</label>
-              <InputNumber v-model="salaryMax" class="w-full" :invalid="hasError('salaryMax')" />
-              <small v-if="hasError('salaryMax')" class="text-red-500">{{ fieldError('salaryMax') }}</small>
-            </div>
-            <div>
-              <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.currency') }}</label>
-              <Dropdown v-model="salaryCurrency" :options="CURRENCY_OPTIONS" option-label="label" option-value="value" class="w-full" />
-            </div>
-          </div>
-
-        </div>
+        <VacancyBasicInfoTab
+          v-model:title="form.title.value"
+          v-model:description="form.description.value"
+          v-model:requirements="form.requirements.value"
+          v-model:responsibilities="form.responsibilities.value"
+          v-model:skills="form.skills.value"
+          v-model:salary-min="form.salaryMin.value"
+          v-model:salary-max="form.salaryMax.value"
+          v-model:salary-currency="form.salaryCurrency.value"
+          v-model:location="form.location.value"
+          v-model:is-remote="form.isRemote.value"
+          v-model:employment-type="form.employmentType.value"
+          v-model:experience-level="form.experienceLevel.value"
+          v-model:deadline="form.deadline.value"
+          :has-error="form.hasError"
+          :field-error="form.fieldError"
+        />
       </TabPanel>
 
-      <!-- Tab 2: Company -->
       <TabPanel value="1" :header="t('vacancies.form.companyInfo')">
-        <div class="space-y-4 py-2">
-          <!-- Employer dropdown + Add New -->
-          <div>
-            <label class="mb-1 block text-sm font-medium">{{ t('employers.selectEmployer') }}</label>
-            <div class="flex gap-2">
-              <Dropdown
-                v-model="employerId"
-                :options="employersList"
-                option-label="name"
-                option-value="id"
-                :placeholder="t('employers.selectEmployer')"
-                :loading="loadingEmployers"
-                show-clear
-                filter
-                class="flex-1"
-              />
-              <Button
-                type="button"
-                icon="pi pi-plus"
-                :label="t('employers.createNew')"
-                severity="secondary"
-                size="small"
-                @click="openCreateDialog"
-              />
-            </div>
-          </div>
-
-          <!-- Selected employer preview -->
-          <div v-if="selectedEmployer" class="rounded-xl border border-gray-200 bg-gray-50 p-4">
-            <div class="flex items-center gap-3">
-              <div v-if="selectedEmployer.logo" class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white ring-1 ring-gray-200">
-                <img :src="selectedEmployer.logo" :alt="selectedEmployer.name" class="h-full w-full object-contain" />
-              </div>
-              <div v-else class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-                <i class="pi pi-building"></i>
-              </div>
-              <div class="min-w-0 flex-1">
-                <p class="font-semibold text-gray-900">{{ selectedEmployer.name }}</p>
-                <p v-if="selectedEmployer.industry" class="text-xs text-gray-500">{{ selectedEmployer.industry }}</p>
-                <a v-if="selectedEmployer.website" :href="selectedEmployer.website" target="_blank" class="text-xs text-blue-500 hover:underline">{{ selectedEmployer.website }}</a>
-              </div>
-            </div>
-            <p v-if="selectedEmployer.description" class="mt-3 whitespace-pre-line text-sm leading-relaxed text-gray-600">
-              {{ selectedEmployer.description.length > 300 ? selectedEmployer.description.slice(0, 300) + '...' : selectedEmployer.description }}
-            </p>
-          </div>
-
-          <!-- Empty state -->
-          <div v-else class="rounded-xl border border-dashed border-gray-200 py-10 text-center">
-            <i class="pi pi-building mb-2 text-3xl text-gray-300"></i>
-            <p class="text-sm text-gray-500">{{ t('employers.selectEmployer') }}</p>
-            <p class="mt-1 text-xs text-gray-400">{{ t('employers.orCreateNew') }}</p>
-          </div>
-        </div>
+        <VacancyCompanyTab
+          v-model:employer-id="form.employerId.value"
+          :employers-list="form.employersList.value"
+          :loading-employers="form.loadingEmployers.value"
+          :selected-employer="form.selectedEmployer.value"
+          @open-create-dialog="showCreateDialog = true"
+        />
       </TabPanel>
 
-      <!-- Tab 3: Prescanning -->
       <TabPanel value="2" :header="t('vacancies.form.prescanning')">
-        <div class="space-y-4 py-2">
-          <div class="rounded-lg border border-teal-200 bg-teal-50/40 p-4">
-            <div class="flex items-center gap-2">
-              <i class="pi pi-comments text-teal-600"></i>
-              <span class="text-sm font-semibold text-teal-800">{{ t('vacancies.form.prescanningAlwaysEnabled') }}</span>
-            </div>
-            <p class="mt-2 text-sm text-gray-600">
-              {{ t('vacancies.form.prescanningHint') }}
-            </p>
-          </div>
-
-          <div>
-            <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.prescanningLanguage') }}</label>
-            <p class="mb-2 text-xs text-gray-400">{{ t('vacancies.form.prescanningLanguageHint') }}</p>
-            <Dropdown
-              v-model="prescanningLanguage"
-              :options="[
-                { label: 'English', value: 'en' },
-                { label: 'Русский', value: 'ru' },
-                { label: `O'zbekcha`, value: 'uz' },
-              ]"
-              option-label="label"
-              option-value="value"
-              class="w-full sm:w-60"
-            />
-          </div>
-
-          <div>
-            <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.prescanningPrompt') }} ({{ t('common.optional') }})</label>
-            <p class="mb-2 text-xs text-gray-400">{{ t('vacancies.form.prescanningPromptHint') }}</p>
-            <Textarea v-model="prescanningPrompt" class="w-full" rows="5" :placeholder="t('vacancies.form.prescanningPromptPlaceholder')" :invalid="hasError('prescanningPrompt')" />
-            <small v-if="hasError('prescanningPrompt')" class="text-red-500">{{ fieldError('prescanningPrompt') }}</small>
-          </div>
-
-        </div>
+        <VacancyPrescanningTab
+          v-model:prescanning-prompt="form.prescanningPrompt.value"
+          v-model:prescanning-language="form.prescanningLanguage.value"
+          :has-error="form.hasError"
+          :field-error="form.fieldError"
+        />
       </TabPanel>
 
-      <!-- Tab 4: Interview -->
       <TabPanel value="3" :header="t('vacancies.form.interview')">
-        <div class="space-y-4 py-2">
-          <div class="flex items-center justify-between rounded-lg border border-emerald-200 bg-emerald-50/40 p-4">
-            <div>
-              <div class="flex items-center gap-2">
-                <i class="pi pi-video text-emerald-600"></i>
-                <span class="text-sm font-semibold text-emerald-800">{{ t('vacancies.form.interviewOptional') }}</span>
-              </div>
-              <p class="mt-1 text-sm text-gray-600">
-                {{ t('vacancies.form.interviewHint') }}
-              </p>
-            </div>
-            <ToggleSwitch v-model="interviewEnabled" />
-          </div>
-
-          <div v-if="interviewEnabled" class="space-y-4">
-            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div>
-                <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.interviewMode') }}</label>
-                <Dropdown v-model="interviewMode" :options="interviewModeOptions" option-label="label" option-value="value" class="w-full" :invalid="hasError('interviewMode')" />
-                <small v-if="hasError('interviewMode')" class="text-red-500">{{ fieldError('interviewMode') }}</small>
-              </div>
-              <div v-if="interviewMode === 'meet'">
-                <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.interviewDuration') }}</label>
-                <InputNumber v-model="interviewDuration" class="w-full" :min="10" :max="120" :step="5" :invalid="hasError('interviewDuration')" />
-                <small v-if="hasError('interviewDuration')" class="text-red-500">{{ fieldError('interviewDuration') }}</small>
-              </div>
-            </div>
-            <div>
-              <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.interviewPrompt') }} ({{ t('common.optional') }})</label>
-              <p class="mb-2 text-xs text-gray-400">{{ t('vacancies.form.interviewPromptHint') }}</p>
-              <Textarea v-model="interviewPrompt" class="w-full" rows="5" :placeholder="t('vacancies.form.interviewPromptPlaceholder')" :invalid="hasError('interviewPrompt')" />
-              <small v-if="hasError('interviewPrompt')" class="text-red-500">{{ fieldError('interviewPrompt') }}</small>
-            </div>
-          </div>
-
-        </div>
+        <VacancyInterviewTab
+          v-model:interview-enabled="form.interviewEnabled.value"
+          v-model:interview-mode="form.interviewMode.value"
+          v-model:interview-duration="form.interviewDuration.value"
+          v-model:interview-prompt="form.interviewPrompt.value"
+          :has-error="form.hasError"
+          :field-error="form.fieldError"
+        />
       </TabPanel>
 
-      <!-- Tab 5: Settings -->
       <TabPanel value="4" :header="t('vacancies.form.settings')">
-        <div class="space-y-5 py-2">
-          <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div>
-              <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.visibility') }}</label>
-              <Dropdown v-model="visibility" :options="visibilityOptions" option-label="label" option-value="value" class="w-full" :invalid="hasError('visibility')" />
-              <small v-if="hasError('visibility')" class="text-red-500">{{ fieldError('visibility') }}</small>
-              <p class="mt-1 text-xs text-gray-400">{{ t('vacancies.form.visibilityPublicHint') }}</p>
-            </div>
-            <div class="flex items-start gap-3 pt-6">
-              <ToggleSwitch v-model="cvRequired" />
-              <div>
-                <label class="text-sm font-medium">{{ t('vacancies.form.cvRequired') }}</label>
-                <p class="text-xs text-gray-400">{{ t('vacancies.form.cvRequiredHint') }}</p>
-              </div>
-            </div>
-          </div>
-
-        </div>
+        <VacancySettingsTab
+          v-model:visibility="form.visibility.value"
+          v-model:cv-required="form.cvRequired.value"
+          :has-error="form.hasError"
+          :field-error="form.fieldError"
+        />
       </TabPanel>
     </TabView>
 
-    <!-- Save button — always visible below tabs -->
     <div class="mt-4 flex justify-end border-t border-gray-100 pt-4">
-      <Button type="submit" :label="t('common.save')" icon="pi pi-check" :loading="loading" :disabled="!canSave" />
+      <Button type="submit" :label="t('common.save')" icon="pi pi-check" :loading="loading" :disabled="!form.canSave.value" />
     </div>
   </form>
 
-  <!-- Create Employer Dialog (outside form to avoid TabView swallowing it) -->
-  <Dialog
-    v-model:visible="showCreateDialog"
-    :header="t('employers.create')"
-    modal
-    :style="{ width: '500px' }"
-    :breakpoints="{ '640px': '95vw' }"
-  >
-    <div class="space-y-4">
-      <SelectButton v-model="createMode" :options="createModeOptions" option-label="label" option-value="value" class="w-full" />
-
-      <div>
-        <label class="mb-1 block text-sm font-medium">{{ t('employers.name') }} <span class="text-red-500">*</span></label>
-        <InputText v-model="newEmployerName" class="w-full" :placeholder="t('employers.namePlaceholder')" />
-      </div>
-
-      <template v-if="createMode === 'manual'">
-        <div>
-          <label class="mb-1 block text-sm font-medium">{{ t('employers.industry') }}</label>
-          <InputText v-model="newEmployerIndustry" class="w-full" />
-        </div>
-        <div>
-          <label class="mb-1 block text-sm font-medium">{{ t('employers.website') }}</label>
-          <InputText v-model="newEmployerWebsite" class="w-full" placeholder="https://" />
-        </div>
-        <div>
-          <label class="mb-1 block text-sm font-medium">{{ t('employers.description') }}</label>
-          <Textarea v-model="newEmployerDescription" class="w-full" rows="4" />
-        </div>
-      </template>
-
-      <template v-if="createMode === 'website'">
-        <div>
-          <label class="mb-1 block text-sm font-medium">{{ t('employers.websiteUrl') }}</label>
-          <InputText v-model="newEmployerUrl" class="w-full" :placeholder="t('employers.urlPlaceholder')" />
-          <p class="mt-1 text-xs text-gray-400">AI will extract company info from this page</p>
-        </div>
-      </template>
-
-      <template v-if="createMode === 'file'">
-        <div>
-          <label class="mb-1 block text-sm font-medium">{{ t('employers.uploadFile') }}</label>
-          <p class="mb-2 text-xs text-gray-400">PDF, DOCX, or TXT. AI will extract company info.</p>
-          <FileUpload
-            mode="basic"
-            accept=".pdf,.docx,.doc,.txt"
-            :max-file-size="10000000"
-            :choose-label="t('employers.uploadFile')"
-            :auto="true"
-            :custom-upload="true"
-            :disabled="creatingEmployer"
-            @uploader="handleCreateFromFile"
-          />
-        </div>
-      </template>
-
-      <p v-if="createError" class="text-sm text-red-500">{{ createError }}</p>
-    </div>
-
-    <template #footer>
-      <div class="flex justify-end gap-2">
-        <Button :label="t('common.cancel')" severity="secondary" text @click="showCreateDialog = false" />
-        <Button
-          v-if="createMode !== 'file'"
-          :label="t('common.save')"
-          icon="pi pi-check"
-          :loading="creatingEmployer"
-          :disabled="!newEmployerName"
-          @click="handleCreateEmployer"
-        />
-      </div>
-    </template>
-  </Dialog>
+  <CreateEmployerDialog v-model:visible="showCreateDialog" @created="handleEmployerCreated" />
 </template>

@@ -9,9 +9,11 @@ import { EMPLOYMENT_LABELS, EXPERIENCE_LABELS, formatSalaryRange, formatDate } f
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { Vacancy } from '../types/vacancy.types'
 import type { EmployerCompany } from '@/features/employers/types/employer.types'
+import { sanitizeHtml } from '@/shared/utils/sanitize'
 
 interface VacancyWithEmployer extends Vacancy {
   employer?: EmployerCompany
+  companyName?: string | null
 }
 
 const { t } = useI18n()
@@ -56,8 +58,8 @@ onMounted(async () => {
       <template v-else-if="vacancy">
         <div class="mb-5 sm:mb-6">
           <h1 class="text-2xl font-bold sm:text-3xl">{{ vacancy.title }}</h1>
-          <p v-if="vacancy.employer?.name || (vacancy as any).companyName" class="mt-1 text-sm text-gray-500 sm:text-base">
-            <i class="pi pi-building mr-1"></i>{{ vacancy.employer?.name || (vacancy as any).companyName }}
+          <p v-if="vacancy.employer?.name || vacancy.companyName" class="mt-1 text-sm text-gray-500 sm:text-base">
+            <i class="pi pi-building mr-1"></i>{{ vacancy.employer?.name || vacancy.companyName }}
           </p>
           <div class="mt-2 flex flex-wrap items-center gap-2 text-xs text-gray-500 sm:gap-3 sm:text-sm">
             <span v-if="vacancy.location"><i class="pi pi-map-marker mr-1"></i>{{ vacancy.location }}</span>
@@ -125,7 +127,8 @@ onMounted(async () => {
 
         <div class="mb-5 sm:mb-6">
           <h2 class="mb-2 text-base font-semibold sm:text-lg">{{ t('vacancies.form.description') }}</h2>
-          <div class="prose prose-sm max-w-none text-gray-700" v-html="vacancy.description"></div>
+          <!-- eslint-disable-next-line vue/no-v-html -->
+          <div class="prose prose-sm max-w-none text-gray-700" v-html="sanitizeHtml(vacancy.description)"></div>
         </div>
         <div v-if="vacancy.requirements" class="mb-5 sm:mb-6">
           <h2 class="mb-2 text-base font-semibold sm:text-lg">{{ t('vacancies.form.requirements') }}</h2>

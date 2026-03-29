@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from apps.notifications.models import Message, Notification
+from apps.notifications.models import Message
 
 
 class NotificationOutputSerializer(serializers.Serializer):

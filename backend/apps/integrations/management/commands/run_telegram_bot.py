@@ -6,7 +6,6 @@ Usage:
 
 For production, use webhook mode instead (setup_telegram_webhook).
 """
-import json
 import logging
 import time
 

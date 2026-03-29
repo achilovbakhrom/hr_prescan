@@ -14,7 +14,6 @@ const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const employerStore = useEmployerStore()
-
 const editing = ref(false)
 const saving = ref(false)
 

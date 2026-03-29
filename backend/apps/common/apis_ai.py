@@ -6,7 +6,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.accounts.permissions import HasHRPermission, IsAdmin, IsHRManager
+from apps.accounts.permissions import HasHRPermission
 from apps.common.ai_assistant import process_ai_command
 from apps.common.messages import MSG_NOT_IN_COMPANY
 

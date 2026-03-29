@@ -5,6 +5,7 @@ import { useRoute } from 'vue-router'
 import Tag from 'primevue/tag'
 import { cvBuilderService } from '../services/cv-builder.service'
 import type { PublicCvProfile } from '../types/cv-builder.types'
+import { sanitizeHtml } from '@/shared/utils/sanitize'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -80,7 +81,8 @@ function proficiencyLabel(value: string): string {
       <!-- Summary -->
       <div v-if="profile.summary" class="mb-8">
         <h2 class="mb-2 text-sm font-semibold uppercase tracking-wider text-gray-400">{{ t('publicCv.summary') }}</h2>
-        <div class="prose prose-sm max-w-none text-gray-700" v-html="profile.summary"></div>
+        <!-- eslint-disable-next-line vue/no-v-html -->
+        <div class="prose prose-sm max-w-none text-gray-700" v-html="sanitizeHtml(profile.summary)"></div>
       </div>
 
       <!-- Experience -->

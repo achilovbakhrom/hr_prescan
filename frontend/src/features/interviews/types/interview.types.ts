@@ -25,6 +25,10 @@ export interface Interview {
   overallScore: number | null
   language: string
   createdAt: string
+  /** Employer company name returned by some API endpoints */
+  employerName?: string | null
+  /** Company name returned by some API endpoints */
+  companyName?: string | null
 }
 
 export interface ChatMessage {
@@ -54,4 +58,6 @@ export interface TranscriptEntry {
   speaker: string
   text: string
   timestamp: number
+  /** Legacy field name used in some transcript formats */
+  role?: string
 }

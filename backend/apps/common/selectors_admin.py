@@ -1,13 +1,13 @@
 from datetime import timedelta
 
-from django.db.models import Avg, Count, Q, QuerySet, Sum
+from django.db.models import Count, Q, QuerySet, Sum
 from django.db.models.functions import TruncMonth
 from django.utils import timezone
 
 from apps.accounts.models import Company, User
 from apps.applications.models import Application
 from apps.interviews.models import Interview
-from apps.subscriptions.models import CompanySubscription, SubscriptionPlan
+from apps.subscriptions.models import CompanySubscription
 from apps.vacancies.models import Vacancy
 
 

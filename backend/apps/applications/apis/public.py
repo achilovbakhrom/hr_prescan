@@ -1,4 +1,3 @@
-import uuid
 
 from rest_framework import serializers, status
 from rest_framework.parsers import FormParser, MultiPartParser

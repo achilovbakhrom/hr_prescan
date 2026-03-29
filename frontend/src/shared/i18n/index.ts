@@ -1,4 +1,5 @@
 import { createI18n } from 'vue-i18n'
+import type { WritableComputedRef } from 'vue'
 import en from './locales/en.json'
 import ru from './locales/ru.json'
 import uz from './locales/uz.json'
@@ -128,13 +129,13 @@ export const i18n = createI18n<[MessageSchema], 'en' | 'ru' | 'uz'>({
 })
 
 export function setLocale(locale: 'en' | 'ru' | 'uz'): void {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ;(i18n.global.locale as any).value = locale
+  // vue-i18n Composition mode exposes locale as a WritableComputedRef but types it as string
+  ;(i18n.global.locale as unknown as WritableComputedRef<string>).value = locale
   localStorage.setItem(LOCALE_STORAGE_KEY, locale)
   document.documentElement.lang = locale
 }
 
 export function getLocale(): string {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (i18n.global.locale as any).value ?? i18n.global.locale
+  // vue-i18n Composition mode exposes locale as a WritableComputedRef but types it as string
+  return (i18n.global.locale as unknown as WritableComputedRef<string>).value ?? i18n.global.locale
 }

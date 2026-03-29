@@ -1,13 +1,12 @@
-from apps.vacancies.apis.criteria_questions import (
-    GenerateQuestionsApi,
+from apps.vacancies.apis.criteria import (
     VacancyCriteriaDetailApi,
     VacancyCriteriaListCreateApi,
-    VacancyQuestionDetailApi,
-    VacancyQuestionListCreateApi,
 )
-from apps.vacancies.apis.employer import (
+from apps.vacancies.apis.employer_crud import (
     EmployerCompanyDetailApi,
     EmployerCompanyListCreateApi,
+)
+from apps.vacancies.apis.employer_parse import (
     ParseEmployerFileApi,
     ParseEmployerUrlApi,
 )
@@ -15,13 +14,22 @@ from apps.vacancies.apis.public import (
     PublicVacancyDetailApi,
     PublicVacancyListApi,
 )
-from apps.vacancies.apis.vacancy import (
+from apps.vacancies.apis.questions import (
+    GenerateQuestionsApi,
+    VacancyQuestionDetailApi,
+    VacancyQuestionListCreateApi,
+)
+from apps.vacancies.apis.vacancy_actions import (
     ParseCompanyFileApi,
     ParseCompanyUrlApi,
-    VacancyDetailApi,
-    VacancyListCreateApi,
     VacancyRegenerateKeywordsApi,
     VacancyStatusApi,
+)
+from apps.vacancies.apis.vacancy_crud import (
+    VacancyListCreateApi,
+)
+from apps.vacancies.apis.vacancy_detail import (
+    VacancyDetailApi,
 )
 
 __all__ = [

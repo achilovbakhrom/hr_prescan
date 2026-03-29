@@ -50,7 +50,7 @@ async function onTelegramAuth(user: TelegramWidgetUser): Promise<void> {
 onMounted(() => {
   if (!botUsername || !widgetContainer.value) return
 
-  ;(window as Record<string, unknown>)[callbackName] = onTelegramAuth
+  ;(window as unknown as Record<string, unknown>)[callbackName] = onTelegramAuth
 
   const script = document.createElement('script')
   script.async = true
@@ -69,7 +69,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  delete (window as Record<string, unknown>)[callbackName]
+  delete (window as unknown as Record<string, unknown>)[callbackName]
 })
 </script>
 

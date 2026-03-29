@@ -12,12 +12,12 @@ function formatTimestamp(seconds: number): string {
 }
 
 function isAi(entry: TranscriptEntry): boolean {
-  const val = (entry.speaker || (entry as any).role || '').toLowerCase()
+  const val = (entry.speaker || entry.role || '').toLowerCase()
   return val === 'ai' || val === 'interviewer'
 }
 
 function getSpeakerLabel(entry: TranscriptEntry): string {
-  const val = entry.speaker || (entry as any).role || 'Unknown'
+  const val = entry.speaker || entry.role || 'Unknown'
   const lower = val.toLowerCase()
   if (lower === 'ai' || lower === 'interviewer') return 'Interviewer'
   if (lower === 'candidate' || lower === 'user') return 'Candidate'

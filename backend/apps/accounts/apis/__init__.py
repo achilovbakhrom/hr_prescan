@@ -1,91 +1,111 @@
-from apps.accounts.apis.auth import (
+from apps.accounts.apis.auth_invitation import (
     AcceptCompanyInvitationApi,
     CheckInvitationApi,
     CompleteCompanySetupApi,
     CompleteOnboardingApi,
+)
+from apps.accounts.apis.auth_login import (
     LoginApi,
     LogoutApi,
     MeApi,
     MyInvitationsApi,
-    RegisterApi,
     TokenRefreshApi,
+)
+from apps.accounts.apis.auth_register import (
+    RegisterApi,
     VerifyEmailApi,
 )
-from apps.accounts.apis.google_auth import GoogleAuthApi
-from apps.accounts.apis.telegram_auth import TelegramAuthApi
-from apps.accounts.apis.company import (
+from apps.accounts.apis.candidate_certifications import (
+    CertificationDetailApi,
+    CertificationListCreateApi,
+)
+from apps.accounts.apis.candidate_cv import (
+    CandidateCVActivateApi,
+    CandidateCVDetailApi,
+    CandidateCVListCreateApi,
+    CvGeneratePdfApi,
+)
+from apps.accounts.apis.candidate_cv_ai import (
+    CvAiChatApi,
+    CvAiGenerateApi,
+    CvImproveSectionApi,
+    CvParseApi,
+)
+from apps.accounts.apis.candidate_cv_public import PublicCvViewApi
+from apps.accounts.apis.candidate_education import (
+    EducationDetailApi,
+    EducationListCreateApi,
+)
+from apps.accounts.apis.candidate_languages import (
+    CandidateLanguageDetailApi,
+    CandidateLanguageListCreateApi,
+)
+from apps.accounts.apis.candidate_profile import (
+    CandidateProfileApi,
+    CandidateProfileSkillsApi,
+    ProfileCompletenessApi,
+)
+from apps.accounts.apis.candidate_work_experience import (
+    WorkExperienceDetailApi,
+    WorkExperienceListCreateApi,
+)
+from apps.accounts.apis.company_profile import (
     AcceptInvitationApi,
     CompanyProfileApi,
     CompanyRegisterApi,
     InviteHRApi,
     MyCompaniesApi,
+)
+from apps.accounts.apis.company_team import (
     SwitchCompanyApi,
     SwitchToPersonalApi,
     TeamListApi,
     TeamMemberDetailApi,
 )
-from apps.accounts.apis.candidate_profile import (
-    CandidateCVActivateApi,
-    CandidateCVDetailApi,
-    CandidateCVListCreateApi,
-    CandidateLanguageDetailApi,
-    CandidateLanguageListCreateApi,
-    CandidateProfileApi,
-    CandidateProfileSkillsApi,
-    CertificationDetailApi,
-    CertificationListCreateApi,
-    CvAiChatApi,
-    CvAiGenerateApi,
-    CvGeneratePdfApi,
-    CvImproveSectionApi,
-    CvParseApi,
-    PublicCvViewApi,
-    EducationDetailApi,
-    EducationListCreateApi,
-    ProfileCompletenessApi,
-    WorkExperienceDetailApi,
-    WorkExperienceListCreateApi,
-)
+from apps.accounts.apis.google_auth import GoogleAuthApi
+from apps.accounts.apis.telegram_auth import TelegramAuthApi
 
 __all__ = [
     "AcceptCompanyInvitationApi",
-    "CompleteCompanySetupApi",
-    "CompleteOnboardingApi",
-    "GoogleAuthApi",
-    "TelegramAuthApi",
-    "LoginApi",
-    "LogoutApi",
-    "MyInvitationsApi",
-    "MeApi",
-    "RegisterApi",
-    "TokenRefreshApi",
-    "VerifyEmailApi",
     "AcceptInvitationApi",
-    "CompanyProfileApi",
-    "CompanyRegisterApi",
-    "InviteHRApi",
-    "TeamListApi",
-    "TeamMemberDetailApi",
-    "MyCompaniesApi",
-    "SwitchCompanyApi",
+    "CandidateCVActivateApi",
+    "CandidateCVDetailApi",
+    "CandidateCVListCreateApi",
     "CandidateLanguageDetailApi",
     "CandidateLanguageListCreateApi",
     "CandidateProfileApi",
     "CandidateProfileSkillsApi",
     "CertificationDetailApi",
     "CertificationListCreateApi",
-    "EducationDetailApi",
-    "EducationListCreateApi",
-    "ProfileCompletenessApi",
-    "WorkExperienceDetailApi",
-    "WorkExperienceListCreateApi",
-    "CandidateCVActivateApi",
-    "CandidateCVDetailApi",
-    "CandidateCVListCreateApi",
+    "CheckInvitationApi",
+    "CompanyProfileApi",
+    "CompanyRegisterApi",
+    "CompleteCompanySetupApi",
+    "CompleteOnboardingApi",
     "CvAiChatApi",
     "CvAiGenerateApi",
     "CvGeneratePdfApi",
     "CvImproveSectionApi",
     "CvParseApi",
+    "EducationDetailApi",
+    "EducationListCreateApi",
+    "GoogleAuthApi",
+    "InviteHRApi",
+    "LoginApi",
+    "LogoutApi",
+    "MeApi",
+    "MyCompaniesApi",
+    "MyInvitationsApi",
+    "ProfileCompletenessApi",
     "PublicCvViewApi",
+    "RegisterApi",
+    "SwitchCompanyApi",
+    "SwitchToPersonalApi",
+    "TeamListApi",
+    "TeamMemberDetailApi",
+    "TelegramAuthApi",
+    "TokenRefreshApi",
+    "VerifyEmailApi",
+    "WorkExperienceDetailApi",
+    "WorkExperienceListCreateApi",
 ]

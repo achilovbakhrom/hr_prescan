@@ -1,5 +1,4 @@
 from django.db.models import Avg, Count, Q, QuerySet
-from django.utils import timezone
 
 from apps.accounts.models import Company, User
 from apps.applications.models import Application

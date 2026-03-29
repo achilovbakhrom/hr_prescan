@@ -140,7 +140,7 @@ async function handleWatchLive(): Promise<void> {
           model="interview"
           :object-id="interview.id"
           field="ai_summary"
-          @translated="(t) => interview.aiSummaryTranslations = t"
+          @translated="(t) => { if (interview) interview.aiSummaryTranslations = t }"
         >
           <template #default="{ text }">
             <p class="mt-4 rounded bg-gray-50 p-3 text-sm text-gray-700">

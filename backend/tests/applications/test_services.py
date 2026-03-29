@@ -1,5 +1,4 @@
 from decimal import Decimal
-from unittest.mock import patch
 
 import pytest
 
@@ -13,7 +12,7 @@ from apps.applications.services import (
 )
 from apps.common.exceptions import ApplicationError
 from apps.interviews.models import Interview
-from tests.factories import ApplicationFactory, InterviewFactory, VacancyFactory
+from tests.factories import ApplicationFactory, InterviewFactory
 
 
 class TestSubmitApplication:
