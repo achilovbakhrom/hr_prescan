@@ -71,11 +71,29 @@ function handleMenuToggle(): void {
   }
 }
 
-const activeCompanyId = computed(() => authStore.user?.company?.id ?? null)
+const activeCompanyId = computed(() => authStore.user?.company?.id ?? 'personal')
 
-async function handleCompanySwitch(companyId: string): Promise<void> {
-  if (companyId === activeCompanyId.value) return
-  await authStore.switchCompany(companyId)
+const companyOptions = computed(() => {
+  const options: { label: string; value: string }[] = []
+  // Add "Personal" option if user has any company memberships (meaning they were originally a candidate)
+  if (authStore.companies.length > 0) {
+    options.push({ label: 'Personal', value: 'personal' })
+  }
+  for (const m of authStore.companies) {
+    options.push({ label: m.company.name, value: m.company.id })
+  }
+  return options
+})
+
+const showSwitcher = computed(() => companyOptions.value.length > 1)
+
+async function handleCompanySwitch(value: string): Promise<void> {
+  if (value === activeCompanyId.value) return
+  if (value === 'personal') {
+    await authStore.switchToPersonal()
+  } else {
+    await authStore.switchCompany(value)
+  }
   router.push({ name: ROUTE_NAMES.DASHBOARD })
 }
 </script>
@@ -107,11 +125,11 @@ async function handleCompanySwitch(companyId: string): Promise<void> {
       </a>
       <!-- Company switcher / badge -->
       <Select
-        v-if="authStore.hasMultipleCompanies"
+        v-if="showSwitcher"
         :model-value="activeCompanyId"
-        :options="authStore.companies"
-        option-label="company.name"
-        option-value="company.id"
+        :options="companyOptions"
+        option-label="label"
+        option-value="value"
         class="hidden !text-xs sm:inline-flex"
         :pt="{ root: { class: '!py-1 !px-2 !min-w-0 max-w-48' }, label: { class: '!text-xs !py-0' } }"
         @update:model-value="handleCompanySwitch"

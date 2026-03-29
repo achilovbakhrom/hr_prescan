@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.permissions import HasHRPermission, IsAdmin, IsHRManager
-from apps.common.services_translation import TRANSLATABLE_FIELDS, translate_ai_content
+from apps.common.services_translation import TRANSLATABLE_FIELDS, batch_translate_vacancy_items, translate_ai_content
 
 # Simple in-memory rate limiter: max 50 requests per user per hour
 _rate_limit_store: dict[str, list[float]] = defaultdict(list)
@@ -66,5 +66,47 @@ class TranslateAIContentApi(APIView):
 
         return Response(
             {"translated_text": translated_text, "language": data["target_language"]},
+            status=status.HTTP_200_OK,
+        )
+
+
+class BatchTranslateApi(APIView):
+    """POST /api/hr/translate/batch/ — Translate all criteria or questions for a vacancy step."""
+
+    permission_classes = [HasHRPermission]
+
+    class InputSerializer(serializers.Serializer):
+        vacancy_id = serializers.UUIDField()
+        item_type = serializers.ChoiceField(choices=["criteria", "questions"])
+        step = serializers.ChoiceField(choices=["prescanning", "interview"])
+        target_language = serializers.ChoiceField(choices=["en", "ru", "uz"])
+
+    def post(self, request: Request) -> Response:
+        if not _check_rate_limit(str(request.user.id)):
+            return Response(
+                {"detail": "Rate limit exceeded. Max 50 translation requests per hour."},
+                status=status.HTTP_429_TOO_MANY_REQUESTS,
+            )
+
+        serializer = self.InputSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+
+        try:
+            results = batch_translate_vacancy_items(
+                item_type=data["item_type"],
+                vacancy_id=data["vacancy_id"],
+                step=data["step"],
+                target_language=data["target_language"],
+                user=request.user,
+            )
+        except Exception as e:
+            return Response(
+                {"detail": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        return Response(
+            {"items": results, "language": data["target_language"]},
             status=status.HTTP_200_OK,
         )

@@ -192,6 +192,37 @@ class MyInvitationsApi(APIView):
         )
 
 
+class CheckInvitationApi(APIView):
+    """GET /api/auth/check-invitation/?token=... — check if invitation is for existing user."""
+
+    permission_classes = [AllowAny]
+
+    def get(self, request: Request) -> Response:
+        token = request.query_params.get("token")
+        if not token:
+            return Response({"detail": "Token is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        from apps.accounts.models import Invitation
+        try:
+            invitation = Invitation.objects.select_related("company").get(token=token)
+        except (Invitation.DoesNotExist, ValueError):
+            return Response({"detail": "Invalid invitation."}, status=status.HTTP_404_NOT_FOUND)
+
+        if invitation.is_accepted:
+            return Response({"detail": "Invitation already accepted."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if invitation.is_expired:
+            return Response({"detail": "Invitation expired."}, status=status.HTTP_400_BAD_REQUEST)
+
+        existing_user = User.objects.filter(email=invitation.email).exists()
+
+        return Response({
+            "email": invitation.email,
+            "company_name": invitation.company.name,
+            "existing_user": existing_user,
+        })
+
+
 class AcceptCompanyInvitationApi(APIView):
     """POST /api/auth/accept-company-invitation/ — accept invitation and switch company."""
 

@@ -178,6 +178,7 @@ class VacancyCriteria(BaseModel):
         choices=ScreeningStep.choices,
         default=ScreeningStep.PRESCANNING,
     )
+    translations = models.JSONField(default=dict, blank=True)
 
     class Meta:
         verbose_name_plural = "vacancy criteria"
@@ -213,6 +214,7 @@ class InterviewQuestion(BaseModel):
         choices=ScreeningStep.choices,
         default=ScreeningStep.PRESCANNING,
     )
+    translations = models.JSONField(default=dict, blank=True)
 
     class Meta:
         ordering = ["order"]

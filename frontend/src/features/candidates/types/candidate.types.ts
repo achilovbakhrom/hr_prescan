@@ -7,7 +7,9 @@ import type { Application } from '@/shared/types/candidate.types'
 export interface ApplicationDetail extends Application {
   cvParsedText: string
   cvParsedData: CvParsedData
-  matchDetails: Record<string, number>
+  matchDetails: Record<string, unknown>
+  matchNotesTranslations: Record<string, string>
+  cvSummaryTranslations: Record<string, string>
   hrNotes: string
   prescanToken?: string
   interviewToken?: string

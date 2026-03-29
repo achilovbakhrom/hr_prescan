@@ -150,6 +150,21 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function acceptCompanyInvitation(token: string): Promise<void> {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await authService.acceptCompanyInvitation(token)
+      user.value = response.user
+    } catch (err: unknown) {
+      const message = extractErrorMessage(err)
+      error.value = message
+      throw new Error(message)
+    } finally {
+      loading.value = false
+    }
+  }
+
   async function registerCompany(data: RegisterCompanyRequest): Promise<void> {
     loading.value = true
     error.value = null
@@ -213,6 +228,20 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function switchToPersonal(): Promise<void> {
+    loading.value = true
+    error.value = null
+    try {
+      user.value = await authService.switchToPersonal()
+    } catch (err: unknown) {
+      const message = extractErrorMessage(err)
+      error.value = message
+      throw new Error(message)
+    } finally {
+      loading.value = false
+    }
+  }
+
   async function initAuth(): Promise<void> {
     const stored = loadTokens()
     if (!stored?.access) {
@@ -241,12 +270,14 @@ export const useAuthStore = defineStore('auth', () => {
     logout,
     refreshAccessToken,
     acceptInvitation,
+    acceptCompanyInvitation,
     registerCompany,
     completeCompanySetup,
     completeOnboarding,
     fetchUser,
     fetchCompanies,
     switchCompany,
+    switchToPersonal,
     initAuth,
   }
 })

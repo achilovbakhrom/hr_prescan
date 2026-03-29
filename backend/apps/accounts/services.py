@@ -397,6 +397,15 @@ def switch_company(*, user: User, company_id: UUID) -> User:
     return user
 
 
+def switch_to_personal(*, user: User) -> User:
+    """Switch user back to personal/candidate context (no company)."""
+    user.company = None
+    user.role = User.Role.CANDIDATE
+    user.hr_permissions = []
+    user.save(update_fields=["company", "role", "hr_permissions", "updated_at"])
+    return user
+
+
 def deactivate_user(*, user: User, deactivated_by: User) -> User:
     """Deactivate a user. Only admins of the same company can deactivate."""
     if deactivated_by.role != User.Role.ADMIN:

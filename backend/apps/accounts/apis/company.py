@@ -32,6 +32,7 @@ from apps.accounts.services import (
     deactivate_user,
     invite_hr,
     switch_company,
+    switch_to_personal,
     update_company_profile,
 )
 
@@ -276,4 +277,14 @@ class SwitchCompanyApi(APIView):
         except ApplicationError as e:
             return Response({"detail": e.message}, status=status.HTTP_400_BAD_REQUEST)
 
+        return Response(UserOutputSerializer(user).data, status=status.HTTP_200_OK)
+
+
+class SwitchToPersonalApi(APIView):
+    """POST /api/auth/switch-personal/ — switch back to personal/candidate context."""
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request: Request) -> Response:
+        user = switch_to_personal(user=request.user)
         return Response(UserOutputSerializer(user).data, status=status.HTTP_200_OK)

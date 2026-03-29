@@ -1,5 +1,6 @@
 from apps.accounts.apis.auth import (
     AcceptCompanyInvitationApi,
+    CheckInvitationApi,
     CompleteCompanySetupApi,
     CompleteOnboardingApi,
     LoginApi,
@@ -19,6 +20,7 @@ from apps.accounts.apis.company import (
     InviteHRApi,
     MyCompaniesApi,
     SwitchCompanyApi,
+    SwitchToPersonalApi,
     TeamListApi,
     TeamMemberDetailApi,
 )

@@ -14,6 +14,7 @@ class VacancyCriteriaOutputSerializer(serializers.ModelSerializer):
             "is_default",
             "order",
             "step",
+            "translations",
             "created_at",
             "updated_at",
         ]
@@ -31,6 +32,7 @@ class InterviewQuestionOutputSerializer(serializers.ModelSerializer):
             "order",
             "is_active",
             "step",
+            "translations",
             "created_at",
             "updated_at",
         ]

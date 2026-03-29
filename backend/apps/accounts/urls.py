@@ -2,6 +2,7 @@ from django.urls import path
 
 from apps.accounts.apis import (
     AcceptCompanyInvitationApi,
+    CheckInvitationApi,
     AcceptInvitationApi,
     CandidateCVActivateApi,
     CandidateCVDetailApi,
@@ -33,6 +34,7 @@ from apps.accounts.apis import (
     ProfileCompletenessApi,
     RegisterApi,
     SwitchCompanyApi,
+    SwitchToPersonalApi,
     TeamListApi,
     TeamMemberDetailApi,
     TelegramAuthApi,
@@ -52,6 +54,7 @@ auth_urlpatterns = [
     path("me/", MeApi.as_view(), name="me"),
     path("company-register/", CompanyRegisterApi.as_view(), name="company-register"),
     path("accept-invitation/", AcceptInvitationApi.as_view(), name="accept-invitation"),
+    path("check-invitation/", CheckInvitationApi.as_view(), name="check-invitation"),
     path("google/", GoogleAuthApi.as_view(), name="google-auth"),
     path("telegram/", TelegramAuthApi.as_view(), name="telegram-auth"),
     path("my-invitations/", MyInvitationsApi.as_view(), name="my-invitations"),
@@ -60,6 +63,7 @@ auth_urlpatterns = [
     path("complete-onboarding/", CompleteOnboardingApi.as_view(), name="complete-onboarding"),
     path("my-companies/", MyCompaniesApi.as_view(), name="my-companies"),
     path("switch-company/", SwitchCompanyApi.as_view(), name="switch-company"),
+    path("switch-personal/", SwitchToPersonalApi.as_view(), name="switch-personal"),
 ]
 
 # HR URLs — mounted at /api/hr/company/

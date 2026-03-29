@@ -42,7 +42,9 @@
     "language": "Язык",
     "educationLevel": "Уровень образования",
     "translate": "Перевести",
-    "translating": "Перевод..."
+    "translating": "Перевод...",
+    "name": "Название",
+    "description": "Описание"
   },
   "nav": {
     "dashboard": "Панель управления",
@@ -469,6 +471,7 @@
     "shareLink": "Поделиться ссылкой",
     "questions": "Компетенции",
     "criteria": "Критерии",
+    "competency": "Компетенция",
     "generateQuestions": "Сгенерировать с ИИ",
     "addQuestion": "Добавить компетенцию",
     "addCriteria": "Добавить критерий",
@@ -505,6 +508,7 @@
     "cv": "Резюме",
     "prescanning": "Прескрининг",
     "interview": "Собеседование",
+    "analysis": "Анализ",
     "notes": "Заметки",
     "messages": "Сообщения",
     "actions": {
@@ -604,7 +608,8 @@
       "combinedAssessment": "Комбинированная оценка",
       "notRecommendedLabel": "Не рекомендован",
       "considerLabel": "На рассмотрении",
-      "recommendedLabel": "Рекомендован"
+      "recommendedLabel": "Рекомендован",
+      "aiNotes": "Оценка соответствия ИИ"
     },
     "messageThread": {
       "noMessages": "Сообщений пока нет",

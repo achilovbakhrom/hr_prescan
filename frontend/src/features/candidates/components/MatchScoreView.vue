@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import TranslatableText from '@/shared/components/TranslatableText.vue'
 
 const { t } = useI18n()
 
@@ -15,6 +16,8 @@ interface MatchDetails {
 const props = defineProps<{
   overallScore: number | null
   matchDetails: MatchDetails | null
+  matchNotesTranslations?: Record<string, string>
+  applicationId?: string
   prescanningScore: number | null
   interviewScore: number | null
 }>()
@@ -161,6 +164,24 @@ const scoreBreakdownLabel = computed(() => {
         <span>{{ t('candidates.matchScoreView.recommendedLabel') }}</span>
         <span>100%</span>
       </div>
+    </div>
+
+    <!-- AI Match Notes -->
+    <div v-if="props.matchDetails?.notes" class="rounded-lg border border-gray-200 bg-white p-4">
+      <p class="mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">{{ t('candidates.matchScoreView.aiNotes') }}</p>
+      <TranslatableText
+        v-if="props.applicationId"
+        :text="props.matchDetails.notes"
+        :translations="props.matchNotesTranslations || {}"
+        model="application"
+        :object-id="props.applicationId"
+        field="match_notes"
+      >
+        <template #default="{ text }">
+          <p class="text-sm text-gray-700 leading-relaxed">{{ text }}</p>
+        </template>
+      </TranslatableText>
+      <p v-else class="text-sm text-gray-700 leading-relaxed">{{ props.matchDetails.notes }}</p>
     </div>
   </div>
 </template>

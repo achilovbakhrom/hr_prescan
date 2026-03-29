@@ -42,7 +42,9 @@
     "language": "Til",
     "educationLevel": "Ta'lim darajasi",
     "translate": "Tarjima qilish",
-    "translating": "Tarjima qilinmoqda..."
+    "translating": "Tarjima qilinmoqda...",
+    "name": "Nomi",
+    "description": "Tavsif"
   },
   "nav": {
     "dashboard": "Boshqaruv paneli",
@@ -469,6 +471,7 @@
     "shareLink": "Havolani ulashish",
     "questions": "Kompetensiyalar",
     "criteria": "Mezonlar",
+    "competency": "Kompetensiya",
     "generateQuestions": "AI bilan yaratish",
     "addQuestion": "Kompetensiya qo'shish",
     "addCriteria": "Mezon qo'shish",
@@ -505,6 +508,7 @@
     "cv": "CV",
     "prescanning": "Oldindan tekshiruv",
     "interview": "Intervyu",
+    "analysis": "Tahlil",
     "notes": "Eslatmalar",
     "messages": "Xabarlar",
     "actions": {
@@ -604,7 +608,8 @@
       "combinedAssessment": "Umumiy baholash",
       "notRecommendedLabel": "Tavsiya etilmaydi",
       "considerLabel": "Ko'rib chiqish",
-      "recommendedLabel": "Tavsiya etiladi"
+      "recommendedLabel": "Tavsiya etiladi",
+      "aiNotes": "AI moslik bahosi"
     },
     "messageThread": {
       "noMessages": "Hozircha xabarlar yo'q",

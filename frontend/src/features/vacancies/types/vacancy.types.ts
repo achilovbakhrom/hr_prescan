@@ -33,6 +33,7 @@ export interface VacancyCriteria {
   isDefault: boolean
   order: number
   step: StepType
+  translations: Record<string, string>
 }
 
 export interface InterviewQuestion {
@@ -43,6 +44,7 @@ export interface InterviewQuestion {
   order: number
   isActive: boolean
   step: StepType
+  translations: Record<string, string>
 }
 
 export interface CreateVacancyRequest {

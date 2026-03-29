@@ -98,4 +98,9 @@ export const authService = {
     const response = await apiClient.post<User>('/auth/switch-company', { companyId })
     return response.data
   },
+
+  async switchToPersonal(): Promise<User> {
+    const response = await apiClient.post<User>('/auth/switch-personal')
+    return response.data
+  },
 }

@@ -219,8 +219,14 @@ local-test-backend: ## Run backend tests (pytest)
 local-test-frontend: ## Run frontend unit tests (vitest)
 	cd frontend && npx vitest run --reporter=verbose
 
-local-test-e2e: ## Run E2E tests (playwright) — app must be running
-	cd frontend && npx playwright test --reporter=list
+local-test-e2e: ## Run all E2E tests (playwright) — app must be running
+	cd e2e && .venv/bin/python -m pytest -v
+
+local-test-e2e-api: ## Run E2E API tests only — backend must be running
+	cd e2e && .venv/bin/python -m pytest api/ -v
+
+local-test-e2e-ui: ## Run E2E UI tests only — app must be running
+	cd e2e && .venv/bin/python -m pytest ui/ -v
 
 # ─── Cleanup ──────────────────────────────────────────────────────────────────
 

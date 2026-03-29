@@ -14,6 +14,8 @@ import ScreeningTab from '../components/ScreeningTab.vue'
 import CandidatesTab from '../components/CandidatesTab.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import { useCandidateStore } from '@/features/candidates/stores/candidate.store'
+import { batchTranslateItems } from '@/shared/api/translate'
+import { getLocale } from '@/shared/i18n'
 import type { CreateVacancyRequest, VacancyStatus } from '../types/vacancy.types'
 
 const { t } = useI18n()
@@ -105,6 +107,27 @@ async function handleUpdate(data: CreateVacancyRequest): Promise<void> {
     await vacancyStore.updateVacancy(vacancyId.value, data)
   } catch {
     /* store handles error */
+  }
+}
+
+async function handleBatchTranslate(itemType: 'criteria' | 'questions', step: 'prescanning' | 'interview'): Promise<void> {
+  try {
+    const result = await batchTranslateItems({
+      vacancyId: vacancyId.value,
+      itemType,
+      step,
+      targetLanguage: getLocale(),
+    })
+    // Update local data with translations
+    if (vacancy.value) {
+      const itemList = itemType === 'criteria' ? vacancy.value.criteria : vacancy.value.questions
+      for (const translated of result.items) {
+        const item = itemList.find((i) => i.id === translated.id)
+        if (item) item.translations = translated.translations
+      }
+    }
+  } catch {
+    /* silent — button stays visible for retry */
   }
 }
 </script>
@@ -219,6 +242,8 @@ async function handleUpdate(data: CreateVacancyRequest): Promise<void> {
             @add-criteria="(d) => vacancyStore.addCriteria(vacancyId, d)"
             @update-criteria="(cId, d) => vacancyStore.updateCriteria(vacancyId, cId, d)"
             @delete-criteria="(cId) => vacancyStore.deleteCriteria(vacancyId, cId)"
+            @translate-questions="() => handleBatchTranslate('questions', 'prescanning')"
+            @translate-criteria="() => handleBatchTranslate('criteria', 'prescanning')"
           />
         </TabPanel>
 
@@ -240,6 +265,8 @@ async function handleUpdate(data: CreateVacancyRequest): Promise<void> {
             @add-criteria="(d) => vacancyStore.addCriteria(vacancyId, d)"
             @update-criteria="(cId, d) => vacancyStore.updateCriteria(vacancyId, cId, d)"
             @delete-criteria="(cId) => vacancyStore.deleteCriteria(vacancyId, cId)"
+            @translate-questions="() => handleBatchTranslate('questions', 'interview')"
+            @translate-criteria="() => handleBatchTranslate('criteria', 'interview')"
           />
         </TabPanel>
 

@@ -30,11 +30,9 @@ const displayText = computed(() => {
 })
 
 const showTranslateButton = computed(() => {
-  if (!props.text || !props.translations) return false
-  // Show button if translations exist (content was tagged) but current locale is missing
-  const hasAnyTranslation = Object.keys(props.translations).length > 0
-  const missingCurrentLocale = !props.translations[currentLocale.value]
-  return hasAnyTranslation && missingCurrentLocale
+  if (!props.text) return false
+  // Show button whenever current locale's translation is missing
+  return !props.translations?.[currentLocale.value]
 })
 
 async function handleTranslate() {

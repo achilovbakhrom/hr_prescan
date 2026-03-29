@@ -43,6 +43,8 @@ const activeTab = computed({
 const prescanningScore = ref<number | null>(null)
 const interviewScore = ref<number | null>(null)
 const aiSummary = ref<string | null>(null)
+const aiSummaryTranslations = ref<Record<string, string>>({})
+const aiSummaryInterviewId = ref<string | null>(null)
 
 onMounted(async () => {
   await candidateStore.fetchCandidateDetail(candidateId.value)
@@ -54,6 +56,8 @@ onMounted(async () => {
     )) as Record<string, unknown>
     prescanningScore.value = (data.overallScore as number) ?? null
     aiSummary.value = (data.aiSummary as string) ?? null
+    aiSummaryTranslations.value = (data.aiSummaryTranslations as Record<string, string>) ?? {}
+    aiSummaryInterviewId.value = (data.id as string) ?? null
   } catch {
     // no prescanning interview yet
   }
@@ -67,6 +71,8 @@ onMounted(async () => {
       interviewScore.value = (data.overallScore as number) ?? null
       if (!aiSummary.value) {
         aiSummary.value = (data.aiSummary as string) ?? null
+        aiSummaryTranslations.value = (data.aiSummaryTranslations as Record<string, string>) ?? {}
+        aiSummaryInterviewId.value = (data.id as string) ?? null
       }
     } catch {
       // no interview yet
@@ -154,6 +160,8 @@ function formatScore(score: number | null | undefined): string {
               :prescanning-score="prescanningScore"
               :interview-score="interviewScore"
               :ai-summary="aiSummary"
+              :ai-summary-translations="aiSummaryTranslations"
+              :ai-summary-interview-id="aiSummaryInterviewId ?? undefined"
             />
           </div>
         </TabPanel>
@@ -181,6 +189,9 @@ function formatScore(score: number | null | undefined): string {
               :cv-filename="candidate.cvOriginalFilename"
               :match-score="candidate.matchScore"
               :match-details="candidate.matchDetails"
+              :match-notes-translations="candidate.matchNotesTranslations"
+              :cv-summary-translations="candidate.cvSummaryTranslations"
+              :application-id="candidate.id"
               @download-cv="handleDownloadCv"
             />
           </div>
@@ -230,12 +241,14 @@ function formatScore(score: number | null | undefined): string {
 
         <TabPanel :value="String(hasInterview ? 4 : 3)">
           <template #header>
-            <span class="text-xs sm:text-sm">Analysis</span>
+            <span class="text-xs sm:text-sm">{{ t('candidates.analysis') }}</span>
           </template>
           <div class="py-3 sm:py-4">
             <MatchScoreView
               :overall-score="candidate.matchScore"
               :match-details="candidate.matchDetails"
+              :match-notes-translations="candidate.matchNotesTranslations"
+              :application-id="candidate.id"
               :prescanning-score="prescanningScore"
               :interview-score="interviewScore"
             />

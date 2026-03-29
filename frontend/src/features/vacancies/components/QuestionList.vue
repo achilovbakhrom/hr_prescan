@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
@@ -9,17 +9,30 @@ import Textarea from 'primevue/textarea'
 import Dialog from 'primevue/dialog'
 import Tag from 'primevue/tag'
 import Select from 'primevue/select'
+import { getLocale } from '@/shared/i18n'
 import type { InterviewQuestion } from '../types/vacancy.types'
 
 const { t } = useI18n()
 
-defineProps<{ questions: InterviewQuestion[]; loading?: boolean }>()
+const props = defineProps<{ questions: InterviewQuestion[]; loading?: boolean }>()
 const emit = defineEmits<{
   add: [data: { text: string; category?: string }]
   update: [questionId: string, data: Partial<InterviewQuestion>]
   delete: [questionId: string]
   generate: []
+  translateAll: []
 }>()
+
+const currentLocale = computed(() => getLocale())
+
+const showTranslateAll = computed(() => {
+  if (!props.questions.length) return false
+  return props.questions.some((q) => !q.translations?.[currentLocale.value])
+})
+
+function getTranslatedText(q: InterviewQuestion): string {
+  return q.translations?.[currentLocale.value] ?? q.text
+}
 
 const showDialog = ref(false)
 const isEditing = ref(false)
@@ -60,15 +73,23 @@ function handleSubmit(): void {
     <div class="mb-4 flex items-center justify-between">
       <h3 class="text-lg font-semibold">{{ t('vacancies.questions') }}</h3>
       <div class="flex gap-2">
+        <Button
+          v-if="showTranslateAll"
+          :label="t('common.translate')"
+          icon="pi pi-language"
+          severity="secondary"
+          size="small"
+          @click="emit('translateAll')"
+        />
         <Button :label="t('vacancies.generateQuestions')" icon="pi pi-sparkles" severity="info" size="small" :loading="loading" @click="emit('generate')" />
         <Button :label="t('vacancies.addQuestion')" icon="pi pi-plus" size="small" @click="openAdd" />
       </div>
     </div>
     <DataTable :value="questions" :loading="loading" striped-rows>
       <Column field="order" header="#" style="width: 50px" />
-      <Column field="text" header="Competency">
+      <Column field="text" :header="t('vacancies.competency')">
         <template #body="{ data }">
-          <span class="text-sm">{{ data.text }}</span>
+          <span class="text-sm">{{ getTranslatedText(data) }}</span>
         </template>
       </Column>
       <Column field="category" header="Category" style="width: 160px">

@@ -79,6 +79,7 @@ All detailed docs live in `docs/`:
 - **Before starting any task** (bug fix, refactor, new feature, or anything else), assess whether the change affects business logic — user flows, statuses, pipelines, scoring, vacancy lifecycle, candidate pipeline, API contracts, or any behavior documented in `docs/BUSINESS_LOGIC.md`.
 - **If it does affect business logic**, update `docs/BUSINESS_LOGIC.md` as part of the same task — not as a follow-up. The code and the docs must stay in sync at all times.
 - **If unsure** whether a change affects business logic, err on the side of updating the doc.
+- **Code review before push**: After completing any code change (feature, bug fix, refactor — anything), run `/review` on the changed files BEFORE committing or pushing. Do NOT push code that hasn't been reviewed. Fix all critical issues and warnings found by the review before pushing.
 
 ## Important Notes
 

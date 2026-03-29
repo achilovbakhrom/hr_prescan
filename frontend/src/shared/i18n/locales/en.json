@@ -42,7 +42,9 @@
     "language": "Language",
     "educationLevel": "Education Level",
     "translate": "Translate",
-    "translating": "Translating..."
+    "translating": "Translating...",
+    "name": "Name",
+    "description": "Description"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -469,6 +471,7 @@
     "shareLink": "Share Link",
     "questions": "Competencies",
     "criteria": "Criteria",
+    "competency": "Competency",
     "generateQuestions": "Generate with AI",
     "addQuestion": "Add Competency",
     "addCriteria": "Add Criteria",
@@ -505,6 +508,7 @@
     "cv": "CV",
     "prescanning": "Prescanning",
     "interview": "Interview",
+    "analysis": "Analysis",
     "notes": "Notes",
     "messages": "Messages",
     "actions": {
@@ -604,7 +608,8 @@
       "combinedAssessment": "Combined Assessment",
       "notRecommendedLabel": "Not Recommended",
       "considerLabel": "Consider",
-      "recommendedLabel": "Recommended"
+      "recommendedLabel": "Recommended",
+      "aiNotes": "AI Match Assessment"
     },
     "messageThread": {
       "noMessages": "No messages yet",
