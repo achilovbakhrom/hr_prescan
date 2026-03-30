@@ -11,48 +11,21 @@ from apps.accounts.serializers import (
     AcceptInvitationInputSerializer,
     CompanyOutputSerializer,
     CompanyProfileInputSerializer,
-    CompanyRegisterInputSerializer,
     InvitationOutputSerializer,
     InviteHRInputSerializer,
     UserOutputSerializer,
 )
 from apps.accounts.services import (
     accept_invitation,
-    create_company_with_admin,
     invite_hr,
     update_company_profile,
 )
 from apps.common.exceptions import ApplicationError
 from apps.common.messages import (
-    MSG_COMPANY_REGISTERED,
     MSG_INVITATION_ACCEPTED,
     MSG_INVITATION_SENT,
     MSG_NOT_IN_COMPANY,
 )
-
-
-class CompanyRegisterApi(APIView):
-    """POST /api/auth/company-register/ — create company + admin user."""
-
-    permission_classes = [AllowAny]
-
-    def post(self, request: Request) -> Response:
-        serializer = CompanyRegisterInputSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        try:
-            company, user = create_company_with_admin(**serializer.validated_data)
-        except ApplicationError as e:
-            return Response({"detail": e.message}, status=status.HTTP_400_BAD_REQUEST)
-
-        return Response(
-            {
-                "detail": str(MSG_COMPANY_REGISTERED),
-                "company": CompanyOutputSerializer(company).data,
-                "user": UserOutputSerializer(user).data,
-            },
-            status=status.HTTP_201_CREATED,
-        )
 
 
 class CompanyProfileApi(APIView):

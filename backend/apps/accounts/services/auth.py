@@ -94,6 +94,8 @@ def verify_email(*, token: str) -> User:
 
 def complete_onboarding(*, user: User, role: str = User.Role.CANDIDATE) -> User:
     """Complete onboarding by setting the user's chosen role."""
+    if user.onboarding_completed:
+        raise ApplicationError("Onboarding already completed.")
     if role not in (User.Role.CANDIDATE, User.Role.HR):
         raise ApplicationError("Invalid role choice.")
     user.role = role

@@ -20,6 +20,7 @@ class CompanyOutputSerializer(serializers.ModelSerializer):
             "logo",
             "website",
             "description",
+            "custom_industry",
             "subscription_status",
             "trial_ends_at",
             "created_at",
@@ -53,25 +54,6 @@ class UserOutputSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
-class CompanyRegisterInputSerializer(serializers.Serializer):
-    # Company fields
-    company_name = serializers.CharField(max_length=255)
-    industries = serializers.ListField(
-        child=serializers.SlugField(max_length=50),
-        required=False, default=list,
-    )
-    size = serializers.ChoiceField(choices=Company.Size.choices)
-    country = serializers.CharField(max_length=100)
-    website = serializers.URLField(max_length=500, required=False, allow_blank=True)
-    description = serializers.CharField(required=False, allow_blank=True)
-
-    # Admin user fields
-    admin_email = serializers.EmailField()
-    admin_password = serializers.CharField(min_length=8)
-    admin_first_name = serializers.CharField(max_length=150)
-    admin_last_name = serializers.CharField(max_length=150)
-
-
 class CompanyProfileInputSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=255, required=False)
     industries = serializers.ListField(
@@ -83,6 +65,7 @@ class CompanyProfileInputSerializer(serializers.Serializer):
     website = serializers.URLField(max_length=500, required=False, allow_blank=True)
     description = serializers.CharField(required=False, allow_blank=True)
     logo = serializers.CharField(max_length=500, required=False, allow_blank=True)
+    custom_industry = serializers.CharField(max_length=255, required=False, allow_blank=True)
 
 
 class InviteHRInputSerializer(serializers.Serializer):

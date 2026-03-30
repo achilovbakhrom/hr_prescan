@@ -52,7 +52,6 @@ from apps.accounts.apis.candidate_work_experience import (
 from apps.accounts.apis.company_profile import (
     AcceptInvitationApi,
     CompanyProfileApi,
-    CompanyRegisterApi,
     InviteHRApi,
     MyCompaniesApi,
 )
@@ -79,7 +78,6 @@ __all__ = [
     "CertificationListCreateApi",
     "CheckInvitationApi",
     "CompanyProfileApi",
-    "CompanyRegisterApi",
     "CompleteCompanySetupApi",
     "CompleteOnboardingApi",
     "CvAiChatApi",
