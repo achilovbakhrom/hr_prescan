@@ -61,7 +61,7 @@ def register_user(
     first_name: str,
     last_name: str,
 ) -> User:
-    """Register a candidate user and trigger verification email."""
+    """Register a user and trigger verification email. Role is chosen after login."""
     user = create_user(
         email=email,
         password=password,
@@ -69,6 +69,8 @@ def register_user(
         last_name=last_name,
         role=User.Role.CANDIDATE,
     )
+    user.onboarding_completed = False
+    user.save(update_fields=["onboarding_completed", "updated_at"])
     send_verification_email.delay(user_id=str(user.id))
     return user
 
@@ -90,8 +92,11 @@ def verify_email(*, token: str) -> User:
     return user
 
 
-def complete_onboarding(*, user: User) -> User:
-    """Mark onboarding as completed (user chose to stay as candidate)."""
+def complete_onboarding(*, user: User, role: str = User.Role.CANDIDATE) -> User:
+    """Complete onboarding by setting the user's chosen role."""
+    if role not in (User.Role.CANDIDATE, User.Role.HR):
+        raise ApplicationError("Invalid role choice.")
+    user.role = role
     user.onboarding_completed = True
-    user.save(update_fields=["onboarding_completed", "updated_at"])
+    user.save(update_fields=["role", "onboarding_completed", "updated_at"])
     return user

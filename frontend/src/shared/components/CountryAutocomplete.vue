@@ -2,6 +2,7 @@
 import { ref, onMounted, watch } from 'vue'
 import AutoComplete from 'primevue/autocomplete'
 import { fetchCountries, type Country } from '@/shared/services/country.service'
+import { getTranslatedName, matchesTranslatedName } from '@/shared/composables/useTranslatedName'
 import { useI18n } from 'vue-i18n'
 
 const props = withDefaults(
@@ -46,10 +47,13 @@ watch(
   },
 )
 
+function translatedLabel(item: Country): string {
+  return getTranslatedName(item)
+}
+
 function search(event: { query: string }): void {
-  const query = event.query.toLowerCase()
   filteredCountries.value = countries.value.filter((c) =>
-    c.name.toLowerCase().includes(query),
+    matchesTranslatedName(c, event.query),
   )
 }
 
@@ -68,7 +72,7 @@ function onClear(): void {
   <AutoComplete
     :modelValue="selectedCountry"
     :suggestions="filteredCountries"
-    optionLabel="name"
+    :optionLabel="translatedLabel"
     :placeholder="t('auth.chooseRole.country')"
     :invalid="invalid"
     @complete="search"

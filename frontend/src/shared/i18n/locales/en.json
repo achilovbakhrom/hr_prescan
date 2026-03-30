@@ -44,7 +44,9 @@
     "translate": "Translate",
     "translating": "Translating...",
     "name": "Name",
-    "description": "Description"
+    "description": "Description",
+    "customIndustry": "Specify your industry",
+    "customIndustryPlaceholder": "Enter your industry name"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -66,7 +68,6 @@
     "signIn": "Sign In",
     "signUp": "Sign Up",
     "signOut": "Sign Out",
-    "forEmployers": "For Employers",
     "browseJobs": "Browse Jobs",
     "jobs": "Jobs",
     "myApplications": "My Applications",
@@ -89,9 +90,7 @@
       "emailPlaceholder": "Enter your email",
       "emailInvalid": "Please enter a valid email address.",
       "passwordPlaceholder": "Enter your password",
-      "passwordRequired": "Password is required.",
-      "wantToHire": "Want to hire?",
-      "registerCompany": "Register your company"
+      "passwordRequired": "Password is required."
     },
     "telegram": {
       "signIn": "Sign in with Telegram",
@@ -110,24 +109,16 @@
       "signIn": "Sign in",
       "success": "Registration successful! Please check your email to verify your account.",
       "passwordMismatch": "Passwords do not match",
-      "passwordTooShort": "Password must be at least 8 characters"
-    },
-    "companyRegister": {
-      "title": "Register Your Company",
-      "subtitle": "Start pre-screening candidates with AI",
-      "step1": "Company Info",
-      "step2": "Admin Account",
-      "companyName": "Company Name",
-      "industry": "Industry",
-      "size": "Company Size",
-      "country": "Country",
-      "website": "Website",
-      "adminEmail": "Admin Email",
-      "adminPassword": "Password",
-      "adminFirstName": "First Name",
-      "adminLastName": "Last Name",
-      "submit": "Register Company",
-      "success": "Company registered! Please verify your email."
+      "passwordTooShort": "Password must be at least 8 characters",
+      "firstNamePlaceholder": "First name",
+      "lastNamePlaceholder": "Last name",
+      "emailPlaceholder": "Enter your email",
+      "passwordPlaceholder": "Minimum 8 characters",
+      "confirmPasswordPlaceholder": "Confirm your password",
+      "firstNameRequired": "First name is required.",
+      "lastNameRequired": "Last name is required.",
+      "emailInvalid": "Please enter a valid email address.",
+      "orRegisterWithEmail": "or register with email"
     },
     "verifyEmail": {
       "title": "Verify Your Email",
@@ -153,15 +144,8 @@
       "candidateDescription": "Browse job openings and participate in AI interviews",
       "company": "I'm hiring",
       "companyDescription": "Post vacancies and screen candidates with AI",
-      "companyFormTitle": "Tell us about your company",
-      "companyName": "Company Name",
       "industry": "Industry",
-      "size": "Company Size",
-      "country": "Country",
-      "email": "Your Email",
-      "emailHint": "Required for company account",
-      "submit": "Complete Setup",
-      "back": "Back"
+      "country": "Country"
     }
   },
   "landing": {

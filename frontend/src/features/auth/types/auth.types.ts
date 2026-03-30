@@ -2,7 +2,7 @@
 export type { User, Company, CompanySize, UserRole, PendingInvitation } from '@/shared/types/auth.types'
 
 // Import shared types needed by feature-specific interfaces
-import type { User, CompanySize } from '@/shared/types/auth.types'
+import type { User } from '@/shared/types/auth.types'
 
 export interface LoginRequest {
   email: string
@@ -31,23 +31,4 @@ export interface AcceptInvitationRequest {
   password: string
   firstName: string
   lastName: string
-}
-
-export interface RegisterCompanyRequest {
-  companyName: string
-  industries: string[]
-  size: CompanySize
-  country: string
-  adminEmail: string
-  adminPassword: string
-  adminFirstName: string
-  adminLastName: string
-}
-
-export interface CompleteCompanySetupRequest {
-  companyName: string
-  industries: string[]
-  size: CompanySize
-  country: string
-  email?: string
 }

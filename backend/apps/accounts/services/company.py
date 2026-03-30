@@ -18,6 +18,7 @@ def _create_company_with_trial(
     *,
     company_name: str,
     industries: list[str] | None = None,
+    custom_industry: str = "",
     size: str,
     country: str,
     website: str | None = None,
@@ -33,6 +34,7 @@ def _create_company_with_trial(
         name=company_name,
         size=size,
         country=country,
+        custom_industry=custom_industry,
         website=website or "",
         description=description or "",
     )
@@ -151,7 +153,7 @@ def update_company_profile(*, company: Company, data: dict) -> Company:
     """Update company fields (name, industries, size, country, website, description, logo)."""
     from apps.common.models import Industry
 
-    allowed_fields = {"name", "size", "country", "website", "description", "logo"}
+    allowed_fields = {"name", "size", "country", "website", "description", "logo", "custom_industry"}
     update_fields = []
 
     # Handle M2M industries separately

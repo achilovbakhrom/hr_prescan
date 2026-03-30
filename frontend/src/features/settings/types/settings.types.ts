@@ -7,6 +7,7 @@ export interface CompanyProfileUpdate {
   country: string
   website: string | null
   description: string | null
+  customIndustry?: string | null
 }
 
 export interface Invitation {

@@ -14,6 +14,8 @@ class IndustryListApi(APIView):
     class OutputSerializer(serializers.Serializer):
         slug = serializers.CharField()
         name = serializers.CharField()
+        name_ru = serializers.CharField()
+        name_uz = serializers.CharField()
 
     def get(self, request):
         industries = Industry.objects.all()

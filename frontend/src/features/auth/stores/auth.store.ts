@@ -5,8 +5,8 @@ import { authService } from '../services/auth.service'
 import { loadTokens, saveTokens, clearTokens } from './auth-tokens'
 import type { CompanyMembership } from '@/shared/types/auth.types'
 import type {
-  AcceptInvitationRequest, CompleteCompanySetupRequest,
-  User, AuthTokens, LoginRequest, RegisterCompanyRequest, RegisterRequest,
+  AcceptInvitationRequest,
+  User, AuthTokens, LoginRequest, RegisterRequest,
 } from '../types/auth.types'
 
 export const useAuthStore = defineStore('auth', () => {
@@ -60,16 +60,8 @@ export const useAuthStore = defineStore('auth', () => {
     await withLoading(async () => { const resp = await authService.acceptCompanyInvitation(token); user.value = resp.user })
   }
 
-  async function registerCompany(data: RegisterCompanyRequest): Promise<void> { await withLoading(() => authService.registerCompany(data)) }
-
-  async function completeCompanySetup(data: CompleteCompanySetupRequest): Promise<void> {
-    await withLoading(async () => setAuth(await authService.completeCompanySetup(data)))
-  }
-
-  async function completeOnboarding(): Promise<void> {
-    loading.value = true
-    try { const resp = await authService.completeOnboarding(); user.value = resp.user }
-    finally { loading.value = false }
+  async function completeOnboarding(role: 'candidate' | 'hr'): Promise<void> {
+    await withLoading(async () => setAuth(await authService.completeOnboarding(role)))
   }
 
   async function fetchCompanies(): Promise<void> {
@@ -95,7 +87,7 @@ export const useAuthStore = defineStore('auth', () => {
     user, tokens, companies, loading, error,
     isAuthenticated, hasMultipleCompanies,
     login, googleLogin, telegramLogin, register, logout, refreshAccessToken,
-    acceptInvitation, acceptCompanyInvitation, registerCompany, completeCompanySetup,
+    acceptInvitation, acceptCompanyInvitation,
     completeOnboarding, fetchUser, fetchCompanies, switchCompany, switchToPersonal, initAuth,
   }
 })

@@ -2,11 +2,9 @@ import { apiClient } from '@/shared/api/client'
 import type { CompanyMembership } from '@/shared/types/auth.types'
 import type {
   AcceptInvitationRequest,
-  CompleteCompanySetupRequest,
   LoginRequest,
   LoginResponse,
   PendingInvitation,
-  RegisterCompanyRequest,
   RegisterRequest,
   User,
 } from '../types/auth.types'
@@ -47,10 +45,6 @@ export const authService = {
     await apiClient.post('/auth/accept-invitation', data)
   },
 
-  async registerCompany(data: RegisterCompanyRequest): Promise<void> {
-    await apiClient.post('/auth/company-register', data)
-  },
-
   async googleAuth(credential: string): Promise<LoginResponse> {
     const response = await apiClient.post<LoginResponse>('/auth/google', { credential })
     return response.data
@@ -79,13 +73,8 @@ export const authService = {
     return response.data
   },
 
-  async completeCompanySetup(data: CompleteCompanySetupRequest): Promise<LoginResponse> {
-    const response = await apiClient.post<LoginResponse>('/auth/complete-company-setup', data)
-    return response.data
-  },
-
-  async completeOnboarding(): Promise<{ user: User }> {
-    const response = await apiClient.post<{ user: User }>('/auth/complete-onboarding')
+  async completeOnboarding(role: 'candidate' | 'hr'): Promise<LoginResponse> {
+    const response = await apiClient.post<LoginResponse>('/auth/complete-onboarding', { role })
     return response.data
   },
 

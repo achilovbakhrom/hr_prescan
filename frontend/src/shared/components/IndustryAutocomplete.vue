@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import AutoComplete from 'primevue/autocomplete'
 import { fetchIndustries, type Industry } from '@/shared/services/industry.service'
+import { getTranslatedName, matchesTranslatedName } from '@/shared/composables/useTranslatedName'
 import { useI18n } from 'vue-i18n'
 
 const props = withDefaults(
@@ -16,6 +17,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   'update:modelValue': [value: string[]]
+  'hasOther': [value: boolean]
 }>()
 
 const { t } = useI18n()
@@ -24,6 +26,10 @@ const industries = ref<Industry[]>([])
 const filteredIndustries = ref<Industry[]>([])
 const selectedIndustries = ref<Industry[]>([])
 
+const hasOtherSelected = computed(() =>
+  selectedIndustries.value.some((i) => i.slug === 'other'),
+)
+
 onMounted(async () => {
   industries.value = await fetchIndustries()
   if (props.modelValue.length) {
@@ -31,6 +37,7 @@ onMounted(async () => {
       props.modelValue.includes(i.slug),
     )
   }
+  emit('hasOther', hasOtherSelected.value)
 })
 
 watch(
@@ -46,11 +53,14 @@ watch(
   },
 )
 
+function translatedLabel(item: Industry): string {
+  return getTranslatedName(item)
+}
+
 function search(event: { query: string }): void {
-  const query = event.query.toLowerCase()
   filteredIndustries.value = industries.value.filter(
     (i) =>
-      i.name.toLowerCase().includes(query) &&
+      matchesTranslatedName(i, event.query) &&
       !selectedIndustries.value.some((s) => s.slug === i.slug),
   )
 }
@@ -61,6 +71,7 @@ function onChange(value: Industry[]): void {
     'update:modelValue',
     value.map((i) => i.slug),
   )
+  emit('hasOther', value.some((i) => i.slug === 'other'))
 }
 </script>
 
@@ -68,7 +79,7 @@ function onChange(value: Industry[]): void {
   <AutoComplete
     :modelValue="selectedIndustries"
     :suggestions="filteredIndustries"
-    optionLabel="name"
+    :optionLabel="translatedLabel"
     :placeholder="t('auth.chooseRole.industry')"
     :invalid="invalid"
     multiple

@@ -25,6 +25,7 @@ class Company(models.Model):
         blank=True,
         related_name="companies",
     )
+    custom_industry = models.CharField(max_length=255, blank=True, default="")
     size = models.CharField(max_length=20, choices=Size.choices)
     country = models.CharField(max_length=100)
     logo = models.ImageField(upload_to="company_logos/", null=True, blank=True)

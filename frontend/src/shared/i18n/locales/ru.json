@@ -44,7 +44,9 @@
     "translate": "Перевести",
     "translating": "Перевод...",
     "name": "Название",
-    "description": "Описание"
+    "description": "Описание",
+    "customIndustry": "Укажите вашу отрасль",
+    "customIndustryPlaceholder": "Введите название отрасли"
   },
   "nav": {
     "dashboard": "Панель управления",
@@ -66,7 +68,6 @@
     "signIn": "Войти",
     "signUp": "Регистрация",
     "signOut": "Выйти",
-    "forEmployers": "Работодателям",
     "browseJobs": "Поиск вакансий",
     "jobs": "Вакансии",
     "myApplications": "Мои заявки",
@@ -89,9 +90,7 @@
       "emailPlaceholder": "Введите ваш email",
       "emailInvalid": "Введите корректный адрес электронной почты.",
       "passwordPlaceholder": "Введите пароль",
-      "passwordRequired": "Пароль обязателен.",
-      "wantToHire": "Хотите нанимать?",
-      "registerCompany": "Зарегистрируйте компанию"
+      "passwordRequired": "Пароль обязателен."
     },
     "telegram": {
       "signIn": "Войти через Telegram",
@@ -110,24 +109,16 @@
       "signIn": "Войти",
       "success": "Регистрация прошла успешно! Проверьте электронную почту для подтверждения.",
       "passwordMismatch": "Пароли не совпадают",
-      "passwordTooShort": "Пароль должен содержать не менее 8 символов"
-    },
-    "companyRegister": {
-      "title": "Регистрация компании",
-      "subtitle": "Начните скрининг кандидатов с помощью ИИ",
-      "step1": "Данные компании",
-      "step2": "Аккаунт администратора",
-      "companyName": "Название компании",
-      "industry": "Отрасль",
-      "size": "Размер компании",
-      "country": "Страна",
-      "website": "Веб-сайт",
-      "adminEmail": "Email администратора",
-      "adminPassword": "Пароль",
-      "adminFirstName": "Имя",
-      "adminLastName": "Фамилия",
-      "submit": "Зарегистрировать компанию",
-      "success": "Компания зарегистрирована! Подтвердите электронную почту."
+      "passwordTooShort": "Пароль должен содержать не менее 8 символов",
+      "firstNamePlaceholder": "Имя",
+      "lastNamePlaceholder": "Фамилия",
+      "emailPlaceholder": "Введите ваш email",
+      "passwordPlaceholder": "Минимум 8 символов",
+      "confirmPasswordPlaceholder": "Подтвердите пароль",
+      "firstNameRequired": "Введите имя.",
+      "lastNameRequired": "Введите фамилию.",
+      "emailInvalid": "Введите корректный email.",
+      "orRegisterWithEmail": "или зарегистрируйтесь по email"
     },
     "verifyEmail": {
       "title": "Подтверждение электронной почты",
@@ -153,15 +144,8 @@
       "candidateDescription": "Просматривайте вакансии и проходите AI-интервью",
       "company": "Нанимаю сотрудников",
       "companyDescription": "Публикуйте вакансии и проводите AI-скрининг кандидатов",
-      "companyFormTitle": "Расскажите о вашей компании",
-      "companyName": "Название компании",
       "industry": "Отрасль",
-      "size": "Размер компании",
-      "country": "Страна",
-      "email": "Ваш email",
-      "emailHint": "Обязательно для аккаунта компании",
-      "submit": "Завершить настройку",
-      "back": "Назад"
+      "country": "Страна"
     }
   },
   "landing": {

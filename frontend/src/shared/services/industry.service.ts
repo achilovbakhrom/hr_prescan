@@ -3,6 +3,8 @@ import { apiClient } from '@/shared/api/client'
 export interface Industry {
   slug: string
   name: string
+  nameRu?: string
+  nameUz?: string
 }
 
 let cachedIndustries: Industry[] | null = null

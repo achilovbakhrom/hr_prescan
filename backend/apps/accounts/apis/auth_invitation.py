@@ -132,10 +132,22 @@ class CompleteCompanySetupApi(APIView):
 
 
 class CompleteOnboardingApi(APIView):
-    """POST /api/auth/complete-onboarding/ — mark onboarding as done (stay as candidate)."""
+    """POST /api/auth/complete-onboarding/ — choose role and complete onboarding."""
 
     permission_classes = [IsAuthenticated]
 
+    class InputSerializer(serializers.Serializer):
+        role = serializers.ChoiceField(choices=["candidate", "hr"])
+
     def post(self, request: Request) -> Response:
-        complete_onboarding(user=request.user)
-        return Response({"user": UserOutputSerializer(request.user).data})
+        serializer = self.InputSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        complete_onboarding(user=request.user, role=serializer.validated_data["role"])
+        request.user.refresh_from_db()
+        refresh = RefreshToken.for_user(request.user)
+
+        return Response({
+            "tokens": {"access": str(refresh.access_token), "refresh": str(refresh)},
+            "user": UserOutputSerializer(request.user).data,
+        })

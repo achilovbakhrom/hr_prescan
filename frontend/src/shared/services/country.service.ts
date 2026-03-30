@@ -3,6 +3,8 @@ import { apiClient } from '@/shared/api/client'
 export interface Country {
   code: string
   name: string
+  nameRu?: string
+  nameUz?: string
 }
 
 let cachedCountries: Country[] | null = null

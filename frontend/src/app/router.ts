@@ -107,8 +107,7 @@ router.beforeEach(async (to) => {
 
   const isAuthPage =
     to.name === ROUTE_NAMES.LOGIN ||
-    to.name === ROUTE_NAMES.REGISTER ||
-    to.name === ROUTE_NAMES.COMPANY_REGISTER
+    to.name === ROUTE_NAMES.REGISTER
 
   if (isAuthPage && authStore.isAuthenticated) {
     return { name: ROUTE_NAMES.DASHBOARD }

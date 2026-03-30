@@ -171,15 +171,6 @@ function handleTelegramError(msg: string): void {
         </RouterLink>
       </p>
 
-      <p class="mt-2 text-center text-sm text-gray-600">
-        {{ t('auth.login.wantToHire') }}
-        <RouterLink
-          :to="{ name: ROUTE_NAMES.COMPANY_REGISTER }"
-          class="font-medium text-blue-600 hover:text-blue-500"
-        >
-          {{ t('auth.login.registerCompany') }}
-        </RouterLink>
-      </p>
     </div>
   </div>
 </template>

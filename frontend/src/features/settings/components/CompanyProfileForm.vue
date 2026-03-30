@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
@@ -16,11 +16,13 @@ const settingsStore = useSettingsStore()
 
 const name = ref('')
 const industries = ref<string[]>([])
+const customIndustry = ref('')
 const size = ref<CompanySize | null>(null)
 const country = ref('')
 const website = ref('')
 const description = ref('')
 const submitted = ref(false)
+const showCustomIndustry = ref(false)
 const errors = ref({ name: false, size: false, country: false })
 
 const emit = defineEmits<{
@@ -28,26 +30,41 @@ const emit = defineEmits<{
   error: [msg: string]
 }>()
 
-const sizeOptions = [
+const sizeOptions = computed(() => [
   { label: t('settings.company.sizeSmall'), value: 'small' as CompanySize },
   { label: t('settings.company.sizeMedium'), value: 'medium' as CompanySize },
   { label: t('settings.company.sizeLarge'), value: 'large' as CompanySize },
   { label: t('settings.company.sizeEnterprise'), value: 'enterprise' as CompanySize },
-]
+])
 
 function populateForm(): void {
   const profile = settingsStore.companyProfile
   if (!profile) return
-  name.value = profile.name; industries.value = profile.industries ?? []
-  size.value = profile.size; country.value = profile.country
-  website.value = profile.website ?? ''; description.value = ''
+  name.value = profile.name
+  industries.value = profile.industries ?? []
+  size.value = profile.size
+  country.value = profile.country
+  website.value = profile.website ?? ''
+  description.value = ''
+  customIndustry.value = profile.customIndustry ?? ''
+  showCustomIndustry.value = industries.value.includes('other')
 }
 
-onMounted(async () => { await settingsStore.fetchProfile(); populateForm() })
+onMounted(async () => {
+  await settingsStore.fetchProfile()
+  populateForm()
+})
 
 function validate(): boolean {
-  errors.value.name = !name.value.trim(); errors.value.size = !size.value; errors.value.country = !country.value.trim()
+  errors.value.name = !name.value.trim()
+  errors.value.size = !size.value
+  errors.value.country = !country.value.trim()
   return !Object.values(errors.value).some(Boolean)
+}
+
+function onHasOther(value: boolean): void {
+  showCustomIndustry.value = value
+  if (!value) customIndustry.value = ''
 }
 
 async function handleSave(): Promise<void> {
@@ -55,11 +72,18 @@ async function handleSave(): Promise<void> {
   if (!validate()) return
   try {
     await settingsStore.updateProfile({
-      name: name.value, industries: industries.value, size: size.value!,
-      country: country.value, website: website.value.trim() || null, description: description.value.trim() || null,
+      name: name.value,
+      industries: industries.value,
+      size: size.value!,
+      country: country.value,
+      website: website.value.trim() || null,
+      description: description.value.trim() || null,
+      customIndustry: showCustomIndustry.value ? customIndustry.value.trim() : null,
     })
     emit('success', t('settings.company.updateSuccess'))
-  } catch (err: unknown) { emit('error', err instanceof Error ? err.message : t('settings.company.updateError')) }
+  } catch (err: unknown) {
+    emit('error', err instanceof Error ? err.message : t('settings.company.updateError'))
+  }
 }
 </script>
 
@@ -77,7 +101,11 @@ async function handleSave(): Promise<void> {
     </div>
     <div class="flex flex-col gap-1">
       <label for="industry" class="text-sm font-medium text-gray-700">{{ t('settings.company.industry') }}</label>
-      <IndustryAutocomplete v-model="industries" />
+      <IndustryAutocomplete v-model="industries" @hasOther="onHasOther" />
+    </div>
+    <div v-if="showCustomIndustry" class="flex flex-col gap-1">
+      <label for="customIndustry" class="text-sm font-medium text-gray-700">{{ t('common.customIndustry') }}</label>
+      <InputText id="customIndustry" v-model="customIndustry" :placeholder="t('common.customIndustryPlaceholder')" class="w-full" />
     </div>
     <div class="flex flex-col gap-1">
       <label for="size" class="text-sm font-medium text-gray-700">{{ t('settings.company.size') }}</label>
@@ -97,6 +125,8 @@ async function handleSave(): Promise<void> {
       <label for="description" class="text-sm font-medium text-gray-700">{{ t('settings.company.description') }}</label>
       <Textarea id="description" v-model="description" :placeholder="t('settings.company.descriptionPlaceholder')" rows="4" class="w-full" />
     </div>
-    <div class="flex justify-end pt-2"><Button type="submit" :label="t('settings.company.save')" :loading="settingsStore.loading" /></div>
+    <div class="flex justify-end pt-2">
+      <Button type="submit" :label="t('settings.company.save')" :loading="settingsStore.loading" />
+    </div>
   </form>
 </template>

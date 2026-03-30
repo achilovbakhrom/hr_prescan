@@ -74,7 +74,7 @@ async function handleTelegramSuccess(data: Parameters<typeof authStore.telegramL
 
         <div class="mb-4 flex items-center gap-3">
           <div class="h-px flex-1 bg-gray-200"></div>
-          <span class="text-xs text-gray-400">or register with email</span>
+          <span class="text-xs text-gray-400">{{ t('auth.register.orRegisterWithEmail') }}</span>
           <div class="h-px flex-1 bg-gray-200"></div>
         </div>
 
@@ -83,10 +83,6 @@ async function handleTelegramSuccess(data: Parameters<typeof authStore.telegramL
         <p class="mt-4 text-center text-sm text-gray-600">
           {{ t('auth.register.hasAccount') }}
           <RouterLink :to="{ name: ROUTE_NAMES.LOGIN }" class="font-medium text-blue-600 hover:text-blue-500">{{ t('auth.register.signIn') }}</RouterLink>
-        </p>
-        <p class="mt-2 text-center text-sm text-gray-600">
-          Want to hire?
-          <RouterLink :to="{ name: ROUTE_NAMES.COMPANY_REGISTER }" class="font-medium text-blue-600 hover:text-blue-500">Register your company</RouterLink>
         </p>
       </template>
     </div>

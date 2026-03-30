@@ -14,6 +14,8 @@ class CountryListApi(APIView):
     class OutputSerializer(serializers.Serializer):
         code = serializers.CharField()
         name = serializers.CharField()
+        name_ru = serializers.CharField()
+        name_uz = serializers.CharField()
 
     def get(self, request):
         countries = Country.objects.all()

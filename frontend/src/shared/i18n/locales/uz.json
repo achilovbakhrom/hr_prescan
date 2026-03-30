@@ -44,7 +44,9 @@
     "translate": "Tarjima qilish",
     "translating": "Tarjima qilinmoqda...",
     "name": "Nomi",
-    "description": "Tavsif"
+    "description": "Tavsif",
+    "customIndustry": "Sohangisingizni kiriting",
+    "customIndustryPlaceholder": "Sohangiz nomini kiriting"
   },
   "nav": {
     "dashboard": "Boshqaruv paneli",
@@ -66,7 +68,6 @@
     "signIn": "Kirish",
     "signUp": "Ro'yxatdan o'tish",
     "signOut": "Chiqish",
-    "forEmployers": "Ish beruvchilar uchun",
     "browseJobs": "Ishlarni ko'rish",
     "jobs": "Ishlar",
     "myApplications": "Mening arizalarim",
@@ -89,9 +90,7 @@
       "emailPlaceholder": "Emailingizni kiriting",
       "emailInvalid": "Iltimos, to'g'ri email manzilini kiriting.",
       "passwordPlaceholder": "Parolingizni kiriting",
-      "passwordRequired": "Parol majburiy.",
-      "wantToHire": "Xodim yollashni xohlaysizmi?",
-      "registerCompany": "Kompaniyangizni ro'yxatdan o'tkazing"
+      "passwordRequired": "Parol majburiy."
     },
     "telegram": {
       "signIn": "Telegram orqali kirish",
@@ -110,24 +109,16 @@
       "signIn": "Kirish",
       "success": "Ro'yxatdan muvaffaqiyatli o'tdingiz! Emailingizni tasdiqlash uchun pochtangizni tekshiring.",
       "passwordMismatch": "Parollar mos kelmaydi",
-      "passwordTooShort": "Parol kamida 8 ta belgidan iborat bo'lishi kerak"
-    },
-    "companyRegister": {
-      "title": "Kompaniyangizni ro'yxatdan o'tkazing",
-      "subtitle": "AI yordamida nomzodlarni oldindan tekshirishni boshlang",
-      "step1": "Kompaniya haqida",
-      "step2": "Administrator hisobi",
-      "companyName": "Kompaniya nomi",
-      "industry": "Soha",
-      "size": "Kompaniya hajmi",
-      "country": "Davlat",
-      "website": "Veb-sayt",
-      "adminEmail": "Administrator email",
-      "adminPassword": "Parol",
-      "adminFirstName": "Ism",
-      "adminLastName": "Familiya",
-      "submit": "Kompaniyani ro'yxatdan o'tkazish",
-      "success": "Kompaniya ro'yxatdan o'tkazildi! Emailingizni tasdiqlang."
+      "passwordTooShort": "Parol kamida 8 ta belgidan iborat bo'lishi kerak",
+      "firstNamePlaceholder": "Ismingiz",
+      "lastNamePlaceholder": "Familiyangiz",
+      "emailPlaceholder": "Emailingizni kiriting",
+      "passwordPlaceholder": "Kamida 8 ta belgi",
+      "confirmPasswordPlaceholder": "Parolni tasdiqlang",
+      "firstNameRequired": "Ism kiritilishi shart.",
+      "lastNameRequired": "Familiya kiritilishi shart.",
+      "emailInvalid": "Toʻgʻri email kiriting.",
+      "orRegisterWithEmail": "yoki email orqali roʻyxatdan oʻting"
     },
     "verifyEmail": {
       "title": "Emailingizni tasdiqlang",
@@ -153,15 +144,8 @@
       "candidateDescription": "Ish o'rinlarini ko'ring va AI intervyularda qatnashing",
       "company": "Xodim yollamoqdaman",
       "companyDescription": "Vakansiyalar joylashtiring va nomzodlarni AI yordamida tekshiring",
-      "companyFormTitle": "Kompaniyangiz haqida gapirib bering",
-      "companyName": "Kompaniya nomi",
       "industry": "Soha",
-      "size": "Kompaniya hajmi",
-      "country": "Davlat",
-      "email": "Emailingiz",
-      "emailHint": "Kompaniya hisobi uchun zarur",
-      "submit": "Sozlashni yakunlash",
-      "back": "Orqaga"
+      "country": "Davlat"
     }
   },
   "landing": {

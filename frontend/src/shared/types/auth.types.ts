@@ -40,6 +40,7 @@ export interface Company {
   country: string
   logo: string | null
   website: string | null
+  customIndustry?: string | null
   subscriptionStatus?: 'trial' | 'active' | 'past_due' | 'cancelled'
   trialEndsAt?: string | null
 }

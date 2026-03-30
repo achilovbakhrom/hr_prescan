@@ -19,6 +19,8 @@ class Country(models.Model):
 
     code = models.CharField(max_length=2, primary_key=True)
     name = models.CharField(max_length=100)
+    name_ru = models.CharField(max_length=100, blank=True, default="")
+    name_uz = models.CharField(max_length=100, blank=True, default="")
 
     class Meta:
         ordering = ["name"]
@@ -33,6 +35,8 @@ class Industry(models.Model):
 
     slug = models.SlugField(max_length=50, primary_key=True)
     name = models.CharField(max_length=100)
+    name_ru = models.CharField(max_length=100, blank=True, default="")
+    name_uz = models.CharField(max_length=100, blank=True, default="")
 
     class Meta:
         ordering = ["name"]
