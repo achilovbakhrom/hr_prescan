@@ -43,7 +43,7 @@ class SubmitApplicationApi(APIView):
                     pk=cv_id, profile__user=request.user,
                 )
             except CandidateCV.DoesNotExist:
-                raise ApplicationError("CV not found.")
+                raise ApplicationError("CV not found.") from None
             return cv.file, cv.name
 
         if cv_file:
