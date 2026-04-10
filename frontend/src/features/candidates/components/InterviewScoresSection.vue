@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ProgressBar from 'primevue/progressbar'
 import TranslatableText from '@/shared/components/TranslatableText.vue'
+import { getLocale } from '@/shared/i18n'
 
 const { t } = useI18n()
 
@@ -9,6 +11,7 @@ interface InterviewScore {
   id: string
   criteria: string
   criteriaName: string
+  criteriaTranslations?: Record<string, string>
   score: number
   aiNotes: string
   aiNotesTranslations: Record<string, string>
@@ -21,6 +24,15 @@ defineProps<{
   interviewId: string
   scores: InterviewScore[]
 }>()
+
+const currentLocale = computed(() => getLocale())
+
+function getLocalizedCriteriaName(score: InterviewScore): string {
+  // Translations are stored as "Name: Description" — split on first ": "
+  const translated = score.criteriaTranslations?.[currentLocale.value]
+  if (!translated) return score.criteriaName
+  return translated.split(': ')[0] || score.criteriaName
+}
 
 const emit = defineEmits<{
   'update:aiSummaryTranslations': [tr: Record<string, string>]
@@ -66,7 +78,7 @@ function scoreBg(score: number): string {
       <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">{{ t('interviews.criteriaBreakdown') }}</p>
       <div v-for="score in scores" :key="score.id" class="rounded-lg border border-gray-200 p-3">
         <div class="mb-1.5 flex items-center justify-between">
-          <span class="text-sm font-medium text-gray-700">{{ score.criteriaName }}</span>
+          <span class="text-sm font-medium text-gray-700">{{ getLocalizedCriteriaName(score) }}</span>
           <span class="text-sm font-bold" :class="scoreColor(score.score)">{{ score.score }}/10</span>
         </div>
         <ProgressBar :value="score.score * 10" :show-value="false" style="height: 6px" />

@@ -1,13 +1,30 @@
-from apps.integrations.telegram_bot.handlers import send_message
+"""HR bot account linking via deep-link tokens.
+
+A logged-in HR user generates a token from the web settings page; the bot
+deep-link ``t.me/<bot>?start=<token>`` carries the token to the bot, which
+matches it against an unused ``TelegramLinkCode`` and links the accounts.
+"""
+from __future__ import annotations
+
+from apps.integrations.telegram_bot.client import TelegramClient
 
 
-def handle_start(*, chat_id, telegram_id, telegram_username="", first_name="", last_name="", payload=""):
-    """Handle the /start command, optionally auto-linking via deep-link payload."""
+def handle_start(
+    *,
+    client: TelegramClient,
+    chat_id: int,
+    telegram_id: int,
+    telegram_username: str = "",
+    first_name: str = "",  # noqa: ARG001 — kept for symmetry with candidate bot
+    last_name: str = "",  # noqa: ARG001 — kept for symmetry with candidate bot
+    payload: str = "",
+) -> None:
+    """Handle ``/start`` for the HR bot, optionally auto-linking via deep-link payload."""
     from apps.accounts.models import User
 
-    user = User.objects.filter(telegram_id=telegram_id).first()
+    user = User.objects.filter(telegram_id=telegram_id, role=User.Role.HR).first()
     if user:
-        send_message(
+        client.send_message(
             chat_id=chat_id,
             text=(
                 f"Welcome back, {user.first_name}!\n\n"
@@ -16,9 +33,9 @@ def handle_start(*, chat_id, telegram_id, telegram_username="", first_name="", l
         )
         return
 
-    # If a deep-link payload is present, try to auto-link (HR account)
     if payload:
         _try_deep_link(
+            client=client,
             chat_id=chat_id,
             telegram_id=telegram_id,
             telegram_username=telegram_username,
@@ -26,7 +43,7 @@ def handle_start(*, chat_id, telegram_id, telegram_username="", first_name="", l
         )
         return
 
-    send_message(
+    client.send_message(
         chat_id=chat_id,
         text=(
             "Welcome to PreScreen AI!\n\n"
@@ -37,9 +54,16 @@ def handle_start(*, chat_id, telegram_id, telegram_username="", first_name="", l
     )
 
 
-def try_link_code(*, chat_id, telegram_id, telegram_username, text):
-    """Handle messages from unlinked users."""
-    send_message(
+def try_link_code(
+    *,
+    client: TelegramClient,
+    chat_id: int,
+    telegram_id: int,  # noqa: ARG001 — reserved for future use
+    telegram_username: str,  # noqa: ARG001 — reserved for future use
+    text: str,  # noqa: ARG001 — reserved for future use
+) -> None:
+    """Handle messages from unlinked HR users (no auto-linking by free text)."""
+    client.send_message(
         chat_id=chat_id,
         text=(
             "Your Telegram account is not linked yet.\n\n"
@@ -49,8 +73,15 @@ def try_link_code(*, chat_id, telegram_id, telegram_username, text):
     )
 
 
-def _try_deep_link(*, chat_id, telegram_id, telegram_username, token):
-    """Auto-link account using a deep-link token from /start payload."""
+def _try_deep_link(
+    *,
+    client: TelegramClient,
+    chat_id: int,
+    telegram_id: int,
+    telegram_username: str,
+    token: str,
+) -> None:
+    """Auto-link an HR account using a deep-link token from the /start payload."""
     from django.db import IntegrityError, transaction
     from django.utils import timezone
 
@@ -60,7 +91,7 @@ def _try_deep_link(*, chat_id, telegram_id, telegram_username, token):
         with transaction.atomic():
             link = (
                 TelegramLinkCode.objects.filter(
-                    code=token, is_used=False, expires_at__gt=timezone.now()
+                    code=token, is_used=False, expires_at__gt=timezone.now(),
                 )
                 .select_related("user")
                 .select_for_update()
@@ -68,7 +99,7 @@ def _try_deep_link(*, chat_id, telegram_id, telegram_username, token):
             )
 
             if link is None:
-                send_message(
+                client.send_message(
                     chat_id=chat_id,
                     text=(
                         "This link has expired or is invalid.\n\n"
@@ -78,7 +109,7 @@ def _try_deep_link(*, chat_id, telegram_id, telegram_username, token):
                 return
 
             if not isinstance(telegram_id, int) or telegram_id <= 0:
-                send_message(chat_id=chat_id, text="Invalid Telegram account.")
+                client.send_message(chat_id=chat_id, text="Invalid Telegram account.")
                 return
 
             user = link.user
@@ -89,14 +120,14 @@ def _try_deep_link(*, chat_id, telegram_id, telegram_username, token):
             link.is_used = True
             link.save(update_fields=["is_used", "updated_at"])
     except IntegrityError:
-        send_message(
+        client.send_message(
             chat_id=chat_id,
             text="This Telegram account is already linked to another user. Please unlink it first.",
         )
         return
 
     company_name = user.company.name if user.company else ""
-    send_message(
+    client.send_message(
         chat_id=chat_id,
         text=(
             f"Connected as {user.email}"

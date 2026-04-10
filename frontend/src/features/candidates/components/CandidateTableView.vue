@@ -12,6 +12,7 @@ defineProps<{
   loading: boolean
   selectedCandidates: Application[]
   searchQuery: string
+  showVacancyColumn?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -38,6 +39,11 @@ function formatDate(dateStr: string): string {
     <Column selection-mode="multiple" header-style="width: 3rem" />
     <Column field="candidateName" :header="t('candidates.application.name')" sortable />
     <Column field="candidateEmail" :header="t('candidates.application.email')" sortable />
+    <Column v-if="showVacancyColumn" field="vacancyTitle" :header="t('nav.vacancies')" sortable>
+      <template #body="{ data }">
+        <span class="text-sm text-gray-700">{{ (data as Application).vacancyTitle }}</span>
+      </template>
+    </Column>
     <Column :header="t('common.status')">
       <template #body="{ data }"><ApplicationStatusBadge :status="(data as Application).status" /></template>
     </Column>

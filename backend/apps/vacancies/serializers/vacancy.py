@@ -91,6 +91,14 @@ class VacancyDetailOutputSerializer(serializers.ModelSerializer):
     questions = InterviewQuestionOutputSerializer(many=True, read_only=True)
     employer = EmployerCompanyOutputSerializer(read_only=True)
     created_by_email = serializers.EmailField(source="created_by.email", read_only=True)
+    candidates_total = serializers.SerializerMethodField()
+    candidates_shortlisted = serializers.SerializerMethodField()
+
+    def get_candidates_total(self, obj) -> int:
+        return obj.applications.filter(is_deleted=False).count()
+
+    def get_candidates_shortlisted(self, obj) -> int:
+        return obj.applications.filter(is_deleted=False, status="shortlisted").count()
 
     class Meta:
         model = Vacancy
@@ -124,6 +132,8 @@ class VacancyDetailOutputSerializer(serializers.ModelSerializer):
             "employer",
             "criteria",
             "questions",
+            "candidates_total",
+            "candidates_shortlisted",
             "created_by_email",
             "created_at",
             "updated_at",

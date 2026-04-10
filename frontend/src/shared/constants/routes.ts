@@ -21,6 +21,7 @@ export const ROUTE_NAMES = {
   MY_APPLICATIONS: 'my-applications',
   MY_APPLICATION_DETAIL: 'my-application-detail',
   VACANCY_CANDIDATES: 'vacancy-candidates',
+  CANDIDATE_LIST: 'candidate-list',
   CANDIDATE_DETAIL: 'candidate-detail',
   INTERVIEW_LIST: 'interview-list',
   INTERVIEW_DETAIL: 'interview-detail',

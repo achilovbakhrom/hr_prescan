@@ -30,7 +30,7 @@ async function fetchData(): Promise<void> {
   error.value = null
   try {
     const [p, c] = await Promise.all([cvBuilderService.getProfile(), cvBuilderService.listCvs()])
-    profile.value = p
+    profile.value = p ?? null
     cvs.value = c
   } catch { error.value = t('myCvs.loadError') }
   finally { loading.value = false }
@@ -66,6 +66,22 @@ async function handleToggleActive(cv: CvFile): Promise<void> {
   finally { actionLoading.value = null }
 }
 
+function handleDeleteProfile(): void {
+  confirm.require({
+    message: t('myCvs.deleteProfileConfirm'),
+    header: t('common.confirm'), icon: 'pi pi-exclamation-triangle', acceptClass: 'p-button-danger',
+    accept: async () => {
+      successMessage.value = null; error.value = null
+      try {
+        await cvBuilderService.deleteProfile()
+        profile.value = null
+        cvs.value = []
+        successMessage.value = t('myCvs.profileDeleted')
+      } catch { error.value = t('common.error') }
+    },
+  })
+}
+
 function handleDelete(cv: CvFile): void {
   confirm.require({
     message: t('myCvs.deleteConfirm', { name: cv.name }),
@@ -93,7 +109,7 @@ function handleDelete(cv: CvFile): void {
     <div v-if="loading" class="py-12 text-center text-gray-400"><i class="pi pi-spinner pi-spin text-3xl"></i></div>
 
     <template v-else>
-      <CvProfileCard v-if="profile" :profile="profile" @toggle-visibility="toggleVisibility" @view-public="viewPublicCv" />
+      <CvProfileCard v-if="profile" :profile="profile" @toggle-visibility="toggleVisibility" @view-public="viewPublicCv" @delete="handleDeleteProfile" />
 
       <div v-if="!hasProfileData && cvs.length === 0" class="rounded-xl border border-dashed border-gray-200 py-16 text-center">
         <i class="pi pi-file-pdf mb-3 text-4xl text-gray-300"></i>

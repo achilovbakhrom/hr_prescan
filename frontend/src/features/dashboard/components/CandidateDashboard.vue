@@ -32,10 +32,10 @@ const recommendedVacancies = computed(() => candidateDash.value?.recommendedVaca
 
 function formatEmploymentType(type: string): string {
   const map: Record<string, string> = {
-    full_time: t('vacancies.employmentType.fullTime'),
-    part_time: t('vacancies.employmentType.partTime'),
-    contract: t('vacancies.employmentType.contract'),
-    internship: t('vacancies.employmentType.internship'),
+    full_time: t('vacancies.employment.fullTime'),
+    part_time: t('vacancies.employment.partTime'),
+    contract: t('vacancies.employment.contract'),
+    internship: t('vacancies.employment.internship'),
   }
   return map[type] || type
 }
@@ -155,7 +155,7 @@ function formatEmploymentType(type: string): string {
             </div>
           </div>
           <div class="text-right">
-            <p class="text-sm font-medium text-gray-700">{{ vacancy.isRemote ? t('vacancies.remote') : vacancy.location }}</p>
+            <p class="text-sm font-medium text-gray-700">{{ vacancy.isRemote ? t('vacancies.overview.remote') : vacancy.location }}</p>
             <p class="text-xs text-gray-400">{{ formatEmploymentType(vacancy.employmentType) }}</p>
           </div>
         </div>

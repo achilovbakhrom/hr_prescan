@@ -1,8 +1,12 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import AutoComplete from 'primevue/autocomplete'
 import { fetchLanguages, type Language } from '@/shared/services/language.service'
 import { useI18n } from 'vue-i18n'
+
+interface DisplayLanguage extends Language {
+  displayName: string
+}
 
 const props = withDefaults(
   defineProps<{
@@ -18,17 +22,40 @@ const emit = defineEmits<{
   'update:modelValue': [value: string]
 }>()
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const languages = ref<Language[]>([])
-const filteredLanguages = ref<Language[]>([])
-const selectedLanguage = ref<Language | null>(null)
+const filteredLanguages = ref<DisplayLanguage[]>([])
+const selectedLanguage = ref<DisplayLanguage | null>(null)
+
+function getLocalizedName(lang: Language): string {
+  if (locale.value === 'ru' && lang.nameRu) return lang.nameRu
+  if (locale.value === 'uz' && lang.nameUz) return lang.nameUz
+  return lang.name
+}
+
+const displayLanguages = computed(() => {
+  const isNonEn = locale.value !== 'en'
+  return languages.value
+    .map((l) => ({ ...l, displayName: getLocalizedName(l) }))
+    .sort((a, b) => {
+      if (isNonEn) {
+        const aTranslated = a.displayName !== a.name
+        const bTranslated = b.displayName !== b.name
+        if (aTranslated !== bTranslated) return aTranslated ? -1 : 1
+      }
+      return a.displayName.localeCompare(b.displayName)
+    })
+})
+
+function findDisplay(code: string): DisplayLanguage | null {
+  return displayLanguages.value.find((l) => l.code === code) ?? null
+}
 
 onMounted(async () => {
   languages.value = await fetchLanguages()
   if (props.modelValue) {
-    selectedLanguage.value =
-      languages.value.find((l) => l.code === props.modelValue) ?? null
+    selectedLanguage.value = findDisplay(props.modelValue)
   }
 })
 
@@ -39,21 +66,20 @@ watch(
       selectedLanguage.value = null
       return
     }
-    const match = languages.value.find((l) => l.code === code)
-    if (match && match.code !== selectedLanguage.value?.code) {
-      selectedLanguage.value = match
+    if (code !== selectedLanguage.value?.code) {
+      selectedLanguage.value = findDisplay(code)
     }
   },
 )
 
 function search(event: { query: string }): void {
   const query = event.query.toLowerCase()
-  filteredLanguages.value = languages.value.filter((l) =>
-    l.name.toLowerCase().includes(query),
+  filteredLanguages.value = displayLanguages.value.filter((l) =>
+    l.displayName.toLowerCase().includes(query) || l.name.toLowerCase().includes(query),
   )
 }
 
-function onSelect(event: { value: Language }): void {
+function onSelect(event: { value: DisplayLanguage }): void {
   selectedLanguage.value = event.value
   emit('update:modelValue', event.value.code)
 }
@@ -68,7 +94,7 @@ function onClear(): void {
   <AutoComplete
     :modelValue="selectedLanguage"
     :suggestions="filteredLanguages"
-    optionLabel="name"
+    optionLabel="displayName"
     :placeholder="t('common.language')"
     :invalid="invalid"
     @complete="search"

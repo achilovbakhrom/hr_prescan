@@ -64,7 +64,7 @@ function templateLabel(template: string): string {
         </div>
         <span class="h-5 w-px bg-gray-200"></span>
         <Button v-if="cv.downloadUrl" icon="pi pi-eye" severity="secondary" text rounded size="small" v-tooltip.top="t('myCvs.view')" @click="emit('view', cv)" />
-        <Button icon="pi pi-trash" severity="danger" text rounded size="small" v-tooltip.top="t('common.delete')" :loading="actionLoading === cv.id" @click="emit('delete', cv)" />
+        <Button icon="pi pi-trash" severity="danger" text rounded size="small" v-tooltip.top="cv.isActive ? t('myCvs.deactivateFirst') : t('common.delete')" :loading="actionLoading === cv.id" :disabled="cv.isActive" @click="emit('delete', cv)" />
       </div>
     </div>
   </div>

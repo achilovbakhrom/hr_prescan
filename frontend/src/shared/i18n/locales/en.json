@@ -28,7 +28,15 @@
     "clearFilters": "Clear filters",
     "copyLink": "Copy Link",
     "copied": "Copied!",
+    "viewDetails": "View details",
+    "searchPlaceholder": "Search vacancies, candidates...",
+    "searchHint": "Type to search across vacancies and candidates",
     "viewAll": "View all",
+    "personal": "Personal",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "active": "Active",
+    "inactive": "Inactive",
     "showMore": "Show more",
     "showLess": "Show less",
     "createdAt": "Created",
@@ -36,6 +44,7 @@
     "total": "total",
     "error": "An unexpected error occurred",
     "success": "Success",
+    "saved": "Saved",
     "or": "or",
     "required_field": "This field is required",
     "skills": "Skills",
@@ -52,7 +61,8 @@
     "dashboard": "Dashboard",
     "vacancies": "Vacancies",
     "candidates": "Candidates",
-    "interviews": "Interviews",
+    "interviews": "Interview Sessions",
+    "allCandidates": "All Candidates",
     "settings": "Settings",
     "notifications": "Notifications",
     "subscriptions": "Subscription",
@@ -74,6 +84,15 @@
     "cvBuilder": "CV Builder",
     "myCvs": "My CVs",
     "hrAnalytics": "Analytics"
+  },
+  "validation": {
+    "required": "This field is required",
+    "maxLength": "Must be at most {max} characters",
+    "invalidUrl": "Must be a valid URL",
+    "invalidDate": "Must be a valid date",
+    "positiveNumber": "Must be a positive number",
+    "salaryRange": "Maximum salary must be greater than minimum",
+    "endDateAfterStart": "End date must be after start date"
   },
   "auth": {
     "login": {
@@ -461,6 +480,33 @@
     "addCriteria": "Add Criteria",
     "deleteConfirm": "Are you sure you want to permanently delete this vacancy?",
     "deleteConfirmHeader": "Delete Vacancy",
+    "deleteConfirmMessage": "Permanently delete \"{title}\"? This cannot be undone.",
+    "deletedSuccess": "Vacancy deleted",
+    "atAGlance": "At a glance",
+    "section": {
+      "details": "Details"
+    },
+    "details": {
+      "jobInfo": "Job info",
+      "company": "Company"
+    },
+    "screening": {
+      "languageAndInstructions": "Language & instructions",
+      "languageHint": "How the AI talks to candidates and any extra guidance for the AI agent."
+    },
+    "settings": {
+      "visibility": "Visibility & application",
+      "interviewStep": "Interview step",
+      "dangerZone": "Danger zone",
+      "dangerZoneHint": "Permanent actions. Be careful.",
+      "deleteVacancy": "Delete vacancy",
+      "deleteOnlyDraftArchived": "Only draft or archived vacancies can be deleted."
+    },
+    "toast": {
+      "published": "Vacancy published",
+      "paused": "Vacancy paused",
+      "archived": "Vacancy archived"
+    },
     "keywords": "Keywords",
     "regenerateKeywords": "Regenerate Keywords",
     "keywordsHint": "AI-generated search keywords for this vacancy"
@@ -501,9 +547,13 @@
       "reject": "Reject",
       "archive": "Archive",
       "reset": "Reset to Applied",
-      "restore": "Restore",
+      "restore": "Restore to Applied",
       "sendEmail": "Send Email",
-      "resetSession": "Reset Session"
+      "resetSession": "Reset Session",
+      "messages": "Messages",
+      "changeStatus": "Change status",
+      "moveToPrescanned": "Move to Prescanned",
+      "moveToInterviewed": "Move to Interviewed"
     },
     "application": {
       "title": "Apply for this Position",
@@ -529,6 +579,10 @@
       "backToJob": "Back to job details",
       "chooseCv": "Choose CV",
       "acceptedFormats": "Accepted formats: PDF, DOCX (max 10MB)",
+      "loggedInAs": "Applying as {name}",
+      "useActiveCv": "Use my CV: {name}",
+      "uploadNewCv": "Upload a new CV",
+      "noCvsYet": "No CVs generated yet. You can upload one or create one in the CV Builder.",
       "answerQuestions": "Answer a few questions to get started",
       "clickToOpenChat": "Click to open prescanning chat",
       "validation": {
@@ -545,8 +599,20 @@
       "resetMessage": "Reset {name} back to Applied? This will cancel active sessions and create a new prescanning link.",
       "moveMessage": "Move {name} to {status}?",
       "yesReset": "Yes, reset",
-      "yesMove": "Yes, move"
+      "yesMove": "Yes, move",
+      "yesShortlist": "Yes, shortlist",
+      "yesHire": "Yes, hire",
+      "yesReject": "Yes, reject",
+      "yesArchive": "Yes, archive",
+      "msgPrescanned": "{name}: This will mark the candidate as prescanned.",
+      "msgInterviewed": "{name}: This will mark the candidate as interviewed.",
+      "msgShortlisted": "{name}: This will move them to the shortlist.",
+      "msgHired": "{name}: This will mark the candidate as hired.",
+      "msgRejected": "{name}: This will reject the candidate.",
+      "msgArchived": "{name}: This will archive the candidate. They can be restored later.",
+      "msgApplied": "{name}: This will reset them back to the initial state."
     },
+    "notesPlaceholder": "Add notes about this candidate...",
     "noCandidates": "No candidates yet",
     "noCandidatesHint": "Candidates will appear here once they apply",
     "matchScore": "Match Score",
@@ -884,7 +950,12 @@
       "invitations": "Pending Invitations",
       "activate": "Activate",
       "deactivate": "Deactivate",
-      "role": "Role"
+      "role": "Role",
+      "roles": {
+        "admin": "Admin",
+        "hr": "HR Manager",
+        "candidate": "Candidate"
+      }
     },
     "language": "Language",
     "theme": "Theme"
@@ -980,6 +1051,7 @@
     "forbidden": "Access Denied",
     "forbiddenHint": "You don't have permission to access this page.",
     "forbiddenDesc": "You don't have permission to access this page.",
+    "needAccess": "Need access? Contact your administrator or",
     "serverError": "Server Error",
     "serverErrorHint": "Something went wrong on our end. Please try again later.",
     "serverErrorDesc": "Something went wrong on our end. Our team has been notified.",
@@ -1281,6 +1353,10 @@
     "activate": "Set as active",
     "inactive": "Inactive",
     "deactivated": "CV deactivated.",
+    "deactivateFirst": "Deactivate CV before deleting",
+    "deleteProfile": "Delete CV",
+    "deleteProfileConfirm": "Are you sure you want to delete your CV? All profile data, work experience, education, and generated PDFs will be permanently removed.",
+    "profileDeleted": "CV deleted successfully.",
     "view": "View CV",
     "activeLabel": "Active CV",
     "noActiveCv": "No active CV. Generate a PDF and activate it to make it visible to employers.",

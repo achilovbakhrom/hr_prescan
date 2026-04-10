@@ -1,6 +1,17 @@
-import requests
-from django.conf import settings
+"""Register a webhook URL with the Telegram Bot API for one of our bots.
+
+Usage:
+    python manage.py setup_telegram_webhook https://example.com/api/telegram/hr/webhook/ --role hr
+    python manage.py setup_telegram_webhook https://example.com/api/telegram/candidate/webhook/ --role candidate
+"""
 from django.core.management.base import BaseCommand, CommandError
+
+from apps.integrations.telegram_bot.bots import (
+    ROLE_HR,
+    VALID_ROLES,
+    get_bot_config,
+    get_client,
+)
 
 
 class Command(BaseCommand):
@@ -10,29 +21,35 @@ class Command(BaseCommand):
         parser.add_argument(
             "url",
             type=str,
-            help="Public HTTPS URL for the webhook (e.g. https://example.com/api/telegram/webhook/)",
+            help="Public HTTPS URL for the webhook (e.g. https://example.com/api/telegram/hr/webhook/)",
+        )
+        parser.add_argument(
+            "--role",
+            type=str,
+            default=ROLE_HR,
+            choices=VALID_ROLES,
+            help="Which bot to register: hr or candidate (default: hr)",
         )
 
     def handle(self, *args, **options):
         url = options["url"]
-        token = settings.TELEGRAM_BOT_TOKEN
-        secret = settings.TELEGRAM_WEBHOOK_SECRET
+        role = options["role"]
+        config = get_bot_config(role=role)
 
-        if not token:
-            raise CommandError("TELEGRAM_BOT_TOKEN is not set in settings.")
+        if not config.token:
+            raise CommandError(
+                f"Telegram {role} bot token is not set. "
+                f"Set TELEGRAM_{role.upper()}_BOT_TOKEN in env."
+            )
 
-        payload = {"url": url}
-        if secret:
-            payload["secret_token"] = secret
-
-        api_url = f"https://api.telegram.org/bot{token}/setWebhook"
-        response = requests.post(api_url, json=payload)
-        data = response.json()
-
-        if data.get("ok"):
-            self.stdout.write(self.style.SUCCESS(f"Webhook set successfully: {url}"))
-            self.stdout.write(f"Description: {data.get('description', '')}")
+        client = get_client(role=role)
+        result = client.set_webhook(url=url, secret_token=config.webhook_secret)
+        if result.get("ok"):
+            self.stdout.write(self.style.SUCCESS(
+                f"{role} webhook set successfully: {url}"
+            ))
+            self.stdout.write(f"Description: {result.get('description', '')}")
         else:
             raise CommandError(
-                f"Failed to set webhook: {data.get('description', 'Unknown error')}"
+                f"Failed to set {role} webhook: {result.get('description', 'Unknown error')}"
             )

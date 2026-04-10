@@ -42,7 +42,10 @@ class CandidateCVListCreateApi(APIView):
                 return None
 
     def get(self, request: Request) -> Response:
-        profile = get_or_create_candidate_profile(user=request.user)
+        from apps.accounts.models import CandidateProfile
+        profile = CandidateProfile.objects.filter(user=request.user).first()
+        if profile is None:
+            return Response([], status=status.HTTP_200_OK)
         items = profile.cvs.all()
         return Response(self.OutputSerializer(items, many=True).data, status=status.HTTP_200_OK)
 
@@ -105,6 +108,11 @@ class CandidateCVDetailApi(APIView):
         item = self._get_item(request, pk)
         if item is None:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+        if item.is_active:
+            return Response(
+                {"detail": "Cannot delete an active CV. Deactivate it first."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         item.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

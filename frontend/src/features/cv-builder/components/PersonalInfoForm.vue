@@ -11,6 +11,8 @@ import PersonalInfoSalary from './PersonalInfoSalary.vue'
 import { useCvBuilderStore } from '../stores/cv-builder.store'
 import { ApiValidationError } from '@/shared/api/errors'
 import type { FieldErrors } from '@/shared/api/errors'
+import { validateForm } from '@/shared/utils/form-validation'
+import { createPersonalInfoSchema } from '../validation/personal-info.schema'
 
 const { t } = useI18n()
 const store = useCvBuilderStore()
@@ -31,6 +33,7 @@ const isOpenToWork = ref(false)
 const successMessage = ref<string | null>(null)
 const errorMessage = ref<string | null>(null)
 const fieldErrors = ref<FieldErrors>({})
+const improvingHeadline = ref(false)
 const improvingSection = ref(false)
 
 function hasError(field: string): boolean {
@@ -69,6 +72,18 @@ function formatDate(date: Date | null): string | null {
   return `${year}-${month}-${day}`
 }
 
+async function handleImproveHeadline(): Promise<void> {
+  if (!headline.value.trim()) return
+  improvingHeadline.value = true
+  try {
+    headline.value = await store.improveCvSection('headline', headline.value)
+  } catch (err: unknown) {
+    errorMessage.value = err instanceof Error ? err.message : t('common.error')
+  } finally {
+    improvingHeadline.value = false
+  }
+}
+
 async function handleImproveSummary(): Promise<void> {
   if (!summary.value.trim()) return
   improvingSection.value = true
@@ -85,6 +100,23 @@ async function handleSave(): Promise<void> {
   successMessage.value = null
   errorMessage.value = null
   fieldErrors.value = {}
+
+  const schema = createPersonalInfoSchema(t)
+  const errors = await validateForm(schema, {
+    headline: headline.value, summary: summary.value, location: location.value,
+    linkedinUrl: linkedinUrl.value || undefined, githubUrl: githubUrl.value || undefined,
+    websiteUrl: websiteUrl.value || undefined,
+    desiredSalaryNegotiable: desiredSalaryNegotiable.value,
+    desiredSalaryMin: desiredSalaryMin.value, desiredSalaryMax: desiredSalaryMax.value,
+    desiredEmploymentType: desiredEmploymentType.value,
+  })
+  if (errors) {
+    fieldErrors.value = errors
+    await nextTick()
+    document.querySelector('.p-invalid, [data-field-error="true"]')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    return
+  }
+
   try {
     await store.updateProfile({
       headline: headline.value, summary: summary.value, location: location.value,
@@ -120,14 +152,17 @@ defineExpose({ save: handleSave })
 
     <form class="flex flex-col gap-5" @submit.prevent="handleSave">
       <div class="flex flex-col gap-1">
-        <label for="headline" class="text-sm font-medium text-gray-700">{{ t('cvBuilder.personal.headline') }}</label>
+        <div class="flex items-center justify-between">
+          <label for="headline" class="text-sm font-medium text-gray-700">{{ t('cvBuilder.personal.headline') }} <span class="text-red-500">*</span></label>
+          <Button :label="t('cvBuilder.improveWithAi')" icon="pi pi-sparkles" severity="secondary" text size="small" :loading="improvingHeadline" :disabled="!headline.trim()" @click="handleImproveHeadline" />
+        </div>
         <InputText id="headline" v-model="headline" :placeholder="t('cvBuilder.personal.headlinePlaceholder')" class="w-full" :invalid="hasError('headline')" />
         <small v-if="hasError('headline')" class="text-red-500">{{ fieldError('headline') }}</small>
       </div>
 
       <div class="flex flex-col gap-1">
         <div class="flex items-center justify-between">
-          <label for="summary" class="text-sm font-medium text-gray-700">{{ t('cvBuilder.personal.summary') }}</label>
+          <label for="summary" class="text-sm font-medium text-gray-700">{{ t('cvBuilder.personal.summary') }} <span class="text-red-500">*</span></label>
           <Button :label="t('cvBuilder.improveWithAi')" icon="pi pi-sparkles" severity="secondary" text size="small" :loading="improvingSection" :disabled="!summary.trim()" @click="handleImproveSummary" />
         </div>
         <Editor v-model="summary" :data-field-error="hasError('summary') || undefined" editorStyle="height: 150px" :class="{ 'border border-red-500 rounded-md': hasError('summary') }" />

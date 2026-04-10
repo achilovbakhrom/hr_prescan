@@ -36,21 +36,25 @@ def evaluate_chat_interview(interview: Interview, *, ai_decision: str = "advance
         transcript_lines.append(f"{role_label}: {msg['text']}")
     transcript_text = "\n\n".join(transcript_lines)
 
-    # Get criteria filtered by step
+    # Get criteria filtered by step. If none exist (e.g. HR deleted them all),
+    # auto-create the default set so evaluation never silently scores 0.
     criteria_list = list(
         vacancy.criteria.filter(step=step).order_by("order").values("id", "name", "description", "weight")
     )
 
     if not criteria_list:
-        logger.warning("No criteria for vacancy %s step %s, skipping scoring", vacancy.id, step)
-        complete_session(
-            interview=interview,
-            overall_score=Decimal("0"),
-            ai_summary="No evaluation criteria configured.",
-            transcript=interview.chat_history or [],
-            ai_decision=ai_decision,
+        logger.warning(
+            "No criteria for vacancy %s step %s — auto-creating default criteria.",
+            vacancy.id, step,
         )
-        return
+        from apps.vacancies.services import create_default_criteria
+
+        create_default_criteria(vacancy=vacancy, step=step)
+        criteria_list = list(
+            vacancy.criteria.filter(step=step)
+            .order_by("order")
+            .values("id", "name", "description", "weight")
+        )
 
     criteria_json = json.dumps([
         {"id": str(c["id"]), "name": c["name"], "description": c["description"], "weight": c["weight"]}

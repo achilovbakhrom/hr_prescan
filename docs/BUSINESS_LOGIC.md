@@ -200,6 +200,10 @@ Each vacancy has a two-step AI screening pipeline. HR configures each step durin
 
 ## 6. Candidate Application Flow
 
+Candidates can apply via two surfaces: the **web app** (public job board) and the **Telegram candidate bot** (`@<TELEGRAM_CANDIDATE_BOT_USERNAME>`). Both surfaces produce the same `Application` row and feed the same screening pipeline.
+
+### 6.1 Web flow
+
 1. Candidate finds a vacancy (public job board or direct link)
 2. Candidate fills in personal details (name, email, phone). No account required.
 3. Candidate uploads CV/resume (optional but recommended; PDF, DOCX supported)
@@ -214,6 +218,29 @@ Each vacancy has a two-step AI screening pipeline. HR configures each step durin
    - **Reject** — candidate is moved to rejected status
 9. If advanced to interview, candidate receives an interview link and completes the interview (chat or meet, depending on vacancy configuration)
 10. After interview completes, AI evaluates and decides to shortlist or reject the candidate
+
+### 6.2 Telegram bot flow (PR1 — deep-link apply)
+
+The candidate bot lets a candidate go from "I got a link from a friend" to "applied" without ever opening a browser.
+
+1. Someone (HR, friend, job board) shares a deep link `https://t.me/<bot>?start=vac_<vacancy_id>`
+2. Candidate opens the link → Telegram launches the bot → bot receives `/start vac_<vacancy_id>`
+3. Bot **auto-creates a candidate `User`** if this Telegram identity hasn't been seen before:
+   - Email is set to a placeholder `tg_<telegram_id>@telegram.local` (`email_verified=False`) — a real address can be collected later for vacancies that require it
+   - First/last name and Telegram username come from the Telegram profile
+   - `onboarding_completed=False` so the web app still walks them through onboarding if they ever sign in there
+4. Bot fetches the vacancy (must be **published + public** — private/draft/paused vacancies show "no longer available") and renders a vacancy card with `[Apply]` and `[Back]` inline buttons
+5. Candidate taps `[Apply]`:
+   - If the vacancy has `cv_required=True` and the bot has no CV on file for this user, the bot asks the candidate to send a PDF/DOCX. The pending apply is stored on the bot session, so as soon as the document arrives the apply resumes automatically.
+   - Otherwise the bot calls the same `submit_application` service the web flow uses (`apps/applications/services/application_crud.py`). The resulting `Application` is bound to the candidate `User`, so HR sees it identically to web applications.
+6. Bot confirms with "✅ Application submitted!" and tells the candidate they'll be DM'd when there's news.
+7. **Prescanning interview itself ships in PR2** (in-Telegram chat, text + voice). Until then, candidates who applied via Telegram can complete their prescanning either via the web link (bound to the same `User`) or wait for PR2 to deliver in-bot interviews.
+
+#### Notes & constraints
+
+- One Telegram identity = one `User`. The same person applying via Telegram and via web (with the same email) is reconciled by `bind_existing_applications` once their email is filled in.
+- Bot UI is **button-driven** wherever possible (Telegram inline keyboards) — free-text replies are accepted as a fallback and routed to the candidate AI agent (PR2).
+- Bot auto-detects language from `message.from.language_code` (en / ru / uz). Strings live in `apps/integrations/telegram_bot/i18n.py`.
 
 ---
 

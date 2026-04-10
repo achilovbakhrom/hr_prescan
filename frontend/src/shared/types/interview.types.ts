@@ -5,6 +5,7 @@ export interface InterviewScore {
   id: string
   criteriaId: string
   criteriaName: string
+  criteriaTranslations?: Record<string, string>
   score: number
   aiNotes: string
   aiNotesTranslations: Record<string, string>

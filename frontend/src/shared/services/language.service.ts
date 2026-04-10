@@ -3,6 +3,8 @@ import { apiClient } from '@/shared/api/client'
 export interface Language {
   code: string
   name: string
+  nameRu: string
+  nameUz: string
 }
 
 let cachedLanguages: Language[] | null = null

@@ -65,6 +65,8 @@ class Language(models.Model):
 
     code = models.CharField(max_length=10, primary_key=True)
     name = models.CharField(max_length=100)
+    name_ru = models.CharField(max_length=100, blank=True, default="")
+    name_uz = models.CharField(max_length=100, blank=True, default="")
 
     class Meta:
         ordering = ["name"]

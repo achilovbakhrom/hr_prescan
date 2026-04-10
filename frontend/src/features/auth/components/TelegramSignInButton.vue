@@ -21,9 +21,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 const botUsername = import.meta.env.VITE_TELEGRAM_BOT_USERNAME as string
-const widgetContainer = ref<HTMLElement | null>(null)
 const loading = ref(false)
-const ready = ref(false)
 
 const callbackName = `__onTelegramAuth_${Date.now()}`
 
@@ -47,38 +45,51 @@ async function onTelegramAuth(user: TelegramWidgetUser): Promise<void> {
   }
 }
 
+function openTelegramAuth(): void {
+  if (loading.value || !botUsername) return
+  const botId = import.meta.env.VITE_TELEGRAM_BOT_ID as string | undefined
+  const origin = encodeURIComponent(window.location.origin)
+  const width = 550
+  const height = 470
+  const left = (screen.width - width) / 2
+  const top = (screen.height - height) / 2
+  window.open(
+    `https://oauth.telegram.org/auth?bot_id=${botId || botUsername}&origin=${origin}&request_access=write`,
+    'telegram_auth',
+    `width=${width},height=${height},left=${left},top=${top}`,
+  )
+}
+
+function handleMessage(e: MessageEvent): void {
+  if (e.origin !== 'https://oauth.telegram.org') return
+  try {
+    const data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data
+    if (data?.event === 'auth_result' && data.result) {
+      onTelegramAuth(data.result as TelegramWidgetUser)
+    }
+  } catch { /* ignore non-JSON messages */ }
+}
+
 onMounted(() => {
-  if (!botUsername || !widgetContainer.value) return
-
+  // Register global callback (fallback for widget redirect mode)
   ;(window as unknown as Record<string, unknown>)[callbackName] = onTelegramAuth
-
-  const script = document.createElement('script')
-  script.async = true
-  script.src = 'https://telegram.org/js/telegram-widget.js?22'
-  script.setAttribute('data-telegram-login', botUsername)
-  script.setAttribute('data-size', 'large')
-  script.setAttribute('data-radius', '6')
-  script.setAttribute('data-request-access', 'write')
-  script.setAttribute('data-userpic', 'false')
-  script.setAttribute('data-onauth', `${callbackName}(user)`)
-  script.onload = () => {
-    ready.value = true
-  }
-
-  widgetContainer.value.appendChild(script)
+  window.addEventListener('message', handleMessage)
 })
 
 onUnmounted(() => {
   delete (window as unknown as Record<string, unknown>)[callbackName]
+  window.removeEventListener('message', handleMessage)
 })
 </script>
 
 <template>
-  <div v-if="botUsername" class="relative mb-4">
-    <!-- Visual button the user sees -->
-    <div
-      class="flex w-full items-center justify-center gap-3 rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm"
-      :class="loading ? 'opacity-50' : ''"
+  <div v-if="botUsername" class="mb-4">
+    <button
+      type="button"
+      class="flex w-full items-center justify-center gap-3 rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
+      :disabled="loading"
+      :class="loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'"
+      @click="openTelegramAuth"
     >
       <i v-if="!loading" class="pi pi-telegram text-[#2AABEE]" />
       <svg
@@ -93,22 +104,6 @@ onUnmounted(() => {
         <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" class="opacity-75" />
       </svg>
       <span>{{ t('auth.telegram.signIn') }}</span>
-    </div>
-
-    <!-- Invisible Telegram iframe overlay — real click target -->
-    <div
-      ref="widgetContainer"
-      class="absolute inset-0 flex items-center justify-center overflow-hidden"
-      :class="loading ? 'pointer-events-none' : ''"
-      :style="{ opacity: ready ? '0.01' : '0' }"
-    />
+    </button>
   </div>
 </template>
-
-<style scoped>
-:deep(iframe) {
-  width: 100% !important;
-  height: 100% !important;
-  cursor: pointer;
-}
-</style>

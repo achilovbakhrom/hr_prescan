@@ -287,11 +287,35 @@ GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
 GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY", "")
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3-flash-preview")
 
-# Telegram bot
-TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
-TELEGRAM_BOT_USERNAME = os.environ.get("TELEGRAM_BOT_USERNAME", "")
-TELEGRAM_WEBHOOK_SECRET = os.environ.get("TELEGRAM_WEBHOOK_SECRET", "")
-TELEGRAM_WEBHOOK_URL = os.environ.get("TELEGRAM_WEBHOOK_URL", "")
+# Telegram bots
+# Two separate bots: one for HRs (manage vacancies, candidates, etc.) and one
+# for candidates (browse jobs, apply, take prescan interview). Each needs its
+# own token/username/webhook secret. The legacy single-bot env vars
+# (TELEGRAM_BOT_TOKEN/USERNAME/WEBHOOK_SECRET/WEBHOOK_URL) remain readable as a
+# fallback for the HR bot so existing deployments keep working.
+TELEGRAM_HR_BOT_TOKEN = os.environ.get(
+    "TELEGRAM_HR_BOT_TOKEN", os.environ.get("TELEGRAM_BOT_TOKEN", ""),
+)
+TELEGRAM_HR_BOT_USERNAME = os.environ.get(
+    "TELEGRAM_HR_BOT_USERNAME", os.environ.get("TELEGRAM_BOT_USERNAME", ""),
+)
+TELEGRAM_HR_WEBHOOK_SECRET = os.environ.get(
+    "TELEGRAM_HR_WEBHOOK_SECRET", os.environ.get("TELEGRAM_WEBHOOK_SECRET", ""),
+)
+TELEGRAM_HR_WEBHOOK_URL = os.environ.get(
+    "TELEGRAM_HR_WEBHOOK_URL", os.environ.get("TELEGRAM_WEBHOOK_URL", ""),
+)
+
+TELEGRAM_CANDIDATE_BOT_TOKEN = os.environ.get("TELEGRAM_CANDIDATE_BOT_TOKEN", "")
+TELEGRAM_CANDIDATE_BOT_USERNAME = os.environ.get("TELEGRAM_CANDIDATE_BOT_USERNAME", "")
+TELEGRAM_CANDIDATE_WEBHOOK_SECRET = os.environ.get("TELEGRAM_CANDIDATE_WEBHOOK_SECRET", "")
+TELEGRAM_CANDIDATE_WEBHOOK_URL = os.environ.get("TELEGRAM_CANDIDATE_WEBHOOK_URL", "")
+
+# Token used by the Telegram Login Widget on the candidate web auth pages.
+# Prefers the candidate bot, falls back to HR bot for backwards-compat.
+TELEGRAM_LOGIN_WIDGET_TOKEN = (
+    TELEGRAM_CANDIDATE_BOT_TOKEN or TELEGRAM_HR_BOT_TOKEN
+)
 
 # Frontend URL (for Telegram bot "Open website" button, etc.)
 FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:5173")

@@ -1,11 +1,20 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ProgressBar from 'primevue/progressbar'
 import { apiClient } from '@/shared/api/client'
+import { getLocale } from '@/shared/i18n'
 import type { InterviewScore, IntegrityFlag } from '@/shared/types/interview.types'
 
 const { t } = useI18n()
+
+const currentLocale = computed(() => getLocale())
+
+function getLocalizedCriteriaName(score: InterviewScore): string {
+  const translated = score.criteriaTranslations?.[currentLocale.value]
+  if (!translated) return score.criteriaName
+  return translated.split(': ')[0] || score.criteriaName
+}
 
 interface CandidateInterviewScores {
   overallScore: number | null
@@ -83,7 +92,7 @@ onMounted(async () => {
         >
           <div class="mb-1.5 flex items-center justify-between">
             <span class="text-sm font-medium text-gray-700">
-              {{ score.criteriaName }}
+              {{ getLocalizedCriteriaName(score) }}
             </span>
             <span class="text-sm font-bold" :class="scoreColor(score.score)">
               {{ score.score }}/100

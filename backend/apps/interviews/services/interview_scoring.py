@@ -60,17 +60,21 @@ def complete_session(
     if interview.session_type == Interview.SessionType.PRESCANNING:
         if ai_decision == "reject":
             application.status = Application.Status.REJECTED
-        else:
+        elif application.vacancy.interview_enabled:
+            # Intermediate step: candidate must still pass the interview
             application.status = Application.Status.PRESCANNED
-            # Auto-create interview session if vacancy has it enabled
             from apps.applications.services import create_interview_session
 
             create_interview_session(application=application)
+        else:
+            # Prescanning is the final AI step → shortlist on advance
+            application.status = Application.Status.SHORTLISTED
     elif interview.session_type == Interview.SessionType.INTERVIEW:
         if ai_decision == "reject":
             application.status = Application.Status.REJECTED
         else:
-            application.status = Application.Status.INTERVIEWED
+            # Interview is the final AI step → shortlist on advance
+            application.status = Application.Status.SHORTLISTED
 
     application.save(update_fields=["status", "updated_at"])
 

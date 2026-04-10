@@ -10,6 +10,8 @@ import { useCvBuilderStore } from '../stores/cv-builder.store'
 import { ApiValidationError } from '@/shared/api/errors'
 import type { FieldErrors } from '@/shared/api/errors'
 import type { LanguageEntry, LanguagePayload } from '../types/cv-builder.types'
+import { validateForm } from '@/shared/utils/form-validation'
+import { createLanguageSchema } from '../validation/language.schema'
 
 const { t } = useI18n()
 const store = useCvBuilderStore()
@@ -44,6 +46,16 @@ function cancelForm(): void { showForm.value = false; resetForm() }
 async function handleSave(): Promise<void> {
   successMessage.value = null; errorMessage.value = null; fieldErrors.value = {}
   const payload: LanguagePayload = { language: languageCode.value, proficiency: proficiency.value }
+
+  const schema = createLanguageSchema(t)
+  const errors = await validateForm(schema, payload as unknown as Record<string, unknown>)
+  if (errors) {
+    fieldErrors.value = errors
+    await nextTick()
+    document.querySelector('.p-invalid, [data-field-error="true"]')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    return
+  }
+
   try {
     if (editingId.value) { await store.updateLanguage(editingId.value, payload); successMessage.value = t('cvBuilder.languages.updateSuccess') }
     else { await store.createLanguage(payload); successMessage.value = t('cvBuilder.languages.addSuccess') }

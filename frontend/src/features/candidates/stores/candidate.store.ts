@@ -37,6 +37,21 @@ export const useCandidateStore = defineStore('candidate', () => {
     }
   }
 
+  async function fetchAllCandidates(
+    params?: { status?: string; ordering?: string; search?: string; vacancyId?: string },
+  ): Promise<void> {
+    candidates.value = []
+    loading.value = true
+    error.value = null
+    try {
+      candidates.value = await candidateService.getAllCandidates(params)
+    } catch (err: unknown) {
+      error.value = extractErrorMessage(err)
+    } finally {
+      loading.value = false
+    }
+  }
+
   async function fetchCandidateDetail(id: string): Promise<void> {
     currentCandidate.value = null
     loading.value = true
@@ -166,6 +181,7 @@ export const useCandidateStore = defineStore('candidate', () => {
     loading,
     error,
     fetchVacancyCandidates,
+    fetchAllCandidates,
     fetchCandidateDetail,
     updateStatus,
     addNote,

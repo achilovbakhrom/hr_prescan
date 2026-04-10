@@ -97,12 +97,26 @@ function toggleRowMenu(event: Event, id: string) { rowMenuRefs.value[id]?.toggle
       <template #body="{ data }"><span class="text-xs text-gray-500">{{ formatDate((data as Application).createdAt) }}</span></template>
     </Column>
 
-    <Column header="" style="width: 50px" :exportable="false">
+    <Column header="" style="width: 160px" :exportable="false">
       <template #body="{ data }">
-        <button class="rounded p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600" @click.stop="toggleRowMenu($event, (data as Application).id)">
-          <i class="pi pi-ellipsis-v text-sm"></i>
-        </button>
-        <Menu :ref="(el: unknown) => setRowMenuRef((data as Application).id, el)" :model="buildRowMenuItems(data as Application, interviewEnabled, viewDetail, confirmRowStatus)" :popup="true" />
+        <div class="flex items-center justify-end gap-1" @click.stop>
+          <button
+            v-if="(data as Application).status !== 'shortlisted' && (data as Application).status !== 'hired' && (data as Application).status !== 'archived'"
+            v-tooltip.top="t('candidates.actions.shortlist')"
+            class="rounded p-1.5 text-gray-400 hover:bg-emerald-50 hover:text-emerald-600"
+            @click="confirmRowStatus(data as Application, 'shortlisted')"
+          ><i class="pi pi-star text-sm"></i></button>
+          <button
+            v-if="(data as Application).status !== 'rejected' && (data as Application).status !== 'hired' && (data as Application).status !== 'archived'"
+            v-tooltip.top="t('candidates.actions.reject')"
+            class="rounded p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600"
+            @click="confirmRowStatus(data as Application, 'rejected')"
+          ><i class="pi pi-times text-sm"></i></button>
+          <button class="rounded p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600" @click="toggleRowMenu($event, (data as Application).id)">
+            <i class="pi pi-ellipsis-v text-sm"></i>
+          </button>
+          <Menu :ref="(el: unknown) => setRowMenuRef((data as Application).id, el)" :model="buildRowMenuItems(data as Application, interviewEnabled, viewDetail, confirmRowStatus, t)" :popup="true" />
+        </div>
       </template>
     </Column>
 

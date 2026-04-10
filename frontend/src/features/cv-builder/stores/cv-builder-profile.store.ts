@@ -11,6 +11,16 @@ import type {
   CertificationPayload,
 } from '../types/cv-builder.types'
 
+const EMPTY_PROFILE: CandidateProfile = {
+  id: '', headline: '', summary: '', location: '', dateOfBirth: null,
+  linkedinUrl: '', githubUrl: '', websiteUrl: '',
+  desiredSalaryMin: null, desiredSalaryMax: null, desiredSalaryCurrency: 'USD',
+  desiredSalaryNegotiable: false, desiredEmploymentType: '',
+  isOpenToWork: false, shareToken: '', photo: null,
+  skills: [], workExperiences: [], educations: [], languages: [], certifications: [], cvs: [],
+  completeness: { score: 0, sections: { personal: false, summary: false, experience: false, education: false, skills: false, languages: false } },
+}
+
 export const useCvBuilderProfileStore = defineStore('cvBuilderProfile', () => {
   const profile = ref<CandidateProfile | null>(null)
   const loading = ref(false)
@@ -52,7 +62,8 @@ export const useCvBuilderProfileStore = defineStore('cvBuilderProfile', () => {
     loading.value = true
     clearErrors()
     try {
-      profile.value = await cvBuilderService.getProfile()
+      const result = await cvBuilderService.getProfile()
+      profile.value = result || { ...EMPTY_PROFILE }
     } catch (err: unknown) {
       error.value = extractApiError(err).message
     } finally {

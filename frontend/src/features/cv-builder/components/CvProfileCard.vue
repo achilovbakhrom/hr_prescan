@@ -17,6 +17,7 @@ defineProps<{
 const emit = defineEmits<{
   toggleVisibility: []
   viewPublic: []
+  delete: []
 }>()
 
 function progressColor(score: number): string {
@@ -44,9 +45,11 @@ function progressColor(score: number): string {
           </div>
         </div>
       </div>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-3">
         <Button icon="pi pi-eye" severity="secondary" text rounded size="small" v-tooltip.top="t('myCvs.view')" :disabled="!profile.isOpenToWork" @click="emit('viewPublic')" />
-        <Button :label="t('common.edit')" icon="pi pi-pencil" size="small" outlined @click="router.push({ name: ROUTE_NAMES.CV_BUILDER })" />
+        <Button icon="pi pi-pencil" severity="secondary" text rounded size="small" v-tooltip.top="t('common.edit')" @click="router.push({ name: ROUTE_NAMES.CV_BUILDER })" />
+        <span class="h-5 w-px bg-gray-200"></span>
+        <Button icon="pi pi-trash" severity="danger" text rounded size="small" v-tooltip.top="t('myCvs.deleteProfile')" @click="emit('delete')" />
       </div>
     </div>
 

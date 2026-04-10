@@ -29,8 +29,10 @@ function hasPermission(permission?: HRPermission): boolean {
 const navItems = computed<NavItem[]>(() => [
   { label: t('nav.dashboard'), icon: 'pi pi-home', to: '/dashboard', roles: [USER_ROLES.ADMIN, USER_ROLES.HR, USER_ROLES.CANDIDATE] },
   { label: t('nav.vacancies'), icon: 'pi pi-briefcase', to: '/vacancies', roles: [USER_ROLES.ADMIN, USER_ROLES.HR], permission: 'manage_vacancies' },
+  { label: t('nav.allCandidates'), icon: 'pi pi-users', to: '/candidates', roles: [USER_ROLES.ADMIN, USER_ROLES.HR], permission: 'manage_candidates' },
   { label: t('nav.interviews'), icon: 'pi pi-calendar', to: '/interviews', roles: [USER_ROLES.ADMIN, USER_ROLES.HR], permission: 'manage_interviews' },
   { label: t('nav.hrAnalytics'), icon: 'pi pi-chart-bar', to: '/analytics', roles: [USER_ROLES.ADMIN, USER_ROLES.HR], permission: 'view_analytics' },
+  { label: t('employers.title'), icon: 'pi pi-building', to: '/employers', roles: [USER_ROLES.ADMIN, USER_ROLES.HR], permission: 'manage_vacancies' },
   { label: t('nav.team'), icon: 'pi pi-users', to: '/settings/team', roles: [USER_ROLES.ADMIN, USER_ROLES.HR], permission: 'manage_team' },
   { label: t('settings.company.title'), icon: 'pi pi-cog', to: '/settings/company', roles: [USER_ROLES.ADMIN, USER_ROLES.HR], permission: 'manage_settings' },
   { label: t('nav.subscription'), icon: 'pi pi-credit-card', to: '/subscription', roles: [USER_ROLES.ADMIN] },

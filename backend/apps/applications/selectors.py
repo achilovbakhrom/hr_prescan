@@ -80,6 +80,53 @@ def get_vacancy_applications_filtered(
     return qs.order_by(ordering)
 
 
+def get_company_applications_filtered(
+    *,
+    company: Company,
+    status: str | None = None,
+    vacancy_id: UUID | None = None,
+    min_score: Decimal | None = None,
+    max_score: Decimal | None = None,
+    ordering: str = "-created_at",
+    search: str | None = None,
+) -> QuerySet[Application]:
+    """Return filtered applications across all vacancies of a company."""
+    allowed_orderings = {
+        "-created_at",
+        "created_at",
+        "-match_score",
+        "match_score",
+        "-candidate_name",
+        "candidate_name",
+    }
+    if ordering not in allowed_orderings:
+        ordering = "-created_at"
+
+    qs = (
+        Application.objects
+        .filter(vacancy__company=company, is_deleted=False)
+        .select_related("candidate", "vacancy", "vacancy__company")
+        .prefetch_related("sessions")
+    )
+
+    if vacancy_id:
+        qs = qs.filter(vacancy_id=vacancy_id)
+    if status:
+        qs = qs.filter(status=status)
+    if min_score is not None:
+        qs = qs.filter(match_score__gte=min_score)
+    if max_score is not None:
+        qs = qs.filter(match_score__lte=max_score)
+    if search:
+        qs = qs.filter(
+            Q(candidate_name__icontains=search)
+            | Q(candidate_email__icontains=search)
+            | Q(vacancy__title__icontains=search)
+        )
+
+    return qs.order_by(ordering)
+
+
 def get_application_by_id(
     *,
     application_id: UUID,

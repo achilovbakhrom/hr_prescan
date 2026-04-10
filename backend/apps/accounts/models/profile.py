@@ -34,7 +34,7 @@ class CandidateProfile(models.Model):
     desired_employment_type = models.CharField(
         max_length=20, choices=EmploymentType.choices, blank=True, default="",
     )
-    is_open_to_work = models.BooleanField(default=True)
+    is_open_to_work = models.BooleanField(default=False)
     share_token = models.CharField(max_length=64, unique=True, blank=True, default="")
 
     skills = models.ManyToManyField("common.Skill", blank=True, related_name="candidate_profiles")

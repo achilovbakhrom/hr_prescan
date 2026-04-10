@@ -3,7 +3,7 @@
        lint format typecheck test \
        up-monitoring up-management up-all \
        clean reset-db backup-db \
-       local-setup local-infra local-backend local-backend-all local-frontend local-stop \
+       local-setup local-infra local-backend local-backend-all local-frontend local-stop local-stop-all \
        local-test local-test-backend local-test-frontend local-test-e2e \
        local-telegram local-telegram-webhook
 
@@ -214,8 +214,13 @@ local-createsuperuser: ## Create superuser (local)
 local-shell: ## Django shell (local)
 	cd backend && $(VENV)/python manage.py shell
 
-local-telegram: ## Run Telegram bot in polling mode (local dev)
-	cd backend && $(VENV)/python manage.py run_telegram_bot
+local-telegram: local-telegram-hr ## Run HR Telegram bot in polling mode (alias)
+
+local-telegram-hr: ## Run HR Telegram bot in polling mode (local dev)
+	cd backend && $(VENV)/python manage.py run_telegram_bot --role hr
+
+local-telegram-candidate: ## Run Candidate Telegram bot in polling mode (local dev)
+	cd backend && $(VENV)/python manage.py run_telegram_bot --role candidate
 
 local-telegram-webhook: ## Start ngrok tunnel + register Telegram webhook (local dev)
 	./deploy/scripts/telegram-ngrok.sh 8000
@@ -228,6 +233,18 @@ local-stop: ## Stop everything (infra + background processes)
 	-@pkill -f "vite" 2>/dev/null || true
 	docker compose down
 	@echo "All stopped."
+
+local-stop-all: ## Force-kill all local backend/frontend processes + stop Docker
+	@echo "Force-killing all processes..."
+	-@pkill -9 -f "manage.py runserver" 2>/dev/null && echo "  Django stopped" || true
+	-@pkill -9 -f "celery -A config" 2>/dev/null && echo "  Celery worker stopped" || true
+	-@pkill -9 -f "celery.*config" 2>/dev/null && echo "  Celery beat stopped" || true
+	-@pkill -9 -f "vite" 2>/dev/null && echo "  Vite stopped" || true
+	-@pkill -9 -f "node.*frontend" 2>/dev/null && echo "  Node frontend stopped" || true
+	-@lsof -ti :8000 | xargs kill -9 2>/dev/null && echo "  Port 8000 freed" || true
+	-@lsof -ti :5173 | xargs kill -9 2>/dev/null && echo "  Port 5173 freed" || true
+	docker compose down
+	@echo "All force-stopped."
 
 # ─── Testing (local) ─────────────────────────────────────────────────────────
 

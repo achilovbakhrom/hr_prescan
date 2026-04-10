@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.permissions import HasHRPermission, HRPermissions
+from apps.common.exceptions import ApplicationError
 from apps.common.messages import MSG_CRITERIA_NOT_FOUND, MSG_VACANCY_NOT_FOUND
 from apps.vacancies.models import ScreeningStep
 from apps.vacancies.selectors import get_vacancy_by_id, get_vacancy_criteria
@@ -103,5 +104,8 @@ class VacancyCriteriaDetailApi(APIView):
         if criteria is None:
             return Response({"detail": str(MSG_CRITERIA_NOT_FOUND)}, status=status.HTTP_404_NOT_FOUND)
 
-        delete_vacancy_criteria(criteria=criteria)
+        try:
+            delete_vacancy_criteria(criteria=criteria)
+        except ApplicationError as e:
+            return Response({"detail": e.message}, status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_204_NO_CONTENT)

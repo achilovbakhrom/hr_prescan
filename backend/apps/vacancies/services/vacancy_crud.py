@@ -6,7 +6,9 @@ from apps.accounts.models import Company, User
 from apps.common.exceptions import ApplicationError
 from apps.common.messages import (
     MSG_CANNOT_CHANGE_MODE,
+    MSG_NO_INTERVIEW_CRITERIA,
     MSG_NO_INTERVIEW_QUESTIONS,
+    MSG_NO_PRESCANNING_CRITERIA,
     MSG_NO_PRESCANNING_QUESTIONS,
     MSG_ONLY_DRAFT_PAUSED_PUBLISH,
     MSG_ONLY_PUBLISHED_PAUSE,
@@ -113,11 +115,14 @@ def publish_vacancy(*, vacancy: Vacancy) -> Vacancy:
     if not vacancy.questions.filter(is_active=True, step=ScreeningStep.PRESCANNING).exists():
         raise ApplicationError(str(MSG_NO_PRESCANNING_QUESTIONS))
 
-    if (
-        vacancy.interview_enabled
-        and not vacancy.questions.filter(is_active=True, step=ScreeningStep.INTERVIEW).exists()
-    ):
-        raise ApplicationError(str(MSG_NO_INTERVIEW_QUESTIONS))
+    if not vacancy.criteria.filter(step=ScreeningStep.PRESCANNING).exists():
+        raise ApplicationError(str(MSG_NO_PRESCANNING_CRITERIA))
+
+    if vacancy.interview_enabled:
+        if not vacancy.questions.filter(is_active=True, step=ScreeningStep.INTERVIEW).exists():
+            raise ApplicationError(str(MSG_NO_INTERVIEW_QUESTIONS))
+        if not vacancy.criteria.filter(step=ScreeningStep.INTERVIEW).exists():
+            raise ApplicationError(str(MSG_NO_INTERVIEW_CRITERIA))
 
     vacancy.status = Vacancy.Status.PUBLISHED
     vacancy.save(update_fields=["status", "updated_at"])

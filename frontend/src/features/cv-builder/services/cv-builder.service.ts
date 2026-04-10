@@ -21,9 +21,13 @@ import type {
 const BASE = '/candidate/profile'
 
 export const cvBuilderService = {
-  async getProfile(): Promise<CandidateProfile> {
-    const response = await apiClient.get<CandidateProfile>(BASE)
+  async getProfile(): Promise<CandidateProfile | null> {
+    const response = await apiClient.get<CandidateProfile | null>(BASE)
     return response.data
+  },
+
+  async deleteProfile(): Promise<void> {
+    await apiClient.delete(BASE)
   },
 
   async updateProfile(data: ProfileUpdatePayload): Promise<CandidateProfile> {

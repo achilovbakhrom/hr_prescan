@@ -19,6 +19,10 @@ const props = defineProps<{
   aiSummaryInterviewId?: string
 }>()
 
+const emit = defineEmits<{
+  'update:aiSummaryTranslations': [tr: Record<string, string>]
+}>()
+
 const overallScore = computed(() => {
   const cv = props.candidate.matchScore
   const ps = props.prescanningScore != null ? Math.round(props.prescanningScore * 10) : null
@@ -150,6 +154,7 @@ const recommendation = computed(() => {
             model="interview"
             :object-id="props.aiSummaryInterviewId"
             field="ai_summary"
+            @translated="(tr) => emit('update:aiSummaryTranslations', tr)"
           >
             <template #default="{ text }">
               <p class="mt-1 text-sm opacity-80">{{ text }}</p>

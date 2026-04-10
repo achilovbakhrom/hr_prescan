@@ -36,7 +36,7 @@ function handleSave(): void {
       v-model="localNotes"
       rows="6"
       class="w-full"
-      placeholder="Add notes about this candidate..."
+      :placeholder="t('candidates.notesPlaceholder')"
       :disabled="props.loading"
     />
     <div class="flex justify-end">

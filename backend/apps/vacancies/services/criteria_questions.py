@@ -1,23 +1,72 @@
 from django.db import models
 
+from apps.common.exceptions import ApplicationError
+from apps.common.messages import MSG_CANNOT_DELETE_LAST_CRITERIA
 from apps.vacancies.models import InterviewQuestion, ScreeningStep, Vacancy, VacancyCriteria
 
 DEFAULT_CRITERIA = [
-    {"name": "Technical Skills", "description": "Relevant technical knowledge and abilities", "weight": 3, "order": 0},
-    {"name": "Communication", "description": "Clarity of expression and listening skills", "weight": 2, "order": 1},
-    {"name": "Problem Solving", "description": "Analytical thinking and creative solutions", "weight": 3, "order": 2},
-    {"name": "Cultural Fit", "description": "Alignment with company values and team dynamics", "weight": 2, "order": 3},
+    {
+        "name": "Technical Skills",
+        "description": "Relevant technical knowledge and abilities",
+        "weight": 3,
+        "order": 0,
+        "translations": {
+            "en": "Technical Skills: Relevant technical knowledge and abilities",
+            "ru": "Технические навыки: Соответствующие технические знания и навыки",
+            "uz": "Texnik ko'nikmalar: Tegishli texnik bilim va ko'nikmalar",
+        },
+    },
+    {
+        "name": "Communication",
+        "description": "Clarity of expression and listening skills",
+        "weight": 2,
+        "order": 1,
+        "translations": {
+            "en": "Communication: Clarity of expression and listening skills",
+            "ru": "Коммуникация: Ясность изложения и навыки слушания",
+            "uz": "Kommunikatsiya: Fikrni aniq ifodalash va tinglash ko'nikmalari",
+        },
+    },
+    {
+        "name": "Problem Solving",
+        "description": "Analytical thinking and creative solutions",
+        "weight": 3,
+        "order": 2,
+        "translations": {
+            "en": "Problem Solving: Analytical thinking and creative solutions",
+            "ru": "Решение проблем: Аналитическое мышление и креативные решения",
+            "uz": "Muammolarni hal qilish: Analitik fikrlash va ijodiy yechimlar",
+        },
+    },
+    {
+        "name": "Cultural Fit",
+        "description": "Alignment with company values and team dynamics",
+        "weight": 2,
+        "order": 3,
+        "translations": {
+            "en": "Cultural Fit: Alignment with company values and team dynamics",
+            "ru": "Соответствие культуре: Соответствие ценностям компании и динамике команды",
+            "uz": "Madaniyatga moslik: Kompaniya qadriyatlari va jamoa dinamikasiga moslik",
+        },
+    },
     {
         "name": "Experience Relevance",
         "description": "Relevance of prior experience to the role",
         "weight": 2,
         "order": 4,
+        "translations": {
+            "en": "Experience Relevance: Relevance of prior experience to the role",
+            "ru": "Релевантность опыта: Релевантность предыдущего опыта данной роли",
+            "uz": "Tajribaning mosligi: Oldingi tajribaning ushbu rolga mosligi",
+        },
     },
 ]
 
 
-def create_default_criteria(*, vacancy: Vacancy) -> list[VacancyCriteria]:
-    """Create the default set of evaluation criteria for prescanning."""
+def create_default_criteria(
+    *, vacancy: Vacancy, step: str = ScreeningStep.PRESCANNING,
+) -> list[VacancyCriteria]:
+    """Create the default set of evaluation criteria for the given step."""
     criteria_list = []
     for item in DEFAULT_CRITERIA:
         criteria = VacancyCriteria.objects.create(
@@ -27,7 +76,8 @@ def create_default_criteria(*, vacancy: Vacancy) -> list[VacancyCriteria]:
             weight=item["weight"],
             order=item["order"],
             is_default=True,
-            step=ScreeningStep.PRESCANNING,
+            step=step,
+            translations=item["translations"],
         )
         criteria_list.append(criteria)
     return criteria_list
@@ -74,7 +124,17 @@ def update_vacancy_criteria(*, criteria: VacancyCriteria, **kwargs: object) -> V
 
 
 def delete_vacancy_criteria(*, criteria: VacancyCriteria) -> None:
-    """Delete a vacancy criteria."""
+    """Delete a vacancy criteria.
+
+    Refuses to delete the last remaining criteria for a step — without at
+    least one criteria, AI scoring at evaluation time would silently produce
+    a 0 score.
+    """
+    siblings = VacancyCriteria.objects.filter(
+        vacancy_id=criteria.vacancy_id, step=criteria.step,
+    ).exclude(id=criteria.id)
+    if not siblings.exists():
+        raise ApplicationError(str(MSG_CANNOT_DELETE_LAST_CRITERIA))
     criteria.delete()
 
 

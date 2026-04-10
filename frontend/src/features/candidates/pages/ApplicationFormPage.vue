@@ -8,9 +8,11 @@ import FileUpload from 'primevue/fileupload'
 import type { FileUploadSelectEvent } from 'primevue/fileupload'
 import { vacancyService } from '@/features/vacancies/services/vacancy.service'
 import { useCandidateStore } from '../stores/candidate.store'
+import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import ApplicationReadyStep from '../components/ApplicationReadyStep.vue'
 import PrescanChatOverlay from '../components/PrescanChatOverlay.vue'
+import CvSelectionSection from '../components/CvSelectionSection.vue'
 import type { Vacancy } from '@/shared/types/vacancy.types'
 import type { EmployerCompany } from '@/features/employers/types/employer.types'
 
@@ -20,6 +22,7 @@ const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const candidateStore = useCandidateStore()
+const authStore = useAuthStore()
 const vacancyId = route.params.vacancyId as string
 
 const vacancy = ref<VacancyWithEmployer | null>(null)
@@ -28,6 +31,7 @@ const name = ref('')
 const email = ref('')
 const phone = ref('')
 const cvFile = ref<File | null>(null)
+const cvId = ref<string | null>(null)
 const errors = ref<Record<string, string>>({})
 
 const step = ref<'form' | 'ready'>('form')
@@ -35,6 +39,12 @@ const prescanToken = ref<string | null>(null)
 const linkCopied = ref(false)
 const showChatOverlay = ref(false)
 const prescanDismissed = ref(false)
+
+const isLoggedIn = computed(() => authStore.isAuthenticated)
+const fullName = computed(() => {
+  const u = authStore.user
+  return u ? `${u.firstName} ${u.lastName}`.trim() || u.email : ''
+})
 
 const prescanUrl = computed(() => prescanToken.value ? `${window.location.origin}/interview/${prescanToken.value}` : '')
 const chatUrl = computed(() => prescanToken.value ? `/interview/${prescanToken.value}/chat` : '')
@@ -44,6 +54,11 @@ onMounted(async () => {
   try { vacancy.value = await vacancyService.getPublicDetail(vacancyId) }
   catch { vacancy.value = null }
   finally { vacancyLoading.value = false }
+
+  if (isLoggedIn.value && authStore.user) {
+    name.value = fullName.value
+    email.value = authStore.user.email
+  }
 })
 
 function onFileSelect(event: FileUploadSelectEvent): void { cvFile.value = event.files[0] as File }
@@ -61,7 +76,9 @@ async function handleSubmit(): Promise<void> {
   try {
     const application = await candidateStore.submitApplication(vacancyId, {
       candidateName: name.value.trim(), candidateEmail: email.value.trim(),
-      candidatePhone: phone.value.trim() || undefined, cvFile: cvFile.value ?? undefined,
+      candidatePhone: phone.value.trim() || undefined,
+      cvFile: cvFile.value ?? undefined,
+      cvId: cvId.value ?? undefined,
     })
     const resp = application as unknown as Record<string, unknown>
     prescanToken.value = (resp.prescanToken ?? resp.prescan_token ?? resp.interviewToken ?? resp.interview_token ?? null) as string | null
@@ -99,28 +116,59 @@ async function copyLink(): Promise<void> {
         </p>
         <div v-else class="mb-4 sm:mb-6"></div>
 
+        <!-- Logged-in banner -->
+        <div v-if="isLoggedIn" class="mb-4 flex items-center gap-2 rounded-lg bg-blue-50 px-4 py-3 text-sm text-blue-700">
+          <i class="pi pi-user"></i>
+          {{ t('candidates.application.loggedInAs', { name: fullName }) }}
+        </div>
+
         <p v-if="candidateStore.error" class="mb-4 text-sm text-red-600">{{ candidateStore.error }}</p>
 
         <form class="space-y-4 sm:space-y-5" @submit.prevent="handleSubmit">
-          <div>
-            <label class="mb-1 block text-sm font-medium">{{ t('candidates.application.name') }} *</label>
-            <InputText v-model="name" class="w-full" placeholder="John Doe" :invalid="!!errors.name" />
-            <small v-if="errors.name" class="text-red-500">{{ errors.name }}</small>
-          </div>
-          <div>
-            <label class="mb-1 block text-sm font-medium">{{ t('candidates.application.email') }} *</label>
-            <InputText v-model="email" type="email" class="w-full" placeholder="john@example.com" :invalid="!!errors.email" />
-            <small v-if="errors.email" class="text-red-500">{{ errors.email }}</small>
-          </div>
+          <!-- Name & Email: editable if guest, read-only if logged in -->
+          <template v-if="isLoggedIn">
+            <div class="grid grid-cols-1 gap-4 rounded-lg border border-gray-100 bg-gray-50 p-4 sm:grid-cols-2">
+              <div>
+                <label class="block text-xs font-medium text-gray-500">{{ t('candidates.application.name') }}</label>
+                <p class="text-sm font-medium text-gray-900">{{ name }}</p>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-500">{{ t('candidates.application.email') }}</label>
+                <p class="text-sm font-medium text-gray-900">{{ email }}</p>
+              </div>
+            </div>
+          </template>
+          <template v-else>
+            <div>
+              <label class="mb-1 block text-sm font-medium">{{ t('candidates.application.name') }} *</label>
+              <InputText v-model="name" class="w-full" placeholder="John Doe" :invalid="!!errors.name" />
+              <small v-if="errors.name" class="text-red-500">{{ errors.name }}</small>
+            </div>
+            <div>
+              <label class="mb-1 block text-sm font-medium">{{ t('candidates.application.email') }} *</label>
+              <InputText v-model="email" type="email" class="w-full" placeholder="john@example.com" :invalid="!!errors.email" />
+              <small v-if="errors.email" class="text-red-500">{{ errors.email }}</small>
+            </div>
+          </template>
+
           <div>
             <label class="mb-1 block text-sm font-medium">{{ t('candidates.application.phone') }}</label>
             <InputText v-model="phone" class="w-full" placeholder="+1 234 567 890" />
           </div>
-          <div>
+
+          <!-- CV Section: smart if logged in, basic upload if guest -->
+          <CvSelectionSection
+            v-if="isLoggedIn"
+            :cv-required="vacancy?.cvRequired ?? false"
+            @update:cv-file="cvFile = $event"
+            @update:cv-id="cvId = $event"
+          />
+          <div v-else>
             <label class="mb-1 block text-sm font-medium">{{ t('candidates.application.uploadCv') }}<span v-if="vacancy?.cvRequired" class="text-red-500">*</span></label>
             <FileUpload mode="basic" accept=".pdf,.docx" :max-file-size="10000000" :choose-label="t('candidates.application.chooseCv')" :auto="false" @select="onFileSelect" />
             <small class="text-gray-400">{{ t('candidates.application.acceptedFormats') }}</small>
           </div>
+
           <Button type="submit" :label="t('candidates.application.submit')" icon="pi pi-send" class="w-full" :loading="candidateStore.loading" />
         </form>
       </template>

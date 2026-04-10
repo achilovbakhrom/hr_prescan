@@ -19,8 +19,9 @@ from apps.common.models import Skill
 
 class CandidateProfileApi(APIView):
     """
-    GET  /api/candidate/profile/ — return full profile with nested relations.
-    PATCH /api/candidate/profile/ — update basic profile fields.
+    GET    /api/candidate/profile/ — return full profile with nested relations.
+    PATCH  /api/candidate/profile/ — update basic profile fields.
+    DELETE /api/candidate/profile/ — delete profile and all related data.
     """
 
     permission_classes = [IsCandidate]
@@ -65,9 +66,23 @@ class CandidateProfileApi(APIView):
         )
 
     def get(self, request: Request) -> Response:
-        profile = get_or_create_candidate_profile(user=request.user)
+        profile = CandidateProfile.objects.filter(user=request.user).first()
+        if profile is None:
+            return Response(None, status=status.HTTP_200_OK)
         profile = self._get_full_profile(profile.pk)
         return Response(self.OutputSerializer(profile).data, status=status.HTTP_200_OK)
+
+    def delete(self, request: Request) -> Response:
+        profile = CandidateProfile.objects.filter(user=request.user).first()
+        if profile is None:
+            return Response({"detail": "No profile to delete."}, status=status.HTTP_404_NOT_FOUND)
+        if profile.cvs.filter(is_active=True).exists():
+            return Response(
+                {"detail": "Cannot delete profile with active CVs. Deactivate them first."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        profile.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     def patch(self, request: Request) -> Response:
         serializer = self.InputSerializer(data=request.data)

@@ -9,6 +9,8 @@ import { useCvBuilderStore } from '../stores/cv-builder.store'
 import { ApiValidationError } from '@/shared/api/errors'
 import type { FieldErrors } from '@/shared/api/errors'
 import type { Certification, CertificationPayload } from '../types/cv-builder.types'
+import { validateForm } from '@/shared/utils/form-validation'
+import { createCertificationSchema } from '../validation/certification.schema'
 
 const { t } = useI18n()
 const store = useCvBuilderStore()
@@ -55,6 +57,16 @@ function buildPayload(): CertificationPayload {
 
 async function handleSave(): Promise<void> {
   successMessage.value = null; errorMessage.value = null; fieldErrors.value = {}
+
+  const schema = createCertificationSchema(t)
+  const errors = await validateForm(schema, buildPayload() as unknown as Record<string, unknown>)
+  if (errors) {
+    fieldErrors.value = errors
+    await nextTick()
+    document.querySelector('.p-invalid, [data-field-error="true"]')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    return
+  }
+
   try {
     if (editingId.value) {
       await store.updateCertification(editingId.value, buildPayload())

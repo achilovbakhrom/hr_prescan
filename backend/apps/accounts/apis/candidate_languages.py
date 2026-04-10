@@ -27,7 +27,8 @@ class CandidateLanguageListCreateApi(APIView):
         proficiency = serializers.CharField()
 
         def get_language(self, obj):
-            return {"code": obj.language.code, "name": obj.language.name}
+            lang = obj.language
+            return {"code": lang.code, "name": lang.name, "name_ru": lang.name_ru, "name_uz": lang.name_uz}
 
     def get(self, request: Request) -> Response:
         profile = get_or_create_candidate_profile(user=request.user)
@@ -85,7 +86,8 @@ class CandidateLanguageDetailApi(APIView):
         proficiency = serializers.CharField()
 
         def get_language(self, obj):
-            return {"code": obj.language.code, "name": obj.language.name}
+            lang = obj.language
+            return {"code": lang.code, "name": lang.name, "name_ru": lang.name_ru, "name_uz": lang.name_uz}
 
     def _get_item(self, request, pk):
         profile = get_or_create_candidate_profile(user=request.user)

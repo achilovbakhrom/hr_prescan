@@ -37,6 +37,8 @@ export interface Education {
 export interface LanguageRef {
   code: string
   name: string
+  nameRu: string
+  nameUz: string
 }
 
 export interface LanguageEntry {

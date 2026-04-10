@@ -2,7 +2,7 @@
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import VacancyStatusBadge from './VacancyStatusBadge.vue'
-import type { Vacancy } from '../types/vacancy.types'
+import type { Vacancy, VacancyStatus } from '../types/vacancy.types'
 
 const { t } = useI18n()
 
@@ -13,10 +13,16 @@ defineProps<{
 const emit = defineEmits<{
   click: [id: string]
   delete: [event: Event, id: string, title: string]
+  statusChange: [event: Event, id: string, status: VacancyStatus]
 }>()
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })
+}
+
+function onStatusClick(event: Event, id: string, status: VacancyStatus): void {
+  event.stopPropagation()
+  emit('statusChange', event, id, status)
 }
 </script>
 
@@ -38,7 +44,10 @@ function formatDate(dateStr: string): string {
           <span><i class="pi pi-calendar mr-1"></i>{{ formatDate(vacancy.createdAt) }}</span>
         </div>
       </div>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2" @click.stop>
+        <Button v-if="vacancy.status === 'draft'" :label="t('vacancies.actions.publish')" icon="pi pi-send" size="small" @click="onStatusClick($event, vacancy.id, 'published')" />
+        <Button v-if="vacancy.status === 'paused'" :label="t('vacancies.actions.resume')" icon="pi pi-play" severity="success" size="small" @click="onStatusClick($event, vacancy.id, 'published')" />
+        <Button v-if="vacancy.status === 'published'" :label="t('vacancies.actions.pause')" icon="pi pi-pause" severity="warn" size="small" outlined @click="onStatusClick($event, vacancy.id, 'paused')" />
         <Button v-if="vacancy.status === 'draft' || vacancy.status === 'archived'" icon="pi pi-trash" severity="danger" text rounded size="small" @click="emit('delete', $event, vacancy.id, vacancy.title)" />
         <i class="pi pi-chevron-right mt-1 hidden text-sm text-gray-300 sm:block"></i>
       </div>

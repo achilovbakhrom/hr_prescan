@@ -28,7 +28,15 @@
     "clearFilters": "Filtrlarni tozalash",
     "copyLink": "Havolani nusxalash",
     "copied": "Nusxalandi!",
+    "viewDetails": "Batafsil",
+    "searchPlaceholder": "Vakansiyalar, nomzodlarni qidirish...",
+    "searchHint": "Vakansiyalar va nomzodlarni qidirish uchun yozishni boshlang",
     "viewAll": "Barchasini ko'rish",
+    "personal": "Shaxsiy",
+    "enabled": "Yoqilgan",
+    "disabled": "O'chirilgan",
+    "active": "Faol",
+    "inactive": "Nofaol",
     "showMore": "Ko'proq ko'rsatish",
     "showLess": "Kamroq ko'rsatish",
     "createdAt": "Yaratilgan",
@@ -36,6 +44,7 @@
     "total": "jami",
     "error": "Kutilmagan xatolik yuz berdi",
     "success": "Muvaffaqiyatli",
+    "saved": "Saqlandi",
     "or": "yoki",
     "required_field": "Bu maydon majburiy",
     "skills": "Ko'nikmalar",
@@ -52,7 +61,8 @@
     "dashboard": "Boshqaruv paneli",
     "vacancies": "Vakansiyalar",
     "candidates": "Nomzodlar",
-    "interviews": "Intervyular",
+    "interviews": "Suhbat seanslari",
+    "allCandidates": "Barcha nomzodlar",
     "settings": "Sozlamalar",
     "notifications": "Bildirishnomalar",
     "subscriptions": "Obuna",
@@ -74,6 +84,15 @@
     "cvBuilder": "CV yaratish",
     "myCvs": "Mening CV larim",
     "hrAnalytics": "Analitika"
+  },
+  "validation": {
+    "required": "Bu maydon majburiy",
+    "maxLength": "Maksimal {max} ta belgi",
+    "invalidUrl": "To'g'ri URL kiriting",
+    "invalidDate": "To'g'ri sana kiriting",
+    "positiveNumber": "Musbat son bo'lishi kerak",
+    "salaryRange": "Maksimal maosh minimaldan katta bo'lishi kerak",
+    "endDateAfterStart": "Tugash sanasi boshlanish sanasidan keyin bo'lishi kerak"
   },
   "auth": {
     "login": {
@@ -461,6 +480,33 @@
     "addCriteria": "Mezon qo'shish",
     "deleteConfirm": "Bu vakansiyani butunlay o'chirishni xohlaysizmi?",
     "deleteConfirmHeader": "Vakansiyani o'chirish",
+    "deleteConfirmMessage": "«{title}» ni butunlay o'chirasizmi? Bu amalni qaytarib bo'lmaydi.",
+    "deletedSuccess": "Vakansiya o'chirildi",
+    "atAGlance": "Qisqacha",
+    "section": {
+      "details": "Tafsilotlar"
+    },
+    "details": {
+      "jobInfo": "Vakansiya ma'lumotlari",
+      "company": "Kompaniya"
+    },
+    "screening": {
+      "languageAndInstructions": "Til va ko'rsatmalar",
+      "languageHint": "AI nomzodlar bilan qaysi tilda gaplashadi va qo'shimcha ko'rsatmalar."
+    },
+    "settings": {
+      "visibility": "Ko'rinish va arizalar",
+      "interviewStep": "Suhbat bosqichi",
+      "dangerZone": "Xavfli zona",
+      "dangerZoneHint": "Qaytarib bo'lmaydigan amallar. Ehtiyot bo'ling.",
+      "deleteVacancy": "Vakansiyani o'chirish",
+      "deleteOnlyDraftArchived": "Faqat qoralama yoki arxivlangan vakansiyalarni o'chirish mumkin."
+    },
+    "toast": {
+      "published": "Vakansiya nashr etildi",
+      "paused": "Vakansiya to'xtatildi",
+      "archived": "Vakansiya arxivlandi"
+    },
     "keywords": "Kalit so'zlar",
     "regenerateKeywords": "Kalit so'zlarni qayta yaratish",
     "keywordsHint": "Bu vakansiya uchun AI tomonidan yaratilgan qidiruv kalit so'zlari"
@@ -501,9 +547,13 @@
       "reject": "Rad etish",
       "archive": "Arxivlash",
       "reset": "Ariza topshirganga qaytarish",
-      "restore": "Tiklash",
+      "restore": "Ariza topshirganga qaytarish",
       "sendEmail": "Email yuborish",
-      "resetSession": "Seansni tiklash"
+      "resetSession": "Seansni tiklash",
+      "messages": "Xabarlar",
+      "changeStatus": "Holatni o'zgartirish",
+      "moveToPrescanned": "Oldindan tekshiruvga",
+      "moveToInterviewed": "Suhbatga"
     },
     "application": {
       "title": "Bu lavozimga ariza topshirish",
@@ -529,6 +579,10 @@
       "backToJob": "Ish tafsilotlariga qaytish",
       "chooseCv": "CV tanlash",
       "acceptedFormats": "Qabul qilinadigan formatlar: PDF, DOCX (maksimal 10MB)",
+      "loggedInAs": "{name} sifatida ariza topshiryapsiz",
+      "useActiveCv": "Mening CV: {name}",
+      "uploadNewCv": "Yangi CV yuklash",
+      "noCvsYet": "CV hali yaratilmagan. Fayl yuklashingiz yoki CV konstruktorida yaratishingiz mumkin.",
       "answerQuestions": "Boshlash uchun bir nechta savollarga javob bering",
       "clickToOpenChat": "Oldindan tekshiruv chatini ochish uchun bosing",
       "validation": {
@@ -545,8 +599,20 @@
       "resetMessage": "{name} ni Ariza topshirganga qaytarasizmi? Bu faol seanslarni bekor qiladi va yangi oldindan tekshiruv havolasini yaratadi.",
       "moveMessage": "{name} ni {status} ga ko'chirasizmi?",
       "yesReset": "Ha, tiklash",
-      "yesMove": "Ha, ko'chirish"
+      "yesMove": "Ha, ko'chirish",
+      "yesShortlist": "Ha, tanlash",
+      "yesHire": "Ha, yollash",
+      "yesReject": "Ha, rad etish",
+      "yesArchive": "Ha, arxivlash",
+      "msgPrescanned": "{name}: nomzod oldindan tekshiruvdan o'tgan deb belgilanadi.",
+      "msgInterviewed": "{name}: nomzod suhbatdan o'tgan deb belgilanadi.",
+      "msgShortlisted": "{name}: nomzod tanlanganlar ro'yxatiga o'tkaziladi.",
+      "msgHired": "{name}: nomzod yollangan deb belgilanadi.",
+      "msgRejected": "{name}: nomzod rad etiladi.",
+      "msgArchived": "{name}: nomzod arxivlanadi. Keyinroq tiklash mumkin.",
+      "msgApplied": "{name}: holat boshlang'ich holatga qaytariladi."
     },
+    "notesPlaceholder": "Bu nomzod haqida eslatmalar qo'shing...",
     "noCandidates": "Hozircha nomzodlar yo'q",
     "noCandidatesHint": "Nomzodlar ariza topshirganidan keyin bu yerda ko'rinadi",
     "matchScore": "Moslik bali",
@@ -884,7 +950,12 @@
       "invitations": "Kutilayotgan takliflar",
       "activate": "Faollashtirish",
       "deactivate": "Faolsizlantirish",
-      "role": "Lavozim"
+      "role": "Lavozim",
+      "roles": {
+        "admin": "Administrator",
+        "hr": "HR-menejer",
+        "candidate": "Nomzod"
+      }
     },
     "language": "Til",
     "theme": "Mavzu"
@@ -980,6 +1051,7 @@
     "forbidden": "Kirish taqiqlangan",
     "forbiddenHint": "Bu sahifaga kirish huquqingiz yo'q.",
     "forbiddenDesc": "Bu sahifaga kirish huquqingiz yo'q.",
+    "needAccess": "Kirish kerakmi? Administratoringizga yoki quyidagi manzilga murojaat qiling:",
     "serverError": "Server xatoligi",
     "serverErrorHint": "Bizning tomonimizda xatolik yuz berdi. Keyinroq qayta urinib ko'ring.",
     "serverErrorDesc": "Bizning tomonimizda xatolik yuz berdi. Jamoamizga xabar berildi.",
@@ -1281,6 +1353,10 @@
     "activate": "Faol qilib belgilash",
     "inactive": "Faol emas",
     "deactivated": "CV faolsizlantirildi.",
+    "deactivateFirst": "O'chirishdan oldin CV ni faolsizlantiring",
+    "deleteProfile": "CV ni o'chirish",
+    "deleteProfileConfirm": "CV ni o'chirishga ishonchingiz komilmi? Barcha profil ma'lumotlari, ish tajribasi, ta'lim va yaratilgan PDF lar butunlay o'chiriladi.",
+    "profileDeleted": "CV muvaffaqiyatli o'chirildi.",
     "view": "CV ni ko'rish",
     "activeLabel": "Faol CV",
     "noActiveCv": "Faol CV yo'q. PDF yarating va uni ish beruvchilarga ko'rsatish uchun faollashtiring.",

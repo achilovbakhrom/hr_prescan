@@ -71,7 +71,7 @@ function permissionCount(member: TeamMember): string {
     <Column :header="t('settings.team.role')">
       <template #body="{ data }">
         <Tag
-          :value="(data as TeamMember).role.toUpperCase()"
+          :value="t(`settings.team.roles.${(data as TeamMember).role}`)"
           :severity="getRoleSeverity((data as TeamMember).role)"
         />
       </template>
@@ -94,7 +94,7 @@ function permissionCount(member: TeamMember): string {
     <Column :header="t('common.status')">
       <template #body="{ data }">
         <Tag
-          :value="(data as TeamMember).isActive ? 'Active' : 'Inactive'"
+          :value="(data as TeamMember).isActive ? t('common.active') : t('common.inactive')"
           :severity="(data as TeamMember).isActive ? 'success' : 'danger'"
         />
       </template>

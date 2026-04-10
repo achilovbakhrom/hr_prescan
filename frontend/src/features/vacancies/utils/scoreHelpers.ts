@@ -38,37 +38,38 @@ export function buildRowMenuItems(
   interviewEnabled: boolean,
   viewDetail: (c: Application) => void,
   confirmStatus: (c: Application, toStatus: ApplicationStatus) => void,
+  t: (key: string) => string,
 ): MenuItem[] {
   const s = c.status
   const items: MenuItem[] = []
 
-  items.push({ label: 'View details', icon: 'pi pi-eye', command: () => viewDetail(c) })
+  items.push({ label: t('common.viewDetails'), icon: 'pi pi-eye', command: () => viewDetail(c) })
   items.push({ label: '', icon: '', command: () => {}, separator: true })
 
   if (s === 'applied') {
-    items.push({ label: 'Move to Prescanned', icon: 'pi pi-arrow-right', command: () => confirmStatus(c, 'prescanned') })
+    items.push({ label: t('candidates.actions.moveToPrescanned'), icon: 'pi pi-arrow-right', command: () => confirmStatus(c, 'prescanned') })
   }
   if (s === 'prescanned' && interviewEnabled) {
-    items.push({ label: 'Move to Interviewed', icon: 'pi pi-arrow-right', command: () => confirmStatus(c, 'interviewed') })
+    items.push({ label: t('candidates.actions.moveToInterviewed'), icon: 'pi pi-arrow-right', command: () => confirmStatus(c, 'interviewed') })
   }
   if (s !== 'shortlisted' && s !== 'hired' && s !== 'archived') {
-    items.push({ label: 'Shortlist', icon: 'pi pi-star', command: () => confirmStatus(c, 'shortlisted') })
+    items.push({ label: t('candidates.actions.shortlist'), icon: 'pi pi-star', command: () => confirmStatus(c, 'shortlisted') })
   }
   if (s !== 'hired' && s !== 'archived') {
-    items.push({ label: 'Hire', icon: 'pi pi-check-circle', command: () => confirmStatus(c, 'hired') })
+    items.push({ label: t('candidates.actions.hire'), icon: 'pi pi-check-circle', command: () => confirmStatus(c, 'hired') })
   }
   if (s !== 'rejected' && s !== 'hired' && s !== 'archived') {
     items.push({ label: '', icon: '', command: () => {}, separator: true })
-    items.push({ label: 'Reject', icon: 'pi pi-times', command: () => confirmStatus(c, 'rejected') })
+    items.push({ label: t('candidates.actions.reject'), icon: 'pi pi-times', command: () => confirmStatus(c, 'rejected') })
   }
   if (s === 'rejected' || s === 'expired' || s === 'shortlisted' || s === 'hired') {
-    items.push({ label: 'Archive', icon: 'pi pi-inbox', command: () => confirmStatus(c, 'archived') })
+    items.push({ label: t('candidates.actions.archive'), icon: 'pi pi-inbox', command: () => confirmStatus(c, 'archived') })
   }
   if (s !== 'applied' && s !== 'archived') {
-    items.push({ label: 'Reset to Applied', icon: 'pi pi-refresh', command: () => confirmStatus(c, 'applied') })
+    items.push({ label: t('candidates.actions.reset'), icon: 'pi pi-refresh', command: () => confirmStatus(c, 'applied') })
   }
   if (s === 'archived') {
-    items.push({ label: 'Restore to Applied', icon: 'pi pi-refresh', command: () => confirmStatus(c, 'applied') })
+    items.push({ label: t('candidates.actions.restore'), icon: 'pi pi-refresh', command: () => confirmStatus(c, 'applied') })
   }
 
   return items

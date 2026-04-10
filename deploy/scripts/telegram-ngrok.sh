@@ -1,24 +1,55 @@
 #!/usr/bin/env bash
-# Start ngrok tunnel and register Telegram webhook automatically.
-# Usage: ./deploy/scripts/telegram-ngrok.sh [port]
-#   port — local Django port (default: 8000)
+# Start ngrok tunnel and register a Telegram bot webhook automatically.
+# Usage:
+#   ./deploy/scripts/telegram-ngrok.sh [port] [--role hr|candidate]
+#     port — local Django port (default: 8000)
+#     role — which bot to register (default: hr)
 
 set -euo pipefail
 
-PORT="${1:-8000}"
-BACKEND_ENV="$(cd "$(dirname "$0")/../../backend" && pwd)/.env"
+PORT=8000
+ROLE=hr
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --role)
+      ROLE="$2"; shift 2 ;;
+    --role=*)
+      ROLE="${1#*=}"; shift ;;
+    *)
+      PORT="$1"; shift ;;
+  esac
+done
 
-# Load TELEGRAM_BOT_TOKEN and TELEGRAM_WEBHOOK_SECRET from backend/.env
-if [[ -f "$BACKEND_ENV" ]]; then
-  TELEGRAM_BOT_TOKEN="$(grep -E '^TELEGRAM_BOT_TOKEN=' "$BACKEND_ENV" | cut -d= -f2- | tr -d '[:space:]')"
-  TELEGRAM_WEBHOOK_SECRET="$(grep -E '^TELEGRAM_WEBHOOK_SECRET=' "$BACKEND_ENV" | cut -d= -f2- | tr -d '[:space:]')"
-else
+if [[ "$ROLE" != "hr" && "$ROLE" != "candidate" ]]; then
+  echo "❌ --role must be 'hr' or 'candidate' (got: $ROLE)"
+  exit 1
+fi
+
+BACKEND_ENV="$(cd "$(dirname "$0")/../../backend" && pwd)/.env"
+if [[ ! -f "$BACKEND_ENV" ]]; then
   echo "❌ backend/.env not found at $BACKEND_ENV"
   exit 1
 fi
 
-if [[ -z "${TELEGRAM_BOT_TOKEN:-}" ]]; then
-  echo "❌ TELEGRAM_BOT_TOKEN is not set in backend/.env"
+read_env() { grep -E "^$1=" "$BACKEND_ENV" | cut -d= -f2- | tr -d '[:space:]'; }
+
+# Pick the right token + secret for the chosen role.
+if [[ "$ROLE" == "hr" ]]; then
+  BOT_TOKEN="$(read_env TELEGRAM_HR_BOT_TOKEN || true)"
+  if [[ -z "${BOT_TOKEN:-}" ]]; then
+    BOT_TOKEN="$(read_env TELEGRAM_BOT_TOKEN || true)"  # legacy fallback
+  fi
+  WEBHOOK_SECRET="$(read_env TELEGRAM_HR_WEBHOOK_SECRET || true)"
+  if [[ -z "${WEBHOOK_SECRET:-}" ]]; then
+    WEBHOOK_SECRET="$(read_env TELEGRAM_WEBHOOK_SECRET || true)"
+  fi
+else
+  BOT_TOKEN="$(read_env TELEGRAM_CANDIDATE_BOT_TOKEN || true)"
+  WEBHOOK_SECRET="$(read_env TELEGRAM_CANDIDATE_WEBHOOK_SECRET || true)"
+fi
+
+if [[ -z "${BOT_TOKEN:-}" ]]; then
+  echo "❌ Telegram $ROLE bot token is not set in backend/.env"
   exit 1
 fi
 
@@ -31,7 +62,8 @@ ngrok http "$PORT" --log=stdout > /dev/null &
 NGROK_PID=$!
 
 # Wait for ngrok to be ready
-for i in {1..15}; do
+NGROK_URL=""
+for _ in {1..15}; do
   NGROK_URL="$(curl -s http://127.0.0.1:4040/api/tunnels 2>/dev/null | python3 -c "
 import sys, json
 try:
@@ -55,19 +87,18 @@ if [[ -z "${NGROK_URL:-}" ]]; then
   exit 1
 fi
 
-WEBHOOK_URL="${NGROK_URL}/api/telegram/webhook/"
+WEBHOOK_URL="${NGROK_URL}/api/telegram/${ROLE}/webhook/"
 echo "🌐 ngrok URL: $NGROK_URL"
-echo "📡 Setting Telegram webhook: $WEBHOOK_URL"
+echo "📡 Setting Telegram $ROLE webhook: $WEBHOOK_URL"
 
-# Build setWebhook payload
 PAYLOAD="{\"url\": \"$WEBHOOK_URL\""
-if [[ -n "${TELEGRAM_WEBHOOK_SECRET:-}" ]]; then
-  PAYLOAD="$PAYLOAD, \"secret_token\": \"$TELEGRAM_WEBHOOK_SECRET\""
+if [[ -n "${WEBHOOK_SECRET:-}" ]]; then
+  PAYLOAD="$PAYLOAD, \"secret_token\": \"$WEBHOOK_SECRET\""
 fi
 PAYLOAD="$PAYLOAD}"
 
 RESPONSE="$(curl -s -X POST \
-  "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setWebhook" \
+  "https://api.telegram.org/bot${BOT_TOKEN}/setWebhook" \
   -H "Content-Type: application/json" \
   -d "$PAYLOAD")"
 
@@ -93,7 +124,7 @@ fi
 cleanup() {
   echo ""
   echo "🧹 Removing Telegram webhook..."
-  curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/deleteWebhook" > /dev/null 2>&1
+  curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/deleteWebhook" > /dev/null 2>&1
   echo "🛑 Stopping ngrok (PID $NGROK_PID)..."
   kill "$NGROK_PID" 2>/dev/null || true
   echo "Done."

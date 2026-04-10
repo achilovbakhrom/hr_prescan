@@ -14,7 +14,7 @@ const props = defineProps<{
 }>()
 
 interface ChatMessage { role: 'ai' | 'candidate'; text: string; timestamp: string; messageType?: 'text' | 'voice'; audioUrl?: string; duration?: number }
-interface InterviewScore { id: string; criteria: string; criteriaName: string; score: number; aiNotes: string; aiNotesTranslations: Record<string, string> }
+interface InterviewScore { id: string; criteria: string; criteriaName: string; criteriaTranslations?: Record<string, string>; score: number; aiNotes: string; aiNotesTranslations: Record<string, string> }
 interface InterviewData { id: string; status: string; overallScore: number | null; aiSummary: string; aiSummaryTranslations: Record<string, string>; chatHistory: ChatMessage[]; scores: InterviewScore[]; createdAt: string }
 
 const interview = ref<InterviewData | null>(null)

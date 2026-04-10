@@ -43,4 +43,5 @@ export interface SubmitApplicationRequest {
   candidateEmail: string
   candidatePhone?: string
   cvFile?: File
+  cvId?: string
 }

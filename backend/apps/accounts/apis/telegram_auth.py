@@ -126,7 +126,7 @@ class TelegramAuthApi(APIView):
             f"{k}={v}" for k, v in sorted(check_data.items())
         )
 
-        bot_token = settings.TELEGRAM_BOT_TOKEN
+        bot_token = settings.TELEGRAM_LOGIN_WIDGET_TOKEN
         if not bot_token:
             return False
         secret_key = hashlib.sha256(bot_token.encode()).digest()

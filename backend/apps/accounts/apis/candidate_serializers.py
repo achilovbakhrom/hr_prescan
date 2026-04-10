@@ -47,7 +47,8 @@ class LanguageOutputSerializer(serializers.Serializer):
     proficiency = serializers.CharField()
 
     def get_language(self, obj):
-        return {"code": obj.language.code, "name": obj.language.name}
+        lang = obj.language
+        return {"code": lang.code, "name": lang.name, "name_ru": lang.name_ru, "name_uz": lang.name_uz}
 
 
 class CertificationOutputSerializer(serializers.Serializer):

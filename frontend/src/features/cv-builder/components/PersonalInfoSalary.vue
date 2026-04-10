@@ -55,7 +55,7 @@ const employmentTypeOptions = [
     <div v-if="!negotiable" class="grid grid-cols-1 gap-5 sm:grid-cols-3">
       <div class="flex flex-col gap-1">
         <label for="salaryMin" class="text-sm font-medium text-gray-700">
-          {{ t('cvBuilder.personal.salaryMin') }}
+          {{ t('cvBuilder.personal.salaryMin') }} <span class="text-red-500">*</span>
         </label>
         <InputNumber
           id="salaryMin"
@@ -70,7 +70,7 @@ const employmentTypeOptions = [
 
       <div class="flex flex-col gap-1">
         <label for="salaryMax" class="text-sm font-medium text-gray-700">
-          {{ t('cvBuilder.personal.salaryMax') }}
+          {{ t('cvBuilder.personal.salaryMax') }} <span class="text-red-500">*</span>
         </label>
         <InputNumber
           id="salaryMax"
@@ -105,7 +105,7 @@ const employmentTypeOptions = [
     <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
       <div class="flex flex-col gap-1">
         <label for="employmentType" class="text-sm font-medium text-gray-700">
-          {{ t('cvBuilder.personal.employmentType') }}
+          {{ t('cvBuilder.personal.employmentType') }} <span class="text-red-500">*</span>
         </label>
         <Select
           id="employmentType"

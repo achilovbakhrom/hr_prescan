@@ -11,7 +11,6 @@ import CvDataView from '../components/CvDataView.vue'
 import MatchScoreView from '../components/MatchScoreView.vue'
 import HRNotesPanel from '../components/HRNotesPanel.vue'
 import CandidateActions from '../components/CandidateActions.vue'
-import MessageThread from '../components/MessageThread.vue'
 import InterviewReviewPanel from '../components/InterviewReviewPanel.vue'
 import { candidateService } from '../services/candidate.service'
 import type { ApplicationStatus } from '../types/candidate.types'
@@ -29,7 +28,7 @@ const hasInterview = computed(() => candidate.value?.interviewEnabled ?? false)
 const tabNames = computed(() => {
   const base = ['overview', 'cv', 'prescanning']
   if (hasInterview.value) base.push('interview')
-  base.push('analysis', 'notes', 'messages')
+  base.push('analysis', 'notes')
   return base
 })
 const activeTab = computed({
@@ -42,6 +41,8 @@ onMounted(async () => {
   await fetchInterviewData(candidateId.value, candidate.value?.interviewEnabled ?? false)
 })
 
+function handleAiSummaryTranslated(tr: Record<string, string>): void { aiSummaryTranslations.value = tr }
+
 async function handleStatusChange(status: ApplicationStatus): Promise<void> { await candidateStore.updateStatus(candidateId.value, status).catch(() => {}) }
 async function handleSaveNotes(note: string): Promise<void> { await candidateStore.addNote(candidateId.value, note).catch(() => {}) }
 async function handleDownloadCv(): Promise<void> {
@@ -49,7 +50,6 @@ async function handleDownloadCv(): Promise<void> {
   try { const { url } = await candidateService.getCvDownloadUrl(candidateId.value); window.open(url, '_blank') }
   catch { window.open(candidate.value.cvFile, '_blank') }
 }
-function handleOpenMessages(): void { router.replace({ query: { ...route.query, tab: 'messages' } }) }
 function formatScore(score: number | null | undefined): string { return score === null || score === undefined ? '' : String(Math.round(score)) }
 </script>
 
@@ -67,12 +67,12 @@ function formatScore(score: number | null | undefined): string { return score ==
     <div v-if="!candidate && candidateStore.loading" class="py-12 text-center"><i class="pi pi-spinner pi-spin text-3xl text-gray-400"></i></div>
 
     <template v-else-if="candidate">
-      <CandidateActions :candidate-id="candidate.id" :candidate-name="candidate.candidateName" :candidate-email="candidate.candidateEmail" :vacancy-id="candidate.vacancyId" :current-status="candidate.status" :loading="candidateStore.loading" @status-change="handleStatusChange" @open-messages="handleOpenMessages" />
+      <CandidateActions :candidate-id="candidate.id" :candidate-name="candidate.candidateName" :candidate-email="candidate.candidateEmail" :vacancy-id="candidate.vacancyId" :current-status="candidate.status" :loading="candidateStore.loading" @status-change="handleStatusChange" />
 
       <TabView v-model:activeIndex="activeTab" scrollable>
         <TabPanel value="0">
           <template #header><span class="text-xs sm:text-sm">{{ t('candidates.overview') }}</span></template>
-          <div class="py-3 sm:py-4"><CandidateOverview :candidate="candidate" :loading="candidateStore.loading" :prescanning-score="prescanningScore" :interview-score="interviewScore" :ai-summary="aiSummary" :ai-summary-translations="aiSummaryTranslations" :ai-summary-interview-id="aiSummaryInterviewId ?? undefined" /></div>
+          <div class="py-3 sm:py-4"><CandidateOverview :candidate="candidate" :loading="candidateStore.loading" :prescanning-score="prescanningScore" :interview-score="interviewScore" :ai-summary="aiSummary" :ai-summary-translations="aiSummaryTranslations" :ai-summary-interview-id="aiSummaryInterviewId ?? undefined" @update:ai-summary-translations="handleAiSummaryTranslated" /></div>
         </TabPanel>
 
         <TabPanel value="1">
@@ -107,11 +107,6 @@ function formatScore(score: number | null | undefined): string { return score ==
         <TabPanel :value="String(hasInterview ? 5 : 4)">
           <template #header><span class="text-xs sm:text-sm">{{ t('candidates.notes') }}</span></template>
           <div class="py-3 sm:py-4"><HRNotesPanel :notes="candidate.hrNotes" :loading="candidateStore.loading" @save="handleSaveNotes" /></div>
-        </TabPanel>
-
-        <TabPanel :value="String(hasInterview ? 6 : 5)">
-          <template #header><span class="text-xs sm:text-sm">{{ t('candidates.messages') }}</span></template>
-          <div class="py-3 sm:py-4"><MessageThread :candidate-id="candidate.id" /></div>
         </TabPanel>
       </TabView>
     </template>

@@ -9,6 +9,7 @@ import { useConfirm } from 'primevue/useconfirm'
 import { useVacancyStore } from '../stores/vacancy.store'
 import VacancyCard from '../components/VacancyCard.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
+import type { VacancyStatus } from '../types/vacancy.types'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -49,6 +50,10 @@ function confirmDelete(event: Event, id: string, title: string): void {
     accept: async () => { await vacancyStore.deleteVacancy(id) },
   })
 }
+
+async function handleStatusChange(_event: Event, id: string, status: VacancyStatus): Promise<void> {
+  await vacancyStore.changeStatus(id, status).catch(() => {})
+}
 </script>
 
 <template>
@@ -69,10 +74,12 @@ function confirmDelete(event: Event, id: string, title: string): void {
       <Dropdown v-if="activeTab === 'active'" v-model="statusFilter" :options="statusOptions" option-label="label" option-value="value" :placeholder="t('common.filter')" class="w-full sm:w-44" @change="onStatusChange" />
     </div>
 
+    <p v-if="vacancyStore.error" class="mb-3 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700">{{ vacancyStore.error }}</p>
+
     <div v-if="vacancyStore.loading" class="flex items-center justify-center py-20"><i class="pi pi-spinner pi-spin text-3xl text-gray-300"></i></div>
 
     <div v-else-if="filteredVacancies.length > 0" class="space-y-3">
-      <VacancyCard v-for="vacancy in filteredVacancies" :key="vacancy.id" :vacancy="vacancy" @click="(id) => router.push({ name: ROUTE_NAMES.VACANCY_DETAIL, params: { id } })" @delete="confirmDelete" />
+      <VacancyCard v-for="vacancy in filteredVacancies" :key="vacancy.id" :vacancy="vacancy" @click="(id) => router.push({ name: ROUTE_NAMES.VACANCY_DETAIL, params: { id } })" @delete="confirmDelete" @status-change="handleStatusChange" />
     </div>
 
     <div v-else class="flex flex-col items-center rounded-xl border border-dashed border-gray-200 px-4 py-12 text-center md:py-16">

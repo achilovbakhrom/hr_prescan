@@ -9,6 +9,7 @@ from apps.applications.apis.hr_actions import (
     HRBulkStatusApi,
     HRSoftDeleteApi,
 )
+from apps.applications.apis.hr_all import HRAllCandidatesListApi
 from apps.applications.apis.hr_list import (
     HRApplicationDetailApi,
     HRApplicationListApi,
@@ -19,6 +20,7 @@ from apps.applications.apis.public import SubmitApplicationApi
 __all__ = [
     "CandidateApplicationDetailApi",
     "CandidateApplicationListApi",
+    "HRAllCandidatesListApi",
     "HRApplicationDetailApi",
     "HRApplicationListApi",
     "HRApplicationNotesApi",

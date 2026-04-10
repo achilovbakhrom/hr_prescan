@@ -4,7 +4,13 @@ import Tag from 'primevue/tag'
 import Button from 'primevue/button'
 import type { LanguageEntry } from '../types/cv-builder.types'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
+
+function getLocalizedName(lang: { name: string; nameRu: string; nameUz: string }): string {
+  if (locale.value === 'ru' && lang.nameRu) return lang.nameRu
+  if (locale.value === 'uz' && lang.nameUz) return lang.nameUz
+  return lang.name
+}
 
 defineProps<{
   entry: LanguageEntry
@@ -39,7 +45,7 @@ function getProficiencySeverity(value: string): "success" | "info" | "warn" | "s
 <template>
   <div class="flex items-center justify-between rounded-lg border border-gray-200 px-4 py-3">
     <div class="flex items-center gap-3">
-      <span class="font-medium text-gray-900">{{ entry.language.name }}</span>
+      <span class="font-medium text-gray-900">{{ getLocalizedName(entry.language) }}</span>
       <Tag :value="getProficiencyLabel(entry.proficiency)" :severity="getProficiencySeverity(entry.proficiency)" />
     </div>
     <div class="flex gap-1">

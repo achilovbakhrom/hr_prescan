@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
@@ -11,6 +11,7 @@ import { ROUTE_NAMES } from '@/shared/constants/routes'
 import NotificationBell from '@/features/notifications/components/NotificationBell.vue'
 import LanguageSwitcher from '@/shared/components/LanguageSwitcher.vue'
 import CompanySwitcher from './CompanySwitcher.vue'
+import GlobalSearchDialog from './GlobalSearchDialog.vue'
 import { useNotificationPolling } from '@/features/notifications/composables/useNotificationPolling'
 import { useAIAssistant } from '@/shared/composables/useAIAssistant'
 import type { MenuItem } from 'primevue/menuitem'
@@ -23,12 +24,25 @@ const authStore = useAuthStore()
 const { t } = useI18n()
 const userMenu = ref<InstanceType<typeof Menu> | null>(null)
 const pendingInvitationsCount = ref(0)
+const showSearch = ref(false)
 
 useNotificationPolling()
 const aiAssistant = useAIAssistant()
 
+function onKeydown(e: KeyboardEvent): void {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+    e.preventDefault()
+    showSearch.value = true
+  }
+}
+
 onMounted(async () => {
   try { pendingInvitationsCount.value = (await authService.getMyInvitations()).length } catch { /* silent */ }
+  window.addEventListener('keydown', onKeydown)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', onKeydown)
 })
 
 const menuItems = computed<MenuItem[]>(() => [
@@ -55,6 +69,25 @@ function handleMenuToggle(): void { globalThis.innerWidth >= 1024 ? emit('toggle
     </div>
 
     <div class="flex items-center gap-3">
+      <button
+        type="button"
+        class="hidden items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs text-gray-500 transition-colors hover:bg-gray-100 sm:flex"
+        :title="t('common.searchPlaceholder')"
+        @click="showSearch = true"
+      >
+        <i class="pi pi-search text-[10px]"></i>
+        <span class="hidden md:inline">{{ t('common.searchPlaceholder') }}</span>
+        <kbd class="hidden rounded border border-gray-200 bg-white px-1 py-0.5 text-[9px] font-medium md:inline">⌘K</kbd>
+      </button>
+      <button
+        type="button"
+        class="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700 sm:hidden"
+        :aria-label="t('common.searchPlaceholder')"
+        @click="showSearch = true"
+      >
+        <i class="pi pi-search"></i>
+      </button>
+
       <Button v-if="pendingInvitationsCount > 0" icon="pi pi-envelope" text severity="info" size="small" class="relative" aria-label="Pending invitations" @click="router.push({ name: ROUTE_NAMES.PROFILE })">
         <template #icon><i class="pi pi-envelope"></i><Badge :value="pendingInvitationsCount" severity="danger" class="absolute -right-1 -top-1" /></template>
       </Button>
@@ -74,5 +107,7 @@ function handleMenuToggle(): void { globalThis.innerWidth >= 1024 ? emit('toggle
 
       <Menu ref="userMenu" :model="menuItems" :popup="true" />
     </div>
+
+    <GlobalSearchDialog v-model:visible="showSearch" />
   </header>
 </template>

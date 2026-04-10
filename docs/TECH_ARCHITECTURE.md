@@ -402,6 +402,84 @@ PATCH  /api/notifications/{id}/read/      — mark as read
 GET    /api/notifications/stream/         — SSE stream for real-time
 ```
 
+### Telegram bot webhooks
+```
+POST   /api/telegram/hr/webhook/          — receives updates from the HR bot
+POST   /api/telegram/candidate/webhook/   — receives updates from the candidate bot
+```
+
+Each endpoint verifies its own `X-Telegram-Bot-Api-Secret-Token` header and dispatches the update to a Celery task (`process_telegram_update`) which routes to the bot's handler module.
+
+---
+
+## 7.1 Telegram Bots
+
+The platform hosts **two independent Telegram bots** that share infrastructure but expose different surfaces:
+
+| Bot | Audience | Purpose |
+|---|---|---|
+| **HR bot** (`@<TELEGRAM_HR_BOT_USERNAME>`) | Recruiters | Manage vacancies, candidates, interviews via the LangChain ReAct agent (`apps.common.ai_assistant.process_ai_command`). Linked to existing HR `User` rows via one-time deep-link tokens (`TelegramLinkCode`). |
+| **Candidate bot** (`@<TELEGRAM_CANDIDATE_BOT_USERNAME>`) | Job seekers | Find vacancies, apply, take prescan interview, track applications. Auto-creates a candidate `User` on first `/start`. |
+
+### Code layout
+
+```
+backend/apps/integrations/telegram_bot/
+├── client.py           # TelegramClient — token-scoped Telegram Bot API wrapper
+├── bots.py             # role registry: get_bot_config, get_client, dispatch_update
+├── keyboards.py        # inline-keyboard helpers (paginated_list, button)
+├── sessions.py         # per-(role, telegram_id) Redis session state
+├── i18n.py             # bot strings (en/ru/uz), normalize_language()
+├── voice.py            # transcribe_voice(client, file_id) — Gemini
+├── hr/                 # HR bot
+│   ├── handlers.py     # update dispatcher, routes free text to LangChain agent
+│   ├── auth.py         # deep-link linking via TelegramLinkCode
+│   └── history.py      # Redis-backed conversation history for the agent
+└── candidate/          # Candidate bot
+    ├── handlers.py     # update dispatcher (text/voice/document/callback)
+    ├── auth.py         # auto-signup via get_or_create_candidate_user
+    ├── apply.py        # deep-link `vac_<uuid>` apply flow
+    ├── menus.py        # inline keyboards + callback grammar
+    └── uploads.py      # CV document ingestion → MinIO
+```
+
+### Configuration
+
+Each bot needs its own token, username, and webhook secret:
+
+```
+TELEGRAM_HR_BOT_TOKEN=
+TELEGRAM_HR_BOT_USERNAME=
+TELEGRAM_HR_WEBHOOK_SECRET=
+TELEGRAM_HR_WEBHOOK_URL=
+
+TELEGRAM_CANDIDATE_BOT_TOKEN=
+TELEGRAM_CANDIDATE_BOT_USERNAME=
+TELEGRAM_CANDIDATE_WEBHOOK_SECRET=
+TELEGRAM_CANDIDATE_WEBHOOK_URL=
+```
+
+The legacy single-bot env vars (`TELEGRAM_BOT_TOKEN/USERNAME/WEBHOOK_SECRET/WEBHOOK_URL`) are still read as fallback for the **HR bot** so existing deployments keep working without code changes.
+
+### Local dev
+
+```bash
+python manage.py run_telegram_bot --role hr
+python manage.py run_telegram_bot --role candidate
+```
+
+Polling mode — no public URL needed. Each command takes over the bot it targets and consumes its `getUpdates` loop.
+
+### Production
+
+`entrypoint.sh` registers each bot's webhook on container start if both its `*_WEBHOOK_URL` and `*_BOT_TOKEN` are present. Webhooks land in `TelegramWebhookApi` → Celery task → `dispatch_update(role=...)`. Both bots share the same Celery worker pool but use disjoint Redis session-key prefixes (`tg_session:hr:*` vs `tg_session:candidate:*`).
+
+### AI agents
+
+The HR bot uses the existing LangChain ReAct agent (~25 tools across vacancies, candidates, interviews, dashboard, subscription, team). A separate **candidate AI agent** (search jobs, apply, profile, take prescan interview) ships in PR2 and lives under `apps/common/ai_assistant/agents/candidate_agent.py`.
+
+The Telegram Login Widget on the candidate web auth pages now uses `settings.TELEGRAM_LOGIN_WIDGET_TOKEN` (which prefers `TELEGRAM_CANDIDATE_BOT_TOKEN`, falling back to the HR bot token for backwards-compat).
+
 ---
 
 ## 8. Authentication & Authorization

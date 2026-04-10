@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import Select from 'primevue/select'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 
+const { t } = useI18n()
 const router = useRouter()
 const authStore = useAuthStore()
 
@@ -12,7 +14,7 @@ const activeCompanyId = computed(() => authStore.user?.company?.id ?? 'personal'
 
 const companyOptions = computed(() => {
   const options: { label: string; value: string }[] = []
-  if (authStore.companies.length > 0) options.push({ label: 'Personal', value: 'personal' })
+  if (authStore.companies.length > 0) options.push({ label: t('common.personal'), value: 'personal' })
   for (const m of authStore.companies) options.push({ label: m.company.name, value: m.company.id })
   return options
 })

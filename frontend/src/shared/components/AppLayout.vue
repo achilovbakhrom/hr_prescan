@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import Toast from 'primevue/toast'
 import AppNavbar from './AppNavbar.vue'
 import AppSidebar from './AppSidebar.vue'
 import MobileNav from './MobileNav.vue'
@@ -46,5 +47,8 @@ function closeMobileNav(): void {
 
     <!-- Mobile slide-out navigation (teleported, only on small screens) -->
     <MobileNav :open="mobileNavOpen" @close="closeMobileNav" />
+
+    <!-- Global toast outlet -->
+    <Toast position="bottom-right" />
   </div>
 </template>

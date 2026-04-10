@@ -7,6 +7,8 @@ import { useCvBuilderStore } from '../stores/cv-builder.store'
 import { ApiValidationError } from '@/shared/api/errors'
 import type { FieldErrors } from '@/shared/api/errors'
 import type { WorkExperience, WorkExperiencePayload } from '../types/cv-builder.types'
+import { validateForm } from '@/shared/utils/form-validation'
+import { createWorkExperienceSchema } from '../validation/work-experience.schema'
 import WorkExperienceItem from './WorkExperienceItem.vue'
 import WorkExperienceEditForm from './WorkExperienceEditForm.vue'
 
@@ -63,6 +65,11 @@ async function handleSave(payload: WorkExperiencePayload, editingId: string | nu
   successMessage.value = null
   errorMessage.value = null
   fieldErrors.value = {}
+
+  const schema = createWorkExperienceSchema(t)
+  const errors = await validateForm(schema, payload as unknown as Record<string, unknown>)
+  if (errors) { fieldErrors.value = errors; scrollToFirstError(); return }
+
   try {
     if (editingId) {
       await store.updateWorkExperience(editingId, payload)
