@@ -38,6 +38,50 @@ def send_email_notification(notification_id: str) -> None:
 
 
 @shared_task
+def notify_hr_company_telegram(
+    company_id: str,
+    application_id: str,
+    candidate_name: str,
+    vacancy_title: str,
+    session_type: str,
+    overall_score: float,
+) -> None:
+    """Push a Telegram message to all HR users in a company when a session completes."""
+    from apps.accounts.models import User
+    from apps.integrations.telegram_bot.bots import ROLE_HR, get_client
+
+    hr_users = list(
+        User.objects.filter(
+            company_id=company_id,
+            role=User.Role.HR,
+            telegram_id__isnull=False,
+        ).exclude(telegram_id=0)
+    )
+    if not hr_users:
+        return
+
+    client = get_client(role=ROLE_HR)
+    label = "Prescanning result" if session_type == "prescanning" else "Interview result"
+    candidate_url = f"{settings.FRONTEND_URL}/candidates/{application_id}"
+    msg = (
+        f"🔔 *{label}*\n\n"
+        f"*{candidate_name}* completed {session_type} for *{vacancy_title}*\n"
+        f"Score: *{overall_score:.1f}/10*\n\n"
+        f"[View candidate →]({candidate_url})"
+    )
+    for user in hr_users:
+        try:
+            client.send_message(
+                chat_id=user.telegram_id,
+                text=msg,
+                parse_mode="Markdown",
+                disable_web_page_preview=True,
+            )
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("Telegram push failed for HR user %s: %s", user.id, exc)
+
+
+@shared_task
 def send_candidate_email(application_id: str, subject: str, body: str) -> None:
     """Send a custom email from HR to a candidate."""
     from apps.applications.models import Application

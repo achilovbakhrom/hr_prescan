@@ -36,7 +36,7 @@ const cvFile = ref<File | null>(null)
 const cvId = ref<string | null>(null)
 const errors = ref<Record<string, string>>({})
 
-const step = ref<'form' | 'ready'>('form')
+const step = ref<'form' | 'ready' | 'done'>('form')
 const prescanToken = ref<string | null>(null)
 const linkCopied = ref(false)
 const showChatOverlay = ref(false)
@@ -109,6 +109,12 @@ async function handleSubmit(): Promise<void> {
 function startPrescanning(): void {
   if (prescanToken.value) showChatOverlay.value = true
 }
+
+function handlePrescanComplete(): void {
+  showChatOverlay.value = false
+  step.value = 'done'
+}
+
 function openInFullScreen(): void {
   router.push({ name: ROUTE_NAMES.INTERVIEW_GATEWAY, params: { token: prescanToken.value! } })
 }
@@ -140,6 +146,21 @@ async function copyLink(): Promise<void> {
         @start-prescanning="startPrescanning"
         @copy-link="copyLink"
       />
+
+      <div v-else-if="step === 'done'" class="py-14 text-center">
+        <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+          <i class="pi pi-check-circle text-3xl text-green-600"></i>
+        </div>
+        <h2 class="mb-2 text-xl font-bold text-gray-900">{{ t('candidates.application.prescanComplete') }}</h2>
+        <p class="mb-7 text-sm text-gray-500">{{ t('candidates.application.prescanCompleteHint') }}</p>
+        <RouterLink
+          to="/jobs"
+          class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+        >
+          <i class="pi pi-briefcase"></i>
+          {{ t('candidates.application.browseVacancies') }}
+        </RouterLink>
+      </div>
 
       <template v-else>
         <RouterLink
@@ -270,6 +291,7 @@ async function copyLink(): Promise<void> {
       @minimize="showChatOverlay = false"
       @restore="showChatOverlay = true"
       @dismiss="prescanDismissed = true"
+      @completed="handlePrescanComplete"
     />
   </div>
 </template>

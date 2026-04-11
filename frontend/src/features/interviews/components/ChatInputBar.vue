@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import VoiceRecordButton from './VoiceRecordButton.vue'
 
@@ -19,6 +20,18 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
+// Detect iframe context: when true, navigate via postMessage instead of RouterLink
+const inIframe = computed(() => {
+  try { return window !== window.top } catch { return true }
+})
+
+// Notify parent frame when prescreening completes inside the overlay
+watch(() => props.isCompleted, (completed) => {
+  if (completed && inIframe.value) {
+    window.parent.postMessage({ type: 'prescan_completed' }, '*')
+  }
+})
+
 function onInput(event: Event) {
   emit('update:modelValue', (event.target as HTMLTextAreaElement).value)
 }
@@ -37,7 +50,11 @@ function onInput(event: Event) {
         {{ t('interviews.chatPage.interviewComplete') }}
       </h2>
       <p class="mb-4 text-sm text-gray-500">{{ t('interviews.chatPage.thankYouReview') }}</p>
-      <div class="flex justify-center gap-3">
+      <!-- Inside iframe: parent handles navigation after prescan_completed postMessage -->
+      <p v-if="inIframe" class="text-sm text-gray-400">{{ t('interviews.chatPage.youCanCloseThis') }}</p>
+
+      <!-- Standalone full-screen mode: show navigation links -->
+      <div v-else class="flex justify-center gap-3">
         <RouterLink
           to="/register"
           class="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"

@@ -615,6 +615,9 @@
       "noCvsYet": "No CVs generated yet. You can upload one or create one in the CV Builder.",
       "answerQuestions": "Answer a few questions to get started",
       "clickToOpenChat": "Click to open prescanning chat",
+      "prescanComplete": "Prescreening complete!",
+      "prescanCompleteHint": "We'll review your answers and get back to you by email.",
+      "browseVacancies": "Browse vacancies",
       "validation": {
         "nameRequired": "Name is required",
         "emailRequired": "Email is required",
@@ -853,6 +856,7 @@
       "thankYouReview": "Thank you for your time. We'll review your responses and be in touch.",
       "createAccount": "Create Account to Track Status",
       "browseJobs": "Browse More Jobs",
+      "youCanCloseThis": "You're all done! You can close this window.",
       "enterHint": "Press Enter to send, Shift+Enter for new line",
       "stayButton": "Stay"
     },

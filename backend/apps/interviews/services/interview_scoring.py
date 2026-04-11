@@ -76,6 +76,21 @@ def complete_session(
 
     application.save(update_fields=["status", "updated_at"])
 
+    # Notify HR team via Telegram (non-blocking, fire-and-forget)
+    try:
+        from django.db import transaction
+        from apps.notifications.tasks import notify_hr_company_telegram
+        transaction.on_commit(lambda: notify_hr_company_telegram.delay(
+            company_id=str(application.vacancy.company_id),
+            application_id=str(application.id),
+            candidate_name=application.candidate_name,
+            vacancy_title=application.vacancy.title,
+            session_type=interview.session_type,
+            overall_score=float(overall_score),
+        ))
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("Failed to schedule HR Telegram notification: %s", exc)
+
     return interview
 
 

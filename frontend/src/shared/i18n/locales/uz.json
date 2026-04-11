@@ -608,6 +608,9 @@
       "noCvsYet": "CV hali yaratilmagan. Fayl yuklashingiz yoki CV konstruktorida yaratishingiz mumkin.",
       "answerQuestions": "Boshlash uchun bir nechta savollarga javob bering",
       "clickToOpenChat": "Oldindan tekshiruv chatini ochish uchun bosing",
+      "prescanComplete": "Preskreeninz yakunlandi!",
+      "prescanCompleteHint": "Javoblaringizni ko'rib chiqib, email orqali bog'lanamiz.",
+      "browseVacancies": "Vakansiyalarni ko'rish",
       "validation": {
         "nameRequired": "Ism majburiy",
         "emailRequired": "Email majburiy",
@@ -846,6 +849,7 @@
       "thankYouReview": "Vaqtingiz uchun rahmat. Javoblaringizni ko'rib chiqamiz va aloqaga chiqamiz.",
       "createAccount": "Holatni kuzatish uchun hisob yarating",
       "browseJobs": "Ko'proq ish o'rinlarini ko'rish",
+      "youCanCloseThis": "Hammasi tayyor! Ushbu oynani yopishingiz mumkin.",
       "enterHint": "Yuborish uchun Enter, yangi qator uchun Shift+Enter bosing",
       "stayButton": "Qolish"
     },
