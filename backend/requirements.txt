@@ -49,8 +49,15 @@ openai>=1.30,<2.0
 PyPDF2>=3.0,<4.0
 python-docx>=1.0,<2.0
 
+# Web scraping
+requests>=2.31,<3.0
+beautifulsoup4>=4.12,<5.0
+
 # LiveKit
 livekit-api>=1.0,<2.0
+
+# Telegram bot
+python-telegram-bot>=21.0,<22.0
 
 # Env file loading
 python-dotenv>=1.0,<2.0
@@ -63,3 +70,10 @@ djangorestframework-stubs>=3.15
 
 # Pre-commit
 pre-commit>=3.7
+
+# Testing
+pytest>=8.0,<9.0
+pytest-django>=4.8,<5.0
+pytest-cov>=5.0,<6.0
+factory-boy>=3.3,<4.0
+faker>=25.0,<26.0

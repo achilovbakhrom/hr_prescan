@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { USER_ROLES } from '@/shared/constants/roles'
-import type { UserRole } from '@/features/auth/types/auth.types'
+import { useAIAssistant } from '@/shared/composables/useAIAssistant'
+import type { UserRole } from '@/shared/types/auth.types'
 
 interface NavItem {
   label: string
@@ -23,51 +25,54 @@ defineProps<{
 
 const route = useRoute()
 const authStore = useAuthStore()
+const { t } = useI18n()
+const aiAssistant = useAIAssistant()
 
-const sections: NavSection[] = [
+const sections = computed<NavSection[]>(() => [
   {
     items: [
-      { label: 'Dashboard', icon: 'pi pi-home', to: '/dashboard', roles: [USER_ROLES.ADMIN, USER_ROLES.HR, USER_ROLES.CANDIDATE] },
+      { label: t('nav.dashboard'), icon: 'pi pi-home', to: '/dashboard', roles: [USER_ROLES.ADMIN, USER_ROLES.HR, USER_ROLES.CANDIDATE] },
     ],
   },
   {
-    title: 'Recruitment',
+    title: t('vacancies.title'),
     items: [
-      { label: 'Vacancies', icon: 'pi pi-briefcase', to: '/vacancies', roles: [USER_ROLES.ADMIN, USER_ROLES.HR] },
-      { label: 'Interviews', icon: 'pi pi-video', to: '/interviews', roles: [USER_ROLES.ADMIN, USER_ROLES.HR] },
+      { label: t('nav.vacancies'), icon: 'pi pi-briefcase', to: '/vacancies', roles: [USER_ROLES.ADMIN, USER_ROLES.HR] },
+      { label: t('employers.title'), icon: 'pi pi-building', to: '/employers', roles: [USER_ROLES.ADMIN, USER_ROLES.HR] },
+      { label: t('nav.interviews'), icon: 'pi pi-video', to: '/interviews', roles: [USER_ROLES.ADMIN, USER_ROLES.HR] },
     ],
   },
   {
-    title: 'Candidate',
+    title: t('candidates.title'),
     items: [
-      { label: 'Browse Jobs', icon: 'pi pi-search', to: '/jobs', roles: [USER_ROLES.CANDIDATE] },
-      { label: 'My Applications', icon: 'pi pi-file', to: '/my-applications', roles: [USER_ROLES.CANDIDATE] },
+      { label: t('nav.browseJobs'), icon: 'pi pi-search', to: '/jobs', roles: [USER_ROLES.CANDIDATE] },
+      { label: t('nav.myApplications'), icon: 'pi pi-file', to: '/my-applications', roles: [USER_ROLES.CANDIDATE] },
     ],
   },
   {
-    title: 'Platform',
+    title: t('nav.admin'),
     items: [
-      { label: 'Admin', icon: 'pi pi-shield', to: '/admin', roles: [USER_ROLES.ADMIN] },
-      { label: 'Companies', icon: 'pi pi-building', to: '/admin/companies', roles: [USER_ROLES.ADMIN] },
-      { label: 'Users', icon: 'pi pi-users', to: '/admin/users', roles: [USER_ROLES.ADMIN] },
-      { label: 'Plans', icon: 'pi pi-list', to: '/admin/plans', roles: [USER_ROLES.ADMIN] },
-      { label: 'Analytics', icon: 'pi pi-chart-bar', to: '/admin/analytics', roles: [USER_ROLES.ADMIN] },
+      { label: t('nav.admin'), icon: 'pi pi-shield', to: '/admin', roles: [USER_ROLES.ADMIN] },
+      { label: t('nav.companies'), icon: 'pi pi-building', to: '/admin/companies', roles: [USER_ROLES.ADMIN] },
+      { label: t('nav.users'), icon: 'pi pi-users', to: '/admin/users', roles: [USER_ROLES.ADMIN] },
+      { label: t('nav.plans'), icon: 'pi pi-list', to: '/admin/plans', roles: [USER_ROLES.ADMIN] },
+      { label: t('nav.analytics'), icon: 'pi pi-chart-bar', to: '/admin/analytics', roles: [USER_ROLES.ADMIN] },
     ],
   },
   {
-    title: 'Settings',
+    title: t('nav.settings'),
     items: [
-      { label: 'Company', icon: 'pi pi-cog', to: '/settings/company', roles: [USER_ROLES.ADMIN, USER_ROLES.HR] },
-      { label: 'Team', icon: 'pi pi-users', to: '/settings/team', roles: [USER_ROLES.ADMIN] },
-      { label: 'Subscription', icon: 'pi pi-credit-card', to: '/subscription', roles: [USER_ROLES.ADMIN] },
+      { label: t('settings.company.title'), icon: 'pi pi-cog', to: '/settings/company', roles: [USER_ROLES.ADMIN, USER_ROLES.HR] },
+      { label: t('nav.team'), icon: 'pi pi-users', to: '/settings/team', roles: [USER_ROLES.ADMIN] },
+      { label: t('nav.subscription'), icon: 'pi pi-credit-card', to: '/subscription', roles: [USER_ROLES.ADMIN] },
     ],
   },
-]
+])
 
 const filteredSections = computed(() => {
   const userRole = authStore.user?.role
   if (!userRole) return []
-  return sections
+  return sections.value
     .map((section) => ({
       ...section,
       items: section.items.filter((item) => item.roles.includes(userRole)),
@@ -126,5 +131,23 @@ function isActive(path: string): boolean {
         </ul>
       </template>
     </nav>
+
+    <!-- AI Assistant button -->
+    <div class="border-t border-gray-100 px-2 py-3">
+      <button
+        type="button"
+        class="flex w-full items-center gap-3 rounded-xl bg-gradient-to-r from-violet-500 to-indigo-600 px-3 py-2.5 text-[13px] font-medium text-white shadow-sm transition-all hover:shadow-md hover:brightness-110 active:scale-[0.98]"
+        :class="collapsed ? 'justify-center' : ''"
+        :title="collapsed ? t('aiAssistant.title') : undefined"
+        @click="aiAssistant.toggle()"
+      >
+        <i
+          class="pi pi-sparkles shrink-0 text-sm"
+          :style="{ width: '18px', textAlign: 'center' }"
+          aria-hidden="true"
+        ></i>
+        <span v-if="!collapsed" class="truncate">{{ t('aiAssistant.title') }}</span>
+      </button>
+    </div>
   </aside>
 </template>

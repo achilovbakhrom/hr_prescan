@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Dropdown from 'primevue/dropdown'
@@ -10,18 +11,20 @@ import InterviewStatusBadge from '../components/InterviewStatusBadge.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { Interview } from '../types/interview.types'
 
+const { t } = useI18n()
+
 const router = useRouter()
 const interviewStore = useInterviewStore()
 const statusFilter = ref<string | undefined>(undefined)
 
-const statusOptions = [
-  { label: 'All Statuses', value: undefined },
-  { label: 'Pending', value: 'pending' },
-  { label: 'In Progress', value: 'in_progress' },
-  { label: 'Completed', value: 'completed' },
-  { label: 'Cancelled', value: 'cancelled' },
-  { label: 'Expired', value: 'expired' },
-]
+const statusOptions = computed(() => [
+  { label: t('vacancies.allStatuses'), value: undefined },
+  { label: t('interviews.status.pending'), value: 'pending' },
+  { label: t('interviews.status.inProgress'), value: 'in_progress' },
+  { label: t('interviews.status.completed'), value: 'completed' },
+  { label: t('interviews.status.cancelled'), value: 'cancelled' },
+  { label: t('interviews.status.expired'), value: 'expired' },
+])
 
 const interviews = computed(() => interviewStore.interviews)
 
@@ -49,7 +52,7 @@ function formatScore(score: number | null): string {
 }
 
 function formatSessionType(type: string): string {
-  return type === 'prescanning' ? 'Prescanning' : 'Interview'
+  return type === 'prescanning' ? t('candidates.prescanning') : t('candidates.interview')
 }
 
 function sessionTypeSeverity(type: string): string {
@@ -60,7 +63,7 @@ function sessionTypeSeverity(type: string): string {
 <template>
   <div class="space-y-4">
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <h1 class="text-lg font-bold md:text-2xl">Interviews</h1>
+      <h1 class="text-lg font-bold md:text-2xl">{{ t('interviews.title') }}</h1>
       <Dropdown
         v-model="statusFilter"
         :options="statusOptions"
@@ -85,7 +88,7 @@ function sessionTypeSeverity(type: string): string {
         v-else-if="interviews.length === 0"
         class="py-8 text-center text-gray-500"
       >
-        No interviews found.
+        {{ t('common.noResults') }}
       </div>
       <div
         v-for="interview in interviews"
@@ -120,24 +123,24 @@ function sessionTypeSeverity(type: string): string {
         class="cursor-pointer"
         @row-click="handleRowClick"
       >
-        <Column field="candidateName" header="Candidate" sortable />
-        <Column field="vacancyTitle" header="Vacancy" sortable />
-        <Column header="Type" sort-field="sessionType">
+        <Column field="candidateName" :header="t('nav.candidates')" sortable />
+        <Column field="vacancyTitle" :header="t('nav.vacancies')" sortable />
+        <Column :header="t('interviews.title')" sort-field="sessionType">
           <template #body="{ data }">
             <Tag :value="formatSessionType((data as Interview).sessionType)" :severity="sessionTypeSeverity((data as Interview).sessionType)" />
           </template>
         </Column>
-        <Column header="Created" sortable sort-field="createdAt">
+        <Column :header="t('common.createdAt')" sortable sort-field="createdAt">
           <template #body="{ data }">
             {{ formatDate((data as Interview).createdAt) }}
           </template>
         </Column>
-        <Column header="Status" sort-field="status">
+        <Column :header="t('common.status')" sort-field="status">
           <template #body="{ data }">
             <InterviewStatusBadge :status="(data as Interview).status" />
           </template>
         </Column>
-        <Column header="Score">
+        <Column :header="t('interviews.overallScore')">
           <template #body="{ data }">
             {{ formatScore((data as Interview).overallScore) }}
           </template>
@@ -145,7 +148,7 @@ function sessionTypeSeverity(type: string): string {
 
         <template #empty>
           <div class="py-8 text-center text-gray-500">
-            No interviews found.
+            {{ t('common.noResults') }}
           </div>
         </template>
       </DataTable>

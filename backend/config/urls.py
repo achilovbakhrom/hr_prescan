@@ -26,12 +26,18 @@ from apps.interviews.urls import (
     public_urlpatterns as interview_public_urlpatterns,
 )
 from apps.common.apis import HRDashboardApi
+from apps.common.apis_ai import AIAssistantApi
 from apps.notifications.urls import (
     candidate_urlpatterns as notification_candidate_urlpatterns,
     hr_bulk_urlpatterns as notification_hr_bulk_urlpatterns,
     hr_candidate_urlpatterns as notification_hr_candidate_urlpatterns,
     notification_urlpatterns,
 )
+from apps.integrations.urls import (
+    hr_telegram_urlpatterns,
+    telegram_urlpatterns,
+)
+from apps.vacancies.urls import employer_urlpatterns as employer_hr_urlpatterns
 from apps.vacancies.urls import hr_urlpatterns as vacancy_hr_urlpatterns
 from apps.vacancies.urls import public_urlpatterns as vacancy_public_urlpatterns
 
@@ -46,6 +52,7 @@ urlpatterns = [
     path("api/health/", health_check, name="health-check"),
     path("api/auth/", include("apps.accounts.urls")),
     path("api/hr/company/", include((hr_urlpatterns, "hr"))),
+    path("api/hr/employers/", include((employer_hr_urlpatterns, "hr-employers"))),
     path("api/hr/vacancies/", include((vacancy_hr_urlpatterns, "hr-vacancies"))),
     path("api/hr/vacancies/", include((application_hr_vacancy_urlpatterns, "hr-applications"))),
     path("api/hr/candidates/", include((application_hr_candidate_urlpatterns, "hr-candidates"))),
@@ -54,6 +61,7 @@ urlpatterns = [
     path("api/hr/candidates/", include((notification_hr_bulk_urlpatterns, "hr-bulk-actions"))),
     path("api/hr/interviews/", include((hr_interview_urlpatterns, "hr-interviews"))),
     path("api/hr/dashboard/", HRDashboardApi.as_view(), name="hr-dashboard"),
+    path("api/hr/ai-assistant/", AIAssistantApi.as_view(), name="hr-ai-assistant"),
     path("api/notifications/", include((notification_urlpatterns, "notifications"))),
     path("api/public/vacancies/", include((vacancy_public_urlpatterns, "public-vacancies"))),
     path("api/public/vacancies/", include((application_public_urlpatterns, "public-applications"))),
@@ -64,6 +72,9 @@ urlpatterns = [
     # Subscriptions
     path("api/subscriptions/", include((subscription_public_urlpatterns, "subscriptions"))),
     path("api/hr/subscription/", include((subscription_hr_urlpatterns, "hr-subscription"))),
+    # Telegram integration
+    path("api/telegram/", include((telegram_urlpatterns, "telegram"))),
+    path("api/hr/telegram/", include((hr_telegram_urlpatterns, "hr-telegram"))),
     # Admin panel
     path("api/admin-panel/", include((admin_urlpatterns, "admin-panel"))),
     # API documentation

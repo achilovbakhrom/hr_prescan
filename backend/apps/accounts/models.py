@@ -107,6 +107,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     email_verified = models.BooleanField(default=False)
 
+    # Telegram integration
+    telegram_id = models.BigIntegerField(unique=True, null=True, blank=True)
+    telegram_username = models.CharField(max_length=255, blank=True, default="")
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

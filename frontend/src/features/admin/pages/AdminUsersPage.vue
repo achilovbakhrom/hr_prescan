@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
@@ -8,6 +9,7 @@ import Column from 'primevue/column'
 import { useAdminStore } from '../stores/admin.store'
 import type { AdminUser } from '../types/admin.types'
 
+const { t } = useI18n()
 const adminStore = useAdminStore()
 const search = ref('')
 const roleFilter = ref<string | undefined>(undefined)
@@ -39,7 +41,7 @@ onMounted(() => adminStore.fetchUsers())
 
 <template>
   <div class="space-y-4">
-    <h1 class="text-2xl font-bold">Users</h1>
+    <h1 class="text-2xl font-bold">{{ t('admin.users.title') }}</h1>
 
     <div class="flex gap-2">
       <InputText
@@ -72,15 +74,15 @@ onMounted(() => adminStore.fetchUsers())
       :rows="10"
       :total-records="adminStore.usersCount"
     >
-      <Column field="email" header="Email" sortable />
-      <Column header="Name" sortable>
+      <Column field="email" :header="t('admin.users.email')" sortable />
+      <Column :header="t('admin.users.name')" sortable>
         <template #body="{ data }">
           {{ (data as AdminUser).firstName }} {{ (data as AdminUser).lastName }}
         </template>
       </Column>
-      <Column field="role" header="Role" sortable />
-      <Column field="companyName" header="Company" />
-      <Column header="Status">
+      <Column field="role" :header="t('admin.users.role')" sortable />
+      <Column field="companyName" :header="t('admin.users.company')" />
+      <Column :header="t('admin.users.status')">
         <template #body="{ data }">
           <span
             class="rounded-full px-2 py-1 text-xs font-semibold"
@@ -99,10 +101,10 @@ onMounted(() => adminStore.fetchUsers())
           {{ formatDate((data as AdminUser).createdAt) }}
         </template>
       </Column>
-      <Column header="Actions">
+      <Column :header="t('common.actions')">
         <template #body="{ data }">
           <Button
-            :label="(data as AdminUser).isActive ? 'Block' : 'Activate'"
+            :label="(data as AdminUser).isActive ? t('admin.companies.block') : t('settings.team.activate')"
             :severity="(data as AdminUser).isActive ? 'danger' : 'success'"
             size="small"
             outlined

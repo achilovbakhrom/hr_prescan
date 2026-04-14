@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import DataTable from 'primevue/datatable'
@@ -7,6 +8,7 @@ import Column from 'primevue/column'
 import { useAdminStore } from '../stores/admin.store'
 import type { AdminCompany } from '../types/admin.types'
 
+const { t } = useI18n()
 const adminStore = useAdminStore()
 const search = ref('')
 
@@ -28,7 +30,7 @@ onMounted(() => adminStore.fetchCompanies())
 <template>
   <div class="space-y-4">
     <div class="flex items-center justify-between">
-      <h1 class="text-2xl font-bold">Companies</h1>
+      <h1 class="text-2xl font-bold">{{ t('admin.companies.title') }}</h1>
     </div>
 
     <div class="flex gap-2">
@@ -53,14 +55,14 @@ onMounted(() => adminStore.fetchCompanies())
       :rows="10"
       :total-records="adminStore.companiesCount"
     >
-      <Column field="name" header="Name" sortable />
+      <Column field="name" :header="t('admin.companies.name')" sortable />
       <Column field="industry" header="Industry" sortable />
       <Column field="size" header="Size" sortable />
       <Column field="country" header="Country" />
-      <Column field="planTier" header="Plan" sortable />
-      <Column field="usersCount" header="Users" sortable />
-      <Column field="vacanciesCount" header="Vacancies" sortable />
-      <Column header="Status">
+      <Column field="planTier" :header="t('admin.companies.plan')" sortable />
+      <Column field="usersCount" :header="t('admin.companies.users')" sortable />
+      <Column field="vacanciesCount" :header="t('admin.companies.vacancies')" sortable />
+      <Column :header="t('admin.companies.status')">
         <template #body="{ data }">
           <span
             class="rounded-full px-2 py-1 text-xs font-semibold"
@@ -79,10 +81,10 @@ onMounted(() => adminStore.fetchCompanies())
           {{ formatDate((data as AdminCompany).createdAt) }}
         </template>
       </Column>
-      <Column header="Actions">
+      <Column :header="t('admin.companies.actions')">
         <template #body="{ data }">
           <Button
-            :label="(data as AdminCompany).isActive ? 'Block' : 'Activate'"
+            :label="(data as AdminCompany).isActive ? t('admin.companies.block') : t('settings.team.activate')"
             :severity="(data as AdminCompany).isActive ? 'danger' : 'success'"
             size="small"
             outlined

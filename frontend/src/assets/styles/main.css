@@ -1,2 +1,80 @@
 @import 'primeicons/primeicons.css';
 @import 'tailwindcss';
+
+/* ============================================
+   Global modern tab styling (PrimeVue TabView)
+   ============================================ */
+
+/* Tab list — underline container */
+.p-tabview-tablist,
+.p-tablist {
+  border-bottom: 2px solid #e5e7eb;
+  gap: 0;
+  background: transparent;
+}
+
+/* Individual tab headers */
+.p-tabview-tab-header,
+.p-tab {
+  cursor: pointer;
+  padding: 0.75rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.2s ease, border-bottom-color 0.2s ease, background-color 0.2s ease;
+  background: transparent;
+  border-radius: 0;
+}
+
+/* Hover state */
+.p-tabview-tab-header:hover,
+.p-tab:hover {
+  color: #374151;
+  background-color: #f9fafb;
+  border-bottom-color: #d1d5db;
+}
+
+/* Active tab */
+.p-tabview-tab-header[data-p-active="true"],
+.p-tabview-tab-header.p-tabview-active-tab-header,
+.p-tabview-tab-header.p-highlight,
+.p-tab[data-p-active="true"],
+.p-tab.p-tab-active {
+  color: #2563eb;
+  font-weight: 600;
+  border-bottom-color: #2563eb;
+  background-color: #eff6ff;
+}
+
+/* Tab panels container */
+.p-tabview-panels,
+.p-tabpanels {
+  border: none;
+  padding: 0;
+  background: transparent;
+}
+
+/* Individual tab panel */
+.p-tabview-panel,
+.p-tabpanel {
+  padding: 1rem 0;
+}
+
+/* Icon alignment in tabs */
+.p-tabview-tab-header .p-icon,
+.p-tab .p-icon {
+  margin-right: 0.375rem;
+  vertical-align: middle;
+}
+
+/* Compact padding on mobile */
+@media (max-width: 639px) {
+  .p-tabview-tab-header,
+  .p-tab {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+}

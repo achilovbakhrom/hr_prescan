@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   shareToken: string
@@ -46,7 +49,7 @@ async function copyLink(): Promise<void> {
     />
     <Button
       :icon="copied ? 'pi pi-check' : 'pi pi-copy'"
-      :label="copied ? 'Copied' : 'Copy'"
+      :label="copied ? t('common.copied') : t('common.copyLink')"
       :severity="copied ? 'success' : 'secondary'"
       size="small"
       @click="copyLink"

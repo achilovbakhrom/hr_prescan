@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import Menu from 'primevue/menu'
 import Badge from 'primevue/badge'
@@ -8,7 +9,9 @@ import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { authService } from '@/features/auth/services/auth.service'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import NotificationBell from '@/features/notifications/components/NotificationBell.vue'
+import LanguageSwitcher from '@/shared/components/LanguageSwitcher.vue'
 import { useNotificationPolling } from '@/features/notifications/composables/useNotificationPolling'
+import { useAIAssistant } from '@/shared/composables/useAIAssistant'
 import type { MenuItem } from 'primevue/menuitem'
 
 defineProps<{
@@ -22,10 +25,12 @@ const emit = defineEmits<{
 
 const router = useRouter()
 const authStore = useAuthStore()
+const { t } = useI18n()
 const userMenu = ref<InstanceType<typeof Menu> | null>(null)
 const pendingInvitationsCount = ref(0)
 
 useNotificationPolling()
+const aiAssistant = useAIAssistant()
 
 onMounted(async () => {
   try {
@@ -36,22 +41,22 @@ onMounted(async () => {
   }
 })
 
-const menuItems: MenuItem[] = [
+const menuItems = computed<MenuItem[]>(() => [
   {
-    label: 'Profile',
+    label: t('nav.profile'),
     icon: 'pi pi-user',
     command: () => router.push({ name: ROUTE_NAMES.PROFILE }),
   },
   { separator: true },
   {
-    label: 'Logout',
+    label: t('nav.logout'),
     icon: 'pi pi-sign-out',
     command: async () => {
       await authStore.logout()
       await router.push({ name: ROUTE_NAMES.LOGIN })
     },
   },
-]
+])
 
 function toggleUserMenu(event: Event): void {
   userMenu.value?.toggle(event)
@@ -78,7 +83,7 @@ function handleMenuToggle(): void {
         @click="handleMenuToggle"
       />
       <RouterLink to="/" class="text-xl font-bold text-gray-900 hover:text-blue-600">
-        HR PreScan
+        PreScreen AI
       </RouterLink>
       <!-- Current company -->
       <span
@@ -110,6 +115,17 @@ function handleMenuToggle(): void {
           />
         </template>
       </Button>
+
+      <button
+        type="button"
+        class="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-violet-500 to-indigo-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-all hover:shadow-md hover:brightness-110 active:scale-95"
+        @click="aiAssistant.toggle()"
+      >
+        <i class="pi pi-sparkles text-[10px]"></i>
+        <span class="hidden sm:inline">AI</span>
+      </button>
+
+      <LanguageSwitcher />
 
       <NotificationBell />
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
 import { useCandidateStore } from '../stores/candidate.store'
@@ -14,6 +15,7 @@ import InterviewReviewPanel from '../components/InterviewReviewPanel.vue'
 import { candidateService } from '../services/candidate.service'
 import type { ApplicationStatus } from '../types/candidate.types'
 
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const candidateStore = useCandidateStore()
@@ -112,7 +114,7 @@ function formatScore(score: number | null | undefined): string {
       </button>
       <div class="min-w-0 flex-1">
         <h1 class="truncate text-base font-bold sm:text-lg md:text-2xl">
-          {{ candidate?.candidateName ?? 'Loading...' }}
+          {{ candidate?.candidateName ?? t('common.loading') }}
         </h1>
         <p v-if="candidate" class="truncate text-xs text-gray-500 sm:text-sm">
           {{ candidate.vacancyTitle }}
@@ -143,7 +145,7 @@ function formatScore(score: number | null | undefined): string {
       <TabView v-model:activeIndex="activeTab" scrollable>
         <TabPanel value="0">
           <template #header>
-            <span class="text-xs sm:text-sm">Overview</span>
+            <span class="text-xs sm:text-sm">{{ t('candidates.overview') }}</span>
           </template>
           <div class="py-3 sm:py-4">
             <CandidateOverview
@@ -158,7 +160,7 @@ function formatScore(score: number | null | undefined): string {
 
         <TabPanel value="1">
           <template #header>
-            <span class="text-xs sm:text-sm">CV</span>
+            <span class="text-xs sm:text-sm">{{ t('candidates.cv') }}</span>
             <span
               v-if="candidate.matchScore !== null"
               class="ml-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold text-white sm:h-5 sm:min-w-5 sm:px-1.5 sm:text-[10px]"
@@ -186,7 +188,7 @@ function formatScore(score: number | null | undefined): string {
 
         <TabPanel value="2">
           <template #header>
-            <span class="text-xs sm:text-sm">Prescanning</span>
+            <span class="text-xs sm:text-sm">{{ t('candidates.prescanning') }}</span>
             <span
               v-if="prescanningScore !== null"
               class="ml-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold text-white sm:h-5 sm:min-w-5 sm:px-1.5 sm:text-[10px]"
@@ -207,7 +209,7 @@ function formatScore(score: number | null | undefined): string {
 
         <TabPanel v-if="hasInterview" value="3">
           <template #header>
-            <span class="text-xs sm:text-sm">Interview</span>
+            <span class="text-xs sm:text-sm">{{ t('candidates.interview') }}</span>
             <span
               v-if="interviewScore !== null"
               class="ml-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold text-white sm:h-5 sm:min-w-5 sm:px-1.5 sm:text-[10px]"
@@ -242,7 +244,7 @@ function formatScore(score: number | null | undefined): string {
 
         <TabPanel :value="String(hasInterview ? 5 : 4)">
           <template #header>
-            <span class="text-xs sm:text-sm">Notes</span>
+            <span class="text-xs sm:text-sm">{{ t('candidates.notes') }}</span>
           </template>
           <div class="py-3 sm:py-4">
             <HRNotesPanel
@@ -255,7 +257,7 @@ function formatScore(score: number | null | undefined): string {
 
         <TabPanel :value="String(hasInterview ? 6 : 5)">
           <template #header>
-            <span class="text-xs sm:text-sm">Messages</span>
+            <span class="text-xs sm:text-sm">{{ t('candidates.messages') }}</span>
           </template>
           <div class="py-3 sm:py-4">
             <MessageThread :candidate-id="candidate.id" />
@@ -266,31 +268,3 @@ function formatScore(score: number | null | undefined): string {
   </div>
 </template>
 
-<style scoped>
-:deep(.p-tabview-panels) {
-  border-top: none !important;
-  background: white !important;
-  border-radius: 0 0 0.5rem 0.5rem !important;
-}
-
-:deep(.p-tabview-tablist) {
-  border-width: 0 0 1px 0 !important;
-  border-color: #e5e7eb !important;
-}
-
-:deep(.p-tabview-tab-header) {
-  border-bottom: none !important;
-  border: none !important;
-}
-
-/* Compact tab padding on mobile */
-:deep(.p-tabview-tab-header) {
-  padding: 0.5rem 0.75rem !important;
-}
-
-@media (min-width: 640px) {
-  :deep(.p-tabview-tab-header) {
-    padding: 0.75rem 1rem !important;
-  }
-}
-</style>

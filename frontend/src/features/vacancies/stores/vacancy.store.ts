@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
+import { extractErrorMessage } from '@/shared/api/errors'
 import { vacancyService } from '../services/vacancy.service'
 import type {
   Vacancy,
@@ -44,6 +45,17 @@ export const useVacancyStore = defineStore('vacancy', () => {
       throw new Error(message)
     } finally {
       loading.value = false
+    }
+  }
+
+  async function deleteVacancy(id: string): Promise<void> {
+    try {
+      await vacancyService.deleteVacancy(id)
+      vacancies.value = vacancies.value.filter(v => v.id !== id)
+    } catch (err: unknown) {
+      const message = extractErrorMessage(err)
+      error.value = message
+      throw new Error(message)
     }
   }
 
@@ -254,6 +266,7 @@ export const useVacancyStore = defineStore('vacancy', () => {
     error,
     fetchVacancies,
     createVacancy,
+    deleteVacancy,
     fetchVacancyDetail,
     updateVacancy,
     changeStatus,
@@ -266,22 +279,3 @@ export const useVacancyStore = defineStore('vacancy', () => {
     generateQuestions,
   }
 })
-
-function extractErrorMessage(err: unknown): string {
-  if (
-    typeof err === 'object' &&
-    err !== null &&
-    'response' in err &&
-    typeof (err as Record<string, unknown>).response === 'object'
-  ) {
-    const response = (err as { response: { data?: { message?: string } } })
-      .response
-    if (response.data?.message) {
-      return response.data.message
-    }
-  }
-  if (err instanceof Error) {
-    return err.message
-  }
-  return 'An unexpected error occurred'
-}

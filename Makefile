@@ -3,7 +3,8 @@
        lint format typecheck test \
        up-monitoring up-management up-all \
        clean reset-db backup-db \
-       local-setup local-infra local-backend local-frontend local-stop
+       local-setup local-infra local-backend local-frontend local-stop \
+       local-test local-test-backend local-test-frontend local-test-e2e
 
 # ─── General ──────────────────────────────────────────────────────────────────
 
@@ -177,6 +178,9 @@ local-all: local-infra ## Start infra + backend + celery + frontend (all in back
 	@echo ""
 	@echo "Run 'make local-stop' to stop everything."
 
+local-pip: ## Install Python dependencies (local)
+	$(VENV)/pip install -r backend/requirements.txt
+
 local-migrate: ## Run migrations (local)
 	cd backend && $(VENV)/python manage.py migrate
 
@@ -189,6 +193,9 @@ local-createsuperuser: ## Create superuser (local)
 local-shell: ## Django shell (local)
 	cd backend && $(VENV)/python manage.py shell
 
+local-telegram: ## Run Telegram bot in polling mode (local dev)
+	cd backend && $(VENV)/python manage.py run_telegram_bot
+
 local-stop: ## Stop everything (infra + background processes)
 	@echo "Stopping background processes..."
 	-@pkill -f "manage.py runserver" 2>/dev/null || true
@@ -197,6 +204,19 @@ local-stop: ## Stop everything (infra + background processes)
 	-@pkill -f "vite" 2>/dev/null || true
 	docker compose down
 	@echo "All stopped."
+
+# ─── Testing (local) ─────────────────────────────────────────────────────────
+
+local-test: local-test-backend local-test-frontend ## Run all tests (backend + frontend)
+
+local-test-backend: ## Run backend tests (pytest)
+	cd backend && $(VENV)/python -m pytest tests/ -v --tb=short
+
+local-test-frontend: ## Run frontend unit tests (vitest)
+	cd frontend && npx vitest run --reporter=verbose
+
+local-test-e2e: ## Run E2E tests (playwright) — app must be running
+	cd frontend && npx playwright test --reporter=list
 
 # ─── Cleanup ──────────────────────────────────────────────────────────────────
 

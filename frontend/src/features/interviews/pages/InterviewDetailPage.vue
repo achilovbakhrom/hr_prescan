@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
 import TabView from 'primevue/tabview'
@@ -11,6 +12,7 @@ import InterviewScoresView from '../components/InterviewScoresView.vue'
 import TranscriptView from '../components/TranscriptView.vue'
 import IntegrityFlagsView from '../components/IntegrityFlagsView.vue'
 
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const interviewStore = useInterviewStore()
@@ -93,7 +95,7 @@ async function handleWatchLive(): Promise<void> {
           </div>
           <div class="flex flex-wrap items-center gap-2 sm:gap-3">
             <Tag
-              :value="interview.sessionType === 'prescanning' ? 'Prescanning' : 'Interview'"
+              :value="interview.sessionType === 'prescanning' ? t('candidates.prescanning') : t('candidates.interview')"
               :severity="interview.sessionType === 'prescanning' ? 'info' : 'success'"
             />
             <InterviewStatusBadge :status="interview.status" />
@@ -107,7 +109,7 @@ async function handleWatchLive(): Promise<void> {
             />
             <Button
               v-if="isScheduled"
-              label="Cancel"
+              :label="t('common.cancel')"
               severity="danger"
               size="small"
               outlined

@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import ProgressBar from 'primevue/progressbar'
 import { apiClient } from '@/shared/api/client'
-import type { InterviewScore, IntegrityFlag } from '@/features/interviews/types/interview.types'
+import type { InterviewScore, IntegrityFlag } from '@/shared/types/interview.types'
+
+const { t } = useI18n()
 
 interface CandidateInterviewScores {
   overallScore: number | null
@@ -66,7 +69,7 @@ onMounted(async () => {
         v-if="data.overallScore !== null"
         class="mb-4 rounded-lg bg-blue-50 p-4 text-center"
       >
-        <p class="text-xs font-medium text-blue-600">Overall Interview Score</p>
+        <p class="text-xs font-medium text-blue-600">{{ t('interviews.overallScore') }}</p>
         <p class="text-3xl font-bold" :class="scoreColor(data.overallScore)">
           {{ data.overallScore }}/100
         </p>

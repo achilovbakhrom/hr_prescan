@@ -86,4 +86,28 @@ export const interviewService = {
     )
     return response.data
   },
+
+  async sendVoiceMessage(
+    token: string,
+    audioBlob: Blob,
+    duration: number,
+  ): Promise<{
+    aiMessage: ChatMessage
+    candidateTranscript: string
+    candidateAudioUrl: string
+  }> {
+    const formData = new FormData()
+    formData.append('audio_file', audioBlob, 'voice-message.webm')
+    formData.append('duration', String(duration))
+    const response = await apiClient.post(
+      `/public/interview/${token}/chat/voice`,
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } },
+    )
+    return response.data
+  },
+
+  getVoiceAudioUrl(token: string, messageIndex: number): string {
+    return `${apiClient.defaults.baseURL}/public/interview/${token}/chat/voice/${messageIndex}/audio/`
+  },
 }

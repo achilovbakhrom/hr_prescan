@@ -7,14 +7,20 @@
 services:
   # --- Reverse Proxy ---
   nginx:
-    ports: []  # no debug ports; TLS is terminated here in prod
+    image: ghcr.io/${GITHUB_REPOSITORY}/frontend:${IMAGE_TAG:-latest}
+    ports:
+      - "80:80"
+      - "443:443"
     volumes:
-      - ./deploy/nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro
-      - ./deploy/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./deploy/nginx/nginx.prod.conf.template:/etc/nginx/templates/nginx.conf.template:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro
-      - certbot_webroot:/var/www/certbot:ro
+      - /etc/nginx/dhparam.pem:/etc/nginx/dhparam.pem:ro
+      - certbot_webroot:/var/www/certbot
     environment:
       - DOMAIN=${DOMAIN}
+      - NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx
+      - NGINX_ENVSUBST_TEMPLATE_SUFFIX=.template
+      - NGINX_ENVSUBST_FILTER=DOMAIN
     restart: unless-stopped
     deploy:
       resources:
@@ -24,7 +30,7 @@ services:
         reservations:
           memory: 64M
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -61,7 +67,8 @@ services:
         reservations:
           memory: 256M
     healthcheck:
-      test: ["CMD-SHELL", "python -c 'import urllib.request; urllib.request.urlopen(\"http://localhost:8000/api/health/\")'"]
+      # Tell Django the request arrived via HTTPS so SECURE_SSL_REDIRECT doesn't 301 us.
+      test: ["CMD-SHELL", "python -c 'import urllib.request as r; r.urlopen(r.Request(\"http://localhost:8000/api/health/\", headers={\"X-Forwarded-Proto\": \"https\"}))'"]
       interval: 30s
       timeout: 10s
       retries: 5

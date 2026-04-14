@@ -1,11 +1,14 @@
+// Re-export shared types so intra-feature imports still work
+export type { InterviewScore, IntegrityFlag, IntegrityFlagType, IntegritySeverity } from '@/shared/types/interview.types'
+
+// Import shared types needed by feature-specific interfaces
+import type { InterviewScore, IntegrityFlag } from '@/shared/types/interview.types'
+
 export type InterviewStatus = 'pending' | 'in_progress' | 'completed' | 'cancelled' | 'expired'
 
 export type ScreeningMode = 'chat' | 'meet'
 
 export type SessionType = 'prescanning' | 'interview'
-
-export type IntegrityFlagType = 'face_not_visible' | 'multiple_faces' | 'gaze_deviation' | 'audio_anomaly' | 'cv_inconsistency'
-export type IntegritySeverity = 'low' | 'medium' | 'high'
 
 export interface Interview {
   id: string
@@ -27,6 +30,9 @@ export interface ChatMessage {
   role: 'ai' | 'candidate'
   text: string
   timestamp: string
+  messageType?: 'text' | 'voice'
+  audioUrl?: string
+  duration?: number
 }
 
 export interface InterviewDetail extends Interview {
@@ -39,22 +45,6 @@ export interface InterviewDetail extends Interview {
   scores: InterviewScore[]
   integrityFlags: IntegrityFlag[]
   updatedAt: string
-}
-
-export interface InterviewScore {
-  id: string
-  criteriaId: string
-  criteriaName: string
-  score: number
-  aiNotes: string
-}
-
-export interface IntegrityFlag {
-  id: string
-  flagType: IntegrityFlagType
-  severity: IntegritySeverity
-  description: string
-  timestampSeconds: number | null
 }
 
 export interface TranscriptEntry {

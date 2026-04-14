@@ -1,0 +1,111 @@
+# Staging / dev-server overrides — layered on top of docker-compose.prod.yml
+#
+# Target server: Hetzner CX32 (4 vCPU / 8 GB RAM)
+# Use with:
+#   docker compose \
+#     -f docker-compose.yml \
+#     -f deploy/docker-compose.prod.yml \
+#     -f deploy/docker-compose.staging.yml \
+#   up -d
+#
+# Changes vs prod:
+#   - All resource limits halved (leaves ~5 GB free for OS + build cache)
+#   - Image tag fallback changed from :latest → :dev
+#   - celery-worker gets stop_grace_period: 60s for zero-downtime draining
+
+services:
+  nginx:
+    image: ghcr.io/${GITHUB_REPOSITORY}/frontend:${IMAGE_TAG:-dev}
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: "0.25"
+        reservations:
+          memory: 32M
+
+  django:
+    image: ghcr.io/${GITHUB_REPOSITORY}/backend:${IMAGE_TAG:-dev}
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "1.00"
+        reservations:
+          memory: 256M
+
+  postgres:
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+          cpus: "0.75"
+        reservations:
+          memory: 128M
+
+  redis:
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.25"
+        reservations:
+          memory: 32M
+
+  rabbitmq:
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.25"
+        reservations:
+          memory: 64M
+
+  celery-worker:
+    image: ghcr.io/${GITHUB_REPOSITORY}/backend:${IMAGE_TAG:-dev}
+    stop_grace_period: 60s   # lets in-progress tasks finish before SIGKILL
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.75"
+        reservations:
+          memory: 128M
+
+  celery-beat:
+    image: ghcr.io/${GITHUB_REPOSITORY}/backend:${IMAGE_TAG:-dev}
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: "0.10"
+        reservations:
+          memory: 32M
+
+  livekit:
+    deploy:
+      resources:
+        limits:
+          memory: 384M
+          cpus: "0.75"
+        reservations:
+          memory: 64M
+
+  livekit-agent:
+    image: ghcr.io/${GITHUB_REPOSITORY}/livekit-agent:${IMAGE_TAG:-dev}
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.75"
+        reservations:
+          memory: 128M
+
+  minio:
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.25"
+        reservations:
+          memory: 64M

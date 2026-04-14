@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import {
   Room,
@@ -14,6 +15,7 @@ import {
 import { interviewService } from '../services/interview.service'
 import type { InterviewDetail } from '../types/interview.types'
 
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 
@@ -273,7 +275,7 @@ function getInitials(name: string): string {
       <div class="max-w-md text-center">
         <i class="pi pi-exclamation-triangle mb-4 text-5xl text-red-400"></i>
         <p class="mb-4 text-white">{{ fetchError }}</p>
-        <Button label="Go Back" severity="secondary" @click="router.back()" />
+        <Button :label="t('errors.goBack')" severity="secondary" @click="router.back()" />
       </div>
     </div>
 
@@ -396,8 +398,8 @@ function getInitials(name: string): string {
           <h2 class="mb-2 text-lg font-medium text-white">Something went wrong</h2>
           <p class="mb-6 text-sm text-gray-400">{{ errorMessage }}</p>
           <div class="flex justify-center gap-3">
-            <Button label="Go back" severity="secondary" outlined @click="connectionState = 'idle'" />
-            <Button label="Retry" icon="pi pi-refresh" @click="startPreview" />
+            <Button :label="t('errors.goBack')" severity="secondary" outlined @click="connectionState = 'idle'" />
+            <Button :label="t('errors.tryAgain')" icon="pi pi-refresh" @click="startPreview" />
           </div>
         </div>
       </div>
@@ -516,13 +518,13 @@ function getInitials(name: string): string {
           <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-500/20">
             <i class="pi pi-check text-3xl text-green-400"></i>
           </div>
-          <h2 class="mb-2 text-xl font-medium text-white">Interview Complete</h2>
+          <h2 class="mb-2 text-xl font-medium text-white">{{ t('interviews.status.completed') }}</h2>
           <p class="mb-1 text-gray-400">Duration: {{ formattedTime }}</p>
           <p class="mb-6 text-sm text-gray-500">
             Thank you! Your responses are being reviewed by our AI.
             You'll receive results shortly.
           </p>
-          <Button label="Back to Home" icon="pi pi-home" class="w-full" @click="router.push('/')" />
+          <Button :label="t('errors.goHome')" icon="pi pi-home" class="w-full" @click="router.push('/')" />
         </div>
       </div>
     </template>

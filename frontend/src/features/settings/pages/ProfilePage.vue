@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
 import Message from 'primevue/message'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { authService } from '@/features/auth/services/auth.service'
-import type { PendingInvitation } from '@/features/auth/types/auth.types'
+import { settingsService } from '../services/settings.service'
+import type { PendingInvitation } from '@/shared/types/auth.types'
 
+const { t } = useI18n()
 const authStore = useAuthStore()
 
 const firstName = ref('')
@@ -20,6 +23,11 @@ const invitations = ref<PendingInvitation[]>([])
 const invitationsLoading = ref(false)
 const acceptingToken = ref<string | null>(null)
 
+const telegramLinked = ref(false)
+const telegramUsername = ref('')
+const linkCode = ref('')
+const generatingCode = ref(false)
+
 onMounted(() => {
   if (authStore.user) {
     firstName.value = authStore.user.firstName ?? ''
@@ -28,6 +36,7 @@ onMounted(() => {
     email.value = authStore.user.email ?? ''
   }
   fetchInvitations()
+  fetchTelegramStatus()
 })
 
 async function fetchInvitations(): Promise<void> {
@@ -64,11 +73,45 @@ function formatDate(dateStr: string): string {
     year: 'numeric',
   })
 }
+
+async function fetchTelegramStatus(): Promise<void> {
+  try {
+    const status = await settingsService.getTelegramStatus()
+    telegramLinked.value = status.linked
+    telegramUsername.value = status.telegramUsername ?? ''
+  } catch {
+    // silent
+  }
+}
+
+async function handleGenerateCode(): Promise<void> {
+  generatingCode.value = true
+  try {
+    const result = await settingsService.generateTelegramLinkCode()
+    linkCode.value = result.code
+  } catch {
+    errorMessage.value = 'Failed to generate Telegram link code'
+  } finally {
+    generatingCode.value = false
+  }
+}
+
+async function handleUnlink(): Promise<void> {
+  try {
+    await settingsService.unlinkTelegram()
+    telegramLinked.value = false
+    telegramUsername.value = ''
+    linkCode.value = ''
+    successMessage.value = t('telegram.disconnected')
+  } catch {
+    errorMessage.value = 'Failed to disconnect Telegram'
+  }
+}
 </script>
 
 <template>
   <div class="mx-auto max-w-2xl space-y-6">
-    <h1 class="text-2xl font-bold text-gray-900">My Profile</h1>
+    <h1 class="text-2xl font-bold text-gray-900">{{ t('settings.profile.title') }}</h1>
 
     <Message v-if="successMessage" severity="success" class="mb-4" :closable="true" @close="successMessage = null">
       {{ successMessage }}
@@ -138,23 +181,23 @@ function formatDate(dateStr: string): string {
       <form class="flex flex-col gap-4" @submit.prevent>
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div class="flex flex-col gap-1">
-            <label for="firstName" class="text-sm font-medium text-gray-700">First Name</label>
+            <label for="firstName" class="text-sm font-medium text-gray-700">{{ t('settings.profile.firstName') }}</label>
             <InputText id="firstName" v-model="firstName" class="w-full" disabled />
           </div>
           <div class="flex flex-col gap-1">
-            <label for="lastName" class="text-sm font-medium text-gray-700">Last Name</label>
+            <label for="lastName" class="text-sm font-medium text-gray-700">{{ t('settings.profile.lastName') }}</label>
             <InputText id="lastName" v-model="lastName" class="w-full" disabled />
           </div>
         </div>
 
         <div class="flex flex-col gap-1">
-          <label for="email" class="text-sm font-medium text-gray-700">Email</label>
+          <label for="email" class="text-sm font-medium text-gray-700">{{ t('settings.profile.email') }}</label>
           <InputText id="email" v-model="email" class="w-full" disabled />
           <small class="text-gray-400">Email cannot be changed</small>
         </div>
 
         <div class="flex flex-col gap-1">
-          <label for="phone" class="text-sm font-medium text-gray-700">Phone</label>
+          <label for="phone" class="text-sm font-medium text-gray-700">{{ t('settings.profile.phone') }}</label>
           <InputText id="phone" v-model="phone" class="w-full" disabled />
         </div>
       </form>
@@ -165,7 +208,7 @@ function formatDate(dateStr: string): string {
           <p>
             Email verified:
             <span :class="authStore.user?.emailVerified ? 'text-green-600' : 'text-red-600'">
-              {{ authStore.user?.emailVerified ? 'Yes' : 'No' }}
+              {{ authStore.user?.emailVerified ? t('common.yes') : t('common.no') }}
             </span>
           </p>
           <p v-if="authStore.user?.company">
@@ -174,6 +217,43 @@ function formatDate(dateStr: string): string {
           <p v-else class="text-gray-400">
             Not associated with any company
           </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Telegram Connection -->
+    <div class="rounded-xl border border-gray-200 bg-white p-5">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50">
+          <i class="pi pi-send text-blue-500 text-lg"></i>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-gray-900">{{ t('telegram.title') }}</h3>
+          <p class="text-xs text-gray-500">{{ t('telegram.subtitle') }}</p>
+        </div>
+      </div>
+
+      <!-- Connected state -->
+      <div v-if="telegramLinked" class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+          <span class="text-sm text-gray-700">{{ t('telegram.connected') }}: @{{ telegramUsername }}</span>
+        </div>
+        <Button :label="t('telegram.disconnect')" severity="danger" text size="small" @click="handleUnlink" />
+      </div>
+
+      <!-- Not connected state -->
+      <div v-else>
+        <div v-if="linkCode" class="text-center">
+          <p class="text-sm text-gray-600 mb-3">{{ t('telegram.linkCodeHint') }}</p>
+          <div class="inline-flex items-center gap-3 rounded-xl bg-gray-50 px-6 py-4 mb-3">
+            <span class="text-3xl font-bold tracking-[0.3em] text-gray-900">{{ linkCode }}</span>
+          </div>
+          <p class="text-xs text-gray-400">{{ t('telegram.linkCodeExpires') }}</p>
+        </div>
+        <div v-else class="text-center">
+          <p class="text-sm text-gray-500 mb-3">{{ t('telegram.notConnected') }}</p>
+          <Button :label="t('telegram.connect')" icon="pi pi-link" size="small" :loading="generatingCode" @click="handleGenerateCode" />
         </div>
       </div>
     </div>

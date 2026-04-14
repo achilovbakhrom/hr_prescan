@@ -5,6 +5,14 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.permissions import IsAdmin, IsHRManager
+from apps.common.exceptions import ApplicationError
+from apps.common.messages import (
+    MSG_COMPANY_REGISTERED,
+    MSG_INVITATION_ACCEPTED,
+    MSG_INVITATION_SENT,
+    MSG_NOT_IN_COMPANY,
+    MSG_USER_NOT_FOUND,
+)
 from apps.accounts.selectors import get_company_invitations, get_company_users, get_user_by_id
 from apps.accounts.serializers import (
     AcceptInvitationInputSerializer,
@@ -35,11 +43,14 @@ class CompanyRegisterApi(APIView):
         serializer = CompanyRegisterInputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        company, user = create_company_with_admin(**serializer.validated_data)
+        try:
+            company, user = create_company_with_admin(**serializer.validated_data)
+        except ApplicationError as e:
+            return Response({"detail": e.message}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(
             {
-                "detail": "Company registered successfully. Please verify your email.",
+                "detail": str(MSG_COMPANY_REGISTERED),
                 "company": CompanyOutputSerializer(company).data,
                 "user": UserOutputSerializer(user).data,
             },
@@ -59,7 +70,7 @@ class CompanyProfileApi(APIView):
         company = request.user.company
         if company is None:
             return Response(
-                {"detail": "You are not associated with a company."},
+                {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
             )
         return Response(CompanyOutputSerializer(company).data, status=status.HTTP_200_OK)
@@ -68,7 +79,7 @@ class CompanyProfileApi(APIView):
         company = request.user.company
         if company is None:
             return Response(
-                {"detail": "You are not associated with a company."},
+                {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -89,15 +100,18 @@ class InviteHRApi(APIView):
         serializer = InviteHRInputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        invitation = invite_hr(
-            company=request.user.company,
-            email=serializer.validated_data["email"],
-            invited_by=request.user,
-        )
+        try:
+            invitation = invite_hr(
+                company=request.user.company,
+                email=serializer.validated_data["email"],
+                invited_by=request.user,
+            )
+        except ApplicationError as e:
+            return Response({"detail": e.message}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(
             {
-                "detail": "Invitation sent successfully.",
+                "detail": str(MSG_INVITATION_SENT),
                 "invitation": InvitationOutputSerializer(invitation).data,
             },
             status=status.HTTP_201_CREATED,
@@ -121,11 +135,14 @@ class AcceptInvitationApi(APIView):
         serializer = AcceptInvitationInputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        user = accept_invitation(**serializer.validated_data)
+        try:
+            user = accept_invitation(**serializer.validated_data)
+        except ApplicationError as e:
+            return Response({"detail": e.message}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(
             {
-                "detail": "Invitation accepted. You can now log in.",
+                "detail": str(MSG_INVITATION_ACCEPTED),
                 "user": UserOutputSerializer(user).data,
             },
             status=status.HTTP_201_CREATED,
@@ -141,7 +158,7 @@ class TeamListApi(APIView):
         company = request.user.company
         if company is None:
             return Response(
-                {"detail": "You are not associated with a company."},
+                {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -164,13 +181,16 @@ class TeamMemberDetailApi(APIView):
         target_user = get_user_by_id(user_id=user_id)
         if target_user is None:
             return Response(
-                {"detail": "User not found."},
+                {"detail": str(MSG_USER_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        if serializer.validated_data["is_active"]:
-            target_user = activate_user(user=target_user, activated_by=request.user)
-        else:
-            target_user = deactivate_user(user=target_user, deactivated_by=request.user)
+        try:
+            if serializer.validated_data["is_active"]:
+                target_user = activate_user(user=target_user, activated_by=request.user)
+            else:
+                target_user = deactivate_user(user=target_user, deactivated_by=request.user)
+        except ApplicationError as e:
+            return Response({"detail": e.message}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(UserOutputSerializer(target_user).data, status=status.HTTP_200_OK)

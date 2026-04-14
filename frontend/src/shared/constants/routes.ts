@@ -40,6 +40,11 @@ export const ROUTE_NAMES = {
   ADMIN_ANALYTICS: 'admin-analytics',
   ADMIN_PLANS: 'admin-plans',
 
+  // Employers
+  EMPLOYER_LIST: 'employer-list',
+  EMPLOYER_CREATE: 'employer-create',
+  EMPLOYER_DETAIL: 'employer-detail',
+
   // Legal
   PRIVACY_POLICY: 'privacy-policy',
   TERMS_OF_SERVICE: 'terms-of-service',

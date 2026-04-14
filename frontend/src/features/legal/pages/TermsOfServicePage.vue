@@ -37,7 +37,7 @@ function goBack(): void {
             1. Acceptance of Terms
           </h2>
           <p class="leading-relaxed text-gray-600">
-            By accessing or using the HR PreScan platform ("Service"), you
+            By accessing or using the PreScreen AI platform ("Service"), you
             agree to be bound by these Terms of Service ("Terms"). If you do
             not agree to these Terms, please do not use the Service. These
             Terms apply to all users, including HR professionals, company
@@ -50,7 +50,7 @@ function goBack(): void {
             2. Description of Service
           </h2>
           <p class="leading-relaxed text-gray-600">
-            HR PreScan provides an AI-powered candidate pre-screening platform
+            PreScreen AI provides an AI-powered candidate pre-screening platform
             that enables companies to conduct automated video interviews, score
             candidates, and manage hiring workflows. The Service includes web
             application access, AI interview capabilities, reporting tools, and
@@ -112,7 +112,7 @@ function goBack(): void {
           </h2>
           <p class="leading-relaxed text-gray-600">
             The Service, including its software, design, and content, is owned
-            by HR PreScan and protected by intellectual property laws. You are
+            by PreScreen AI and protected by intellectual property laws. You are
             granted a limited, non-exclusive, non-transferable license to use
             the Service for your internal business purposes. You retain
             ownership of any content you upload, and grant us a license to
@@ -129,7 +129,7 @@ function goBack(): void {
             informational tools to assist your hiring process. They do not
             constitute employment decisions. You remain solely responsible for
             all hiring decisions and must ensure compliance with applicable
-            employment and anti-discrimination laws. HR PreScan disclaims
+            employment and anti-discrimination laws. PreScreen AI disclaims
             liability for hiring decisions made based on AI outputs.
           </p>
         </section>
@@ -139,7 +139,7 @@ function goBack(): void {
             8. Limitation of Liability
           </h2>
           <p class="leading-relaxed text-gray-600">
-            To the maximum extent permitted by law, HR PreScan shall not be
+            To the maximum extent permitted by law, PreScreen AI shall not be
             liable for any indirect, incidental, special, consequential, or
             punitive damages, including loss of profits or data, arising from
             your use of the Service. Our total liability shall not exceed the
@@ -181,7 +181,7 @@ function goBack(): void {
             For questions about these Terms, contact us at:
           </p>
           <div class="mt-3 text-gray-600">
-            <p>HR PreScan</p>
+            <p>PreScreen AI</p>
             <p>
               Email:
               <a

@@ -83,3 +83,7 @@ htmlcov/
 # Static files (collected)
 staticfiles/
 static_collected/
+
+# Claude Code local state
+.claude/
+.claude-task-state/

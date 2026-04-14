@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 
+const { t } = useI18n()
 const router = useRouter()
 
 function goHome(): void {
@@ -21,20 +23,19 @@ function goBack(): void {
     <div class="text-center">
       <p class="text-8xl font-extrabold text-amber-500">403</p>
       <h1 class="mt-4 text-3xl font-bold tracking-tight text-gray-900">
-        Access forbidden
+        {{ t('errors.forbidden') }}
       </h1>
       <p class="mt-4 text-lg text-gray-600">
-        You don't have permission to access this page. If you believe this is a
-        mistake, please contact your administrator.
+        {{ t('errors.forbiddenDesc') }}
       </p>
       <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
         <Button
-          label="Go to Dashboard"
+          :label="t('errors.goHome')"
           icon="pi pi-home"
           @click="goHome"
         />
         <Button
-          label="Go Back"
+          :label="t('errors.goBack')"
           icon="pi pi-arrow-left"
           text
           severity="secondary"

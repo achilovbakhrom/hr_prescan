@@ -6,13 +6,20 @@ from uuid import UUID
 import boto3
 from botocore.config import Config as BotoConfig
 from django.conf import settings
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.db.models import Q
 from openai import OpenAI
 
 from apps.accounts.models import User
 from apps.applications.models import Application
 from apps.common.exceptions import ApplicationError
+from apps.common.messages import (
+    MSG_ALREADY_APPLIED,
+    MSG_CV_REQUIRED,
+    MSG_STATUS_TRANSITION_INVALID,
+    MSG_VACANCY_NOT_ACCEPTING,
+    MSG_VACANCY_NOT_FOUND,
+)
 from apps.interviews.models import Interview
 from apps.vacancies.models import Vacancy
 
@@ -125,13 +132,13 @@ def submit_application(
     try:
         vacancy = Vacancy.objects.get(id=vacancy_id)
     except Vacancy.DoesNotExist:
-        raise ApplicationError("Vacancy not found.")
+        raise ApplicationError(str(MSG_VACANCY_NOT_FOUND))
 
     if vacancy.status != Vacancy.Status.PUBLISHED:
-        raise ApplicationError("This vacancy is not accepting applications.")
+        raise ApplicationError(str(MSG_VACANCY_NOT_ACCEPTING))
 
     if vacancy.cv_required and not cv_file_path:
-        raise ApplicationError("A CV is required for this vacancy.")
+        raise ApplicationError(str(MSG_CV_REQUIRED))
 
     try:
         application = Application.objects.create(
@@ -144,7 +151,7 @@ def submit_application(
             cv_original_filename=cv_original_filename,
         )
     except IntegrityError:
-        raise ApplicationError("You have already applied to this vacancy.")
+        raise ApplicationError(str(MSG_ALREADY_APPLIED))
 
     if cv_file_path:
         from django.db import transaction
@@ -206,7 +213,7 @@ def update_application_status(
 
     if status not in allowed:
         raise ApplicationError(
-            f"Cannot transition from '{current}' to '{status}'."
+            str(MSG_STATUS_TRANSITION_INVALID).format(current=current, target=status)
         )
 
     # Reset to Applied = full pipeline restart
@@ -411,6 +418,7 @@ def calculate_match_score(*, application_id: UUID) -> None:
     logger.info("calculate_match_score: score=%.1f for application %s", application.match_score, application_id)
 
 
+@transaction.atomic
 def bulk_update_status(
     *,
     application_ids: list[UUID],
@@ -422,6 +430,8 @@ def bulk_update_status(
     Only transitions that are valid per _STATUS_TRANSITIONS are applied;
     applications that cannot transition are silently skipped.
     """
+    from apps.notifications.services import notify_status_changed
+
     applications = Application.objects.filter(
         id__in=application_ids,
         vacancy__company=updated_by.company,
@@ -436,9 +446,6 @@ def bulk_update_status(
         application.status = status
         application.save(update_fields=["status", "updated_at"])
 
-        # Trigger notification
-        from apps.notifications.services import notify_status_changed
-
         notify_status_changed(application=application)
         updated += 1
 
@@ -451,11 +458,13 @@ def soft_delete_applications(
     updated_by: User,
 ) -> int:
     """Soft-delete applications (clear from archive). Completely hidden from UI."""
+    from django.utils import timezone
+
     return Application.objects.filter(
         id__in=application_ids,
         vacancy__company=updated_by.company,
         status=Application.Status.ARCHIVED,
-    ).update(is_deleted=True)
+    ).update(is_deleted=True, updated_at=timezone.now())
 
 
 def bulk_move_by_filter(
@@ -487,7 +496,9 @@ def bulk_move_by_filter(
     # Validate transition
     allowed = _STATUS_TRANSITIONS.get(from_status, set())
     if to_status not in allowed:
-        raise ApplicationError(f"Cannot transition from '{from_status}' to '{to_status}'.")
+        raise ApplicationError(
+            str(MSG_STATUS_TRANSITION_INVALID).format(current=from_status, target=to_status)
+        )
 
     qs = Application.objects.filter(
         vacancy_id=vacancy_id,

@@ -1,5 +1,5 @@
 import { apiClient } from '@/shared/api/client'
-import type { Company } from '@/features/auth/types/auth.types'
+import type { Company } from '@/shared/types/auth.types'
 import type {
   CompanyProfileUpdate,
   Invitation,
@@ -48,5 +48,19 @@ export const settingsService = {
       data,
     )
     return response.data
+  },
+
+  async getTelegramStatus(): Promise<{ linked: boolean; telegramUsername: string | null }> {
+    const response = await apiClient.get('/hr/telegram/status')
+    return response.data
+  },
+
+  async generateTelegramLinkCode(): Promise<{ code: string; expiresAt: string }> {
+    const response = await apiClient.get('/hr/telegram/link-code')
+    return response.data
+  },
+
+  async unlinkTelegram(): Promise<void> {
+    await apiClient.post('/hr/telegram/unlink')
   },
 }

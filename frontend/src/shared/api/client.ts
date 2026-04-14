@@ -62,7 +62,7 @@ export const apiClient = axios.create({
   },
 })
 
-// Ensure trailing slash + convert request body keys to snake_case
+// Ensure trailing slash + convert request body & params keys to snake_case
 apiClient.interceptors.request.use((config) => {
   if (config.url && !config.url.endsWith('/')) {
     config.url += '/'
@@ -70,12 +70,20 @@ apiClient.interceptors.request.use((config) => {
   if (config.data && typeof config.data === 'object') {
     config.data = convertKeysToSnakeCase(config.data)
   }
+  if (config.params && typeof config.params === 'object') {
+    config.params = convertKeysToSnakeCase(config.params)
+  }
   return config
 })
 
-// Convert response body keys to camelCase
+// Convert response body keys to camelCase (skip binary responses)
 apiClient.interceptors.response.use((response) => {
-  if (response.data && typeof response.data === 'object') {
+  if (
+    response.data &&
+    typeof response.data === 'object' &&
+    !(response.data instanceof Blob) &&
+    !(response.data instanceof ArrayBuffer)
+  ) {
     response.data = convertKeysToCamelCase(response.data)
   }
   return response
@@ -83,6 +91,10 @@ apiClient.interceptors.response.use((response) => {
 
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
+    // Add locale header for server-side i18n
+    const locale = localStorage.getItem('hr_prescan_locale') || 'en'
+    config.headers['Accept-Language'] = locale
+
     const raw = localStorage.getItem(TOKENS_KEY)
     if (raw) {
       try {

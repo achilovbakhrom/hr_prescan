@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import { useRouter } from 'vue-router'
 import { useNotificationStore } from '../stores/notification.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { Notification, NotificationType } from '../types/notification.types'
 
+const { t } = useI18n()
 const router = useRouter()
 const notificationStore = useNotificationStore()
 const filterMode = ref<'all' | 'unread'>('all')
@@ -71,10 +73,10 @@ onMounted(() => notificationStore.fetchNotifications())
 <template>
   <div class="space-y-4">
     <div class="flex items-center justify-between">
-      <h1 class="text-2xl font-bold">Notifications</h1>
+      <h1 class="text-2xl font-bold">{{ t('notifications.title') }}</h1>
       <Button
         v-if="notificationStore.unreadCount > 0"
-        label="Mark all as read"
+        :label="t('notifications.markAllRead')"
         icon="pi pi-check"
         size="small"
         outlined
@@ -84,7 +86,7 @@ onMounted(() => notificationStore.fetchNotifications())
 
     <div class="flex gap-2">
       <Button
-        label="All"
+        :label="t('common.all')"
         :outlined="filterMode !== 'all'"
         size="small"
         @click="filterMode = 'all'"
@@ -106,7 +108,7 @@ onMounted(() => notificationStore.fetchNotifications())
       class="py-12 text-center text-gray-500"
     >
       <i class="pi pi-bell-slash mb-2 text-3xl"></i>
-      <p>No notifications</p>
+      <p>{{ t('notifications.noNotifications') }}</p>
     </div>
 
     <div v-else class="space-y-2">

@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.permissions import IsAdmin, IsHRManager
+from apps.common.messages import MSG_NOT_IN_COMPANY
 from apps.applications.serializers import ApplicationListOutputSerializer
 from apps.common.selectors import (
     get_dashboard_stats,
@@ -22,7 +23,7 @@ class HRDashboardApi(APIView):
         company = request.user.company
         if company is None:
             return Response(
-                {"detail": "You are not associated with a company."},
+                {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 

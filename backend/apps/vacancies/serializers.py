@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from apps.vacancies.models import InterviewQuestion, Vacancy, VacancyCriteria
+from apps.vacancies.models import EmployerCompany, InterviewQuestion, Vacancy, VacancyCriteria
 
 
 class VacancyCriteriaOutputSerializer(serializers.ModelSerializer):
@@ -37,6 +37,23 @@ class InterviewQuestionOutputSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
+class EmployerCompanyOutputSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmployerCompany
+        fields = [
+            "id",
+            "name",
+            "industry",
+            "logo",
+            "website",
+            "description",
+            "source",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = fields
+
+
 class VacancyListOutputSerializer(serializers.ModelSerializer):
     """Lighter serializer for vacancy lists."""
 
@@ -46,7 +63,9 @@ class VacancyListOutputSerializer(serializers.ModelSerializer):
     candidates_interviewed = serializers.IntegerField(read_only=True, default=0)
     candidates_shortlisted = serializers.IntegerField(read_only=True, default=0)
     candidates_rejected = serializers.IntegerField(read_only=True, default=0)
+    candidates_hired = serializers.IntegerField(read_only=True, default=0)
     created_by_email = serializers.EmailField(source="created_by.email", read_only=True)
+    employer_name = serializers.CharField(source="employer.name", read_only=True, default=None, allow_null=True)
 
     class Meta:
         model = Vacancy
@@ -69,7 +88,9 @@ class VacancyListOutputSerializer(serializers.ModelSerializer):
             "candidates_interviewed",
             "candidates_shortlisted",
             "candidates_rejected",
+            "candidates_hired",
             "created_by_email",
+            "employer_name",
             "created_at",
             "updated_at",
         ]
@@ -81,6 +102,7 @@ class VacancyDetailOutputSerializer(serializers.ModelSerializer):
 
     criteria = VacancyCriteriaOutputSerializer(many=True, read_only=True)
     questions = InterviewQuestionOutputSerializer(many=True, read_only=True)
+    employer = EmployerCompanyOutputSerializer(read_only=True)
     created_by_email = serializers.EmailField(source="created_by.email", read_only=True)
 
     class Meta:
@@ -110,6 +132,8 @@ class VacancyDetailOutputSerializer(serializers.ModelSerializer):
             "company_info",
             "prescanning_prompt",
             "interview_prompt",
+            "keywords",
+            "employer",
             "criteria",
             "questions",
             "created_by_email",
@@ -123,6 +147,7 @@ class PublicVacancyListOutputSerializer(serializers.ModelSerializer):
     """Public vacancy list — includes salary and skills for job seekers."""
 
     company_name = serializers.CharField(source="company.name", read_only=True)
+    employer_name = serializers.CharField(source="employer.name", read_only=True, default=None, allow_null=True)
 
     class Meta:
         model = Vacancy
@@ -135,6 +160,7 @@ class PublicVacancyListOutputSerializer(serializers.ModelSerializer):
             "employment_type",
             "experience_level",
             "company_name",
+            "employer_name",
             "cv_required",
             "skills",
             "salary_min",
@@ -150,6 +176,7 @@ class PublicVacancyDetailOutputSerializer(serializers.ModelSerializer):
     """Public vacancy detail — includes requirements but no salary or internal info."""
 
     company_name = serializers.CharField(source="company.name", read_only=True)
+    employer = EmployerCompanyOutputSerializer(read_only=True)
 
     class Meta:
         model = Vacancy
@@ -165,6 +192,7 @@ class PublicVacancyDetailOutputSerializer(serializers.ModelSerializer):
             "employment_type",
             "experience_level",
             "company_name",
+            "employer",
             "cv_required",
             "deadline",
             "interview_duration",

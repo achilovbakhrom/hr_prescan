@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.postgres",
     # Third-party
     "rest_framework",
     "corsheaders",
@@ -42,6 +43,7 @@ INSTALLED_APPS = [
     "apps.interviews",
     "apps.notifications",
     "apps.subscriptions",
+    "apps.integrations",
 ]
 
 MIDDLEWARE = [
@@ -49,6 +51,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -113,6 +116,15 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = "UTC"
 
+from celery.schedules import crontab  # noqa: E402
+
+CELERY_BEAT_SCHEDULE = {
+    "check-expired-trials": {
+        "task": "apps.subscriptions.tasks.check_expired_trials",
+        "schedule": crontab(hour=0, minute=15),
+    },
+}
+
 # MinIO / S3 storage
 AWS_ACCESS_KEY_ID = os.environ.get("MINIO_ACCESS_KEY", "")
 AWS_SECRET_ACCESS_KEY = os.environ.get("MINIO_SECRET_KEY", "")
@@ -164,10 +176,20 @@ CORS_ALLOWED_ORIGINS = os.environ.get(
 ).split(",")
 
 # Internationalization
-LANGUAGE_CODE = "en-us"
-TIME_ZONE = "UTC"
+LANGUAGE_CODE = "en"
 USE_I18N = True
+USE_L10N = True
+TIME_ZONE = "UTC"
 USE_TZ = True
+
+LANGUAGES = [
+    ("en", "English"),
+    ("ru", "Russian"),
+]
+
+LOCALE_PATHS = [
+    BASE_DIR / "locale",
+]
 
 # Static files
 STATIC_URL = "static/"
@@ -258,3 +280,7 @@ GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
 # OpenAI
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 OPENAI_CHAT_MODEL = os.environ.get("OPENAI_CHAT_MODEL", "gpt-4o-mini")
+
+# Telegram bot
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+TELEGRAM_WEBHOOK_SECRET = os.environ.get("TELEGRAM_WEBHOOK_SECRET", "")

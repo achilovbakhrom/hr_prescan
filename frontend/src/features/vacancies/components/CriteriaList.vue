@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Button from 'primevue/button'
@@ -8,6 +9,8 @@ import InputNumber from 'primevue/inputnumber'
 import Dialog from 'primevue/dialog'
 import Tag from 'primevue/tag'
 import type { VacancyCriteria } from '../types/vacancy.types'
+
+const { t } = useI18n()
 
 defineProps<{ criteria: VacancyCriteria[]; loading?: boolean }>()
 const emit = defineEmits<{
@@ -47,8 +50,8 @@ function handleSubmit(): void {
 <template>
   <div>
     <div class="mb-4 flex items-center justify-between">
-      <h3 class="text-lg font-semibold">Evaluation Criteria</h3>
-      <Button label="Add Criteria" icon="pi pi-plus" size="small" @click="openAdd" />
+      <h3 class="text-lg font-semibold">{{ t('vacancies.criteria') }}</h3>
+      <Button :label="t('vacancies.addCriteria')" icon="pi pi-plus" size="small" @click="openAdd" />
     </div>
     <DataTable :value="criteria" :loading="loading" striped-rows>
       <Column field="order" header="#" style="width: 50px" />
@@ -60,7 +63,7 @@ function handleSubmit(): void {
           <Tag v-if="data.isDefault" value="Default" severity="info" />
         </template>
       </Column>
-      <Column header="Actions" style="width: 120px">
+      <Column :header="t('common.actions')" style="width: 120px">
         <template #body="{ data }">
           <div class="flex gap-1">
             <Button icon="pi pi-pencil" severity="secondary" text size="small" @click="openEdit(data)" />
@@ -72,7 +75,7 @@ function handleSubmit(): void {
         <div class="py-8 text-center text-gray-500">No criteria defined yet. Add evaluation criteria for this vacancy.</div>
       </template>
     </DataTable>
-    <Dialog v-model:visible="showDialog" :header="isEditing ? 'Edit Criteria' : 'Add Criteria'" :style="{ width: '500px' }" modal>
+    <Dialog v-model:visible="showDialog" :header="isEditing ? 'Edit Criteria' : t('vacancies.addCriteria')" :style="{ width: '500px' }" modal>
       <div class="space-y-4">
         <div><label class="mb-1 block text-sm font-medium">Name *</label>
           <InputText v-model="formName" class="w-full" placeholder="e.g. Communication Skills" /></div>
@@ -82,8 +85,8 @@ function handleSubmit(): void {
           <InputNumber v-model="formWeight" class="w-full" :min="1" :max="10" /></div>
       </div>
       <template #footer>
-        <Button label="Cancel" severity="secondary" text @click="showDialog = false" />
-        <Button :label="isEditing ? 'Save' : 'Add'" :disabled="!formName.trim()" @click="handleSubmit" />
+        <Button :label="t('common.cancel')" severity="secondary" text @click="showDialog = false" />
+        <Button :label="isEditing ? t('common.save') : 'Add'" :disabled="!formName.trim()" @click="handleSubmit" />
       </template>
     </Dialog>
   </div>

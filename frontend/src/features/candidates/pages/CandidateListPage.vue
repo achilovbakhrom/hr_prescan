@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Dropdown from 'primevue/dropdown'
@@ -16,6 +17,8 @@ import CandidateKanban from '../components/CandidateKanban.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { Application, ApplicationStatus } from '../types/candidate.types'
 
+const { t } = useI18n()
+
 const route = useRoute()
 const router = useRouter()
 const confirm = useConfirm()
@@ -30,27 +33,27 @@ const selectedCandidates = ref<Application[]>([])
 
 let searchTimeout: ReturnType<typeof setTimeout> | null = null
 
-const statusOptions = [
-  { label: 'All Statuses', value: undefined },
-  { label: 'Applied', value: 'applied' },
-  { label: 'Prescanned', value: 'prescanned' },
-  { label: 'Interviewed', value: 'interviewed' },
-  { label: 'Shortlisted', value: 'shortlisted' },
-  { label: 'Rejected', value: 'rejected' },
-  { label: 'Expired', value: 'expired' },
-]
+const statusOptions = computed(() => [
+  { label: t('vacancies.allStatuses'), value: undefined },
+  { label: t('candidates.status.applied'), value: 'applied' },
+  { label: t('candidates.status.prescanned'), value: 'prescanned' },
+  { label: t('candidates.status.interviewed'), value: 'interviewed' },
+  { label: t('candidates.status.shortlisted'), value: 'shortlisted' },
+  { label: t('candidates.status.rejected'), value: 'rejected' },
+  { label: t('candidates.status.expired'), value: 'expired' },
+])
 
-const orderingOptions = [
-  { label: 'Newest first', value: '-created_at' },
-  { label: 'Oldest first', value: 'created_at' },
-  { label: 'Highest score', value: '-match_score' },
-  { label: 'Lowest score', value: 'match_score' },
-]
+const orderingOptions = computed(() => [
+  { label: t('candidates.ordering.newest'), value: '-created_at' },
+  { label: t('candidates.ordering.oldest'), value: 'created_at' },
+  { label: t('candidates.ordering.highestScore'), value: '-match_score' },
+  { label: t('candidates.ordering.lowestScore'), value: 'match_score' },
+])
 
-const bulkActionOptions = [
-  { label: 'Shortlist', value: 'shortlisted' as ApplicationStatus },
-  { label: 'Reject', value: 'rejected' as ApplicationStatus },
-]
+const bulkActionOptions = computed(() => [
+  { label: t('candidates.actions.shortlist'), value: 'shortlisted' as ApplicationStatus },
+  { label: t('candidates.actions.reject'), value: 'rejected' as ApplicationStatus },
+])
 
 function fetchCandidates(): void {
   candidateStore.fetchVacancyCandidates(vacancyId.value, {
@@ -82,8 +85,8 @@ function handleBulkAction(event: { value: ApplicationStatus }): void {
   const label = status === 'shortlisted' ? 'shortlist' : 'reject'
 
   confirm.require({
-    message: `Are you sure you want to ${label} ${count} candidate(s)?`,
-    header: 'Confirm Bulk Action',
+    message: t('candidates.dialogs.bulkConfirmMessage', { action: label, count }),
+    header: t('candidates.dialogs.bulkConfirmHeader'),
     icon: 'pi pi-exclamation-triangle',
     acceptClass: status === 'rejected' ? 'p-button-danger' : 'p-button-success',
     accept: async () => {
@@ -101,15 +104,15 @@ function handleKanbanStatusChange(candidateId: string, status: ApplicationStatus
   const statusLabel = status.replace(/_/g, ' ')
   const isReset = status === 'applied'
   const message = isReset
-    ? `Reset ${candidate.candidateName} back to "Applied"? This will clear their current status.`
-    : `Move ${candidate.candidateName} to "${statusLabel}"?`
+    ? t('candidates.dialogs.resetMessage', { name: candidate.candidateName })
+    : t('candidates.dialogs.moveMessage', { name: candidate.candidateName, status: statusLabel })
 
   confirm.require({
     message,
-    header: isReset ? 'Reset Candidate Status' : 'Confirm Status Change',
+    header: isReset ? t('candidates.dialogs.resetHeader') : t('candidates.dialogs.statusChangeHeader'),
     icon: isReset ? 'pi pi-refresh' : 'pi pi-exclamation-triangle',
-    acceptLabel: isReset ? 'Yes, reset' : 'Yes, move',
-    rejectLabel: 'Cancel',
+    acceptLabel: isReset ? t('candidates.dialogs.yesReset') : t('candidates.dialogs.yesMove'),
+    rejectLabel: t('common.cancel'),
     accept: async () => {
       await candidateStore.updateStatus(candidateId, status).catch(() => {})
     },
@@ -126,8 +129,8 @@ function handleKanbanStatusChange(candidateId: string, status: ApplicationStatus
           <i class="pi pi-arrow-left"></i>
         </button>
         <div>
-          <h1 class="text-lg font-bold text-gray-900 md:text-xl">Candidate Pipeline</h1>
-          <p class="text-sm text-gray-500">{{ candidateStore.candidates.length }} candidates</p>
+          <h1 class="text-lg font-bold text-gray-900 md:text-xl">{{ t('candidates.pipeline') }}</h1>
+          <p class="text-sm text-gray-500">{{ candidateStore.candidates.length }} {{ t('nav.candidates').toLowerCase() }}</p>
         </div>
       </div>
 
@@ -138,14 +141,14 @@ function handleKanbanStatusChange(candidateId: string, status: ApplicationStatus
           :class="viewMode === 'kanban' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:text-gray-700'"
           @click="viewMode = 'kanban'"
         >
-          <i class="pi pi-th-large mr-1.5"></i>Board
+          <i class="pi pi-th-large mr-1.5"></i>{{ t('candidates.kanban') }}
         </button>
         <button
           class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
           :class="viewMode === 'table' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:text-gray-700'"
           @click="viewMode = 'table'"
         >
-          <i class="pi pi-list mr-1.5"></i>Table
+          <i class="pi pi-list mr-1.5"></i>{{ t('candidates.table') }}
         </button>
       </div>
     </div>
@@ -160,7 +163,7 @@ function handleKanbanStatusChange(candidateId: string, status: ApplicationStatus
         <InputIcon class="pi pi-search" />
         <InputText
           v-model="searchQuery"
-          placeholder="Search by name or email..."
+          :placeholder="t('candidates.search')"
           class="w-full"
           @input="onSearchInput"
         />
@@ -220,14 +223,14 @@ function handleKanbanStatusChange(candidateId: string, status: ApplicationStatus
       @row-click="(e) => viewDetail(e.data)"
     >
       <Column selection-mode="multiple" header-style="width: 3rem" />
-      <Column field="candidateName" header="Name" sortable />
-      <Column field="candidateEmail" header="Email" sortable />
-      <Column header="Status">
+      <Column field="candidateName" :header="t('candidates.application.name')" sortable />
+      <Column field="candidateEmail" :header="t('candidates.application.email')" sortable />
+      <Column :header="t('common.status')">
         <template #body="{ data }">
           <ApplicationStatusBadge :status="(data as Application).status" />
         </template>
       </Column>
-      <Column header="Match Score" sortable sort-field="matchScore">
+      <Column :header="t('candidates.matchScore')" sortable sort-field="matchScore">
         <template #body="{ data }">
           <span
             v-if="(data as Application).matchScore !== null"
@@ -242,10 +245,10 @@ function handleKanbanStatusChange(candidateId: string, status: ApplicationStatus
           >
             {{ (data as Application).matchScore }}%
           </span>
-          <span v-else class="text-xs text-gray-400">Pending</span>
+          <span v-else class="text-xs text-gray-400">{{ t('interviews.status.pending') }}</span>
         </template>
       </Column>
-      <Column header="Applied" sortable sort-field="createdAt">
+      <Column :header="t('common.createdAt')" sortable sort-field="createdAt">
         <template #body="{ data }">
           {{ formatDate((data as Application).createdAt) }}
         </template>
@@ -254,7 +257,7 @@ function handleKanbanStatusChange(candidateId: string, status: ApplicationStatus
         <div class="py-8 text-center text-gray-500">
           <i class="pi pi-users mb-2 text-3xl"></i>
           <p v-if="searchQuery">No candidates matching "{{ searchQuery }}"</p>
-          <p v-else>No candidates have applied yet</p>
+          <p v-else>{{ t('candidates.noCandidates') }}</p>
         </div>
       </template>
     </DataTable>

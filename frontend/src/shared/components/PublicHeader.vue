@@ -1,37 +1,41 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import Menu from 'primevue/menu'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
+import LanguageSwitcher from '@/shared/components/LanguageSwitcher.vue'
+import AppLogo from '@/shared/components/AppLogo.vue'
 import type { MenuItem } from 'primevue/menuitem'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const { t } = useI18n()
 const userMenu = ref<InstanceType<typeof Menu> | null>(null)
 
-const menuItems: MenuItem[] = [
+const menuItems = computed<MenuItem[]>(() => [
   {
-    label: 'Dashboard',
+    label: t('nav.dashboard'),
     icon: 'pi pi-th-large',
     command: () => router.push({ name: ROUTE_NAMES.DASHBOARD }),
   },
   {
-    label: 'Profile',
+    label: t('nav.profile'),
     icon: 'pi pi-user',
     command: () => router.push({ name: ROUTE_NAMES.PROFILE }),
   },
   { separator: true },
   {
-    label: 'Logout',
+    label: t('nav.logout'),
     icon: 'pi pi-sign-out',
     command: async () => {
       await authStore.logout()
       await router.push({ name: ROUTE_NAMES.LOGIN })
     },
   },
-]
+])
 
 function toggleUserMenu(event: Event): void {
   userMenu.value?.toggle(event)
@@ -48,19 +52,19 @@ function initials(): string {
   <header class="sticky top-0 z-50 border-b border-gray-100 bg-white/95 backdrop-blur-md">
     <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
       <RouterLink to="/" class="flex items-center gap-2.5">
-        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 shadow-sm">
-          <i class="pi pi-bolt text-sm text-white"></i>
-        </div>
-        <span class="text-xl font-bold tracking-tight text-gray-900">HR PreScan</span>
+        <AppLogo size="sm" />
+        <span class="text-xl font-bold tracking-tight text-gray-900">PreScreen AI</span>
       </RouterLink>
 
       <slot name="center" />
 
       <div class="flex items-center gap-3">
+        <LanguageSwitcher />
+
         <!-- Authenticated: show user menu -->
         <template v-if="authStore.isAuthenticated">
           <Button
-            label="Dashboard"
+            :label="t('nav.dashboard')"
             icon="pi pi-th-large"
             text
             severity="secondary"
@@ -90,13 +94,13 @@ function initials(): string {
             :to="{ name: ROUTE_NAMES.LOGIN }"
             class="text-sm font-medium text-gray-600 hover:text-gray-900"
           >
-            Sign In
+            {{ t('nav.signIn') }}
           </RouterLink>
           <RouterLink
             :to="{ name: ROUTE_NAMES.COMPANY_REGISTER }"
             class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
           >
-            For Employers
+            {{ t('nav.forEmployers') }}
           </RouterLink>
         </template>
       </div>

@@ -4,7 +4,7 @@ import type {
   AdminUser,
   PlatformAnalytics,
 } from '../types/admin.types'
-import type { SubscriptionPlan } from '@/features/subscriptions/types/subscription.types'
+import type { SubscriptionPlan } from '@/shared/types/subscription.types'
 
 interface PaginatedResponse<T> {
   results: T[]

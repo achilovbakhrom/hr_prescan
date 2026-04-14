@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { onMounted, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import type { InterviewDetail } from '../types/interview.types'
+
+const { t } = useI18n()
 import VideoPreview from '@/features/video/components/VideoPreview.vue'
 import DeviceSelector from '@/features/video/components/DeviceSelector.vue'
 import { useMediaDevices } from '@/features/video/composables/useMediaDevices'
@@ -71,7 +74,7 @@ onMounted(() => {
     <!-- Camera Preview + Device Selection -->
     <div class="rounded-lg border border-gray-200 bg-white p-6">
       <h2 class="mb-4 text-lg font-semibold text-gray-800">
-        Camera & Microphone Check
+        {{ t('interviews.preCheck.title') }}
       </h2>
 
       <p v-if="mediaError" class="mb-4 text-sm text-red-600">
@@ -87,13 +90,13 @@ onMounted(() => {
           <DeviceSelector
             :devices="cameras"
             :selected-device="selectedCamera"
-            label="Camera"
+            :label="t('interviews.preCheck.camera')"
             @update:selected-device="selectedCamera = $event"
           />
           <DeviceSelector
             :devices="microphones"
             :selected-device="selectedMicrophone"
-            label="Microphone"
+            :label="t('interviews.preCheck.microphone')"
             @update:selected-device="selectedMicrophone = $event"
           />
         </div>
@@ -129,7 +132,7 @@ onMounted(() => {
 
     <!-- Join Button -->
     <Button
-      label="Join Interview"
+      :label="t('interviews.preCheck.join')"
       icon="pi pi-video"
       class="w-full"
       size="large"

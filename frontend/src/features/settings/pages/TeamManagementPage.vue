@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import Message from 'primevue/message'
 import InviteHRDialog from '../components/InviteHRDialog.vue'
@@ -7,6 +8,7 @@ import InvitationsTable from '../components/InvitationsTable.vue'
 import TeamMembersTable from '../components/TeamMembersTable.vue'
 import { useSettingsStore } from '../stores/settings.store'
 
+const { t } = useI18n()
 const settingsStore = useSettingsStore()
 
 const showInviteDialog = ref(false)
@@ -51,9 +53,9 @@ async function handleToggleActive(userId: string): Promise<void> {
 <template>
   <div class="mx-auto max-w-5xl p-6">
     <div class="mb-6 flex items-center justify-between">
-      <h1 class="text-2xl font-bold text-gray-900">Team Management</h1>
+      <h1 class="text-2xl font-bold text-gray-900">{{ t('settings.team.title') }}</h1>
       <Button
-        label="Invite HR"
+        :label="t('settings.team.invite')"
         icon="pi pi-plus"
         @click="showInviteDialog = true"
       />
@@ -80,13 +82,13 @@ async function handleToggleActive(userId: string): Promise<void> {
         class="mb-8 rounded-lg bg-white p-6 shadow-sm"
       >
         <h2 class="mb-4 text-lg font-semibold text-gray-900">
-          Pending Invitations
+          {{ t('settings.team.invitations') }}
         </h2>
         <InvitationsTable :invitations="settingsStore.invitations" />
       </div>
 
       <div class="rounded-lg bg-white p-6 shadow-sm">
-        <h2 class="mb-4 text-lg font-semibold text-gray-900">Team Members</h2>
+        <h2 class="mb-4 text-lg font-semibold text-gray-900">{{ t('settings.team.members') }}</h2>
         <TeamMembersTable
           :members="settingsStore.team"
           @toggle-active="handleToggleActive"

@@ -1,13 +1,11 @@
 services:
   # --- Reverse Proxy & Frontend ---
   nginx:
+    image: ${FRONTEND_IMAGE:-hr-prescan-frontend:local}
     build:
       context: ./frontend
     ports:
       - "80:80"
-    volumes:
-      - ./deploy/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./deploy/nginx/conf.d:/etc/nginx/conf.d:ro
     depends_on:
       django:
         condition: service_healthy
@@ -22,7 +20,7 @@ services:
     expose:
       - "8000"
     env_file:
-      - .env
+      - backend/.env
     depends_on:
       postgres:
         condition: service_healthy
@@ -33,11 +31,12 @@ services:
       minio:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "python -c 'import urllib.request; urllib.request.urlopen(\"http://localhost:8000/api/health/\")'"]
-      interval: 10s
+      # Send X-Forwarded-Proto: https so Django's SECURE_SSL_REDIRECT doesn't 301 us.
+      test: ["CMD-SHELL", "python -c 'import urllib.request as r; r.urlopen(r.Request(\"http://localhost:8000/api/health/\", headers={\"X-Forwarded-Proto\": \"https\", \"Host\": \"localhost\"}))'"]
+      interval: 15s
       timeout: 5s
       retries: 5
-      start_period: 30s
+      start_period: 45s
     networks:
       - frontend
       - backend
@@ -47,15 +46,15 @@ services:
   postgres:
     image: postgres:16
     env_file:
-      - .env
+      - backend/.env
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-hr_prescan}
-      POSTGRES_USER: ${POSTGRES_USER:-hr_prescan}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-supersecretpassword}
+      POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB in .env}
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-hr_prescan}"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
       interval: 5s
       timeout: 3s
       retries: 5
@@ -81,8 +80,8 @@ services:
   rabbitmq:
     image: rabbitmq:3-management
     environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:?Set RABBITMQ_USER in .env}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:?Set RABBITMQ_PASS in .env}
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     healthcheck:
@@ -100,7 +99,7 @@ services:
       context: ./backend
     command: celery -A config worker -l info --concurrency=${CELERY_CONCURRENCY:-4}
     env_file:
-      - .env
+      - backend/.env
     depends_on:
       django:
         condition: service_healthy
@@ -114,7 +113,7 @@ services:
       context: ./backend
     command: celery -A config beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
     env_file:
-      - .env
+      - backend/.env
     depends_on:
       django:
         condition: service_healthy
@@ -137,7 +136,7 @@ services:
           port_range_end: 60000
           use_external_ip: false
         keys:
-          devkey: devsecret
+          ${LIVEKIT_API_KEY:?Set LIVEKIT_API_KEY in .env}: ${LIVEKIT_API_SECRET:?Set LIVEKIT_API_SECRET in .env}
         logging:
           level: info
         room:
@@ -161,7 +160,7 @@ services:
       context: ./livekit-agent
     command: python agent.py start
     env_file:
-      - .env
+      - backend/.env
     depends_on:
       livekit:
         condition: service_healthy
@@ -177,10 +176,10 @@ services:
     image: minio/minio:latest
     command: server /data --console-address ":9001"
     env_file:
-      - .env
+      - backend/.env
     environment:
-      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minioadmin}
-      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-minioadmin}
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:?Set MINIO_ACCESS_KEY in .env}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:?Set MINIO_SECRET_KEY in .env}
     volumes:
       - minio_data:/data
     healthcheck:

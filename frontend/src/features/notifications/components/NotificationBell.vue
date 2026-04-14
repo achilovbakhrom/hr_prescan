@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import Badge from 'primevue/badge'
 import { useNotificationStore } from '../stores/notification.store'
 import NotificationDropdown from './NotificationDropdown.vue'
 
+const { t } = useI18n()
 const notificationStore = useNotificationStore()
 const showDropdown = ref(false)
 
@@ -24,7 +26,7 @@ function closeDropdown(): void {
       text
       severity="secondary"
       rounded
-      aria-label="Notifications"
+      :aria-label="t('notifications.title')"
       @click="toggleDropdown"
     />
     <Badge

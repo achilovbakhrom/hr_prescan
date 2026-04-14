@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, dev]
   pull_request:
-    branches: [main]
+    branches: [main, dev]
 
 jobs:
   backend-quality:
@@ -51,29 +51,4 @@ jobs:
   #   needs: [frontend-quality]
   #   ...
 
-  build:
-    needs: [backend-quality, frontend-quality]
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: docker/build-push-action@v6
-        with:
-          context: ./backend
-          push: true
-          tags: ghcr.io/${{ github.repository }}/backend:${{ github.sha }}
-      - uses: docker/build-push-action@v6
-        with:
-          context: ./frontend
-          push: true
-          tags: ghcr.io/${{ github.repository }}/frontend:${{ github.sha }}
-      - uses: docker/build-push-action@v6
-        with:
-          context: ./livekit-agent
-          push: true
-          tags: ghcr.io/${{ github.repository }}/livekit-agent:${{ github.sha }}
+  # Image builds handled by cd.yml (main) and cd-dev.yml (dev) workflows.

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { useVacancyStore } from '@/features/vacancies/stores/vacancy.store'
@@ -8,9 +9,11 @@ import { useInterviewStore } from '@/features/interviews/stores/interview.store'
 import { useCandidateStore } from '@/features/candidates/stores/candidate.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { Interview } from '@/features/interviews/types/interview.types'
+import TrialBanner from '@/features/dashboard/components/TrialBanner.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const { t } = useI18n()
 const vacancyStore = useVacancyStore()
 const interviewStore = useInterviewStore()
 const candidateStore = useCandidateStore()
@@ -18,9 +21,9 @@ const candidateStore = useCandidateStore()
 const role = computed(() => authStore.user?.role)
 const greeting = computed(() => {
   const hour = new Date().getHours()
-  if (hour < 12) return 'Good morning'
-  if (hour < 18) return 'Good afternoon'
-  return 'Good evening'
+  if (hour < 12) return t('dashboard.greeting.morning')
+  if (hour < 18) return t('dashboard.greeting.afternoon')
+  return t('dashboard.greeting.evening')
 })
 
 const loadingStats = ref(true)
@@ -104,6 +107,9 @@ function goToInterview(interview: Interview): void {
       </p>
     </div>
 
+    <!-- Trial Banner -->
+    <TrialBanner class="mb-6" />
+
     <!-- Loading -->
     <div v-if="loadingStats" class="flex items-center justify-center py-20">
       <i class="pi pi-spinner pi-spin text-3xl text-gray-300"></i>
@@ -123,7 +129,7 @@ function goToInterview(interview: Interview): void {
             </div>
             <span class="text-2xl font-bold text-gray-900">{{ totalVacancies }}</span>
           </div>
-          <p class="mt-3 text-sm font-medium text-gray-500">Total Vacancies</p>
+          <p class="mt-3 text-sm font-medium text-gray-500">{{ t('dashboard.activeVacancies') }}</p>
           <p class="mt-0.5 text-xs text-blue-600">{{ activeVacancies }} active, {{ draftVacancies }} draft</p>
         </div>
 
@@ -137,7 +143,7 @@ function goToInterview(interview: Interview): void {
             </div>
             <span class="text-2xl font-bold text-gray-900">{{ scheduledInterviews }}</span>
           </div>
-          <p class="mt-3 text-sm font-medium text-gray-500">Scheduled Interviews</p>
+          <p class="mt-3 text-sm font-medium text-gray-500">{{ t('dashboard.pendingInterviews') }}</p>
           <p class="mt-0.5 text-xs text-amber-600">{{ completedInterviews }} completed</p>
         </div>
 
@@ -148,7 +154,7 @@ function goToInterview(interview: Interview): void {
             </div>
             <span class="text-2xl font-bold text-gray-900">{{ completedInterviews }}</span>
           </div>
-          <p class="mt-3 text-sm font-medium text-gray-500">Completed</p>
+          <p class="mt-3 text-sm font-medium text-gray-500">{{ t('dashboard.completedInterviews') }}</p>
           <p class="mt-0.5 text-xs text-emerald-600">AI interviews done</p>
         </div>
 
@@ -159,7 +165,7 @@ function goToInterview(interview: Interview): void {
             </div>
             <span class="text-2xl font-bold text-gray-900">{{ interviewStore.interviews.length }}</span>
           </div>
-          <p class="mt-3 text-sm font-medium text-gray-500">Total Interviews</p>
+          <p class="mt-3 text-sm font-medium text-gray-500">{{ t('interviews.title') }}</p>
           <p class="mt-0.5 text-xs text-violet-600">All time</p>
         </div>
       </div>
@@ -167,7 +173,7 @@ function goToInterview(interview: Interview): void {
       <div class="grid gap-6 lg:grid-cols-3">
         <!-- Quick Actions -->
         <div class="rounded-xl border border-gray-100 bg-white p-6">
-          <h2 class="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-400">Quick Actions</h2>
+          <h2 class="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-400">{{ t('dashboard.quickActions') }}</h2>
           <div class="space-y-2">
             <button
               class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
@@ -176,7 +182,7 @@ function goToInterview(interview: Interview): void {
               <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50">
                 <i class="pi pi-plus text-sm text-blue-600"></i>
               </div>
-              Create New Vacancy
+              {{ t('dashboard.createVacancy') }}
             </button>
             <button
               class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
@@ -185,7 +191,7 @@ function goToInterview(interview: Interview): void {
               <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50">
                 <i class="pi pi-list text-sm text-emerald-600"></i>
               </div>
-              View All Vacancies
+              {{ t('nav.vacancies') }}
             </button>
             <button
               class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
@@ -194,7 +200,7 @@ function goToInterview(interview: Interview): void {
               <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50">
                 <i class="pi pi-video text-sm text-amber-600"></i>
               </div>
-              View Interviews
+              {{ t('nav.interviews') }}
             </button>
             <button
               v-if="role === 'admin'"
@@ -204,7 +210,7 @@ function goToInterview(interview: Interview): void {
               <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-50">
                 <i class="pi pi-user-plus text-sm text-violet-600"></i>
               </div>
-              Invite Team Member
+              {{ t('settings.team.invite') }}
             </button>
           </div>
         </div>
@@ -212,9 +218,9 @@ function goToInterview(interview: Interview): void {
         <!-- Upcoming Interviews -->
         <div class="lg:col-span-2 rounded-xl border border-gray-100 bg-white p-6">
           <div class="mb-4 flex items-center justify-between">
-            <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400">Upcoming Interviews</h2>
+            <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400">{{ t('dashboard.upcomingInterviews') }}</h2>
             <Button
-              label="View all"
+              :label="t('common.viewAll')"
               text
               size="small"
               severity="secondary"
@@ -248,7 +254,7 @@ function goToInterview(interview: Interview): void {
             <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
               <i class="pi pi-calendar text-xl text-gray-400"></i>
             </div>
-            <p class="mt-3 text-sm text-gray-500">No upcoming interviews</p>
+            <p class="mt-3 text-sm text-gray-500">{{ t('dashboard.noUpcomingInterviews') }}</p>
             <p class="text-xs text-gray-400">Scheduled interviews will appear here</p>
           </div>
         </div>
@@ -276,7 +282,7 @@ function goToInterview(interview: Interview): void {
             </div>
             <span class="text-2xl font-bold text-gray-900">{{ pendingApplications }}</span>
           </div>
-          <p class="mt-3 text-sm font-medium text-gray-500">Pending</p>
+          <p class="mt-3 text-sm font-medium text-gray-500">{{ t('interviews.status.pending') }}</p>
         </div>
 
         <div class="rounded-xl border border-gray-100 bg-white p-5">
@@ -286,7 +292,7 @@ function goToInterview(interview: Interview): void {
             </div>
             <span class="text-2xl font-bold text-gray-900">{{ interviewedApplications }}</span>
           </div>
-          <p class="mt-3 text-sm font-medium text-gray-500">Interviewed</p>
+          <p class="mt-3 text-sm font-medium text-gray-500">{{ t('candidates.status.interviewed') }}</p>
         </div>
       </div>
 
@@ -299,8 +305,8 @@ function goToInterview(interview: Interview): void {
           <div class="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 transition-colors group-hover:bg-blue-100">
             <i class="pi pi-search text-lg text-blue-600"></i>
           </div>
-          <h3 class="text-base font-semibold text-gray-900">Browse Jobs</h3>
-          <p class="mt-1 text-sm text-gray-500">Find and apply to open positions</p>
+          <h3 class="text-base font-semibold text-gray-900">{{ t('nav.browseJobs') }}</h3>
+          <p class="mt-1 text-sm text-gray-500">{{ t('jobBoard.subtitle') }}</p>
         </div>
 
         <div
@@ -310,7 +316,7 @@ function goToInterview(interview: Interview): void {
           <div class="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 transition-colors group-hover:bg-emerald-100">
             <i class="pi pi-list text-lg text-emerald-600"></i>
           </div>
-          <h3 class="text-base font-semibold text-gray-900">My Applications</h3>
+          <h3 class="text-base font-semibold text-gray-900">{{ t('nav.myApplications') }}</h3>
           <p class="mt-1 text-sm text-gray-500">Track your application status</p>
         </div>
 
@@ -321,7 +327,7 @@ function goToInterview(interview: Interview): void {
           <div class="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-violet-50 transition-colors group-hover:bg-violet-100">
             <i class="pi pi-user text-lg text-violet-600"></i>
           </div>
-          <h3 class="text-base font-semibold text-gray-900">My Profile</h3>
+          <h3 class="text-base font-semibold text-gray-900">{{ t('nav.profile') }}</h3>
           <p class="mt-1 text-sm text-gray-500">View and edit your profile</p>
         </div>
       </div>

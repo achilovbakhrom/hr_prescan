@@ -71,7 +71,9 @@ else
 fi
 
 # --- Also install weekly certbot renewal cron ---
-CERTBOT_JOB="0 0 * * 0 docker run --rm -v /etc/letsencrypt:/etc/letsencrypt -v /var/www/certbot:/var/www/certbot certbot/certbot renew --quiet && docker exec nginx nginx -s reload >> /var/log/certbot_renewal.log 2>&1"
+# Uses docker compose exec so it works with compose project container names (prescreen-nginx-1).
+COMPOSE_DIR="${COMPOSE_DIR:-/opt/prescreen}"
+CERTBOT_JOB="0 0 * * 0 docker run --rm -v /etc/letsencrypt:/etc/letsencrypt -v ${COMPOSE_DIR}/certbot-webroot:/var/www/certbot certbot/certbot renew --quiet && cd ${COMPOSE_DIR} && docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml exec -T nginx nginx -s reload >> /var/log/certbot_renewal.log 2>&1"
 
 EXISTING=$(crontab -u "${CRON_USER}" -l 2>/dev/null || true)
 if echo "${EXISTING}" | grep -qF "certbot renew"; then

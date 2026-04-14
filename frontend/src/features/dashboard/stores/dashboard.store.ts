@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
+import { extractErrorMessage } from '@/shared/api/errors'
 import { dashboardService } from '../services/dashboard.service'
 import type { DashboardStats } from '../types/dashboard.types'
 
@@ -27,22 +28,3 @@ export const useDashboardStore = defineStore('dashboard', () => {
     fetchStats,
   }
 })
-
-function extractErrorMessage(err: unknown): string {
-  if (
-    typeof err === 'object' &&
-    err !== null &&
-    'response' in err &&
-    typeof (err as Record<string, unknown>).response === 'object'
-  ) {
-    const response = (err as { response: { data?: { message?: string } } })
-      .response
-    if (response.data?.message) {
-      return response.data.message
-    }
-  }
-  if (err instanceof Error) {
-    return err.message
-  }
-  return 'An unexpected error occurred'
-}

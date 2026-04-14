@@ -1,3 +1,4 @@
+import io
 import json
 import logging
 
@@ -6,7 +7,25 @@ from openai import OpenAI
 
 from apps.accounts.models import Company, User
 from apps.common.exceptions import ApplicationError
-from apps.vacancies.models import InterviewQuestion, ScreeningStep, Vacancy, VacancyCriteria
+from apps.common.messages import (
+    MSG_AI_COMPANY_INFO_FAILED,
+    MSG_AI_QUESTIONS_FAILED,
+    MSG_CANNOT_CHANGE_MODE,
+    MSG_EMPLOYER_HAS_VACANCIES,
+    MSG_FILE_EXTRACT_FAILED,
+    MSG_INTERNAL_URL_NOT_ALLOWED,
+    MSG_INVALID_URL,
+    MSG_NO_INTERVIEW_QUESTIONS,
+    MSG_NO_PRESCANNING_QUESTIONS,
+    MSG_ONLY_ARCHIVED_DELETE,
+    MSG_ONLY_DRAFT_PAUSED_PUBLISH,
+    MSG_ONLY_PUBLISHED_PAUSE,
+    MSG_ONLY_PUBLISHED_PAUSED_ARCHIVE,
+    MSG_URL_RESOLVE_FAILED,
+    MSG_WEBSITE_EXTRACT_FAILED,
+    MSG_WEBSITE_FETCH_FAILED,
+)
+from apps.vacancies.models import EmployerCompany, InterviewQuestion, ScreeningStep, Vacancy, VacancyCriteria
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +57,11 @@ def create_vacancy(
         **kwargs,
     )
     create_default_criteria(vacancy=vacancy)
+
+    from apps.vacancies.tasks import generate_keywords_task
+
+    transaction.on_commit(lambda: generate_keywords_task.delay(str(vacancy.id)))
+
     return vacancy
 
 
@@ -58,9 +82,7 @@ def update_vacancy(*, vacancy: Vacancy, data: dict) -> Vacancy:
     # Guard: interview_mode cannot be changed once applications exist
     if "interview_mode" in data and data["interview_mode"] != vacancy.interview_mode:
         if vacancy.applications.exists():
-            raise ApplicationError(
-                "Cannot change interview mode after applications have been submitted."
-            )
+            raise ApplicationError(str(MSG_CANNOT_CHANGE_MODE))
 
     update_fields: list[str] = []
 
@@ -74,6 +96,14 @@ def update_vacancy(*, vacancy: Vacancy, data: dict) -> Vacancy:
 
     update_fields.append("updated_at")
     vacancy.save(update_fields=update_fields)
+
+    # Regenerate keywords when search-relevant fields change
+    search_relevant_fields = {"title", "description", "requirements", "skills"}
+    if search_relevant_fields & set(update_fields):
+        from apps.vacancies.tasks import generate_keywords_task
+
+        transaction.on_commit(lambda: generate_keywords_task.delay(str(vacancy.id)))
+
     return vacancy
 
 
@@ -83,13 +113,13 @@ def publish_vacancy(*, vacancy: Vacancy) -> Vacancy:
     Lifecycle: draft → published ↔ paused → archived. Cannot go back to draft.
     """
     if vacancy.status not in (Vacancy.Status.DRAFT, Vacancy.Status.PAUSED):
-        raise ApplicationError("Only draft or paused vacancies can be published.")
+        raise ApplicationError(str(MSG_ONLY_DRAFT_PAUSED_PUBLISH))
 
     if not vacancy.questions.filter(is_active=True, step=ScreeningStep.PRESCANNING).exists():
-        raise ApplicationError("Cannot publish a vacancy without active prescanning questions.")
+        raise ApplicationError(str(MSG_NO_PRESCANNING_QUESTIONS))
 
     if vacancy.interview_enabled and not vacancy.questions.filter(is_active=True, step=ScreeningStep.INTERVIEW).exists():
-        raise ApplicationError("Cannot publish a vacancy with interview enabled but no active interview questions.")
+        raise ApplicationError(str(MSG_NO_INTERVIEW_QUESTIONS))
 
     vacancy.status = Vacancy.Status.PUBLISHED
     vacancy.save(update_fields=["status", "updated_at"])
@@ -99,7 +129,7 @@ def publish_vacancy(*, vacancy: Vacancy) -> Vacancy:
 def pause_vacancy(*, vacancy: Vacancy) -> Vacancy:
     """Pause a published vacancy. Can be resumed (published again)."""
     if vacancy.status != Vacancy.Status.PUBLISHED:
-        raise ApplicationError("Only published vacancies can be paused.")
+        raise ApplicationError(str(MSG_ONLY_PUBLISHED_PAUSE))
 
     vacancy.status = Vacancy.Status.PAUSED
     vacancy.save(update_fields=["status", "updated_at"])
@@ -112,7 +142,7 @@ def archive_vacancy(*, vacancy: Vacancy) -> Vacancy:
     Allowed from published or paused. Terminal state — cannot go back.
     """
     if vacancy.status not in (Vacancy.Status.PUBLISHED, Vacancy.Status.PAUSED):
-        raise ApplicationError("Only published or paused vacancies can be archived.")
+        raise ApplicationError(str(MSG_ONLY_PUBLISHED_PAUSED_ARCHIVE))
 
     vacancy.status = Vacancy.Status.ARCHIVED
     vacancy.save(update_fields=["status", "updated_at"])
@@ -122,6 +152,15 @@ def archive_vacancy(*, vacancy: Vacancy) -> Vacancy:
 
     expire_interviews_for_vacancy(vacancy=vacancy)
 
+    return vacancy
+
+
+def soft_delete_vacancy(*, vacancy: Vacancy) -> Vacancy:
+    """Soft-delete a vacancy. Only draft or archived vacancies can be deleted."""
+    if vacancy.status not in (Vacancy.Status.DRAFT, Vacancy.Status.ARCHIVED):
+        raise ApplicationError("Only draft or archived vacancies can be deleted.")
+    vacancy.is_deleted = True
+    vacancy.save(update_fields=["is_deleted", "updated_at"])
     return vacancy
 
 
@@ -295,7 +334,7 @@ def generate_interview_questions(
         questions_data = data.get("questions", [])
     except Exception:
         logger.exception("Failed to generate questions with AI for vacancy %s", vacancy.id)
-        raise ApplicationError("Failed to generate questions. Please try again.")
+        raise ApplicationError(str(MSG_AI_QUESTIONS_FAILED))
 
     max_order = vacancy.questions.filter(step=step).aggregate(
         max_order=models.Max("order")
@@ -314,3 +353,252 @@ def generate_interview_questions(
         created_questions.append(question)
 
     return created_questions
+
+
+def generate_vacancy_keywords(*, vacancy: Vacancy) -> list[str]:
+    """Generate search keywords using AI for a vacancy."""
+    client = OpenAI()
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        temperature=0.3,
+        response_format={"type": "json_object"},
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "Generate 20-30 search keywords for this job vacancy. "
+                    "Include ALL of these categories:\n"
+                    "- Job title synonyms and variations\n"
+                    "- Broad field/industry terms (e.g. 'programming', 'software development', 'IT')\n"
+                    "- Related roles and specializations\n"
+                    "- Key skills and technologies mentioned\n"
+                    "- Industry jargon and abbreviations\n"
+                    "- Common search terms a job seeker would use\n"
+                    "Generate keywords in BOTH English and Russian. "
+                    'Return JSON: {"keywords": ["keyword1", "keyword2", ...]}'
+                ),
+            },
+            {
+                "role": "user",
+                "content": (
+                    f"Title: {vacancy.title}\n"
+                    f"Description: {vacancy.description[:2000]}\n"
+                    f"Requirements: {(vacancy.requirements or 'N/A')[:1000]}\n"
+                    f"Skills: {', '.join(vacancy.skills) if vacancy.skills else 'N/A'}"
+                ),
+            },
+        ],
+    )
+    data = json.loads(response.choices[0].message.content)
+    keywords = data.get("keywords", [])
+    vacancy.keywords = keywords
+    vacancy.save(update_fields=["keywords", "updated_at"])
+    return keywords
+
+
+def update_vacancy_search_vector(*, vacancy: Vacancy) -> None:
+    """Update the pre-computed search vector for a vacancy.
+
+    Uses both 'english' (for stemming: program matches programming) and
+    'simple' (for exact matches of non-English words like Russian).
+    """
+    from django.contrib.postgres.search import SearchVector
+    from django.db.models import Value
+
+    skills_text = " ".join(vacancy.skills) if vacancy.skills else ""
+    keywords_text = " ".join(vacancy.keywords) if vacancy.keywords else ""
+
+    Vacancy.objects.filter(id=vacancy.id).update(
+        search_vector=(
+            # English stemming (program → programming, develop → developer)
+            SearchVector("title", weight="A", config="english")
+            + SearchVector(Value(skills_text), weight="A", config="english")
+            + SearchVector(Value(keywords_text), weight="A", config="english")
+            + SearchVector("requirements", weight="B", config="english")
+            + SearchVector("description", weight="C", config="english")
+            # Simple config for exact matches (Russian words, abbreviations)
+            + SearchVector("title", weight="A", config="simple")
+            + SearchVector(Value(skills_text), weight="A", config="simple")
+            + SearchVector(Value(keywords_text), weight="A", config="simple")
+        )
+    )
+
+
+def parse_company_info_from_file(*, file_obj) -> str:
+    """Extract text from an uploaded file (PDF/DOCX/TXT) and use AI to generate company info."""
+    filename = getattr(file_obj, "name", "file.txt")
+    ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else "txt"
+    file_bytes = file_obj.read()
+
+    if ext == "pdf":
+        text = _extract_text_from_pdf(file_bytes)
+    elif ext in ("docx", "doc"):
+        text = _extract_text_from_docx(file_bytes)
+    else:
+        text = file_bytes.decode("utf-8", errors="ignore")
+
+    if not text.strip():
+        raise ApplicationError(str(MSG_FILE_EXTRACT_FAILED))
+
+    return _generate_company_info_with_ai(text=text, source_label="document")
+
+
+def _extract_text_from_pdf(file_bytes: bytes) -> str:
+    """Extract text from PDF bytes using PyPDF2."""
+    import PyPDF2
+
+    reader = PyPDF2.PdfReader(io.BytesIO(file_bytes))
+    pages = []
+    for page in reader.pages:
+        text = page.extract_text()
+        if text:
+            pages.append(text)
+    return "\n\n".join(pages)
+
+
+def _extract_text_from_docx(file_bytes: bytes) -> str:
+    """Extract text from DOCX bytes using python-docx."""
+    import docx
+
+    doc = docx.Document(io.BytesIO(file_bytes))
+    return "\n".join(p.text for p in doc.paragraphs if p.text.strip())
+
+
+def _validate_url_not_internal(url: str) -> None:
+    """Reject URLs pointing to private/internal networks to prevent SSRF."""
+    import ipaddress
+    import socket
+    from urllib.parse import urlparse
+
+    parsed = urlparse(url)
+    hostname = parsed.hostname
+    if not hostname:
+        raise ApplicationError(str(MSG_INVALID_URL))
+
+    # Block obvious internal hostnames
+    blocked_hostnames = {"localhost", "127.0.0.1", "::1", "0.0.0.0", "metadata.google.internal"}
+    if hostname.lower() in blocked_hostnames:
+        raise ApplicationError(str(MSG_INTERNAL_URL_NOT_ALLOWED))
+
+    try:
+        resolved_ip = socket.getaddrinfo(hostname, None, socket.AF_UNSPEC, socket.SOCK_STREAM)[0][4][0]
+        ip = ipaddress.ip_address(resolved_ip)
+    except (socket.gaierror, ValueError) as exc:
+        raise ApplicationError(str(MSG_URL_RESOLVE_FAILED)) from exc
+
+    if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved:
+        raise ApplicationError(str(MSG_INTERNAL_URL_NOT_ALLOWED))
+
+
+def parse_company_info_from_url(*, url: str) -> str:
+    """Fetch a webpage and use AI to generate company info from its content."""
+    import requests
+    from bs4 import BeautifulSoup
+
+    _validate_url_not_internal(url)
+
+    try:
+        response = requests.get(url, timeout=10, headers={
+            "User-Agent": "Mozilla/5.0 (compatible; HRPreScan/1.0)",
+        }, allow_redirects=True)
+        response.raise_for_status()
+    except requests.RequestException as exc:
+        raise ApplicationError(str(MSG_WEBSITE_FETCH_FAILED)) from exc
+
+    soup = BeautifulSoup(response.text, "html.parser")
+
+    # Remove non-content elements
+    for tag in soup(["script", "style", "nav", "footer", "header", "aside", "iframe"]):
+        tag.decompose()
+
+    text = soup.get_text(separator="\n", strip=True)
+
+    if not text.strip():
+        raise ApplicationError(str(MSG_WEBSITE_EXTRACT_FAILED))
+
+    return _generate_company_info_with_ai(text=text, source_label="website")
+
+
+def _generate_company_info_with_ai(*, text: str, source_label: str = "document") -> str:
+    """Use AI to generate a company info summary from extracted text."""
+    try:
+        client = OpenAI()
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            temperature=0.3,
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You are an AI assistant helping HR managers prepare company descriptions "
+                        "for AI-powered candidate interviews. Given the content extracted from a "
+                        f"company {source_label}, write a concise "
+                        "company introduction (3-5 paragraphs) that an AI interviewer can use to "
+                        "introduce the company to candidates.\n\n"
+                        "Include: what the company does, industry, mission/values, culture, "
+                        "notable achievements or products, and team size if available.\n"
+                        "Tone: professional but friendly. Write in third person."
+                    ),
+                },
+                {
+                    "role": "user",
+                    "content": f"Generate a company info summary from this {source_label}:\n\n{text[:6000]}",
+                },
+            ],
+        )
+        return response.choices[0].message.content.strip()
+    except Exception:
+        logger.exception("Failed to generate company info with AI from %s", source_label)
+        raise ApplicationError(str(MSG_AI_COMPANY_INFO_FAILED))
+
+
+# ---------------------------------------------------------------------------
+# Employer Company services
+# ---------------------------------------------------------------------------
+
+def create_employer(*, company: Company, name: str, **kwargs: object) -> EmployerCompany:
+    """Create a manually-entered employer company."""
+    return EmployerCompany.objects.create(company=company, name=name, **kwargs)
+
+
+def create_employer_from_file(*, company: Company, name: str, file_obj: object) -> EmployerCompany:
+    """Create an employer company with description parsed from an uploaded file."""
+    description = parse_company_info_from_file(file_obj=file_obj)
+    return EmployerCompany.objects.create(
+        company=company,
+        name=name,
+        description=description,
+        source=EmployerCompany.Source.FILE,
+    )
+
+
+def create_employer_from_url(*, company: Company, name: str, url: str) -> EmployerCompany:
+    """Create an employer company with description parsed from a website URL."""
+    description = parse_company_info_from_url(url=url)
+    return EmployerCompany.objects.create(
+        company=company,
+        name=name,
+        description=description,
+        source=EmployerCompany.Source.WEBSITE,
+    )
+
+
+def update_employer(*, employer: EmployerCompany, data: dict) -> EmployerCompany:
+    """Update allowed employer company fields."""
+    allowed_fields = {"name", "industry", "logo", "website", "description"}
+    update_fields: list[str] = []
+    for field, value in data.items():
+        if field in allowed_fields:
+            setattr(employer, field, value)
+            update_fields.append(field)
+    if update_fields:
+        update_fields.append("updated_at")
+        employer.save(update_fields=update_fields)
+    return employer
+
+
+def delete_employer(*, employer: EmployerCompany) -> None:
+    """Delete an employer company. Raises if it has linked vacancies."""
+    if employer.vacancies.exists():
+        raise ApplicationError(str(MSG_EMPLOYER_HAS_VACANCIES))
+    employer.delete()

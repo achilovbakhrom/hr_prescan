@@ -20,6 +20,7 @@ from django.utils import timezone
 
 from openai import OpenAI
 
+from apps.common.messages import MSG_EVALUATION_MALFORMED
 from apps.interviews.models import Interview
 
 logger = logging.getLogger(__name__)
@@ -77,9 +78,13 @@ Use this CV data to ask targeted follow-up questions and verify claims.
 Use this CV data to ask targeted follow-up questions and verify claims.
 """
 
-    # Company info section
+    # Company info section — prefer employer description, fall back to vacancy.company_info
     company_info_section = ""
-    company_info = getattr(vacancy, "company_info", "") or ""
+    company_info = ""
+    if vacancy.employer and vacancy.employer.description:
+        company_info = vacancy.employer.description
+    elif vacancy.company_info:
+        company_info = vacancy.company_info
     if company_info:
         company_info_section = f"""
 ## About the Company
@@ -217,29 +222,29 @@ def generate_greeting(interview: Interview) -> str:
     return greeting
 
 
-def process_candidate_message(interview: Interview, candidate_message: str) -> dict:
+def _get_ai_response_and_update_history(interview: Interview, candidate_entry: dict) -> dict:
     """
-    Process a candidate's message and generate the AI response.
+    Shared helper: append candidate entry to history, call OpenAI, handle
+    completion markers, save, and run evaluation if complete.
+
+    Args:
+        interview: The Interview instance (will be mutated and saved).
+        candidate_entry: A dict with at least {role, text, timestamp} and
+            optionally {message_type, audio_url, duration}.
 
     Returns dict with:
-    - ai_message: str — the AI's response text (cleaned, no markers)
-    - is_complete: bool — whether the session is now complete
-    - ai_decision: str | None — "advance" or "reject" if complete
-    - chat_history: list — updated chat history
+        - ai_message: str — the AI's response text (cleaned, no markers)
+        - ai_timestamp: str
+        - is_complete: bool
+        - ai_decision: str | None — "advance" or "reject" if complete
+        - chat_history: list — updated chat history
     """
     client = _get_client()
     system_prompt = _build_system_prompt(interview)
-    now = timezone.now().isoformat()
 
     # Build conversation history for OpenAI
     chat_history = list(interview.chat_history or [])
-
-    # Append the new candidate message
-    chat_history.append({
-        "role": "candidate",
-        "text": candidate_message,
-        "timestamp": now,
-    })
+    chat_history.append(candidate_entry)
 
     # Convert our chat history to OpenAI message format
     openai_messages = [{"role": "system", "content": system_prompt}]
@@ -303,6 +308,92 @@ def process_candidate_message(interview: Interview, candidate_message: str) -> d
         "ai_decision": ai_decision,
         "chat_history": chat_history,
     }
+
+
+def process_candidate_message(interview: Interview, candidate_message: str) -> dict:
+    """
+    Process a candidate's text message and generate the AI response.
+
+    Returns dict with:
+    - ai_message: str — the AI's response text (cleaned, no markers)
+    - is_complete: bool — whether the session is now complete
+    - ai_decision: str | None — "advance" or "reject" if complete
+    - chat_history: list — updated chat history
+    """
+    now = timezone.now().isoformat()
+
+    candidate_entry = {
+        "role": "candidate",
+        "text": candidate_message,
+        "timestamp": now,
+    }
+
+    return _get_ai_response_and_update_history(interview, candidate_entry)
+
+
+def process_voice_message(*, interview: Interview, audio_file, duration: float) -> dict:
+    """
+    Process a candidate's voice message: upload, transcribe, and generate AI response.
+
+    Steps:
+    1. Upload audio to S3 via upload_voice_message_to_s3
+    2. Transcribe via transcribe_audio
+    3. Append candidate voice message to chat_history with extra fields
+    4. Get AI response via shared helper
+    5. Return dict with: ai_message, candidate_transcript, candidate_audio_url
+
+    Returns dict with:
+    - ai_message: str
+    - ai_timestamp: str
+    - is_complete: bool
+    - ai_decision: str | None
+    - chat_history: list
+    - candidate_transcript: str
+    - candidate_audio_url: str
+    """
+    from apps.interviews.transcription_service import (
+        transcribe_audio,
+        upload_voice_message_to_s3,
+    )
+
+    # Read bytes once — the file object can't be re-read after S3 upload
+    file_bytes = audio_file.read()
+    filename = getattr(audio_file, "name", "audio.webm") or "audio.webm"
+
+    # 1. Upload audio to S3
+    import io
+    s3_key = upload_voice_message_to_s3(
+        file_obj=io.BytesIO(file_bytes),
+        interview_id=str(interview.id),
+        filename=filename,
+    )
+
+    # 2. Transcribe audio
+    transcript = transcribe_audio(
+        file_bytes=file_bytes,
+        filename=filename,
+    )
+
+    now = timezone.now().isoformat()
+
+    # 3. Build candidate entry with voice metadata
+    candidate_entry = {
+        "role": "candidate",
+        "text": transcript,
+        "timestamp": now,
+        "message_type": "voice",
+        "audio_url": s3_key,
+        "duration": duration,
+    }
+
+    # 4. Get AI response using shared helper
+    result = _get_ai_response_and_update_history(interview, candidate_entry)
+
+    # 5. Augment result with voice-specific fields
+    result["candidate_transcript"] = transcript
+    result["candidate_audio_url"] = s3_key
+
+    return result
 
 
 def evaluate_chat_interview(interview: Interview, *, ai_decision: str = "advance") -> None:
@@ -400,7 +491,18 @@ Respond with ONLY valid JSON in this exact format:
     try:
         result = json.loads(raw)
     except json.JSONDecodeError:
-        logger.error("Failed to parse evaluation JSON for session %s", interview.id)
+        logger.error(
+            "Failed to parse evaluation JSON for session %s. Raw response: %s",
+            interview.id, raw[:500],
+        )
+        # Complete session with fallback so the pipeline doesn't get stuck
+        complete_session(
+            interview=interview,
+            overall_score=Decimal("0"),
+            ai_summary=str(MSG_EVALUATION_MALFORMED),
+            transcript=interview.chat_history or [],
+            ai_decision=ai_decision,
+        )
         return
 
     # Save scores

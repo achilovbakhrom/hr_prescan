@@ -1,22 +1,18 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useVacancyStore } from '../stores/vacancy.store'
 import VacancyForm from '../components/VacancyForm.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { CreateVacancyRequest } from '../types/vacancy.types'
 
+const { t } = useI18n()
 const router = useRouter()
 const vacancyStore = useVacancyStore()
 
-async function handleSave(
-  data: CreateVacancyRequest,
-  publish: boolean,
-): Promise<void> {
+async function handleSave(data: CreateVacancyRequest): Promise<void> {
   try {
     const vacancy = await vacancyStore.createVacancy(data)
-    if (publish) {
-      await vacancyStore.changeStatus(vacancy.id, 'published')
-    }
     router.push({
       name: ROUTE_NAMES.VACANCY_DETAIL,
       params: { id: vacancy.id },
@@ -36,7 +32,7 @@ async function handleSave(
       >
         <i class="pi pi-arrow-left text-lg"></i>
       </button>
-      <h1 class="text-2xl font-bold">Create Vacancy</h1>
+      <h1 class="text-2xl font-bold">{{ t('vacancies.createTitle') }}</h1>
     </div>
 
     <p v-if="vacancyStore.error" class="text-sm text-red-600">

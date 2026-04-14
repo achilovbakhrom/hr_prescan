@@ -6,7 +6,7 @@ import type {
   AdminUser,
   PlatformAnalytics,
 } from '../types/admin.types'
-import type { SubscriptionPlan } from '@/features/subscriptions/types/subscription.types'
+import type { SubscriptionPlan } from '@/shared/types/subscription.types'
 
 export const useAdminStore = defineStore('admin', () => {
   const companies = ref<AdminCompany[]>([])
