@@ -179,16 +179,24 @@ jobs:
 
       - name: Rollback on failure
         if: failure()
+        timeout-minutes: 3
         run: |
-          echo "[ROLLBACK] Deployment failed — rolling back to previous images..."
-          ssh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} \
-            "cd ${{ secrets.PROD_DEPLOY_PATH }} && \
-             IMAGE_TAG=latest \
-               docker compose \
-                 -f docker-compose.yml \
-                 -f deploy/docker-compose.prod.yml \
-               up -d --no-deps django celery-worker celery-beat nginx livekit-agent"
-          echo "[ROLLBACK] Rollback complete."
+          echo "[ROLLBACK] Deployment failed — attempting rollback to :latest images..."
+          ssh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} bash -s <<'EOSSH' || echo "[ROLLBACK] SSH rollback exited non-zero"
+          set +e
+          cd /opt/prescreen
+          # Skip rollback if no previous :latest images exist (first deploy).
+          if ! docker image inspect ghcr.io/achilovbakhrom/hr_prescan/backend:latest >/dev/null 2>&1; then
+            echo "[ROLLBACK] No previous :latest image found — skipping rollback (first deploy)."
+            exit 0
+          fi
+          # Kill any leftover ephemeral `run --rm` containers.
+          docker ps -aq --filter "name=prescreen-django-run-" | xargs -r docker rm -f
+          IMAGE_TAG=latest timeout 120 \
+            docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml \
+            up -d --no-deps --timeout 30 django celery-worker celery-beat nginx livekit-agent
+          echo "[ROLLBACK] Done."
+          EOSSH
           exit 1
 
       - name: Prune old Docker images on host

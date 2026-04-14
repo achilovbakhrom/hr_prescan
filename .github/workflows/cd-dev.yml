@@ -156,12 +156,24 @@ jobs:
 
       - name: Rollback on failure
         if: failure()
+        timeout-minutes: 3
         run: |
-          echo "[ROLLBACK] Rolling back to :dev images..."
-          IMAGE_TAG=dev \
-            docker compose $CF \
-            up -d --no-deps django celery-worker celery-beat nginx livekit-agent
-          echo "[ROLLBACK] Complete."
+          echo "[ROLLBACK] Attempting rollback to :dev images..."
+          # Skip rollback entirely if no previous :dev images exist (first deploy).
+          if ! docker image inspect ghcr.io/${{ github.repository }}/backend:dev >/dev/null 2>&1; then
+            echo "[ROLLBACK] No previous :dev image found — skipping rollback (first deploy)."
+            exit 1
+          fi
+          # Kill any leftover `run --rm` ephemeral containers that can wedge compose.
+          docker ps -aq --filter "name=prescreen-django-run-" | xargs -r docker rm -f || true
+          # --timeout 30 so stuck containers are force-killed quickly.
+          # No --wait: we don't block on health; if new images were worse than old,
+          # at least previous containers come back up.
+          IMAGE_TAG=dev timeout 120 \
+            docker compose $CF up -d --no-deps --timeout 30 \
+              django celery-worker celery-beat nginx livekit-agent \
+            || echo "[ROLLBACK] compose up timed out or partially failed — leaving state as-is"
+          echo "[ROLLBACK] Done."
           exit 1
 
       # Always runs — keeps the dev server disk clean
