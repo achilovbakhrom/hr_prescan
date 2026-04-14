@@ -72,6 +72,14 @@ jobs:
           tags: |
             ${{ env.IMAGE_PREFIX }}/frontend:${{ github.sha }}
             ${{ env.IMAGE_PREFIX }}/frontend:latest
+          build-args: |
+            VITE_API_URL=https://prescreen-app.com/api
+            VITE_LIVEKIT_URL=wss://prescreen-app.com/ws/
+            VITE_GOOGLE_CLIENT_ID=349448119179-u765ec4rflb1g0jetpmfb722lcuhkkcv.apps.googleusercontent.com
+            VITE_TELEGRAM_BOT_USERNAME=hr_prescreen_ai_bot
+            VITE_TELEGRAM_BOT_ID=8419067285
+            VITE_TELEGRAM_CANDIDATE_BOT_USERNAME=hr_prescreen_candidate_dev_bot
+            VITE_BILLING_ENABLED=false
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,scope=frontend
           cache-to: type=gha,mode=max,scope=frontend
