@@ -105,16 +105,9 @@ jobs:
           IMAGE_TAG=${{ github.sha }} \
             docker compose $CF up -d --wait postgres redis rabbitmq minio livekit
 
-      - name: Run database migrations (via ephemeral container, works on first deploy)
-        run: |
-          IMAGE_TAG=${{ github.sha }} \
-            docker compose $CF run --rm django python manage.py migrate --no-input
-
-      - name: Collect static files
-        run: |
-          IMAGE_TAG=${{ github.sha }} \
-            docker compose $CF run --rm django python manage.py collectstatic --no-input --clear
-
+      # The backend image's entrypoint.sh applies migrations and collectstatic
+      # on every container start before launching gunicorn, so no explicit
+      # migration step is needed. Health check waits until that's done.
       - name: Rolling update — backend (zero-downtime on subsequent deploys)
         run: |
           # If no django container exists yet (first deploy), this just creates one.

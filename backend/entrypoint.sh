@@ -1,6 +1,12 @@
 #!/bin/bash
 set -e
 
+# If an explicit command was passed (e.g. celery, manage.py subcommand),
+# run it directly so this image can back both web and worker services.
+if [ "$#" -gt 0 ]; then
+  exec "$@"
+fi
+
 echo "Applying migrations..."
 python manage.py migrate --noinput
 
