@@ -125,6 +125,11 @@ function togglePreviewCamera(): void {
   })
 }
 
+function handleGoBack(): void {
+  stopPreview()
+  connectionState.value = 'idle'
+}
+
 // --- Room connection ---
 async function joinRoom(): Promise<void> {
   stopPreview()
@@ -402,10 +407,7 @@ function getInitials(name: string): string {
           />
           <button
             class="mt-3 text-sm text-gray-400 hover:text-white"
-            @click="
-              stopPreview()
-              connectionState = 'idle'
-            "
+            @click="handleGoBack"
           >
             Go back
           </button>
