@@ -5,8 +5,6 @@ import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
 
-const { t } = useI18n()
-
 const props = defineProps<{
   visible: boolean
   loading: boolean
@@ -16,6 +14,8 @@ const emit = defineEmits<{
   hide: []
   invite: [email: string]
 }>()
+
+const { t } = useI18n()
 
 const email = ref('')
 const submitted = ref(false)
@@ -77,11 +77,7 @@ function handleSubmit(): void {
           severity="secondary"
           @click="emit('hide')"
         />
-        <Button
-          type="submit"
-          :label="t('settings.team.send')"
-          :loading="loading"
-        />
+        <Button type="submit" :label="t('settings.team.send')" :loading="loading" />
       </div>
     </form>
   </Dialog>

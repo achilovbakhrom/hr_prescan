@@ -1,5 +1,3 @@
-import uuid
-
 from rest_framework import serializers, status
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import AllowAny
@@ -22,7 +20,10 @@ class SubmitApplicationApi(APIView):
         candidate_name = serializers.CharField(max_length=255)
         candidate_email = serializers.EmailField()
         candidate_phone = serializers.CharField(
-            max_length=50, required=False, allow_blank=True, default="",
+            max_length=50,
+            required=False,
+            allow_blank=True,
+            default="",
         )
         cv_file = serializers.FileField(required=False, allow_null=True, default=None)
 

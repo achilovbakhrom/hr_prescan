@@ -23,7 +23,15 @@ const globalConfig = {
     },
     Password: {
       template: '<input :id="inputId" type="password" :placeholder="placeholder" />',
-      props: ['inputId', 'modelValue', 'placeholder', 'feedback', 'toggleMask', 'invalid', 'inputClass'],
+      props: [
+        'inputId',
+        'modelValue',
+        'placeholder',
+        'feedback',
+        'toggleMask',
+        'invalid',
+        'inputClass',
+      ],
     },
     Button: {
       template: '<button :type="type">{{ label }}</button>',

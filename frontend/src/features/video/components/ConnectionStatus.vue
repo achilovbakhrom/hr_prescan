@@ -23,9 +23,7 @@ const config = computed(() => {
       class="inline-block h-2.5 w-2.5 rounded-full"
       :class="[
         config.color,
-        state === 'connecting' || state === 'reconnecting'
-          ? 'animate-pulse'
-          : '',
+        state === 'connecting' || state === 'reconnecting' ? 'animate-pulse' : '',
       ]"
     ></span>
     <span class="text-gray-600">{{ config.label }}</span>

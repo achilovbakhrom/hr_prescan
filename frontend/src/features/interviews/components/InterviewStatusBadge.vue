@@ -10,10 +10,12 @@ const props = defineProps<{
 
 const { t } = useI18n()
 
-const statusConfig = computed<Record<
-  InterviewStatus,
-  { label: string; severity: 'success' | 'info' | 'warn' | 'danger' | 'secondary' }
->>(() => ({
+const statusConfig = computed<
+  Record<
+    InterviewStatus,
+    { label: string; severity: 'success' | 'info' | 'warn' | 'danger' | 'secondary' }
+  >
+>(() => ({
   pending: { label: t('interviews.status.pending'), severity: 'warn' },
   in_progress: { label: t('interviews.status.inProgress'), severity: 'info' },
   completed: { label: t('interviews.status.completed'), severity: 'success' },
@@ -21,7 +23,9 @@ const statusConfig = computed<Record<
   expired: { label: t('interviews.status.expired'), severity: 'secondary' },
 }))
 
-const config = computed(() => statusConfig.value[props.status] ?? { label: props.status, severity: 'secondary' as const })
+const config = computed(
+  () => statusConfig.value[props.status] ?? { label: props.status, severity: 'secondary' as const },
+)
 </script>
 
 <template>

@@ -1,7 +1,4 @@
-import axios, {
-  type AxiosResponse,
-  type InternalAxiosRequestConfig,
-} from 'axios'
+import axios, { type AxiosResponse, type InternalAxiosRequestConfig } from 'axios'
 
 const TOKENS_KEY = 'hr_prescan_tokens'
 
@@ -20,7 +17,13 @@ function convertKeysToSnakeCase(obj: unknown): unknown {
   if (Array.isArray(obj)) {
     return obj.map(convertKeysToSnakeCase)
   }
-  if (obj !== null && typeof obj === 'object' && !(obj instanceof File) && !(obj instanceof Blob) && !(obj instanceof FormData)) {
+  if (
+    obj !== null &&
+    typeof obj === 'object' &&
+    !(obj instanceof File) &&
+    !(obj instanceof Blob) &&
+    !(obj instanceof FormData)
+  ) {
     return Object.fromEntries(
       Object.entries(obj as Record<string, unknown>).map(([key, value]) => [
         toSnakeCase(key),
@@ -89,24 +92,22 @@ apiClient.interceptors.response.use((response) => {
   return response
 })
 
-apiClient.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    // Add locale header for server-side i18n
-    const locale = localStorage.getItem('hr_prescan_locale') || 'en'
-    config.headers['Accept-Language'] = locale
+apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+  // Add locale header for server-side i18n
+  const locale = localStorage.getItem('hr_prescan_locale') || 'en'
+  config.headers['Accept-Language'] = locale
 
-    const raw = localStorage.getItem(TOKENS_KEY)
-    if (raw) {
-      try {
-        const tokens = JSON.parse(raw) as { access: string }
-        config.headers.Authorization = `Bearer ${tokens.access}`
-      } catch {
-        // Invalid token data, skip
-      }
+  const raw = localStorage.getItem(TOKENS_KEY)
+  if (raw) {
+    try {
+      const tokens = JSON.parse(raw) as { access: string }
+      config.headers.Authorization = `Bearer ${tokens.access}`
+    } catch {
+      // Invalid token data, skip
     }
-    return config
-  },
-)
+  }
+  return config
+})
 
 let isRefreshing = false
 let failedQueue: Array<{
@@ -148,11 +149,7 @@ apiClient.interceptors.response.use(
       originalRequest.url?.includes('/auth/login') ||
       originalRequest.url?.includes('/auth/token/refresh')
 
-    if (
-      axiosError.response?.status !== 401 ||
-      originalRequest._retry ||
-      isAuthEndpoint
-    ) {
+    if (axiosError.response?.status !== 401 || originalRequest._retry || isAuthEndpoint) {
       return Promise.reject(error)
     }
 

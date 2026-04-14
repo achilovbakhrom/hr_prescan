@@ -5,16 +5,21 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('accounts', '0002_add_invitation_model'),
-        ('subscriptions', '0001_initial'),
+        ("accounts", "0002_add_invitation_model"),
+        ("subscriptions", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='company',
-            name='subscription_plan',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='companies', to='subscriptions.subscriptionplan'),
+            model_name="company",
+            name="subscription_plan",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="companies",
+                to="subscriptions.subscriptionplan",
+            ),
         ),
     ]

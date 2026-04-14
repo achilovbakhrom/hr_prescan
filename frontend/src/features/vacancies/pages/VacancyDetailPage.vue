@@ -68,17 +68,17 @@ const editFormData = computed(() => {
   }
 })
 
-const prescanningQuestions = computed(() =>
-  vacancy.value?.questions.filter((q) => q.step === 'prescanning') ?? [],
+const prescanningQuestions = computed(
+  () => vacancy.value?.questions.filter((q) => q.step === 'prescanning') ?? [],
 )
-const interviewQuestions = computed(() =>
-  vacancy.value?.questions.filter((q) => q.step === 'interview') ?? [],
+const interviewQuestions = computed(
+  () => vacancy.value?.questions.filter((q) => q.step === 'interview') ?? [],
 )
-const prescanningCriteria = computed(() =>
-  vacancy.value?.criteria.filter((c) => c.step === 'prescanning') ?? [],
+const prescanningCriteria = computed(
+  () => vacancy.value?.criteria.filter((c) => c.step === 'prescanning') ?? [],
 )
-const interviewCriteria = computed(() =>
-  vacancy.value?.criteria.filter((c) => c.step === 'interview') ?? [],
+const interviewCriteria = computed(
+  () => vacancy.value?.criteria.filter((c) => c.step === 'interview') ?? [],
 )
 
 onMounted(() => {
@@ -92,7 +92,9 @@ function copyShareLink(): void {
   const url = `${window.location.origin}/jobs/share/${vacancy.value.shareToken}`
   navigator.clipboard.writeText(url).then(() => {
     linkCopied.value = true
-    setTimeout(() => { linkCopied.value = false }, 2000)
+    setTimeout(() => {
+      linkCopied.value = false
+    }, 2000)
   })
 }
 
@@ -202,7 +204,9 @@ async function handleUpdate(data: CreateVacancyRequest): Promise<void> {
         <!-- Prescanning tab -->
         <TabPanel value="1">
           <template #header>
-            <span class="text-xs sm:text-sm"><i class="pi pi-comments mr-1"></i>{{ t('vacancies.form.prescanning') }}</span>
+            <span class="text-xs sm:text-sm"
+              ><i class="pi pi-comments mr-1"></i>{{ t('vacancies.form.prescanning') }}</span
+            >
           </template>
           <ScreeningTab
             :vacancy-id="vacancyId"
@@ -223,7 +227,9 @@ async function handleUpdate(data: CreateVacancyRequest): Promise<void> {
         <!-- Interview tab (only when enabled) -->
         <TabPanel v-if="vacancy.interviewEnabled" value="2">
           <template #header>
-            <span class="text-xs sm:text-sm"><i class="pi pi-video mr-1"></i>{{ t('vacancies.form.interview') }}</span>
+            <span class="text-xs sm:text-sm"
+              ><i class="pi pi-video mr-1"></i>{{ t('vacancies.form.interview') }}</span
+            >
           </template>
           <ScreeningTab
             :vacancy-id="vacancyId"

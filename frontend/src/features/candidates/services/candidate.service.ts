@@ -20,10 +20,7 @@ interface ScheduleInterviewPayload {
 
 export const candidateService = {
   // Public — submit application with CV upload
-  async submitApplication(
-    vacancyId: string,
-    data: SubmitApplicationRequest,
-  ): Promise<Application> {
+  async submitApplication(vacancyId: string, data: SubmitApplicationRequest): Promise<Application> {
     const formData = new FormData()
     formData.append('candidate_name', data.candidateName)
     formData.append('candidate_email', data.candidateEmail)
@@ -43,15 +40,12 @@ export const candidateService = {
 
   // Candidate (auth required)
   async getMyApplications(): Promise<Application[]> {
-    const response =
-      await apiClient.get<Application[]>('/candidate/applications')
+    const response = await apiClient.get<Application[]>('/candidate/applications')
     return response.data
   },
 
   async getMyApplicationDetail(id: string): Promise<ApplicationDetail> {
-    const response = await apiClient.get<ApplicationDetail>(
-      `/candidate/applications/${id}`,
-    )
+    const response = await apiClient.get<ApplicationDetail>(`/candidate/applications/${id}`)
     return response.data
   },
 
@@ -60,63 +54,42 @@ export const candidateService = {
     vacancyId: string,
     params?: { status?: string; ordering?: string; search?: string },
   ): Promise<Application[]> {
-    const response = await apiClient.get<Application[]>(
-      `/hr/vacancies/${vacancyId}/candidates`,
-      { params },
-    )
+    const response = await apiClient.get<Application[]>(`/hr/vacancies/${vacancyId}/candidates`, {
+      params,
+    })
     return response.data
   },
 
   async getCandidateDetail(id: string): Promise<ApplicationDetail> {
-    const response = await apiClient.get<ApplicationDetail>(
-      `/hr/candidates/${id}`,
-    )
+    const response = await apiClient.get<ApplicationDetail>(`/hr/candidates/${id}`)
     return response.data
   },
 
-  async updateCandidateStatus(
-    id: string,
-    status: ApplicationStatus,
-  ): Promise<Application> {
-    const response = await apiClient.patch<Application>(
-      `/hr/candidates/${id}/status`,
-      { status },
-    )
+  async updateCandidateStatus(id: string, status: ApplicationStatus): Promise<Application> {
+    const response = await apiClient.patch<Application>(`/hr/candidates/${id}/status`, { status })
     return response.data
   },
 
-  async addCandidateNote(
-    id: string,
-    note: string,
-  ): Promise<ApplicationDetail> {
-    const response = await apiClient.post<ApplicationDetail>(
-      `/hr/candidates/${id}/notes`,
-      { note },
-    )
+  async addCandidateNote(id: string, note: string): Promise<ApplicationDetail> {
+    const response = await apiClient.post<ApplicationDetail>(`/hr/candidates/${id}/notes`, { note })
     return response.data
   },
 
   // Messaging
   async getMessages(candidateId: string): Promise<Message[]> {
-    const response = await apiClient.get<Message[]>(
-      `/hr/candidates/${candidateId}/messages`,
-    )
+    const response = await apiClient.get<Message[]>(`/hr/candidates/${candidateId}/messages`)
     return response.data
   },
 
   async sendMessage(candidateId: string, content: string): Promise<Message> {
-    const response = await apiClient.post<Message>(
-      `/hr/candidates/${candidateId}/messages`,
-      { content },
-    )
+    const response = await apiClient.post<Message>(`/hr/candidates/${candidateId}/messages`, {
+      content,
+    })
     return response.data
   },
 
   // Email
-  async sendEmail(
-    candidateId: string,
-    payload: SendEmailPayload,
-  ): Promise<void> {
+  async sendEmail(candidateId: string, payload: SendEmailPayload): Promise<void> {
     await apiClient.post(`/hr/candidates/${candidateId}/email`, payload)
   },
 
@@ -125,14 +98,14 @@ export const candidateService = {
     candidateId: string,
     payload: ScheduleInterviewPayload,
   ): Promise<void> {
-    await apiClient.post(
-      `/hr/candidates/${candidateId}/schedule-human-interview`,
-      payload,
-    )
+    await apiClient.post(`/hr/candidates/${candidateId}/schedule-human-interview`, payload)
   },
 
   // Interview data for candidate
-  async getCandidateInterview(candidateId: string, sessionType?: string): Promise<Record<string, unknown>> {
+  async getCandidateInterview(
+    candidateId: string,
+    sessionType?: string,
+  ): Promise<Record<string, unknown>> {
     const params = sessionType ? { session_type: sessionType } : undefined
     const response = await apiClient.get(`/hr/candidates/${candidateId}/interview`, { params })
     return response.data as Record<string, unknown>
@@ -147,10 +120,7 @@ export const candidateService = {
   },
 
   // Bulk actions
-  async bulkUpdateStatus(
-    applicationIds: string[],
-    status: ApplicationStatus,
-  ): Promise<void> {
+  async bulkUpdateStatus(applicationIds: string[], status: ApplicationStatus): Promise<void> {
     await apiClient.patch('/hr/candidates/bulk-status', {
       application_ids: applicationIds,
       status,
@@ -187,10 +157,9 @@ export const candidateService = {
 
   // Soft delete archived candidates
   async softDelete(applicationIds: string[]): Promise<{ deleted: number }> {
-    const response = await apiClient.post<{ deleted: number }>(
-      '/hr/candidates/soft-delete',
-      { application_ids: applicationIds },
-    )
+    const response = await apiClient.post<{ deleted: number }>('/hr/candidates/soft-delete', {
+      application_ids: applicationIds,
+    })
     return response.data
   },
 }

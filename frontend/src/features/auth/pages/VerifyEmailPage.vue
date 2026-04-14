@@ -27,9 +27,7 @@ onMounted(async () => {
     success.value = true
   } catch (err: unknown) {
     errorMessage.value =
-      err instanceof Error
-        ? err.message
-        : 'Email verification failed. The link may have expired.'
+      err instanceof Error ? err.message : 'Email verification failed. The link may have expired.'
   } finally {
     loading.value = false
   }

@@ -39,17 +39,33 @@ export const EXPERIENCE_LABELS: Record<string, string> = {
 }
 
 export function formatMoney(amount: number): string {
-  return Math.round(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+  return Math.round(amount)
+    .toString()
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
 }
 
-export function formatSalaryRange(vacancy: Vacancy, t: (key: string, params?: Record<string, unknown>) => string): string {
+export function formatSalaryRange(
+  vacancy: Vacancy,
+  t: (key: string, params?: Record<string, unknown>) => string,
+): string {
   const { salaryMin, salaryMax, salaryCurrency } = vacancy
   if (!salaryMin && !salaryMax) return t('vacancies.overview.salaryNotSpecified')
   if (salaryMin && salaryMax) {
-    return t('vacancies.overview.salaryRange', { min: formatMoney(salaryMin), max: formatMoney(salaryMax), currency: salaryCurrency })
+    return t('vacancies.overview.salaryRange', {
+      min: formatMoney(salaryMin),
+      max: formatMoney(salaryMax),
+      currency: salaryCurrency,
+    })
   }
-  if (salaryMin) return t('vacancies.overview.salaryFrom', { amount: formatMoney(salaryMin), currency: salaryCurrency })
-  return t('vacancies.overview.salaryUpTo', { amount: formatMoney(salaryMax!), currency: salaryCurrency })
+  if (salaryMin)
+    return t('vacancies.overview.salaryFrom', {
+      amount: formatMoney(salaryMin),
+      currency: salaryCurrency,
+    })
+  return t('vacancies.overview.salaryUpTo', {
+    amount: formatMoney(salaryMax!),
+    currency: salaryCurrency,
+  })
 }
 
 export function formatDate(dateStr: string): string {

@@ -17,7 +17,6 @@ def set_existing_steps_to_prescanning(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("vacancies", "0003_add_company_info_to_vacancy"),
     ]

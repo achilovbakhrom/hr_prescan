@@ -54,6 +54,7 @@ class PublicVacancyDetailApi(APIView):
         # For non-share-token access, only show published + public vacancies
         if not share_token:
             from apps.vacancies.models import Vacancy
+
             if vacancy.status != Vacancy.Status.PUBLISHED or vacancy.visibility != Vacancy.Visibility.PUBLIC:
                 return Response({"detail": str(MSG_VACANCY_NOT_FOUND)}, status=status.HTTP_404_NOT_FOUND)
 

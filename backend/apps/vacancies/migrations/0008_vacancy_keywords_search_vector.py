@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("vacancies", "0007_enable_pg_trgm"),
     ]
@@ -22,8 +21,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name="vacancy",
-            index=django.contrib.postgres.indexes.GinIndex(
-                fields=["search_vector"], name="vacancy_search_vector_gin"
-            ),
+            index=django.contrib.postgres.indexes.GinIndex(fields=["search_vector"], name="vacancy_search_vector_gin"),
         ),
     ]

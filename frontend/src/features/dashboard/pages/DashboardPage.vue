@@ -32,31 +32,30 @@ onMounted(async () => {
   loadingStats.value = true
   try {
     if (role.value === 'hr' || role.value === 'admin') {
-      await Promise.all([
-        vacancyStore.fetchVacancies(),
-        interviewStore.fetchInterviews(),
-      ])
+      await Promise.all([vacancyStore.fetchVacancies(), interviewStore.fetchInterviews()])
     } else if (role.value === 'candidate') {
       await candidateStore.fetchMyApplications()
     }
-  } catch { /* silent */ } finally {
+  } catch {
+    /* silent */
+  } finally {
     loadingStats.value = false
   }
 })
 
 // HR computed stats
-const activeVacancies = computed(() =>
-  vacancyStore.vacancies.filter((v) => v.status === 'published').length,
+const activeVacancies = computed(
+  () => vacancyStore.vacancies.filter((v) => v.status === 'published').length,
 )
-const draftVacancies = computed(() =>
-  vacancyStore.vacancies.filter((v) => v.status === 'draft').length,
+const draftVacancies = computed(
+  () => vacancyStore.vacancies.filter((v) => v.status === 'draft').length,
 )
 const totalVacancies = computed(() => vacancyStore.vacancies.length)
-const scheduledInterviews = computed(() =>
-  interviewStore.interviews.filter((i) => i.status === 'pending').length,
+const scheduledInterviews = computed(
+  () => interviewStore.interviews.filter((i) => i.status === 'pending').length,
 )
-const completedInterviews = computed(() =>
-  interviewStore.interviews.filter((i) => i.status === 'completed').length,
+const completedInterviews = computed(
+  () => interviewStore.interviews.filter((i) => i.status === 'completed').length,
 )
 const upcomingInterviews = computed(() =>
   interviewStore.interviews
@@ -67,13 +66,13 @@ const upcomingInterviews = computed(() =>
 
 // Candidate computed stats
 const totalApplications = computed(() => candidateStore.myApplications.length)
-const pendingApplications = computed(() =>
-  candidateStore.myApplications.filter((a) => a.status === 'applied').length,
+const pendingApplications = computed(
+  () => candidateStore.myApplications.filter((a) => a.status === 'applied').length,
 )
-const interviewedApplications = computed(() =>
-  candidateStore.myApplications.filter((a) =>
-    ['prescanned', 'interviewed'].includes(a.status),
-  ).length,
+const interviewedApplications = computed(
+  () =>
+    candidateStore.myApplications.filter((a) => ['prescanned', 'interviewed'].includes(a.status))
+      .length,
 )
 
 function formatDateTime(dateStr: string): string {
@@ -102,9 +101,7 @@ function goToInterview(interview: Interview): void {
       <h1 class="text-2xl font-bold text-gray-900">
         {{ greeting }}, {{ authStore.user?.firstName ?? 'User' }}
       </h1>
-      <p class="mt-1 text-sm text-gray-500">
-        Here's what's happening today
-      </p>
+      <p class="mt-1 text-sm text-gray-500">Here's what's happening today</p>
     </div>
 
     <!-- Trial Banner -->
@@ -130,7 +127,9 @@ function goToInterview(interview: Interview): void {
             <span class="text-2xl font-bold text-gray-900">{{ totalVacancies }}</span>
           </div>
           <p class="mt-3 text-sm font-medium text-gray-500">{{ t('dashboard.activeVacancies') }}</p>
-          <p class="mt-0.5 text-xs text-blue-600">{{ activeVacancies }} active, {{ draftVacancies }} draft</p>
+          <p class="mt-0.5 text-xs text-blue-600">
+            {{ activeVacancies }} active, {{ draftVacancies }} draft
+          </p>
         </div>
 
         <div
@@ -143,7 +142,9 @@ function goToInterview(interview: Interview): void {
             </div>
             <span class="text-2xl font-bold text-gray-900">{{ scheduledInterviews }}</span>
           </div>
-          <p class="mt-3 text-sm font-medium text-gray-500">{{ t('dashboard.pendingInterviews') }}</p>
+          <p class="mt-3 text-sm font-medium text-gray-500">
+            {{ t('dashboard.pendingInterviews') }}
+          </p>
           <p class="mt-0.5 text-xs text-amber-600">{{ completedInterviews }} completed</p>
         </div>
 
@@ -154,7 +155,9 @@ function goToInterview(interview: Interview): void {
             </div>
             <span class="text-2xl font-bold text-gray-900">{{ completedInterviews }}</span>
           </div>
-          <p class="mt-3 text-sm font-medium text-gray-500">{{ t('dashboard.completedInterviews') }}</p>
+          <p class="mt-3 text-sm font-medium text-gray-500">
+            {{ t('dashboard.completedInterviews') }}
+          </p>
           <p class="mt-0.5 text-xs text-emerald-600">AI interviews done</p>
         </div>
 
@@ -163,7 +166,9 @@ function goToInterview(interview: Interview): void {
             <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-50">
               <i class="pi pi-users text-lg text-violet-600"></i>
             </div>
-            <span class="text-2xl font-bold text-gray-900">{{ interviewStore.interviews.length }}</span>
+            <span class="text-2xl font-bold text-gray-900">{{
+              interviewStore.interviews.length
+            }}</span>
           </div>
           <p class="mt-3 text-sm font-medium text-gray-500">{{ t('interviews.title') }}</p>
           <p class="mt-0.5 text-xs text-violet-600">All time</p>
@@ -173,7 +178,9 @@ function goToInterview(interview: Interview): void {
       <div class="grid gap-6 lg:grid-cols-3">
         <!-- Quick Actions -->
         <div class="rounded-xl border border-gray-100 bg-white p-6">
-          <h2 class="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-400">{{ t('dashboard.quickActions') }}</h2>
+          <h2 class="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-400">
+            {{ t('dashboard.quickActions') }}
+          </h2>
           <div class="space-y-2">
             <button
               class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
@@ -218,7 +225,9 @@ function goToInterview(interview: Interview): void {
         <!-- Upcoming Interviews -->
         <div class="lg:col-span-2 rounded-xl border border-gray-100 bg-white p-6">
           <div class="mb-4 flex items-center justify-between">
-            <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400">{{ t('dashboard.upcomingInterviews') }}</h2>
+            <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400">
+              {{ t('dashboard.upcomingInterviews') }}
+            </h2>
             <Button
               :label="t('common.viewAll')"
               text
@@ -230,12 +239,15 @@ function goToInterview(interview: Interview): void {
 
           <div v-if="upcomingInterviews.length > 0" class="space-y-3">
             <div
-              v-for="interview in upcomingInterviews" :key="interview.id"
+              v-for="interview in upcomingInterviews"
+              :key="interview.id"
               class="flex cursor-pointer items-center justify-between rounded-lg border border-gray-50 px-4 py-3 transition-colors hover:bg-gray-50"
               @click="goToInterview(interview)"
             >
               <div class="flex items-center gap-3">
-                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">
+                <div
+                  class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700"
+                >
                   {{ interview.candidateName?.charAt(0) ?? '?' }}
                 </div>
                 <div>
@@ -244,7 +256,9 @@ function goToInterview(interview: Interview): void {
                 </div>
               </div>
               <div class="text-right">
-                <p class="text-sm font-medium text-gray-700">{{ formatDateTime(interview.createdAt) }}</p>
+                <p class="text-sm font-medium text-gray-700">
+                  {{ formatDateTime(interview.createdAt) }}
+                </p>
                 <p class="text-xs text-gray-400">{{ interview.durationMinutes }} min</p>
               </div>
             </div>
@@ -292,7 +306,9 @@ function goToInterview(interview: Interview): void {
             </div>
             <span class="text-2xl font-bold text-gray-900">{{ interviewedApplications }}</span>
           </div>
-          <p class="mt-3 text-sm font-medium text-gray-500">{{ t('candidates.status.interviewed') }}</p>
+          <p class="mt-3 text-sm font-medium text-gray-500">
+            {{ t('candidates.status.interviewed') }}
+          </p>
         </div>
       </div>
 
@@ -302,7 +318,9 @@ function goToInterview(interview: Interview): void {
           class="group cursor-pointer rounded-xl border border-gray-100 bg-white p-6 transition-all hover:border-blue-200 hover:shadow-md"
           @click="router.push({ name: ROUTE_NAMES.JOB_BOARD })"
         >
-          <div class="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 transition-colors group-hover:bg-blue-100">
+          <div
+            class="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 transition-colors group-hover:bg-blue-100"
+          >
             <i class="pi pi-search text-lg text-blue-600"></i>
           </div>
           <h3 class="text-base font-semibold text-gray-900">{{ t('nav.browseJobs') }}</h3>
@@ -313,7 +331,9 @@ function goToInterview(interview: Interview): void {
           class="group cursor-pointer rounded-xl border border-gray-100 bg-white p-6 transition-all hover:border-emerald-200 hover:shadow-md"
           @click="router.push({ name: ROUTE_NAMES.MY_APPLICATIONS })"
         >
-          <div class="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 transition-colors group-hover:bg-emerald-100">
+          <div
+            class="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 transition-colors group-hover:bg-emerald-100"
+          >
             <i class="pi pi-list text-lg text-emerald-600"></i>
           </div>
           <h3 class="text-base font-semibold text-gray-900">{{ t('nav.myApplications') }}</h3>
@@ -324,7 +344,9 @@ function goToInterview(interview: Interview): void {
           class="group cursor-pointer rounded-xl border border-gray-100 bg-white p-6 transition-all hover:border-violet-200 hover:shadow-md"
           @click="router.push({ name: ROUTE_NAMES.PROFILE })"
         >
-          <div class="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-violet-50 transition-colors group-hover:bg-violet-100">
+          <div
+            class="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-violet-50 transition-colors group-hover:bg-violet-100"
+          >
             <i class="pi pi-user text-lg text-violet-600"></i>
           </div>
           <h3 class="text-base font-semibold text-gray-900">{{ t('nav.profile') }}</h3>

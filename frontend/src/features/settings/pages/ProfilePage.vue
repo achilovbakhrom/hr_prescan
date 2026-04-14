@@ -113,18 +113,27 @@ async function handleUnlink(): Promise<void> {
   <div class="mx-auto max-w-2xl space-y-6">
     <h1 class="text-2xl font-bold text-gray-900">{{ t('settings.profile.title') }}</h1>
 
-    <Message v-if="successMessage" severity="success" class="mb-4" :closable="true" @close="successMessage = null">
+    <Message
+      v-if="successMessage"
+      severity="success"
+      class="mb-4"
+      :closable="true"
+      @close="successMessage = null"
+    >
       {{ successMessage }}
     </Message>
-    <Message v-if="errorMessage" severity="error" class="mb-4" :closable="true" @close="errorMessage = null">
+    <Message
+      v-if="errorMessage"
+      severity="error"
+      class="mb-4"
+      :closable="true"
+      @close="errorMessage = null"
+    >
       {{ errorMessage }}
     </Message>
 
     <!-- Pending Invitations -->
-    <div
-      v-if="invitations.length > 0"
-      class="rounded-lg border-2 border-blue-200 bg-blue-50 p-5"
-    >
+    <div v-if="invitations.length > 0" class="rounded-lg border-2 border-blue-200 bg-blue-50 p-5">
       <div class="mb-3 flex items-center gap-2">
         <i class="pi pi-envelope text-blue-600"></i>
         <h2 class="text-base font-semibold text-blue-900">
@@ -143,8 +152,8 @@ async function handleUnlink(): Promise<void> {
               {{ inv.company.industry }} &middot; {{ inv.company.country }}
             </p>
             <p class="mt-1 text-xs text-gray-400">
-              Invited by {{ inv.invitedByName }} &middot; {{ formatDate(inv.createdAt) }}
-              &middot; Expires {{ formatDate(inv.expiresAt) }}
+              Invited by {{ inv.invitedByName }} &middot; {{ formatDate(inv.createdAt) }} &middot;
+              Expires {{ formatDate(inv.expiresAt) }}
             </p>
           </div>
           <Button
@@ -168,7 +177,8 @@ async function handleUnlink(): Promise<void> {
         <div
           class="flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 text-2xl font-bold text-blue-700"
         >
-          {{ authStore.user?.firstName?.charAt(0) ?? '' }}{{ authStore.user?.lastName?.charAt(0) ?? '' }}
+          {{ authStore.user?.firstName?.charAt(0) ?? ''
+          }}{{ authStore.user?.lastName?.charAt(0) ?? '' }}
         </div>
         <div>
           <p class="text-lg font-semibold text-gray-900">
@@ -181,23 +191,31 @@ async function handleUnlink(): Promise<void> {
       <form class="flex flex-col gap-4" @submit.prevent>
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div class="flex flex-col gap-1">
-            <label for="firstName" class="text-sm font-medium text-gray-700">{{ t('settings.profile.firstName') }}</label>
+            <label for="firstName" class="text-sm font-medium text-gray-700">{{
+              t('settings.profile.firstName')
+            }}</label>
             <InputText id="firstName" v-model="firstName" class="w-full" disabled />
           </div>
           <div class="flex flex-col gap-1">
-            <label for="lastName" class="text-sm font-medium text-gray-700">{{ t('settings.profile.lastName') }}</label>
+            <label for="lastName" class="text-sm font-medium text-gray-700">{{
+              t('settings.profile.lastName')
+            }}</label>
             <InputText id="lastName" v-model="lastName" class="w-full" disabled />
           </div>
         </div>
 
         <div class="flex flex-col gap-1">
-          <label for="email" class="text-sm font-medium text-gray-700">{{ t('settings.profile.email') }}</label>
+          <label for="email" class="text-sm font-medium text-gray-700">{{
+            t('settings.profile.email')
+          }}</label>
           <InputText id="email" v-model="email" class="w-full" disabled />
           <small class="text-gray-400">Email cannot be changed</small>
         </div>
 
         <div class="flex flex-col gap-1">
-          <label for="phone" class="text-sm font-medium text-gray-700">{{ t('settings.profile.phone') }}</label>
+          <label for="phone" class="text-sm font-medium text-gray-700">{{
+            t('settings.profile.phone')
+          }}</label>
           <InputText id="phone" v-model="phone" class="w-full" disabled />
         </div>
       </form>
@@ -212,11 +230,10 @@ async function handleUnlink(): Promise<void> {
             </span>
           </p>
           <p v-if="authStore.user?.company">
-            Company: <span class="font-medium text-gray-900">{{ authStore.user.company.name }}</span>
+            Company:
+            <span class="font-medium text-gray-900">{{ authStore.user.company.name }}</span>
           </p>
-          <p v-else class="text-gray-400">
-            Not associated with any company
-          </p>
+          <p v-else class="text-gray-400">Not associated with any company</p>
         </div>
       </div>
     </div>
@@ -237,9 +254,17 @@ async function handleUnlink(): Promise<void> {
       <div v-if="telegramLinked" class="flex items-center justify-between">
         <div class="flex items-center gap-2">
           <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
-          <span class="text-sm text-gray-700">{{ t('telegram.connected') }}: @{{ telegramUsername }}</span>
+          <span class="text-sm text-gray-700"
+            >{{ t('telegram.connected') }}: @{{ telegramUsername }}</span
+          >
         </div>
-        <Button :label="t('telegram.disconnect')" severity="danger" text size="small" @click="handleUnlink" />
+        <Button
+          :label="t('telegram.disconnect')"
+          severity="danger"
+          text
+          size="small"
+          @click="handleUnlink"
+        />
       </div>
 
       <!-- Not connected state -->
@@ -253,7 +278,13 @@ async function handleUnlink(): Promise<void> {
         </div>
         <div v-else class="text-center">
           <p class="text-sm text-gray-500 mb-3">{{ t('telegram.notConnected') }}</p>
-          <Button :label="t('telegram.connect')" icon="pi pi-link" size="small" :loading="generatingCode" @click="handleGenerateCode" />
+          <Button
+            :label="t('telegram.connect')"
+            icon="pi pi-link"
+            size="small"
+            :loading="generatingCode"
+            @click="handleGenerateCode"
+          />
         </div>
       </div>
     </div>

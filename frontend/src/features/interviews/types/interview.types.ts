@@ -1,5 +1,10 @@
 // Re-export shared types so intra-feature imports still work
-export type { InterviewScore, IntegrityFlag, IntegrityFlagType, IntegritySeverity } from '@/shared/types/interview.types'
+export type {
+  InterviewScore,
+  IntegrityFlag,
+  IntegrityFlagType,
+  IntegritySeverity,
+} from '@/shared/types/interview.types'
 
 // Import shared types needed by feature-specific interfaces
 import type { InterviewScore, IntegrityFlag } from '@/shared/types/interview.types'

@@ -8,25 +8,20 @@ import type {
 
 export const subscriptionService = {
   async getPlans(): Promise<SubscriptionPlan[]> {
-    const response =
-      await apiClient.get<SubscriptionPlan[]>('/subscriptions/plans')
+    const response = await apiClient.get<SubscriptionPlan[]>('/subscriptions/plans')
     return response.data
   },
 
   async getCurrentSubscription(): Promise<CompanySubscription> {
-    const response =
-      await apiClient.get<CompanySubscription>('/hr/subscription')
+    const response = await apiClient.get<CompanySubscription>('/hr/subscription')
     return response.data
   },
 
-  async subscribe(
-    planTier: string,
-    billingPeriod: BillingPeriod,
-  ): Promise<CompanySubscription> {
-    const response = await apiClient.post<CompanySubscription>(
-      '/hr/subscription',
-      { planTier, billingPeriod },
-    )
+  async subscribe(planTier: string, billingPeriod: BillingPeriod): Promise<CompanySubscription> {
+    const response = await apiClient.post<CompanySubscription>('/hr/subscription', {
+      planTier,
+      billingPeriod,
+    })
     return response.data
   },
 
@@ -35,8 +30,7 @@ export const subscriptionService = {
   },
 
   async getUsage(): Promise<SubscriptionUsage> {
-    const response =
-      await apiClient.get<SubscriptionUsage>('/hr/subscription/usage')
+    const response = await apiClient.get<SubscriptionUsage>('/hr/subscription/usage')
     return response.data
   },
 }

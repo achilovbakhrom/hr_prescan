@@ -45,7 +45,9 @@ onMounted(async () => {
       router.replace({ name: ROUTE_NAMES.INTERVIEW_ROOM, params: { token } })
     }
   } catch (err: unknown) {
-    const axiosErr = err as { response?: { status?: number; data?: { detail?: string; message?: string } } }
+    const axiosErr = err as {
+      response?: { status?: number; data?: { detail?: string; message?: string } }
+    }
     const status = axiosErr.response?.status
     const detail = axiosErr.response?.data?.detail ?? axiosErr.response?.data?.message ?? ''
 
@@ -97,7 +99,10 @@ onMounted(async () => {
           <i class="pi pi-clock mb-4 text-5xl text-yellow-500"></i>
           <h1 class="mb-2 text-2xl font-bold text-gray-900">Link Expired</h1>
           <p class="mb-4 text-gray-600">
-            {{ errorMessage || 'This interview link has expired. Please contact the hiring team for a new link.' }}
+            {{
+              errorMessage ||
+              'This interview link has expired. Please contact the hiring team for a new link.'
+            }}
           </p>
           <RouterLink to="/jobs" class="text-blue-600 hover:underline">
             Browse more jobs

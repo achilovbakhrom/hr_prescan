@@ -1,5 +1,4 @@
-from django.db.models import Avg, Count, Q, QuerySet
-from django.utils import timezone
+from django.db.models import Avg, QuerySet
 
 from apps.accounts.models import Company
 from apps.applications.models import Application
@@ -55,8 +54,7 @@ def get_recent_applications(
 ) -> QuerySet[Application]:
     """Return the most recent applications for a company."""
     return (
-        Application.objects
-        .filter(vacancy__company=company, is_deleted=False)
+        Application.objects.filter(vacancy__company=company, is_deleted=False)
         .select_related("vacancy")
         .order_by("-created_at")[:limit]
     )
@@ -69,8 +67,7 @@ def get_pending_company_interviews(
 ) -> QuerySet[Interview]:
     """Return pending interviews (awaiting candidate) for a company."""
     return (
-        Interview.objects
-        .filter(
+        Interview.objects.filter(
             application__vacancy__company=company,
             status=Interview.Status.PENDING,
         )

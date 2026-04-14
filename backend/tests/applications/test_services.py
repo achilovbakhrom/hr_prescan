@@ -1,5 +1,4 @@
 from decimal import Decimal
-from unittest.mock import patch
 
 import pytest
 
@@ -13,7 +12,7 @@ from apps.applications.services import (
 )
 from apps.common.exceptions import ApplicationError
 from apps.interviews.models import Interview
-from tests.factories import ApplicationFactory, InterviewFactory, VacancyFactory
+from tests.factories import ApplicationFactory, InterviewFactory
 
 
 class TestSubmitApplication:
@@ -138,12 +137,8 @@ class TestCreateInterviewSession:
 class TestSoftDelete:
     def test_soft_delete_only_archived(self, vacancy, hr_user):
         """Soft delete only works on applications with 'archived' status."""
-        archived_app = ApplicationFactory(
-            vacancy=vacancy, status=Application.Status.ARCHIVED
-        )
-        applied_app = ApplicationFactory(
-            vacancy=vacancy, status=Application.Status.APPLIED
-        )
+        archived_app = ApplicationFactory(vacancy=vacancy, status=Application.Status.ARCHIVED)
+        applied_app = ApplicationFactory(vacancy=vacancy, status=Application.Status.APPLIED)
 
         count = soft_delete_applications(
             application_ids=[archived_app.id, applied_app.id],

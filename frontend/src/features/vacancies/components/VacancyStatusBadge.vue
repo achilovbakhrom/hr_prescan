@@ -4,16 +4,15 @@ import { useI18n } from 'vue-i18n'
 import Tag from 'primevue/tag'
 import type { VacancyStatus } from '../types/vacancy.types'
 
-const { t } = useI18n()
-
 const props = defineProps<{
   status: VacancyStatus
 }>()
 
-const statusConfig = computed<Record<
-  string,
-  { label: string; severity: 'success' | 'info' | 'warn' | 'danger' | 'secondary' }
->>(() => ({
+const { t } = useI18n()
+
+const statusConfig = computed<
+  Record<string, { label: string; severity: 'success' | 'info' | 'warn' | 'danger' | 'secondary' }>
+>(() => ({
   draft: { label: t('vacancies.status.draft'), severity: 'secondary' },
   published: { label: t('vacancies.status.published'), severity: 'success' },
   paused: { label: t('vacancies.status.paused'), severity: 'warn' },
@@ -21,7 +20,9 @@ const statusConfig = computed<Record<
   closed: { label: t('vacancies.status.closed'), severity: 'danger' },
 }))
 
-const config = computed(() => statusConfig.value[props.status] ?? { label: props.status, severity: 'secondary' as const })
+const config = computed(
+  () => statusConfig.value[props.status] ?? { label: props.status, severity: 'secondary' as const },
+)
 </script>
 
 <template>

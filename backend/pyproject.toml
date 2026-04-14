@@ -29,7 +29,10 @@ ignore = [
 known-first-party = ["apps", "config"]
 
 [tool.ruff.lint.per-file-ignores]
-"**/tests/**/*.py" = ["S101"]
+# Tests: hardcoded passwords/tokens are expected fixtures; long assertion lines OK.
+"**/tests/**/*.py" = ["S101", "S105", "S106", "S108", "S311", "E501"]
+# Auto-generated migrations have long help_text strings Django produces.
+"**/migrations/*.py" = ["E501", "DJ001"]
 "**/settings/**/*.py" = ["F401", "F403"]
 
 [tool.mypy]

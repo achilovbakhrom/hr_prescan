@@ -40,8 +40,4 @@ class Command(BaseCommand):
                 logger.exception("Failed to process vacancy %s", vacancy.id)
                 self.stderr.write(f"  [{success + failed}/{total}] {vacancy.title} — FAILED")
 
-        self.stdout.write(
-            self.style.SUCCESS(
-                f"Done. Success: {success}, Failed: {failed}, Total: {total}"
-            )
-        )
+        self.stdout.write(self.style.SUCCESS(f"Done. Success: {success}, Failed: {failed}, Total: {total}"))

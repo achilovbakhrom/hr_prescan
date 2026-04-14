@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('vacancies', '0005_vacancy_archived_status'),
+        ("vacancies", "0005_vacancy_archived_status"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='vacancy',
-            name='is_deleted',
+            model_name="vacancy",
+            name="is_deleted",
             field=models.BooleanField(default=False),
         ),
     ]

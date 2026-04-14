@@ -70,7 +70,6 @@ def remove_plans(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("subscriptions", "0001_initial"),
     ]

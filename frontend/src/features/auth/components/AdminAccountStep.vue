@@ -35,9 +35,7 @@ const emit = defineEmits<{
   <form class="flex flex-col gap-4 pt-4" @submit.prevent="emit('submit')">
     <div class="grid grid-cols-2 gap-4">
       <div class="flex flex-col gap-1">
-        <label for="adminFirstName" class="text-sm font-medium text-gray-700">
-          First Name
-        </label>
+        <label for="adminFirstName" class="text-sm font-medium text-gray-700"> First Name </label>
         <InputText
           id="adminFirstName"
           :model-value="firstName"
@@ -52,9 +50,7 @@ const emit = defineEmits<{
       </div>
 
       <div class="flex flex-col gap-1">
-        <label for="adminLastName" class="text-sm font-medium text-gray-700">
-          Last Name
-        </label>
+        <label for="adminLastName" class="text-sm font-medium text-gray-700"> Last Name </label>
         <InputText
           id="adminLastName"
           :model-value="lastName"
@@ -70,9 +66,7 @@ const emit = defineEmits<{
     </div>
 
     <div class="flex flex-col gap-1">
-      <label for="adminEmail" class="text-sm font-medium text-gray-700">
-        Email
-      </label>
+      <label for="adminEmail" class="text-sm font-medium text-gray-700"> Email </label>
       <InputText
         id="adminEmail"
         :model-value="email"
@@ -88,9 +82,7 @@ const emit = defineEmits<{
     </div>
 
     <div class="flex flex-col gap-1">
-      <label for="adminPassword" class="text-sm font-medium text-gray-700">
-        Password
-      </label>
+      <label for="adminPassword" class="text-sm font-medium text-gray-700"> Password </label>
       <Password
         :model-value="password"
         input-id="adminPassword"
@@ -107,10 +99,7 @@ const emit = defineEmits<{
     </div>
 
     <div class="flex flex-col gap-1">
-      <label
-        for="adminConfirmPassword"
-        class="text-sm font-medium text-gray-700"
-      >
+      <label for="adminConfirmPassword" class="text-sm font-medium text-gray-700">
         Confirm Password
       </label>
       <Password
@@ -137,11 +126,7 @@ const emit = defineEmits<{
         icon="pi pi-arrow-left"
         @click="emit('back')"
       />
-      <Button
-        type="submit"
-        label="Register Company"
-        :loading="loading"
-      />
+      <Button type="submit" label="Register Company" :loading="loading" />
     </div>
   </form>
 </template>

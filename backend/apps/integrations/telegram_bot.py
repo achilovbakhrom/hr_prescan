@@ -18,6 +18,7 @@ def send_message(*, chat_id, text, parse_mode="Markdown"):
             "text": text,
             "parse_mode": parse_mode,
         },
+        timeout=10,
     )
 
 
@@ -84,9 +85,7 @@ def handle_update(update_data):
     response_text = result.get("message", "Something went wrong.")
 
     # Store in conversation history
-    _save_telegram_history(
-        telegram_id=telegram_id, user_msg=text, bot_msg=response_text
-    )
+    _save_telegram_history(telegram_id=telegram_id, user_msg=text, bot_msg=response_text)
 
     send_message(chat_id=chat_id, text=response_text, parse_mode="Markdown")
 
@@ -99,10 +98,7 @@ def _handle_start(*, chat_id, telegram_id):
     if user:
         send_message(
             chat_id=chat_id,
-            text=(
-                f"Welcome back, {user.first_name}!\n\n"
-                "Type your request or /help to see what I can do."
-            ),
+            text=(f"Welcome back, {user.first_name}!\n\nType your request or /help to see what I can do."),
         )
     else:
         send_message(
@@ -166,14 +162,12 @@ def _try_link_code(*, chat_id, telegram_id, telegram_username, text):
         return
     cache.set(rate_key, attempts + 1, timeout=600)
 
-    from django.db import transaction, IntegrityError
+    from django.db import IntegrityError, transaction
 
     try:
         with transaction.atomic():
             link = (
-                TelegramLinkCode.objects.filter(
-                    code=code, is_used=False, expires_at__gt=timezone.now()
-                )
+                TelegramLinkCode.objects.filter(code=code, is_used=False, expires_at__gt=timezone.now())
                 .select_related("user")
                 .select_for_update()
                 .first()
@@ -224,14 +218,14 @@ def _transcribe_voice(file_id):
 
     try:
         # Get file path from Telegram
-        resp = requests.get(f"{TELEGRAM_API}/getFile", params={"file_id": file_id})
+        resp = requests.get(f"{TELEGRAM_API}/getFile", params={"file_id": file_id}, timeout=10)
         file_path = resp.json().get("result", {}).get("file_path")
         if not file_path:
             return None
 
         # Download the file
         file_url = f"https://api.telegram.org/file/bot{settings.TELEGRAM_BOT_TOKEN}/{file_path}"
-        audio_resp = requests.get(file_url)
+        audio_resp = requests.get(file_url, timeout=30)
         audio_bytes = audio_resp.content
 
         # Transcribe with Whisper

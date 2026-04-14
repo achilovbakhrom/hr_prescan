@@ -19,7 +19,8 @@ const daysRemaining = computed(() => {
 })
 
 const bannerClass = computed(() => {
-  if (!daysRemaining.value || daysRemaining.value > 3) return 'bg-blue-50 border-blue-200 text-blue-800'
+  if (!daysRemaining.value || daysRemaining.value > 3)
+    return 'bg-blue-50 border-blue-200 text-blue-800'
   if (daysRemaining.value > 0) return 'bg-amber-50 border-amber-200 text-amber-800'
   return 'bg-red-50 border-red-200 text-red-800'
 })
@@ -32,15 +33,22 @@ const bannerClass = computed(() => {
         <i class="pi pi-clock text-lg"></i>
         <div>
           <p class="text-sm font-semibold">
-            {{ daysRemaining && daysRemaining > 0
-              ? t('trial.daysLeft', { days: daysRemaining })
-              : t('trial.expired')
+            {{
+              daysRemaining && daysRemaining > 0
+                ? t('trial.daysLeft', { days: daysRemaining })
+                : t('trial.expired')
             }}
           </p>
           <p class="text-xs opacity-75">{{ t('trial.banner') }}</p>
         </div>
       </div>
-      <Button :label="t('trial.choosePlan')" icon="pi pi-arrow-right" icon-pos="right" size="small" @click="router.push({ name: ROUTE_NAMES.PRICING })" />
+      <Button
+        :label="t('trial.choosePlan')"
+        icon="pi pi-arrow-right"
+        icon-pos="right"
+        size="small"
+        @click="router.push({ name: ROUTE_NAMES.PRICING })"
+      />
     </div>
   </div>
 </template>

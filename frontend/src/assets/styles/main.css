@@ -24,7 +24,10 @@
   border: none;
   border-bottom: 2px solid transparent;
   margin-bottom: -2px;
-  transition: color 0.2s ease, border-bottom-color 0.2s ease, background-color 0.2s ease;
+  transition:
+    color 0.2s ease,
+    border-bottom-color 0.2s ease,
+    background-color 0.2s ease;
   background: transparent;
   border-radius: 0;
 }
@@ -38,10 +41,10 @@
 }
 
 /* Active tab */
-.p-tabview-tab-header[data-p-active="true"],
+.p-tabview-tab-header[data-p-active='true'],
 .p-tabview-tab-header.p-tabview-active-tab-header,
 .p-tabview-tab-header.p-highlight,
-.p-tab[data-p-active="true"],
+.p-tab[data-p-active='true'],
 .p-tab.p-tab-active {
   color: #2563eb;
   font-weight: 600;

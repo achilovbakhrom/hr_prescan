@@ -6,12 +6,12 @@ import { apiClient } from '@/shared/api/client'
 import { candidateService } from '../services/candidate.service'
 import VoiceMessageBubble from '@/features/interviews/components/VoiceMessageBubble.vue'
 
-const { t } = useI18n()
-
 const props = defineProps<{
   candidateId: string
   sessionType?: string
 }>()
+
+const { t } = useI18n()
 
 interface ChatMessage {
   role: 'ai' | 'candidate'
@@ -70,7 +70,7 @@ async function loadAudioBlob(messageIndex: number): Promise<void> {
   try {
     const response = await apiClient.get(
       `/hr/interviews/${interview.value.id}/voice/${messageIndex}/audio/`,
-      { responseType: 'blob' }
+      { responseType: 'blob' },
     )
     audioBlobUrls.value[messageIndex] = URL.createObjectURL(response.data as Blob)
   } catch {
@@ -81,7 +81,10 @@ async function loadAudioBlob(messageIndex: number): Promise<void> {
 onMounted(async () => {
   loading.value = true
   try {
-    const data = await candidateService.getCandidateInterview(props.candidateId, props.sessionType) as unknown as InterviewData
+    const data = (await candidateService.getCandidateInterview(
+      props.candidateId,
+      props.sessionType,
+    )) as unknown as InterviewData
     interview.value = data
 
     if (data.chatHistory) {
@@ -99,7 +102,7 @@ onMounted(async () => {
 })
 
 onBeforeUnmount(() => {
-  Object.values(audioBlobUrls.value).forEach(url => URL.revokeObjectURL(url))
+  Object.values(audioBlobUrls.value).forEach((url) => URL.revokeObjectURL(url))
 })
 </script>
 
@@ -118,46 +121,72 @@ onBeforeUnmount(() => {
       <div class="mb-4 flex gap-2">
         <button
           class="rounded-lg px-4 py-2 text-sm font-medium transition-colors"
-          :class="activeSection === 'scores' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+          :class="
+            activeSection === 'scores'
+              ? 'bg-blue-600 text-white'
+              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          "
           @click="activeSection = 'scores'"
         >
           {{ t('interviews.scores') }}
         </button>
         <button
           class="rounded-lg px-4 py-2 text-sm font-medium transition-colors"
-          :class="activeSection === 'conversation' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+          :class="
+            activeSection === 'conversation'
+              ? 'bg-blue-600 text-white'
+              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          "
           @click="activeSection = 'conversation'"
         >
-          {{ t('interviews.conversation') }} ({{ interview.chatHistory?.length || 0 }} {{ t('interviews.messages') }})
+          {{ t('interviews.conversation') }} ({{ interview.chatHistory?.length || 0 }}
+          {{ t('interviews.messages') }})
         </button>
       </div>
 
       <!-- Scores Section -->
       <div v-if="activeSection === 'scores'">
         <!-- Overall Score -->
-        <div v-if="interview.overallScore !== null" class="mb-4 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 p-5">
+        <div
+          v-if="interview.overallScore !== null"
+          class="mb-4 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 p-5"
+        >
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-xs font-medium text-blue-600 uppercase tracking-wide">{{ t('interviews.overallScore') }}</p>
+              <p class="text-xs font-medium text-blue-600 uppercase tracking-wide">
+                {{ t('interviews.overallScore') }}
+              </p>
               <p class="mt-1 text-4xl font-bold" :class="scoreColor(interview.overallScore)">
                 {{ interview.overallScore }}<span class="text-lg text-gray-400">/10</span>
               </p>
             </div>
-            <div class="h-16 w-16 rounded-full border-4 flex items-center justify-center" :class="scoreBg(interview.overallScore) + ' border-opacity-20'">
-              <span class="text-xl font-bold text-white">{{ Math.round(interview.overallScore) }}</span>
+            <div
+              class="h-16 w-16 rounded-full border-4 flex items-center justify-center"
+              :class="scoreBg(interview.overallScore) + ' border-opacity-20'"
+            >
+              <span class="text-xl font-bold text-white">{{
+                Math.round(interview.overallScore)
+              }}</span>
             </div>
           </div>
         </div>
 
         <!-- AI Summary -->
-        <div v-if="interview.aiSummary" class="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
-          <p class="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">{{ t('interviews.aiAssessment') }}</p>
+        <div
+          v-if="interview.aiSummary"
+          class="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4"
+        >
+          <p class="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+            {{ t('interviews.aiAssessment') }}
+          </p>
           <p class="text-sm text-gray-700 leading-relaxed">{{ interview.aiSummary }}</p>
         </div>
 
         <!-- Per-criteria scores -->
         <div v-if="interview.scores?.length" class="space-y-3">
-          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">{{ t('interviews.criteriaBreakdown') }}</p>
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+            {{ t('interviews.criteriaBreakdown') }}
+          </p>
           <div
             v-for="score in interview.scores"
             :key="score.id"
@@ -198,7 +227,11 @@ onBeforeUnmount(() => {
           </div>
           <div
             class="max-w-[75%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed"
-            :class="msg.role === 'ai' ? 'rounded-tl-md bg-white border border-gray-200 text-gray-800' : 'rounded-tr-md bg-blue-600 text-white'"
+            :class="
+              msg.role === 'ai'
+                ? 'rounded-tl-md bg-white border border-gray-200 text-gray-800'
+                : 'rounded-tr-md bg-blue-600 text-white'
+            "
           >
             <!-- Voice message -->
             <template v-if="msg.messageType === 'voice'">

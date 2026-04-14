@@ -113,18 +113,14 @@ export function useLiveKit() {
   async function toggleMic(): Promise<void> {
     if (room.value) {
       isMicEnabled.value = !isMicEnabled.value
-      await room.value.localParticipant.setMicrophoneEnabled(
-        isMicEnabled.value,
-      )
+      await room.value.localParticipant.setMicrophoneEnabled(isMicEnabled.value)
     }
   }
 
   async function toggleCamera(): Promise<void> {
     if (room.value) {
       isCameraEnabled.value = !isCameraEnabled.value
-      await room.value.localParticipant.setCameraEnabled(
-        isCameraEnabled.value,
-      )
+      await room.value.localParticipant.setCameraEnabled(isCameraEnabled.value)
     }
   }
 

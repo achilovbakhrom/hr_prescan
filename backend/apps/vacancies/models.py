@@ -52,12 +52,8 @@ class Vacancy(BaseModel):
     requirements = models.TextField(blank=True)
     responsibilities = models.TextField(blank=True)
     skills = models.JSONField(default=list)
-    salary_min = models.DecimalField(
-        max_digits=12, decimal_places=2, null=True, blank=True
-    )
-    salary_max = models.DecimalField(
-        max_digits=12, decimal_places=2, null=True, blank=True
-    )
+    salary_min = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    salary_max = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
     salary_currency = models.CharField(max_length=3, default="USD")
     location = models.CharField(max_length=255, blank=True)
     is_remote = models.BooleanField(default=False)

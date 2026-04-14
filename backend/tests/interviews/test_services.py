@@ -1,10 +1,7 @@
 from decimal import Decimal
 from unittest.mock import patch
 
-import pytest
-
 from apps.applications.models import Application
-from apps.common.exceptions import ApplicationError
 from apps.interviews.models import Interview
 from apps.interviews.services import (
     cancel_interview,
@@ -12,7 +9,7 @@ from apps.interviews.services import (
     reset_interview,
     start_interview,
 )
-from tests.factories import ApplicationFactory, InterviewFactory, VacancyFactory
+from tests.factories import ApplicationFactory, InterviewFactory
 
 
 class TestStartSession:

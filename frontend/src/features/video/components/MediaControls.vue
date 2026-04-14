@@ -23,10 +23,7 @@ const emit = defineEmits<{
       :title="isMicEnabled ? 'Mute microphone' : 'Unmute microphone'"
       @click="emit('toggleMic')"
     >
-      <i
-        class="pi text-lg"
-        :class="isMicEnabled ? 'pi-microphone' : 'pi-microphone-slash'"
-      ></i>
+      <i class="pi text-lg" :class="isMicEnabled ? 'pi-microphone' : 'pi-microphone-slash'"></i>
     </button>
 
     <button
@@ -39,10 +36,7 @@ const emit = defineEmits<{
       :title="isCameraEnabled ? 'Turn off camera' : 'Turn on camera'"
       @click="emit('toggleCamera')"
     >
-      <i
-        class="pi text-lg"
-        :class="isCameraEnabled ? 'pi-video' : 'pi-video-slash'"
-      ></i>
+      <i class="pi text-lg" :class="isCameraEnabled ? 'pi-video' : 'pi-video-slash'"></i>
     </button>
 
     <button

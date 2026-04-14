@@ -21,12 +21,7 @@ function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString()
 }
 
-const statusSteps = [
-  'applied',
-  'prescanned',
-  'interviewed',
-  'shortlisted',
-] as const
+const statusSteps = ['applied', 'prescanned', 'interviewed', 'shortlisted'] as const
 
 function stepIndex(status: string): number {
   const idx = statusSteps.indexOf(status as (typeof statusSteps)[number])
@@ -57,18 +52,12 @@ function stepIndex(status: string): number {
     <template v-if="application">
       <!-- Status Timeline -->
       <div class="rounded-lg border border-gray-200 bg-white p-4">
-        <h2 class="mb-3 text-sm font-semibold text-gray-600">
-          Application Progress
-        </h2>
+        <h2 class="mb-3 text-sm font-semibold text-gray-600">Application Progress</h2>
         <div
           v-if="application.status !== 'rejected'"
           class="flex items-center gap-1 overflow-x-auto"
         >
-          <div
-            v-for="(step, idx) in statusSteps"
-            :key="step"
-            class="flex items-center"
-          >
+          <div v-for="(step, idx) in statusSteps" :key="step" class="flex items-center">
             <div
               class="flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold"
               :class="
@@ -82,11 +71,7 @@ function stepIndex(status: string): number {
             <div
               v-if="idx < statusSteps.length - 1"
               class="mx-1 h-0.5 w-6"
-              :class="
-                idx < stepIndex(application.status)
-                  ? 'bg-blue-500'
-                  : 'bg-gray-200'
-              "
+              :class="idx < stepIndex(application.status) ? 'bg-blue-500' : 'bg-gray-200'"
             ></div>
           </div>
         </div>
@@ -99,9 +84,7 @@ function stepIndex(status: string): number {
       <div class="rounded-lg border border-gray-200 bg-white p-4">
         <h2 class="mb-2 text-sm font-semibold text-gray-600">{{ t('nav.vacancies') }}</h2>
         <p class="text-lg font-medium">{{ application.vacancyTitle }}</p>
-        <p class="text-sm text-gray-500">
-          Applied on {{ formatDate(application.createdAt) }}
-        </p>
+        <p class="text-sm text-gray-500">Applied on {{ formatDate(application.createdAt) }}</p>
       </div>
 
       <!-- Match Score -->

@@ -4,7 +4,7 @@ from unittest.mock import patch
 import pytest
 from django.utils import timezone
 
-from apps.accounts.models import Company, Invitation, User
+from apps.accounts.models import Company, User
 from apps.accounts.services import (
     accept_invitation,
     accept_invitation_existing_user,
@@ -17,7 +17,6 @@ from apps.accounts.services import (
 )
 from apps.common.exceptions import ApplicationError
 from tests.factories import CompanyFactory, UserFactory
-
 
 # ---------------------------------------------------------------------------
 # register_user

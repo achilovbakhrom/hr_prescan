@@ -35,10 +35,12 @@ class TelegramLinkCodeApi(APIView):
         from apps.integrations.models import TelegramLinkCode
 
         link = TelegramLinkCode.generate(user=request.user)
-        return Response({
-            "code": link.code,
-            "expires_at": link.expires_at.isoformat(),
-        })
+        return Response(
+            {
+                "code": link.code,
+                "expires_at": link.expires_at.isoformat(),
+            }
+        )
 
 
 class TelegramStatusApi(APIView):
@@ -48,10 +50,12 @@ class TelegramStatusApi(APIView):
 
     def get(self, request):
         user = request.user
-        return Response({
-            "linked": bool(user.telegram_id),
-            "telegram_username": user.telegram_username or None,
-        })
+        return Response(
+            {
+                "linked": bool(user.telegram_id),
+                "telegram_username": user.telegram_username or None,
+            }
+        )
 
 
 class TelegramUnlinkApi(APIView):

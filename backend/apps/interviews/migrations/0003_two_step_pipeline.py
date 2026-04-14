@@ -5,8 +5,8 @@
 - Set all existing records to prescanning
 """
 
-from django.db import migrations, models
 import django.db.models.deletion
+from django.db import migrations, models
 
 
 def set_existing_session_type(apps, schema_editor):
@@ -16,7 +16,6 @@ def set_existing_session_type(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("interviews", "0002_alter_interview_options_and_more"),
         ("applications", "0002_alter_application_status"),

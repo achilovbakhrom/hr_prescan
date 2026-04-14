@@ -5,7 +5,6 @@ import { useI18n } from 'vue-i18n'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Dropdown from 'primevue/dropdown'
-import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
@@ -109,7 +108,9 @@ function handleKanbanStatusChange(candidateId: string, status: ApplicationStatus
 
   confirm.require({
     message,
-    header: isReset ? t('candidates.dialogs.resetHeader') : t('candidates.dialogs.statusChangeHeader'),
+    header: isReset
+      ? t('candidates.dialogs.resetHeader')
+      : t('candidates.dialogs.statusChangeHeader'),
     icon: isReset ? 'pi pi-refresh' : 'pi pi-exclamation-triangle',
     acceptLabel: isReset ? t('candidates.dialogs.yesReset') : t('candidates.dialogs.yesMove'),
     rejectLabel: t('common.cancel'),
@@ -125,12 +126,17 @@ function handleKanbanStatusChange(candidateId: string, status: ApplicationStatus
     <!-- Header -->
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div class="flex items-center gap-3">
-        <button class="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600" @click="router.back()">
+        <button
+          class="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+          @click="router.back()"
+        >
           <i class="pi pi-arrow-left"></i>
         </button>
         <div>
           <h1 class="text-lg font-bold text-gray-900 md:text-xl">{{ t('candidates.pipeline') }}</h1>
-          <p class="text-sm text-gray-500">{{ candidateStore.candidates.length }} {{ t('nav.candidates').toLowerCase() }}</p>
+          <p class="text-sm text-gray-500">
+            {{ candidateStore.candidates.length }} {{ t('nav.candidates').toLowerCase() }}
+          </p>
         </div>
       </div>
 
@@ -138,14 +144,18 @@ function handleKanbanStatusChange(candidateId: string, status: ApplicationStatus
       <div class="flex items-center gap-2 rounded-lg border border-gray-200 p-0.5">
         <button
           class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
-          :class="viewMode === 'kanban' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:text-gray-700'"
+          :class="
+            viewMode === 'kanban' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:text-gray-700'
+          "
           @click="viewMode = 'kanban'"
         >
           <i class="pi pi-th-large mr-1.5"></i>{{ t('candidates.kanban') }}
         </button>
         <button
           class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
-          :class="viewMode === 'table' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:text-gray-700'"
+          :class="
+            viewMode === 'table' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:text-gray-700'
+          "
           @click="viewMode = 'table'"
         >
           <i class="pi pi-list mr-1.5"></i>{{ t('candidates.table') }}

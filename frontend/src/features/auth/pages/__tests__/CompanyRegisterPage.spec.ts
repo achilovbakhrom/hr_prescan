@@ -22,11 +22,27 @@ const globalConfig = {
     },
     Password: {
       template: '<input :id="inputId" type="password" :placeholder="placeholder" />',
-      props: ['inputId', 'modelValue', 'placeholder', 'feedback', 'toggleMask', 'invalid', 'inputClass'],
+      props: [
+        'inputId',
+        'modelValue',
+        'placeholder',
+        'feedback',
+        'toggleMask',
+        'invalid',
+        'inputClass',
+      ],
     },
     Select: {
       template: '<select :id="id"></select>',
-      props: ['id', 'modelValue', 'options', 'optionLabel', 'optionValue', 'placeholder', 'invalid'],
+      props: [
+        'id',
+        'modelValue',
+        'options',
+        'optionLabel',
+        'optionValue',
+        'placeholder',
+        'invalid',
+      ],
     },
     Button: {
       template: '<button :type="type">{{ label }}</button>',
@@ -55,12 +71,22 @@ const globalConfig = {
       props: ['value'],
     },
     CompanyInfoStep: {
-      template: '<div data-testid="company-info-step"><input id="companyName" placeholder="Enter company name" /></div>',
+      template:
+        '<div data-testid="company-info-step"><input id="companyName" placeholder="Enter company name" /></div>',
       props: ['companyName', 'industry', 'size', 'country', 'submitted', 'errors', 'sizeOptions'],
     },
     AdminAccountStep: {
       template: '<div data-testid="admin-account-step"></div>',
-      props: ['firstName', 'lastName', 'email', 'password', 'confirmPassword', 'submitted', 'errors', 'loading'],
+      props: [
+        'firstName',
+        'lastName',
+        'email',
+        'password',
+        'confirmPassword',
+        'submitted',
+        'errors',
+        'loading',
+      ],
     },
   },
 }

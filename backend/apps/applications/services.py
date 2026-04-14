@@ -132,7 +132,7 @@ def submit_application(
     try:
         vacancy = Vacancy.objects.get(id=vacancy_id)
     except Vacancy.DoesNotExist:
-        raise ApplicationError(str(MSG_VACANCY_NOT_FOUND))
+        raise ApplicationError(str(MSG_VACANCY_NOT_FOUND)) from None
 
     if vacancy.status != Vacancy.Status.PUBLISHED:
         raise ApplicationError(str(MSG_VACANCY_NOT_ACCEPTING))
@@ -151,10 +151,11 @@ def submit_application(
             cv_original_filename=cv_original_filename,
         )
     except IntegrityError:
-        raise ApplicationError(str(MSG_ALREADY_APPLIED))
+        raise ApplicationError(str(MSG_ALREADY_APPLIED)) from None
 
     if cv_file_path:
         from django.db import transaction
+
         from apps.applications.tasks import process_cv
 
         transaction.on_commit(lambda: process_cv.delay(str(application.id)))
@@ -212,9 +213,7 @@ def update_application_status(
     allowed = _STATUS_TRANSITIONS.get(current, set())
 
     if status not in allowed:
-        raise ApplicationError(
-            str(MSG_STATUS_TRANSITION_INVALID).format(current=current, target=status)
-        )
+        raise ApplicationError(str(MSG_STATUS_TRANSITION_INVALID).format(current=current, target=status))
 
     # Reset to Applied = full pipeline restart
     if status == Application.Status.APPLIED and current != Application.Status.APPLIED:
@@ -334,7 +333,8 @@ def analyze_cv_with_ai(*, application_id: UUID) -> None:
                 "content": (
                     "You are a CV/resume parser. Extract structured data from the CV text. "
                     "Return JSON with these fields:\n"
-                    '- "contacts": {email, phone, location, linkedin, github, website, telegram} (strings, null if not found)\n'
+                    '- "contacts": {email, phone, location, linkedin, github, website, telegram} '
+                    "(strings, null if not found)\n"
                     '- "skills": list of technical and soft skills\n'
                     '- "experience_years": estimated total years of professional experience (number)\n'
                     '- "experience": list of {company, role, duration, description}\n'
@@ -363,9 +363,7 @@ def calculate_match_score(*, application_id: UUID) -> None:
     import json as _json
 
     try:
-        application = Application.objects.select_related("vacancy").get(
-            id=application_id
-        )
+        application = Application.objects.select_related("vacancy").get(id=application_id)
     except Application.DoesNotExist:
         logger.error("calculate_match_score: application %s not found", application_id)
         return
@@ -390,7 +388,8 @@ def calculate_match_score(*, application_id: UUID) -> None:
                     "You are an HR matching expert. Compare a candidate's CV against a job vacancy "
                     "and provide a match score. Return JSON with:\n"
                     '- "overall": number 0-100 (overall match percentage)\n'
-                    '- "criteria_scores": {technical_skills: 0-100, experience_relevance: 0-100, education_fit: 0-100}\n'
+                    '- "criteria_scores": {technical_skills: 0-100, experience_relevance: 0-100, '
+                    "education_fit: 0-100}\n"
                     '- "notes": brief explanation of the match assessment\n'
                     '- "matching_skills": list of skills that match the vacancy\n'
                     '- "missing_skills": list of required skills the candidate lacks'
@@ -412,9 +411,7 @@ def calculate_match_score(*, application_id: UUID) -> None:
     match_data = _json.loads(response.choices[0].message.content)
     application.match_score = round(float(match_data.get("overall", 0)), 2)
     application.match_details = match_data
-    application.save(
-        update_fields=["match_score", "match_details", "updated_at"]
-    )
+    application.save(update_fields=["match_score", "match_details", "updated_at"])
     logger.info("calculate_match_score: score=%.1f for application %s", application.match_score, application_id)
 
 
@@ -490,15 +487,14 @@ def bulk_move_by_filter(
         has_cv: Filter by whether candidate has a CV.
         days_since_applied: Only include candidates applied more than X days ago.
     """
-    from django.utils import timezone as tz
     from datetime import timedelta
+
+    from django.utils import timezone as tz
 
     # Validate transition
     allowed = _STATUS_TRANSITIONS.get(from_status, set())
     if to_status not in allowed:
-        raise ApplicationError(
-            str(MSG_STATUS_TRANSITION_INVALID).format(current=from_status, target=to_status)
-        )
+        raise ApplicationError(str(MSG_STATUS_TRANSITION_INVALID).format(current=from_status, target=to_status))
 
     qs = Application.objects.filter(
         vacancy_id=vacancy_id,

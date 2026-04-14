@@ -61,9 +61,7 @@ async function handleSubmit(): Promise<void> {
     })
   } catch (err: unknown) {
     errorMessage.value =
-      err instanceof Error
-        ? err.message
-        : 'Failed to accept invitation. Please try again.'
+      err instanceof Error ? err.message : 'Failed to accept invitation. Please try again.'
   }
 }
 </script>
@@ -83,17 +81,10 @@ async function handleSubmit(): Promise<void> {
         {{ errorMessage }}
       </Message>
 
-      <form
-        v-if="token"
-        class="flex flex-col gap-4"
-        @submit.prevent="handleSubmit"
-      >
+      <form v-if="token" class="flex flex-col gap-4" @submit.prevent="handleSubmit">
         <div class="grid grid-cols-2 gap-4">
           <div class="flex flex-col gap-1">
-            <label
-              for="firstName"
-              class="text-sm font-medium text-gray-700"
-            >
+            <label for="firstName" class="text-sm font-medium text-gray-700">
               {{ t('auth.acceptInvitation.firstName') }}
             </label>
             <InputText
@@ -103,10 +94,7 @@ async function handleSubmit(): Promise<void> {
               :invalid="submitted && errors.firstName"
               class="w-full"
             />
-            <small
-              v-if="submitted && errors.firstName"
-              class="text-red-500"
-            >
+            <small v-if="submitted && errors.firstName" class="text-red-500">
               First name is required.
             </small>
           </div>
@@ -147,10 +135,7 @@ async function handleSubmit(): Promise<void> {
         </div>
 
         <div class="flex flex-col gap-1">
-          <label
-            for="confirmPassword"
-            class="text-sm font-medium text-gray-700"
-          >
+          <label for="confirmPassword" class="text-sm font-medium text-gray-700">
             {{ t('auth.register.confirmPassword') }}
           </label>
           <Password
@@ -163,10 +148,7 @@ async function handleSubmit(): Promise<void> {
             class="w-full"
             input-class="w-full"
           />
-          <small
-            v-if="submitted && errors.confirmPassword"
-            class="text-red-500"
-          >
+          <small v-if="submitted && errors.confirmPassword" class="text-red-500">
             {{ t('auth.register.passwordMismatch') }}
           </small>
         </div>

@@ -5,37 +5,57 @@ Root URL configuration for HR PreScan.
 from django.contrib import admin
 from django.http import JsonResponse
 from django.urls import include, path
-from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 from apps.accounts.urls import hr_urlpatterns
-from apps.common.urls_admin import admin_urlpatterns
-from apps.subscriptions.urls import (
-    hr_urlpatterns as subscription_hr_urlpatterns,
-    public_urlpatterns as subscription_public_urlpatterns,
-)
 from apps.applications.urls import (
     candidate_urlpatterns as application_candidate_urlpatterns,
-    hr_candidate_urlpatterns as application_hr_candidate_urlpatterns,
-    hr_vacancy_urlpatterns as application_hr_vacancy_urlpatterns,
-    public_urlpatterns as application_public_urlpatterns,
 )
-from apps.interviews.urls import (
-    candidate_urlpatterns as interview_candidate_urlpatterns,
-    hr_candidate_urlpatterns as interview_hr_candidate_urlpatterns,
-    hr_interview_urlpatterns,
-    public_urlpatterns as interview_public_urlpatterns,
+from apps.applications.urls import (
+    hr_candidate_urlpatterns as application_hr_candidate_urlpatterns,
+)
+from apps.applications.urls import (
+    hr_vacancy_urlpatterns as application_hr_vacancy_urlpatterns,
+)
+from apps.applications.urls import (
+    public_urlpatterns as application_public_urlpatterns,
 )
 from apps.common.apis import HRDashboardApi
 from apps.common.apis_ai import AIAssistantApi
-from apps.notifications.urls import (
-    candidate_urlpatterns as notification_candidate_urlpatterns,
-    hr_bulk_urlpatterns as notification_hr_bulk_urlpatterns,
-    hr_candidate_urlpatterns as notification_hr_candidate_urlpatterns,
-    notification_urlpatterns,
-)
+from apps.common.urls_admin import admin_urlpatterns
 from apps.integrations.urls import (
     hr_telegram_urlpatterns,
     telegram_urlpatterns,
+)
+from apps.interviews.urls import (
+    candidate_urlpatterns as interview_candidate_urlpatterns,
+)
+from apps.interviews.urls import (
+    hr_candidate_urlpatterns as interview_hr_candidate_urlpatterns,
+)
+from apps.interviews.urls import (
+    hr_interview_urlpatterns,
+)
+from apps.interviews.urls import (
+    public_urlpatterns as interview_public_urlpatterns,
+)
+from apps.notifications.urls import (
+    candidate_urlpatterns as notification_candidate_urlpatterns,
+)
+from apps.notifications.urls import (
+    hr_bulk_urlpatterns as notification_hr_bulk_urlpatterns,
+)
+from apps.notifications.urls import (
+    hr_candidate_urlpatterns as notification_hr_candidate_urlpatterns,
+)
+from apps.notifications.urls import (
+    notification_urlpatterns,
+)
+from apps.subscriptions.urls import (
+    hr_urlpatterns as subscription_hr_urlpatterns,
+)
+from apps.subscriptions.urls import (
+    public_urlpatterns as subscription_public_urlpatterns,
 )
 from apps.vacancies.urls import employer_urlpatterns as employer_hr_urlpatterns
 from apps.vacancies.urls import hr_urlpatterns as vacancy_hr_urlpatterns

@@ -40,11 +40,7 @@ onMounted(() => adminStore.fetchCompanies())
         class="w-64"
         @keyup.enter="handleSearch"
       />
-      <Button
-        icon="pi pi-search"
-        outlined
-        @click="handleSearch"
-      />
+      <Button icon="pi pi-search" outlined @click="handleSearch" />
     </div>
 
     <DataTable
@@ -84,7 +80,11 @@ onMounted(() => adminStore.fetchCompanies())
       <Column :header="t('admin.companies.actions')">
         <template #body="{ data }">
           <Button
-            :label="(data as AdminCompany).isActive ? t('admin.companies.block') : t('settings.team.activate')"
+            :label="
+              (data as AdminCompany).isActive
+                ? t('admin.companies.block')
+                : t('settings.team.activate')
+            "
             :severity="(data as AdminCompany).isActive ? 'danger' : 'success'"
             size="small"
             outlined

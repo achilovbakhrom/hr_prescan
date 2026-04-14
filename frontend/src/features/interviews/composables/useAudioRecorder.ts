@@ -55,9 +55,7 @@ export function useAudioRecorder(maxDuration = 120) {
         : ''
 
     try {
-      mediaRecorder = mimeType
-        ? new MediaRecorder(stream, { mimeType })
-        : new MediaRecorder(stream)
+      mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream)
     } catch {
       error.value = 'Failed to initialize audio recorder.'
       cleanup()

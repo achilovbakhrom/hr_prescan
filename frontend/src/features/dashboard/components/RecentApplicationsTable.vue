@@ -53,9 +53,7 @@ function formatDate(dateStr: string): string {
         </template>
       </Column>
       <template #empty>
-        <div class="py-4 text-center text-sm text-gray-500">
-          No recent applications
-        </div>
+        <div class="py-4 text-center text-sm text-gray-500">No recent applications</div>
       </template>
     </DataTable>
   </div>

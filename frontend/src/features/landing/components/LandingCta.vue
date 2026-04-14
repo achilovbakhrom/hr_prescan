@@ -22,7 +22,9 @@ const { t } = useI18n()
       <p class="scroll-animate mx-auto mb-10 max-w-lg text-lg text-blue-100">
         {{ t('landing.cta.subtitle') }}
       </p>
-      <div class="scroll-animate flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
+      <div
+        class="scroll-animate flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4"
+      >
         <Button
           :label="t('landing.cta.startFree')"
           icon="pi pi-arrow-right"

@@ -18,7 +18,7 @@ def process_cv(self, application_id: str) -> None:
         process_cv_text(application_id=application_id)
     except Exception as exc:
         logger.exception("process_cv failed for %s", application_id)
-        raise self.retry(exc=exc)
+        raise self.retry(exc=exc) from exc
     analyze_cv.delay(application_id)
 
 
@@ -29,7 +29,7 @@ def analyze_cv(self, application_id: str) -> None:
         analyze_cv_with_ai(application_id=application_id)
     except Exception as exc:
         logger.exception("analyze_cv failed for %s", application_id)
-        raise self.retry(exc=exc)
+        raise self.retry(exc=exc) from exc
     calculate_cv_match.delay(application_id)
 
 
@@ -40,4 +40,4 @@ def calculate_cv_match(self, application_id: str) -> None:
         calculate_match_score(application_id=application_id)
     except Exception as exc:
         logger.exception("calculate_cv_match failed for %s", application_id)
-        raise self.retry(exc=exc)
+        raise self.retry(exc=exc) from exc

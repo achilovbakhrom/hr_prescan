@@ -17,7 +17,6 @@ import logging
 
 from django.conf import settings
 from django.utils import timezone
-
 from openai import OpenAI
 
 from apps.common.messages import MSG_EVALUATION_MALFORMED
@@ -41,20 +40,16 @@ def _build_system_prompt(interview: Interview) -> str:
 
     # Filter questions and criteria by step
     questions = list(
-        vacancy.questions.filter(is_active=True, step=step)
-        .order_by("order")
-        .values_list("text", flat=True)
+        vacancy.questions.filter(is_active=True, step=step).order_by("order").values_list("text", flat=True)
     )
     questions_text = "\n".join(f"- {q}" for q in questions) if questions else "No specific questions defined."
 
-    criteria = list(
-        vacancy.criteria.filter(step=step)
-        .order_by("order")
-        .values_list("name", "description", "weight")
+    criteria = list(vacancy.criteria.filter(step=step).order_by("order").values_list("name", "description", "weight"))
+    criteria_text = (
+        "\n".join(f"- {name} (weight: {weight}): {desc}" for name, desc, weight in criteria)
+        if criteria
+        else "No specific criteria defined."
     )
-    criteria_text = "\n".join(
-        f"- {name} (weight: {weight}): {desc}" for name, desc, weight in criteria
-    ) if criteria else "No specific criteria defined."
 
     # CV data
     cv_section = ""
@@ -62,11 +57,11 @@ def _build_system_prompt(interview: Interview) -> str:
         cv_data = application.cv_parsed_data
         cv_section = f"""
 ## Candidate's CV Summary
-- Skills: {', '.join(cv_data.get('skills', [])) or 'Not available'}
-- Experience: {cv_data.get('experience_years', 'Unknown')} years
-- Education: {cv_data.get('education', 'Not available')}
-- Languages: {', '.join(cv_data.get('languages', [])) or 'Not available'}
-- Summary: {cv_data.get('summary', 'Not available')}
+- Skills: {", ".join(cv_data.get("skills", [])) or "Not available"}
+- Experience: {cv_data.get("experience_years", "Unknown")} years
+- Education: {cv_data.get("education", "Not available")}
+- Languages: {", ".join(cv_data.get("languages", [])) or "Not available"}
+- Summary: {cv_data.get("summary", "Not available")}
 
 Use this CV data to ask targeted follow-up questions and verify claims.
 """
@@ -117,8 +112,8 @@ Include a brief company introduction in your greeting (1-2 sentences based on th
 ## Vacancy Details
 - Title: {vacancy.title}
 - Description: {vacancy.description[:500]}
-- Requirements: {(vacancy.requirements or 'Not specified')[:500]}
-- Skills needed: {', '.join(vacancy.skills) if vacancy.skills else 'Not specified'}
+- Requirements: {(vacancy.requirements or "Not specified")[:500]}
+- Skills needed: {", ".join(vacancy.skills) if vacancy.skills else "Not specified"}
 - Experience level: {vacancy.get_experience_level_display()}
 {cv_section}{additional_prompt}
 ## Prepared Questions
@@ -136,7 +131,8 @@ When you have enough information to make a decision:
 - The marker must be the last thing in your message
 
 ## Language
-Respond in the same language the candidate uses. If they write in Russian, respond in Russian. If in English, respond in English.
+Respond in the same language the candidate uses. If they write in Russian, respond in Russian.
+If in English, respond in English.
 
 ## Style
 - Keep messages under 100 words
@@ -148,7 +144,8 @@ Respond in the same language the candidate uses. If they write in Russian, respo
 
 def _prescanning_behavior(vacancy, company_info: str) -> str:
     """Build the prescanning-specific behavior prompt."""
-    return f"""You are an AI pre-screener conducting a quick text-based prescanning for the position of "{vacancy.title}" at {vacancy.company.name}.
+    return f"""You are an AI pre-screener conducting a quick text-based prescanning \
+for the position of "{vacancy.title}" at {vacancy.company.name}.
 
 ## Your Role — Prescanning
 - Professional, warm, and concise screener
@@ -160,7 +157,8 @@ def _prescanning_behavior(vacancy, company_info: str) -> str:
 - Typically ask 4-6 questions total
 
 ## Prescanning Rules
-1. Greet the candidate briefly{' and introduce the company' if company_info else ''}, then ask them to introduce themselves
+1. Greet the candidate briefly{" and introduce the company" if company_info else ""}, \
+then ask them to introduce themselves
 2. Work through the prepared questions, adapting based on answers
 3. Quickly assess basic fit — don't probe deeply (that's for the interview step)
 4. Cover the evaluation criteria through your questions
@@ -173,7 +171,8 @@ def _prescanning_behavior(vacancy, company_info: str) -> str:
 
 def _interview_behavior(vacancy, company_info: str) -> str:
     """Build the interview-specific behavior prompt."""
-    return f"""You are an AI interviewer conducting a rigorous text-based interview for the position of "{vacancy.title}" at {vacancy.company.name}.
+    return f"""You are an AI interviewer conducting a rigorous text-based interview \
+for the position of "{vacancy.title}" at {vacancy.company.name}.
 
 ## Your Role — Interview
 - Professional and thorough interviewer
@@ -210,7 +209,15 @@ def generate_greeting(interview: Interview) -> str:
         model=settings.OPENAI_CHAT_MODEL,
         messages=[
             {"role": "system", "content": system_prompt},
-            {"role": "user", "content": f"[SYSTEM: The candidate has just opened the {step_label} chat. Send a brief, warm greeting (2-3 sentences). Introduce yourself and the company briefly if company info is available. Then ask the candidate to tell you about themselves.]"},
+            {
+                "role": "user",
+                "content": (
+                    f"[SYSTEM: The candidate has just opened the {step_label} chat. "
+                    "Send a brief, warm greeting (2-3 sentences). Introduce yourself and the "
+                    "company briefly if company info is available. Then ask the candidate to "
+                    "tell you about themselves.]"
+                ),
+            },
         ],
         max_tokens=300,
         temperature=0.7,
@@ -276,11 +283,13 @@ def _get_ai_response_and_update_history(interview: Interview, candidate_entry: d
     ai_timestamp = timezone.now().isoformat()
 
     # Append AI response to history
-    chat_history.append({
-        "role": "ai",
-        "text": clean_ai_text,
-        "timestamp": ai_timestamp,
-    })
+    chat_history.append(
+        {
+            "role": "ai",
+            "text": clean_ai_text,
+            "timestamp": ai_timestamp,
+        }
+    )
 
     # Save updated history
     interview.chat_history = chat_history
@@ -362,6 +371,7 @@ def process_voice_message(*, interview: Interview, audio_file, duration: float) 
 
     # 1. Upload audio to S3
     import io
+
     s3_key = upload_voice_message_to_s3(
         file_obj=io.BytesIO(file_bytes),
         interview_id=str(interview.id),
@@ -406,6 +416,7 @@ def evaluate_chat_interview(interview: Interview, *, ai_decision: str = "advance
     """
     import json
     from decimal import Decimal
+
     from apps.interviews.models import InterviewScore
     from apps.interviews.services import complete_session
 
@@ -438,10 +449,12 @@ def evaluate_chat_interview(interview: Interview, *, ai_decision: str = "advance
         )
         return
 
-    criteria_json = json.dumps([
-        {"id": str(c["id"]), "name": c["name"], "description": c["description"], "weight": c["weight"]}
-        for c in criteria_list
-    ])
+    criteria_json = json.dumps(
+        [
+            {"id": str(c["id"]), "name": c["name"], "description": c["description"], "weight": c["weight"]}
+            for c in criteria_list
+        ]
+    )
 
     step_label = "prescanning" if step == Interview.SessionType.PRESCANNING else "interview"
 
@@ -454,7 +467,7 @@ def evaluate_chat_interview(interview: Interview, *, ai_decision: str = "advance
 {vacancy.description}
 
 ## Requirements
-{vacancy.requirements or 'Not specified'}
+{vacancy.requirements or "Not specified"}
 
 ## Evaluation Criteria
 {criteria_json}
@@ -493,7 +506,8 @@ Respond with ONLY valid JSON in this exact format:
     except json.JSONDecodeError:
         logger.error(
             "Failed to parse evaluation JSON for session %s. Raw response: %s",
-            interview.id, raw[:500],
+            interview.id,
+            raw[:500],
         )
         # Complete session with fallback so the pipeline doesn't get stuck
         complete_session(
@@ -541,5 +555,9 @@ Respond with ONLY valid JSON in this exact format:
 
     logger.info(
         "Evaluation complete for session %s (%s): score=%.1f, decision=%s, %d criteria scored",
-        interview.id, step, interview.overall_score or 0, ai_decision, len(score_objects),
+        interview.id,
+        step,
+        interview.overall_score or 0,
+        ai_decision,
+        len(score_objects),
     )

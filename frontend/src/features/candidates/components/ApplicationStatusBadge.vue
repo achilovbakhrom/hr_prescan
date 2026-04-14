@@ -10,16 +10,18 @@ const props = defineProps<{
 
 const { t } = useI18n()
 
-const STATUS_CONFIG = computed<Record<ApplicationStatus, { label: string; severity: string }>>(() => ({
-  applied: { label: t('candidates.status.applied'), severity: 'info' },
-  prescanned: { label: t('candidates.status.prescanned'), severity: 'info' },
-  interviewed: { label: t('candidates.status.interviewed'), severity: 'success' },
-  shortlisted: { label: t('candidates.status.shortlisted'), severity: 'success' },
-  hired: { label: t('candidates.status.hired'), severity: 'success' },
-  rejected: { label: t('candidates.status.rejected'), severity: 'danger' },
-  expired: { label: t('candidates.status.expired'), severity: 'secondary' },
-  archived: { label: t('candidates.status.archived'), severity: 'secondary' },
-}))
+const STATUS_CONFIG = computed<Record<ApplicationStatus, { label: string; severity: string }>>(
+  () => ({
+    applied: { label: t('candidates.status.applied'), severity: 'info' },
+    prescanned: { label: t('candidates.status.prescanned'), severity: 'info' },
+    interviewed: { label: t('candidates.status.interviewed'), severity: 'success' },
+    shortlisted: { label: t('candidates.status.shortlisted'), severity: 'success' },
+    hired: { label: t('candidates.status.hired'), severity: 'success' },
+    rejected: { label: t('candidates.status.rejected'), severity: 'danger' },
+    expired: { label: t('candidates.status.expired'), severity: 'secondary' },
+    archived: { label: t('candidates.status.archived'), severity: 'secondary' },
+  }),
+)
 </script>
 
 <template>

@@ -48,18 +48,12 @@ async function handleMarkAllAsRead(): Promise<void> {
 async function handleClick(notification: Notification): Promise<void> {
   await notificationStore.markAsRead(notification.id)
 
-  if (
-    notification.type === 'application_received' &&
-    notification.data.candidateId
-  ) {
+  if (notification.type === 'application_received' && notification.data.candidateId) {
     await router.push({
       name: ROUTE_NAMES.CANDIDATE_DETAIL,
       params: { id: notification.data.candidateId },
     })
-  } else if (
-    notification.type === 'interview_scheduled' &&
-    notification.data.interviewId
-  ) {
+  } else if (notification.type === 'interview_scheduled' && notification.data.interviewId) {
     await router.push({
       name: ROUTE_NAMES.INTERVIEW_DETAIL,
       params: { id: notification.data.interviewId },
@@ -103,10 +97,7 @@ onMounted(() => notificationStore.fetchNotifications())
       <i class="pi pi-spinner pi-spin text-3xl text-gray-400"></i>
     </div>
 
-    <div
-      v-else-if="filteredNotifications.length === 0"
-      class="py-12 text-center text-gray-500"
-    >
+    <div v-else-if="filteredNotifications.length === 0" class="py-12 text-center text-gray-500">
       <i class="pi pi-bell-slash mb-2 text-3xl"></i>
       <p>{{ t('notifications.noNotifications') }}</p>
     </div>

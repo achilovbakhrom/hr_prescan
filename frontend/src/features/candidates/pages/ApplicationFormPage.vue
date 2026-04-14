@@ -81,7 +81,11 @@ async function handleSubmit(): Promise<void> {
       cvFile: cvFile.value ?? undefined,
     })
     const resp = application as unknown as Record<string, unknown>
-    prescanToken.value = (resp.prescanToken ?? resp.prescan_token ?? resp.interviewToken ?? resp.interview_token ?? null) as string | null
+    prescanToken.value = (resp.prescanToken ??
+      resp.prescan_token ??
+      resp.interviewToken ??
+      resp.interview_token ??
+      null) as string | null
     step.value = 'ready'
   } catch {
     /* store handles error */
@@ -102,7 +106,9 @@ async function copyLink(): Promise<void> {
   try {
     await navigator.clipboard.writeText(prescanUrl.value)
     linkCopied.value = true
-    setTimeout(() => { linkCopied.value = false }, 2000)
+    setTimeout(() => {
+      linkCopied.value = false
+    }, 2000)
   } catch {
     // fallback
   }
@@ -128,13 +134,14 @@ async function copyLink(): Promise<void> {
           </div>
 
           <div class="rounded-lg border border-gray-200 bg-white p-8 text-center">
-            <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
+            <div
+              class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100"
+            >
               <i class="pi pi-comments text-3xl text-blue-600"></i>
             </div>
             <h2 class="mb-2 text-xl font-bold text-gray-900">Your Prescanning is Ready</h2>
             <p class="mb-6 text-sm text-gray-500">
-              You can start your AI prescanning chat now,
-              or do it later using the link below.
+              You can start your AI prescanning chat now, or do it later using the link below.
             </p>
 
             <Button
@@ -173,7 +180,8 @@ async function copyLink(): Promise<void> {
             <div class="rounded-lg border border-blue-100 bg-blue-50 p-4">
               <p class="text-sm text-blue-800">
                 <i class="pi pi-user-plus mr-1"></i>
-                <strong>Tip:</strong> Create an account to track your application status and access your interview results.
+                <strong>Tip:</strong> Create an account to track your application status and access
+                your interview results.
               </p>
               <RouterLink
                 to="/register"
@@ -194,14 +202,21 @@ async function copyLink(): Promise<void> {
 
       <!-- Step 1: Application form -->
       <template v-else>
-        <RouterLink :to="`/jobs/${vacancyId}`" class="mb-4 inline-flex items-center text-sm text-gray-500 hover:text-gray-700">
+        <RouterLink
+          :to="`/jobs/${vacancyId}`"
+          class="mb-4 inline-flex items-center text-sm text-gray-500 hover:text-gray-700"
+        >
           <i class="pi pi-arrow-left mr-1"></i> Back to job details
         </RouterLink>
 
         <h1 class="mb-1 text-2xl font-bold">{{ t('candidates.application.title') }}</h1>
         <p v-if="vacancy" class="mb-1 text-gray-600">{{ vacancy.title }}</p>
-        <p v-if="vacancy && ((vacancy as any).employer?.name || (vacancy as any).companyName)" class="mb-6 text-sm text-gray-500">
-          <i class="pi pi-building mr-1"></i>{{ (vacancy as any).employer?.name || (vacancy as any).companyName }}
+        <p
+          v-if="vacancy && ((vacancy as any).employer?.name || (vacancy as any).companyName)"
+          class="mb-6 text-sm text-gray-500"
+        >
+          <i class="pi pi-building mr-1"></i
+          >{{ (vacancy as any).employer?.name || (vacancy as any).companyName }}
         </p>
         <div v-else class="mb-6"></div>
 
@@ -211,19 +226,36 @@ async function copyLink(): Promise<void> {
 
         <form class="space-y-5" @submit.prevent="handleSubmit">
           <div>
-            <label class="mb-1 block text-sm font-medium">{{ t('candidates.application.name') }} *</label>
-            <InputText v-model="name" class="w-full" placeholder="John Doe" :invalid="!!errors.name" />
+            <label class="mb-1 block text-sm font-medium"
+              >{{ t('candidates.application.name') }} *</label
+            >
+            <InputText
+              v-model="name"
+              class="w-full"
+              placeholder="John Doe"
+              :invalid="!!errors.name"
+            />
             <small v-if="errors.name" class="text-red-500">{{ errors.name }}</small>
           </div>
 
           <div>
-            <label class="mb-1 block text-sm font-medium">{{ t('candidates.application.email') }} *</label>
-            <InputText v-model="email" type="email" class="w-full" placeholder="john@example.com" :invalid="!!errors.email" />
+            <label class="mb-1 block text-sm font-medium"
+              >{{ t('candidates.application.email') }} *</label
+            >
+            <InputText
+              v-model="email"
+              type="email"
+              class="w-full"
+              placeholder="john@example.com"
+              :invalid="!!errors.email"
+            />
             <small v-if="errors.email" class="text-red-500">{{ errors.email }}</small>
           </div>
 
           <div>
-            <label class="mb-1 block text-sm font-medium">{{ t('candidates.application.phone') }}</label>
+            <label class="mb-1 block text-sm font-medium">{{
+              t('candidates.application.phone')
+            }}</label>
             <InputText v-model="phone" class="w-full" placeholder="+1 234 567 890" />
           </div>
 
@@ -259,15 +291,23 @@ async function copyLink(): Promise<void> {
       v-if="showChatOverlay && prescanToken"
       class="fixed inset-0 z-50 flex flex-col items-center justify-end sm:justify-center bg-black/30 backdrop-blur-sm"
     >
-      <div class="flex w-full max-w-3xl flex-1 sm:flex-initial sm:h-[85vh] flex-col overflow-hidden rounded-t-3xl sm:rounded-2xl bg-white shadow-2xl">
+      <div
+        class="flex w-full max-w-3xl flex-1 sm:flex-initial sm:h-[85vh] flex-col overflow-hidden rounded-t-3xl sm:rounded-2xl bg-white shadow-2xl"
+      >
         <!-- Overlay header -->
-        <div class="flex items-center justify-between bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-3">
+        <div
+          class="flex items-center justify-between bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-3"
+        >
           <div class="flex items-center gap-3">
-            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 ring-2 ring-white/30">
+            <div
+              class="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 ring-2 ring-white/30"
+            >
               <i class="pi pi-comments text-sm text-white"></i>
             </div>
             <div>
-              <p class="text-sm font-semibold text-white">{{ t('interviews.chat.aiPrescanning') }}</p>
+              <p class="text-sm font-semibold text-white">
+                {{ t('interviews.chat.aiPrescanning') }}
+              </p>
               <p class="text-xs text-blue-100">Answer a few questions to get started</p>
             </div>
           </div>
@@ -295,11 +335,7 @@ async function copyLink(): Promise<void> {
           </div>
         </div>
         <!-- Embedded chat iframe -->
-        <iframe
-          :src="chatUrl"
-          class="flex-1 border-0"
-          allow="microphone; camera"
-        ></iframe>
+        <iframe :src="chatUrl" class="flex-1 border-0" allow="microphone; camera"></iframe>
       </div>
     </div>
 
@@ -315,7 +351,9 @@ async function copyLink(): Promise<void> {
             <i class="pi pi-comments text-white"></i>
           </div>
           <div>
-            <p class="text-sm font-medium text-gray-900">{{ t('interviews.chat.aiPrescanning') }}</p>
+            <p class="text-sm font-medium text-gray-900">
+              {{ t('interviews.chat.aiPrescanning') }}
+            </p>
             <p class="text-xs text-gray-500">Click to open prescanning chat</p>
           </div>
         </div>

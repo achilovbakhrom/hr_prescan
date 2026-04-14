@@ -30,10 +30,7 @@ function handleJoinInterview(): void {
 
 <template>
   <div class="mx-auto max-w-lg py-12">
-    <div
-      v-if="!interview && interviewStore.loading"
-      class="py-12 text-center"
-    >
+    <div v-if="!interview && interviewStore.loading" class="py-12 text-center">
       <i class="pi pi-spinner pi-spin text-3xl text-gray-400"></i>
     </div>
 
@@ -50,19 +47,13 @@ function handleJoinInterview(): void {
         <i class="pi pi-check-circle mb-4 text-5xl text-green-500"></i>
         <h1 class="mb-2 text-2xl font-bold text-gray-900">Thank You!</h1>
         <p class="text-gray-600">
-          Your interview has been completed. We will review your responses and
-          get back to you soon.
+          Your interview has been completed. We will review your responses and get back to you soon.
         </p>
       </div>
 
       <!-- Pre-interview state -->
-      <div
-        v-else
-        class="rounded-lg border border-gray-200 bg-white p-8"
-      >
-        <h1 class="mb-6 text-2xl font-bold text-gray-900">
-          Your Interview
-        </h1>
+      <div v-else class="rounded-lg border border-gray-200 bg-white p-8">
+        <h1 class="mb-6 text-2xl font-bold text-gray-900">Your Interview</h1>
 
         <div class="space-y-4">
           <div class="rounded-lg bg-gray-50 p-4">
@@ -79,9 +70,7 @@ function handleJoinInterview(): void {
               </div>
               <div class="flex justify-between">
                 <dt class="text-gray-500">Duration</dt>
-                <dd class="font-medium">
-                  {{ interview.durationMinutes }} minutes
-                </dd>
+                <dd class="font-medium">{{ interview.durationMinutes }} minutes</dd>
               </div>
               <div class="flex justify-between">
                 <dt class="text-gray-500">Status</dt>
@@ -93,9 +82,7 @@ function handleJoinInterview(): void {
           </div>
 
           <div class="rounded-lg border border-blue-100 bg-blue-50 p-4">
-            <h3 class="mb-2 text-sm font-semibold text-blue-800">
-              Instructions
-            </h3>
+            <h3 class="mb-2 text-sm font-semibold text-blue-800">Instructions</h3>
             <ul class="list-inside list-disc space-y-1 text-sm text-blue-700">
               <li>Ensure you have a stable internet connection</li>
               <li>Use a well-lit, quiet room</li>
@@ -105,9 +92,7 @@ function handleJoinInterview(): void {
           </div>
 
           <div class="rounded-lg border border-gray-200 p-4">
-            <h3 class="mb-2 text-sm font-semibold text-gray-700">
-              Camera & Microphone Test
-            </h3>
+            <h3 class="mb-2 text-sm font-semibold text-gray-700">Camera & Microphone Test</h3>
             <p class="text-xs text-gray-500">
               Device testing will be available when LiveKit is integrated.
             </p>

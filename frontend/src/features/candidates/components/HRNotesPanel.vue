@@ -4,8 +4,6 @@ import { useI18n } from 'vue-i18n'
 import Textarea from 'primevue/textarea'
 import Button from 'primevue/button'
 
-const { t } = useI18n()
-
 const props = defineProps<{
   notes: string
   loading: boolean
@@ -14,6 +12,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   save: [note: string]
 }>()
+
+const { t } = useI18n()
 
 const localNotes = ref(props.notes)
 

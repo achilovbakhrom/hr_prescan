@@ -12,7 +12,6 @@ def migrate_closed_to_archived(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("vacancies", "0004_two_step_pipeline"),
     ]

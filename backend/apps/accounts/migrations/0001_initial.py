@@ -1,11 +1,10 @@
-import django.db.models.deletion
 import uuid
 
+import django.db.models.deletion
 from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -43,9 +42,7 @@ class Migration(migrations.Migration):
                 ("country", models.CharField(max_length=100)),
                 (
                     "logo",
-                    models.ImageField(
-                        blank=True, null=True, upload_to="company_logos/"
-                    ),
+                    models.ImageField(blank=True, null=True, upload_to="company_logos/"),
                 ),
                 (
                     "website",
@@ -93,9 +90,7 @@ class Migration(migrations.Migration):
                 ("password", models.CharField(max_length=128, verbose_name="password")),
                 (
                     "last_login",
-                    models.DateTimeField(
-                        blank=True, null=True, verbose_name="last login"
-                    ),
+                    models.DateTimeField(blank=True, null=True, verbose_name="last login"),
                 ),
                 (
                     "is_superuser",

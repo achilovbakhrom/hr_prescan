@@ -7,19 +7,17 @@ import { useNotificationStore } from '../stores/notification.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { Notification, NotificationType } from '../types/notification.types'
 
-const { t } = useI18n()
-
 const emit = defineEmits<{
   close: []
 }>()
+
+const { t } = useI18n()
 
 const router = useRouter()
 const notificationStore = useNotificationStore()
 const dropdownEl = ref<HTMLElement | null>(null)
 
-const recentNotifications = computed(() =>
-  notificationStore.notifications.slice(0, 10),
-)
+const recentNotifications = computed(() => notificationStore.notifications.slice(0, 10))
 
 const typeIcons: Record<NotificationType, string> = {
   application_received: 'pi pi-user-plus',
@@ -48,32 +46,21 @@ function formatTimeAgo(dateStr: string): string {
   return `${diffDay}d ago`
 }
 
-async function handleNotificationClick(
-  notification: Notification,
-): Promise<void> {
+async function handleNotificationClick(notification: Notification): Promise<void> {
   await notificationStore.markAsRead(notification.id)
   emit('close')
 
-  if (
-    notification.type === 'application_received' &&
-    notification.data.candidateId
-  ) {
+  if (notification.type === 'application_received' && notification.data.candidateId) {
     await router.push({
       name: ROUTE_NAMES.CANDIDATE_DETAIL,
       params: { id: notification.data.candidateId },
     })
-  } else if (
-    notification.type === 'interview_scheduled' &&
-    notification.data.interviewId
-  ) {
+  } else if (notification.type === 'interview_scheduled' && notification.data.interviewId) {
     await router.push({
       name: ROUTE_NAMES.INTERVIEW_DETAIL,
       params: { id: notification.data.interviewId },
     })
-  } else if (
-    notification.type === 'status_changed' &&
-    notification.data.applicationId
-  ) {
+  } else if (notification.type === 'status_changed' && notification.data.applicationId) {
     await router.push({
       name: ROUTE_NAMES.MY_APPLICATION_DETAIL,
       params: { id: notification.data.applicationId },
@@ -91,10 +78,7 @@ function handleViewAll(): void {
 }
 
 function handleClickOutside(event: MouseEvent): void {
-  if (
-    dropdownEl.value &&
-    !dropdownEl.value.contains(event.target as Node)
-  ) {
+  if (dropdownEl.value && !dropdownEl.value.contains(event.target as Node)) {
     emit('close')
   }
 }
@@ -140,10 +124,7 @@ onUnmounted(() => {
         :class="{ 'bg-blue-50': !notification.isRead }"
         @click="handleNotificationClick(notification)"
       >
-        <i
-          :class="getIcon(notification.type)"
-          class="mt-0.5 text-gray-400"
-        ></i>
+        <i :class="getIcon(notification.type)" class="mt-0.5 text-gray-400"></i>
         <div class="min-w-0 flex-1">
           <p class="truncate text-sm font-medium text-gray-900">
             {{ notification.title }}

@@ -4,15 +4,26 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('applications', '0001_initial'),
+        ("applications", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='application',
-            name='status',
-            field=models.CharField(choices=[('applied', 'Applied'), ('interview_in_progress', 'Interview In Progress'), ('interview_completed', 'Interview Completed'), ('reviewing', 'Reviewing'), ('shortlisted', 'Shortlisted'), ('rejected', 'Rejected'), ('expired', 'Expired')], default='applied', max_length=30),
+            model_name="application",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("applied", "Applied"),
+                    ("interview_in_progress", "Interview In Progress"),
+                    ("interview_completed", "Interview Completed"),
+                    ("reviewing", "Reviewing"),
+                    ("shortlisted", "Shortlisted"),
+                    ("rejected", "Rejected"),
+                    ("expired", "Expired"),
+                ],
+                default="applied",
+                max_length=30,
+            ),
         ),
     ]

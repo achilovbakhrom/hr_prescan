@@ -267,4 +267,3 @@ function formatScore(score: number | null | undefined): string {
     </template>
   </div>
 </template>
-

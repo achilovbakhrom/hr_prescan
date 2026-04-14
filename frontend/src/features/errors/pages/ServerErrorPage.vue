@@ -17,9 +17,7 @@ function reload(): void {
 </script>
 
 <template>
-  <div
-    class="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-6 py-24"
-  >
+  <div class="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-6 py-24">
     <div class="text-center">
       <p class="text-8xl font-extrabold text-red-500">500</p>
       <h1 class="mt-4 text-3xl font-bold tracking-tight text-gray-900">
@@ -29,11 +27,7 @@ function reload(): void {
         {{ t('errors.serverErrorDesc') }}
       </p>
       <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-        <Button
-          :label="t('errors.tryAgain')"
-          icon="pi pi-refresh"
-          @click="reload"
-        />
+        <Button :label="t('errors.tryAgain')" icon="pi pi-refresh" @click="reload" />
         <Button
           :label="t('errors.goHome')"
           icon="pi pi-home"

@@ -66,7 +66,10 @@ const statusOptions = computed(() => {
   return options
 })
 
-const statusMessages: Record<string, { message: string; icon: string; acceptClass: string; acceptLabel: string }> = {
+const statusMessages: Record<
+  string,
+  { message: string; icon: string; acceptClass: string; acceptLabel: string }
+> = {
   prescanned: {
     message: 'This will mark the candidate as prescanned.',
     icon: 'pi pi-check',
@@ -122,7 +125,8 @@ function handleStatusChange(event: { value: ApplicationStatus }): void {
 
   confirm.require({
     message: `${props.candidateName}: ${config.message}`,
-    header: status === 'applied' ? 'Reset Candidate Status' : `Confirm ${status.replace(/_/g, ' ')}`,
+    header:
+      status === 'applied' ? 'Reset Candidate Status' : `Confirm ${status.replace(/_/g, ' ')}`,
     icon: config.icon,
     acceptClass: config.acceptClass,
     acceptLabel: config.acceptLabel,
@@ -130,7 +134,6 @@ function handleStatusChange(event: { value: ApplicationStatus }): void {
     accept: () => emit('statusChange', status),
   })
 }
-
 </script>
 
 <template>

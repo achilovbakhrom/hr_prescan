@@ -19,9 +19,7 @@ withDefaults(defineProps<Props>(), {
   >
     <!-- Avatar / icon placeholder -->
     <div v-if="showAvatar" class="mb-4 flex items-center gap-3">
-      <div
-        class="h-10 w-10 animate-pulse rounded-full bg-gray-200"
-      ></div>
+      <div class="h-10 w-10 animate-pulse rounded-full bg-gray-200"></div>
       <div class="flex-1 space-y-2">
         <div class="h-4 w-1/3 animate-pulse rounded-full bg-gray-200"></div>
         <div class="h-3 w-1/4 animate-pulse rounded-full bg-gray-200"></div>

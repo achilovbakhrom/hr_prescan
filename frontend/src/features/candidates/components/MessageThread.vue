@@ -33,10 +33,7 @@ async function handleSend(): Promise<void> {
 
   sending.value = true
   try {
-    const message = await candidateService.sendMessage(
-      props.candidateId,
-      content,
-    )
+    const message = await candidateService.sendMessage(props.candidateId, content)
     messages.value.push(message)
     newMessage.value = ''
     await scrollToBottom()
@@ -68,26 +65,16 @@ onMounted(fetchMessages)
       <h3 class="text-sm font-semibold text-gray-900">Messages</h3>
     </div>
 
-    <div
-      ref="threadContainer"
-      class="flex-1 space-y-3 overflow-y-auto p-4"
-    >
+    <div ref="threadContainer" class="flex-1 space-y-3 overflow-y-auto p-4">
       <div v-if="loading" class="py-8 text-center">
         <i class="pi pi-spinner pi-spin text-gray-400"></i>
       </div>
 
-      <div
-        v-else-if="messages.length === 0"
-        class="py-8 text-center text-sm text-gray-500"
-      >
+      <div v-else-if="messages.length === 0" class="py-8 text-center text-sm text-gray-500">
         No messages yet
       </div>
 
-      <div
-        v-for="msg in messages"
-        :key="msg.id"
-        class="flex flex-col gap-1"
-      >
+      <div v-for="msg in messages" :key="msg.id" class="flex flex-col gap-1">
         <div class="flex items-baseline gap-2">
           <span class="text-xs font-medium text-gray-700">
             {{ msg.senderName }}

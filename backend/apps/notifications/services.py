@@ -1,5 +1,4 @@
 import logging
-from uuid import UUID
 
 from django.db.models import QuerySet
 
@@ -19,7 +18,7 @@ logger = logging.getLogger(__name__)
 def create_notification(
     *,
     user: User,
-    type: str,
+    notification_type: str,
     title: str,
     message: str,
     data: dict | None = None,
@@ -27,7 +26,7 @@ def create_notification(
     """Create a notification for a user and queue an email task."""
     notification = Notification.objects.create(
         user=user,
-        type=type,
+        type=notification_type,
         title=title,
         message=message,
         data=data or {},
@@ -70,12 +69,9 @@ def notify_application_received(*, application: Application) -> None:
     for user in hr_users:
         create_notification(
             user=user,
-            type=Notification.Type.APPLICATION_RECEIVED,
+            notification_type=Notification.Type.APPLICATION_RECEIVED,
             title="New Application Received",
-            message=(
-                f"{application.candidate_name} applied for "
-                f"{application.vacancy.title}."
-            ),
+            message=(f"{application.candidate_name} applied for {application.vacancy.title}."),
             data={
                 "application_id": str(application.id),
                 "vacancy_id": str(application.vacancy_id),
@@ -92,7 +88,7 @@ def notify_interview_ready(*, interview: Interview) -> None:
     if application.candidate:
         create_notification(
             user=application.candidate,
-            type=Notification.Type.INTERVIEW_SCHEDULED,
+            notification_type=Notification.Type.INTERVIEW_SCHEDULED,
             title="Interview Ready",
             message=(
                 f"Your interview for {application.vacancy.title} is ready. "
@@ -114,11 +110,10 @@ def notify_interview_ready(*, interview: Interview) -> None:
     for user in hr_users:
         create_notification(
             user=user,
-            type=Notification.Type.INTERVIEW_SCHEDULED,
+            notification_type=Notification.Type.INTERVIEW_SCHEDULED,
             title="New Application",
             message=(
-                f"New application from {application.candidate_name} "
-                f"({application.vacancy.title}). Interview link sent."
+                f"New application from {application.candidate_name} ({application.vacancy.title}). Interview link sent."
             ),
             data={
                 "interview_id": str(interview.id),
@@ -141,7 +136,7 @@ def notify_interview_completed(*, interview: Interview) -> None:
     for user in hr_users:
         create_notification(
             user=user,
-            type=Notification.Type.INTERVIEW_COMPLETED,
+            notification_type=Notification.Type.INTERVIEW_COMPLETED,
             title="Interview Completed",
             message=(
                 f"{application.candidate_name} completed the interview for "
@@ -162,11 +157,10 @@ def notify_status_changed(*, application: Application) -> None:
 
     create_notification(
         user=application.candidate,
-        type=Notification.Type.STATUS_CHANGED,
+        notification_type=Notification.Type.STATUS_CHANGED,
         title="Application Status Updated",
         message=(
-            f"Your application for {application.vacancy.title} "
-            f"has been updated to: {application.get_status_display()}."
+            f"Your application for {application.vacancy.title} has been updated to: {application.get_status_display()}."
         ),
         data={
             "application_id": str(application.id),
@@ -206,9 +200,7 @@ def get_message_thread(
     """Return the message thread between two users, optionally scoped to an application."""
     from django.db.models import Q
 
-    qs = Message.objects.filter(
-        Q(sender=user, recipient=other_user) | Q(sender=other_user, recipient=user)
-    )
+    qs = Message.objects.filter(Q(sender=user, recipient=other_user) | Q(sender=other_user, recipient=user))
 
     if application is not None:
         qs = qs.filter(application=application)

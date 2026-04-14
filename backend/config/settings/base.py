@@ -107,9 +107,7 @@ CACHES = {
 }
 
 # Celery — RabbitMQ broker, Redis result backend
-CELERY_BROKER_URL = os.environ.get(
-    "RABBITMQ_URL", "amqp://guest:guest@localhost:5672//"
-)
+CELERY_BROKER_URL = os.environ.get("RABBITMQ_URL", "amqp://guest:guest@localhost:5672//")
 CELERY_RESULT_BACKEND = os.environ.get("REDIS_URL", "redis://localhost:6379/1")
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
@@ -171,9 +169,7 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTH_USER_MODEL = "accounts.User"
 
 # CORS
-CORS_ALLOWED_ORIGINS = os.environ.get(
-    "CORS_ALLOWED_ORIGINS", "http://localhost:3000"
-).split(",")
+CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:3000").split(",")
 
 # Internationalization
 LANGUAGE_CODE = "en"

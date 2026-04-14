@@ -1,9 +1,12 @@
 <script setup lang="ts">
-withDefaults(defineProps<{
-  size?: 'sm' | 'md' | 'lg'
-}>(), {
-  size: 'sm',
-})
+withDefaults(
+  defineProps<{
+    size?: 'sm' | 'md' | 'lg'
+  }>(),
+  {
+    size: 'sm',
+  },
+)
 
 const sizeMap = {
   sm: { wrapper: 'h-9 w-9', svg: 24 },
@@ -49,10 +52,7 @@ const sizeMap = {
         fill="rgba(255,255,255,0.7)"
       />
       <!-- AI sparkle right -->
-      <path
-        d="M36 15l1 2L39 18l-2 1L36 21l-1-2L33 18l2-1z"
-        fill="rgba(255,255,255,0.7)"
-      />
+      <path d="M36 15l1 2L39 18l-2 1L36 21l-1-2L33 18l2-1z" fill="rgba(255,255,255,0.7)" />
     </svg>
   </div>
 </template>

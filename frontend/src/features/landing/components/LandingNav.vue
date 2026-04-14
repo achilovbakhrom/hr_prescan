@@ -61,7 +61,9 @@ const navLinks = [
             class="hidden sm:flex"
             @click="router.push({ name: ROUTE_NAMES.DASHBOARD })"
           />
-          <div class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-medium text-blue-700">
+          <div
+            class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-medium text-blue-700"
+          >
             {{ authStore.user?.firstName?.charAt(0) }}{{ authStore.user?.lastName?.charAt(0) }}
           </div>
         </template>
@@ -118,18 +120,27 @@ const navLinks = [
               text
               severity="secondary"
               class="justify-start"
-              @click="router.push({ name: ROUTE_NAMES.LOGIN }); mobileOpen = false"
+              @click="
+                router.push({ name: ROUTE_NAMES.LOGIN })
+                mobileOpen = false
+              "
             />
             <Button
               :label="t('landing.hero.getStarted')"
-              @click="router.push({ name: ROUTE_NAMES.REGISTER }); mobileOpen = false"
+              @click="
+                router.push({ name: ROUTE_NAMES.REGISTER })
+                mobileOpen = false
+              "
             />
           </template>
           <template v-else>
             <Button
               :label="t('nav.dashboard')"
               icon="pi pi-th-large"
-              @click="router.push({ name: ROUTE_NAMES.DASHBOARD }); mobileOpen = false"
+              @click="
+                router.push({ name: ROUTE_NAMES.DASHBOARD })
+                mobileOpen = false
+              "
             />
           </template>
         </div>

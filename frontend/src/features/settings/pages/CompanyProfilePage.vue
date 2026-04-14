@@ -80,9 +80,7 @@ async function handleSave(): Promise<void> {
     successMessage.value = 'Company profile updated successfully.'
   } catch (err: unknown) {
     errorMessage.value =
-      err instanceof Error
-        ? err.message
-        : 'Failed to update profile. Please try again.'
+      err instanceof Error ? err.message : 'Failed to update profile. Please try again.'
   }
 }
 </script>

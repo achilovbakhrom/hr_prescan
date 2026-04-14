@@ -44,9 +44,7 @@ function formatDateTime(dateStr: string): string {
       </Column>
       <Column field="status" header="Status" />
       <template #empty>
-        <div class="py-4 text-center text-sm text-gray-500">
-          No upcoming interviews
-        </div>
+        <div class="py-4 text-center text-sm text-gray-500">No upcoming interviews</div>
       </template>
     </DataTable>
   </div>

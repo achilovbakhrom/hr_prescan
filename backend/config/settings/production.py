@@ -11,7 +11,7 @@ Extends base settings with:
 
 import os
 
-from config.settings.base import *  # noqa: F401, F403
+from config.settings.base import *
 
 # ---------------------------------------------------------------------------
 # Core
@@ -35,9 +35,7 @@ SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = True
-CSRF_TRUSTED_ORIGINS = os.environ.get(
-    "CSRF_TRUSTED_ORIGINS", ""
-).split(",")
+CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",")
 X_FRAME_OPTIONS = "DENY"
 
 # ---------------------------------------------------------------------------
@@ -98,13 +96,11 @@ STORAGES = {
 # ---------------------------------------------------------------------------
 OTEL_ENABLED = os.environ.get("OTEL_ENABLED", "true").lower() == "true"
 OTEL_SERVICE_NAME = os.environ.get("OTEL_SERVICE_NAME", "hr-prescan-backend")
-OTEL_EXPORTER_OTLP_ENDPOINT = os.environ.get(
-    "OTEL_EXPORTER_OTLP_ENDPOINT", "http://jaeger:4317"
-)
+OTEL_EXPORTER_OTLP_ENDPOINT = os.environ.get("OTEL_EXPORTER_OTLP_ENDPOINT", "http://jaeger:4317")
 
 if OTEL_ENABLED:
     try:
-        from opentelemetry import trace  # noqa: F401
+        from opentelemetry import trace
         from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import (
             OTLPSpanExporter,
         )
@@ -130,9 +126,7 @@ if OTEL_ENABLED:
     except ImportError:
         import logging as _logging
 
-        _logging.getLogger(__name__).warning(
-            "OpenTelemetry packages not installed — tracing disabled."
-        )
+        _logging.getLogger(__name__).warning("OpenTelemetry packages not installed — tracing disabled.")
 
 # ---------------------------------------------------------------------------
 # Structured JSON logging (production)

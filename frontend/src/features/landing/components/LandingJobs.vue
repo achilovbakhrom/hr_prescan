@@ -6,7 +6,11 @@ import Button from 'primevue/button'
 import Tag from 'primevue/tag'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import { vacancyService } from '@/features/vacancies/services/vacancy.service'
-import { EMPLOYMENT_LABELS, formatSalaryRange, formatDate } from '@/features/vacancies/composables/useVacancyLabels'
+import {
+  EMPLOYMENT_LABELS,
+  formatSalaryRange,
+  formatDate,
+} from '@/features/vacancies/composables/useVacancyLabels'
 import type { Vacancy } from '@/shared/types/vacancy.types'
 
 const router = useRouter()
@@ -28,12 +32,19 @@ onMounted(async () => {
 function goToJobDetail(id: string): void {
   router.push({ name: ROUTE_NAMES.JOB_DETAIL, params: { id } })
 }
+
+function getEmployerName(job: Vacancy): string | undefined {
+  const j = job as unknown as Record<string, unknown>
+  return (j.employerName as string) || (j.companyName as string) || undefined
+}
 </script>
 
 <template>
   <section id="jobs" class="px-6 py-24">
     <div class="mx-auto max-w-5xl">
-      <div class="scroll-animate mb-10 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
+      <div
+        class="scroll-animate mb-10 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end"
+      >
         <div>
           <h2 class="mb-2 text-3xl font-bold tracking-tight text-gray-900">
             {{ t('landing.latestJobs') }}
@@ -65,13 +76,23 @@ function goToJobDetail(id: string): void {
         >
           <div class="min-w-0 flex-1">
             <h3 class="text-base font-semibold text-gray-900">{{ job.title }}</h3>
-            <p v-if="(job as Record<string, unknown>).employerName || (job as Record<string, unknown>).companyName" class="mt-0.5 text-sm text-gray-500">
-              <i class="pi pi-building mr-1 text-xs"></i>{{ (job as Record<string, unknown>).employerName || (job as Record<string, unknown>).companyName }}
+            <p v-if="getEmployerName(job)" class="mt-0.5 text-sm text-gray-500">
+              <i class="pi pi-building mr-1 text-xs"></i>{{ getEmployerName(job) }}
             </p>
             <div class="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">
-              <span v-if="job.location"><i class="pi pi-map-marker mr-1 text-xs"></i>{{ job.location }}</span>
-              <span><i class="pi pi-briefcase mr-1 text-xs"></i>{{ EMPLOYMENT_LABELS[job.employmentType] }}</span>
-              <Tag v-if="job.isRemote" :value="t('landing.remote')" severity="info" class="text-xs" />
+              <span v-if="job.location"
+                ><i class="pi pi-map-marker mr-1 text-xs"></i>{{ job.location }}</span
+              >
+              <span
+                ><i class="pi pi-briefcase mr-1 text-xs"></i
+                >{{ EMPLOYMENT_LABELS[job.employmentType] }}</span
+              >
+              <Tag
+                v-if="job.isRemote"
+                :value="t('landing.remote')"
+                severity="info"
+                class="text-xs"
+              />
             </div>
           </div>
           <div class="ml-4 flex flex-col items-end gap-1">

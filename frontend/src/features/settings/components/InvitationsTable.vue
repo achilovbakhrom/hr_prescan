@@ -5,19 +5,17 @@ import Column from 'primevue/column'
 import Tag from 'primevue/tag'
 import type { Invitation } from '../types/settings.types'
 
-const { t } = useI18n()
-
 defineProps<{
   invitations: Invitation[]
 }>()
+
+const { t } = useI18n()
 
 function formatDate(dateString: string): string {
   return new Date(dateString).toLocaleDateString()
 }
 
-function getStatusSeverity(
-  invitation: Invitation,
-): 'success' | 'warn' | 'danger' {
+function getStatusSeverity(invitation: Invitation): 'success' | 'warn' | 'danger' {
   if (invitation.isAccepted) return 'success'
   const now = new Date()
   const expires = new Date(invitation.expiresAt)

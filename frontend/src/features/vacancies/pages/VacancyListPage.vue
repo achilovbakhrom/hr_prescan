@@ -29,17 +29,21 @@ const statusOptions = computed(() => [
 
 const filteredVacancies = computed(() => {
   if (activeTab.value === 'archived') {
-    return vacancyStore.vacancies.filter(v => v.status === 'archived')
+    return vacancyStore.vacancies.filter((v) => v.status === 'archived')
   }
-  const active = vacancyStore.vacancies.filter(v => v.status !== 'archived')
+  const active = vacancyStore.vacancies.filter((v) => v.status !== 'archived')
   if (statusFilter.value) {
-    return active.filter(v => v.status === statusFilter.value)
+    return active.filter((v) => v.status === statusFilter.value)
   }
   return active
 })
 
-const activeCount = computed(() => vacancyStore.vacancies.filter(v => v.status !== 'archived').length)
-const archivedCount = computed(() => vacancyStore.vacancies.filter(v => v.status === 'archived').length)
+const activeCount = computed(
+  () => vacancyStore.vacancies.filter((v) => v.status !== 'archived').length,
+)
+const archivedCount = computed(
+  () => vacancyStore.vacancies.filter((v) => v.status === 'archived').length,
+)
 
 onMounted(() => {
   vacancyStore.fetchVacancies()
@@ -77,7 +81,11 @@ function confirmDelete(event: Event, id: string, title: string): void {
 }
 
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })
+  return new Date(dateStr).toLocaleDateString([], {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
 }
 </script>
 
@@ -89,7 +97,12 @@ function formatDate(dateStr: string): string {
         <h1 class="text-lg font-bold text-gray-900 md:text-xl">{{ t('vacancies.title') }}</h1>
         <p class="mt-0.5 text-sm text-gray-500">{{ filteredVacancies.length }} shown</p>
       </div>
-      <Button :label="t('vacancies.create')" icon="pi pi-plus" size="small" @click="navigateToCreate" />
+      <Button
+        :label="t('vacancies.create')"
+        icon="pi pi-plus"
+        size="small"
+        @click="navigateToCreate"
+      />
     </div>
 
     <!-- Tabs -->
@@ -97,7 +110,11 @@ function formatDate(dateStr: string): string {
       <div class="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-0.5">
         <button
           class="rounded-md px-4 py-1.5 text-sm font-medium transition-colors"
-          :class="activeTab === 'active' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+          :class="
+            activeTab === 'active'
+              ? 'bg-white text-gray-900 shadow-sm'
+              : 'text-gray-500 hover:text-gray-700'
+          "
           @click="switchTab('active')"
         >
           {{ t('vacancies.active') }}
@@ -105,7 +122,11 @@ function formatDate(dateStr: string): string {
         </button>
         <button
           class="rounded-md px-4 py-1.5 text-sm font-medium transition-colors"
-          :class="activeTab === 'archived' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+          :class="
+            activeTab === 'archived'
+              ? 'bg-white text-gray-900 shadow-sm'
+              : 'text-gray-500 hover:text-gray-700'
+          "
           @click="switchTab('archived')"
         >
           {{ t('vacancies.status.archived') }}
@@ -149,8 +170,12 @@ function formatDate(dateStr: string): string {
               <i class="pi pi-building mr-1"></i>{{ (vacancy as any).employerName }}
             </p>
             <div class="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500">
-              <span v-if="vacancy.location"><i class="pi pi-map-marker mr-1"></i>{{ vacancy.location }}</span>
-              <span v-if="vacancy.isRemote" class="text-blue-600">{{ t('vacancies.overview.remote') }}</span>
+              <span v-if="vacancy.location"
+                ><i class="pi pi-map-marker mr-1"></i>{{ vacancy.location }}</span
+              >
+              <span v-if="vacancy.isRemote" class="text-blue-600">{{
+                t('vacancies.overview.remote')
+              }}</span>
               <span><i class="pi pi-calendar mr-1"></i>{{ formatDate(vacancy.createdAt) }}</span>
             </div>
           </div>
@@ -171,24 +196,45 @@ function formatDate(dateStr: string): string {
 
         <!-- Stats row -->
         <div class="mt-3 flex flex-wrap gap-2">
-          <div class="flex items-center gap-1.5 rounded-lg bg-blue-50 px-2 py-1 sm:px-2.5 sm:py-1.5">
+          <div
+            class="flex items-center gap-1.5 rounded-lg bg-blue-50 px-2 py-1 sm:px-2.5 sm:py-1.5"
+          >
             <i class="pi pi-users text-xs text-blue-500"></i>
-            <span class="text-xs font-semibold text-blue-700 sm:text-sm">{{ vacancy.candidatesTotal ?? 0 }}</span>
+            <span class="text-xs font-semibold text-blue-700 sm:text-sm">{{
+              vacancy.candidatesTotal ?? 0
+            }}</span>
             <span class="text-[10px] text-blue-400 sm:text-xs">{{ t('vacancies.applied') }}</span>
           </div>
-          <div class="flex items-center gap-1.5 rounded-lg bg-emerald-50 px-2 py-1 sm:px-2.5 sm:py-1.5">
+          <div
+            class="flex items-center gap-1.5 rounded-lg bg-emerald-50 px-2 py-1 sm:px-2.5 sm:py-1.5"
+          >
             <i class="pi pi-check text-xs text-emerald-500"></i>
-            <span class="text-xs font-semibold text-emerald-700 sm:text-sm">{{ vacancy.candidatesInterviewed ?? 0 }}</span>
-            <span class="text-[10px] text-emerald-400 sm:text-xs">{{ t('vacancies.interviewed') }}</span>
+            <span class="text-xs font-semibold text-emerald-700 sm:text-sm">{{
+              vacancy.candidatesInterviewed ?? 0
+            }}</span>
+            <span class="text-[10px] text-emerald-400 sm:text-xs">{{
+              t('vacancies.interviewed')
+            }}</span>
           </div>
-          <div class="flex items-center gap-1.5 rounded-lg bg-violet-50 px-2 py-1 sm:px-2.5 sm:py-1.5">
+          <div
+            class="flex items-center gap-1.5 rounded-lg bg-violet-50 px-2 py-1 sm:px-2.5 sm:py-1.5"
+          >
             <i class="pi pi-star text-xs text-violet-500"></i>
-            <span class="text-xs font-semibold text-violet-700 sm:text-sm">{{ vacancy.candidatesShortlisted ?? 0 }}</span>
-            <span class="text-[10px] text-violet-400 sm:text-xs">{{ t('vacancies.shortlisted') }}</span>
+            <span class="text-xs font-semibold text-violet-700 sm:text-sm">{{
+              vacancy.candidatesShortlisted ?? 0
+            }}</span>
+            <span class="text-[10px] text-violet-400 sm:text-xs">{{
+              t('vacancies.shortlisted')
+            }}</span>
           </div>
-          <div v-if="vacancy.status === 'archived' && (vacancy.candidatesHired ?? 0) > 0" class="flex items-center gap-1.5 rounded-lg bg-amber-50 px-2 py-1 sm:px-2.5 sm:py-1.5">
+          <div
+            v-if="vacancy.status === 'archived' && (vacancy.candidatesHired ?? 0) > 0"
+            class="flex items-center gap-1.5 rounded-lg bg-amber-50 px-2 py-1 sm:px-2.5 sm:py-1.5"
+          >
             <i class="pi pi-verified text-xs text-amber-500"></i>
-            <span class="text-xs font-semibold text-amber-700 sm:text-sm">{{ vacancy.candidatesHired }}</span>
+            <span class="text-xs font-semibold text-amber-700 sm:text-sm">{{
+              vacancy.candidatesHired
+            }}</span>
             <span class="text-[10px] text-amber-400 sm:text-xs">{{ t('vacancies.hired') }}</span>
           </div>
         </div>
@@ -196,18 +242,29 @@ function formatDate(dateStr: string): string {
     </div>
 
     <!-- Empty -->
-    <div v-else class="flex flex-col items-center rounded-xl border border-dashed border-gray-200 px-4 py-12 text-center md:py-16">
+    <div
+      v-else
+      class="flex flex-col items-center rounded-xl border border-dashed border-gray-200 px-4 py-12 text-center md:py-16"
+    >
       <div class="flex h-14 w-14 items-center justify-center rounded-full bg-gray-100">
         <i class="pi pi-briefcase text-2xl text-gray-400"></i>
       </div>
       <template v-if="activeTab === 'archived'">
-        <p class="mt-4 text-sm font-medium text-gray-600">{{ t('vacancies.noArchivedVacancies') }}</p>
+        <p class="mt-4 text-sm font-medium text-gray-600">
+          {{ t('vacancies.noArchivedVacancies') }}
+        </p>
         <p class="mt-1 text-sm text-gray-400">Archived vacancies will appear here</p>
       </template>
       <template v-else>
         <p class="mt-4 text-sm font-medium text-gray-600">{{ t('vacancies.noVacancies') }}</p>
         <p class="mt-1 text-sm text-gray-400">{{ t('vacancies.noVacanciesHint') }}</p>
-        <Button :label="t('vacancies.create')" icon="pi pi-plus" class="mt-4" size="small" @click="navigateToCreate" />
+        <Button
+          :label="t('vacancies.create')"
+          icon="pi pi-plus"
+          class="mt-4"
+          size="small"
+          @click="navigateToCreate"
+        />
       </template>
     </div>
 

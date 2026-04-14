@@ -1,11 +1,7 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { adminService } from '../services/admin.service'
-import type {
-  AdminCompany,
-  AdminUser,
-  PlatformAnalytics,
-} from '../types/admin.types'
+import type { AdminCompany, AdminUser, PlatformAnalytics } from '../types/admin.types'
 import type { SubscriptionPlan } from '@/shared/types/subscription.types'
 
 export const useAdminStore = defineStore('admin', () => {
@@ -18,10 +14,7 @@ export const useAdminStore = defineStore('admin', () => {
   const loading = ref(false)
   const error = ref<string | null>(null)
 
-  async function fetchCompanies(params?: {
-    search?: string
-    page?: number
-  }): Promise<void> {
+  async function fetchCompanies(params?: { search?: string; page?: number }): Promise<void> {
     loading.value = true
     error.value = null
     try {
@@ -35,10 +28,7 @@ export const useAdminStore = defineStore('admin', () => {
     }
   }
 
-  async function toggleCompanyStatus(
-    id: string,
-    isActive: boolean,
-  ): Promise<void> {
+  async function toggleCompanyStatus(id: string, isActive: boolean): Promise<void> {
     try {
       const updated = await adminService.toggleCompanyStatus(id, isActive)
       const index = companies.value.findIndex((c) => c.id === id)
@@ -68,10 +58,7 @@ export const useAdminStore = defineStore('admin', () => {
     }
   }
 
-  async function toggleUserStatus(
-    id: string,
-    isActive: boolean,
-  ): Promise<void> {
+  async function toggleUserStatus(id: string, isActive: boolean): Promise<void> {
     try {
       const updated = await adminService.toggleUserStatus(id, isActive)
       const index = users.value.findIndex((u) => u.id === id)
@@ -107,10 +94,7 @@ export const useAdminStore = defineStore('admin', () => {
     }
   }
 
-  async function updatePlan(
-    id: string,
-    data: Partial<SubscriptionPlan>,
-  ): Promise<void> {
+  async function updatePlan(id: string, data: Partial<SubscriptionPlan>): Promise<void> {
     try {
       const updated = await adminService.updatePlan(id, data)
       const index = plans.value.findIndex((p) => p.id === id)

@@ -18,9 +18,7 @@ export const useVacancyStore = defineStore('vacancy', () => {
   const loading = ref(false)
   const error = ref<string | null>(null)
 
-  async function fetchVacancies(params?: {
-    status?: string
-  }): Promise<void> {
+  async function fetchVacancies(params?: { status?: string }): Promise<void> {
     loading.value = true
     error.value = null
     try {
@@ -51,7 +49,7 @@ export const useVacancyStore = defineStore('vacancy', () => {
   async function deleteVacancy(id: string): Promise<void> {
     try {
       await vacancyService.deleteVacancy(id)
-      vacancies.value = vacancies.value.filter(v => v.id !== id)
+      vacancies.value = vacancies.value.filter((v) => v.id !== id)
     } catch (err: unknown) {
       const message = extractErrorMessage(err)
       error.value = message
@@ -71,10 +69,7 @@ export const useVacancyStore = defineStore('vacancy', () => {
     }
   }
 
-  async function updateVacancy(
-    id: string,
-    data: UpdateVacancyRequest,
-  ): Promise<void> {
+  async function updateVacancy(id: string, data: UpdateVacancyRequest): Promise<void> {
     loading.value = true
     error.value = null
     try {
@@ -95,10 +90,7 @@ export const useVacancyStore = defineStore('vacancy', () => {
     }
   }
 
-  async function changeStatus(
-    id: string,
-    status: VacancyStatus,
-  ): Promise<void> {
+  async function changeStatus(id: string, status: VacancyStatus): Promise<void> {
     loading.value = true
     error.value = null
     try {
@@ -142,15 +134,9 @@ export const useVacancyStore = defineStore('vacancy', () => {
     data: Partial<VacancyCriteria>,
   ): Promise<void> {
     try {
-      const updated = await vacancyService.updateCriteria(
-        vacancyId,
-        criteriaId,
-        data,
-      )
+      const updated = await vacancyService.updateCriteria(vacancyId, criteriaId, data)
       if (currentVacancy.value?.id === vacancyId) {
-        const index = currentVacancy.value.criteria.findIndex(
-          (c) => c.id === criteriaId,
-        )
+        const index = currentVacancy.value.criteria.findIndex((c) => c.id === criteriaId)
         if (index !== -1) {
           currentVacancy.value.criteria[index] = updated
         }
@@ -162,15 +148,13 @@ export const useVacancyStore = defineStore('vacancy', () => {
     }
   }
 
-  async function deleteCriteria(
-    vacancyId: string,
-    criteriaId: string,
-  ): Promise<void> {
+  async function deleteCriteria(vacancyId: string, criteriaId: string): Promise<void> {
     try {
       await vacancyService.deleteCriteria(vacancyId, criteriaId)
       if (currentVacancy.value?.id === vacancyId) {
-        currentVacancy.value.criteria =
-          currentVacancy.value.criteria.filter((c) => c.id !== criteriaId)
+        currentVacancy.value.criteria = currentVacancy.value.criteria.filter(
+          (c) => c.id !== criteriaId,
+        )
         currentVacancy.value.criteriaCount -= 1
       }
     } catch (err: unknown) {
@@ -203,15 +187,9 @@ export const useVacancyStore = defineStore('vacancy', () => {
     data: Partial<InterviewQuestion>,
   ): Promise<void> {
     try {
-      const updated = await vacancyService.updateQuestion(
-        vacancyId,
-        questionId,
-        data,
-      )
+      const updated = await vacancyService.updateQuestion(vacancyId, questionId, data)
       if (currentVacancy.value?.id === vacancyId) {
-        const index = currentVacancy.value.questions.findIndex(
-          (q) => q.id === questionId,
-        )
+        const index = currentVacancy.value.questions.findIndex((q) => q.id === questionId)
         if (index !== -1) {
           currentVacancy.value.questions[index] = updated
         }
@@ -223,15 +201,13 @@ export const useVacancyStore = defineStore('vacancy', () => {
     }
   }
 
-  async function deleteQuestion(
-    vacancyId: string,
-    questionId: string,
-  ): Promise<void> {
+  async function deleteQuestion(vacancyId: string, questionId: string): Promise<void> {
     try {
       await vacancyService.deleteQuestion(vacancyId, questionId)
       if (currentVacancy.value?.id === vacancyId) {
-        currentVacancy.value.questions =
-          currentVacancy.value.questions.filter((q) => q.id !== questionId)
+        currentVacancy.value.questions = currentVacancy.value.questions.filter(
+          (q) => q.id !== questionId,
+        )
         currentVacancy.value.questionsCount -= 1
       }
     } catch (err: unknown) {

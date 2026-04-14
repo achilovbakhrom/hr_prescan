@@ -3,7 +3,6 @@ from datetime import timedelta
 from decimal import Decimal
 
 from django.db import transaction
-from django.db.models import Count, Q
 from django.utils import timezone
 
 from apps.accounts.models import Company, User
@@ -89,7 +88,7 @@ def subscribe_company(
     else:
         period_end = now + timedelta(days=30)
 
-    subscription, created = CompanySubscription.objects.update_or_create(
+    subscription, _created = CompanySubscription.objects.update_or_create(
         company=company,
         defaults={
             "plan": plan,

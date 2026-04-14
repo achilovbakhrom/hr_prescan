@@ -56,9 +56,7 @@ async function handleRegister(): Promise<void> {
     registered.value = true
   } catch (err: unknown) {
     errorMessage.value =
-      err instanceof Error
-        ? err.message
-        : 'Registration failed. Please try again.'
+      err instanceof Error ? err.message : 'Registration failed. Please try again.'
   }
 }
 
@@ -68,8 +66,7 @@ async function handleGoogleSuccess(credential: string): Promise<void> {
     await authStore.googleLogin(credential)
     await router.push({ name: ROUTE_NAMES.DASHBOARD })
   } catch (err: unknown) {
-    errorMessage.value =
-      err instanceof Error ? err.message : 'Google sign-in failed.'
+    errorMessage.value = err instanceof Error ? err.message : 'Google sign-in failed.'
   }
 }
 
@@ -83,13 +80,11 @@ function handleGoogleError(msg: string): void {
     <div class="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
       <template v-if="registered">
         <div class="text-center">
-          <h1 class="mb-4 text-2xl font-bold text-gray-900">
-            Check Your Email
-          </h1>
+          <h1 class="mb-4 text-2xl font-bold text-gray-900">Check Your Email</h1>
           <p class="mb-6 text-gray-600">
             We've sent a verification link to
-            <strong>{{ email }}</strong>. Please check your inbox and click the
-            link to activate your account.
+            <strong>{{ email }}</strong
+            >. Please check your inbox and click the link to activate your account.
           </p>
           <RouterLink
             :to="{ name: ROUTE_NAMES.LOGIN }"
@@ -109,10 +104,7 @@ function handleGoogleError(msg: string): void {
           {{ errorMessage }}
         </Message>
 
-        <GoogleSignInButton
-          @success="handleGoogleSuccess"
-          @error="handleGoogleError"
-        />
+        <GoogleSignInButton @success="handleGoogleSuccess" @error="handleGoogleError" />
 
         <div class="mb-4 flex items-center gap-3">
           <div class="h-px flex-1 bg-gray-200"></div>
@@ -123,10 +115,7 @@ function handleGoogleError(msg: string): void {
         <form class="flex flex-col gap-4" @submit.prevent="handleRegister">
           <div class="grid grid-cols-2 gap-4">
             <div class="flex flex-col gap-1">
-              <label
-                for="firstName"
-                class="text-sm font-medium text-gray-700"
-              >
+              <label for="firstName" class="text-sm font-medium text-gray-700">
                 {{ t('auth.register.firstName') }}
               </label>
               <InputText
@@ -136,10 +125,7 @@ function handleGoogleError(msg: string): void {
                 :invalid="submitted && errors.firstName"
                 class="w-full"
               />
-              <small
-                v-if="submitted && errors.firstName"
-                class="text-red-500"
-              >
+              <small v-if="submitted && errors.firstName" class="text-red-500">
                 First name is required.
               </small>
             </div>
@@ -197,10 +183,7 @@ function handleGoogleError(msg: string): void {
           </div>
 
           <div class="flex flex-col gap-1">
-            <label
-              for="confirmPassword"
-              class="text-sm font-medium text-gray-700"
-            >
+            <label for="confirmPassword" class="text-sm font-medium text-gray-700">
               {{ t('auth.register.confirmPassword') }}
             </label>
             <Password
@@ -213,10 +196,7 @@ function handleGoogleError(msg: string): void {
               class="w-full"
               input-class="w-full"
             />
-            <small
-              v-if="submitted && errors.confirmPassword"
-              class="text-red-500"
-            >
+            <small v-if="submitted && errors.confirmPassword" class="text-red-500">
               {{ t('auth.register.passwordMismatch') }}
             </small>
           </div>

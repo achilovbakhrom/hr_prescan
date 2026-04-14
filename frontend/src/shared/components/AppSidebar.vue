@@ -31,40 +31,95 @@ const aiAssistant = useAIAssistant()
 const sections = computed<NavSection[]>(() => [
   {
     items: [
-      { label: t('nav.dashboard'), icon: 'pi pi-home', to: '/dashboard', roles: [USER_ROLES.ADMIN, USER_ROLES.HR, USER_ROLES.CANDIDATE] },
+      {
+        label: t('nav.dashboard'),
+        icon: 'pi pi-home',
+        to: '/dashboard',
+        roles: [USER_ROLES.ADMIN, USER_ROLES.HR, USER_ROLES.CANDIDATE],
+      },
     ],
   },
   {
     title: t('vacancies.title'),
     items: [
-      { label: t('nav.vacancies'), icon: 'pi pi-briefcase', to: '/vacancies', roles: [USER_ROLES.ADMIN, USER_ROLES.HR] },
-      { label: t('employers.title'), icon: 'pi pi-building', to: '/employers', roles: [USER_ROLES.ADMIN, USER_ROLES.HR] },
-      { label: t('nav.interviews'), icon: 'pi pi-video', to: '/interviews', roles: [USER_ROLES.ADMIN, USER_ROLES.HR] },
+      {
+        label: t('nav.vacancies'),
+        icon: 'pi pi-briefcase',
+        to: '/vacancies',
+        roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
+      },
+      {
+        label: t('employers.title'),
+        icon: 'pi pi-building',
+        to: '/employers',
+        roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
+      },
+      {
+        label: t('nav.interviews'),
+        icon: 'pi pi-video',
+        to: '/interviews',
+        roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
+      },
     ],
   },
   {
     title: t('candidates.title'),
     items: [
-      { label: t('nav.browseJobs'), icon: 'pi pi-search', to: '/jobs', roles: [USER_ROLES.CANDIDATE] },
-      { label: t('nav.myApplications'), icon: 'pi pi-file', to: '/my-applications', roles: [USER_ROLES.CANDIDATE] },
+      {
+        label: t('nav.browseJobs'),
+        icon: 'pi pi-search',
+        to: '/jobs',
+        roles: [USER_ROLES.CANDIDATE],
+      },
+      {
+        label: t('nav.myApplications'),
+        icon: 'pi pi-file',
+        to: '/my-applications',
+        roles: [USER_ROLES.CANDIDATE],
+      },
     ],
   },
   {
     title: t('nav.admin'),
     items: [
       { label: t('nav.admin'), icon: 'pi pi-shield', to: '/admin', roles: [USER_ROLES.ADMIN] },
-      { label: t('nav.companies'), icon: 'pi pi-building', to: '/admin/companies', roles: [USER_ROLES.ADMIN] },
+      {
+        label: t('nav.companies'),
+        icon: 'pi pi-building',
+        to: '/admin/companies',
+        roles: [USER_ROLES.ADMIN],
+      },
       { label: t('nav.users'), icon: 'pi pi-users', to: '/admin/users', roles: [USER_ROLES.ADMIN] },
       { label: t('nav.plans'), icon: 'pi pi-list', to: '/admin/plans', roles: [USER_ROLES.ADMIN] },
-      { label: t('nav.analytics'), icon: 'pi pi-chart-bar', to: '/admin/analytics', roles: [USER_ROLES.ADMIN] },
+      {
+        label: t('nav.analytics'),
+        icon: 'pi pi-chart-bar',
+        to: '/admin/analytics',
+        roles: [USER_ROLES.ADMIN],
+      },
     ],
   },
   {
     title: t('nav.settings'),
     items: [
-      { label: t('settings.company.title'), icon: 'pi pi-cog', to: '/settings/company', roles: [USER_ROLES.ADMIN, USER_ROLES.HR] },
-      { label: t('nav.team'), icon: 'pi pi-users', to: '/settings/team', roles: [USER_ROLES.ADMIN] },
-      { label: t('nav.subscription'), icon: 'pi pi-credit-card', to: '/subscription', roles: [USER_ROLES.ADMIN] },
+      {
+        label: t('settings.company.title'),
+        icon: 'pi pi-cog',
+        to: '/settings/company',
+        roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
+      },
+      {
+        label: t('nav.team'),
+        icon: 'pi pi-users',
+        to: '/settings/team',
+        roles: [USER_ROLES.ADMIN],
+      },
+      {
+        label: t('nav.subscription'),
+        icon: 'pi pi-credit-card',
+        to: '/subscription',
+        roles: [USER_ROLES.ADMIN],
+      },
     ],
   },
 ])
@@ -96,10 +151,7 @@ function isActive(path: string): boolean {
     <nav class="flex flex-1 flex-col gap-0.5 overflow-y-auto px-2 py-3">
       <template v-for="(section, sIdx) in filteredSections" :key="sIdx">
         <!-- Section divider -->
-        <div
-          v-if="section.title && !collapsed && sIdx > 0"
-          class="mb-1 mt-3 px-3"
-        >
+        <div v-if="section.title && !collapsed && sIdx > 0" class="mb-1 mt-3 px-3">
           <span class="text-[10px] font-semibold uppercase tracking-widest text-gray-400">
             {{ section.title }}
           </span>

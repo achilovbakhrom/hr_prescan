@@ -27,9 +27,7 @@ LIVEKIT_API_SECRET = os.environ.get("LIVEKIT_API_SECRET", "")
 def cancel_interview(*, interview: Interview) -> Interview:
     """Cancel a pending or in-progress session and revert application status."""
     if interview.status not in (Interview.Status.PENDING, Interview.Status.IN_PROGRESS):
-        raise ApplicationError(
-            str(MSG_CANNOT_CANCEL_SESSION).format(status=interview.status)
-        )
+        raise ApplicationError(str(MSG_CANNOT_CANCEL_SESSION).format(status=interview.status))
 
     interview.status = Interview.Status.CANCELLED
     interview.save(update_fields=["status", "updated_at"])
@@ -52,9 +50,7 @@ def start_interview(*, interview: Interview) -> Interview:
     For meet mode, generates a LiveKit candidate token.
     """
     if interview.status != Interview.Status.PENDING:
-        raise ApplicationError(
-            str(MSG_CANNOT_START_SESSION).format(status=interview.status)
-        )
+        raise ApplicationError(str(MSG_CANNOT_START_SESSION).format(status=interview.status))
 
     interview.status = Interview.Status.IN_PROGRESS
     interview.started_at = timezone.now()
@@ -83,11 +79,13 @@ def start_interview(*, interview: Interview) -> Interview:
                 f"Let's start — could you briefly introduce yourself and tell me "
                 f"why you're interested in this role?"
             )
-        interview.chat_history = [{
-            "role": "ai",
-            "text": greeting,
-            "timestamp": timezone.now().isoformat(),
-        }]
+        interview.chat_history = [
+            {
+                "role": "ai",
+                "text": greeting,
+                "timestamp": timezone.now().isoformat(),
+            }
+        ]
         update_fields.append("chat_history")
 
     interview.save(update_fields=update_fields)
@@ -108,9 +106,7 @@ def reset_interview(*, interview: Interview) -> Interview:
     Returns the newly created session.
     """
     if interview.status not in (Interview.Status.IN_PROGRESS, Interview.Status.CANCELLED):
-        raise ApplicationError(
-            f"Cannot reset session with status '{interview.status}'."
-        )
+        raise ApplicationError(f"Cannot reset session with status '{interview.status}'.")
 
     application = interview.application
 
@@ -181,9 +177,7 @@ def complete_session(
         ai_decision: "advance" to move candidate forward, "reject" to reject.
     """
     if interview.status != Interview.Status.IN_PROGRESS:
-        raise ApplicationError(
-            f"Cannot complete session with status '{interview.status}'."
-        )
+        raise ApplicationError(f"Cannot complete session with status '{interview.status}'.")
 
     from django.utils import timezone
 
@@ -286,7 +280,7 @@ def create_integrity_flags(
     try:
         interview = Interview.objects.get(id=interview_id)
     except Interview.DoesNotExist:
-        raise ApplicationError(str(MSG_INTERVIEW_NOT_FOUND))
+        raise ApplicationError(str(MSG_INTERVIEW_NOT_FOUND)) from None
 
     flag_objects = [
         InterviewIntegrityFlag(
@@ -300,9 +294,7 @@ def create_integrity_flags(
     ]
 
     created = InterviewIntegrityFlag.objects.bulk_create(flag_objects)
-    logger.info(
-        "Created %d integrity flags for interview %s.", len(created), interview_id
-    )
+    logger.info("Created %d integrity flags for interview %s.", len(created), interview_id)
     return created
 
 
@@ -316,10 +308,7 @@ def _create_livekit_token(
 ) -> str:
     """Create a LiveKit access token with the given grants."""
     if not LIVEKIT_API_KEY or not LIVEKIT_API_SECRET:
-        raise ApplicationError(
-            "LiveKit credentials not configured. "
-            "Set LIVEKIT_API_KEY and LIVEKIT_API_SECRET."
-        )
+        raise ApplicationError("LiveKit credentials not configured. Set LIVEKIT_API_KEY and LIVEKIT_API_SECRET.")
 
     token = (
         AccessToken(LIVEKIT_API_KEY, LIVEKIT_API_SECRET)
@@ -383,12 +372,12 @@ def schedule_human_interview(
 
     # Notify candidate
     if application.candidate:
-        from apps.notifications.services import create_notification
         from apps.notifications.models import Notification
+        from apps.notifications.services import create_notification
 
         create_notification(
             user=application.candidate,
-            type=Notification.Type.INTERVIEW_SCHEDULED,
+            notification_type=Notification.Type.INTERVIEW_SCHEDULED,
             title="Human Interview Scheduled",
             message=(
                 f"A follow-up interview for {application.vacancy.title} has been "
