@@ -10,14 +10,14 @@ from apps.accounts.models import Company, Invitation, User
 from apps.accounts.tasks import send_invitation_email, send_verification_email
 from apps.common.exceptions import ApplicationError
 from apps.common.messages import (
+    MSG_CANNOT_DEACTIVATE_SELF,
     MSG_EMAIL_ALREADY_VERIFIED,
+    MSG_INVALID_INVITATION,
+    MSG_INVALID_VERIFICATION_TOKEN,
     MSG_INVITATION_ALREADY_ACCEPTED,
     MSG_INVITATION_EXISTS,
     MSG_INVITATION_EXPIRED,
     MSG_INVITATION_WRONG_EMAIL,
-    MSG_INVALID_INVITATION,
-    MSG_INVALID_VERIFICATION_TOKEN,
-    MSG_CANNOT_DEACTIVATE_SELF,
     MSG_MANAGE_OWN_COMPANY,
     MSG_ONLY_ADMINS_ACTIVATE,
     MSG_ONLY_ADMINS_DEACTIVATE,

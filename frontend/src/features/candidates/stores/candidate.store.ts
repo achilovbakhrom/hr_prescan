@@ -26,10 +26,7 @@ export const useCandidateStore = defineStore('candidate', () => {
     loading.value = true
     error.value = null
     try {
-      candidates.value = await candidateService.getVacancyCandidates(
-        vacancyId,
-        params,
-      )
+      candidates.value = await candidateService.getVacancyCandidates(vacancyId, params)
     } catch (err: unknown) {
       error.value = extractErrorMessage(err)
     } finally {
@@ -50,10 +47,7 @@ export const useCandidateStore = defineStore('candidate', () => {
     }
   }
 
-  async function updateStatus(
-    id: string,
-    status: ApplicationStatus,
-  ): Promise<void> {
+  async function updateStatus(id: string, status: ApplicationStatus): Promise<void> {
     loading.value = true
     error.value = null
     try {
@@ -99,10 +93,7 @@ export const useCandidateStore = defineStore('candidate', () => {
     loading.value = true
     error.value = null
     try {
-      const application = await candidateService.submitApplication(
-        vacancyId,
-        data,
-      )
+      const application = await candidateService.submitApplication(vacancyId, data)
       return application
     } catch (err: unknown) {
       const message = extractErrorMessage(err)
@@ -129,8 +120,7 @@ export const useCandidateStore = defineStore('candidate', () => {
     loading.value = true
     error.value = null
     try {
-      currentApplication.value =
-        await candidateService.getMyApplicationDetail(id)
+      currentApplication.value = await candidateService.getMyApplicationDetail(id)
     } catch (err: unknown) {
       error.value = extractErrorMessage(err)
     } finally {

@@ -31,8 +31,7 @@ export const useSubscriptionStore = defineStore('subscription', () => {
     loading.value = true
     error.value = null
     try {
-      currentSubscription.value =
-        await subscriptionService.getCurrentSubscription()
+      currentSubscription.value = await subscriptionService.getCurrentSubscription()
     } catch {
       error.value = 'Failed to load current subscription'
     } finally {
@@ -40,17 +39,11 @@ export const useSubscriptionStore = defineStore('subscription', () => {
     }
   }
 
-  async function subscribe(
-    planId: string,
-    billingPeriod: BillingPeriod,
-  ): Promise<void> {
+  async function subscribe(planId: string, billingPeriod: BillingPeriod): Promise<void> {
     loading.value = true
     error.value = null
     try {
-      currentSubscription.value = await subscriptionService.subscribe(
-        planId,
-        billingPeriod,
-      )
+      currentSubscription.value = await subscriptionService.subscribe(planId, billingPeriod)
     } catch {
       error.value = 'Failed to subscribe to plan'
       throw new Error(error.value)

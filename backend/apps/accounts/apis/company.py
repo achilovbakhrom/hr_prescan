@@ -5,14 +5,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.permissions import IsAdmin, IsHRManager
-from apps.common.exceptions import ApplicationError
-from apps.common.messages import (
-    MSG_COMPANY_REGISTERED,
-    MSG_INVITATION_ACCEPTED,
-    MSG_INVITATION_SENT,
-    MSG_NOT_IN_COMPANY,
-    MSG_USER_NOT_FOUND,
-)
 from apps.accounts.selectors import get_company_invitations, get_company_users, get_user_by_id
 from apps.accounts.serializers import (
     AcceptInvitationInputSerializer,
@@ -31,6 +23,14 @@ from apps.accounts.services import (
     deactivate_user,
     invite_hr,
     update_company_profile,
+)
+from apps.common.exceptions import ApplicationError
+from apps.common.messages import (
+    MSG_COMPANY_REGISTERED,
+    MSG_INVITATION_ACCEPTED,
+    MSG_INVITATION_SENT,
+    MSG_NOT_IN_COMPANY,
+    MSG_USER_NOT_FOUND,
 )
 
 

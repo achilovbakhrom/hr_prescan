@@ -16,10 +16,7 @@ const successMessage = ref<string | null>(null)
 const errorMessage = ref<string | null>(null)
 
 onMounted(async () => {
-  await Promise.all([
-    settingsStore.fetchTeam(),
-    settingsStore.fetchInvitations(),
-  ])
+  await Promise.all([settingsStore.fetchTeam(), settingsStore.fetchInvitations()])
 })
 
 async function handleInvite(email: string): Promise<void> {
@@ -31,9 +28,7 @@ async function handleInvite(email: string): Promise<void> {
     successMessage.value = `Invitation sent to ${email}.`
   } catch (err: unknown) {
     errorMessage.value =
-      err instanceof Error
-        ? err.message
-        : 'Failed to send invitation. Please try again.'
+      err instanceof Error ? err.message : 'Failed to send invitation. Please try again.'
   }
 }
 
@@ -43,9 +38,7 @@ async function handleToggleActive(userId: string): Promise<void> {
     await settingsStore.toggleMemberActive(userId)
   } catch (err: unknown) {
     errorMessage.value =
-      err instanceof Error
-        ? err.message
-        : 'Failed to update member status. Please try again.'
+      err instanceof Error ? err.message : 'Failed to update member status. Please try again.'
   }
 }
 </script>
@@ -77,10 +70,7 @@ async function handleToggleActive(userId: string): Promise<void> {
     </div>
 
     <template v-else>
-      <div
-        v-if="settingsStore.invitations.length"
-        class="mb-8 rounded-lg bg-white p-6 shadow-sm"
-      >
+      <div v-if="settingsStore.invitations.length" class="mb-8 rounded-lg bg-white p-6 shadow-sm">
         <h2 class="mb-4 text-lg font-semibold text-gray-900">
           {{ t('settings.team.invitations') }}
         </h2>
@@ -89,10 +79,7 @@ async function handleToggleActive(userId: string): Promise<void> {
 
       <div class="rounded-lg bg-white p-6 shadow-sm">
         <h2 class="mb-4 text-lg font-semibold text-gray-900">{{ t('settings.team.members') }}</h2>
-        <TeamMembersTable
-          :members="settingsStore.team"
-          @toggle-active="handleToggleActive"
-        />
+        <TeamMembersTable :members="settingsStore.team" @toggle-active="handleToggleActive" />
       </div>
     </template>
 

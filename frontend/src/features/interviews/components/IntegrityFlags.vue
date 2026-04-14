@@ -62,14 +62,11 @@ const SEVERITY_CONFIG: Record<Severity, SeverityConfig> = {
 // Flag type icons and labels
 // ---------------------------------------------------------------------------
 
-const FLAG_TYPE_META: Record<
-  FlagType,
-  { icon: string; label: string; detail: string }
-> = {
+const FLAG_TYPE_META: Record<FlagType, { icon: string; label: string; detail: string }> = {
   face_not_visible: {
     icon: '👤',
     label: 'Face Not Visible',
-    detail: 'The candidate\'s face was not visible in the video feed.',
+    detail: "The candidate's face was not visible in the video feed.",
   },
   multiple_faces: {
     icon: '👥',
@@ -79,7 +76,7 @@ const FLAG_TYPE_META: Record<
   gaze_deviation: {
     icon: '👀',
     label: 'Gaze Deviation',
-    detail: 'The candidate\'s gaze deviated significantly from the camera.',
+    detail: "The candidate's gaze deviated significantly from the camera.",
   },
   audio_anomaly: {
     icon: '🎙️',
@@ -89,7 +86,7 @@ const FLAG_TYPE_META: Record<
   cv_inconsistency: {
     icon: '📄',
     label: 'CV Inconsistency',
-    detail: 'Discrepancies were found between the candidate\'s CV and interview answers.',
+    detail: "Discrepancies were found between the candidate's CV and interview answers.",
   },
 }
 
@@ -150,7 +147,9 @@ function getSeverityConfig(severity: Severity): SeverityConfig {
 <template>
   <div class="space-y-4">
     <!-- Overall integrity score banner -->
-    <div class="flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-5 py-4">
+    <div
+      class="flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-5 py-4"
+    >
       <div>
         <p class="text-sm font-medium text-gray-500">Overall Integrity Score</p>
         <p class="mt-0.5 text-xs text-gray-400">

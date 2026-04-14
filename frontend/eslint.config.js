@@ -18,14 +18,8 @@ export default [
     rules: {
       'vue/multi-word-component-names': 'off',
       'vue/component-name-in-template-casing': ['error', 'PascalCase'],
-      'vue/define-macros-order': [
-        'error',
-        { order: ['defineProps', 'defineEmits'] },
-      ],
-      '@typescript-eslint/no-unused-vars': [
-        'error',
-        { argsIgnorePattern: '^_' },
-      ],
+      'vue/define-macros-order': ['error', { order: ['defineProps', 'defineEmits'] }],
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/consistent-type-imports': 'error',
       'no-console': ['warn', { allow: ['warn', 'error'] }],
     },

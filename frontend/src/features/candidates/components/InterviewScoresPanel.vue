@@ -5,6 +5,10 @@ import ProgressBar from 'primevue/progressbar'
 import { apiClient } from '@/shared/api/client'
 import type { InterviewScore, IntegrityFlag } from '@/shared/types/interview.types'
 
+const props = defineProps<{
+  candidateId: string
+}>()
+
 const { t } = useI18n()
 
 interface CandidateInterviewScores {
@@ -12,10 +16,6 @@ interface CandidateInterviewScores {
   scores: InterviewScore[]
   integrityFlags: IntegrityFlag[]
 }
-
-const props = defineProps<{
-  candidateId: string
-}>()
 
 const data = ref<CandidateInterviewScores | null>(null)
 const loading = ref(false)
@@ -50,9 +50,7 @@ onMounted(async () => {
 
 <template>
   <div>
-    <h3 class="mb-3 text-sm font-semibold text-gray-600">
-      Interview Performance
-    </h3>
+    <h3 class="mb-3 text-sm font-semibold text-gray-600">Interview Performance</h3>
 
     <div v-if="loading" class="py-4 text-center">
       <i class="pi pi-spinner pi-spin text-xl text-gray-400"></i>
@@ -65,10 +63,7 @@ onMounted(async () => {
     </div>
 
     <template v-else>
-      <div
-        v-if="data.overallScore !== null"
-        class="mb-4 rounded-lg bg-blue-50 p-4 text-center"
-      >
+      <div v-if="data.overallScore !== null" class="mb-4 rounded-lg bg-blue-50 p-4 text-center">
         <p class="text-xs font-medium text-blue-600">{{ t('interviews.overallScore') }}</p>
         <p class="text-3xl font-bold" :class="scoreColor(data.overallScore)">
           {{ data.overallScore }}/100
@@ -89,24 +84,15 @@ onMounted(async () => {
               {{ score.score }}/100
             </span>
           </div>
-          <ProgressBar
-            :value="score.score"
-            :show-value="false"
-            style="height: 6px"
-          />
+          <ProgressBar :value="score.score" :show-value="false" style="height: 6px" />
           <p v-if="score.aiNotes" class="mt-1.5 text-xs text-gray-500">
             {{ score.aiNotes }}
           </p>
         </div>
       </div>
 
-      <div
-        v-if="data.integrityFlags.length > 0"
-        class="mt-4"
-      >
-        <h4 class="mb-2 text-xs font-semibold text-gray-500">
-          Integrity Flags
-        </h4>
+      <div v-if="data.integrityFlags.length > 0" class="mt-4">
+        <h4 class="mb-2 text-xs font-semibold text-gray-500">Integrity Flags</h4>
         <div class="space-y-1.5">
           <div
             v-for="flag in data.integrityFlags"

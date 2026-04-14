@@ -60,7 +60,10 @@ class Interview(BaseModel):
     recording_path = models.CharField(max_length=500, blank=True)
     transcript = models.JSONField(default=list)
     overall_score = models.DecimalField(
-        max_digits=4, decimal_places=2, null=True, blank=True,
+        max_digits=4,
+        decimal_places=2,
+        null=True,
+        blank=True,
     )
     ai_summary = models.TextField(blank=True)
 

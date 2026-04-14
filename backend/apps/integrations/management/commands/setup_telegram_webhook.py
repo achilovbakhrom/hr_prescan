@@ -26,13 +26,11 @@ class Command(BaseCommand):
             payload["secret_token"] = secret
 
         api_url = f"https://api.telegram.org/bot{token}/setWebhook"
-        response = requests.post(api_url, json=payload)
+        response = requests.post(api_url, json=payload, timeout=10)
         data = response.json()
 
         if data.get("ok"):
             self.stdout.write(self.style.SUCCESS(f"Webhook set successfully: {url}"))
             self.stdout.write(f"Description: {data.get('description', '')}")
         else:
-            raise CommandError(
-                f"Failed to set webhook: {data.get('description', 'Unknown error')}"
-            )
+            raise CommandError(f"Failed to set webhook: {data.get('description', 'Unknown error')}")

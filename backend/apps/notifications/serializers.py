@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from apps.notifications.models import Message, Notification
+from apps.notifications.models import Message
 
 
 class NotificationOutputSerializer(serializers.Serializer):
@@ -46,8 +46,10 @@ class BulkStatusUpdateInputSerializer(serializers.Serializer):
         min_length=1,
         max_length=100,
     )
-    status = serializers.ChoiceField(choices=[
-        ("reviewing", "Reviewing"),
-        ("shortlisted", "Shortlisted"),
-        ("rejected", "Rejected"),
-    ])
+    status = serializers.ChoiceField(
+        choices=[
+            ("reviewing", "Reviewing"),
+            ("shortlisted", "Shortlisted"),
+            ("rejected", "Rejected"),
+        ]
+    )

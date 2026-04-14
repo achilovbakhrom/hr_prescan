@@ -4,18 +4,16 @@ import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import type { InterviewDetail } from '../types/interview.types'
 
+const props = defineProps<{
+  interview: InterviewDetail
+}>()
+const emit = defineEmits<{
+  join: []
+}>()
 const { t } = useI18n()
 import VideoPreview from '@/features/video/components/VideoPreview.vue'
 import DeviceSelector from '@/features/video/components/DeviceSelector.vue'
 import { useMediaDevices } from '@/features/video/composables/useMediaDevices'
-
-const props = defineProps<{
-  interview: InterviewDetail
-}>()
-
-const emit = defineEmits<{
-  join: []
-}>()
 
 const {
   cameras,
@@ -35,8 +33,7 @@ const devicesReady = computed(() => {
 const canJoin = computed(() => {
   return (
     devicesReady.value &&
-    (props.interview.status === 'pending' ||
-      props.interview.status === 'in_progress')
+    (props.interview.status === 'pending' || props.interview.status === 'in_progress')
   )
 })
 
@@ -118,9 +115,7 @@ onMounted(() => {
 
     <!-- Instructions -->
     <div class="rounded-lg border border-blue-100 bg-blue-50 p-6">
-      <h3 class="mb-3 text-sm font-semibold text-blue-800">
-        Before you join
-      </h3>
+      <h3 class="mb-3 text-sm font-semibold text-blue-800">Before you join</h3>
       <ul class="list-inside list-disc space-y-1 text-sm text-blue-700">
         <li>Ensure you have a stable internet connection</li>
         <li>Use a well-lit, quiet room</li>

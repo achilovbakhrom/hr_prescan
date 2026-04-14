@@ -2,9 +2,7 @@ import { apiClient } from '@/shared/api/client'
 import type { Notification } from '../types/notification.types'
 
 export const notificationService = {
-  async getNotifications(params?: {
-    unread?: boolean
-  }): Promise<Notification[]> {
+  async getNotifications(params?: { unread?: boolean }): Promise<Notification[]> {
     const response = await apiClient.get<Notification[]>('/notifications', {
       params,
     })
@@ -20,9 +18,7 @@ export const notificationService = {
   },
 
   async getUnreadCount(): Promise<number> {
-    const response = await apiClient.get<{ count: number }>(
-      '/notifications/unread-count',
-    )
+    const response = await apiClient.get<{ count: number }>('/notifications/unread-count')
     return response.data.count
   },
 }

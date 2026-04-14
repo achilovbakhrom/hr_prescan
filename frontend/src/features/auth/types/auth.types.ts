@@ -1,5 +1,11 @@
 // Re-export shared types so intra-feature imports still work
-export type { User, Company, CompanySize, UserRole, PendingInvitation } from '@/shared/types/auth.types'
+export type {
+  User,
+  Company,
+  CompanySize,
+  UserRole,
+  PendingInvitation,
+} from '@/shared/types/auth.types'
 
 // Import shared types needed by feature-specific interfaces
 import type { User, CompanySize } from '@/shared/types/auth.types'

@@ -13,9 +13,7 @@ async function startPreview(): Promise<void> {
 
   try {
     const constraints: MediaStreamConstraints = {
-      video: props.deviceId
-        ? { deviceId: { exact: props.deviceId } }
-        : true,
+      video: props.deviceId ? { deviceId: { exact: props.deviceId } } : true,
       audio: false,
     }
     stream.value = await navigator.mediaDevices.getUserMedia(constraints)
@@ -42,12 +40,6 @@ onUnmounted(stopPreview)
 
 <template>
   <div class="overflow-hidden rounded-lg bg-gray-900">
-    <video
-      ref="videoRef"
-      autoplay
-      playsinline
-      muted
-      class="h-full w-full object-cover"
-    />
+    <video ref="videoRef" autoplay playsinline muted class="h-full w-full object-cover" />
   </div>
 </template>

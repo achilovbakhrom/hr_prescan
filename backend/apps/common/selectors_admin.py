@@ -1,10 +1,10 @@
-from django.db.models import Avg, Count, Q, QuerySet, Sum
+from django.db.models import Count, Q, QuerySet, Sum
 from django.utils import timezone
 
 from apps.accounts.models import Company, User
 from apps.applications.models import Application
 from apps.interviews.models import Interview
-from apps.subscriptions.models import CompanySubscription, SubscriptionPlan
+from apps.subscriptions.models import CompanySubscription
 from apps.vacancies.models import Vacancy
 
 
@@ -20,10 +20,7 @@ def get_all_companies(
     )
 
     if search:
-        qs = qs.filter(
-            Q(name__icontains=search)
-            | Q(industry__icontains=search)
-        )
+        qs = qs.filter(Q(name__icontains=search) | Q(industry__icontains=search))
 
     if status:
         qs = qs.filter(subscription_status=status)
@@ -40,11 +37,7 @@ def get_all_users(
     qs = User.objects.select_related("company")
 
     if search:
-        qs = qs.filter(
-            Q(email__icontains=search)
-            | Q(first_name__icontains=search)
-            | Q(last_name__icontains=search)
-        )
+        qs = qs.filter(Q(email__icontains=search) | Q(first_name__icontains=search) | Q(last_name__icontains=search))
 
     if role:
         qs = qs.filter(role=role)
@@ -66,19 +59,25 @@ def get_platform_analytics() -> dict:
     active_subscriptions = CompanySubscription.objects.filter(is_active=True).count()
 
     # Monthly revenue estimate (from active subscriptions)
-    monthly_revenue = CompanySubscription.objects.filter(
-        is_active=True,
-        billing_period=CompanySubscription.BillingPeriod.MONTHLY,
-    ).aggregate(
-        total=Sum("plan__price_monthly"),
-    )["total"] or 0
+    monthly_revenue = (
+        CompanySubscription.objects.filter(
+            is_active=True,
+            billing_period=CompanySubscription.BillingPeriod.MONTHLY,
+        ).aggregate(
+            total=Sum("plan__price_monthly"),
+        )["total"]
+        or 0
+    )
 
-    yearly_revenue_monthly = CompanySubscription.objects.filter(
-        is_active=True,
-        billing_period=CompanySubscription.BillingPeriod.YEARLY,
-    ).aggregate(
-        total=Sum("plan__price_yearly"),
-    )["total"] or 0
+    yearly_revenue_monthly = (
+        CompanySubscription.objects.filter(
+            is_active=True,
+            billing_period=CompanySubscription.BillingPeriod.YEARLY,
+        ).aggregate(
+            total=Sum("plan__price_yearly"),
+        )["total"]
+        or 0
+    )
 
     # Convert yearly to monthly equivalent
     monthly_revenue = float(monthly_revenue) + float(yearly_revenue_monthly) / 12
@@ -98,8 +97,7 @@ def get_platform_analytics() -> dict:
 
     # Subscription tier breakdown
     tier_breakdown = (
-        CompanySubscription.objects
-        .filter(is_active=True)
+        CompanySubscription.objects.filter(is_active=True)
         .values("plan__tier", "plan__name")
         .annotate(count=Count("id"))
         .order_by("plan__tier")

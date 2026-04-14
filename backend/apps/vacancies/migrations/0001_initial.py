@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -36,15 +35,11 @@ class Migration(migrations.Migration):
                 ("skills", models.JSONField(default=list)),
                 (
                     "salary_min",
-                    models.DecimalField(
-                        blank=True, decimal_places=2, max_digits=12, null=True
-                    ),
+                    models.DecimalField(blank=True, decimal_places=2, max_digits=12, null=True),
                 ),
                 (
                     "salary_max",
-                    models.DecimalField(
-                        blank=True, decimal_places=2, max_digits=12, null=True
-                    ),
+                    models.DecimalField(blank=True, decimal_places=2, max_digits=12, null=True),
                 ),
                 (
                     "salary_currency",

@@ -36,9 +36,12 @@ onMounted(async () => {
   syncFormFromStore()
 })
 
-watch(() => employerStore.currentEmployer, () => {
-  if (!editing.value) syncFormFromStore()
-})
+watch(
+  () => employerStore.currentEmployer,
+  () => {
+    if (!editing.value) syncFormFromStore()
+  },
+)
 
 function startEdit(): void {
   syncFormFromStore()
@@ -94,7 +97,10 @@ function sourceLabel(source: string): string {
     </div>
 
     <!-- Error -->
-    <div v-else-if="employerStore.error && !employerStore.currentEmployer" class="py-12 text-center text-red-600">
+    <div
+      v-else-if="employerStore.error && !employerStore.currentEmployer"
+      class="py-12 text-center text-red-600"
+    >
       <i class="pi pi-exclamation-circle mb-3 text-4xl"></i>
       <p>{{ employerStore.error }}</p>
     </div>
@@ -120,7 +126,9 @@ function sourceLabel(source: string): string {
             <i class="pi pi-building text-xl"></i>
           </div>
           <div>
-            <h1 v-if="!editing" class="text-2xl font-bold text-gray-900">{{ employerStore.currentEmployer.name }}</h1>
+            <h1 v-if="!editing" class="text-2xl font-bold text-gray-900">
+              {{ employerStore.currentEmployer.name }}
+            </h1>
             <Tag :value="sourceLabel(employerStore.currentEmployer.source)" severity="info" />
           </div>
         </div>
@@ -134,7 +142,10 @@ function sourceLabel(source: string): string {
       </div>
 
       <!-- Error banner -->
-      <div v-if="employerStore.error" class="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+      <div
+        v-if="employerStore.error"
+        class="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600"
+      >
         {{ employerStore.error }}
       </div>
 
@@ -157,14 +168,22 @@ function sourceLabel(source: string): string {
         </div>
         <div v-if="employerStore.currentEmployer.description">
           <p class="text-sm text-gray-500">{{ t('employers.description') }}</p>
-          <p class="whitespace-pre-line text-gray-700">{{ employerStore.currentEmployer.description }}</p>
+          <p class="whitespace-pre-line text-gray-700">
+            {{ employerStore.currentEmployer.description }}
+          </p>
         </div>
       </div>
 
       <!-- Edit mode -->
-      <form v-else class="space-y-4 rounded-xl border border-gray-200 bg-white p-6" @submit.prevent="handleSave">
+      <form
+        v-else
+        class="space-y-4 rounded-xl border border-gray-200 bg-white p-6"
+        @submit.prevent="handleSave"
+      >
         <div>
-          <label class="mb-1 block text-sm font-medium">{{ t('employers.name') }} <span class="text-red-500">*</span></label>
+          <label class="mb-1 block text-sm font-medium"
+            >{{ t('employers.name') }} <span class="text-red-500">*</span></label
+          >
           <InputText v-model="name" class="w-full" />
         </div>
         <div>
@@ -180,8 +199,19 @@ function sourceLabel(source: string): string {
           <Textarea v-model="description" class="w-full" rows="6" />
         </div>
         <div class="flex justify-end gap-2">
-          <Button :label="t('common.cancel')" severity="secondary" type="button" @click="cancelEdit" />
-          <Button :label="t('common.save')" icon="pi pi-check" type="submit" :loading="saving" :disabled="!name" />
+          <Button
+            :label="t('common.cancel')"
+            severity="secondary"
+            type="button"
+            @click="cancelEdit"
+          />
+          <Button
+            :label="t('common.save')"
+            icon="pi pi-check"
+            type="submit"
+            :loading="saving"
+            :disabled="!name"
+          />
         </div>
       </form>
     </template>

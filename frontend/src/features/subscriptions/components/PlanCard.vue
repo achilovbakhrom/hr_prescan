@@ -4,8 +4,6 @@ import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import type { SubscriptionPlan, BillingPeriod } from '../types/subscription.types'
 
-const { t } = useI18n()
-
 const props = defineProps<{
   plan: SubscriptionPlan
   billingPeriod: BillingPeriod
@@ -16,10 +14,10 @@ const emit = defineEmits<{
   select: [planTier: string]
 }>()
 
+const { t } = useI18n()
+
 const price = computed(() => {
-  return props.billingPeriod === 'monthly'
-    ? props.plan.priceMonthly
-    : props.plan.priceYearly
+  return props.billingPeriod === 'monthly' ? props.plan.priceMonthly : props.plan.priceYearly
 })
 
 const periodLabel = computed(() => {
@@ -51,9 +49,7 @@ const isHighlighted = computed(() => props.plan.tier === 'professional')
     <p class="mt-1 text-sm text-gray-500">{{ plan.description }}</p>
 
     <div class="mt-4">
-      <span class="text-3xl font-bold text-gray-900">
-        ${{ price }}
-      </span>
+      <span class="text-3xl font-bold text-gray-900"> ${{ price }} </span>
       <span class="text-gray-500">{{ periodLabel }}</span>
     </div>
 

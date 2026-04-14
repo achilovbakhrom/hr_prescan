@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('interviews', '0003_two_step_pipeline'),
+        ("interviews", "0003_two_step_pipeline"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='interview',
-            name='completed_at',
+            model_name="interview",
+            name="completed_at",
             field=models.DateTimeField(blank=True, null=True),
         ),
     ]

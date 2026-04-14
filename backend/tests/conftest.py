@@ -1,13 +1,11 @@
 import pytest
 
+from apps.vacancies.models import InterviewQuestion, ScreeningStep, VacancyCriteria
 from tests.factories import (
-    ApplicationFactory,
     CompanyFactory,
-    InterviewFactory,
     UserFactory,
     VacancyFactory,
 )
-from apps.vacancies.models import InterviewQuestion, ScreeningStep, VacancyCriteria
 
 
 @pytest.fixture(autouse=True)

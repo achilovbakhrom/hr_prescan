@@ -16,15 +16,9 @@ function scoreColor(score: number): string {
 
 <template>
   <div class="space-y-4">
-    <p v-if="scores.length === 0" class="text-sm text-gray-500">
-      No scores available yet.
-    </p>
+    <p v-if="scores.length === 0" class="text-sm text-gray-500">No scores available yet.</p>
 
-    <div
-      v-for="score in scores"
-      :key="score.id"
-      class="rounded-lg border border-gray-200 p-4"
-    >
+    <div v-for="score in scores" :key="score.id" class="rounded-lg border border-gray-200 p-4">
       <div class="mb-2 flex items-center justify-between">
         <span class="text-sm font-medium text-gray-700">
           {{ score.criteriaName }}
@@ -34,12 +28,7 @@ function scoreColor(score: number): string {
         </span>
       </div>
 
-      <ProgressBar
-        :value="score.score"
-        :show-value="false"
-        class="mb-2"
-        style="height: 8px"
-      />
+      <ProgressBar :value="score.score" :show-value="false" class="mb-2" style="height: 8px" />
 
       <p v-if="score.aiNotes" class="text-xs text-gray-500">
         {{ score.aiNotes }}

@@ -6,7 +6,7 @@ Usage:
 
 For production, use webhook mode instead (setup_telegram_webhook).
 """
-import json
+
 import logging
 import time
 
@@ -29,7 +29,7 @@ class Command(BaseCommand):
         api = f"https://api.telegram.org/bot{token}"
 
         # Delete any existing webhook so polling works
-        requests.post(f"{api}/deleteWebhook")
+        requests.post(f"{api}/deleteWebhook", timeout=10)
         self.stdout.write(self.style.SUCCESS("Webhook deleted. Starting polling mode..."))
 
         offset = 0
@@ -55,6 +55,7 @@ class Command(BaseCommand):
 
                     try:
                         from apps.integrations.telegram_bot import handle_update
+
                         handle_update(update)
                     except Exception as e:
                         logger.error("Error processing update: %s", e, exc_info=True)

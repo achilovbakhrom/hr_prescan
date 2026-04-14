@@ -9,7 +9,13 @@ export type {
 } from '@/shared/types/vacancy.types'
 
 // Import shared types needed by feature-specific interfaces
-import type { Vacancy, EmploymentType, ExperienceLevel, VacancyVisibility, InterviewMode } from '@/shared/types/vacancy.types'
+import type {
+  Vacancy,
+  EmploymentType,
+  ExperienceLevel,
+  VacancyVisibility,
+  InterviewMode,
+} from '@/shared/types/vacancy.types'
 import type { EmployerCompany } from '@/features/employers/types/employer.types'
 
 export type QuestionSource = 'ai_generated' | 'hr_added'
@@ -69,4 +75,4 @@ export interface CreateVacancyRequest {
   interviewPrompt?: string
 }
 
-export interface UpdateVacancyRequest extends Partial<CreateVacancyRequest> {}
+export type UpdateVacancyRequest = Partial<CreateVacancyRequest>

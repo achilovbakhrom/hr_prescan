@@ -27,10 +27,7 @@ export const vacancyService = {
   },
 
   async update(id: string, data: UpdateVacancyRequest): Promise<Vacancy> {
-    const response = await apiClient.put<Vacancy>(
-      `/hr/vacancies/${id}`,
-      data,
-    )
+    const response = await apiClient.put<Vacancy>(`/hr/vacancies/${id}`, data)
     return response.data
   },
 
@@ -46,18 +43,13 @@ export const vacancyService = {
     }
     const action = statusToAction[status]
     if (!action) throw new Error(`Invalid status transition: ${status}`)
-    const response = await apiClient.patch<Vacancy>(
-      `/hr/vacancies/${id}/status`,
-      { action },
-    )
+    const response = await apiClient.patch<Vacancy>(`/hr/vacancies/${id}/status`, { action })
     return response.data
   },
 
   // Criteria
   async getCriteria(vacancyId: string): Promise<VacancyCriteria[]> {
-    const response = await apiClient.get<VacancyCriteria[]>(
-      `/hr/vacancies/${vacancyId}/criteria`,
-    )
+    const response = await apiClient.get<VacancyCriteria[]>(`/hr/vacancies/${vacancyId}/criteria`)
     return response.data
   },
 
@@ -119,13 +111,8 @@ export const vacancyService = {
     return response.data
   },
 
-  async deleteQuestion(
-    vacancyId: string,
-    questionId: string,
-  ): Promise<void> {
-    await apiClient.delete(
-      `/hr/vacancies/${vacancyId}/questions/${questionId}`,
-    )
+  async deleteQuestion(vacancyId: string, questionId: string): Promise<void> {
+    await apiClient.delete(`/hr/vacancies/${vacancyId}/questions/${questionId}`)
   },
 
   async parseCompanyFile(file: File): Promise<string> {
@@ -155,7 +142,9 @@ export const vacancyService = {
   },
 
   async regenerateKeywords(id: string): Promise<{ keywords: string[] }> {
-    const response = await apiClient.post<{ keywords: string[] }>(`/hr/vacancies/${id}/regenerate-keywords`)
+    const response = await apiClient.post<{ keywords: string[] }>(
+      `/hr/vacancies/${id}/regenerate-keywords`,
+    )
     return response.data
   },
 
@@ -181,9 +170,7 @@ export const vacancyService = {
   },
 
   async getByShareToken(token: string): Promise<Vacancy> {
-    const response = await apiClient.get<Vacancy>(
-      `/public/vacancies/share/${token}`,
-    )
+    const response = await apiClient.get<Vacancy>(`/public/vacancies/share/${token}`)
     return response.data
   },
 }

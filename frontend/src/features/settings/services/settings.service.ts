@@ -14,18 +14,12 @@ export const settingsService = {
   },
 
   async updateCompanyProfile(data: CompanyProfileUpdate): Promise<Company> {
-    const response = await apiClient.put<Company>(
-      '/hr/company/profile',
-      data,
-    )
+    const response = await apiClient.put<Company>('/hr/company/profile', data)
     return response.data
   },
 
   async inviteHR(data: InviteHRRequest): Promise<Invitation> {
-    const response = await apiClient.post<Invitation>(
-      '/hr/company/invite',
-      data,
-    )
+    const response = await apiClient.post<Invitation>('/hr/company/invite', data)
     return response.data
   },
 
@@ -39,14 +33,8 @@ export const settingsService = {
     return response.data
   },
 
-  async updateTeamMember(
-    userId: string,
-    data: { isActive: boolean },
-  ): Promise<TeamMember> {
-    const response = await apiClient.patch<TeamMember>(
-      `/hr/company/team/${userId}`,
-      data,
-    )
+  async updateTeamMember(userId: string, data: { isActive: boolean }): Promise<TeamMember> {
+    const response = await apiClient.patch<TeamMember>(`/hr/company/team/${userId}`, data)
     return response.data
   },
 

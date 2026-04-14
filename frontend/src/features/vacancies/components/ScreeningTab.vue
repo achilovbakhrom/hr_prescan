@@ -32,7 +32,9 @@ const { t } = useI18n()
     <TabView>
       <TabPanel value="0">
         <template #header>
-          <span class="text-xs sm:text-sm"><i class="pi pi-list mr-1"></i>{{ t('vacancies.questions') }}</span>
+          <span class="text-xs sm:text-sm"
+            ><i class="pi pi-list mr-1"></i>{{ t('vacancies.questions') }}</span
+          >
         </template>
         <div class="py-3">
           <QuestionList
@@ -47,7 +49,9 @@ const { t } = useI18n()
       </TabPanel>
       <TabPanel value="1">
         <template #header>
-          <span class="text-xs sm:text-sm"><i class="pi pi-chart-bar mr-1"></i>{{ t('vacancies.criteria') }}</span>
+          <span class="text-xs sm:text-sm"
+            ><i class="pi pi-chart-bar mr-1"></i>{{ t('vacancies.criteria') }}</span
+          >
         </template>
         <div class="py-3">
           <CriteriaList

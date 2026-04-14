@@ -2,6 +2,13 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+const props = defineProps<{
+  overallScore: number | null
+  matchDetails: MatchDetails | null
+  prescanningScore: number | null
+  interviewScore: number | null
+}>()
+
 const { t } = useI18n()
 
 interface MatchDetails {
@@ -11,13 +18,6 @@ interface MatchDetails {
   matching_skills?: string[]
   missing_skills?: string[]
 }
-
-const props = defineProps<{
-  overallScore: number | null
-  matchDetails: MatchDetails | null
-  prescanningScore: number | null
-  interviewScore: number | null
-}>()
 
 const cvScore = computed(() => props.overallScore)
 const prescanningScoreNorm = computed(() => {
@@ -51,9 +51,23 @@ const combinedScore = computed(() => {
 
 const recommendation = computed(() => {
   if (combinedScore.value === null) return null
-  if (combinedScore.value >= 75) return { label: 'Strong Candidate — Recommend to move forward', color: 'bg-green-100 text-green-800 border-green-200', icon: 'pi-check-circle text-green-600' }
-  if (combinedScore.value >= 55) return { label: 'Moderate Candidate — Consider for next round', color: 'bg-yellow-100 text-yellow-800 border-yellow-200', icon: 'pi-exclamation-circle text-yellow-600' }
-  return { label: 'Weak Candidate — Not recommended to proceed', color: 'bg-red-100 text-red-800 border-red-200', icon: 'pi-times-circle text-red-600' }
+  if (combinedScore.value >= 75)
+    return {
+      label: 'Strong Candidate — Recommend to move forward',
+      color: 'bg-green-100 text-green-800 border-green-200',
+      icon: 'pi-check-circle text-green-600',
+    }
+  if (combinedScore.value >= 55)
+    return {
+      label: 'Moderate Candidate — Consider for next round',
+      color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      icon: 'pi-exclamation-circle text-yellow-600',
+    }
+  return {
+    label: 'Weak Candidate — Not recommended to proceed',
+    color: 'bg-red-100 text-red-800 border-red-200',
+    icon: 'pi-times-circle text-red-600',
+  }
 })
 
 function scoreBg(score: number): string {
@@ -78,7 +92,15 @@ const scoreBreakdownLabel = computed(() => {
 </script>
 
 <template>
-  <div v-if="combinedScore === null && cvScore === null && prescanningScoreNorm === null && interviewScoreNorm === null" class="py-8 text-center text-sm text-gray-400">
+  <div
+    v-if="
+      combinedScore === null &&
+      cvScore === null &&
+      prescanningScoreNorm === null &&
+      interviewScoreNorm === null
+    "
+    class="py-8 text-center text-sm text-gray-400"
+  >
     Analysis will be available after CV processing and prescanning/interview completion.
   </div>
 
@@ -100,9 +122,15 @@ const scoreBreakdownLabel = computed(() => {
     <div class="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-4">
       <!-- CV Match -->
       <div class="rounded-xl border border-gray-200 bg-white p-3 text-center sm:p-5">
-        <p class="mb-1 text-[9px] font-semibold text-gray-500 uppercase tracking-wide sm:mb-2 sm:text-xs">{{ t('candidates.matchScore') }}</p>
+        <p
+          class="mb-1 text-[9px] font-semibold text-gray-500 uppercase tracking-wide sm:mb-2 sm:text-xs"
+        >
+          {{ t('candidates.matchScore') }}
+        </p>
         <div v-if="cvScore !== null">
-          <p class="text-xl font-bold sm:text-3xl" :class="scoreTextColor(cvScore)">{{ cvScore }}%</p>
+          <p class="text-xl font-bold sm:text-3xl" :class="scoreTextColor(cvScore)">
+            {{ cvScore }}%
+          </p>
           <p class="mt-1 hidden text-xs text-gray-400 sm:block">Based on resume analysis</p>
         </div>
         <p v-else class="text-xl text-gray-300 sm:text-2xl">—</p>
@@ -110,9 +138,15 @@ const scoreBreakdownLabel = computed(() => {
 
       <!-- Prescanning Score -->
       <div class="rounded-xl border border-gray-200 bg-white p-3 text-center sm:p-5">
-        <p class="mb-1 text-[9px] font-semibold text-gray-500 uppercase tracking-wide sm:mb-2 sm:text-xs">{{ t('candidates.prescanning') }}</p>
+        <p
+          class="mb-1 text-[9px] font-semibold text-gray-500 uppercase tracking-wide sm:mb-2 sm:text-xs"
+        >
+          {{ t('candidates.prescanning') }}
+        </p>
         <div v-if="props.prescanningScore !== null">
-          <p class="text-xl font-bold sm:text-3xl" :class="scoreTextColor(prescanningScoreNorm!)">{{ props.prescanningScore }}/10</p>
+          <p class="text-xl font-bold sm:text-3xl" :class="scoreTextColor(prescanningScoreNorm!)">
+            {{ props.prescanningScore }}/10
+          </p>
           <p class="mt-1 hidden text-xs text-gray-400 sm:block">AI prescanning result</p>
         </div>
         <p v-else class="text-xl text-gray-300 sm:text-2xl">—</p>
@@ -120,19 +154,34 @@ const scoreBreakdownLabel = computed(() => {
 
       <!-- Interview Score -->
       <div class="rounded-xl border border-gray-200 bg-white p-3 text-center sm:p-5">
-        <p class="mb-1 text-[9px] font-semibold text-gray-500 uppercase tracking-wide sm:mb-2 sm:text-xs">{{ t('candidates.interview') }}</p>
+        <p
+          class="mb-1 text-[9px] font-semibold text-gray-500 uppercase tracking-wide sm:mb-2 sm:text-xs"
+        >
+          {{ t('candidates.interview') }}
+        </p>
         <div v-if="props.interviewScore !== null">
-          <p class="text-xl font-bold sm:text-3xl" :class="scoreTextColor(interviewScoreNorm!)">{{ props.interviewScore }}/10</p>
+          <p class="text-xl font-bold sm:text-3xl" :class="scoreTextColor(interviewScoreNorm!)">
+            {{ props.interviewScore }}/10
+          </p>
           <p class="mt-1 hidden text-xs text-gray-400 sm:block">AI interview result</p>
         </div>
         <p v-else class="text-xl text-gray-300 sm:text-2xl">—</p>
       </div>
 
       <!-- Combined -->
-      <div class="rounded-xl border-2 bg-white p-3 text-center sm:p-5" :class="combinedScore !== null ? 'border-blue-200' : 'border-gray-200'">
-        <p class="mb-1 text-[9px] font-semibold text-gray-500 uppercase tracking-wide sm:mb-2 sm:text-xs">{{ t('candidates.overallScore') }}</p>
+      <div
+        class="rounded-xl border-2 bg-white p-3 text-center sm:p-5"
+        :class="combinedScore !== null ? 'border-blue-200' : 'border-gray-200'"
+      >
+        <p
+          class="mb-1 text-[9px] font-semibold text-gray-500 uppercase tracking-wide sm:mb-2 sm:text-xs"
+        >
+          {{ t('candidates.overallScore') }}
+        </p>
         <div v-if="combinedScore !== null">
-          <p class="text-xl font-bold sm:text-3xl" :class="scoreTextColor(combinedScore)">{{ combinedScore }}%</p>
+          <p class="text-xl font-bold sm:text-3xl" :class="scoreTextColor(combinedScore)">
+            {{ combinedScore }}%
+          </p>
           <p class="mt-1 hidden text-xs text-gray-400 sm:block">Combined score</p>
         </div>
         <p v-else class="text-xl text-gray-300 sm:text-2xl">—</p>
@@ -143,7 +192,9 @@ const scoreBreakdownLabel = computed(() => {
     <div v-if="combinedScore !== null" class="rounded-lg border border-gray-200 bg-white p-4">
       <div class="mb-2 flex items-center justify-between">
         <span class="text-sm font-medium text-gray-700">Combined Assessment</span>
-        <span class="text-sm font-bold" :class="scoreTextColor(combinedScore)">{{ combinedScore }}%</span>
+        <span class="text-sm font-bold" :class="scoreTextColor(combinedScore)"
+          >{{ combinedScore }}%</span
+        >
       </div>
       <div class="h-3 w-full rounded-full bg-gray-200">
         <div

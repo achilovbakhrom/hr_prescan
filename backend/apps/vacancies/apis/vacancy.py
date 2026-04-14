@@ -1,4 +1,5 @@
 from rest_framework import serializers, status
+from rest_framework.parsers import MultiPartParser
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -16,7 +17,6 @@ from apps.common.messages import (
 from apps.vacancies.models import Vacancy
 from apps.vacancies.selectors import get_company_vacancies, get_employer_by_id, get_vacancy_by_id
 from apps.vacancies.serializers import VacancyDetailOutputSerializer, VacancyListOutputSerializer
-from rest_framework.parsers import MultiPartParser
 from apps.vacancies.services import (
     archive_vacancy,
     create_vacancy,
@@ -44,10 +44,16 @@ class VacancyListCreateApi(APIView):
         responsibilities = serializers.CharField(required=False, allow_blank=True, default="")
         skills = serializers.ListField(child=serializers.CharField(), required=False, default=list)
         salary_min = serializers.DecimalField(
-            max_digits=12, decimal_places=2, required=False, allow_null=True,
+            max_digits=12,
+            decimal_places=2,
+            required=False,
+            allow_null=True,
         )
         salary_max = serializers.DecimalField(
-            max_digits=12, decimal_places=2, required=False, allow_null=True,
+            max_digits=12,
+            decimal_places=2,
+            required=False,
+            allow_null=True,
         )
         salary_currency = serializers.CharField(max_length=3, required=False, default="USD")
         location = serializers.CharField(max_length=255, required=False, allow_blank=True, default="")
@@ -157,24 +163,33 @@ class VacancyDetailApi(APIView):
         responsibilities = serializers.CharField(required=False, allow_blank=True)
         skills = serializers.ListField(child=serializers.CharField(), required=False)
         salary_min = serializers.DecimalField(
-            max_digits=12, decimal_places=2, required=False, allow_null=True,
+            max_digits=12,
+            decimal_places=2,
+            required=False,
+            allow_null=True,
         )
         salary_max = serializers.DecimalField(
-            max_digits=12, decimal_places=2, required=False, allow_null=True,
+            max_digits=12,
+            decimal_places=2,
+            required=False,
+            allow_null=True,
         )
         salary_currency = serializers.CharField(max_length=3, required=False)
         location = serializers.CharField(max_length=255, required=False, allow_blank=True)
         is_remote = serializers.BooleanField(required=False)
         employment_type = serializers.ChoiceField(
-            choices=Vacancy.EmploymentType.choices, required=False,
+            choices=Vacancy.EmploymentType.choices,
+            required=False,
         )
         experience_level = serializers.ChoiceField(
-            choices=Vacancy.ExperienceLevel.choices, required=False,
+            choices=Vacancy.ExperienceLevel.choices,
+            required=False,
         )
         deadline = serializers.DateField(required=False, allow_null=True)
         visibility = serializers.ChoiceField(choices=Vacancy.Visibility.choices, required=False)
         interview_mode = serializers.ChoiceField(
-            choices=Vacancy.InterviewMode.choices, required=False,
+            choices=Vacancy.InterviewMode.choices,
+            required=False,
         )
         interview_enabled = serializers.BooleanField(required=False)
         cv_required = serializers.BooleanField(required=False)

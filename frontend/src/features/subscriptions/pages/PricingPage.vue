@@ -48,10 +48,7 @@ onMounted(() => subscriptionStore.fetchPlans())
         size="small"
         @click="togglePeriod('yearly')"
       />
-      <span
-        v-if="billingPeriod === 'yearly'"
-        class="ml-2 text-sm font-medium text-green-600"
-      >
+      <span v-if="billingPeriod === 'yearly'" class="ml-2 text-sm font-medium text-green-600">
         {{ t('subscriptions.saveUpTo') }}
       </span>
     </div>
@@ -60,10 +57,7 @@ onMounted(() => subscriptionStore.fetchPlans())
       <i class="pi pi-spinner pi-spin text-3xl text-gray-400"></i>
     </div>
 
-    <div
-      v-else
-      class="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4"
-    >
+    <div v-else class="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
       <PlanCard
         v-for="plan in subscriptionStore.plans"
         :key="plan.id"

@@ -42,8 +42,7 @@ async function handleLogin(): Promise<void> {
     const redirect = router.currentRoute.value.query.redirect as string
     await router.push(redirect || { name: ROUTE_NAMES.DASHBOARD })
   } catch (err: unknown) {
-    errorMessage.value =
-      err instanceof Error ? err.message : 'Login failed. Please try again.'
+    errorMessage.value = err instanceof Error ? err.message : 'Login failed. Please try again.'
   }
 }
 
@@ -54,8 +53,7 @@ async function handleGoogleSuccess(credential: string): Promise<void> {
     const redirect = router.currentRoute.value.query.redirect as string
     await router.push(redirect || { name: ROUTE_NAMES.DASHBOARD })
   } catch (err: unknown) {
-    errorMessage.value =
-      err instanceof Error ? err.message : 'Google sign-in failed.'
+    errorMessage.value = err instanceof Error ? err.message : 'Google sign-in failed.'
   }
 }
 
@@ -75,10 +73,7 @@ function handleGoogleError(msg: string): void {
         {{ errorMessage }}
       </Message>
 
-      <GoogleSignInButton
-        @success="handleGoogleSuccess"
-        @error="handleGoogleError"
-      />
+      <GoogleSignInButton @success="handleGoogleSuccess" @error="handleGoogleError" />
 
       <div class="mb-4 flex items-center gap-3">
         <div class="h-px flex-1 bg-gray-200"></div>

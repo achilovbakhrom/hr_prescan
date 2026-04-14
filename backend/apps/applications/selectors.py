@@ -24,11 +24,7 @@ def get_vacancy_applications(
     if ordering not in allowed_orderings:
         ordering = "-created_at"
 
-    qs = (
-        Application.objects
-        .filter(vacancy=vacancy, is_deleted=False)
-        .select_related("candidate")
-    )
+    qs = Application.objects.filter(vacancy=vacancy, is_deleted=False).select_related("candidate")
     if status:
         qs = qs.filter(status=status)
     return qs.order_by(ordering)
@@ -56,8 +52,7 @@ def get_vacancy_applications_filtered(
         ordering = "-created_at"
 
     qs = (
-        Application.objects
-        .filter(vacancy=vacancy, is_deleted=False)
+        Application.objects.filter(vacancy=vacancy, is_deleted=False)
         .select_related("candidate")
         .prefetch_related("sessions")
     )
@@ -72,10 +67,7 @@ def get_vacancy_applications_filtered(
         qs = qs.filter(match_score__lte=max_score)
 
     if search:
-        qs = qs.filter(
-            Q(candidate_name__icontains=search)
-            | Q(candidate_email__icontains=search)
-        )
+        qs = qs.filter(Q(candidate_name__icontains=search) | Q(candidate_email__icontains=search))
 
     return qs.order_by(ordering)
 
@@ -98,8 +90,7 @@ def get_candidate_applications(
 ) -> QuerySet[Application]:
     """Return all applications by a candidate email for their dashboard."""
     return (
-        Application.objects
-        .filter(candidate_email=candidate_email)
+        Application.objects.filter(candidate_email=candidate_email)
         .select_related("vacancy", "vacancy__company", "vacancy__employer")
         .order_by("-created_at")
     )
@@ -112,8 +103,7 @@ def get_candidate_application_by_id(
 ) -> Application | None:
     """Get a single application for a candidate view."""
     return (
-        Application.objects
-        .select_related("vacancy", "vacancy__company", "vacancy__employer")
+        Application.objects.select_related("vacancy", "vacancy__company", "vacancy__employer")
         .filter(id=application_id, candidate_email=candidate_email)
         .first()
     )

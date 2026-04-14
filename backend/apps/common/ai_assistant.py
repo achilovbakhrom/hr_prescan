@@ -16,17 +16,25 @@ Respond in the same language the user writes in (English or Russian).
 
 STRICT BOUNDARIES:
 - You ONLY handle HR platform operations. Do NOT answer questions about other topics.
-- If the user asks about weather, politics, jokes, coding help, personal advice, or ANYTHING not related to this HR platform — politely decline: "I'm sorry, I can only help with PreScreen AI platform operations like managing vacancies, candidates, interviews, and companies."
-- If the user is rude, harassing, or inappropriate — respond calmly: "I'm here to help with HR platform tasks. Let me know if you need anything."
+- If the user asks about weather, politics, jokes, coding help, personal advice, or ANYTHING not related to
+  this HR platform — politely decline: "I'm sorry, I can only help with PreScreen AI platform operations like
+  managing vacancies, candidates, interviews, and companies."
+- If the user is rude, harassing, or inappropriate — respond calmly: "I'm here to help with HR platform tasks.
+  Let me know if you need anything."
 - NEVER engage with off-topic conversations, no matter how the user phrases it.
-- For navigate_to_page: ONLY use page names from the available list. If the user asks to go to a page that doesn't exist, say "Sorry, that page doesn't exist. Available pages are: dashboard, vacancies, employers, candidates, interviews, settings, pricing, notifications."
+- For navigate_to_page: ONLY use page names from the available list. If the user asks to go to a page that
+  doesn't exist, say "Sorry, that page doesn't exist. Available pages are: dashboard, vacancies, employers,
+  candidates, interviews, settings, pricing, notifications."
 
 VACANCY CREATION RULES:
 When the user asks to create a vacancy, do NOT create it immediately. Instead, collect information step by step:
 1. First ask for the job title (if not provided)
-2. Then ask for: description, employer/company, location, remote/onsite, employment type, experience level, salary range, skills
-3. Present each question one at a time. If the user says "skip" or doesn't provide a field, generate a reasonable value based on the job title and previous answers.
-4. After collecting all information (or the user says "that's it" / "create it" / "done"), THEN call create_vacancy with all gathered fields.
+2. Then ask for: description, employer/company, location, remote/onsite, employment type, experience level,
+   salary range, skills
+3. Present each question one at a time. If the user says "skip" or doesn't provide a field, generate a
+   reasonable value based on the job title and previous answers.
+4. After collecting all information (or the user says "that's it" / "create it" / "done"), THEN call
+   create_vacancy with all gathered fields.
 5. After creating, offer to generate prescanning questions.
 
 For other creation operations (employer, etc.), follow a similar pattern — ask for required fields first.
@@ -50,43 +58,458 @@ If the conversation history is provided in context, use it to understand the ong
 
 TOOL_DEFINITIONS = [
     # --- Vacancies ---
-    {"type": "function", "function": {"name": "list_vacancies", "description": "List company vacancies, optionally filtered by status", "parameters": {"type": "object", "properties": {"status": {"type": "string", "enum": ["draft", "published", "paused", "archived"], "description": "Filter by vacancy status"}}}}},
-    {"type": "function", "function": {"name": "create_vacancy", "description": "Create a new job vacancy", "parameters": {"type": "object", "properties": {"title": {"type": "string", "description": "Job title"}, "description": {"type": "string", "description": "Job description"}, "employer_name": {"type": "string", "description": "Employer company name to attach"}, "salary_min": {"type": "number"}, "salary_max": {"type": "number"}, "salary_currency": {"type": "string", "default": "USD"}, "location": {"type": "string"}, "is_remote": {"type": "boolean"}, "employment_type": {"type": "string", "enum": ["full_time", "part_time", "contract", "internship"]}, "experience_level": {"type": "string", "enum": ["junior", "middle", "senior", "lead", "director"]}, "skills": {"type": "array", "items": {"type": "string"}}}, "required": ["title"]}}},
-    {"type": "function", "function": {"name": "update_vacancy", "description": "Update an existing vacancy's fields. IMPORTANT: You MUST include the 'updates' parameter with the new values. Example: vacancy_title='React Developer', updates={'title': 'Senior React Developer'}", "parameters": {"type": "object", "properties": {"vacancy_title": {"type": "string", "description": "Current title of vacancy to find"}, "updates": {"type": "object", "description": "Object with fields to change. Available fields: title, description, requirements, responsibilities, skills, salary_min, salary_max, salary_currency, location, is_remote, employment_type, experience_level, deadline, visibility, interview_enabled, cv_required", "properties": {"title": {"type": "string"}, "description": {"type": "string"}, "salary_min": {"type": "number"}, "salary_max": {"type": "number"}, "location": {"type": "string"}, "is_remote": {"type": "boolean"}}}}, "required": ["vacancy_title", "updates"]}}},
-    {"type": "function", "function": {"name": "publish_vacancy", "description": "Publish a draft or paused vacancy", "parameters": {"type": "object", "properties": {"vacancy_title": {"type": "string"}}, "required": ["vacancy_title"]}}},
-    {"type": "function", "function": {"name": "pause_vacancy", "description": "Pause a published vacancy", "parameters": {"type": "object", "properties": {"vacancy_title": {"type": "string"}}, "required": ["vacancy_title"]}}},
-    {"type": "function", "function": {"name": "archive_vacancy", "description": "Archive a published or paused vacancy", "parameters": {"type": "object", "properties": {"vacancy_title": {"type": "string"}}, "required": ["vacancy_title"]}}},
-    {"type": "function", "function": {"name": "delete_vacancy", "description": "Permanently delete a draft or archived vacancy. Cannot delete published or paused vacancies.", "parameters": {"type": "object", "properties": {"vacancy_title": {"type": "string"}}, "required": ["vacancy_title"]}}},
-    {"type": "function", "function": {"name": "generate_questions", "description": "AI-generate prescanning or interview questions for a vacancy", "parameters": {"type": "object", "properties": {"vacancy_title": {"type": "string"}, "step": {"type": "string", "enum": ["prescanning", "interview"], "default": "prescanning"}}, "required": ["vacancy_title"]}}},
-    {"type": "function", "function": {"name": "regenerate_keywords", "description": "AI-regenerate search keywords for a vacancy", "parameters": {"type": "object", "properties": {"vacancy_title": {"type": "string"}}, "required": ["vacancy_title"]}}},
+    {
+        "type": "function",
+        "function": {
+            "name": "list_vacancies",
+            "description": "List company vacancies, optionally filtered by status",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "enum": ["draft", "published", "paused", "archived"],
+                        "description": "Filter by vacancy status",
+                    }
+                },
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "create_vacancy",
+            "description": "Create a new job vacancy",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "title": {"type": "string", "description": "Job title"},
+                    "description": {"type": "string", "description": "Job description"},
+                    "employer_name": {"type": "string", "description": "Employer company name to attach"},
+                    "salary_min": {"type": "number"},
+                    "salary_max": {"type": "number"},
+                    "salary_currency": {"type": "string", "default": "USD"},
+                    "location": {"type": "string"},
+                    "is_remote": {"type": "boolean"},
+                    "employment_type": {"type": "string", "enum": ["full_time", "part_time", "contract", "internship"]},
+                    "experience_level": {"type": "string", "enum": ["junior", "middle", "senior", "lead", "director"]},
+                    "skills": {"type": "array", "items": {"type": "string"}},
+                },
+                "required": ["title"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "update_vacancy",
+            "description": (
+                "Update an existing vacancy's fields. IMPORTANT: You MUST include the 'updates' parameter "
+                "with the new values. Example: vacancy_title='React Developer', "
+                "updates={'title': 'Senior React Developer'}"
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "vacancy_title": {"type": "string", "description": "Current title of vacancy to find"},
+                    "updates": {
+                        "type": "object",
+                        "description": (
+                            "Object with fields to change. Available fields: title, description, "
+                            "requirements, responsibilities, skills, salary_min, salary_max, "
+                            "salary_currency, location, is_remote, employment_type, experience_level, "
+                            "deadline, visibility, interview_enabled, cv_required"
+                        ),
+                        "properties": {
+                            "title": {"type": "string"},
+                            "description": {"type": "string"},
+                            "salary_min": {"type": "number"},
+                            "salary_max": {"type": "number"},
+                            "location": {"type": "string"},
+                            "is_remote": {"type": "boolean"},
+                        },
+                    },
+                },
+                "required": ["vacancy_title", "updates"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "publish_vacancy",
+            "description": "Publish a draft or paused vacancy",
+            "parameters": {
+                "type": "object",
+                "properties": {"vacancy_title": {"type": "string"}},
+                "required": ["vacancy_title"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "pause_vacancy",
+            "description": "Pause a published vacancy",
+            "parameters": {
+                "type": "object",
+                "properties": {"vacancy_title": {"type": "string"}},
+                "required": ["vacancy_title"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "archive_vacancy",
+            "description": "Archive a published or paused vacancy",
+            "parameters": {
+                "type": "object",
+                "properties": {"vacancy_title": {"type": "string"}},
+                "required": ["vacancy_title"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "delete_vacancy",
+            "description": (
+                "Permanently delete a draft or archived vacancy. Cannot delete published or paused vacancies."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {"vacancy_title": {"type": "string"}},
+                "required": ["vacancy_title"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "generate_questions",
+            "description": "AI-generate prescanning or interview questions for a vacancy",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "vacancy_title": {"type": "string"},
+                    "step": {"type": "string", "enum": ["prescanning", "interview"], "default": "prescanning"},
+                },
+                "required": ["vacancy_title"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "regenerate_keywords",
+            "description": "AI-regenerate search keywords for a vacancy",
+            "parameters": {
+                "type": "object",
+                "properties": {"vacancy_title": {"type": "string"}},
+                "required": ["vacancy_title"],
+            },
+        },
+    },
     # --- Employers ---
-    {"type": "function", "function": {"name": "list_employers", "description": "List employer companies", "parameters": {"type": "object", "properties": {}}}},
-    {"type": "function", "function": {"name": "create_employer", "description": "Create a new employer company", "parameters": {"type": "object", "properties": {"name": {"type": "string"}, "industry": {"type": "string"}, "website": {"type": "string"}, "description": {"type": "string"}}, "required": ["name"]}}},
-    {"type": "function", "function": {"name": "create_employer_from_url", "description": "Create employer by parsing a website URL with AI", "parameters": {"type": "object", "properties": {"name": {"type": "string"}, "url": {"type": "string"}}, "required": ["name", "url"]}}},
-    {"type": "function", "function": {"name": "update_employer", "description": "Update an employer company", "parameters": {"type": "object", "properties": {"employer_name": {"type": "string"}, "updates": {"type": "object"}}, "required": ["employer_name", "updates"]}}},
-    {"type": "function", "function": {"name": "delete_employer", "description": "Delete an employer company (only if no vacancies linked)", "parameters": {"type": "object", "properties": {"employer_name": {"type": "string"}}, "required": ["employer_name"]}}},
+    {
+        "type": "function",
+        "function": {
+            "name": "list_employers",
+            "description": "List employer companies",
+            "parameters": {"type": "object", "properties": {}},
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "create_employer",
+            "description": "Create a new employer company",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "name": {"type": "string"},
+                    "industry": {"type": "string"},
+                    "website": {"type": "string"},
+                    "description": {"type": "string"},
+                },
+                "required": ["name"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "create_employer_from_url",
+            "description": "Create employer by parsing a website URL with AI",
+            "parameters": {
+                "type": "object",
+                "properties": {"name": {"type": "string"}, "url": {"type": "string"}},
+                "required": ["name", "url"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "update_employer",
+            "description": "Update an employer company",
+            "parameters": {
+                "type": "object",
+                "properties": {"employer_name": {"type": "string"}, "updates": {"type": "object"}},
+                "required": ["employer_name", "updates"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "delete_employer",
+            "description": "Delete an employer company (only if no vacancies linked)",
+            "parameters": {
+                "type": "object",
+                "properties": {"employer_name": {"type": "string"}},
+                "required": ["employer_name"],
+            },
+        },
+    },
     # --- Candidates ---
-    {"type": "function", "function": {"name": "list_candidates", "description": "List candidates for a vacancy", "parameters": {"type": "object", "properties": {"vacancy_title": {"type": "string"}, "status": {"type": "string", "enum": ["applied", "prescanned", "interviewed", "shortlisted", "hired", "rejected", "expired", "archived"]}}, "required": ["vacancy_title"]}}},
-    {"type": "function", "function": {"name": "update_candidate_status", "description": "Change a candidate's pipeline status", "parameters": {"type": "object", "properties": {"candidate_email_or_name": {"type": "string"}, "vacancy_title": {"type": "string"}, "new_status": {"type": "string", "enum": ["applied", "prescanned", "interviewed", "shortlisted", "hired", "rejected", "archived"]}}, "required": ["candidate_email_or_name", "new_status"]}}},
-    {"type": "function", "function": {"name": "bulk_update_status", "description": "Move all candidates from one status to another for a vacancy", "parameters": {"type": "object", "properties": {"vacancy_title": {"type": "string"}, "from_status": {"type": "string"}, "to_status": {"type": "string"}}, "required": ["vacancy_title", "from_status", "to_status"]}}},
-    {"type": "function", "function": {"name": "add_candidate_note", "description": "Add an HR note to a candidate's application", "parameters": {"type": "object", "properties": {"candidate_email_or_name": {"type": "string"}, "vacancy_title": {"type": "string"}, "note": {"type": "string"}}, "required": ["candidate_email_or_name", "note"]}}},
+    {
+        "type": "function",
+        "function": {
+            "name": "list_candidates",
+            "description": "List candidates for a vacancy",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "vacancy_title": {"type": "string"},
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "applied",
+                            "prescanned",
+                            "interviewed",
+                            "shortlisted",
+                            "hired",
+                            "rejected",
+                            "expired",
+                            "archived",
+                        ],
+                    },
+                },
+                "required": ["vacancy_title"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "update_candidate_status",
+            "description": "Change a candidate's pipeline status",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "candidate_email_or_name": {"type": "string"},
+                    "vacancy_title": {"type": "string"},
+                    "new_status": {
+                        "type": "string",
+                        "enum": [
+                            "applied",
+                            "prescanned",
+                            "interviewed",
+                            "shortlisted",
+                            "hired",
+                            "rejected",
+                            "archived",
+                        ],
+                    },
+                },
+                "required": ["candidate_email_or_name", "new_status"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "bulk_update_status",
+            "description": "Move all candidates from one status to another for a vacancy",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "vacancy_title": {"type": "string"},
+                    "from_status": {"type": "string"},
+                    "to_status": {"type": "string"},
+                },
+                "required": ["vacancy_title", "from_status", "to_status"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "add_candidate_note",
+            "description": "Add an HR note to a candidate's application",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "candidate_email_or_name": {"type": "string"},
+                    "vacancy_title": {"type": "string"},
+                    "note": {"type": "string"},
+                },
+                "required": ["candidate_email_or_name", "note"],
+            },
+        },
+    },
     # --- Interviews ---
-    {"type": "function", "function": {"name": "list_interviews", "description": "List interviews, optionally filtered by status", "parameters": {"type": "object", "properties": {"status": {"type": "string", "enum": ["pending", "in_progress", "completed", "cancelled", "expired"]}}}}},
-    {"type": "function", "function": {"name": "cancel_interview", "description": "Cancel a pending or in-progress interview", "parameters": {"type": "object", "properties": {"candidate_email_or_name": {"type": "string"}}, "required": ["candidate_email_or_name"]}}},
-    {"type": "function", "function": {"name": "reset_interview", "description": "Reset an abandoned interview (creates a new session)", "parameters": {"type": "object", "properties": {"candidate_email_or_name": {"type": "string"}}, "required": ["candidate_email_or_name"]}}},
+    {
+        "type": "function",
+        "function": {
+            "name": "list_interviews",
+            "description": "List interviews, optionally filtered by status",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "enum": ["pending", "in_progress", "completed", "cancelled", "expired"],
+                    }
+                },
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "cancel_interview",
+            "description": "Cancel a pending or in-progress interview",
+            "parameters": {
+                "type": "object",
+                "properties": {"candidate_email_or_name": {"type": "string"}},
+                "required": ["candidate_email_or_name"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "reset_interview",
+            "description": "Reset an abandoned interview (creates a new session)",
+            "parameters": {
+                "type": "object",
+                "properties": {"candidate_email_or_name": {"type": "string"}},
+                "required": ["candidate_email_or_name"],
+            },
+        },
+    },
     # --- Dashboard ---
-    {"type": "function", "function": {"name": "get_dashboard", "description": "Get dashboard statistics (active vacancies, candidates, interviews)", "parameters": {"type": "object", "properties": {}}}},
-    {"type": "function", "function": {"name": "get_vacancy_summary", "description": "Get detailed pipeline summary for a specific vacancy", "parameters": {"type": "object", "properties": {"vacancy_title": {"type": "string"}}, "required": ["vacancy_title"]}}},
+    {
+        "type": "function",
+        "function": {
+            "name": "get_dashboard",
+            "description": "Get dashboard statistics (active vacancies, candidates, interviews)",
+            "parameters": {"type": "object", "properties": {}},
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_vacancy_summary",
+            "description": "Get detailed pipeline summary for a specific vacancy",
+            "parameters": {
+                "type": "object",
+                "properties": {"vacancy_title": {"type": "string"}},
+                "required": ["vacancy_title"],
+            },
+        },
+    },
     # --- Subscription ---
-    {"type": "function", "function": {"name": "get_subscription_info", "description": "Get current subscription plan info", "parameters": {"type": "object", "properties": {}}}},
-    {"type": "function", "function": {"name": "get_usage", "description": "Get current usage stats (vacancies, interviews, storage)", "parameters": {"type": "object", "properties": {}}}},
+    {
+        "type": "function",
+        "function": {
+            "name": "get_subscription_info",
+            "description": "Get current subscription plan info",
+            "parameters": {"type": "object", "properties": {}},
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_usage",
+            "description": "Get current usage stats (vacancies, interviews, storage)",
+            "parameters": {"type": "object", "properties": {}},
+        },
+    },
     # --- Team ---
-    {"type": "function", "function": {"name": "invite_hr", "description": "Invite a new HR manager to the team", "parameters": {"type": "object", "properties": {"email": {"type": "string"}}, "required": ["email"]}}},
-    {"type": "function", "function": {"name": "list_team", "description": "List team members", "parameters": {"type": "object", "properties": {}}}},
-    {"type": "function", "function": {"name": "toggle_user_active", "description": "Activate or deactivate a team member", "parameters": {"type": "object", "properties": {"email": {"type": "string"}, "activate": {"type": "boolean"}}, "required": ["email", "activate"]}}},
+    {
+        "type": "function",
+        "function": {
+            "name": "invite_hr",
+            "description": "Invite a new HR manager to the team",
+            "parameters": {"type": "object", "properties": {"email": {"type": "string"}}, "required": ["email"]},
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "list_team",
+            "description": "List team members",
+            "parameters": {"type": "object", "properties": {}},
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "toggle_user_active",
+            "description": "Activate or deactivate a team member",
+            "parameters": {
+                "type": "object",
+                "properties": {"email": {"type": "string"}, "activate": {"type": "boolean"}},
+                "required": ["email", "activate"],
+            },
+        },
+    },
     # --- Frontend Actions ---
-    {"type": "function", "function": {"name": "navigate_to_page", "description": "Navigate the user to a specific page in the app. Use after creating/updating resources or when user asks to go somewhere. Available pages: dashboard, vacancies, vacancy-detail (needs vacancy_id), employers, employer-create, candidates, interviews, settings, profile, company-profile, team, pricing, subscription, notifications, jobs (public job board)", "parameters": {"type": "object", "properties": {"page": {"type": "string", "description": "Page name: dashboard, vacancies, vacancy-detail, employers, employer-create, candidates, interviews, settings, profile, company-profile, team, pricing, subscription, notifications, jobs"}, "params": {"type": "object", "description": "Route params if needed, e.g. {\"id\": \"vacancy-uuid\"} for vacancy-detail"}}, "required": ["page"]}}},
-    {"type": "function", "function": {"name": "clear_chat_history", "description": "Clear the AI assistant chat history. Use when user asks to clear history, reset conversation, or start fresh.", "parameters": {"type": "object", "properties": {}}}},
+    {
+        "type": "function",
+        "function": {
+            "name": "navigate_to_page",
+            "description": (
+                "Navigate the user to a specific page in the app. Use after creating/updating resources "
+                "or when user asks to go somewhere. Available pages: dashboard, vacancies, vacancy-detail "
+                "(needs vacancy_id), employers, employer-create, candidates, interviews, settings, profile, "
+                "company-profile, team, pricing, subscription, notifications, jobs (public job board)"
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "page": {
+                        "type": "string",
+                        "description": (
+                            "Page name: dashboard, vacancies, vacancy-detail, employers, "
+                            "employer-create, candidates, interviews, settings, profile, "
+                            "company-profile, team, pricing, subscription, notifications, jobs"
+                        ),
+                    },
+                    "params": {
+                        "type": "object",
+                        "description": 'Route params if needed, e.g. {"id": "vacancy-uuid"} for vacancy-detail',
+                    },
+                },
+                "required": ["page"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "clear_chat_history",
+            "description": (
+                "Clear the AI assistant chat history. "
+                "Use when user asks to clear history, reset conversation, or start fresh."
+            ),
+            "parameters": {"type": "object", "properties": {}},
+        },
+    },
 ]
 
 # ---------------------------------------------------------------------------
@@ -207,11 +630,13 @@ def process_ai_command(*, user, message, context=None):
                     actions_taken.append({"tool": fn_name, "result": result})
 
                     # Feed result back to GPT
-                    messages.append({
-                        "role": "tool",
-                        "tool_call_id": tool_call.id,
-                        "content": json.dumps(result, default=str),
-                    })
+                    messages.append(
+                        {
+                            "role": "tool",
+                            "tool_call_id": tool_call.id,
+                            "content": json.dumps(result, default=str),
+                        }
+                    )
             else:
                 # GPT is done — build final response
                 return _build_final_response(
@@ -236,8 +661,7 @@ def process_ai_command(*, user, message, context=None):
 def _build_final_response(*, gpt_message, actions_taken):
     """Build the final response, appending error details if any tools failed."""
     has_errors = any(
-        a.get("result", {}).get("error") or a.get("result", {}).get("success") is False
-        for a in actions_taken
+        a.get("result", {}).get("error") or a.get("result", {}).get("success") is False for a in actions_taken
     )
 
     message = gpt_message or "Done."
@@ -279,14 +703,15 @@ def _build_error_response(*, actions_taken, fallback_message):
 # Helper: resolve vacancy by title (fuzzy) scoped to company
 # ---------------------------------------------------------------------------
 
+
 def _resolve_vacancy(*, company, title):
     """Find a vacancy by fuzzy title match. Raises if ambiguous or not found."""
     from apps.vacancies.models import Vacancy
 
     matches = list(
-        Vacancy.objects
-        .filter(company=company, is_deleted=False, title__icontains=title)
-        .values_list("id", "title")[:10]
+        Vacancy.objects.filter(company=company, is_deleted=False, title__icontains=title).values_list("id", "title")[
+            :10
+        ]
     )
     if not matches:
         raise ApplicationError(f"Vacancy matching '{title}' not found.")
@@ -300,11 +725,7 @@ def _resolve_employer(*, company, name):
     """Find an employer by fuzzy name match. Raises if ambiguous or not found."""
     from apps.vacancies.models import EmployerCompany
 
-    matches = list(
-        EmployerCompany.objects
-        .filter(company=company, name__icontains=name)
-        .values_list("id", "name")[:10]
-    )
+    matches = list(EmployerCompany.objects.filter(company=company, name__icontains=name).values_list("id", "name")[:10])
     if not matches:
         raise ApplicationError(f"Employer matching '{name}' not found.")
     if len(matches) > 1:
@@ -315,8 +736,8 @@ def _resolve_employer(*, company, name):
 
 def _resolve_application(*, company, candidate_email_or_name, vacancy_title=None):
     """Find an application by candidate email or name. Raises if ambiguous."""
+
     from apps.applications.models import Application
-    from django.db.models import Q
 
     qs = Application.objects.filter(
         vacancy__company=company,
@@ -327,26 +748,41 @@ def _resolve_application(*, company, candidate_email_or_name, vacancy_title=None
         qs = qs.filter(vacancy__title__icontains=vacancy_title)
 
     # Try email match first, then name
-    matches = list(qs.filter(candidate_email__icontains=candidate_email_or_name).values_list("id", "candidate_name", "candidate_email")[:10])
+    matches = list(
+        qs.filter(candidate_email__icontains=candidate_email_or_name).values_list(
+            "id", "candidate_name", "candidate_email"
+        )[:10]
+    )
     if not matches:
-        matches = list(qs.filter(candidate_name__icontains=candidate_email_or_name).values_list("id", "candidate_name", "candidate_email")[:10])
+        matches = list(
+            qs.filter(candidate_name__icontains=candidate_email_or_name).values_list(
+                "id", "candidate_name", "candidate_email"
+            )[:10]
+        )
     if not matches:
         raise ApplicationError(f"Candidate matching '{candidate_email_or_name}' not found.")
     if len(matches) > 1:
-        names = ", ".join(f'{m[1]} ({m[2]})' for m in matches)
-        raise ApplicationError(f"Multiple candidates match '{candidate_email_or_name}': {names}. Please be more specific (use email).")
+        names = ", ".join(f"{m[1]} ({m[2]})" for m in matches)
+        raise ApplicationError(
+            f"Multiple candidates match '{candidate_email_or_name}': {names}. Please be more specific (use email)."
+        )
     return Application.objects.select_related("vacancy").get(id=matches[0][0])
 
 
 def _resolve_interview_for_candidate(*, company, candidate_email_or_name):
     """Find the most recent active interview for a candidate."""
-    from apps.interviews.models import Interview
     from django.db.models import Q
 
-    qs = Interview.objects.filter(
-        application__vacancy__company=company,
-        application__is_deleted=False,
-    ).select_related("application", "application__vacancy").order_by("-created_at")
+    from apps.interviews.models import Interview
+
+    qs = (
+        Interview.objects.filter(
+            application__vacancy__company=company,
+            application__is_deleted=False,
+        )
+        .select_related("application", "application__vacancy")
+        .order_by("-created_at")
+    )
 
     interview = qs.filter(
         Q(application__candidate_email__icontains=candidate_email_or_name)
@@ -360,6 +796,7 @@ def _resolve_interview_for_candidate(*, company, candidate_email_or_name):
 # ---------------------------------------------------------------------------
 # VACANCY HANDLERS
 # ---------------------------------------------------------------------------
+
 
 def _handle_list_vacancies(*, user, params):
     from apps.vacancies.selectors import get_company_vacancies
@@ -377,7 +814,7 @@ def _handle_list_vacancies(*, user, params):
     ]
     msg = f"Found {total} vacanc{'y' if total == 1 else 'ies'}."
     if total > 20:
-        msg += f" Showing first 20."
+        msg += " Showing first 20."
     return {
         "success": True,
         "message": msg,
@@ -392,18 +829,20 @@ def _handle_create_vacancy(*, user, params):
 
     employer = None
     if params.get("employer_name"):
-        employer = EmployerCompany.objects.filter(
-            company=user.company, name__icontains=params["employer_name"]
-        ).first()
+        employer = EmployerCompany.objects.filter(company=user.company, name__icontains=params["employer_name"]).first()
         if not employer:
-            employer = EmployerCompany.objects.create(
-                company=user.company, name=params["employer_name"]
-            )
+            employer = EmployerCompany.objects.create(company=user.company, name=params["employer_name"])
 
     kwargs = {}
     for field in (
-        "salary_min", "salary_max", "salary_currency",
-        "location", "is_remote", "employment_type", "experience_level", "skills",
+        "salary_min",
+        "salary_max",
+        "salary_currency",
+        "location",
+        "is_remote",
+        "employment_type",
+        "experience_level",
+        "skills",
     ):
         if params.get(field) is not None:
             kwargs[field] = params[field]
@@ -433,7 +872,10 @@ def _handle_update_vacancy(*, user, params):
     if not updates:
         return {
             "success": False,
-            "message": f"No updates provided for vacancy '{vacancy.title}'. You must pass the 'updates' parameter with fields to change, e.g. updates={{\"title\": \"New Title\"}}.",
+            "message": (
+                f"No updates provided for vacancy '{vacancy.title}'. You must pass the 'updates' "
+                'parameter with fields to change, e.g. updates={"title": "New Title"}.'
+            ),
             "data": {"id": str(vacancy.id), "title": vacancy.title},
         }
     vacancy = update_vacancy(vacancy=vacancy, data=updates)
@@ -529,6 +971,7 @@ def _handle_regenerate_keywords(*, user, params):
 # EMPLOYER HANDLERS
 # ---------------------------------------------------------------------------
 
+
 def _handle_list_employers(*, user, params):
     from apps.vacancies.selectors import get_company_employers
 
@@ -619,6 +1062,7 @@ def _handle_delete_employer(*, user, params):
 # CANDIDATE HANDLERS
 # ---------------------------------------------------------------------------
 
+
 def _handle_list_candidates(*, user, params):
     from apps.applications.selectors import get_vacancy_applications
 
@@ -679,7 +1123,10 @@ def _handle_bulk_update_status(*, user, params):
     )
     return {
         "success": True,
-        "message": f"Moved {count} candidate{'s' if count != 1 else ''} from '{params.get('from_status')}' to '{params.get('to_status')}'.",
+        "message": (
+            f"Moved {count} candidate{'s' if count != 1 else ''} "
+            f"from '{params.get('from_status')}' to '{params.get('to_status')}'."
+        ),
         "data": {"count": count},
         "action": "bulk_update_status",
     }
@@ -708,6 +1155,7 @@ def _handle_add_candidate_note(*, user, params):
 # ---------------------------------------------------------------------------
 # INTERVIEW HANDLERS
 # ---------------------------------------------------------------------------
+
 
 def _handle_list_interviews(*, user, params):
     from apps.interviews.selectors import get_company_interviews
@@ -768,6 +1216,7 @@ def _handle_reset_interview(*, user, params):
 # DASHBOARD HANDLERS
 # ---------------------------------------------------------------------------
 
+
 def _handle_get_dashboard(*, user, params):
     from apps.common.selectors import get_dashboard_stats
 
@@ -787,12 +1236,15 @@ def _handle_get_vacancy_summary(*, user, params):
     vacancy = _resolve_vacancy(company=user.company, title=params.get("vacancy_title", ""))
 
     total_candidates = Application.objects.filter(
-        vacancy=vacancy, is_deleted=False,
+        vacancy=vacancy,
+        is_deleted=False,
     ).count()
     by_status = {}
     for s in Application.Status:
         count = Application.objects.filter(
-            vacancy=vacancy, is_deleted=False, status=s.value,
+            vacancy=vacancy,
+            is_deleted=False,
+            status=s.value,
         ).count()
         if count > 0:
             by_status[s.value] = count
@@ -826,6 +1278,7 @@ def _handle_get_vacancy_summary(*, user, params):
 # ---------------------------------------------------------------------------
 # SUBSCRIPTION HANDLERS
 # ---------------------------------------------------------------------------
+
 
 def _handle_get_subscription_info(*, user, params):
     from apps.subscriptions.selectors import get_company_subscription
@@ -870,6 +1323,7 @@ def _handle_get_usage(*, user, params):
 # TEAM HANDLERS
 # ---------------------------------------------------------------------------
 
+
 def _handle_invite_hr(*, user, params):
     from apps.accounts.services import invite_hr
 
@@ -911,7 +1365,8 @@ def _handle_toggle_user_active(*, user, params):
 
     email = params.get("email", "")
     target_user = User.objects.filter(
-        company=user.company, email__iexact=email,
+        company=user.company,
+        email__iexact=email,
     ).first()
     if target_user is None:
         raise ApplicationError(f"User with email '{email}' not found in your team.")
@@ -939,10 +1394,12 @@ def _handle_toggle_user_active(*, user, params):
 # GENERAL HANDLERS
 # ---------------------------------------------------------------------------
 
+
 def _handle_help(*, user, params):
     help_text = (
         "I can help you with:\n"
-        "- **Vacancies**: list, create, update, publish, pause, archive, delete, generate questions, regenerate keywords\n"
+        "- **Vacancies**: list, create, update, publish, pause, archive, delete, "
+        "generate questions, regenerate keywords\n"
         "- **Employers**: list, create (manual or from URL), update, delete\n"
         "- **Candidates**: list by vacancy, update status, bulk move, add notes\n"
         "- **Interviews**: list, cancel, reset\n"
@@ -1034,5 +1491,3 @@ def _handle_clear_chat_history(*, user, params):
         "data": {},
         "frontend_action": {"type": "clear_history"},
     }
-
-

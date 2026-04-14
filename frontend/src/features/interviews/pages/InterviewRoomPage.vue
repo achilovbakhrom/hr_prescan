@@ -72,7 +72,10 @@ onMounted(async () => {
     }
   } catch (err: unknown) {
     const axiosErr = err as { response?: { data?: { detail?: string; message?: string } } }
-    fetchError.value = axiosErr.response?.data?.detail ?? axiosErr.response?.data?.message ?? 'Failed to load interview.'
+    fetchError.value =
+      axiosErr.response?.data?.detail ??
+      axiosErr.response?.data?.message ??
+      'Failed to load interview.'
   } finally {
     loading.value = false
   }
@@ -248,7 +251,9 @@ function leaveInterview(): void {
 
 function startTimer(): void {
   elapsedTime.value = 0
-  timerInterval = setInterval(() => { elapsedTime.value++ }, 1000)
+  timerInterval = setInterval(() => {
+    elapsedTime.value++
+  }, 1000)
 }
 
 function stopTimer(): void {
@@ -259,7 +264,14 @@ function stopTimer(): void {
 }
 
 function getInitials(name: string): string {
-  return name.split(' ').map((n) => n.charAt(0)).slice(0, 2).join('').toUpperCase() || '?'
+  return (
+    name
+      .split(' ')
+      .map((n) => n.charAt(0))
+      .slice(0, 2)
+      .join('')
+      .toUpperCase() || '?'
+  )
 }
 </script>
 
@@ -281,26 +293,33 @@ function getInitials(name: string): string {
 
     <!-- Main states -->
     <template v-else-if="interview">
-
       <!-- ======= IDLE — Welcome card ======= -->
       <div v-if="connectionState === 'idle'" class="flex flex-1 items-center justify-center p-6">
         <div class="w-full max-w-md rounded-2xl bg-[#303134] p-8 text-center shadow-2xl">
-          <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-blue-500/20">
+          <div
+            class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-blue-500/20"
+          >
             <i class="pi pi-video text-3xl text-blue-400"></i>
           </div>
           <h2 class="mb-1 text-xl font-medium text-white">AI Video Interview</h2>
           <p class="mb-1 text-sm text-gray-400">{{ interview.vacancyTitle }}</p>
-          <p class="mb-6 text-xs text-gray-500">
-            {{ interview.durationMinutes }} min
-          </p>
+          <p class="mb-6 text-xs text-gray-500">{{ interview.durationMinutes }} min</p>
 
           <div class="mb-6 rounded-xl bg-[#3c4043] p-4 text-left text-sm text-gray-300">
             <p class="mb-2 font-medium text-white">Before you join:</p>
             <ul class="space-y-1.5 text-gray-400">
-              <li class="flex items-start gap-2"><i class="pi pi-wifi mt-0.5 text-xs text-green-400"></i> Stable internet connection</li>
-              <li class="flex items-start gap-2"><i class="pi pi-volume-up mt-0.5 text-xs text-green-400"></i> Quiet, well-lit room</li>
-              <li class="flex items-start gap-2"><i class="pi pi-camera mt-0.5 text-xs text-green-400"></i> Allow camera & microphone</li>
-              <li class="flex items-start gap-2"><i class="pi pi-user mt-0.5 text-xs text-green-400"></i> Keep your face visible</li>
+              <li class="flex items-start gap-2">
+                <i class="pi pi-wifi mt-0.5 text-xs text-green-400"></i> Stable internet connection
+              </li>
+              <li class="flex items-start gap-2">
+                <i class="pi pi-volume-up mt-0.5 text-xs text-green-400"></i> Quiet, well-lit room
+              </li>
+              <li class="flex items-start gap-2">
+                <i class="pi pi-camera mt-0.5 text-xs text-green-400"></i> Allow camera & microphone
+              </li>
+              <li class="flex items-start gap-2">
+                <i class="pi pi-user mt-0.5 text-xs text-green-400"></i> Keep your face visible
+              </li>
             </ul>
           </div>
 
@@ -320,7 +339,10 @@ function getInitials(name: string): string {
       </div>
 
       <!-- ======= PREVIEW — Camera/mic check (Google Meet style) ======= -->
-      <div v-else-if="connectionState === 'preview'" class="flex flex-1 items-center justify-center gap-8 p-6">
+      <div
+        v-else-if="connectionState === 'preview'"
+        class="flex flex-1 items-center justify-center gap-8 p-6"
+      >
         <!-- Preview video -->
         <div class="relative w-full max-w-xl overflow-hidden rounded-2xl bg-[#303134]">
           <div class="aspect-video">
@@ -332,11 +354,10 @@ function getInitials(name: string): string {
               muted
               class="h-full w-full object-cover"
             ></video>
-            <div
-              v-if="isCameraOff"
-              class="flex h-full w-full items-center justify-center"
-            >
-              <div class="flex h-24 w-24 items-center justify-center rounded-full bg-blue-600 text-3xl font-medium text-white">
+            <div v-if="isCameraOff" class="flex h-full w-full items-center justify-center">
+              <div
+                class="flex h-24 w-24 items-center justify-center rounded-full bg-blue-600 text-3xl font-medium text-white"
+              >
                 {{ interview.candidateName ? getInitials(interview.candidateName) : '?' }}
               </div>
             </div>
@@ -346,14 +367,21 @@ function getInitials(name: string): string {
           <div class="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-3">
             <button
               class="flex h-12 w-12 items-center justify-center rounded-full transition-colors"
-              :class="isMuted ? 'bg-red-500 text-white' : 'bg-[#3c4043] text-white hover:bg-[#4a4d50]'"
+              :class="
+                isMuted ? 'bg-red-500 text-white' : 'bg-[#3c4043] text-white hover:bg-[#4a4d50]'
+              "
               @click="togglePreviewMic"
             >
-              <i :class="isMuted ? 'pi pi-microphone-slash' : 'pi pi-microphone'" class="text-lg"></i>
+              <i
+                :class="isMuted ? 'pi pi-microphone-slash' : 'pi pi-microphone'"
+                class="text-lg"
+              ></i>
             </button>
             <button
               class="flex h-12 w-12 items-center justify-center rounded-full transition-colors"
-              :class="isCameraOff ? 'bg-red-500 text-white' : 'bg-[#3c4043] text-white hover:bg-[#4a4d50]'"
+              :class="
+                isCameraOff ? 'bg-red-500 text-white' : 'bg-[#3c4043] text-white hover:bg-[#4a4d50]'
+              "
               @click="togglePreviewCamera"
             >
               <i :class="isCameraOff ? 'pi pi-eye-slash' : 'pi pi-eye'" class="text-lg"></i>
@@ -374,7 +402,10 @@ function getInitials(name: string): string {
           />
           <button
             class="mt-3 text-sm text-gray-400 hover:text-white"
-            @click="stopPreview(); connectionState = 'idle'"
+            @click="
+              stopPreview()
+              connectionState = 'idle'
+            "
           >
             Go back
           </button>
@@ -382,7 +413,10 @@ function getInitials(name: string): string {
       </div>
 
       <!-- ======= CONNECTING ======= -->
-      <div v-else-if="connectionState === 'connecting'" class="flex flex-1 items-center justify-center">
+      <div
+        v-else-if="connectionState === 'connecting'"
+        class="flex flex-1 items-center justify-center"
+      >
         <div class="text-center">
           <i class="pi pi-spinner pi-spin mb-4 text-5xl text-blue-400"></i>
           <p class="text-lg text-white">Joining interview...</p>
@@ -390,15 +424,25 @@ function getInitials(name: string): string {
       </div>
 
       <!-- ======= ERROR ======= -->
-      <div v-else-if="connectionState === 'error'" class="flex flex-1 items-center justify-center p-8">
+      <div
+        v-else-if="connectionState === 'error'"
+        class="flex flex-1 items-center justify-center p-8"
+      >
         <div class="w-full max-w-md rounded-2xl bg-[#303134] p-8 text-center shadow-2xl">
-          <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-500/20">
+          <div
+            class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-500/20"
+          >
             <i class="pi pi-exclamation-triangle text-2xl text-red-400"></i>
           </div>
           <h2 class="mb-2 text-lg font-medium text-white">Something went wrong</h2>
           <p class="mb-6 text-sm text-gray-400">{{ errorMessage }}</p>
           <div class="flex justify-center gap-3">
-            <Button :label="t('errors.goBack')" severity="secondary" outlined @click="connectionState = 'idle'" />
+            <Button
+              :label="t('errors.goBack')"
+              severity="secondary"
+              outlined
+              @click="connectionState = 'idle'"
+            />
             <Button :label="t('errors.tryAgain')" icon="pi pi-refresh" @click="startPreview" />
           </div>
         </div>
@@ -424,7 +468,9 @@ function getInitials(name: string): string {
         <!-- Video grid -->
         <div class="flex flex-1 items-center justify-center gap-3 px-3 pb-3">
           <!-- Remote participant (main/large) -->
-          <div class="relative flex h-full flex-1 items-center justify-center overflow-hidden rounded-xl bg-[#303134]">
+          <div
+            class="relative flex h-full flex-1 items-center justify-center overflow-hidden rounded-xl bg-[#303134]"
+          >
             <video
               v-show="hasRemoteVideo"
               ref="remoteVideoEl"
@@ -436,7 +482,9 @@ function getInitials(name: string): string {
 
             <!-- Avatar fallback when no remote video -->
             <div v-if="!hasRemoteVideo" class="flex flex-col items-center gap-3">
-              <div class="flex h-24 w-24 items-center justify-center rounded-full bg-purple-600 text-3xl font-medium text-white">
+              <div
+                class="flex h-24 w-24 items-center justify-center rounded-full bg-purple-600 text-3xl font-medium text-white"
+              >
                 {{ getInitials(remoteParticipantName) }}
               </div>
               <span class="text-sm text-gray-400">{{ remoteParticipantName }}</span>
@@ -461,17 +509,22 @@ function getInitials(name: string): string {
               muted
               class="h-full w-full object-cover"
             ></video>
-            <div
-              v-if="isCameraOff"
-              class="flex h-full w-full items-center justify-center"
-            >
-              <div class="flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-lg font-medium text-white">
+            <div v-if="isCameraOff" class="flex h-full w-full items-center justify-center">
+              <div
+                class="flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-lg font-medium text-white"
+              >
                 {{ interview.candidateName ? getInitials(interview.candidateName) : 'Y' }}
               </div>
             </div>
-            <div class="absolute bottom-2 left-2 flex items-center gap-1.5 rounded-md bg-black/60 px-2 py-0.5 text-xs text-white backdrop-blur-sm">
+            <div
+              class="absolute bottom-2 left-2 flex items-center gap-1.5 rounded-md bg-black/60 px-2 py-0.5 text-xs text-white backdrop-blur-sm"
+            >
               <span>You</span>
-              <i v-if="isMuted" class="pi pi-microphone-slash text-red-400" style="font-size: 0.65rem"></i>
+              <i
+                v-if="isMuted"
+                class="pi pi-microphone-slash text-red-400"
+                style="font-size: 0.65rem"
+              ></i>
             </div>
           </div>
         </div>
@@ -482,17 +535,24 @@ function getInitials(name: string): string {
             <!-- Mic -->
             <button
               class="flex h-12 w-12 items-center justify-center rounded-full transition-colors"
-              :class="isMuted ? 'bg-red-500 text-white' : 'bg-[#3c4043] text-white hover:bg-[#4a4d50]'"
+              :class="
+                isMuted ? 'bg-red-500 text-white' : 'bg-[#3c4043] text-white hover:bg-[#4a4d50]'
+              "
               :title="isMuted ? 'Unmute' : 'Mute'"
               @click="toggleMute"
             >
-              <i :class="isMuted ? 'pi pi-microphone-slash' : 'pi pi-microphone'" class="text-lg"></i>
+              <i
+                :class="isMuted ? 'pi pi-microphone-slash' : 'pi pi-microphone'"
+                class="text-lg"
+              ></i>
             </button>
 
             <!-- Camera -->
             <button
               class="flex h-12 w-12 items-center justify-center rounded-full transition-colors"
-              :class="isCameraOff ? 'bg-red-500 text-white' : 'bg-[#3c4043] text-white hover:bg-[#4a4d50]'"
+              :class="
+                isCameraOff ? 'bg-red-500 text-white' : 'bg-[#3c4043] text-white hover:bg-[#4a4d50]'
+              "
               :title="isCameraOff ? 'Turn on camera' : 'Turn off camera'"
               @click="toggleCamera"
             >
@@ -513,18 +573,29 @@ function getInitials(name: string): string {
       </div>
 
       <!-- ======= ENDED ======= -->
-      <div v-else-if="connectionState === 'ended'" class="flex flex-1 items-center justify-center p-8">
+      <div
+        v-else-if="connectionState === 'ended'"
+        class="flex flex-1 items-center justify-center p-8"
+      >
         <div class="w-full max-w-md rounded-2xl bg-[#303134] p-8 text-center shadow-2xl">
-          <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-500/20">
+          <div
+            class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-500/20"
+          >
             <i class="pi pi-check text-3xl text-green-400"></i>
           </div>
-          <h2 class="mb-2 text-xl font-medium text-white">{{ t('interviews.status.completed') }}</h2>
+          <h2 class="mb-2 text-xl font-medium text-white">
+            {{ t('interviews.status.completed') }}
+          </h2>
           <p class="mb-1 text-gray-400">Duration: {{ formattedTime }}</p>
           <p class="mb-6 text-sm text-gray-500">
-            Thank you! Your responses are being reviewed by our AI.
-            You'll receive results shortly.
+            Thank you! Your responses are being reviewed by our AI. You'll receive results shortly.
           </p>
-          <Button :label="t('errors.goHome')" icon="pi pi-home" class="w-full" @click="router.push('/')" />
+          <Button
+            :label="t('errors.goHome')"
+            icon="pi pi-home"
+            class="w-full"
+            @click="router.push('/')"
+          />
         </div>
       </div>
     </template>

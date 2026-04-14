@@ -20,10 +20,7 @@ withDefaults(defineProps<Props>(), {
     aria-busy="true"
   >
     <!-- Table header -->
-    <div
-      v-if="showHeader"
-      class="flex gap-4 border-b border-gray-100 bg-gray-50 px-6 py-3"
-    >
+    <div v-if="showHeader" class="flex gap-4 border-b border-gray-100 bg-gray-50 px-6 py-3">
       <div
         v-for="col in columns"
         :key="col"
@@ -34,26 +31,15 @@ withDefaults(defineProps<Props>(), {
 
     <!-- Table rows -->
     <div class="divide-y divide-gray-50">
-      <div
-        v-for="row in rows"
-        :key="row"
-        class="flex items-center gap-4 px-6 py-4"
-      >
+      <div v-for="row in rows" :key="row" class="flex items-center gap-4 px-6 py-4">
         <!-- Row checkbox / icon placeholder -->
         <div class="h-4 w-4 shrink-0 animate-pulse rounded bg-gray-200"></div>
 
         <!-- Column cells -->
-        <div
-          v-for="col in columns"
-          :key="col"
-          class="flex-1"
-        >
+        <div v-for="col in columns" :key="col" class="flex-1">
           <div
             class="animate-pulse rounded-full bg-gray-200"
-            :class="[
-              col === 1 ? 'h-4 w-3/4' : 'h-3 w-1/2',
-              row % 3 === 0 ? 'opacity-60' : '',
-            ]"
+            :class="[col === 1 ? 'h-4 w-3/4' : 'h-3 w-1/2', row % 3 === 0 ? 'opacity-60' : '']"
           ></div>
         </div>
 

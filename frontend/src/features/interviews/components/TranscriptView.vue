@@ -12,12 +12,16 @@ function formatTimestamp(seconds: number): string {
 }
 
 function isAi(entry: TranscriptEntry): boolean {
-  const val = (entry.speaker || (entry as any).role || '').toLowerCase()
+  const val = (
+    entry.speaker ||
+    (entry as TranscriptEntry & { role?: string }).role ||
+    ''
+  ).toLowerCase()
   return val === 'ai' || val === 'interviewer'
 }
 
 function getSpeakerLabel(entry: TranscriptEntry): string {
-  const val = entry.speaker || (entry as any).role || 'Unknown'
+  const val = entry.speaker || (entry as TranscriptEntry & { role?: string }).role || 'Unknown'
   const lower = val.toLowerCase()
   if (lower === 'ai' || lower === 'interviewer') return 'Interviewer'
   if (lower === 'candidate' || lower === 'user') return 'Candidate'
@@ -27,9 +31,7 @@ function getSpeakerLabel(entry: TranscriptEntry): string {
 
 <template>
   <div class="space-y-3">
-    <p v-if="transcript.length === 0" class="text-sm text-gray-500">
-      No transcript available yet.
-    </p>
+    <p v-if="transcript.length === 0" class="text-sm text-gray-500">No transcript available yet.</p>
 
     <div
       v-for="(entry, index) in transcript"
@@ -39,11 +41,7 @@ function getSpeakerLabel(entry: TranscriptEntry): string {
     >
       <div
         class="max-w-[75%] rounded-lg px-4 py-2"
-        :class="
-          isAi(entry)
-            ? 'bg-gray-100 text-gray-800'
-            : 'bg-blue-50 text-blue-900'
-        "
+        :class="isAi(entry) ? 'bg-gray-100 text-gray-800' : 'bg-blue-50 text-blue-900'"
       >
         <div class="mb-1 flex items-center gap-2">
           <span class="text-xs font-semibold">{{ getSpeakerLabel(entry) }}</span>

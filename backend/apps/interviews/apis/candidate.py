@@ -1,6 +1,5 @@
 from django.conf import settings
-from django.http import HttpResponse, HttpResponseRedirect
-from django.utils import timezone
+from django.http import HttpResponse
 from rest_framework import serializers, status
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import AllowAny
@@ -15,9 +14,9 @@ from apps.common.messages import (
     MSG_AUDIO_NOT_FOUND,
     MSG_CHAT_HISTORY_ONLY,
     MSG_CHAT_ONLY,
+    MSG_INTERVIEW_NOT_FOUND,
     MSG_INVALID_AUDIO_FILE_TYPE,
     MSG_INVALID_AUDIO_URL,
-    MSG_INTERVIEW_NOT_FOUND,
     MSG_MESSAGE_INDEX_OUT_OF_RANGE,
     MSG_NO_AUDIO_FILE,
     MSG_VACANCY_NOT_ACCEPTING_INTERVIEWS,
@@ -224,7 +223,7 @@ class ChatMessageApi(APIView):
             )
         except Exception as e:
             return Response(
-                {"detail": f"AI service error: {str(e)}"},
+                {"detail": f"AI service error: {e!s}"},
                 status=status.HTTP_502_BAD_GATEWAY,
             )
 
@@ -338,7 +337,7 @@ class VoiceChatMessageApi(APIView):
             )
         except Exception as e:
             return Response(
-                {"detail": f"AI service error: {str(e)}"},
+                {"detail": f"AI service error: {e!s}"},
                 status=status.HTTP_502_BAD_GATEWAY,
             )
 

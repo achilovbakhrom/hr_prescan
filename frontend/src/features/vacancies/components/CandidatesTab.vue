@@ -146,35 +146,67 @@ function getRowMenuItems(c: Application) {
 
   // Forward moves
   if (s === 'applied') {
-    items.push({ label: 'Move to Prescanned', icon: 'pi pi-arrow-right', command: () => confirmRowStatus(c, 'prescanned') })
+    items.push({
+      label: 'Move to Prescanned',
+      icon: 'pi pi-arrow-right',
+      command: () => confirmRowStatus(c, 'prescanned'),
+    })
   }
   if (s === 'prescanned' && props.interviewEnabled) {
-    items.push({ label: 'Move to Interviewed', icon: 'pi pi-arrow-right', command: () => confirmRowStatus(c, 'interviewed') })
+    items.push({
+      label: 'Move to Interviewed',
+      icon: 'pi pi-arrow-right',
+      command: () => confirmRowStatus(c, 'interviewed'),
+    })
   }
   if (s !== 'shortlisted' && s !== 'hired' && s !== 'archived') {
-    items.push({ label: 'Shortlist', icon: 'pi pi-star', command: () => confirmRowStatus(c, 'shortlisted') })
+    items.push({
+      label: 'Shortlist',
+      icon: 'pi pi-star',
+      command: () => confirmRowStatus(c, 'shortlisted'),
+    })
   }
   if (s !== 'hired' && s !== 'archived') {
-    items.push({ label: 'Hire', icon: 'pi pi-check-circle', command: () => confirmRowStatus(c, 'hired') })
+    items.push({
+      label: 'Hire',
+      icon: 'pi pi-check-circle',
+      command: () => confirmRowStatus(c, 'hired'),
+    })
   }
 
   // Reject
   if (s !== 'rejected' && s !== 'hired' && s !== 'archived') {
     items.push({ label: '', icon: '', command: () => {}, separator: true })
-    items.push({ label: 'Reject', icon: 'pi pi-times', command: () => confirmRowStatus(c, 'rejected') })
+    items.push({
+      label: 'Reject',
+      icon: 'pi pi-times',
+      command: () => confirmRowStatus(c, 'rejected'),
+    })
   }
 
   // Archive
   if (s === 'rejected' || s === 'expired' || s === 'shortlisted' || s === 'hired') {
-    items.push({ label: 'Archive', icon: 'pi pi-inbox', command: () => confirmRowStatus(c, 'archived') })
+    items.push({
+      label: 'Archive',
+      icon: 'pi pi-inbox',
+      command: () => confirmRowStatus(c, 'archived'),
+    })
   }
 
   // Reset
   if (s !== 'applied' && s !== 'archived') {
-    items.push({ label: 'Reset to Applied', icon: 'pi pi-refresh', command: () => confirmRowStatus(c, 'applied') })
+    items.push({
+      label: 'Reset to Applied',
+      icon: 'pi pi-refresh',
+      command: () => confirmRowStatus(c, 'applied'),
+    })
   }
   if (s === 'archived') {
-    items.push({ label: 'Restore to Applied', icon: 'pi pi-refresh', command: () => confirmRowStatus(c, 'applied') })
+    items.push({
+      label: 'Restore to Applied',
+      icon: 'pi pi-refresh',
+      command: () => confirmRowStatus(c, 'applied'),
+    })
   }
 
   return items
@@ -265,7 +297,12 @@ function handleBatchMoveByScore(
   direction: 'below' | 'above',
 ): void {
   const dirLabel = direction === 'below' ? '<' : '>'
-  const fieldLabel = scoreField === 'match_score' ? 'CV match' : scoreField === 'prescanning_score' ? 'prescan score' : 'interview score'
+  const fieldLabel =
+    scoreField === 'match_score'
+      ? 'CV match'
+      : scoreField === 'prescanning_score'
+        ? 'prescan score'
+        : 'interview score'
 
   confirm.require({
     message: `Move "${fromStatus}" candidates with ${fieldLabel} ${dirLabel} ${threshold} to "${toStatus}"?`,
@@ -303,7 +340,11 @@ function handleBatchMoveNoCv(fromStatus: ApplicationStatus, toStatus: Applicatio
   })
 }
 
-function handleBatchMoveByDays(fromStatus: ApplicationStatus, toStatus: ApplicationStatus, days: number): void {
+function handleBatchMoveByDays(
+  fromStatus: ApplicationStatus,
+  toStatus: ApplicationStatus,
+  days: number,
+): void {
   confirm.require({
     message: `Move "${fromStatus}" candidates idle for more than ${days} days to "${toStatus}"?`,
     header: 'Batch Move (Idle)',
@@ -349,14 +390,22 @@ function handleSoftDeleteAll(status: ApplicationStatus): void {
       <div class="flex shrink-0 items-center rounded-lg border border-gray-200 p-0.5">
         <button
           class="rounded-md px-2.5 py-1 text-xs font-medium transition-colors sm:px-3 sm:py-1.5 sm:text-sm"
-          :class="candidateViewMode === 'kanban' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:text-gray-700'"
+          :class="
+            candidateViewMode === 'kanban'
+              ? 'bg-gray-900 text-white'
+              : 'text-gray-500 hover:text-gray-700'
+          "
           @click="candidateViewMode = 'kanban'"
         >
           <i class="pi pi-th-large sm:mr-1.5"></i><span class="hidden sm:inline">Board</span>
         </button>
         <button
           class="rounded-md px-2.5 py-1 text-xs font-medium transition-colors sm:px-3 sm:py-1.5 sm:text-sm"
-          :class="candidateViewMode === 'table' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:text-gray-700'"
+          :class="
+            candidateViewMode === 'table'
+              ? 'bg-gray-900 text-white'
+              : 'text-gray-500 hover:text-gray-700'
+          "
           @click="candidateViewMode = 'table'"
         >
           <i class="pi pi-list sm:mr-1.5"></i><span class="hidden sm:inline">Table</span>
@@ -396,7 +445,9 @@ function handleSoftDeleteAll(status: ApplicationStatus): void {
 
       <!-- Bulk actions (when selected) -->
       <template v-if="selectedCandidates.length > 0">
-        <span class="hidden shrink-0 text-xs text-gray-500 sm:inline">{{ selectedCandidates.length }} selected</span>
+        <span class="hidden shrink-0 text-xs text-gray-500 sm:inline"
+          >{{ selectedCandidates.length }} selected</span
+        >
         <Dropdown
           :model-value="null"
           :options="bulkActionOptions"
@@ -409,7 +460,9 @@ function handleSoftDeleteAll(status: ApplicationStatus): void {
       </template>
 
       <!-- Count -->
-      <span class="ml-auto shrink-0 text-xs text-gray-400">{{ candidateStore.candidates.length }}</span>
+      <span class="ml-auto shrink-0 text-xs text-gray-400">{{
+        candidateStore.candidates.length
+      }}</span>
     </div>
 
     <p v-if="candidateStore.error" class="rounded-lg bg-red-50 px-4 py-2 text-sm text-red-600">
@@ -444,18 +497,36 @@ function handleSoftDeleteAll(status: ApplicationStatus): void {
       <Column selection-mode="multiple" header-style="width: 3rem" />
 
       <!-- Candidate -->
-      <Column :header="t('candidates.title')" sortable sort-field="candidateName" style="min-width: 200px">
+      <Column
+        :header="t('candidates.title')"
+        sortable
+        sort-field="candidateName"
+        style="min-width: 200px"
+      >
         <template #body="{ data }">
           <div
             class="flex cursor-pointer items-center gap-2.5"
             @click="viewCandidateDetail(data as Application)"
           >
-            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-50 text-xs font-semibold text-blue-700">
-              {{ (data as Application).candidateName.split(' ').map((n: string) => n[0]).slice(0, 2).join('').toUpperCase() }}
+            <div
+              class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-50 text-xs font-semibold text-blue-700"
+            >
+              {{
+                (data as Application).candidateName
+                  .split(' ')
+                  .map((n: string) => n[0])
+                  .slice(0, 2)
+                  .join('')
+                  .toUpperCase()
+              }}
             </div>
             <div class="min-w-0">
-              <p class="truncate font-medium text-gray-900">{{ (data as Application).candidateName }}</p>
-              <p class="truncate text-xs text-gray-500">{{ (data as Application).candidateEmail }}</p>
+              <p class="truncate font-medium text-gray-900">
+                {{ (data as Application).candidateName }}
+              </p>
+              <p class="truncate text-xs text-gray-500">
+                {{ (data as Application).candidateEmail }}
+              </p>
             </div>
           </div>
         </template>
@@ -469,7 +540,12 @@ function handleSoftDeleteAll(status: ApplicationStatus): void {
       </Column>
 
       <!-- Overall -->
-      <Column :header="t('candidates.overallScore')" sortable sort-field="matchScore" style="min-width: 80px">
+      <Column
+        :header="t('candidates.overallScore')"
+        sortable
+        sort-field="matchScore"
+        style="min-width: 80px"
+      >
         <template #body="{ data }">
           <span
             v-if="getTableOverallScore(data as Application) != null"
@@ -510,7 +586,11 @@ function handleSoftDeleteAll(status: ApplicationStatus): void {
       </Column>
 
       <!-- Interview (conditional) -->
-      <Column v-if="interviewEnabled" :header="t('candidates.interviewScore')" style="min-width: 80px">
+      <Column
+        v-if="interviewEnabled"
+        :header="t('candidates.interviewScore')"
+        style="min-width: 80px"
+      >
         <template #body="{ data }">
           <span
             v-if="(data as Application).interviewScore != null"
@@ -524,9 +604,16 @@ function handleSoftDeleteAll(status: ApplicationStatus): void {
       </Column>
 
       <!-- Applied date -->
-      <Column :header="t('candidates.status.applied')" sortable sort-field="createdAt" style="min-width: 100px">
+      <Column
+        :header="t('candidates.status.applied')"
+        sortable
+        sort-field="createdAt"
+        style="min-width: 100px"
+      >
         <template #body="{ data }">
-          <span class="text-xs text-gray-500">{{ formatDate((data as Application).createdAt) }}</span>
+          <span class="text-xs text-gray-500">{{
+            formatDate((data as Application).createdAt)
+          }}</span>
         </template>
       </Column>
 

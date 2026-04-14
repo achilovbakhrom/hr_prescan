@@ -1,4 +1,4 @@
-from rest_framework import serializers, status
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -23,7 +23,6 @@ from apps.notifications.services import (
     mark_messages_as_read,
     send_message,
 )
-
 
 # ---------------------------------------------------------------------------
 # Notification APIs
@@ -53,7 +52,8 @@ class NotificationReadApi(APIView):
     def patch(self, request: Request, notification_id: str) -> Response:
         try:
             notification = Notification.objects.get(
-                id=notification_id, user=request.user,
+                id=notification_id,
+                user=request.user,
             )
         except Notification.DoesNotExist:
             return Response(
@@ -152,7 +152,8 @@ class HRMessageListApi(APIView):
     def _get_application(request: Request, application_id: str) -> Application | None:
         try:
             return Application.objects.select_related(
-                "candidate", "vacancy",
+                "candidate",
+                "vacancy",
             ).get(
                 id=application_id,
                 vacancy__company=request.user.company,
@@ -167,8 +168,9 @@ class CandidateMessageListApi(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request: Request) -> Response:
-        from apps.notifications.models import Message
         from django.db.models import Q
+
+        from apps.notifications.models import Message
 
         messages = (
             Message.objects.filter(

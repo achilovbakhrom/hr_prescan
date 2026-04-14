@@ -53,10 +53,14 @@ onMounted(() => adminStore.fetchAnalytics())
 
       <!-- Charts Placeholder -->
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div class="flex h-64 items-center justify-center rounded-lg border border-gray-200 bg-white">
+        <div
+          class="flex h-64 items-center justify-center rounded-lg border border-gray-200 bg-white"
+        >
           <p class="text-gray-400">Revenue Chart (coming soon)</p>
         </div>
-        <div class="flex h-64 items-center justify-center rounded-lg border border-gray-200 bg-white">
+        <div
+          class="flex h-64 items-center justify-center rounded-lg border border-gray-200 bg-white"
+        >
           <p class="text-gray-400">User Growth Chart (coming soon)</p>
         </div>
       </div>

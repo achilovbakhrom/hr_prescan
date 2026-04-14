@@ -57,6 +57,6 @@ def transcribe_audio(*, file_bytes: bytes, filename: str = "audio.webm") -> str:
         )
     except Exception as e:
         logger.error("Whisper transcription failed: %s", e)
-        raise ApplicationError(str(MSG_AUDIO_TRANSCRIPTION_FAILED))
+        raise ApplicationError(str(MSG_AUDIO_TRANSCRIPTION_FAILED)) from e
 
     return transcript.text

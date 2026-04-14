@@ -29,7 +29,9 @@ const errorState = ref<'expired' | 'closed' | 'completed' | 'error' | null>(null
 const errorMessage = ref('')
 const messagesContainer = ref<HTMLElement | null>(null)
 
-const canSend = computed(() => inputMessage.value.trim().length > 0 && !sending.value && !isCompleted.value)
+const canSend = computed(
+  () => inputMessage.value.trim().length > 0 && !sending.value && !isCompleted.value,
+)
 
 // Prevent accidental page close
 function beforeUnloadHandler(e: BeforeUnloadEvent) {
@@ -76,7 +78,9 @@ onMounted(async () => {
     await nextTick()
     scrollToBottom()
   } catch (err: unknown) {
-    const axiosErr = err as { response?: { status?: number; data?: { detail?: string; message?: string } } }
+    const axiosErr = err as {
+      response?: { status?: number; data?: { detail?: string; message?: string } }
+    }
     const status = axiosErr.response?.status
     const detail = axiosErr.response?.data?.detail ?? axiosErr.response?.data?.message ?? ''
 
@@ -99,7 +103,7 @@ onBeforeUnmount(() => {
 })
 
 function delay(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms))
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 async function sendMessage(): Promise<void> {
@@ -136,7 +140,10 @@ async function sendMessage(): Promise<void> {
     if (aiReply.text.includes('[INTERVIEW_COMPLETE]') || aiReply.text.includes('[END]')) {
       isCompleted.value = true
       const lastMsg = messages.value[messages.value.length - 1]
-      lastMsg.text = lastMsg.text.replace(/\[INTERVIEW_COMPLETE\]/g, '').replace(/\[END\]/g, '').trim()
+      lastMsg.text = lastMsg.text
+        .replace(/\[INTERVIEW_COMPLETE\]/g, '')
+        .replace(/\[END\]/g, '')
+        .trim()
     }
 
     try {
@@ -218,10 +225,16 @@ async function handleVoiceRecorded(blob: Blob, voiceDuration: number): Promise<v
     isTyping.value = false
     messages.value.push(result.aiMessage)
 
-    if (result.aiMessage.text.includes('[INTERVIEW_COMPLETE]') || result.aiMessage.text.includes('[END]')) {
+    if (
+      result.aiMessage.text.includes('[INTERVIEW_COMPLETE]') ||
+      result.aiMessage.text.includes('[END]')
+    ) {
       isCompleted.value = true
       const lastMsg = messages.value[messages.value.length - 1]
-      lastMsg.text = lastMsg.text.replace(/\[INTERVIEW_COMPLETE\]/g, '').replace(/\[END\]/g, '').trim()
+      lastMsg.text = lastMsg.text
+        .replace(/\[INTERVIEW_COMPLETE\]/g, '')
+        .replace(/\[END\]/g, '')
+        .trim()
     }
 
     try {
@@ -236,7 +249,10 @@ async function handleVoiceRecorded(blob: Blob, voiceDuration: number): Promise<v
     isTyping.value = false
     // Remove the placeholder message
     const lastIdx = messages.value.length - 1
-    if (messages.value[lastIdx]?.role === 'candidate' && messages.value[lastIdx]?.text === 'Transcribing...') {
+    if (
+      messages.value[lastIdx]?.role === 'candidate' &&
+      messages.value[lastIdx]?.text === 'Transcribing...'
+    ) {
       messages.value.pop()
     }
     messages.value.push({
@@ -265,7 +281,9 @@ function handleClose(): void {
     <!-- Loading -->
     <div v-if="loading" class="flex flex-1 items-center justify-center">
       <div class="text-center">
-        <div class="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600"></div>
+        <div
+          class="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600"
+        ></div>
         <p class="text-sm text-gray-500">Preparing your interview...</p>
       </div>
     </div>
@@ -275,7 +293,9 @@ function handleClose(): void {
       <div class="w-full max-w-md text-center">
         <template v-if="errorState === 'completed'">
           <div class="rounded-2xl bg-white p-8 shadow-lg">
-            <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+            <div
+              class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100"
+            >
               <i class="pi pi-check text-3xl text-green-600"></i>
             </div>
             <h1 class="mb-2 text-xl font-bold text-gray-900">Interview Completed</h1>
@@ -292,32 +312,51 @@ function handleClose(): void {
         </template>
         <template v-else-if="errorState === 'expired'">
           <div class="rounded-2xl bg-white p-8 shadow-lg">
-            <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-yellow-100">
+            <div
+              class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-yellow-100"
+            >
               <i class="pi pi-clock text-3xl text-yellow-600"></i>
             </div>
             <h1 class="mb-2 text-xl font-bold text-gray-900">Link Expired</h1>
-            <p class="mb-6 text-sm text-gray-500">{{ errorMessage || t('interviews.states.expired') }}</p>
-            <RouterLink to="/jobs" class="text-sm font-medium text-blue-600 hover:underline">Browse more jobs</RouterLink>
+            <p class="mb-6 text-sm text-gray-500">
+              {{ errorMessage || t('interviews.states.expired') }}
+            </p>
+            <RouterLink to="/jobs" class="text-sm font-medium text-blue-600 hover:underline"
+              >Browse more jobs</RouterLink
+            >
           </div>
         </template>
         <template v-else-if="errorState === 'closed'">
           <div class="rounded-2xl bg-white p-8 shadow-lg">
-            <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
+            <div
+              class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100"
+            >
               <i class="pi pi-ban text-3xl text-gray-400"></i>
             </div>
             <h1 class="mb-2 text-xl font-bold text-gray-900">Vacancy Closed</h1>
-            <p class="mb-6 text-sm text-gray-500">{{ errorMessage || t('interviews.states.closed') }}</p>
-            <RouterLink to="/jobs" class="text-sm font-medium text-blue-600 hover:underline">Browse more jobs</RouterLink>
+            <p class="mb-6 text-sm text-gray-500">
+              {{ errorMessage || t('interviews.states.closed') }}
+            </p>
+            <RouterLink to="/jobs" class="text-sm font-medium text-blue-600 hover:underline"
+              >Browse more jobs</RouterLink
+            >
           </div>
         </template>
         <template v-else>
           <div class="rounded-2xl bg-white p-8 shadow-lg">
-            <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
+            <div
+              class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100"
+            >
               <i class="pi pi-exclamation-triangle text-3xl text-red-400"></i>
             </div>
             <h1 class="mb-2 text-xl font-bold text-gray-900">Something Went Wrong</h1>
             <p class="mb-6 text-sm text-gray-500">{{ errorMessage }}</p>
-            <Button :label="t('errors.tryAgain')" icon="pi pi-refresh" rounded @click="$router.go(0)" />
+            <Button
+              :label="t('errors.tryAgain')"
+              icon="pi pi-refresh"
+              rounded
+              @click="$router.go(0)"
+            />
           </div>
         </template>
       </div>
@@ -338,14 +377,21 @@ function handleClose(): void {
             </div>
             <div>
               <p class="text-sm font-medium text-gray-900">{{ interview.vacancyTitle }}</p>
-              <p v-if="(interview as any).employerName || (interview as any).companyName" class="text-xs text-gray-500">
-                <i class="pi pi-building mr-0.5"></i>{{ (interview as any).employerName || (interview as any).companyName }}
+              <p
+                v-if="(interview as any).employerName || (interview as any).companyName"
+                class="text-xs text-gray-500"
+              >
+                <i class="pi pi-building mr-0.5"></i
+                >{{ (interview as any).employerName || (interview as any).companyName }}
               </p>
               <p class="text-xs text-gray-500">AI Interview in progress - click to expand</p>
             </div>
           </div>
           <div class="flex items-center gap-2">
-            <span v-if="messages.length" class="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white">
+            <span
+              v-if="messages.length"
+              class="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white"
+            >
               {{ messages.length }}
             </span>
             <i class="pi pi-chevron-up text-gray-400"></i>
@@ -368,17 +414,30 @@ function handleClose(): void {
         <header class="border-b border-gray-200 bg-white px-4 py-3 shadow-sm">
           <div class="mx-auto flex max-w-3xl items-center justify-between">
             <div class="flex items-center gap-3">
-              <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-700">
+              <div
+                class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-700"
+              >
                 <i class="pi pi-comments text-white"></i>
               </div>
               <div>
                 <h1 class="text-base font-semibold text-gray-900">{{ interview.vacancyTitle }}</h1>
-                <p v-if="(interview as any).employerName || (interview as any).companyName" class="text-xs text-gray-500">
-                  <i class="pi pi-building mr-1"></i>{{ (interview as any).employerName || (interview as any).companyName }}
+                <p
+                  v-if="(interview as any).employerName || (interview as any).companyName"
+                  class="text-xs text-gray-500"
+                >
+                  <i class="pi pi-building mr-1"></i
+                  >{{ (interview as any).employerName || (interview as any).companyName }}
                 </p>
                 <div class="flex items-center gap-1.5">
-                  <span class="h-2 w-2 rounded-full" :class="isCompleted ? 'bg-gray-400' : 'bg-green-500 animate-pulse'"></span>
-                  <span class="text-xs text-gray-500">{{ isCompleted ? t('interviews.status.completed') : t('interviews.chat.aiInterview') }}</span>
+                  <span
+                    class="h-2 w-2 rounded-full"
+                    :class="isCompleted ? 'bg-gray-400' : 'bg-green-500 animate-pulse'"
+                  ></span>
+                  <span class="text-xs text-gray-500">{{
+                    isCompleted
+                      ? t('interviews.status.completed')
+                      : t('interviews.chat.aiInterview')
+                  }}</span>
                 </div>
               </div>
             </div>
@@ -402,7 +461,10 @@ function handleClose(): void {
         </header>
 
         <!-- Leave confirmation dialog -->
-        <div v-if="showLeaveConfirm" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+        <div
+          v-if="showLeaveConfirm"
+          class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+        >
           <div class="mx-4 w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl">
             <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-yellow-100">
               <i class="pi pi-exclamation-triangle text-xl text-yellow-600"></i>
@@ -433,22 +495,37 @@ function handleClose(): void {
           <div class="mx-auto max-w-3xl space-y-4">
             <!-- Date header -->
             <div class="flex items-center justify-center">
-              <span class="rounded-full bg-gray-200 px-3 py-1 text-[10px] font-medium text-gray-500">
+              <span
+                class="rounded-full bg-gray-200 px-3 py-1 text-[10px] font-medium text-gray-500"
+              >
                 Today
               </span>
             </div>
 
-            <div v-for="(msg, idx) in messages" :key="idx" class="flex" :class="msg.role === 'candidate' ? 'justify-end' : 'justify-start'">
+            <div
+              v-for="(msg, idx) in messages"
+              :key="idx"
+              class="flex"
+              :class="msg.role === 'candidate' ? 'justify-end' : 'justify-start'"
+            >
               <!-- AI message -->
               <div v-if="msg.role === 'ai'" class="flex max-w-[80%] gap-2.5">
-                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-700 shadow-sm">
+                <div
+                  class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-700 shadow-sm"
+                >
                   <i class="pi pi-comments text-xs text-white"></i>
                 </div>
                 <div class="min-w-0">
-                  <div class="rounded-2xl rounded-tl-sm bg-white px-4 py-3 shadow-sm ring-1 ring-gray-100">
-                    <p class="whitespace-pre-wrap text-[13px] leading-relaxed text-gray-800">{{ msg.text }}</p>
+                  <div
+                    class="rounded-2xl rounded-tl-sm bg-white px-4 py-3 shadow-sm ring-1 ring-gray-100"
+                  >
+                    <p class="whitespace-pre-wrap text-[13px] leading-relaxed text-gray-800">
+                      {{ msg.text }}
+                    </p>
                   </div>
-                  <span class="mt-1 block pl-1 text-[10px] text-gray-400">{{ formatTime(msg.timestamp) }}</span>
+                  <span class="mt-1 block pl-1 text-[10px] text-gray-400">{{
+                    formatTime(msg.timestamp)
+                  }}</span>
                 </div>
               </div>
 
@@ -456,7 +533,10 @@ function handleClose(): void {
               <div v-else-if="msg.messageType === 'voice'" class="max-w-[80%]">
                 <div class="rounded-2xl rounded-tr-sm bg-blue-600 px-4 py-3 shadow-sm">
                   <!-- Still transcribing — show placeholder -->
-                  <div v-if="msg.text === 'Transcribing...'" class="flex items-center gap-2 text-white/80">
+                  <div
+                    v-if="msg.text === 'Transcribing...'"
+                    class="flex items-center gap-2 text-white/80"
+                  >
                     <i class="pi pi-spinner pi-spin text-xs"></i>
                     <span class="text-[13px]">{{ t('interviews.chat.transcribing') }}</span>
                   </div>
@@ -477,7 +557,9 @@ function handleClose(): void {
               <!-- Candidate text message -->
               <div v-else class="max-w-[80%]">
                 <div class="rounded-2xl rounded-tr-sm bg-blue-600 px-4 py-3 shadow-sm">
-                  <p class="whitespace-pre-wrap text-[13px] leading-relaxed text-white">{{ msg.text }}</p>
+                  <p class="whitespace-pre-wrap text-[13px] leading-relaxed text-white">
+                    {{ msg.text }}
+                  </p>
                 </div>
                 <span class="mt-1 block pr-1 text-right text-[10px] text-gray-400">
                   {{ formatTime(msg.timestamp) }}
@@ -489,14 +571,24 @@ function handleClose(): void {
             <!-- Typing indicator -->
             <div v-if="isTyping" class="flex justify-start">
               <div class="flex max-w-[80%] gap-2.5">
-                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-700 shadow-sm">
+                <div
+                  class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-700 shadow-sm"
+                >
                   <i class="pi pi-comments text-xs text-white"></i>
                 </div>
-                <div class="rounded-2xl rounded-tl-sm bg-white px-5 py-3.5 shadow-sm ring-1 ring-gray-100">
+                <div
+                  class="rounded-2xl rounded-tl-sm bg-white px-5 py-3.5 shadow-sm ring-1 ring-gray-100"
+                >
                   <div class="flex items-center gap-1.5">
                     <span class="typing-dot h-2 w-2 rounded-full bg-gray-400"></span>
-                    <span class="typing-dot h-2 w-2 rounded-full bg-gray-400" style="animation-delay: 0.15s"></span>
-                    <span class="typing-dot h-2 w-2 rounded-full bg-gray-400" style="animation-delay: 0.3s"></span>
+                    <span
+                      class="typing-dot h-2 w-2 rounded-full bg-gray-400"
+                      style="animation-delay: 0.15s"
+                    ></span>
+                    <span
+                      class="typing-dot h-2 w-2 rounded-full bg-gray-400"
+                      style="animation-delay: 0.3s"
+                    ></span>
                   </div>
                 </div>
               </div>
@@ -507,7 +599,9 @@ function handleClose(): void {
         <!-- Completed overlay -->
         <div v-if="isCompleted" class="border-t border-gray-200 bg-white px-4 py-6">
           <div class="mx-auto max-w-3xl text-center">
-            <div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-green-100">
+            <div
+              class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-green-100"
+            >
               <i class="pi pi-check text-2xl text-green-600"></i>
             </div>
             <h2 class="mb-1 text-lg font-semibold text-gray-900">Interview Complete!</h2>
@@ -552,7 +646,11 @@ function handleClose(): void {
             <button
               v-else
               class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-all"
-              :class="canSend ? 'bg-blue-600 text-white shadow-md hover:bg-blue-700 hover:shadow-lg' : 'bg-gray-200 text-gray-400'"
+              :class="
+                canSend
+                  ? 'bg-blue-600 text-white shadow-md hover:bg-blue-700 hover:shadow-lg'
+                  : 'bg-gray-200 text-gray-400'
+              "
               :disabled="!canSend"
               @click="sendMessage"
             >
@@ -571,7 +669,9 @@ function handleClose(): void {
 
 <style scoped>
 @keyframes typing {
-  0%, 60%, 100% {
+  0%,
+  60%,
+  100% {
     transform: translateY(0);
     opacity: 0.4;
   }

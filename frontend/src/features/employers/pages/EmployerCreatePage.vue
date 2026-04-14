@@ -30,8 +30,9 @@ const description = ref('')
 const fileUrl = ref('')
 const saving = ref(false)
 
-async function handleFileUpload(event: { files: File[] }): Promise<void> {
-  const file = event.files?.[0]
+async function handleFileUpload(event: { files: File | File[] }): Promise<void> {
+  const files = Array.isArray(event.files) ? event.files : [event.files]
+  const file = files[0]
   if (!file || !name.value) return
 
   saving.value = true
@@ -94,19 +95,29 @@ async function handleSave(): Promise<void> {
     <h1 class="mb-6 text-2xl font-bold text-gray-900">{{ t('employers.create') }}</h1>
 
     <!-- Error -->
-    <div v-if="employerStore.error" class="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+    <div
+      v-if="employerStore.error"
+      class="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600"
+    >
       {{ employerStore.error }}
     </div>
 
     <!-- Source toggle -->
     <div class="mb-6">
       <label class="mb-2 block text-sm font-medium">{{ t('employers.source') }}</label>
-      <SelectButton v-model="sourceMode" :options="sourceModeOptions" option-label="label" option-value="value" />
+      <SelectButton
+        v-model="sourceMode"
+        :options="sourceModeOptions"
+        option-label="label"
+        option-value="value"
+      />
     </div>
 
     <!-- Company name (always required) -->
     <div class="mb-4">
-      <label class="mb-1 block text-sm font-medium">{{ t('employers.name') }} <span class="text-red-500">*</span></label>
+      <label class="mb-1 block text-sm font-medium"
+        >{{ t('employers.name') }} <span class="text-red-500">*</span></label
+      >
       <InputText v-model="name" class="w-full" :placeholder="t('employers.namePlaceholder')" />
     </div>
 
@@ -162,7 +173,12 @@ async function handleSave(): Promise<void> {
       <div class="mb-6">
         <label class="mb-1 block text-sm font-medium">{{ t('employers.website') }}</label>
         <div class="flex gap-2">
-          <InputText v-model="fileUrl" class="flex-1" :placeholder="t('employers.urlPlaceholder')" :disabled="saving" />
+          <InputText
+            v-model="fileUrl"
+            class="flex-1"
+            :placeholder="t('employers.urlPlaceholder')"
+            :disabled="saving"
+          />
           <Button
             type="button"
             :label="t('employers.fetchFromUrl')"

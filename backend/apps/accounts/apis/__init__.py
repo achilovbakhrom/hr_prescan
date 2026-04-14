@@ -8,7 +8,6 @@ from apps.accounts.apis.auth import (
     TokenRefreshApi,
     VerifyEmailApi,
 )
-from apps.accounts.apis.google_auth import GoogleAuthApi
 from apps.accounts.apis.company import (
     AcceptInvitationApi,
     CompanyProfileApi,
@@ -17,21 +16,22 @@ from apps.accounts.apis.company import (
     TeamListApi,
     TeamMemberDetailApi,
 )
+from apps.accounts.apis.google_auth import GoogleAuthApi
 
 __all__ = [
     "AcceptCompanyInvitationApi",
-    "GoogleAuthApi",
-    "LoginApi",
-    "LogoutApi",
-    "MyInvitationsApi",
-    "MeApi",
-    "RegisterApi",
-    "TokenRefreshApi",
-    "VerifyEmailApi",
     "AcceptInvitationApi",
     "CompanyProfileApi",
     "CompanyRegisterApi",
+    "GoogleAuthApi",
     "InviteHRApi",
+    "LoginApi",
+    "LogoutApi",
+    "MeApi",
+    "MyInvitationsApi",
+    "RegisterApi",
     "TeamListApi",
     "TeamMemberDetailApi",
+    "TokenRefreshApi",
+    "VerifyEmailApi",
 ]

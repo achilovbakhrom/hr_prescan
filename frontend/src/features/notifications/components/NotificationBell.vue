@@ -35,9 +35,6 @@ function closeDropdown(): void {
       severity="danger"
       class="absolute -right-1 -top-1 pointer-events-none"
     />
-    <NotificationDropdown
-      v-if="showDropdown"
-      @close="closeDropdown"
-    />
+    <NotificationDropdown v-if="showDropdown" @close="closeDropdown" />
   </div>
 </template>

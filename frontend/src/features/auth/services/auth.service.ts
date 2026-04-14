@@ -25,10 +25,9 @@ export const authService = {
   },
 
   async refreshToken(refreshToken: string): Promise<{ access: string }> {
-    const response = await apiClient.post<{ access: string }>(
-      '/auth/token/refresh',
-      { refresh: refreshToken },
-    )
+    const response = await apiClient.post<{ access: string }>('/auth/token/refresh', {
+      refresh: refreshToken,
+    })
     return response.data
   },
 
@@ -60,7 +59,9 @@ export const authService = {
   },
 
   async acceptCompanyInvitation(token: string): Promise<{ user: User }> {
-    const response = await apiClient.post<{ user: User }>('/auth/accept-company-invitation', { token })
+    const response = await apiClient.post<{ user: User }>('/auth/accept-company-invitation', {
+      token,
+    })
     return response.data
   },
 }

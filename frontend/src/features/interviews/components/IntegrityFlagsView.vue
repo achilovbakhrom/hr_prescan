@@ -6,10 +6,7 @@ defineProps<{
   flags: IntegrityFlag[]
 }>()
 
-const severityConfig: Record<
-  IntegritySeverity,
-  { severity: 'success' | 'warn' | 'danger' }
-> = {
+const severityConfig: Record<IntegritySeverity, { severity: 'success' | 'warn' | 'danger' }> = {
   low: { severity: 'success' },
   medium: { severity: 'warn' },
   high: { severity: 'danger' },
@@ -32,9 +29,7 @@ function formatTimestamp(seconds: number | null): string {
 
 <template>
   <div class="space-y-3">
-    <p v-if="flags.length === 0" class="text-sm text-gray-500">
-      No integrity flags detected.
-    </p>
+    <p v-if="flags.length === 0" class="text-sm text-gray-500">No integrity flags detected.</p>
 
     <div
       v-for="flag in flags"
@@ -51,10 +46,7 @@ function formatTimestamp(seconds: number | null): string {
           <span class="text-sm font-medium text-gray-800">
             {{ formatFlagType(flag.flagType) }}
           </span>
-          <span
-            v-if="flag.timestampSeconds !== null"
-            class="text-xs text-gray-400"
-          >
+          <span v-if="flag.timestampSeconds !== null" class="text-xs text-gray-400">
             {{ formatTimestamp(flag.timestampSeconds) }}
           </span>
         </div>

@@ -27,8 +27,8 @@ class Company(models.Model):
     size = models.CharField(max_length=20, choices=Size.choices)
     country = models.CharField(max_length=100)
     logo = models.ImageField(upload_to="company_logos/", null=True, blank=True)
-    website = models.URLField(max_length=500, null=True, blank=True)
-    description = models.TextField(null=True, blank=True)
+    website = models.URLField(max_length=500, null=True, blank=True)  # noqa: DJ001 (existing schema, nullable intentional)
+    description = models.TextField(null=True, blank=True)  # noqa: DJ001 (existing schema, nullable intentional)
 
     # Subscription fields
     subscription_plan = models.ForeignKey(
@@ -94,7 +94,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=150)
     last_name = models.CharField(max_length=150)
-    phone = models.CharField(max_length=30, null=True, blank=True)
+    phone = models.CharField(max_length=30, null=True, blank=True)  # noqa: DJ001 (existing schema, nullable intentional)
     role = models.CharField(max_length=20, choices=Role.choices, default=Role.CANDIDATE)
     company = models.ForeignKey(
         Company,

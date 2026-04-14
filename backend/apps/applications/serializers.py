@@ -30,7 +30,7 @@ class ApplicationListOutputSerializer(serializers.ModelSerializer):
 
     def _get_session_score(self, obj: Application, session_type: str) -> float | None:
         # Use prefetched sessions if available
-        sessions = getattr(obj, '_prefetched_objects_cache', {}).get('sessions')
+        sessions = getattr(obj, "_prefetched_objects_cache", {}).get("sessions")
         if sessions is not None:
             for s in sessions:
                 if s.session_type == session_type and s.status == "completed" and s.overall_score is not None:
@@ -38,9 +38,8 @@ class ApplicationListOutputSerializer(serializers.ModelSerializer):
             return None
         # Fallback to query
         from apps.interviews.models import Interview
-        session = Interview.objects.filter(
-            application=obj, session_type=session_type, status="completed"
-        ).first()
+
+        session = Interview.objects.filter(application=obj, session_type=session_type, status="completed").first()
         if session and session.overall_score is not None:
             return float(session.overall_score)
         return None
@@ -57,15 +56,18 @@ class ApplicationDetailOutputSerializer(serializers.ModelSerializer):
 
     vacancy_title = serializers.CharField(source="vacancy.title", read_only=True)
     company_name = serializers.CharField(
-        source="vacancy.company.name", read_only=True,
+        source="vacancy.company.name",
+        read_only=True,
     )
     prescan_token = serializers.SerializerMethodField()
     interview_token = serializers.SerializerMethodField()
     interview_enabled = serializers.BooleanField(
-        source="vacancy.interview_enabled", read_only=True,
+        source="vacancy.interview_enabled",
+        read_only=True,
     )
     interview_mode = serializers.CharField(
-        source="vacancy.interview_mode", read_only=True,
+        source="vacancy.interview_mode",
+        read_only=True,
     )
 
     class Meta:
@@ -96,9 +98,9 @@ class ApplicationDetailOutputSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
     def _get_session_token(self, obj: Application, session_type: str) -> str | None:
-        session = obj.sessions.filter(session_type=session_type).exclude(
-            status="cancelled"
-        ).order_by("-created_at").first()
+        session = (
+            obj.sessions.filter(session_type=session_type).exclude(status="cancelled").order_by("-created_at").first()
+        )
         if session:
             return str(session.interview_token)
         return None
@@ -115,10 +117,14 @@ class CandidateApplicationListOutputSerializer(serializers.ModelSerializer):
 
     vacancy_title = serializers.CharField(source="vacancy.title", read_only=True)
     company_name = serializers.CharField(
-        source="vacancy.company.name", read_only=True,
+        source="vacancy.company.name",
+        read_only=True,
     )
     employer_name = serializers.CharField(
-        source="vacancy.employer.name", read_only=True, default=None, allow_null=True,
+        source="vacancy.employer.name",
+        read_only=True,
+        default=None,
+        allow_null=True,
     )
 
     class Meta:
@@ -139,7 +145,8 @@ class CandidateApplicationDetailOutputSerializer(serializers.ModelSerializer):
 
     vacancy_title = serializers.CharField(source="vacancy.title", read_only=True)
     company_name = serializers.CharField(
-        source="vacancy.company.name", read_only=True,
+        source="vacancy.company.name",
+        read_only=True,
     )
     prescan_token = serializers.SerializerMethodField()
     interview_token = serializers.SerializerMethodField()
@@ -165,9 +172,9 @@ class CandidateApplicationDetailOutputSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
     def _get_session_token(self, obj: Application, session_type: str) -> str | None:
-        session = obj.sessions.filter(session_type=session_type).exclude(
-            status="cancelled"
-        ).order_by("-created_at").first()
+        session = (
+            obj.sessions.filter(session_type=session_type).exclude(status="cancelled").order_by("-created_at").first()
+        )
         if session:
             return str(session.interview_token)
         return None

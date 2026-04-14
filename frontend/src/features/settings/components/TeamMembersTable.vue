@@ -6,8 +6,6 @@ import Tag from 'primevue/tag'
 import ToggleSwitch from 'primevue/toggleswitch'
 import type { TeamMember } from '../types/settings.types'
 
-const { t } = useI18n()
-
 defineProps<{
   members: TeamMember[]
 }>()
@@ -15,6 +13,8 @@ defineProps<{
 const emit = defineEmits<{
   toggleActive: [userId: string]
 }>()
+
+const { t } = useI18n()
 
 function getRoleSeverity(role: string): 'info' | 'warn' | undefined {
   if (role === 'admin') return 'warn'

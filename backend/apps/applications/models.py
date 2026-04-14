@@ -42,7 +42,10 @@ class Application(BaseModel):
     cv_parsed_text = models.TextField(blank=True, default="")  # raw extracted text
     cv_parsed_data = models.JSONField(default=dict, blank=True)  # structured: skills, experience, education
     match_score = models.DecimalField(
-        max_digits=5, decimal_places=2, null=True, blank=True,
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
     )  # 0-100
     match_details = models.JSONField(default=dict, blank=True)  # per-criteria match breakdown
 

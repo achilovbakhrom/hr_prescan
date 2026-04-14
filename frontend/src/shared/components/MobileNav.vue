@@ -168,9 +168,7 @@ watch(
         aria-label="Mobile navigation"
       >
         <!-- Drawer header -->
-        <div
-          class="flex h-16 items-center justify-between border-b border-gray-200 px-4"
-        >
+        <div class="flex h-16 items-center justify-between border-b border-gray-200 px-4">
           <div class="flex items-center gap-2">
             <AppLogo size="sm" />
             <span class="text-lg font-bold text-gray-900">PreScreen AI</span>
@@ -186,20 +184,14 @@ watch(
         </div>
 
         <!-- Navigation items -->
-        <nav
-          class="flex-1 overflow-y-auto px-3 py-4"
-          role="navigation"
-          aria-label="Mobile menu"
-        >
+        <nav class="flex-1 overflow-y-auto px-3 py-4" role="navigation" aria-label="Mobile menu">
           <ul class="flex flex-col gap-1" role="list">
             <li v-for="item in filteredItems" :key="item.to" role="listitem">
               <RouterLink
                 :to="item.to"
                 class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors"
                 :class="
-                  isActive(item.to)
-                    ? 'bg-blue-50 text-blue-700'
-                    : 'text-gray-700 hover:bg-gray-100'
+                  isActive(item.to) ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-100'
                 "
                 :aria-current="isActive(item.to) ? 'page' : undefined"
               >
@@ -216,15 +208,13 @@ watch(
         </div>
 
         <!-- User info footer -->
-        <div
-          v-if="authStore.user"
-          class="border-t border-gray-200 px-4 py-3"
-        >
+        <div v-if="authStore.user" class="border-t border-gray-200 px-4 py-3">
           <div class="flex items-center gap-3">
             <div
               class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-medium text-blue-700"
             >
-              {{ authStore.user.firstName?.charAt(0) ?? '' }}{{ authStore.user.lastName?.charAt(0) ?? '' }}
+              {{ authStore.user.firstName?.charAt(0) ?? ''
+              }}{{ authStore.user.lastName?.charAt(0) ?? '' }}
             </div>
             <div class="min-w-0">
               <p class="truncate text-sm font-medium text-gray-900">

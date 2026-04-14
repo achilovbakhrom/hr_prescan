@@ -4,11 +4,11 @@ import { useI18n } from 'vue-i18n'
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
 
-const { t } = useI18n()
-
 const props = defineProps<{
   shareToken: string
 }>()
+
+const { t } = useI18n()
 
 const copied = ref(false)
 
@@ -42,11 +42,7 @@ async function copyLink(): Promise<void> {
 
 <template>
   <div class="flex items-center gap-2">
-    <InputText
-      :model-value="shareUrl"
-      readonly
-      class="flex-1 text-sm"
-    />
+    <InputText :model-value="shareUrl" readonly class="flex-1 text-sm" />
     <Button
       :icon="copied ? 'pi pi-check' : 'pi pi-copy'"
       :label="copied ? t('common.copied') : t('common.copyLink')"

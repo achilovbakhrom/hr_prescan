@@ -1,13 +1,13 @@
-import apps.accounts.models
-import django.db.models.deletion
 import uuid
 
+import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
 
+import apps.accounts.models
+
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("accounts", "0001_initial"),
     ]

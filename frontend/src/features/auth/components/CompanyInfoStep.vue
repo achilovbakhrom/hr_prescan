@@ -36,9 +36,7 @@ const emit = defineEmits<{
 <template>
   <form class="flex flex-col gap-4 pt-4" @submit.prevent="emit('next')">
     <div class="flex flex-col gap-1">
-      <label for="companyName" class="text-sm font-medium text-gray-700">
-        Company Name
-      </label>
+      <label for="companyName" class="text-sm font-medium text-gray-700"> Company Name </label>
       <InputText
         id="companyName"
         :model-value="companyName"
@@ -53,9 +51,7 @@ const emit = defineEmits<{
     </div>
 
     <div class="flex flex-col gap-1">
-      <label for="industry" class="text-sm font-medium text-gray-700">
-        Industry
-      </label>
+      <label for="industry" class="text-sm font-medium text-gray-700"> Industry </label>
       <InputText
         id="industry"
         :model-value="industry"
@@ -70,9 +66,7 @@ const emit = defineEmits<{
     </div>
 
     <div class="flex flex-col gap-1">
-      <label for="size" class="text-sm font-medium text-gray-700">
-        Company Size
-      </label>
+      <label for="size" class="text-sm font-medium text-gray-700"> Company Size </label>
       <Select
         id="size"
         :model-value="size"
@@ -90,9 +84,7 @@ const emit = defineEmits<{
     </div>
 
     <div class="flex flex-col gap-1">
-      <label for="country" class="text-sm font-medium text-gray-700">
-        Country
-      </label>
+      <label for="country" class="text-sm font-medium text-gray-700"> Country </label>
       <InputText
         id="country"
         :model-value="country"
@@ -101,9 +93,7 @@ const emit = defineEmits<{
         class="w-full"
         @update:model-value="emit('update:country', $event as string)"
       />
-      <small v-if="submitted && errors.country" class="text-red-500">
-        Country is required.
-      </small>
+      <small v-if="submitted && errors.country" class="text-red-500"> Country is required. </small>
     </div>
 
     <div class="flex justify-end pt-2">

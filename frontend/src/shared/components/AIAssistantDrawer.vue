@@ -6,8 +6,7 @@ import Textarea from 'primevue/textarea'
 import { useAIAssistant } from '../composables/useAIAssistant'
 
 const { t } = useI18n()
-const { isOpen, messages, sending, close, toggle, sendMessage, clearHistory } =
-  useAIAssistant()
+const { isOpen, messages, sending, close, toggle, sendMessage, clearHistory } = useAIAssistant()
 
 const inputText = ref('')
 const messagesContainer = ref<HTMLElement | null>(null)
@@ -54,10 +53,7 @@ onUnmounted(() => {
 function formatMessage(text: string): string {
   return text
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(
-      /`(.*?)`/g,
-      '<code class="rounded bg-gray-200 px-1 text-xs">$1</code>',
-    )
+    .replace(/`(.*?)`/g, '<code class="rounded bg-gray-200 px-1 text-xs">$1</code>')
     .replace(/\n/g, '<br>')
 }
 </script>
@@ -65,11 +61,7 @@ function formatMessage(text: string): string {
 <template>
   <!-- Backdrop -->
   <Transition name="fade">
-    <div
-      v-if="isOpen"
-      class="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm"
-      @click="close"
-    ></div>
+    <div v-if="isOpen" class="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm" @click="close"></div>
   </Transition>
 
   <!-- Drawer -->
@@ -79,9 +71,7 @@ function formatMessage(text: string): string {
       class="fixed right-0 top-0 z-50 flex h-full w-full flex-col border-l border-gray-200 bg-white shadow-2xl sm:max-w-[400px]"
     >
       <!-- Header -->
-      <div
-        class="flex items-center justify-between border-b border-gray-100 px-4 py-3"
-      >
+      <div class="flex items-center justify-between border-b border-gray-100 px-4 py-3">
         <div class="flex items-center gap-2">
           <div
             class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600"
@@ -127,9 +117,7 @@ function formatMessage(text: string): string {
           v-if="messages.length === 0"
           class="flex flex-col items-center justify-center py-12 text-center"
         >
-          <div
-            class="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-50"
-          >
+          <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-50">
             <i class="pi pi-sparkles text-2xl text-violet-500"></i>
           </div>
           <p class="text-sm font-medium text-gray-700">
@@ -141,11 +129,7 @@ function formatMessage(text: string): string {
           <!-- Quick actions -->
           <div class="mt-4 flex flex-wrap justify-center gap-2">
             <button
-              v-for="hint in [
-                'List my vacancies',
-                'Show dashboard stats',
-                'Help',
-              ]"
+              v-for="hint in ['List my vacancies', 'Show dashboard stats', 'Help']"
               :key="hint"
               class="rounded-full border border-gray-200 px-3 py-1.5 text-xs text-gray-600 transition-colors hover:border-violet-300 hover:bg-violet-50 hover:text-violet-700"
               @click="sendMessage(hint)"
@@ -161,9 +145,7 @@ function formatMessage(text: string): string {
             v-for="(msg, idx) in messages"
             :key="idx"
             class="flex"
-            :class="
-              msg.role === 'user' ? 'justify-end' : 'justify-start'
-            "
+            :class="msg.role === 'user' ? 'justify-end' : 'justify-start'"
           >
             <!-- User message -->
             <div
@@ -186,10 +168,7 @@ function formatMessage(text: string): string {
                 ></p>
               </div>
               <!-- Action badges -->
-              <div
-                v-if="msg.actions?.length"
-                class="mt-1.5 flex flex-wrap gap-1"
-              >
+              <div v-if="msg.actions?.length" class="mt-1.5 flex flex-wrap gap-1">
                 <span
                   v-for="(action, aidx) in msg.actions"
                   :key="aidx"
@@ -243,9 +222,7 @@ function formatMessage(text: string): string {
             @click="handleSend"
           />
         </div>
-        <p class="mt-1.5 text-center text-[10px] text-gray-300">
-          Ctrl+K / Cmd+K
-        </p>
+        <p class="mt-1.5 text-center text-[10px] text-gray-300">Ctrl+K / Cmd+K</p>
       </div>
     </div>
   </Transition>

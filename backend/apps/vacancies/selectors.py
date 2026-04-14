@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from django.contrib.postgres.search import SearchQuery, SearchRank, TrigramSimilarity
-from django.db.models import Count, F, Q, QuerySet, Value
+from django.db.models import Count, F, Q, QuerySet
 from django.db.models.functions import Greatest
 
 from apps.accounts.models import Company
@@ -16,8 +16,7 @@ def get_company_vacancies(
 ) -> QuerySet[Vacancy]:
     """Return vacancies for a company, optionally filtered by status."""
     qs = (
-        Vacancy.objects
-        .filter(company=company)
+        Vacancy.objects.filter(company=company)
         .select_related("created_by", "employer")
         .annotate(
             criteria_count=Count("criteria"),
@@ -66,12 +65,7 @@ def get_vacancy_by_id(
 
 def get_vacancy_by_share_token(*, share_token: UUID) -> Vacancy | None:
     """Get a vacancy by its share token for public/private access."""
-    return (
-        Vacancy.objects
-        .select_related("company", "created_by", "employer")
-        .filter(share_token=share_token)
-        .first()
-    )
+    return Vacancy.objects.select_related("company", "created_by", "employer").filter(share_token=share_token).first()
 
 
 def get_public_vacancies(
@@ -88,15 +82,11 @@ def get_public_vacancies(
 
     Uses full-text search with SearchVector + trigram similarity for fuzzy matching.
     """
-    qs = (
-        Vacancy.objects
-        .filter(
-            status=Vacancy.Status.PUBLISHED,
-            visibility=Vacancy.Visibility.PUBLIC,
-            is_deleted=False,
-        )
-        .select_related("company", "employer")
-    )
+    qs = Vacancy.objects.filter(
+        status=Vacancy.Status.PUBLISHED,
+        visibility=Vacancy.Visibility.PUBLIC,
+        is_deleted=False,
+    ).select_related("company", "employer")
     if search:
         # Both english (stemming: program→programming) and simple (exact: Russian words)
         query_en = SearchQuery(search, config="english", search_type="websearch")
@@ -108,12 +98,14 @@ def get_public_vacancies(
             TrigramSimilarity("title", search),
             TrigramSimilarity("requirements", search),
         )
-        qs = qs.annotate(
-            fts_rank=fts_rank,
-            trigram_sim=trigram_sim,
-        ).filter(
-            Q(search_vector=query_combined) | Q(trigram_sim__gte=0.15)
-        ).order_by("-fts_rank", "-trigram_sim")
+        qs = (
+            qs.annotate(
+                fts_rank=fts_rank,
+                trigram_sim=trigram_sim,
+            )
+            .filter(Q(search_vector=query_combined) | Q(trigram_sim__gte=0.15))
+            .order_by("-fts_rank", "-trigram_sim")
+        )
     if location:
         qs = qs.filter(location__icontains=location)
     if is_remote is not None:

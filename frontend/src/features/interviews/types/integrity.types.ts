@@ -42,10 +42,7 @@ export function computeIntegrityScore(flags: IntegrityFlag[]): number {
     medium: 15,
     high: 25,
   }
-  const totalPenalty = flags.reduce(
-    (acc, flag) => acc + (penalties[flag.severity] ?? 5),
-    0,
-  )
+  const totalPenalty = flags.reduce((acc, flag) => acc + (penalties[flag.severity] ?? 5), 0)
   return Math.max(0, 100 - totalPenalty)
 }
 

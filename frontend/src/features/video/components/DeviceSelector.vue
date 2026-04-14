@@ -18,18 +18,9 @@ const emit = defineEmits<{
     <select
       class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
       :value="selectedDevice"
-      @change="
-        emit(
-          'update:selectedDevice',
-          ($event.target as HTMLSelectElement).value,
-        )
-      "
+      @change="emit('update:selectedDevice', ($event.target as HTMLSelectElement).value)"
     >
-      <option
-        v-for="device in devices"
-        :key="device.deviceId"
-        :value="device.deviceId"
-      >
+      <option v-for="device in devices" :key="device.deviceId" :value="device.deviceId">
         {{ device.label }}
       </option>
     </select>

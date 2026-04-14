@@ -39,15 +39,19 @@ const displayLimit = computed(() => {
   <div class="space-y-1">
     <div class="flex items-center justify-between text-sm">
       <span class="font-medium text-gray-700">{{ label }}</span>
-      <span :class="colorClass">
-        {{ displayUsed }} / {{ displayLimit }}
-      </span>
+      <span :class="colorClass"> {{ displayUsed }} / {{ displayLimit }} </span>
     </div>
     <ProgressBar
       :value="percentage"
       :show-value="false"
       style="height: 8px"
-      :class="severity === 'danger' ? '[&_.p-progressbar-value]:!bg-red-500' : severity === 'warning' ? '[&_.p-progressbar-value]:!bg-yellow-500' : ''"
+      :class="
+        severity === 'danger'
+          ? '[&_.p-progressbar-value]:!bg-red-500'
+          : severity === 'warning'
+            ? '[&_.p-progressbar-value]:!bg-yellow-500'
+            : ''
+      "
     />
   </div>
 </template>

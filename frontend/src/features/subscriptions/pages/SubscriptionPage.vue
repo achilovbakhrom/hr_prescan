@@ -70,16 +70,19 @@ onMounted(async () => {
         <div class="mt-4 text-sm text-gray-600">
           <p>
             Current period:
-            {{ new Date(subscriptionStore.currentSubscription.currentPeriodStart).toLocaleDateString() }}
+            {{
+              new Date(
+                subscriptionStore.currentSubscription.currentPeriodStart,
+              ).toLocaleDateString()
+            }}
             —
-            {{ new Date(subscriptionStore.currentSubscription.currentPeriodEnd).toLocaleDateString() }}
+            {{
+              new Date(subscriptionStore.currentSubscription.currentPeriodEnd).toLocaleDateString()
+            }}
           </p>
         </div>
 
-        <div
-          v-if="subscriptionStore.currentSubscription.isActive"
-          class="mt-4"
-        >
+        <div v-if="subscriptionStore.currentSubscription.isActive" class="mt-4">
           <Button
             v-if="!showCancelConfirm"
             label="Cancel Subscription"
@@ -90,27 +93,14 @@ onMounted(async () => {
           />
           <div v-else class="flex items-center gap-2">
             <span class="text-sm text-red-600">Are you sure?</span>
-            <Button
-              label="Yes, cancel"
-              severity="danger"
-              size="small"
-              @click="handleCancel"
-            />
-            <Button
-              label="Keep plan"
-              outlined
-              size="small"
-              @click="showCancelConfirm = false"
-            />
+            <Button label="Yes, cancel" severity="danger" size="small" @click="handleCancel" />
+            <Button label="Keep plan" outlined size="small" @click="showCancelConfirm = false" />
           </div>
         </div>
       </div>
 
       <!-- Usage -->
-      <div
-        v-if="subscriptionStore.usage"
-        class="rounded-lg border border-gray-200 bg-white p-6"
-      >
+      <div v-if="subscriptionStore.usage" class="rounded-lg border border-gray-200 bg-white p-6">
         <h2 class="mb-4 text-lg font-semibold">{{ t('subscriptions.usage') }}</h2>
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <UsageMeter
@@ -146,9 +136,7 @@ onMounted(async () => {
             :key="plan.id"
             :plan="plan"
             :billing-period="upgradePeriod"
-            :is-current-plan="
-              subscriptionStore.currentSubscription?.plan.id === plan.id
-            "
+            :is-current-plan="subscriptionStore.currentSubscription?.plan.id === plan.id"
             @select="handleUpgrade"
           />
         </div>
@@ -157,9 +145,7 @@ onMounted(async () => {
       <!-- Billing History Placeholder -->
       <div class="rounded-lg border border-gray-200 bg-white p-6">
         <h2 class="mb-4 text-lg font-semibold">Billing History</h2>
-        <p class="text-sm text-gray-500">
-          Billing history will be available soon.
-        </p>
+        <p class="text-sm text-gray-500">Billing history will be available soon.</p>
       </div>
     </template>
   </div>

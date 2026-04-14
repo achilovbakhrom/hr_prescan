@@ -17,7 +17,6 @@ from apps.common.messages import (
     MSG_INVALID_URL,
     MSG_NO_INTERVIEW_QUESTIONS,
     MSG_NO_PRESCANNING_QUESTIONS,
-    MSG_ONLY_ARCHIVED_DELETE,
     MSG_ONLY_DRAFT_PAUSED_PUBLISH,
     MSG_ONLY_PUBLISHED_PAUSE,
     MSG_ONLY_PUBLISHED_PAUSED_ARCHIVE,
@@ -35,7 +34,12 @@ DEFAULT_CRITERIA = [
     {"name": "Communication", "description": "Clarity of expression and listening skills", "weight": 2, "order": 1},
     {"name": "Problem Solving", "description": "Analytical thinking and creative solutions", "weight": 3, "order": 2},
     {"name": "Cultural Fit", "description": "Alignment with company values and team dynamics", "weight": 2, "order": 3},
-    {"name": "Experience Relevance", "description": "Relevance of prior experience to the role", "weight": 2, "order": 4},
+    {
+        "name": "Experience Relevance",
+        "description": "Relevance of prior experience to the role",
+        "weight": 2,
+        "order": 4,
+    },
 ]
 
 
@@ -71,18 +75,32 @@ def update_vacancy(*, vacancy: Vacancy, data: dict) -> Vacancy:
     interview_mode can only be changed if the vacancy has no applications.
     """
     allowed_fields = {
-        "title", "description", "requirements", "responsibilities",
-        "skills", "salary_min", "salary_max", "salary_currency",
-        "location", "is_remote", "employment_type", "experience_level",
-        "deadline", "visibility", "interview_duration",
-        "interview_mode", "interview_enabled", "cv_required", "company_info",
-        "prescanning_prompt", "interview_prompt",
+        "title",
+        "description",
+        "requirements",
+        "responsibilities",
+        "skills",
+        "salary_min",
+        "salary_max",
+        "salary_currency",
+        "location",
+        "is_remote",
+        "employment_type",
+        "experience_level",
+        "deadline",
+        "visibility",
+        "interview_duration",
+        "interview_mode",
+        "interview_enabled",
+        "cv_required",
+        "company_info",
+        "prescanning_prompt",
+        "interview_prompt",
     }
 
     # Guard: interview_mode cannot be changed once applications exist
-    if "interview_mode" in data and data["interview_mode"] != vacancy.interview_mode:
-        if vacancy.applications.exists():
-            raise ApplicationError(str(MSG_CANNOT_CHANGE_MODE))
+    if "interview_mode" in data and data["interview_mode"] != vacancy.interview_mode and vacancy.applications.exists():
+        raise ApplicationError(str(MSG_CANNOT_CHANGE_MODE))
 
     update_fields: list[str] = []
 
@@ -118,7 +136,10 @@ def publish_vacancy(*, vacancy: Vacancy) -> Vacancy:
     if not vacancy.questions.filter(is_active=True, step=ScreeningStep.PRESCANNING).exists():
         raise ApplicationError(str(MSG_NO_PRESCANNING_QUESTIONS))
 
-    if vacancy.interview_enabled and not vacancy.questions.filter(is_active=True, step=ScreeningStep.INTERVIEW).exists():
+    if (
+        vacancy.interview_enabled
+        and not vacancy.questions.filter(is_active=True, step=ScreeningStep.INTERVIEW).exists()
+    ):
         raise ApplicationError(str(MSG_NO_INTERVIEW_QUESTIONS))
 
     vacancy.status = Vacancy.Status.PUBLISHED
@@ -190,9 +211,7 @@ def add_vacancy_criteria(
     step: str = ScreeningStep.PRESCANNING,
 ) -> VacancyCriteria:
     """Add a custom evaluation criteria to a vacancy."""
-    max_order = vacancy.criteria.filter(step=step).aggregate(
-        max_order=models.Max("order")
-    )["max_order"] or 0
+    max_order = vacancy.criteria.filter(step=step).aggregate(max_order=models.Max("order"))["max_order"] or 0
 
     return VacancyCriteria.objects.create(
         vacancy=vacancy,
@@ -237,9 +256,7 @@ def add_interview_question(
     step: str = ScreeningStep.PRESCANNING,
 ) -> InterviewQuestion:
     """Add a question to a vacancy for the specified step."""
-    max_order = vacancy.questions.filter(step=step).aggregate(
-        max_order=models.Max("order")
-    )["max_order"] or 0
+    max_order = vacancy.questions.filter(step=step).aggregate(max_order=models.Max("order"))["max_order"] or 0
 
     return InterviewQuestion.objects.create(
         vacancy=vacancy,
@@ -274,9 +291,7 @@ def delete_interview_question(*, question: InterviewQuestion) -> None:
     question.delete()
 
 
-def generate_interview_questions(
-    *, vacancy: Vacancy, step: str = ScreeningStep.PRESCANNING
-) -> list[InterviewQuestion]:
+def generate_interview_questions(*, vacancy: Vacancy, step: str = ScreeningStep.PRESCANNING) -> list[InterviewQuestion]:
     """Generate questions using OpenAI based on vacancy details and step type."""
     skills_text = ", ".join(vacancy.skills) if vacancy.skills else "not specified"
     criteria = list(vacancy.criteria.filter(step=step).values_list("name", flat=True))
@@ -332,13 +347,11 @@ def generate_interview_questions(
 
         data = json.loads(response.choices[0].message.content)
         questions_data = data.get("questions", [])
-    except Exception:
+    except Exception as exc:
         logger.exception("Failed to generate questions with AI for vacancy %s", vacancy.id)
-        raise ApplicationError(str(MSG_AI_QUESTIONS_FAILED))
+        raise ApplicationError(str(MSG_AI_QUESTIONS_FAILED)) from exc
 
-    max_order = vacancy.questions.filter(step=step).aggregate(
-        max_order=models.Max("order")
-    )["max_order"] or 0
+    max_order = vacancy.questions.filter(step=step).aggregate(max_order=models.Max("order"))["max_order"] or 0
 
     created_questions: list[InterviewQuestion] = []
     for i, q in enumerate(questions_data, start=1):
@@ -476,7 +489,7 @@ def _validate_url_not_internal(url: str) -> None:
         raise ApplicationError(str(MSG_INVALID_URL))
 
     # Block obvious internal hostnames
-    blocked_hostnames = {"localhost", "127.0.0.1", "::1", "0.0.0.0", "metadata.google.internal"}
+    blocked_hostnames = {"localhost", "127.0.0.1", "::1", "0.0.0.0", "metadata.google.internal"}  # noqa: S104 (SSRF blocklist, not a bind address)
     if hostname.lower() in blocked_hostnames:
         raise ApplicationError(str(MSG_INTERNAL_URL_NOT_ALLOWED))
 
@@ -498,9 +511,14 @@ def parse_company_info_from_url(*, url: str) -> str:
     _validate_url_not_internal(url)
 
     try:
-        response = requests.get(url, timeout=10, headers={
-            "User-Agent": "Mozilla/5.0 (compatible; HRPreScan/1.0)",
-        }, allow_redirects=True)
+        response = requests.get(
+            url,
+            timeout=10,
+            headers={
+                "User-Agent": "Mozilla/5.0 (compatible; HRPreScan/1.0)",
+            },
+            allow_redirects=True,
+        )
         response.raise_for_status()
     except requests.RequestException as exc:
         raise ApplicationError(str(MSG_WEBSITE_FETCH_FAILED)) from exc
@@ -547,14 +565,15 @@ def _generate_company_info_with_ai(*, text: str, source_label: str = "document")
             ],
         )
         return response.choices[0].message.content.strip()
-    except Exception:
+    except Exception as exc:
         logger.exception("Failed to generate company info with AI from %s", source_label)
-        raise ApplicationError(str(MSG_AI_COMPANY_INFO_FAILED))
+        raise ApplicationError(str(MSG_AI_COMPANY_INFO_FAILED)) from exc
 
 
 # ---------------------------------------------------------------------------
 # Employer Company services
 # ---------------------------------------------------------------------------
+
 
 def create_employer(*, company: Company, name: str, **kwargs: object) -> EmployerCompany:
     """Create a manually-entered employer company."""

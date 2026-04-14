@@ -75,13 +75,12 @@ const pipelineSteps = computed<PipelineStep[]>(() => [
                 <i :class="step.icon" class="text-2xl"></i>
               </div>
               <h3 class="mb-1.5 text-sm font-semibold text-gray-900">{{ step.title }}</h3>
-              <p class="max-w-[160px] text-xs leading-relaxed text-gray-500">{{ step.description }}</p>
+              <p class="max-w-[160px] text-xs leading-relaxed text-gray-500">
+                {{ step.description }}
+              </p>
             </div>
             <!-- Connector arrow -->
-            <div
-              v-if="idx < pipelineSteps.length - 1"
-              class="mt-6 flex shrink-0 items-center px-1"
-            >
+            <div v-if="idx < pipelineSteps.length - 1" class="mt-6 flex shrink-0 items-center px-1">
               <div class="h-px w-8 bg-gray-300"></div>
               <i class="pi pi-angle-right text-xs text-gray-400"></i>
             </div>
@@ -92,11 +91,7 @@ const pipelineSteps = computed<PipelineStep[]>(() => [
       <!-- Mobile: vertical flow -->
       <div class="scroll-animate lg:hidden">
         <div class="relative ml-6 border-l-2 border-gray-200 pl-8">
-          <div
-            v-for="(step, idx) in pipelineSteps"
-            :key="step.title"
-            class="relative pb-10 last:pb-0"
-          >
+          <div v-for="step in pipelineSteps" :key="step.title" class="relative pb-10 last:pb-0">
             <!-- Dot on the timeline -->
             <div
               class="absolute -left-[41px] flex h-10 w-10 items-center justify-center rounded-xl"

@@ -10,8 +10,4 @@ export interface MediaDeviceInfo {
   kind: 'audioinput' | 'audiooutput' | 'videoinput'
 }
 
-export type ConnectionState =
-  | 'disconnected'
-  | 'connecting'
-  | 'connected'
-  | 'reconnecting'
+export type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'reconnecting'

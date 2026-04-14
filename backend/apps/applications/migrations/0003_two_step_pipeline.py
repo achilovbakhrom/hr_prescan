@@ -20,7 +20,6 @@ def migrate_statuses_forward(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("applications", "0002_alter_application_status"),
         ("interviews", "0003_two_step_pipeline"),

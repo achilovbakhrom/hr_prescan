@@ -10,7 +10,9 @@ function loadHistory(): AIMessage[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (raw) return JSON.parse(raw) as AIMessage[]
-  } catch { /* corrupted data */ }
+  } catch {
+    /* corrupted data */
+  }
   return []
 }
 
@@ -30,16 +32,26 @@ export function useAIAssistant() {
   const route = useRoute()
   const router = useRouter()
 
-  function toggle() { isOpen.value = !isOpen.value }
-  function open() { isOpen.value = true }
-  function close() { isOpen.value = false }
+  function toggle() {
+    isOpen.value = !isOpen.value
+  }
+  function open() {
+    isOpen.value = true
+  }
+  function close() {
+    isOpen.value = false
+  }
 
-  function executeFrontendActions(actions: Array<{ tool: string; result: Record<string, unknown> }> | undefined): void {
+  function executeFrontendActions(
+    actions: Array<{ tool: string; result: Record<string, unknown> }> | undefined,
+  ): void {
     if (!actions) return
 
     for (const action of actions) {
       // Check both camelCase (after axios interceptor) and snake_case (raw)
-      const fa = (action.result?.frontendAction || action.result?.frontend_action) as FrontendAction | undefined
+      const fa = (action.result?.frontendAction || action.result?.frontend_action) as
+        | FrontendAction
+        | undefined
       if (!fa) continue
 
       if (fa.type === 'navigate' && fa.path) {

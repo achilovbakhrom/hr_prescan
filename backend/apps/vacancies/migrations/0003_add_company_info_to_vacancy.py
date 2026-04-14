@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('vacancies', '0002_vacancy_cv_required_vacancy_screening_mode'),
+        ("vacancies", "0002_vacancy_cv_required_vacancy_screening_mode"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='vacancy',
-            name='company_info',
-            field=models.TextField(blank=True, default=''),
+            model_name="vacancy",
+            name="company_info",
+            field=models.TextField(blank=True, default=""),
         ),
     ]

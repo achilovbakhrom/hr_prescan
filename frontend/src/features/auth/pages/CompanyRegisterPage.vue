@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import InputText from 'primevue/inputtext'
-import Password from 'primevue/password'
-import Button from 'primevue/button'
-import Select from 'primevue/select'
 import Message from 'primevue/message'
 import Stepper from 'primevue/stepper'
 import StepList from 'primevue/steplist'
@@ -71,12 +67,9 @@ function validateAdminStep(): boolean {
   adminStepSubmitted.value = true
   adminErrors.value.firstName = !adminFirstName.value.trim()
   adminErrors.value.lastName = !adminLastName.value.trim()
-  adminErrors.value.email =
-    !adminEmail.value || !adminEmail.value.includes('@')
-  adminErrors.value.password =
-    !adminPassword.value || adminPassword.value.length < 8
-  adminErrors.value.confirmPassword =
-    adminPassword.value !== confirmPassword.value
+  adminErrors.value.email = !adminEmail.value || !adminEmail.value.includes('@')
+  adminErrors.value.password = !adminPassword.value || adminPassword.value.length < 8
+  adminErrors.value.confirmPassword = adminPassword.value !== confirmPassword.value
   return !Object.values(adminErrors.value).some(Boolean)
 }
 
@@ -103,9 +96,7 @@ async function handleSubmit(): Promise<void> {
     registered.value = true
   } catch (err: unknown) {
     errorMessage.value =
-      err instanceof Error
-        ? err.message
-        : 'Registration failed. Please try again.'
+      err instanceof Error ? err.message : 'Registration failed. Please try again.'
   }
 }
 </script>
@@ -115,14 +106,11 @@ async function handleSubmit(): Promise<void> {
     <div class="w-full max-w-2xl rounded-lg bg-white p-8 shadow-md">
       <template v-if="registered">
         <div class="text-center">
-          <h1 class="mb-4 text-2xl font-bold text-gray-900">
-            Check Your Email
-          </h1>
+          <h1 class="mb-4 text-2xl font-bold text-gray-900">Check Your Email</h1>
           <p class="mb-6 text-gray-600">
             We've sent a verification link to
             <strong>{{ adminEmail }}</strong
-            >. Please check your inbox and click the link to activate your
-            account.
+            >. Please check your inbox and click the link to activate your account.
           </p>
           <RouterLink
             :to="{ name: ROUTE_NAMES.LOGIN }"

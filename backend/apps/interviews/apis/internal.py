@@ -6,7 +6,6 @@ They should only be reachable from within the Docker network.
 """
 
 import logging
-from decimal import Decimal, InvalidOperation
 from uuid import UUID
 
 from django.conf import settings
@@ -27,6 +26,7 @@ logger = logging.getLogger(__name__)
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _validate_internal_key(request: Request) -> bool:
     """Check that the request carries a valid internal API key."""
     key = request.headers.get("X-Internal-Key", "")
@@ -43,6 +43,7 @@ def _forbidden_response() -> Response:
 # ---------------------------------------------------------------------------
 # Serializers (kept co-located — they are only used by internal APIs)
 # ---------------------------------------------------------------------------
+
 
 class _InterviewScoreInputSerializer(serializers.Serializer):
     criteria_id = serializers.UUIDField()
@@ -74,6 +75,7 @@ class _InterviewResultsInputSerializer(serializers.Serializer):
 # Views
 # ---------------------------------------------------------------------------
 
+
 class InternalInterviewContextApi(APIView):
     """GET /api/internal/interviews/<id>/context/
 
@@ -88,8 +90,7 @@ class InternalInterviewContextApi(APIView):
             return _forbidden_response()
 
         interview = (
-            Interview.objects
-            .select_related(
+            Interview.objects.select_related(
                 "application",
                 "application__vacancy",
                 "application__vacancy__company",
@@ -112,18 +113,12 @@ class InternalInterviewContextApi(APIView):
 
         # Gather questions filtered by step
         questions = list(
-            vacancy.questions
-            .filter(is_active=True, step=step)
-            .order_by("order")
-            .values("text", "category")
+            vacancy.questions.filter(is_active=True, step=step).order_by("order").values("text", "category")
         )
 
         # Gather criteria filtered by step
         criteria = list(
-            vacancy.criteria
-            .filter(step=step)
-            .order_by("order")
-            .values("id", "name", "description", "weight")
+            vacancy.criteria.filter(step=step).order_by("order").values("id", "name", "description", "weight")
         )
         # Convert UUIDs to strings for JSON serialisation
         for c in criteria:
@@ -165,12 +160,7 @@ class InternalInterviewResultsApi(APIView):
         if not _validate_internal_key(request):
             return _forbidden_response()
 
-        interview = (
-            Interview.objects
-            .select_related("application")
-            .filter(id=interview_id)
-            .first()
-        )
+        interview = Interview.objects.select_related("application").filter(id=interview_id).first()
 
         if interview is None:
             return Response(

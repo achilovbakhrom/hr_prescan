@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import { useInterviewStore } from '../stores/interview.store'
 import ConnectionStatus from '@/features/video/components/ConnectionStatus.vue'
 import { useLiveKit } from '@/features/video/composables/useLiveKit'
 
-const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const interviewStore = useInterviewStore()
@@ -19,12 +17,7 @@ const livekitUrl = computed(() => {
   return import.meta.env.VITE_LIVEKIT_URL || 'wss://localhost:7880'
 })
 
-const {
-  connectionState,
-  error: livekitError,
-  connectAsObserver,
-  disconnect,
-} = useLiveKit()
+const { connectionState, error: livekitError, connectAsObserver, disconnect } = useLiveKit()
 
 const isJoined = ref(false)
 
@@ -68,10 +61,7 @@ async function handleLeave(): Promise<void> {
       {{ livekitError }}
     </p>
 
-    <div
-      v-if="interviewStore.loading && !interview"
-      class="py-12 text-center"
-    >
+    <div v-if="interviewStore.loading && !interview" class="py-12 text-center">
       <i class="pi pi-spinner pi-spin text-3xl text-gray-400"></i>
     </div>
 
@@ -83,19 +73,14 @@ async function handleLeave(): Promise<void> {
       >
         <i class="pi pi-info-circle mb-3 text-3xl text-yellow-500"></i>
         <p class="text-gray-700">
-          This interview is not currently in progress. You can only observe live
-          interviews.
+          This interview is not currently in progress. You can only observe live interviews.
         </p>
-        <p class="mt-2 text-sm text-gray-500">
-          Status: {{ interview.status }}
-        </p>
+        <p class="mt-2 text-sm text-gray-500">Status: {{ interview.status }}</p>
       </div>
 
       <!-- Observer View -->
       <template v-if="isJoined">
-        <div
-          class="flex items-center justify-between rounded-lg bg-white p-4 shadow-sm"
-        >
+        <div class="flex items-center justify-between rounded-lg bg-white p-4 shadow-sm">
           <div class="flex items-center gap-4">
             <ConnectionStatus :state="connectionState" />
             <span class="rounded bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700">
@@ -110,18 +95,14 @@ async function handleLeave(): Promise<void> {
         </div>
 
         <!-- Audio-only observer area -->
-        <div
-          class="flex min-h-[300px] items-center justify-center rounded-lg bg-gray-900 p-8"
-        >
+        <div class="flex min-h-[300px] items-center justify-center rounded-lg bg-gray-900 p-8">
           <div class="text-center">
             <div
               class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gray-700"
             >
               <i class="pi pi-headphones text-3xl text-gray-400"></i>
             </div>
-            <p class="text-sm text-gray-400">
-              Listening to interview audio
-            </p>
+            <p class="text-sm text-gray-400">Listening to interview audio</p>
             <p class="mt-1 text-xs text-gray-500">
               Observer mode - audio only, no video or mic published
             </p>

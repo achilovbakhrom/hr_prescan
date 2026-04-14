@@ -77,7 +77,9 @@ function initials(): string {
             class="flex items-center gap-2 rounded-lg px-2 py-1 transition-colors hover:bg-gray-100"
             @click="toggleUserMenu"
           >
-            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-medium text-blue-700">
+            <div
+              class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-medium text-blue-700"
+            >
               {{ initials() }}
             </div>
             <span class="hidden text-sm font-medium text-gray-700 sm:inline">

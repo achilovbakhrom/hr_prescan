@@ -10,7 +10,11 @@ import Button from 'primevue/button'
 import Tag from 'primevue/tag'
 import { vacancyService } from '../services/vacancy.service'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
-import { EMPLOYMENT_LABELS, EXPERIENCE_LABELS, formatSalaryRange } from '../composables/useVacancyLabels'
+import {
+  EMPLOYMENT_LABELS,
+  EXPERIENCE_LABELS,
+  formatSalaryRange,
+} from '../composables/useVacancyLabels'
 import type { Vacancy } from '../types/vacancy.types'
 
 const { t } = useI18n()
@@ -31,7 +35,11 @@ const employmentOptions = computed(() => [
   { value: 'full_time', label: t('vacancies.employment.fullTime'), icon: 'pi pi-clock' },
   { value: 'part_time', label: t('vacancies.employment.partTime'), icon: 'pi pi-hourglass' },
   { value: 'contract', label: t('vacancies.employment.contract'), icon: 'pi pi-file' },
-  { value: 'internship', label: t('vacancies.employment.internship'), icon: 'pi pi-graduation-cap' },
+  {
+    value: 'internship',
+    label: t('vacancies.employment.internship'),
+    icon: 'pi pi-graduation-cap',
+  },
 ])
 
 const experienceOptions = computed(() => [
@@ -74,7 +82,9 @@ async function fetchJobs(): Promise<void> {
       salaryMin: salaryMin.value ?? undefined,
       salaryMax: salaryMax.value ?? undefined,
     })
-  } catch { /* silent */ } finally {
+  } catch {
+    /* silent */
+  } finally {
     loading.value = false
   }
 }
@@ -107,6 +117,11 @@ function clearFilters(): void {
 
 function navigateToDetail(id: string): void {
   router.push({ name: ROUTE_NAMES.JOB_DETAIL, params: { id } })
+}
+
+function getEmployerName(job: Vacancy): string | undefined {
+  const j = job as unknown as Record<string, unknown>
+  return (j.employerName as string) || (j.companyName as string) || undefined
 }
 
 function formatRelativeDate(dateStr: string): string {
@@ -149,7 +164,12 @@ function formatRelativeDate(dateStr: string): string {
               @keyup.enter="fetchJobs"
             />
           </IconField>
-          <Button :label="t('common.search')" icon="pi pi-search" :loading="loading" @click="fetchJobs" />
+          <Button
+            :label="t('common.search')"
+            icon="pi pi-search"
+            :loading="loading"
+            @click="fetchJobs"
+          />
         </div>
       </div>
     </div>
@@ -162,8 +182,12 @@ function formatRelativeDate(dateStr: string): string {
           <div class="sticky top-4 space-y-6">
             <!-- Active filters -->
             <div v-if="activeFilterCount > 0" class="flex items-center justify-between">
-              <span class="text-xs font-medium text-gray-500">{{ activeFilterCount }} {{ t('jobBoard.activeFilters') }}</span>
-              <button class="text-xs text-blue-600 hover:underline" @click="clearFilters">{{ t('jobBoard.clearAll') }}</button>
+              <span class="text-xs font-medium text-gray-500"
+                >{{ activeFilterCount }} {{ t('jobBoard.activeFilters') }}</span
+              >
+              <button class="text-xs text-blue-600 hover:underline" @click="clearFilters">
+                {{ t('jobBoard.clearAll') }}
+              </button>
             </div>
 
             <!-- Remote toggle -->
@@ -180,12 +204,19 @@ function formatRelativeDate(dateStr: string): string {
 
             <!-- Employment Type -->
             <div>
-              <h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">{{ t('vacancies.form.employmentType') }}</h3>
+              <h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                {{ t('vacancies.form.employmentType') }}
+              </h3>
               <div class="space-y-1">
                 <button
-                  v-for="opt in employmentOptions" :key="opt.value"
+                  v-for="opt in employmentOptions"
+                  :key="opt.value"
                   class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors"
-                  :class="employmentType === opt.value ? 'bg-blue-50 font-medium text-blue-700' : 'text-gray-600 hover:bg-gray-100'"
+                  :class="
+                    employmentType === opt.value
+                      ? 'bg-blue-50 font-medium text-blue-700'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  "
                   @click="toggleEmploymentType(opt.value)"
                 >
                   <i :class="opt.icon" class="text-xs"></i>
@@ -196,12 +227,19 @@ function formatRelativeDate(dateStr: string): string {
 
             <!-- Experience Level -->
             <div>
-              <h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">{{ t('vacancies.form.experienceLevel') }}</h3>
+              <h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                {{ t('vacancies.form.experienceLevel') }}
+              </h3>
               <div class="space-y-1">
                 <button
-                  v-for="opt in experienceOptions" :key="opt.value"
+                  v-for="opt in experienceOptions"
+                  :key="opt.value"
                   class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors"
-                  :class="experienceLevel === opt.value ? 'bg-blue-50 font-medium text-blue-700' : 'text-gray-600 hover:bg-gray-100'"
+                  :class="
+                    experienceLevel === opt.value
+                      ? 'bg-blue-50 font-medium text-blue-700'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  "
                   @click="toggleExperienceLevel(opt.value)"
                 >
                   {{ opt.label }}
@@ -211,7 +249,9 @@ function formatRelativeDate(dateStr: string): string {
 
             <!-- Salary Range -->
             <div>
-              <h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">{{ t('jobBoard.salaryRange') }}</h3>
+              <h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                {{ t('jobBoard.salaryRange') }}
+              </h3>
               <div class="space-y-2">
                 <InputNumber
                   v-model="salaryMin"
@@ -240,15 +280,24 @@ function formatRelativeDate(dateStr: string): string {
         <div class="mb-4 flex flex-wrap gap-2 lg:hidden">
           <button
             class="rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
-            :class="remoteOnly ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600'"
+            :class="
+              remoteOnly
+                ? 'border-blue-200 bg-blue-50 text-blue-700'
+                : 'border-gray-200 text-gray-600'
+            "
             @click="toggleRemote"
           >
             {{ t('vacancies.overview.remote') }}
           </button>
           <button
-            v-for="opt in employmentOptions" :key="opt.value"
+            v-for="opt in employmentOptions"
+            :key="opt.value"
             class="rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
-            :class="employmentType === opt.value ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600'"
+            :class="
+              employmentType === opt.value
+                ? 'border-blue-200 bg-blue-50 text-blue-700'
+                : 'border-gray-200 text-gray-600'
+            "
             @click="toggleEmploymentType(opt.value)"
           >
             {{ opt.label }}
@@ -265,7 +314,8 @@ function formatRelativeDate(dateStr: string): string {
           <!-- Results -->
           <div v-else-if="jobs.length > 0" class="space-y-3">
             <div
-              v-for="job in jobs" :key="job.id"
+              v-for="job in jobs"
+              :key="job.id"
               class="group cursor-pointer rounded-xl border border-gray-100 bg-white p-5 transition-all hover:border-blue-200 hover:shadow-md"
               @click="navigateToDetail(job.id)"
             >
@@ -275,8 +325,8 @@ function formatRelativeDate(dateStr: string): string {
                   <h2 class="text-base font-semibold text-gray-900 group-hover:text-blue-600">
                     {{ job.title }}
                   </h2>
-                  <p v-if="(job as Record<string, unknown>).employerName || (job as Record<string, unknown>).companyName" class="mt-0.5 text-sm text-gray-500">
-                    <i class="pi pi-building mr-1 text-xs"></i>{{ (job as Record<string, unknown>).employerName || (job as Record<string, unknown>).companyName }}
+                  <p v-if="getEmployerName(job)" class="mt-0.5 text-sm text-gray-500">
+                    <i class="pi pi-building mr-1 text-xs"></i>{{ getEmployerName(job) }}
                   </p>
                 </div>
                 <span
@@ -292,7 +342,12 @@ function formatRelativeDate(dateStr: string): string {
                 <span v-if="job.location" class="flex items-center gap-1 text-sm text-gray-500">
                   <i class="pi pi-map-marker text-xs"></i>{{ job.location }}
                 </span>
-                <Tag v-if="job.isRemote" :value="t('vacancies.overview.remote')" severity="info" class="text-xs" />
+                <Tag
+                  v-if="job.isRemote"
+                  :value="t('vacancies.overview.remote')"
+                  severity="info"
+                  class="text-xs"
+                />
                 <span class="rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
                   {{ EMPLOYMENT_LABELS[job.employmentType] || job.employmentType }}
                 </span>
@@ -310,28 +365,44 @@ function formatRelativeDate(dateStr: string): string {
               <div class="mt-3 flex items-center justify-between">
                 <div v-if="job.skills?.length" class="flex flex-wrap gap-1.5">
                   <span
-                    v-for="skill in job.skills.slice(0, 4)" :key="skill"
+                    v-for="skill in job.skills.slice(0, 4)"
+                    :key="skill"
                     class="rounded-md bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600"
                   >
                     {{ skill }}
                   </span>
-                  <span v-if="job.skills.length > 4" class="rounded-md bg-gray-50 px-2 py-0.5 text-xs text-gray-400">
+                  <span
+                    v-if="job.skills.length > 4"
+                    class="rounded-md bg-gray-50 px-2 py-0.5 text-xs text-gray-400"
+                  >
                     +{{ job.skills.length - 4 }}
                   </span>
                 </div>
-                <span class="shrink-0 text-xs text-gray-400">{{ formatRelativeDate(job.createdAt) }}</span>
+                <span class="shrink-0 text-xs text-gray-400">{{
+                  formatRelativeDate(job.createdAt)
+                }}</span>
               </div>
             </div>
           </div>
 
           <!-- Empty -->
-          <div v-else class="flex flex-col items-center rounded-xl border border-dashed border-gray-200 bg-white py-20 text-center">
+          <div
+            v-else
+            class="flex flex-col items-center rounded-xl border border-dashed border-gray-200 bg-white py-20 text-center"
+          >
             <div class="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
               <i class="pi pi-search text-2xl text-gray-400"></i>
             </div>
             <p class="mt-4 font-medium text-gray-600">{{ t('jobBoard.noJobs') }}</p>
             <p class="mt-1 text-sm text-gray-400">{{ t('jobBoard.noJobsHint') }}</p>
-            <Button v-if="activeFilterCount > 0" :label="t('common.clearFilters')" text size="small" class="mt-3" @click="clearFilters" />
+            <Button
+              v-if="activeFilterCount > 0"
+              :label="t('common.clearFilters')"
+              text
+              size="small"
+              class="mt-3"
+              @click="clearFilters"
+            />
           </div>
         </div>
       </div>

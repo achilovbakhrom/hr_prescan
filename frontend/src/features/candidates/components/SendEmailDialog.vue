@@ -7,8 +7,6 @@ import Textarea from 'primevue/textarea'
 import Button from 'primevue/button'
 import { candidateService } from '../services/candidate.service'
 
-const { t } = useI18n()
-
 const props = defineProps<{
   visible: boolean
   candidateId: string
@@ -18,6 +16,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   close: []
 }>()
+
+const { t } = useI18n()
 
 const subject = ref('')
 const body = ref('')
@@ -69,42 +69,22 @@ async function handleSend(): Promise<void> {
     </div>
 
     <div v-else class="space-y-4">
-      <p class="text-sm text-gray-500">
-        To: {{ props.candidateEmail }}
-      </p>
+      <p class="text-sm text-gray-500">To: {{ props.candidateEmail }}</p>
 
       <div>
-        <label class="mb-1 block text-sm font-medium text-gray-700">
-          Subject
-        </label>
-        <InputText
-          v-model="subject"
-          class="w-full"
-          placeholder="Email subject"
-        />
+        <label class="mb-1 block text-sm font-medium text-gray-700"> Subject </label>
+        <InputText v-model="subject" class="w-full" placeholder="Email subject" />
       </div>
 
       <div>
-        <label class="mb-1 block text-sm font-medium text-gray-700">
-          Body
-        </label>
-        <Textarea
-          v-model="body"
-          class="w-full"
-          rows="6"
-          placeholder="Email body"
-        />
+        <label class="mb-1 block text-sm font-medium text-gray-700"> Body </label>
+        <Textarea v-model="body" class="w-full" rows="6" placeholder="Email body" />
       </div>
     </div>
 
     <template #footer>
       <div v-if="!sent" class="flex justify-end gap-2">
-        <Button
-          :label="t('common.cancel')"
-          severity="secondary"
-          text
-          @click="emit('close')"
-        />
+        <Button :label="t('common.cancel')" severity="secondary" text @click="emit('close')" />
         <Button
           :label="t('interviews.chat.send')"
           icon="pi pi-send"

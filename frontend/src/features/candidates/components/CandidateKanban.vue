@@ -9,8 +9,6 @@ import Button from 'primevue/button'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { Application, ApplicationStatus } from '../types/candidate.types'
 
-const { t } = useI18n()
-
 const props = defineProps<{
   candidates: Application[]
   loading: boolean
@@ -20,11 +18,19 @@ const props = defineProps<{
 const emit = defineEmits<{
   statusChange: [id: string, status: ApplicationStatus]
   batchMove: [fromStatus: ApplicationStatus, toStatus: ApplicationStatus]
-  batchMoveByScore: [fromStatus: ApplicationStatus, toStatus: ApplicationStatus, scoreField: string, threshold: number, direction: 'below' | 'above']
+  batchMoveByScore: [
+    fromStatus: ApplicationStatus,
+    toStatus: ApplicationStatus,
+    scoreField: string,
+    threshold: number,
+    direction: 'below' | 'above',
+  ]
   batchMoveNoCv: [fromStatus: ApplicationStatus, toStatus: ApplicationStatus]
   batchMoveByDays: [fromStatus: ApplicationStatus, toStatus: ApplicationStatus, days: number]
   softDeleteAll: [status: ApplicationStatus]
 }>()
+
+const { t } = useI18n()
 
 const router = useRouter()
 
@@ -38,19 +44,66 @@ interface KanbanColumn {
 }
 
 const columns = computed<KanbanColumn[]>(() => [
-  { status: 'applied', label: t('candidates.status.applied'), color: 'text-blue-700', bgColor: 'bg-blue-50', borderColor: 'border-blue-200', dotColor: 'bg-blue-500' },
-  { status: 'prescanned', label: t('candidates.status.prescanned'), color: 'text-teal-700', bgColor: 'bg-teal-50', borderColor: 'border-teal-200', dotColor: 'bg-teal-500' },
-  { status: 'interviewed', label: t('candidates.status.interviewed'), color: 'text-emerald-700', bgColor: 'bg-emerald-50', borderColor: 'border-emerald-200', dotColor: 'bg-emerald-500' },
-  { status: 'shortlisted', label: t('candidates.status.shortlisted'), color: 'text-violet-700', bgColor: 'bg-violet-50', borderColor: 'border-violet-200', dotColor: 'bg-violet-500' },
-  { status: 'hired', label: t('candidates.status.hired'), color: 'text-green-700', bgColor: 'bg-green-50', borderColor: 'border-green-200', dotColor: 'bg-green-500' },
-  { status: 'rejected', label: t('candidates.status.rejected'), color: 'text-red-700', bgColor: 'bg-red-50', borderColor: 'border-red-200', dotColor: 'bg-red-500' },
-  { status: 'archived', label: t('candidates.status.archived'), color: 'text-gray-600', bgColor: 'bg-gray-100', borderColor: 'border-gray-200', dotColor: 'bg-gray-400' },
+  {
+    status: 'applied',
+    label: t('candidates.status.applied'),
+    color: 'text-blue-700',
+    bgColor: 'bg-blue-50',
+    borderColor: 'border-blue-200',
+    dotColor: 'bg-blue-500',
+  },
+  {
+    status: 'prescanned',
+    label: t('candidates.status.prescanned'),
+    color: 'text-teal-700',
+    bgColor: 'bg-teal-50',
+    borderColor: 'border-teal-200',
+    dotColor: 'bg-teal-500',
+  },
+  {
+    status: 'interviewed',
+    label: t('candidates.status.interviewed'),
+    color: 'text-emerald-700',
+    bgColor: 'bg-emerald-50',
+    borderColor: 'border-emerald-200',
+    dotColor: 'bg-emerald-500',
+  },
+  {
+    status: 'shortlisted',
+    label: t('candidates.status.shortlisted'),
+    color: 'text-violet-700',
+    bgColor: 'bg-violet-50',
+    borderColor: 'border-violet-200',
+    dotColor: 'bg-violet-500',
+  },
+  {
+    status: 'hired',
+    label: t('candidates.status.hired'),
+    color: 'text-green-700',
+    bgColor: 'bg-green-50',
+    borderColor: 'border-green-200',
+    dotColor: 'bg-green-500',
+  },
+  {
+    status: 'rejected',
+    label: t('candidates.status.rejected'),
+    color: 'text-red-700',
+    bgColor: 'bg-red-50',
+    borderColor: 'border-red-200',
+    dotColor: 'bg-red-500',
+  },
+  {
+    status: 'archived',
+    label: t('candidates.status.archived'),
+    color: 'text-gray-600',
+    bgColor: 'bg-gray-100',
+    borderColor: 'border-gray-200',
+    dotColor: 'bg-gray-400',
+  },
 ])
 
 const visibleColumns = computed(() =>
-  props.interviewEnabled
-    ? columns.value
-    : columns.value.filter((c) => c.status !== 'interviewed'),
+  props.interviewEnabled ? columns.value : columns.value.filter((c) => c.status !== 'interviewed'),
 )
 
 // --- Column menu ---
@@ -70,57 +123,169 @@ function getColumnMenuItems(status: ApplicationStatus) {
   if (count === 0) return [{ label: 'No candidates', icon: 'pi pi-info-circle', command: () => {} }]
 
   if (status === 'applied') {
-    items.push({ label: 'Reject all', icon: 'pi pi-times', command: () => emit('batchMove', 'applied', 'rejected') })
-    items.push({ label: 'Reject by CV match < ...', icon: 'pi pi-filter', command: () => openThresholdDialog('applied', 'rejected', 'match_score', 'below') })
-    items.push({ label: 'Reject with no CV', icon: 'pi pi-file', command: () => emit('batchMoveNoCv', 'applied', 'rejected') })
-    items.push({ label: 'Reject idle > ... days', icon: 'pi pi-clock', command: () => openDaysDialog('applied', 'rejected') })
+    items.push({
+      label: 'Reject all',
+      icon: 'pi pi-times',
+      command: () => emit('batchMove', 'applied', 'rejected'),
+    })
+    items.push({
+      label: 'Reject by CV match < ...',
+      icon: 'pi pi-filter',
+      command: () => openThresholdDialog('applied', 'rejected', 'match_score', 'below'),
+    })
+    items.push({
+      label: 'Reject with no CV',
+      icon: 'pi pi-file',
+      command: () => emit('batchMoveNoCv', 'applied', 'rejected'),
+    })
+    items.push({
+      label: 'Reject idle > ... days',
+      icon: 'pi pi-clock',
+      command: () => openDaysDialog('applied', 'rejected'),
+    })
     items.push({ label: '', icon: '', command: () => {}, separator: true })
-    items.push({ label: 'Shortlist all', icon: 'pi pi-star', command: () => emit('batchMove', 'applied', 'shortlisted') })
-    items.push({ label: 'Hire all', icon: 'pi pi-check-circle', command: () => emit('batchMove', 'applied', 'hired') })
-    items.push({ label: 'Archive all', icon: 'pi pi-inbox', command: () => emit('batchMove', 'applied', 'archived') })
+    items.push({
+      label: 'Shortlist all',
+      icon: 'pi pi-star',
+      command: () => emit('batchMove', 'applied', 'shortlisted'),
+    })
+    items.push({
+      label: 'Hire all',
+      icon: 'pi pi-check-circle',
+      command: () => emit('batchMove', 'applied', 'hired'),
+    })
+    items.push({
+      label: 'Archive all',
+      icon: 'pi pi-inbox',
+      command: () => emit('batchMove', 'applied', 'archived'),
+    })
   }
 
   if (status === 'prescanned') {
     if (props.interviewEnabled) {
-      items.push({ label: 'Move all to Interviewed', icon: 'pi pi-arrow-right', command: () => emit('batchMove', 'prescanned', 'interviewed') })
+      items.push({
+        label: 'Move all to Interviewed',
+        icon: 'pi pi-arrow-right',
+        command: () => emit('batchMove', 'prescanned', 'interviewed'),
+      })
     }
-    items.push({ label: 'Shortlist all', icon: 'pi pi-star', command: () => emit('batchMove', 'prescanned', 'shortlisted') })
-    items.push({ label: 'Hire all', icon: 'pi pi-check-circle', command: () => emit('batchMove', 'prescanned', 'hired') })
+    items.push({
+      label: 'Shortlist all',
+      icon: 'pi pi-star',
+      command: () => emit('batchMove', 'prescanned', 'shortlisted'),
+    })
+    items.push({
+      label: 'Hire all',
+      icon: 'pi pi-check-circle',
+      command: () => emit('batchMove', 'prescanned', 'hired'),
+    })
     items.push({ label: '', icon: '', command: () => {}, separator: true })
-    items.push({ label: 'Reject all', icon: 'pi pi-times', command: () => emit('batchMove', 'prescanned', 'rejected') })
-    items.push({ label: 'Reject by prescan score < ...', icon: 'pi pi-filter', command: () => openThresholdDialog('prescanned', 'rejected', 'prescanning_score', 'below') })
-    items.push({ label: 'Shortlist by prescan score > ...', icon: 'pi pi-filter', command: () => openThresholdDialog('prescanned', 'shortlisted', 'prescanning_score', 'above') })
-    items.push({ label: 'Archive all', icon: 'pi pi-inbox', command: () => emit('batchMove', 'prescanned', 'archived') })
+    items.push({
+      label: 'Reject all',
+      icon: 'pi pi-times',
+      command: () => emit('batchMove', 'prescanned', 'rejected'),
+    })
+    items.push({
+      label: 'Reject by prescan score < ...',
+      icon: 'pi pi-filter',
+      command: () => openThresholdDialog('prescanned', 'rejected', 'prescanning_score', 'below'),
+    })
+    items.push({
+      label: 'Shortlist by prescan score > ...',
+      icon: 'pi pi-filter',
+      command: () => openThresholdDialog('prescanned', 'shortlisted', 'prescanning_score', 'above'),
+    })
+    items.push({
+      label: 'Archive all',
+      icon: 'pi pi-inbox',
+      command: () => emit('batchMove', 'prescanned', 'archived'),
+    })
   }
 
   if (status === 'interviewed') {
-    items.push({ label: 'Shortlist all', icon: 'pi pi-star', command: () => emit('batchMove', 'interviewed', 'shortlisted') })
-    items.push({ label: 'Hire all', icon: 'pi pi-check-circle', command: () => emit('batchMove', 'interviewed', 'hired') })
+    items.push({
+      label: 'Shortlist all',
+      icon: 'pi pi-star',
+      command: () => emit('batchMove', 'interviewed', 'shortlisted'),
+    })
+    items.push({
+      label: 'Hire all',
+      icon: 'pi pi-check-circle',
+      command: () => emit('batchMove', 'interviewed', 'hired'),
+    })
     items.push({ label: '', icon: '', command: () => {}, separator: true })
-    items.push({ label: 'Reject all', icon: 'pi pi-times', command: () => emit('batchMove', 'interviewed', 'rejected') })
-    items.push({ label: 'Reject by interview score < ...', icon: 'pi pi-filter', command: () => openThresholdDialog('interviewed', 'rejected', 'interview_score', 'below') })
-    items.push({ label: 'Shortlist by interview score > ...', icon: 'pi pi-filter', command: () => openThresholdDialog('interviewed', 'shortlisted', 'interview_score', 'above') })
-    items.push({ label: 'Archive all', icon: 'pi pi-inbox', command: () => emit('batchMove', 'interviewed', 'archived') })
+    items.push({
+      label: 'Reject all',
+      icon: 'pi pi-times',
+      command: () => emit('batchMove', 'interviewed', 'rejected'),
+    })
+    items.push({
+      label: 'Reject by interview score < ...',
+      icon: 'pi pi-filter',
+      command: () => openThresholdDialog('interviewed', 'rejected', 'interview_score', 'below'),
+    })
+    items.push({
+      label: 'Shortlist by interview score > ...',
+      icon: 'pi pi-filter',
+      command: () => openThresholdDialog('interviewed', 'shortlisted', 'interview_score', 'above'),
+    })
+    items.push({
+      label: 'Archive all',
+      icon: 'pi pi-inbox',
+      command: () => emit('batchMove', 'interviewed', 'archived'),
+    })
   }
 
   if (status === 'shortlisted') {
-    items.push({ label: 'Hire all', icon: 'pi pi-check-circle', command: () => emit('batchMove', 'shortlisted', 'hired') })
-    items.push({ label: 'Reject all', icon: 'pi pi-times', command: () => emit('batchMove', 'shortlisted', 'rejected') })
-    items.push({ label: 'Archive all', icon: 'pi pi-inbox', command: () => emit('batchMove', 'shortlisted', 'archived') })
+    items.push({
+      label: 'Hire all',
+      icon: 'pi pi-check-circle',
+      command: () => emit('batchMove', 'shortlisted', 'hired'),
+    })
+    items.push({
+      label: 'Reject all',
+      icon: 'pi pi-times',
+      command: () => emit('batchMove', 'shortlisted', 'rejected'),
+    })
+    items.push({
+      label: 'Archive all',
+      icon: 'pi pi-inbox',
+      command: () => emit('batchMove', 'shortlisted', 'archived'),
+    })
   }
 
   if (status === 'hired') {
-    items.push({ label: 'Archive all', icon: 'pi pi-inbox', command: () => emit('batchMove', 'hired', 'archived') })
+    items.push({
+      label: 'Archive all',
+      icon: 'pi pi-inbox',
+      command: () => emit('batchMove', 'hired', 'archived'),
+    })
   }
 
   if (status === 'rejected') {
-    items.push({ label: 'Archive all', icon: 'pi pi-inbox', command: () => emit('batchMove', 'rejected', 'archived') })
-    items.push({ label: 'Reset all to Applied', icon: 'pi pi-refresh', command: () => emit('batchMove', 'rejected', 'applied') })
+    items.push({
+      label: 'Archive all',
+      icon: 'pi pi-inbox',
+      command: () => emit('batchMove', 'rejected', 'archived'),
+    })
+    items.push({
+      label: 'Reset all to Applied',
+      icon: 'pi pi-refresh',
+      command: () => emit('batchMove', 'rejected', 'applied'),
+    })
   }
 
   if (status === 'archived') {
-    items.push({ label: 'Restore all to Applied', icon: 'pi pi-refresh', command: () => emit('batchMove', 'archived', 'applied') })
-    items.push({ label: 'Clear all (soft delete)', icon: 'pi pi-trash', command: () => emit('softDeleteAll', 'archived') })
+    items.push({
+      label: 'Restore all to Applied',
+      icon: 'pi pi-refresh',
+      command: () => emit('batchMove', 'archived', 'applied'),
+    })
+    items.push({
+      label: 'Clear all (soft delete)',
+      icon: 'pi pi-trash',
+      command: () => emit('softDeleteAll', 'archived'),
+    })
   }
 
   return items
@@ -136,7 +301,12 @@ const thresholdContext = ref<{
   direction: 'below' | 'above'
 }>({ fromStatus: 'applied', toStatus: 'rejected', scoreField: 'match_score', direction: 'below' })
 
-function openThresholdDialog(from: ApplicationStatus, to: ApplicationStatus, field: string, dir: 'below' | 'above') {
+function openThresholdDialog(
+  from: ApplicationStatus,
+  to: ApplicationStatus,
+  field: string,
+  dir: 'below' | 'above',
+) {
   thresholdContext.value = { fromStatus: from, toStatus: to, scoreField: field, direction: dir }
   thresholdValue.value = dir === 'below' ? 4 : 7
   showThresholdDialog.value = true
@@ -145,23 +315,40 @@ function openThresholdDialog(from: ApplicationStatus, to: ApplicationStatus, fie
 function confirmThreshold() {
   if (thresholdValue.value == null) return
   const ctx = thresholdContext.value
-  emit('batchMoveByScore', ctx.fromStatus, ctx.toStatus, ctx.scoreField, thresholdValue.value, ctx.direction)
+  emit(
+    'batchMoveByScore',
+    ctx.fromStatus,
+    ctx.toStatus,
+    ctx.scoreField,
+    thresholdValue.value,
+    ctx.direction,
+  )
   showThresholdDialog.value = false
 }
 
 const thresholdDialogTitle = computed(() => {
   const ctx = thresholdContext.value
-  const fieldLabel = ctx.scoreField === 'match_score' ? 'CV match' : ctx.scoreField === 'prescanning_score' ? 'prescanning score' : 'interview score'
+  const fieldLabel =
+    ctx.scoreField === 'match_score'
+      ? 'CV match'
+      : ctx.scoreField === 'prescanning_score'
+        ? 'prescanning score'
+        : 'interview score'
   const dirLabel = ctx.direction === 'below' ? 'below' : 'above'
   return `${ctx.toStatus === 'rejected' ? 'Reject' : 'Shortlist'} where ${fieldLabel} ${dirLabel}...`
 })
 
-const thresholdMax = computed(() => thresholdContext.value.scoreField === 'match_score' ? 100 : 10)
+const thresholdMax = computed(() =>
+  thresholdContext.value.scoreField === 'match_score' ? 100 : 10,
+)
 
 // --- Days dialog ---
 const showDaysDialog = ref(false)
 const daysValue = ref<number | null>(7)
-const daysContext = ref<{ fromStatus: ApplicationStatus; toStatus: ApplicationStatus }>({ fromStatus: 'applied', toStatus: 'rejected' })
+const daysContext = ref<{ fromStatus: ApplicationStatus; toStatus: ApplicationStatus }>({
+  fromStatus: 'applied',
+  toStatus: 'rejected',
+})
 
 function openDaysDialog(from: ApplicationStatus, to: ApplicationStatus) {
   daysContext.value = { fromStatus: from, toStatus: to }
@@ -316,7 +503,10 @@ function onDragOver(event: DragEvent): void {
             <div
               v-if="getOverallScore(candidate) != null"
               class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 text-xs font-bold"
-              :class="[getScoreColor(getOverallScore(candidate)!), getScoreRingColor(getOverallScore(candidate)!)]"
+              :class="[
+                getScoreColor(getOverallScore(candidate)!),
+                getScoreRingColor(getOverallScore(candidate)!),
+              ]"
               :title="`Overall score: ${getOverallScore(candidate)}%`"
             >
               {{ getOverallScore(candidate) }}
@@ -338,7 +528,11 @@ function onDragOver(event: DragEvent): void {
 
           <!-- Bottom: individual score badges -->
           <div
-            v-if="candidate.matchScore !== null || candidate.prescanningScore != null || candidate.interviewScore != null"
+            v-if="
+              candidate.matchScore !== null ||
+              candidate.prescanningScore != null ||
+              candidate.interviewScore != null
+            "
             class="mt-2 flex flex-wrap gap-1"
           >
             <span
@@ -391,27 +585,60 @@ function onDragOver(event: DragEvent): void {
   </div>
 
   <!-- Threshold input dialog -->
-  <Dialog v-model:visible="showThresholdDialog" :header="thresholdDialogTitle" modal :style="{ width: '360px' }">
+  <Dialog
+    v-model:visible="showThresholdDialog"
+    :header="thresholdDialogTitle"
+    modal
+    :style="{ width: '360px' }"
+  >
     <div class="flex flex-col gap-3">
       <label class="text-sm text-gray-600">
         {{ thresholdContext.direction === 'below' ? 'Score below' : 'Score above' }}
       </label>
-      <InputNumber v-model="thresholdValue" :min="0" :max="thresholdMax" show-buttons class="w-full" />
+      <InputNumber
+        v-model="thresholdValue"
+        :min="0"
+        :max="thresholdMax"
+        show-buttons
+        class="w-full"
+      />
     </div>
     <template #footer>
-      <Button :label="t('common.cancel')" severity="secondary" text @click="showThresholdDialog = false" />
+      <Button
+        :label="t('common.cancel')"
+        severity="secondary"
+        text
+        @click="showThresholdDialog = false"
+      />
       <Button :label="t('common.confirm')" @click="confirmThreshold" />
     </template>
   </Dialog>
 
   <!-- Days input dialog -->
-  <Dialog v-model:visible="showDaysDialog" header="Reject idle candidates" modal :style="{ width: '360px' }">
+  <Dialog
+    v-model:visible="showDaysDialog"
+    header="Reject idle candidates"
+    modal
+    :style="{ width: '360px' }"
+  >
     <div class="flex flex-col gap-3">
       <label class="text-sm text-gray-600">Applied more than ... days ago</label>
-      <InputNumber v-model="daysValue" :min="1" :max="365" show-buttons suffix=" days" class="w-full" />
+      <InputNumber
+        v-model="daysValue"
+        :min="1"
+        :max="365"
+        show-buttons
+        suffix=" days"
+        class="w-full"
+      />
     </div>
     <template #footer>
-      <Button :label="t('common.cancel')" severity="secondary" text @click="showDaysDialog = false" />
+      <Button
+        :label="t('common.cancel')"
+        severity="secondary"
+        text
+        @click="showDaysDialog = false"
+      />
       <Button :label="t('common.confirm')" severity="danger" @click="confirmDays" />
     </template>
   </Dialog>

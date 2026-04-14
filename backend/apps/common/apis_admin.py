@@ -10,7 +10,6 @@ from apps.common.selectors_admin import get_all_companies, get_all_users, get_pl
 from apps.subscriptions.models import SubscriptionPlan
 from apps.subscriptions.selectors import get_all_plans
 
-
 # ---------------------------------------------------------------------------
 # Serializers
 # ---------------------------------------------------------------------------

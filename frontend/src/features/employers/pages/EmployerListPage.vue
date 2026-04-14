@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
@@ -115,7 +115,9 @@ function handleDelete(employer: EmployerCompany): void {
           </div>
           <div class="min-w-0 flex-1">
             <h3 class="truncate text-base font-semibold text-gray-900">{{ employer.name }}</h3>
-            <p v-if="employer.industry" class="truncate text-sm text-gray-500">{{ employer.industry }}</p>
+            <p v-if="employer.industry" class="truncate text-sm text-gray-500">
+              {{ employer.industry }}
+            </p>
           </div>
         </div>
 

@@ -2,10 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import { authRoutes } from '@/features/auth/routes'
 import { dashboardRoutes } from '@/features/dashboard/routes'
-import {
-  vacancyRoutes,
-  publicVacancyRoutes,
-} from '@/features/vacancies/routes'
+import { vacancyRoutes, publicVacancyRoutes } from '@/features/vacancies/routes'
 import {
   candidateRoutes,
   hrCandidateRoutes,
@@ -18,10 +15,7 @@ import {
 } from '@/features/interviews/routes'
 import { notificationRoutes } from '@/features/notifications/routes'
 import { settingsRoutes } from '@/features/settings/routes'
-import {
-  subscriptionRoutes,
-  publicSubscriptionRoutes,
-} from '@/features/subscriptions/routes'
+import { subscriptionRoutes, publicSubscriptionRoutes } from '@/features/subscriptions/routes'
 import { adminRoutes } from '@/features/admin/routes'
 import { employerRoutes } from '@/features/employers/routes'
 import { landingRoutes } from '@/features/landing/routes'

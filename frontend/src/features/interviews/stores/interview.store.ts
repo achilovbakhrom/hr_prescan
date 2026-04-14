@@ -2,11 +2,7 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { extractErrorMessage } from '@/shared/api/errors'
 import { interviewService } from '../services/interview.service'
-import type {
-  ChatMessage,
-  Interview,
-  InterviewDetail,
-} from '../types/interview.types'
+import type { ChatMessage, Interview, InterviewDetail } from '../types/interview.types'
 
 export const useInterviewStore = defineStore('interview', () => {
   const interviews = ref<Interview[]>([])
@@ -15,9 +11,7 @@ export const useInterviewStore = defineStore('interview', () => {
   const loading = ref(false)
   const error = ref<string | null>(null)
 
-  async function fetchInterviews(params?: {
-    status?: string
-  }): Promise<void> {
+  async function fetchInterviews(params?: { status?: string }): Promise<void> {
     loading.value = true
     error.value = null
     try {
@@ -81,8 +75,7 @@ export const useInterviewStore = defineStore('interview', () => {
     loading.value = true
     error.value = null
     try {
-      currentInterview.value =
-        await interviewService.getCandidateInterview(id)
+      currentInterview.value = await interviewService.getCandidateInterview(id)
     } catch (err: unknown) {
       error.value = extractErrorMessage(err)
     } finally {

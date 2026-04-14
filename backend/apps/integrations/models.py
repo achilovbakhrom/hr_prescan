@@ -1,5 +1,4 @@
-import random
-import string
+import secrets
 from datetime import timedelta
 
 from django.db import models
@@ -31,7 +30,7 @@ class TelegramLinkCode(BaseModel):
         """Create a fresh 6-digit link code, removing any previous unused codes."""
         # Delete old unused codes for this user
         TelegramLinkCode.objects.filter(user=user, is_used=False).delete()
-        code = "".join(random.choices(string.digits, k=6))
+        code = "".join(str(secrets.randbelow(10)) for _ in range(6))
         return TelegramLinkCode.objects.create(
             user=user,
             code=code,

@@ -2,11 +2,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ApplicationStatusBadge from './ApplicationStatusBadge.vue'
-import type {
-  ApplicationDetail,
-} from '../types/candidate.types'
-
-const { t } = useI18n()
+import type { ApplicationDetail } from '../types/candidate.types'
 
 const props = defineProps<{
   candidate: ApplicationDetail
@@ -15,6 +11,8 @@ const props = defineProps<{
   interviewScore?: number | null
   aiSummary?: string | null
 }>()
+
+const { t } = useI18n()
 
 const overallScore = computed(() => {
   const cv = props.candidate.matchScore
@@ -42,19 +40,26 @@ function scoreColor(score: number): string {
   return 'text-red-600'
 }
 
-function scoreBg(score: number): string {
-  if (score >= 75) return 'bg-green-100 text-green-700'
-  if (score >= 55) return 'bg-yellow-100 text-yellow-700'
-  return 'bg-red-100 text-red-700'
-}
-
 const recommendation = computed(() => {
   if (overallScore.value === null) return null
-  if (overallScore.value >= 75) return { label: 'Recommend to move forward', icon: 'pi-check-circle', cls: 'bg-green-50 border-green-200 text-green-800' }
-  if (overallScore.value >= 55) return { label: 'Consider for next round', icon: 'pi-exclamation-circle', cls: 'bg-yellow-50 border-yellow-200 text-yellow-800' }
-  return { label: 'Not recommended to proceed', icon: 'pi-times-circle', cls: 'bg-red-50 border-red-200 text-red-800' }
+  if (overallScore.value >= 75)
+    return {
+      label: 'Recommend to move forward',
+      icon: 'pi-check-circle',
+      cls: 'bg-green-50 border-green-200 text-green-800',
+    }
+  if (overallScore.value >= 55)
+    return {
+      label: 'Consider for next round',
+      icon: 'pi-exclamation-circle',
+      cls: 'bg-yellow-50 border-yellow-200 text-yellow-800',
+    }
+  return {
+    label: 'Not recommended to proceed',
+    icon: 'pi-times-circle',
+    cls: 'bg-red-50 border-red-200 text-red-800',
+  }
 })
-
 </script>
 
 <template>
@@ -94,15 +99,23 @@ const recommendation = computed(() => {
       <i class="pi pi-spinner pi-spin text-blue-500"></i>
       <div>
         <p class="text-sm font-medium text-blue-800">CV is being analyzed...</p>
-        <p class="text-xs text-blue-600">Extracting skills, experience, and calculating match score. This takes about 20 seconds.</p>
+        <p class="text-xs text-blue-600">
+          Extracting skills, experience, and calculating match score. This takes about 20 seconds.
+        </p>
       </div>
     </div>
 
     <!-- Scores -->
     <div class="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
       <div class="rounded-lg border border-gray-200 bg-gray-50 p-2 text-center sm:p-3">
-        <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide sm:text-[10px]">{{ t('candidates.matchScore') }}</p>
-        <p v-if="props.candidate.matchScore !== null" class="mt-0.5 text-base font-bold sm:mt-1 sm:text-lg" :class="scoreColor(props.candidate.matchScore)">
+        <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide sm:text-[10px]">
+          {{ t('candidates.matchScore') }}
+        </p>
+        <p
+          v-if="props.candidate.matchScore !== null"
+          class="mt-0.5 text-base font-bold sm:mt-1 sm:text-lg"
+          :class="scoreColor(props.candidate.matchScore)"
+        >
           {{ props.candidate.matchScore }}%
         </p>
         <div v-else-if="props.candidate.cvFile" class="mt-1">
@@ -111,26 +124,49 @@ const recommendation = computed(() => {
         <p v-else class="mt-0.5 text-base text-gray-300 sm:mt-1 sm:text-lg">—</p>
       </div>
       <div class="rounded-lg border border-gray-200 bg-gray-50 p-2 text-center sm:p-3">
-        <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide sm:text-[10px]">{{ t('candidates.prescanning') }}</p>
-        <p v-if="props.prescanningScore != null" class="mt-0.5 text-base font-bold sm:mt-1 sm:text-lg" :class="scoreColor(props.prescanningScore * 10)">
+        <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide sm:text-[10px]">
+          {{ t('candidates.prescanning') }}
+        </p>
+        <p
+          v-if="props.prescanningScore != null"
+          class="mt-0.5 text-base font-bold sm:mt-1 sm:text-lg"
+          :class="scoreColor(props.prescanningScore * 10)"
+        >
           {{ props.prescanningScore }}/10
         </p>
         <p v-else class="mt-0.5 text-base text-gray-300 sm:mt-1 sm:text-lg">—</p>
       </div>
       <div class="rounded-lg border border-gray-200 bg-gray-50 p-2 text-center sm:p-3">
-        <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide sm:text-[10px]">{{ t('candidates.interview') }}</p>
-        <p v-if="props.interviewScore != null" class="mt-0.5 text-base font-bold sm:mt-1 sm:text-lg" :class="scoreColor(props.interviewScore * 10)">
+        <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide sm:text-[10px]">
+          {{ t('candidates.interview') }}
+        </p>
+        <p
+          v-if="props.interviewScore != null"
+          class="mt-0.5 text-base font-bold sm:mt-1 sm:text-lg"
+          :class="scoreColor(props.interviewScore * 10)"
+        >
           {{ props.interviewScore }}/10
         </p>
         <p v-else class="mt-0.5 text-base text-gray-300 sm:mt-1 sm:text-lg">—</p>
       </div>
-      <div class="rounded-lg border-2 p-2 text-center sm:p-3" :class="overallScore !== null ? 'border-blue-200 bg-blue-50' : 'border-gray-200 bg-gray-50'">
-        <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide sm:text-[10px]">{{ t('candidates.overallScore') }}</p>
-        <p v-if="overallScore !== null" class="mt-0.5 text-base font-bold sm:mt-1 sm:text-lg" :class="scoreColor(overallScore)">
+      <div
+        class="rounded-lg border-2 p-2 text-center sm:p-3"
+        :class="overallScore !== null ? 'border-blue-200 bg-blue-50' : 'border-gray-200 bg-gray-50'"
+      >
+        <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide sm:text-[10px]">
+          {{ t('candidates.overallScore') }}
+        </p>
+        <p
+          v-if="overallScore !== null"
+          class="mt-0.5 text-base font-bold sm:mt-1 sm:text-lg"
+          :class="scoreColor(overallScore)"
+        >
           {{ overallScore }}%
         </p>
         <p v-else class="mt-0.5 text-base text-gray-300 sm:mt-1 sm:text-lg">—</p>
-        <p v-if="overallScore !== null" class="mt-0.5 hidden text-[10px] text-gray-400 sm:block">Combined score</p>
+        <p v-if="overallScore !== null" class="mt-0.5 hidden text-[10px] text-gray-400 sm:block">
+          Combined score
+        </p>
       </div>
     </div>
 

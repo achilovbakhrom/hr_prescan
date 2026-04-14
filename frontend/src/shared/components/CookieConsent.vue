@@ -72,11 +72,7 @@ function decline(): void {
             size="small"
             @click="decline"
           />
-          <Button
-            :label="t('cookies.accept')"
-            size="small"
-            @click="accept"
-          />
+          <Button :label="t('cookies.accept')" size="small" @click="accept" />
         </div>
       </div>
     </div>

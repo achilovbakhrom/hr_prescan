@@ -80,10 +80,7 @@ async function confirmLeave(): Promise<void> {
             <i class="pi pi-user text-4xl text-gray-400"></i>
           </div>
           <p class="text-sm text-gray-400">AI Interviewer</p>
-          <p
-            v-if="connectionState === 'connecting'"
-            class="mt-2 text-xs text-gray-500"
-          >
+          <p v-if="connectionState === 'connecting'" class="mt-2 text-xs text-gray-500">
             Connecting...
           </p>
         </div>
@@ -114,12 +111,9 @@ async function confirmLeave(): Promise<void> {
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
     >
       <div class="mx-4 w-full max-w-sm rounded-lg bg-white p-6 shadow-xl">
-        <h3 class="mb-2 text-lg font-semibold text-gray-900">
-          Leave Interview?
-        </h3>
+        <h3 class="mb-2 text-lg font-semibold text-gray-900">Leave Interview?</h3>
         <p class="mb-6 text-sm text-gray-600">
-          Are you sure you want to leave? The interview will end and cannot be
-          restarted.
+          Are you sure you want to leave? The interview will end and cannot be restarted.
         </p>
         <div class="flex justify-end gap-3">
           <button

@@ -25,13 +25,7 @@ const isVideo = computed(() => {
       >
         Your browser does not support the video element.
       </video>
-      <audio
-        v-else
-        :src="recordingUrl"
-        controls
-        class="w-full"
-        preload="metadata"
-      >
+      <audio v-else :src="recordingUrl" controls class="w-full" preload="metadata">
         Your browser does not support the audio element.
       </audio>
     </template>

@@ -31,9 +31,7 @@ const interviews = computed(() => interviewStore.interviews)
 onMounted(() => interviewStore.fetchInterviews())
 
 function handleFilterChange(): void {
-  interviewStore.fetchInterviews(
-    statusFilter.value ? { status: statusFilter.value } : undefined,
-  )
+  interviewStore.fetchInterviews(statusFilter.value ? { status: statusFilter.value } : undefined)
 }
 
 function handleRowClick(event: { data: Interview }): void {
@@ -84,10 +82,7 @@ function sessionTypeSeverity(type: string): string {
       <div v-if="interviewStore.loading" class="py-8 text-center">
         <i class="pi pi-spinner pi-spin text-2xl text-gray-300"></i>
       </div>
-      <div
-        v-else-if="interviews.length === 0"
-        class="py-8 text-center text-gray-500"
-      >
+      <div v-else-if="interviews.length === 0" class="py-8 text-center text-gray-500">
         {{ t('common.noResults') }}
       </div>
       <div
@@ -102,13 +97,19 @@ function sessionTypeSeverity(type: string): string {
             <p class="text-xs text-gray-500">{{ interview.vacancyTitle }}</p>
           </div>
           <div class="flex flex-col items-end gap-1">
-            <Tag :value="formatSessionType(interview.sessionType)" :severity="sessionTypeSeverity(interview.sessionType)" class="text-[10px]" />
+            <Tag
+              :value="formatSessionType(interview.sessionType)"
+              :severity="sessionTypeSeverity(interview.sessionType)"
+              class="text-[10px]"
+            />
             <InterviewStatusBadge :status="interview.status" />
           </div>
         </div>
         <div class="mt-2 flex items-center justify-between text-xs text-gray-400">
           <span>{{ formatDate(interview.createdAt) }}</span>
-          <span v-if="interview.overallScore !== null" class="font-semibold text-gray-700">{{ formatScore(interview.overallScore) }}</span>
+          <span v-if="interview.overallScore !== null" class="font-semibold text-gray-700">{{
+            formatScore(interview.overallScore)
+          }}</span>
         </div>
       </div>
     </div>
@@ -127,7 +128,10 @@ function sessionTypeSeverity(type: string): string {
         <Column field="vacancyTitle" :header="t('nav.vacancies')" sortable />
         <Column :header="t('interviews.title')" sort-field="sessionType">
           <template #body="{ data }">
-            <Tag :value="formatSessionType((data as Interview).sessionType)" :severity="sessionTypeSeverity((data as Interview).sessionType)" />
+            <Tag
+              :value="formatSessionType((data as Interview).sessionType)"
+              :severity="sessionTypeSeverity((data as Interview).sessionType)"
+            />
           </template>
         </Column>
         <Column :header="t('common.createdAt')" sortable sort-field="createdAt">

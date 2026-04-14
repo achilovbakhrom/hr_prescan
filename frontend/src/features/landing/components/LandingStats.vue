@@ -52,7 +52,9 @@ onUnmounted(() => {
 
 <template>
   <section ref="statsRef" class="border-y border-gray-100 bg-gray-50/50">
-    <div class="mx-auto grid max-w-5xl grid-cols-1 divide-y divide-gray-200 py-10 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+    <div
+      class="mx-auto grid max-w-5xl grid-cols-1 divide-y divide-gray-200 py-10 sm:grid-cols-3 sm:divide-x sm:divide-y-0"
+    >
       <div class="py-6 text-center sm:py-0">
         <div class="text-3xl font-extrabold text-gray-900 sm:text-4xl">{{ counters.fast }}x</div>
         <div class="mt-1 text-sm text-gray-500">{{ t('landing.stats.fasterScreening') }}</div>

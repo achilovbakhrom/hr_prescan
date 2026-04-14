@@ -12,14 +12,10 @@ def get_company_interviews(
     status: str | None = None,
 ) -> QuerySet[Interview]:
     """Return interviews for a company, optionally filtered by status."""
-    qs = (
-        Interview.objects
-        .filter(application__vacancy__company=company)
-        .select_related(
-            "application",
-            "application__vacancy",
-            "application__candidate",
-        )
+    qs = Interview.objects.filter(application__vacancy__company=company).select_related(
+        "application",
+        "application__vacancy",
+        "application__candidate",
     )
     if status:
         qs = qs.filter(status=status)
@@ -49,8 +45,7 @@ def get_interview_by_token(
 ) -> Interview | None:
     """Get an interview by its unique interview_token (for candidate access)."""
     return (
-        Interview.objects
-        .select_related(
+        Interview.objects.select_related(
             "application",
             "application__vacancy",
             "application__vacancy__company",
@@ -69,8 +64,7 @@ def get_interview_for_candidate(
 ) -> Interview | None:
     """Get an interview for a candidate accessing their own interview."""
     return (
-        Interview.objects
-        .select_related(
+        Interview.objects.select_related(
             "application",
             "application__vacancy",
             "application__vacancy__company",
@@ -89,12 +83,7 @@ def get_interview_scores(
     interview: Interview,
 ) -> QuerySet[InterviewScore]:
     """Return scores for an interview with related criteria."""
-    return (
-        InterviewScore.objects
-        .filter(interview=interview)
-        .select_related("criteria")
-        .order_by("criteria__order")
-    )
+    return InterviewScore.objects.filter(interview=interview).select_related("criteria").order_by("criteria__order")
 
 
 def get_interview_integrity_flags(
@@ -102,11 +91,7 @@ def get_interview_integrity_flags(
     interview: Interview,
 ) -> QuerySet[InterviewIntegrityFlag]:
     """Return integrity flags for an interview."""
-    return (
-        InterviewIntegrityFlag.objects
-        .filter(interview=interview)
-        .order_by("timestamp_seconds")
-    )
+    return InterviewIntegrityFlag.objects.filter(interview=interview).order_by("timestamp_seconds")
 
 
 def get_integrity_flags(
@@ -126,8 +111,4 @@ def get_integrity_flags(
     if interview is None:
         return None
 
-    return (
-        InterviewIntegrityFlag.objects
-        .filter(interview=interview)
-        .order_by("timestamp_seconds")
-    )
+    return InterviewIntegrityFlag.objects.filter(interview=interview).order_by("timestamp_seconds")

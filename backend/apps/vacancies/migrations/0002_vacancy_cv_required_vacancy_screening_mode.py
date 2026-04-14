@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('vacancies', '0001_initial'),
+        ("vacancies", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='vacancy',
-            name='cv_required',
+            model_name="vacancy",
+            name="cv_required",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='vacancy',
-            name='screening_mode',
-            field=models.CharField(choices=[('chat', 'Chat'), ('meet', 'Meet')], default='chat', max_length=10),
+            model_name="vacancy",
+            name="screening_mode",
+            field=models.CharField(choices=[("chat", "Chat"), ("meet", "Meet")], default="chat", max_length=10),
         ),
     ]

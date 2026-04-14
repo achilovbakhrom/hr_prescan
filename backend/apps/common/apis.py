@@ -4,12 +4,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.permissions import IsAdmin, IsHRManager
-from apps.common.messages import MSG_NOT_IN_COMPANY
 from apps.applications.serializers import ApplicationListOutputSerializer
+from apps.common.messages import MSG_NOT_IN_COMPANY
 from apps.common.selectors import (
     get_dashboard_stats,
-    get_recent_applications,
     get_pending_company_interviews,
+    get_recent_applications,
 )
 from apps.interviews.serializers import InterviewOutputSerializer
 
@@ -31,17 +31,20 @@ class HRDashboardApi(APIView):
 
         recent_applications = get_recent_applications(company=company, limit=5)
         upcoming_interviews = get_pending_company_interviews(
-            company=company, limit=5,
+            company=company,
+            limit=5,
         )
 
         return Response(
             {
                 **stats,
                 "recent_applications": ApplicationListOutputSerializer(
-                    recent_applications, many=True,
+                    recent_applications,
+                    many=True,
                 ).data,
                 "upcoming_interviews": InterviewOutputSerializer(
-                    upcoming_interviews, many=True,
+                    upcoming_interviews,
+                    many=True,
                 ).data,
             },
             status=status.HTTP_200_OK,
