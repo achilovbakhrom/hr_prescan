@@ -97,13 +97,34 @@ http {
     }
 
     # ---------------------------------------------------------------
-    # HTTP → HTTPS redirect
+    # HTTP default (catches any Host including localhost healthcheck)
+    # ---------------------------------------------------------------
+    server {
+        listen 80 default_server;
+        server_name _;
+
+        location /health {
+            access_log off;
+            return 200 "OK\n";
+            add_header Content-Type text/plain;
+        }
+
+        location /.well-known/acme-challenge/ {
+            root /var/www/certbot;
+        }
+
+        location / {
+            return 301 https://${DOMAIN}$request_uri;
+        }
+    }
+
+    # ---------------------------------------------------------------
+    # HTTP → HTTPS redirect for real traffic
     # ---------------------------------------------------------------
     server {
         listen 80;
         server_name ${DOMAIN} www.${DOMAIN};
 
-        # Allow certbot ACME challenges through
         location /.well-known/acme-challenge/ {
             root /var/www/certbot;
         }
