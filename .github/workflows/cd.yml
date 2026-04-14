@@ -3,6 +3,7 @@ name: CD — Deploy to Production
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 concurrency:
   group: production-deploy
@@ -114,6 +115,14 @@ jobs:
         run: |
           ssh-keyscan -H "${{ secrets.PROD_HOST }}" >> ~/.ssh/known_hosts
 
+      - name: Sync compose files from main
+        run: |
+          ssh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} \
+            "cd ${{ secrets.PROD_DEPLOY_PATH }} && \
+             git fetch origin main && \
+             git checkout main && \
+             git reset --hard origin/main"
+
       - name: Pull new images on production host
         run: |
           ssh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} \
@@ -121,19 +130,38 @@ jobs:
              echo '${{ secrets.GITHUB_TOKEN }}' | \
                docker login ghcr.io -u ${{ github.actor }} --password-stdin && \
              IMAGE_TAG=${{ github.sha }} \
-               docker compose \
-                 -f docker-compose.yml \
-                 -f deploy/docker-compose.prod.yml \
-               pull"
+               docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml pull"
+
+      - name: Ensure stateful services are up (first deploy bootstrap)
+        run: |
+          ssh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} \
+            "cd ${{ secrets.PROD_DEPLOY_PATH }} && \
+             IMAGE_TAG=${{ github.sha }} \
+               docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml \
+               up -d --wait postgres redis rabbitmq minio livekit"
+
+      - name: Run database migrations (ephemeral container — works for first deploy)
+        run: |
+          ssh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} \
+            "cd ${{ secrets.PROD_DEPLOY_PATH }} && \
+             IMAGE_TAG=${{ github.sha }} \
+               docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml \
+               run --rm django python manage.py migrate --no-input"
+
+      - name: Collect static files (ephemeral container)
+        run: |
+          ssh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} \
+            "cd ${{ secrets.PROD_DEPLOY_PATH }} && \
+             IMAGE_TAG=${{ github.sha }} \
+               docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml \
+               run --rm django python manage.py collectstatic --no-input --clear"
 
       - name: Rolling update — backend
         run: |
           ssh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} \
             "cd ${{ secrets.PROD_DEPLOY_PATH }} && \
              IMAGE_TAG=${{ github.sha }} \
-               docker compose \
-                 -f docker-compose.yml \
-                 -f deploy/docker-compose.prod.yml \
+               docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml \
                up -d --no-deps --wait django celery-worker celery-beat"
 
       - name: Rolling update — frontend & nginx
@@ -141,9 +169,7 @@ jobs:
           ssh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} \
             "cd ${{ secrets.PROD_DEPLOY_PATH }} && \
              IMAGE_TAG=${{ github.sha }} \
-               docker compose \
-                 -f docker-compose.yml \
-                 -f deploy/docker-compose.prod.yml \
+               docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml \
                up -d --no-deps --wait nginx"
 
       - name: Rolling update — livekit-agent
@@ -151,28 +177,8 @@ jobs:
           ssh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} \
             "cd ${{ secrets.PROD_DEPLOY_PATH }} && \
              IMAGE_TAG=${{ github.sha }} \
-               docker compose \
-                 -f docker-compose.yml \
-                 -f deploy/docker-compose.prod.yml \
+               docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml \
                up -d --no-deps livekit-agent"
-
-      - name: Run database migrations
-        run: |
-          ssh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} \
-            "cd ${{ secrets.PROD_DEPLOY_PATH }} && \
-             docker compose \
-               -f docker-compose.yml \
-               -f deploy/docker-compose.prod.yml \
-             exec -T django python manage.py migrate --no-input"
-
-      - name: Collect static files
-        run: |
-          ssh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} \
-            "cd ${{ secrets.PROD_DEPLOY_PATH }} && \
-             docker compose \
-               -f docker-compose.yml \
-               -f deploy/docker-compose.prod.yml \
-             exec -T django python manage.py collectstatic --no-input --clear"
 
       - name: Smoke test
         run: |

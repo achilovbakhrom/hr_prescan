@@ -32,6 +32,13 @@ echo "========================================="
 # --- 1. Create required directories ---
 mkdir -p "${DATA_PATH}"
 mkdir -p "${WEBROOT}"
+mkdir -p /etc/nginx
+
+# Generate dhparam for nginx if missing (needed by nginx.prod.conf.template)
+if [ ! -f /etc/nginx/dhparam.pem ]; then
+    echo "[INFO] Generating /etc/nginx/dhparam.pem (2048 bit, ~30s)..."
+    openssl dhparam -out /etc/nginx/dhparam.pem 2048 2>/dev/null
+fi
 
 # --- 2. Check for existing certificate ---
 if [ -d "${CERT_DIR}" ]; then
@@ -69,6 +76,8 @@ sleep 5
 rm -rf "${CERT_DIR}"
 
 # --- 7. Build certbot arguments ---
+# Set INCLUDE_WWW=0 to skip the www subdomain (e.g. for dev.prescreen-app.com)
+INCLUDE_WWW="${INCLUDE_WWW:-1}"
 CERTBOT_ARGS=(
     certonly
     --webroot
@@ -77,8 +86,10 @@ CERTBOT_ARGS=(
     --agree-tos
     --no-eff-email
     -d "${DOMAIN}"
-    -d "www.${DOMAIN}"
 )
+if [ "${INCLUDE_WWW}" = "1" ]; then
+    CERTBOT_ARGS+=(-d "www.${DOMAIN}")
+fi
 
 if [ "${STAGING}" = "1" ]; then
     echo "[WARN] Using Let's Encrypt STAGING environment (not trusted by browsers)"
