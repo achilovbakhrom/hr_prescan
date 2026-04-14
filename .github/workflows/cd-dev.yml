@@ -1,0 +1,171 @@
+name: CD — Deploy to Dev
+
+on:
+  push:
+    branches: [dev]
+
+concurrency:
+  group: dev-deploy
+  cancel-in-progress: true  # unlike prod, it's OK to cancel an in-flight dev deploy
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ghcr.io/${{ github.repository }}
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # 1. Build & push — GitHub-hosted runner (fast upload to GHCR)
+  # ---------------------------------------------------------------------------
+  build-and-push:
+    name: Build & Push Images
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push backend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: true
+          tags: |
+            ${{ env.IMAGE_PREFIX }}/backend:${{ github.sha }}
+            ${{ env.IMAGE_PREFIX }}/backend:dev
+          cache-from: type=gha,scope=backend-dev
+          cache-to: type=gha,mode=max,scope=backend-dev
+
+      - name: Build & push frontend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          push: true
+          tags: |
+            ${{ env.IMAGE_PREFIX }}/frontend:${{ github.sha }}
+            ${{ env.IMAGE_PREFIX }}/frontend:dev
+          cache-from: type=gha,scope=frontend-dev
+          cache-to: type=gha,mode=max,scope=frontend-dev
+
+      - name: Build & push livekit-agent
+        uses: docker/build-push-action@v6
+        with:
+          context: ./livekit-agent
+          push: true
+          tags: |
+            ${{ env.IMAGE_PREFIX }}/livekit-agent:${{ github.sha }}
+            ${{ env.IMAGE_PREFIX }}/livekit-agent:dev
+          cache-from: type=gha,scope=livekit-agent-dev
+          cache-to: type=gha,mode=max,scope=livekit-agent-dev
+
+  # ---------------------------------------------------------------------------
+  # 2. Deploy — self-hosted runner IS the dev server (no SSH required)
+  # ---------------------------------------------------------------------------
+  deploy:
+    name: Deploy to Dev
+    runs-on: [self-hosted, dev-server]
+    needs: build-and-push
+    environment:
+      name: development
+      url: https://${{ vars.DEV_DOMAIN }}
+    defaults:
+      run:
+        working-directory: ${{ vars.DEV_DEPLOY_PATH }}
+    env:
+      # Three-file override stack: base → prod settings → staging resource limits
+      CF: -f docker-compose.yml -f deploy/docker-compose.prod.yml -f deploy/docker-compose.staging.yml
+
+    steps:
+      - name: Sync compose files
+        run: |
+          git fetch origin dev
+          git checkout dev
+          git pull origin dev
+
+      - name: Log in to GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | \
+            docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Pull new images
+        run: IMAGE_TAG=${{ github.sha }} docker compose $CF pull
+
+      - name: Run database migrations
+        run: docker compose $CF exec -T django python manage.py migrate --no-input
+
+      - name: Rolling update — backend (zero-downtime)
+        run: |
+          # Scale up: old container stays alive while new one starts
+          IMAGE_TAG=${{ github.sha }} \
+            docker compose $CF up -d --no-deps --scale django=2 --no-recreate django
+
+          # Wait for the new container to pass its health check
+          for i in $(seq 1 24); do
+            docker compose $CF exec -T django python manage.py check --deploy \
+              && break || true
+            echo "Waiting for Django... (${i}/24)"
+            sleep 5
+          done
+
+          # Graceful nginx reload — re-resolves upstream DNS, zero dropped connections
+          docker compose $CF exec -T nginx nginx -s reload
+
+          # Scale back down: Docker removes the old container
+          IMAGE_TAG=${{ github.sha }} \
+            docker compose $CF up -d --no-deps --scale django=1 django
+
+      - name: Collect static files
+        run: docker compose $CF exec -T django python manage.py collectstatic --no-input --clear
+
+      - name: Rolling update — celery (graceful drain)
+        run: |
+          # SIGTERM lets workers finish their current task before stopping
+          docker compose $CF stop celery-worker
+          IMAGE_TAG=${{ github.sha }} \
+            docker compose $CF up -d --no-deps --wait celery-worker celery-beat
+
+      - name: Rolling update — frontend & nginx
+        run: |
+          IMAGE_TAG=${{ github.sha }} \
+            docker compose $CF up -d --no-deps --wait nginx
+
+      - name: Rolling update — livekit-agent
+        run: |
+          IMAGE_TAG=${{ github.sha }} \
+            docker compose $CF up -d --no-deps livekit-agent
+
+      - name: Smoke test
+        run: |
+          sleep 5
+          bash deploy/scripts/smoke-test.sh "https://${{ vars.DEV_DOMAIN }}"
+
+      - name: Rollback on failure
+        if: failure()
+        run: |
+          echo "[ROLLBACK] Rolling back to :dev images..."
+          IMAGE_TAG=dev \
+            docker compose $CF \
+            up -d --no-deps django celery-worker celery-beat nginx livekit-agent
+          echo "[ROLLBACK] Complete."
+          exit 1
+
+      # Always runs — keeps the dev server disk clean
+      - name: Cleanup Docker artifacts
+        if: always()
+        run: |
+          docker image prune -f
+          docker builder prune -f --keep-storage 3GB
+          docker container prune -f
+
+      - name: Prune old images
+        if: success()
+        run: docker image prune -f --filter "until=72h"

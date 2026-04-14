@@ -114,6 +114,14 @@ jobs:
         run: |
           ssh-keyscan -H "${{ secrets.PROD_HOST }}" >> ~/.ssh/known_hosts
 
+      - name: Sync compose files from main
+        run: |
+          ssh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} \
+            "cd ${{ secrets.PROD_DEPLOY_PATH }} && \
+             git fetch origin main && \
+             git checkout main && \
+             git reset --hard origin/main"
+
       - name: Pull new images on production host
         run: |
           ssh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} \
