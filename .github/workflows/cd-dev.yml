@@ -3,6 +3,7 @@ name: CD — Deploy to Dev
 on:
   push:
     branches: [dev]
+  workflow_dispatch:
 
 concurrency:
   group: dev-deploy
@@ -99,32 +100,44 @@ jobs:
       - name: Pull new images
         run: IMAGE_TAG=${{ github.sha }} docker compose $CF pull
 
-      - name: Run database migrations
-        run: docker compose $CF exec -T django python manage.py migrate --no-input
-
-      - name: Rolling update — backend (zero-downtime)
+      - name: Ensure stateful services are up (first deploy bootstrap)
         run: |
-          # Scale up: old container stays alive while new one starts
           IMAGE_TAG=${{ github.sha }} \
-            docker compose $CF up -d --no-deps --scale django=2 --no-recreate django
+            docker compose $CF up -d --wait postgres redis rabbitmq minio livekit
 
-          # Wait for the new container to pass its health check
-          for i in $(seq 1 24); do
-            docker compose $CF exec -T django python manage.py check --deploy \
-              && break || true
-            echo "Waiting for Django... (${i}/24)"
-            sleep 5
-          done
-
-          # Graceful nginx reload — re-resolves upstream DNS, zero dropped connections
-          docker compose $CF exec -T nginx nginx -s reload
-
-          # Scale back down: Docker removes the old container
+      - name: Run database migrations (via ephemeral container, works on first deploy)
+        run: |
           IMAGE_TAG=${{ github.sha }} \
-            docker compose $CF up -d --no-deps --scale django=1 django
+            docker compose $CF run --rm django python manage.py migrate --no-input
 
       - name: Collect static files
-        run: docker compose $CF exec -T django python manage.py collectstatic --no-input --clear
+        run: |
+          IMAGE_TAG=${{ github.sha }} \
+            docker compose $CF run --rm django python manage.py collectstatic --no-input --clear
+
+      - name: Rolling update — backend (zero-downtime on subsequent deploys)
+        run: |
+          # If no django container exists yet (first deploy), this just creates one.
+          # If one exists, it scales to 2 so traffic is never dropped, then scales back.
+          CURRENT=$(docker compose $CF ps -q django | wc -l)
+          if [ "$CURRENT" -eq 0 ]; then
+            echo "First deploy: starting django container"
+            IMAGE_TAG=${{ github.sha }} \
+              docker compose $CF up -d --no-deps --wait django
+          else
+            echo "Rolling update: scale 2 -> 1"
+            IMAGE_TAG=${{ github.sha }} \
+              docker compose $CF up -d --no-deps --scale django=2 --no-recreate django
+            for i in $(seq 1 24); do
+              HEALTHY=$(docker compose $CF ps --format '{{.Service}} {{.Health}}' | grep -c '^django healthy$' || true)
+              [ "$HEALTHY" -ge 1 ] && break
+              echo "Waiting for new Django container... (${i}/24)"
+              sleep 5
+            done
+            docker compose $CF exec -T nginx nginx -s reload || true
+            IMAGE_TAG=${{ github.sha }} \
+              docker compose $CF up -d --no-deps --scale django=1 django
+          fi
 
       - name: Rolling update — celery (graceful drain)
         run: |
