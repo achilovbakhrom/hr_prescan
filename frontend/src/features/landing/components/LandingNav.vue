@@ -18,6 +18,11 @@ function scrollTo(id: string): void {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
 }
 
+function goToRoute(name: string): void {
+  router.push({ name })
+  mobileOpen.value = false
+}
+
 const navLinks = [
   { id: 'features', labelKey: 'landing.footer.features' },
   { id: 'how-it-works', labelKey: 'landing.howItWorks.title' },
@@ -120,27 +125,18 @@ const navLinks = [
               text
               severity="secondary"
               class="justify-start"
-              @click="
-                router.push({ name: ROUTE_NAMES.LOGIN })
-                mobileOpen = false
-              "
+              @click="goToRoute(ROUTE_NAMES.LOGIN)"
             />
             <Button
               :label="t('landing.hero.getStarted')"
-              @click="
-                router.push({ name: ROUTE_NAMES.REGISTER })
-                mobileOpen = false
-              "
+              @click="goToRoute(ROUTE_NAMES.REGISTER)"
             />
           </template>
           <template v-else>
             <Button
               :label="t('nav.dashboard')"
               icon="pi pi-th-large"
-              @click="
-                router.push({ name: ROUTE_NAMES.DASHBOARD })
-                mobileOpen = false
-              "
+              @click="goToRoute(ROUTE_NAMES.DASHBOARD)"
             />
           </template>
         </div>

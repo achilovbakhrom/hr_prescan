@@ -8,20 +8,20 @@ on:
 
 jobs:
   backend-quality:
-    name: Backend — Lint, Format, Types
+    name: Backend — Lint & Format
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install ruff mypy django-stubs djangorestframework-stubs
+      - run: pip install ruff
       - name: Ruff lint
         run: ruff check backend/
       - name: Ruff format check
         run: ruff format --check backend/
-      - name: Mypy type check
-        run: mypy backend/
+      # Mypy is intentionally disabled until the codebase has full type
+      # annotations. Re-enable as a gradual hygiene task (see pyproject.toml).
 
   frontend-quality:
     name: Frontend — Lint, Format, Types

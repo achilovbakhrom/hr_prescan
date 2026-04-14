@@ -405,10 +405,7 @@ function getInitials(name: string): string {
             size="large"
             @click="joinRoom"
           />
-          <button
-            class="mt-3 text-sm text-gray-400 hover:text-white"
-            @click="handleGoBack"
-          >
+          <button class="mt-3 text-sm text-gray-400 hover:text-white" @click="handleGoBack">
             Go back
           </button>
         </div>
