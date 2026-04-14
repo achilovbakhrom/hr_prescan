@@ -67,7 +67,8 @@ services:
         reservations:
           memory: 256M
     healthcheck:
-      test: ["CMD-SHELL", "python -c 'import urllib.request; urllib.request.urlopen(\"http://localhost:8000/api/health/\")'"]
+      # Tell Django the request arrived via HTTPS so SECURE_SSL_REDIRECT doesn't 301 us.
+      test: ["CMD-SHELL", "python -c 'import urllib.request as r; r.urlopen(r.Request(\"http://localhost:8000/api/health/\", headers={\"X-Forwarded-Proto\": \"https\"}))'"]
       interval: 30s
       timeout: 10s
       retries: 5
