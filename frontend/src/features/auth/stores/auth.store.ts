@@ -84,12 +84,12 @@ export const useAuthStore = defineStore('auth', () => {
         saveTokens(response.tokens)
         pendingGoogleSignup.value = null
       } else {
-        // needs_role or needs_company — keep the credential for the next step
+        // needsRole or needsCompany — keep the credential for the next step
         pendingGoogleSignup.value = {
           credential,
           email: response.email,
-          firstName: response.first_name,
-          lastName: response.last_name,
+          firstName: response.firstName,
+          lastName: response.lastName,
         }
       }
       return response

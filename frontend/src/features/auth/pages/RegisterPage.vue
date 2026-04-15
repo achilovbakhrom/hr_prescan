@@ -67,8 +67,7 @@ async function handleRegister(): Promise<void> {
     })
     registered.value = true
   } catch (err: unknown) {
-    errorMessage.value =
-      err instanceof Error ? err.message : 'Registration failed. Please try again.'
+    errorMessage.value = err instanceof Error ? err.message : t('auth.register.registrationFailed')
   }
 }
 
@@ -89,7 +88,7 @@ async function handleGoogleSuccess(credential: string): Promise<void> {
       await router.push({ name: ROUTE_NAMES.COMPANY_REGISTER })
     }
   } catch (err: unknown) {
-    errorMessage.value = err instanceof Error ? err.message : 'Google sign-in failed.'
+    errorMessage.value = err instanceof Error ? err.message : t('auth.register.googleFailed')
   }
 }
 
@@ -109,7 +108,7 @@ async function handleRolePick(role: GoogleAuthRole): Promise<void> {
       await router.push({ name: ROUTE_NAMES.COMPANY_REGISTER })
     }
   } catch (err: unknown) {
-    errorMessage.value = err instanceof Error ? err.message : 'Google sign-in failed.'
+    errorMessage.value = err instanceof Error ? err.message : t('auth.register.googleFailed')
   } finally {
     rolePickerLoading.value = false
   }
@@ -125,17 +124,19 @@ function handleGoogleError(msg: string): void {
     <div class="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
       <template v-if="registered">
         <div class="text-center">
-          <h1 class="mb-4 text-2xl font-bold text-gray-900">Check Your Email</h1>
+          <h1 class="mb-4 text-2xl font-bold text-gray-900">
+            {{ t('auth.register.checkEmail') }}
+          </h1>
           <p class="mb-6 text-gray-600">
-            We've sent a verification link to
+            {{ t('auth.register.verificationSent') }}
             <strong>{{ email }}</strong
-            >. Please check your inbox and click the link to activate your account.
+            >{{ t('auth.register.verificationSentSuffix') }}
           </p>
           <RouterLink
             :to="{ name: ROUTE_NAMES.LOGIN }"
             class="font-medium text-blue-600 hover:text-blue-500"
           >
-            Back to Login
+            {{ t('auth.register.backToLogin') }}
           </RouterLink>
         </div>
       </template>
@@ -159,7 +160,7 @@ function handleGoogleError(msg: string): void {
 
         <div class="mb-4 flex items-center gap-3">
           <div class="h-px flex-1 bg-gray-200"></div>
-          <span class="text-xs text-gray-400">or register with email</span>
+          <span class="text-xs text-gray-400">{{ t('auth.register.orRegisterWithEmail') }}</span>
           <div class="h-px flex-1 bg-gray-200"></div>
         </div>
 
@@ -172,12 +173,12 @@ function handleGoogleError(msg: string): void {
               <InputText
                 id="firstName"
                 v-model="firstName"
-                placeholder="First name"
+                :placeholder="t('auth.register.firstNamePlaceholder')"
                 :invalid="submitted && errors.firstName"
                 class="w-full"
               />
               <small v-if="submitted && errors.firstName" class="text-red-500">
-                First name is required.
+                {{ t('auth.register.firstNameRequired') }}
               </small>
             </div>
 
@@ -188,12 +189,12 @@ function handleGoogleError(msg: string): void {
               <InputText
                 id="lastName"
                 v-model="lastName"
-                placeholder="Last name"
+                :placeholder="t('auth.register.lastNamePlaceholder')"
                 :invalid="submitted && errors.lastName"
                 class="w-full"
               />
               <small v-if="submitted && errors.lastName" class="text-red-500">
-                Last name is required.
+                {{ t('auth.register.lastNameRequired') }}
               </small>
             </div>
           </div>
@@ -206,12 +207,12 @@ function handleGoogleError(msg: string): void {
               id="email"
               v-model="email"
               type="email"
-              placeholder="Enter your email"
+              :placeholder="t('auth.register.emailPlaceholder')"
               :invalid="submitted && errors.email"
               class="w-full"
             />
             <small v-if="submitted && errors.email" class="text-red-500">
-              Please enter a valid email address.
+              {{ t('auth.register.invalidEmail') }}
             </small>
           </div>
 
@@ -222,7 +223,7 @@ function handleGoogleError(msg: string): void {
             <Password
               v-model="password"
               input-id="password"
-              placeholder="Minimum 8 characters"
+              :placeholder="t('auth.register.passwordPlaceholder')"
               toggle-mask
               :invalid="submitted && errors.password"
               class="w-full"
@@ -240,7 +241,7 @@ function handleGoogleError(msg: string): void {
             <Password
               v-model="confirmPassword"
               input-id="confirmPassword"
-              placeholder="Confirm your password"
+              :placeholder="t('auth.register.confirmPasswordPlaceholder')"
               :feedback="false"
               toggle-mask
               :invalid="submitted && errors.confirmPassword"
@@ -271,12 +272,12 @@ function handleGoogleError(msg: string): void {
         </p>
 
         <p class="mt-2 text-center text-sm text-gray-600">
-          Want to hire?
+          {{ t('auth.register.wantToHire') }}
           <RouterLink
             :to="{ name: ROUTE_NAMES.COMPANY_REGISTER }"
             class="font-medium text-blue-600 hover:text-blue-500"
           >
-            Register your company
+            {{ t('auth.register.registerCompany') }}
           </RouterLink>
         </p>
       </template>

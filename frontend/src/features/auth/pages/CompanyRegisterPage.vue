@@ -37,12 +37,12 @@ const errorMessage = ref<string | null>(null)
 const registered = ref(false)
 const activeStep = ref<string>('1')
 
-const sizeOptions = [
-  { label: '1-50 employees', value: 'small' as CompanySize },
-  { label: '51-200 employees', value: 'medium' as CompanySize },
-  { label: '201-1000 employees', value: 'large' as CompanySize },
-  { label: '1000+ employees', value: 'enterprise' as CompanySize },
-]
+const sizeOptions = computed(() => [
+  { label: t('auth.companyRegister.sizes.small'), value: 'small' as CompanySize },
+  { label: t('auth.companyRegister.sizes.medium'), value: 'medium' as CompanySize },
+  { label: t('auth.companyRegister.sizes.large'), value: 'large' as CompanySize },
+  { label: t('auth.companyRegister.sizes.enterprise'), value: 'enterprise' as CompanySize },
+])
 
 const companyStepSubmitted = ref(false)
 const adminStepSubmitted = ref(false)
@@ -111,7 +111,7 @@ async function handleSubmit(): Promise<void> {
     registered.value = true
   } catch (err: unknown) {
     errorMessage.value =
-      err instanceof Error ? err.message : 'Registration failed. Please try again.'
+      err instanceof Error ? err.message : t('auth.companyRegister.registrationFailed')
   }
 }
 
@@ -119,7 +119,7 @@ async function handleGoogleSubmit(): Promise<void> {
   errorMessage.value = null
   try {
     await authStore.googleRegisterCompany({
-      company_name: companyName.value,
+      companyName: companyName.value,
       industry: industry.value,
       size: size.value!,
       country: country.value,
@@ -127,7 +127,7 @@ async function handleGoogleSubmit(): Promise<void> {
     await router.push({ name: ROUTE_NAMES.DASHBOARD })
   } catch (err: unknown) {
     errorMessage.value =
-      err instanceof Error ? err.message : 'Registration failed. Please try again.'
+      err instanceof Error ? err.message : t('auth.companyRegister.registrationFailed')
   }
 }
 
@@ -142,17 +142,17 @@ function cancelGoogleFlow(): void {
     <div class="w-full max-w-2xl rounded-lg bg-white p-8 shadow-md">
       <template v-if="registered">
         <div class="text-center">
-          <h1 class="mb-4 text-2xl font-bold text-gray-900">Check Your Email</h1>
+          <h1 class="mb-4 text-2xl font-bold text-gray-900">
+            {{ t('auth.companyRegister.success.title') }}
+          </h1>
           <p class="mb-6 text-gray-600">
-            We've sent a verification link to
-            <strong>{{ adminEmail }}</strong
-            >. Please check your inbox and click the link to activate your account.
+            {{ t('auth.companyRegister.success.body', { email: adminEmail }) }}
           </p>
           <RouterLink
             :to="{ name: ROUTE_NAMES.LOGIN }"
             class="font-medium text-blue-600 hover:text-blue-500"
           >
-            Back to Login
+            {{ t('auth.companyRegister.success.backToLogin') }}
           </RouterLink>
         </div>
       </template>
