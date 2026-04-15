@@ -57,18 +57,21 @@ export interface GoogleAuthTokensResponse {
   user: User
 }
 
+// Backend returns snake_case (needs_role, first_name, last_name), but the
+// axios client has a global response interceptor that converts snake_case →
+// camelCase before it reaches callers. So the shapes below use camelCase.
 export interface GoogleAuthNeedsRoleResponse {
-  needs_role: true
+  needsRole: true
   email: string
-  first_name: string
-  last_name: string
+  firstName: string
+  lastName: string
 }
 
 export interface GoogleAuthNeedsCompanyResponse {
-  needs_company: true
+  needsCompany: true
   email: string
-  first_name: string
-  last_name: string
+  firstName: string
+  lastName: string
 }
 
 export type GoogleAuthResponse =
@@ -85,18 +88,18 @@ export function isGoogleTokensResponse(
 export function isGoogleNeedsRoleResponse(
   response: GoogleAuthResponse,
 ): response is GoogleAuthNeedsRoleResponse {
-  return 'needs_role' in response && response.needs_role === true
+  return 'needsRole' in response && response.needsRole === true
 }
 
 export function isGoogleNeedsCompanyResponse(
   response: GoogleAuthResponse,
 ): response is GoogleAuthNeedsCompanyResponse {
-  return 'needs_company' in response && response.needs_company === true
+  return 'needsCompany' in response && response.needsCompany === true
 }
 
 export interface GoogleRegisterCompanyRequest {
   credential: string
-  company_name: string
+  companyName: string
   industry: string
   size: CompanySize
   country: string

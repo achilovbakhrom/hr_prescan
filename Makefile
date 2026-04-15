@@ -4,7 +4,8 @@
        up-monitoring up-management up-all \
        clean reset-db backup-db ensure-env \
        local-setup local-infra local-backend local-backend-all local-frontend local-stop local-stop-all \
-       local-test local-test-backend local-test-frontend local-test-e2e
+       local-test local-test-backend local-test-frontend local-test-e2e \
+       dev-db-tunnel dev-db-tunnel-stop
 
 # Ensure a project-root .env exists so docker compose variable
 # interpolation (LIVEKIT_API_KEY etc.) finds the values. On servers this
@@ -268,6 +269,32 @@ local-test-frontend: ## Run frontend unit tests (vitest)
 
 local-test-e2e: ## Run E2E tests (playwright) — app must be running
 	cd frontend && npx playwright test --reporter=list
+
+# ─── Dev Server DB Tunnel ────────────────────────────────────────────────────
+# Creds live in .env.dev-server (gitignored). See .env.dev-server.example for keys.
+
+DEV_ENV_FILE = .env.dev-server
+
+define DEV_SSH_CMD
+set -a; . $(DEV_ENV_FILE); set +a; \
+SSHPASS="$$DEV_SSH_PASS" sshpass -e ssh -o StrictHostKeyChecking=accept-new
+endef
+
+dev-db-tunnel: ## Open SSH tunnel to dev Postgres (localhost:$$DEV_PG_LOCAL_PORT)
+	@test -f $(DEV_ENV_FILE) || { echo "Missing $(DEV_ENV_FILE) (copy from .env.dev-server.example)"; exit 1; }
+	@command -v sshpass >/dev/null || { echo "sshpass not installed: brew install sshpass"; exit 1; }
+	@set -a; . $(DEV_ENV_FILE); set +a; \
+	IP=$$(SSHPASS="$$DEV_SSH_PASS" sshpass -e ssh -o StrictHostKeyChecking=accept-new $$DEV_SSH_USER@$$DEV_SSH_HOST \
+	  "docker inspect $$DEV_PG_CONTAINER --format '{{(index .NetworkSettings.Networks \"'$$DEV_PG_NETWORK'\").IPAddress}}'"); \
+	if [ -z "$$IP" ]; then echo "Could not resolve postgres container IP"; exit 1; fi; \
+	SSHPASS="$$DEV_SSH_PASS" sshpass -e ssh -fN -o StrictHostKeyChecking=accept-new \
+	  -L $$DEV_PG_LOCAL_PORT:$$IP:5432 $$DEV_SSH_USER@$$DEV_SSH_HOST; \
+	echo "Tunnel open on localhost:$$DEV_PG_LOCAL_PORT"; \
+	echo "  host=localhost port=$$DEV_PG_LOCAL_PORT user=$$DEV_PG_USER db=$$DEV_PG_DB"
+
+dev-db-tunnel-stop: ## Close SSH tunnel to dev Postgres
+	@set -a; . $(DEV_ENV_FILE); set +a; \
+	pkill -f "ssh -fN .* -L $$DEV_PG_LOCAL_PORT:" 2>/dev/null && echo "Tunnel closed." || echo "No tunnel running."
 
 # ─── Cleanup ──────────────────────────────────────────────────────────────────
 
