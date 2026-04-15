@@ -99,9 +99,14 @@ class CompleteCompanySetupApi(APIView):
         email = serializers.EmailField(required=False)
 
     def post(self, request: Request) -> Response:
-        if request.user.role != User.Role.CANDIDATE or request.user.company is not None:
+        # Accept either:
+        #  - a candidate (converting to HR via this flow), OR
+        #  - an HR user who has just picked the HR role via ChooseRolePage
+        #    but hasn't set up their company yet.
+        # Admins and users who already belong to a company cannot use it.
+        if request.user.company is not None or request.user.role == User.Role.ADMIN:
             return Response(
-                {"detail": "Only candidates without a company can use this."},
+                {"detail": "This account already has a company."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
