@@ -30,7 +30,7 @@ class CheckInvitationApi(APIView):
 
         try:
             invitation = Invitation.objects.select_related("company").get(token=token)
-        except Invitation.DoesNotExist, ValueError:
+        except (Invitation.DoesNotExist, ValueError):
             return Response({"detail": "Invalid invitation."}, status=status.HTTP_404_NOT_FOUND)
 
         if invitation.is_accepted:
