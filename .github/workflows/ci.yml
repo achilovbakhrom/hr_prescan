@@ -15,7 +15,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install ruff
+      # Pin to match requirements.txt — ruff's formatter output changes between
+      # minors, so an unpinned install here caused local/CI divergence.
+      - run: pip install "ruff==0.15.10"
       - name: Ruff lint
         run: ruff check backend/
       - name: Ruff format check

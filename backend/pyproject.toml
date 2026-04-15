@@ -1,5 +1,8 @@
 [tool.ruff]
-target-version = "py314"
+# Must match Dockerfile's python:3.12-slim — otherwise ruff parses code
+# with a newer grammar than CI runs, silently accepting syntax that will
+# SyntaxError at import time in the container (e.g. `except X, Y:`).
+target-version = "py312"
 line-length = 120
 src = ["."]
 
