@@ -4,12 +4,23 @@ import { extractErrorMessage } from '@/shared/api/errors'
 import { authService } from '../services/auth.service'
 import type {
   AcceptInvitationRequest,
+  GoogleAuthResponse,
+  GoogleAuthRole,
+  GoogleRegisterCompanyRequest,
   User,
   AuthTokens,
   LoginRequest,
   RegisterCompanyRequest,
   RegisterRequest,
 } from '../types/auth.types'
+import { isGoogleTokensResponse } from '../types/auth.types'
+
+export interface PendingGoogleSignup {
+  credential: string
+  email: string
+  firstName: string
+  lastName: string
+}
 
 const TOKENS_KEY = 'hr_prescan_tokens'
 
@@ -37,6 +48,8 @@ export const useAuthStore = defineStore('auth', () => {
   const tokens = ref<AuthTokens | null>(loadTokens())
   const loading = ref(false)
   const error = ref<string | null>(null)
+  // In-memory only — never persisted to localStorage
+  const pendingGoogleSignup = ref<PendingGoogleSignup | null>(null)
 
   const isAuthenticated = computed(() => !!tokens.value?.access && !!user.value)
 
@@ -57,14 +70,29 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  async function googleLogin(credential: string): Promise<void> {
+  async function googleLogin(
+    credential: string,
+    role?: GoogleAuthRole,
+  ): Promise<GoogleAuthResponse> {
     loading.value = true
     error.value = null
     try {
-      const response = await authService.googleAuth(credential)
-      tokens.value = response.tokens
-      user.value = response.user
-      saveTokens(response.tokens)
+      const response = await authService.googleAuth(credential, role)
+      if (isGoogleTokensResponse(response)) {
+        tokens.value = response.tokens
+        user.value = response.user
+        saveTokens(response.tokens)
+        pendingGoogleSignup.value = null
+      } else {
+        // needs_role or needs_company — keep the credential for the next step
+        pendingGoogleSignup.value = {
+          credential,
+          email: response.email,
+          firstName: response.first_name,
+          lastName: response.last_name,
+        }
+      }
+      return response
     } catch (err: unknown) {
       const message = extractErrorMessage(err)
       error.value = message
@@ -72,6 +100,37 @@ export const useAuthStore = defineStore('auth', () => {
     } finally {
       loading.value = false
     }
+  }
+
+  async function googleRegisterCompany(
+    data: Omit<GoogleRegisterCompanyRequest, 'credential'>,
+  ): Promise<void> {
+    const pending = pendingGoogleSignup.value
+    if (!pending) {
+      throw new Error('No pending Google sign-up in progress')
+    }
+    loading.value = true
+    error.value = null
+    try {
+      const response = await authService.googleRegisterCompany({
+        ...data,
+        credential: pending.credential,
+      })
+      tokens.value = response.tokens
+      user.value = response.user
+      saveTokens(response.tokens)
+      pendingGoogleSignup.value = null
+    } catch (err: unknown) {
+      const message = extractErrorMessage(err)
+      error.value = message
+      throw new Error(message)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  function clearPendingGoogleSignup(): void {
+    pendingGoogleSignup.value = null
   }
 
   async function register(data: RegisterRequest): Promise<void> {
@@ -170,8 +229,11 @@ export const useAuthStore = defineStore('auth', () => {
     loading,
     error,
     isAuthenticated,
+    pendingGoogleSignup,
     login,
     googleLogin,
+    googleRegisterCompany,
+    clearPendingGoogleSignup,
     register,
     logout,
     refreshAccessToken,

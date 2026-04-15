@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Message from 'primevue/message'
 import Stepper from 'primevue/stepper'
@@ -7,6 +8,7 @@ import StepList from 'primevue/steplist'
 import StepPanels from 'primevue/steppanels'
 import Step from 'primevue/step'
 import StepPanel from 'primevue/steppanel'
+import Button from 'primevue/button'
 import CompanyInfoStep from '../components/CompanyInfoStep.vue'
 import AdminAccountStep from '../components/AdminAccountStep.vue'
 import { useAuthStore } from '../stores/auth.store'
@@ -14,15 +16,21 @@ import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { CompanySize } from '../types/auth.types'
 
 const authStore = useAuthStore()
+const router = useRouter()
 const { t } = useI18n()
+
+// If a Google HR sign-up is pending (credential + email/name prefilled),
+// we skip the admin-account step entirely and call the Google endpoint.
+const pendingGoogle = computed(() => authStore.pendingGoogleSignup)
+const isGoogleFlow = computed(() => !!pendingGoogle.value)
 
 const companyName = ref('')
 const industry = ref('')
 const size = ref<CompanySize | null>(null)
 const country = ref('')
-const adminFirstName = ref('')
-const adminLastName = ref('')
-const adminEmail = ref('')
+const adminFirstName = ref(pendingGoogle.value?.firstName ?? '')
+const adminLastName = ref(pendingGoogle.value?.lastName ?? '')
+const adminEmail = ref(pendingGoogle.value?.email ?? '')
 const adminPassword = ref('')
 const confirmPassword = ref('')
 const errorMessage = ref<string | null>(null)
@@ -73,8 +81,15 @@ function validateAdminStep(): boolean {
   return !Object.values(adminErrors.value).some(Boolean)
 }
 
-function goToAdminStep(): void {
+async function goToAdminStep(): Promise<void> {
   if (!validateCompanyStep()) return
+
+  if (isGoogleFlow.value) {
+    // Google HR flow: no admin account step — submit straight away
+    await handleGoogleSubmit()
+    return
+  }
+
   activeStep.value = '2'
 }
 
@@ -98,6 +113,27 @@ async function handleSubmit(): Promise<void> {
     errorMessage.value =
       err instanceof Error ? err.message : 'Registration failed. Please try again.'
   }
+}
+
+async function handleGoogleSubmit(): Promise<void> {
+  errorMessage.value = null
+  try {
+    await authStore.googleRegisterCompany({
+      company_name: companyName.value,
+      industry: industry.value,
+      size: size.value!,
+      country: country.value,
+    })
+    await router.push({ name: ROUTE_NAMES.DASHBOARD })
+  } catch (err: unknown) {
+    errorMessage.value =
+      err instanceof Error ? err.message : 'Registration failed. Please try again.'
+  }
+}
+
+function cancelGoogleFlow(): void {
+  authStore.clearPendingGoogleSignup()
+  void router.push({ name: ROUTE_NAMES.LOGIN })
 }
 </script>
 
@@ -130,7 +166,35 @@ async function handleSubmit(): Promise<void> {
           {{ errorMessage }}
         </Message>
 
-        <Stepper v-model:value="activeStep" linear>
+        <template v-if="isGoogleFlow">
+          <Message severity="info" class="mb-4">
+            {{ t('auth.companyRegister.googleSignedInAs', { email: adminEmail }) }}
+          </Message>
+
+          <CompanyInfoStep
+            v-model:company-name="companyName"
+            v-model:industry="industry"
+            v-model:size="size"
+            v-model:country="country"
+            :submitted="companyStepSubmitted"
+            :errors="companyErrors"
+            :size-options="sizeOptions"
+            @next="goToAdminStep"
+          />
+
+          <div class="mt-2 flex justify-center">
+            <Button
+              type="button"
+              severity="secondary"
+              text
+              :label="t('auth.companyRegister.cancelGoogle')"
+              :disabled="authStore.loading"
+              @click="cancelGoogleFlow"
+            />
+          </div>
+        </template>
+
+        <Stepper v-else v-model:value="activeStep" linear>
           <StepList>
             <Step value="1">{{ t('auth.companyRegister.step1') }}</Step>
             <Step value="2">{{ t('auth.companyRegister.step2') }}</Step>

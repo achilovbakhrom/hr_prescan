@@ -2,9 +2,24 @@
        migrate makemigrations createsuperuser shell \
        lint format typecheck test \
        up-monitoring up-management up-all \
-       clean reset-db backup-db \
-       local-setup local-infra local-backend local-frontend local-stop \
+       clean reset-db backup-db ensure-env \
+       local-setup local-infra local-backend local-backend-all local-frontend local-stop local-stop-all \
        local-test local-test-backend local-test-frontend local-test-e2e
+
+# Ensure a project-root .env exists so docker compose variable
+# interpolation (LIVEKIT_API_KEY etc.) finds the values. On servers this
+# symlink is created during provisioning; for local dev we auto-create it.
+# No-op if .env already exists.
+ensure-env:
+	@if [ ! -e .env ]; then \
+		if [ -e backend/.env ]; then \
+			ln -s backend/.env .env; \
+			echo "Created .env -> backend/.env symlink for docker compose."; \
+		else \
+			echo "ERROR: backend/.env not found. Run 'make local-setup' or copy backend/.env.example."; \
+			exit 1; \
+		fi; \
+	fi
 
 # ─── General ──────────────────────────────────────────────────────────────────
 
@@ -17,6 +32,7 @@ help: ## Show this help
 setup: ## First-time setup: copy env, build images, start services, run migrations
 	@test -f backend/.env || cp backend/.env.example backend/.env
 	@test -f frontend/.env || cp frontend/.env.example frontend/.env
+	@$(MAKE) ensure-env
 	@echo "✅ .env files ready (edit backend/.env and frontend/.env)"
 	docker compose build
 	docker compose up -d
@@ -36,7 +52,7 @@ setup: ## First-time setup: copy env, build images, start services, run migratio
 
 # ─── Docker ───────────────────────────────────────────────────────────────────
 
-up: ## Start all dev services
+up: ensure-env ## Start all dev services
 	docker compose up -d
 
 down: ## Stop all services
@@ -141,10 +157,11 @@ local-setup: ## First-time local dev setup: venv, deps, infra, migrate
 	@echo ""
 	@echo "Local dev ready! Run:"
 	@echo "  make local-all       # Start everything (backend + celery + frontend)"
+	@echo "  make local-backend-all  # Django + Celery worker + Celery beat (no frontend)"
 	@echo "  make local-backend   # Django only on :8000"
 	@echo "  make local-frontend  # Vite only on :5173"
 
-local-infra: ## Start only infra in Docker (stop app containers to free ports)
+local-infra: ensure-env ## Start only infra in Docker (stop app containers to free ports)
 	-@docker compose stop django celery-worker celery-beat frontend nginx 2>/dev/null || true
 	docker compose up -d postgres redis rabbitmq minio livekit
 
@@ -159,6 +176,26 @@ local-celery-beat: ## Run Celery beat natively
 
 local-frontend: ## Run Vite dev server natively
 	cd frontend && npm run dev
+
+local-backend-all: local-infra ## Start infra + Django + Celery worker + Celery beat
+	@echo "Starting infra containers..."
+	@sleep 3
+	@echo "Running migrations..."
+	@cd backend && $(VENV)/python manage.py migrate --noinput
+	@echo "Starting Django server..."
+	@cd backend && $(VENV)/python manage.py runserver 0.0.0.0:8000 &
+	@echo "Starting Celery worker..."
+	@cd backend && $(VENV)/celery -A config worker -l info --concurrency=2 &
+	@echo "Starting Celery beat..."
+	@cd backend && $(VENV)/celery -A config beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler &
+	@echo ""
+	@echo "Backend services started in background:"
+	@echo "  Django:   http://localhost:8000"
+	@echo "  Celery:   worker + beat"
+	@echo "  RabbitMQ: http://localhost:15672"
+	@echo "  MinIO:    http://localhost:9001"
+	@echo ""
+	@echo "Run 'make local-stop' to stop everything."
 
 local-all: local-infra ## Start infra + backend + celery + frontend (all in background)
 	@echo "Starting infra containers..."
@@ -204,6 +241,20 @@ local-stop: ## Stop everything (infra + background processes)
 	-@pkill -f "vite" 2>/dev/null || true
 	docker compose down
 	@echo "All stopped."
+
+local-stop-all: ## Force-kill all local backend/frontend processes + stop Docker
+	@echo "Force-killing all processes..."
+	-@pkill -9 -f "manage.py runserver" 2>/dev/null && echo "  Django stopped" || true
+	-@pkill -9 -f "celery -A config" 2>/dev/null && echo "  Celery worker stopped" || true
+	-@pkill -9 -f "celery.*config" 2>/dev/null && echo "  Celery beat stopped" || true
+	-@pkill -9 -f "vite" 2>/dev/null && echo "  Vite stopped" || true
+	-@pkill -9 -f "node.*frontend" 2>/dev/null && echo "  Node frontend stopped" || true
+	-@lsof -ti :8000 | xargs kill -9 2>/dev/null && echo "  Port 8000 freed" || true
+	-@lsof -ti :5173 | xargs kill -9 2>/dev/null && echo "  Port 5173 freed" || true
+	-@lsof -ti :8100 | xargs kill -9 2>/dev/null && echo "  Port 8100 freed" || true
+	-@lsof -ti :5180 | xargs kill -9 2>/dev/null && echo "  Port 5180 freed" || true
+	docker compose down
+	@echo "All force-stopped."
 
 # ─── Testing (local) ─────────────────────────────────────────────────────────
 

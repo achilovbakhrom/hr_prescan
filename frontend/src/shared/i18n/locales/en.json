@@ -103,7 +103,22 @@
       "adminFirstName": "First Name",
       "adminLastName": "Last Name",
       "submit": "Register Company",
-      "success": "Company registered! Please verify your email."
+      "success": "Company registered! Please verify your email.",
+      "googleSignedInAs": "Signed in with Google as {email}. Fill in your company details to finish.",
+      "cancelGoogle": "Cancel and use a different account"
+    },
+    "rolePicker": {
+      "title": "How will you use HR PreScan?",
+      "subtitle": "Tell us a bit about yourself so we can set up the right experience.",
+      "cancel": "Cancel",
+      "candidate": {
+        "title": "I'm looking for a job",
+        "description": "Browse open positions and apply to vacancies."
+      },
+      "hr": {
+        "title": "I'm hiring",
+        "description": "Post vacancies and pre-screen candidates with AI."
+      }
     },
     "verifyEmail": {
       "title": "Verify Your Email",

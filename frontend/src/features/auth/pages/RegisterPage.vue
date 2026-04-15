@@ -7,8 +7,15 @@ import Password from 'primevue/password'
 import Button from 'primevue/button'
 import Message from 'primevue/message'
 import GoogleSignInButton from '../components/GoogleSignInButton.vue'
+import RolePickerDialog from '../components/RolePickerDialog.vue'
 import { useAuthStore } from '../stores/auth.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
+import type { GoogleAuthRole } from '../types/auth.types'
+import {
+  isGoogleNeedsCompanyResponse,
+  isGoogleNeedsRoleResponse,
+  isGoogleTokensResponse,
+} from '../types/auth.types'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -30,6 +37,11 @@ const errors = ref({
   password: false,
   confirmPassword: false,
 })
+
+// Google sign-in — credential kept only in memory
+const googleCredential = ref<string | null>(null)
+const rolePickerVisible = ref(false)
+const rolePickerLoading = ref(false)
 
 function validate(): boolean {
   errors.value.firstName = !firstName.value.trim()
@@ -62,11 +74,44 @@ async function handleRegister(): Promise<void> {
 
 async function handleGoogleSuccess(credential: string): Promise<void> {
   errorMessage.value = null
+  googleCredential.value = credential
   try {
-    await authStore.googleLogin(credential)
-    await router.push({ name: ROUTE_NAMES.DASHBOARD })
+    const response = await authStore.googleLogin(credential)
+    if (isGoogleTokensResponse(response)) {
+      await router.push({ name: ROUTE_NAMES.DASHBOARD })
+      return
+    }
+    if (isGoogleNeedsRoleResponse(response)) {
+      rolePickerVisible.value = true
+      return
+    }
+    if (isGoogleNeedsCompanyResponse(response)) {
+      await router.push({ name: ROUTE_NAMES.COMPANY_REGISTER })
+    }
   } catch (err: unknown) {
     errorMessage.value = err instanceof Error ? err.message : 'Google sign-in failed.'
+  }
+}
+
+async function handleRolePick(role: GoogleAuthRole): Promise<void> {
+  if (!googleCredential.value) return
+  rolePickerLoading.value = true
+  errorMessage.value = null
+  try {
+    const response = await authStore.googleLogin(googleCredential.value, role)
+    if (isGoogleTokensResponse(response)) {
+      rolePickerVisible.value = false
+      await router.push({ name: ROUTE_NAMES.DASHBOARD })
+      return
+    }
+    if (isGoogleNeedsCompanyResponse(response)) {
+      rolePickerVisible.value = false
+      await router.push({ name: ROUTE_NAMES.COMPANY_REGISTER })
+    }
+  } catch (err: unknown) {
+    errorMessage.value = err instanceof Error ? err.message : 'Google sign-in failed.'
+  } finally {
+    rolePickerLoading.value = false
   }
 }
 
@@ -105,6 +150,12 @@ function handleGoogleError(msg: string): void {
         </Message>
 
         <GoogleSignInButton @success="handleGoogleSuccess" @error="handleGoogleError" />
+
+        <RolePickerDialog
+          v-model:visible="rolePickerVisible"
+          :loading="rolePickerLoading"
+          @pick="handleRolePick"
+        />
 
         <div class="mb-4 flex items-center gap-3">
           <div class="h-px flex-1 bg-gray-200"></div>
