@@ -70,7 +70,11 @@ function toggleUserMenu(event: Event): void {
   userMenu.value?.toggle(event)
 }
 function handleMenuToggle(): void {
-  globalThis.innerWidth >= 1024 ? emit('toggleSidebar') : emit('toggleMobileNav')
+  if (globalThis.innerWidth >= 1024) {
+    emit('toggleSidebar')
+  } else {
+    emit('toggleMobileNav')
+  }
 }
 </script>
 

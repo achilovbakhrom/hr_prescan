@@ -39,7 +39,6 @@ function getTranslatedDescription(c: VacancyCriteria): string {
   const parts = translated.split(': ')
   return parts.length > 1 ? parts.slice(1).join(': ') : c.description
 }
-const { t } = useI18n()
 
 const showDialog = ref(false)
 const isEditing = ref(false)

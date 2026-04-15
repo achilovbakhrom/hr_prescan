@@ -14,7 +14,7 @@ export interface ColumnDef {
   dotColor: string
 }
 
-const props = defineProps<{
+defineProps<{
   column: ColumnDef
   candidates: Application[]
   menuItems: { label: string; icon: string; command: () => void; separator?: boolean }[]

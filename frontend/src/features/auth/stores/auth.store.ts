@@ -11,14 +11,6 @@ import type {
   LoginRequest,
   RegisterRequest,
 } from '../types/auth.types'
-import { isGoogleTokensResponse } from '../types/auth.types'
-
-export interface PendingGoogleSignup {
-  credential: string
-  email: string
-  firstName: string
-  lastName: string
-}
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
@@ -26,8 +18,6 @@ export const useAuthStore = defineStore('auth', () => {
   const companies = ref<CompanyMembership[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
-  // In-memory only — never persisted to localStorage
-  const pendingGoogleSignup = ref<PendingGoogleSignup | null>(null)
 
   const isAuthenticated = computed(() => !!tokens.value?.access && !!user.value)
   const hasMultipleCompanies = computed(() => companies.value.length > 1)

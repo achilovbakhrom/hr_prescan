@@ -2,7 +2,6 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import Button from 'primevue/button'
 import { vacancyService } from '../services/vacancy.service'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { Vacancy } from '../types/vacancy.types'

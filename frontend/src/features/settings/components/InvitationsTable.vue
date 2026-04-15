@@ -14,6 +14,8 @@ const emit = defineEmits<{
   cancel: [invitationId: string]
 }>()
 
+const { t } = useI18n()
+
 function formatDate(dateString: string): string {
   return new Date(dateString).toLocaleDateString()
 }

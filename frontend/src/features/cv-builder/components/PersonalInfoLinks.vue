@@ -13,10 +13,6 @@ const emit = defineEmits<{
   'update:githubUrl': [value: string]
   'update:websiteUrl': [value: string]
 }>()
-
-function hasError(field: string): boolean {
-  return field in (arguments[0] ?? {})
-}
 </script>
 
 <template>

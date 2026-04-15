@@ -20,6 +20,8 @@ const emit = defineEmits<{
   updatePermissions: [userId: string, permissions: HRPermission[]]
 }>()
 
+const { t } = useI18n()
+
 const editingMember = ref<TeamMember | null>(null)
 const editPermissions = ref<HRPermission[]>([])
 

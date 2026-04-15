@@ -16,7 +16,7 @@ import {
   buildRowMenuItems,
 } from '../utils/scoreHelpers'
 
-const props = defineProps<{
+defineProps<{
   interviewEnabled: boolean
   confirmRowStatus: (c: Application, toStatus: ApplicationStatus) => void
   searchQuery: string

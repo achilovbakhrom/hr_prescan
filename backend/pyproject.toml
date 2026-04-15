@@ -39,6 +39,20 @@ known-first-party = ["apps", "config", "integrations"]
 "**/prompts.py" = ["E501", "RUF001"]
 "**/tool_definitions.py" = ["E501", "RUF001"]
 "**/settings/**/*.py" = ["F401", "F403"]
+# AI service files contain long prompt strings (inline JSON schemas,
+# few-shot examples); and `type` is a domain term (notification type)
+# not the Python builtin.
+"**/cv_services/*.py" = ["E501"]
+"**/applications/services/cv_processing.py" = ["E501"]
+"**/vacancies/services/vacancy_ai.py" = ["E501"]
+"**/notifications/services/*.py" = ["A002"]
+"**/telegram_bot/candidate/apply.py" = ["RUF001"]
+"**/apis_candidate_dashboard.py" = ["S110"]
+"**/services/company_info.py" = ["S104"]
+"**/config/celery.py" = ["E402"]
+# Service __init__.py files re-export from submodules after a conditional
+# import block — E402 is a false positive for this pattern.
+"**/services/__init__.py" = ["E402"]
 
 [tool.mypy]
 python_version = "3.12"

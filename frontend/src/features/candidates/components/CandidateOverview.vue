@@ -21,8 +21,6 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
-const { t } = useI18n()
-
 const overallScore = computed(() => {
   const cv = props.candidate.matchScore
   const ps = props.prescanningScore != null ? Math.round(props.prescanningScore * 10) : null

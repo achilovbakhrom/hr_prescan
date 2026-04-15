@@ -9,12 +9,6 @@ import RegisterFormFields from '../components/RegisterFormFields.vue'
 import RegisterSuccess from '../components/RegisterSuccess.vue'
 import { useAuthStore } from '../stores/auth.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
-import type { GoogleAuthRole } from '../types/auth.types'
-import {
-  isGoogleNeedsCompanyResponse,
-  isGoogleNeedsRoleResponse,
-  isGoogleTokensResponse,
-} from '../types/auth.types'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -39,8 +33,6 @@ const errors = ref({
 
 // Google sign-in — credential kept only in memory
 const googleCredential = ref<string | null>(null)
-const rolePickerVisible = ref(false)
-const rolePickerLoading = ref(false)
 
 function validate(): boolean {
   errors.value.firstName = !firstName.value.trim()

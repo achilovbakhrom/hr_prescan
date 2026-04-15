@@ -12,13 +12,6 @@ const props = defineProps<{
   interviewScore: number | null
 }>()
 
-const props = defineProps<{
-  overallScore: number | null
-  matchDetails: MatchDetails | null
-  prescanningScore: number | null
-  interviewScore: number | null
-}>()
-
 const { t } = useI18n()
 
 interface MatchDetails {

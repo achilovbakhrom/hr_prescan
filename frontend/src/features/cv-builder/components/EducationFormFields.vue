@@ -33,10 +33,6 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
-
-function hasError(field: string): boolean {
-  return field in emit
-}
 </script>
 
 <template>

@@ -1,4 +1,5 @@
 """Integration tests for the candidate Telegram bot — PR1 deep-link apply flow."""
+
 from __future__ import annotations
 
 from unittest.mock import patch
@@ -11,7 +12,6 @@ from apps.integrations.telegram_bot.bots import ROLE_CANDIDATE
 from apps.integrations.telegram_bot.candidate.auth import get_or_create_candidate_user
 from apps.integrations.telegram_bot.candidate.handlers import handle_update
 from apps.integrations.telegram_bot.sessions import clear_session, get_session
-
 
 TG_USER = {
     "id": 12345678,
@@ -86,10 +86,13 @@ class TestGetOrCreateCandidateUser:
 
 class TestStartCommand:
     def test_plain_start_creates_user_and_sends_welcome(self):
-        with patch(
-            "apps.integrations.telegram_bot.client.requests.post",
-        ) as post_mock, patch(
-            "apps.integrations.telegram_bot.client.requests.get",
+        with (
+            patch(
+                "apps.integrations.telegram_bot.client.requests.post",
+            ) as post_mock,
+            patch(
+                "apps.integrations.telegram_bot.client.requests.get",
+            ),
         ):
             post_mock.return_value.json.return_value = {"ok": True, "result": {}}
             handle_update(_make_message_update("/start"))
@@ -99,10 +102,13 @@ class TestStartCommand:
         assert any("sendMessage" in str(c) for c in post_mock.call_args_list)
 
     def test_start_with_vacancy_deep_link(self, vacancy):
-        with patch(
-            "apps.integrations.telegram_bot.client.requests.post",
-        ) as post_mock, patch(
-            "apps.integrations.telegram_bot.client.requests.get",
+        with (
+            patch(
+                "apps.integrations.telegram_bot.client.requests.post",
+            ) as post_mock,
+            patch(
+                "apps.integrations.telegram_bot.client.requests.get",
+            ),
         ):
             post_mock.return_value.json.return_value = {"ok": True, "result": {}}
             handle_update(_make_message_update(f"/start vac_{vacancy.id}"))
@@ -110,9 +116,7 @@ class TestStartCommand:
         # User created
         assert User.objects.filter(telegram_id=TG_USER["id"]).exists()
         # Vacancy card sent — payload contains the vacancy title
-        sent_text = "".join(
-            str(call.kwargs.get("json", {}).get("text", "")) for call in post_mock.call_args_list
-        )
+        sent_text = "".join(str(call.kwargs.get("json", {}).get("text", "")) for call in post_mock.call_args_list)
         assert vacancy.title in sent_text
 
 
@@ -121,10 +125,13 @@ class TestApplyFlow:
         vacancy.cv_required = True
         vacancy.save(update_fields=["cv_required"])
 
-        with patch(
-            "apps.integrations.telegram_bot.client.requests.post",
-        ) as post_mock, patch(
-            "apps.integrations.telegram_bot.client.requests.get",
+        with (
+            patch(
+                "apps.integrations.telegram_bot.client.requests.post",
+            ) as post_mock,
+            patch(
+                "apps.integrations.telegram_bot.client.requests.get",
+            ),
         ):
             post_mock.return_value.json.return_value = {"ok": True, "result": {}}
             handle_update(_make_callback_update(f"cand:vac:apply:{vacancy.id}"))
@@ -138,10 +145,13 @@ class TestApplyFlow:
         vacancy.cv_required = False
         vacancy.save(update_fields=["cv_required"])
 
-        with patch(
-            "apps.integrations.telegram_bot.client.requests.post",
-        ) as post_mock, patch(
-            "apps.integrations.telegram_bot.client.requests.get",
+        with (
+            patch(
+                "apps.integrations.telegram_bot.client.requests.post",
+            ) as post_mock,
+            patch(
+                "apps.integrations.telegram_bot.client.requests.get",
+            ),
         ):
             post_mock.return_value.json.return_value = {"ok": True, "result": {}}
             handle_update(_make_callback_update(f"cand:vac:apply:{vacancy.id}"))

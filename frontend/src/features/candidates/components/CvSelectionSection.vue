@@ -7,7 +7,7 @@ import type { FileUploadSelectEvent } from 'primevue/fileupload'
 import { cvBuilderService } from '@/features/cv-builder/services/cv-builder.service'
 import type { CvFile } from '@/features/cv-builder/types/cv-builder.types'
 
-const props = defineProps<{
+defineProps<{
   cvRequired: boolean
 }>()
 

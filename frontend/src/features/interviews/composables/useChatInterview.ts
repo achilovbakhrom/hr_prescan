@@ -144,7 +144,11 @@ export function useChatInterview(token: string) {
     }
   }
   function handleClose(): void {
-    isCompleted.value ? router.push('/jobs') : (showLeaveConfirm.value = true)
+    if (isCompleted.value) {
+      router.push('/jobs')
+    } else {
+      showLeaveConfirm.value = true
+    }
   }
 
   onMounted(async () => {

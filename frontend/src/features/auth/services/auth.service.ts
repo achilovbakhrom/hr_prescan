@@ -2,8 +2,6 @@ import { apiClient } from '@/shared/api/client'
 import type { CompanyMembership } from '@/shared/types/auth.types'
 import type {
   AcceptInvitationRequest,
-  GoogleAuthResponse,
-  GoogleAuthRole,
   LoginRequest,
   LoginResponse,
   PendingInvitation,

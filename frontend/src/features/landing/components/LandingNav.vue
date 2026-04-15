@@ -47,6 +47,12 @@ function goToRoute(name: string): void {
   mobileOpen.value = false
 }
 
+async function handleLogout(): Promise<void> {
+  await authStore.logout()
+  mobileOpen.value = false
+  await router.push({ name: ROUTE_NAMES.LOGIN })
+}
+
 const navLinks = [
   { id: 'features', labelKey: 'landing.footer.features' },
   { id: 'how-it-works', labelKey: 'landing.howItWorks.title' },
@@ -179,10 +185,7 @@ const navLinks = [
               text
               severity="secondary"
               class="justify-start"
-              @click="
-                router.push({ name: ROUTE_NAMES.PROFILE })
-                mobileOpen = false
-              "
+              @click="goToRoute(ROUTE_NAMES.PROFILE)"
             />
             <Button
               :label="t('nav.logout')"
@@ -190,12 +193,7 @@ const navLinks = [
               text
               severity="secondary"
               class="justify-start"
-              @click="
-                authStore.logout().then(() => {
-                  router.push({ name: ROUTE_NAMES.LOGIN })
-                  mobileOpen = false
-                })
-              "
+              @click="handleLogout"
             />
           </template>
         </div>

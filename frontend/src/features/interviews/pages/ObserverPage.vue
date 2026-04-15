@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import { useInterviewStore } from '../stores/interview.store'
 import ConnectionStatus from '@/features/video/components/ConnectionStatus.vue'
 import { useLiveKit } from '@/features/video/composables/useLiveKit'
 
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const interviewStore = useInterviewStore()

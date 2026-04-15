@@ -5,6 +5,14 @@ import Button from 'primevue/button'
 import CvMatchScoreCard from './CvMatchScoreCard.vue'
 import CvParsedSections from './CvParsedSections.vue'
 
+interface MatchDetails {
+  overall?: number
+  criteria_scores?: Record<string, number>
+  notes?: string
+  matching_skills?: string[]
+  missing_skills?: string[]
+}
+
 const props = defineProps<{
   data: Record<string, unknown> | null
   cvFile?: string
@@ -17,6 +25,8 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{ downloadCv: [] }>()
+
+const { t } = useI18n()
 
 const hasData = computed(() => {
   if (!props.data) return false

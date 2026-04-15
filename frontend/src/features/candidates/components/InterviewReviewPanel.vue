@@ -39,6 +39,8 @@ interface InterviewData {
   createdAt: string
 }
 
+const { t } = useI18n()
+
 const interview = ref<InterviewData | null>(null)
 const loading = ref(false)
 const error = ref('')
