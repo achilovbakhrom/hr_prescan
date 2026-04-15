@@ -3,7 +3,7 @@
        lint format typecheck test \
        up-monitoring up-management up-all \
        clean reset-db backup-db \
-       local-setup local-infra local-backend local-frontend local-stop \
+       local-setup local-infra local-backend local-backend-all local-frontend local-stop \
        local-test local-test-backend local-test-frontend local-test-e2e
 
 # ─── General ──────────────────────────────────────────────────────────────────
@@ -141,6 +141,7 @@ local-setup: ## First-time local dev setup: venv, deps, infra, migrate
 	@echo ""
 	@echo "Local dev ready! Run:"
 	@echo "  make local-all       # Start everything (backend + celery + frontend)"
+	@echo "  make local-backend-all  # Django + Celery worker + Celery beat (no frontend)"
 	@echo "  make local-backend   # Django only on :8000"
 	@echo "  make local-frontend  # Vite only on :5173"
 
@@ -159,6 +160,26 @@ local-celery-beat: ## Run Celery beat natively
 
 local-frontend: ## Run Vite dev server natively
 	cd frontend && npm run dev
+
+local-backend-all: local-infra ## Start infra + Django + Celery worker + Celery beat
+	@echo "Starting infra containers..."
+	@sleep 3
+	@echo "Running migrations..."
+	@cd backend && $(VENV)/python manage.py migrate --noinput
+	@echo "Starting Django server..."
+	@cd backend && $(VENV)/python manage.py runserver 0.0.0.0:8000 &
+	@echo "Starting Celery worker..."
+	@cd backend && $(VENV)/celery -A config worker -l info --concurrency=2 &
+	@echo "Starting Celery beat..."
+	@cd backend && $(VENV)/celery -A config beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler &
+	@echo ""
+	@echo "Backend services started in background:"
+	@echo "  Django:   http://localhost:8000"
+	@echo "  Celery:   worker + beat"
+	@echo "  RabbitMQ: http://localhost:15672"
+	@echo "  MinIO:    http://localhost:9001"
+	@echo ""
+	@echo "Run 'make local-stop' to stop everything."
 
 local-all: local-infra ## Start infra + backend + celery + frontend (all in background)
 	@echo "Starting infra containers..."

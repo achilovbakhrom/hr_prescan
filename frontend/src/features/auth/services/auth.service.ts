@@ -1,6 +1,10 @@
 import { apiClient } from '@/shared/api/client'
 import type {
   AcceptInvitationRequest,
+  GoogleAuthResponse,
+  GoogleAuthRole,
+  GoogleRegisterCompanyRequest,
+  GoogleRegisterCompanyResponse,
   LoginRequest,
   LoginResponse,
   PendingInvitation,
@@ -48,8 +52,20 @@ export const authService = {
     await apiClient.post('/auth/company-register', data)
   },
 
-  async googleAuth(credential: string): Promise<LoginResponse> {
-    const response = await apiClient.post<LoginResponse>('/auth/google', { credential })
+  async googleAuth(credential: string, role?: GoogleAuthRole): Promise<GoogleAuthResponse> {
+    const payload: { credential: string; role?: GoogleAuthRole } = { credential }
+    if (role) payload.role = role
+    const response = await apiClient.post<GoogleAuthResponse>('/auth/google', payload)
+    return response.data
+  },
+
+  async googleRegisterCompany(
+    data: GoogleRegisterCompanyRequest,
+  ): Promise<GoogleRegisterCompanyResponse> {
+    const response = await apiClient.post<GoogleRegisterCompanyResponse>(
+      '/auth/google/register-company',
+      data,
+    )
     return response.data
   },
 

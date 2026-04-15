@@ -16,7 +16,7 @@ from apps.accounts.apis.company import (
     TeamListApi,
     TeamMemberDetailApi,
 )
-from apps.accounts.apis.google_auth import GoogleAuthApi
+from apps.accounts.apis.google_auth import GoogleAuthApi, GoogleCompanyRegisterApi
 
 __all__ = [
     "AcceptCompanyInvitationApi",
@@ -24,6 +24,7 @@ __all__ = [
     "CompanyProfileApi",
     "CompanyRegisterApi",
     "GoogleAuthApi",
+    "GoogleCompanyRegisterApi",
     "InviteHRApi",
     "LoginApi",
     "LogoutApi",

@@ -6,6 +6,7 @@ from apps.accounts.apis import (
     CompanyProfileApi,
     CompanyRegisterApi,
     GoogleAuthApi,
+    GoogleCompanyRegisterApi,
     InviteHRApi,
     LoginApi,
     LogoutApi,
@@ -29,6 +30,7 @@ auth_urlpatterns = [
     path("company-register/", CompanyRegisterApi.as_view(), name="company-register"),
     path("accept-invitation/", AcceptInvitationApi.as_view(), name="accept-invitation"),
     path("google/", GoogleAuthApi.as_view(), name="google-auth"),
+    path("google/register-company/", GoogleCompanyRegisterApi.as_view(), name="google-company-register"),
     path("my-invitations/", MyInvitationsApi.as_view(), name="my-invitations"),
     path("accept-company-invitation/", AcceptCompanyInvitationApi.as_view(), name="accept-company-invitation"),
 ]
