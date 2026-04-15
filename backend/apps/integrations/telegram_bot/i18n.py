@@ -133,6 +133,6 @@ def t(key: str, *, lang: str = DEFAULT_LANGUAGE, **fmt: Any) -> str:
     if fmt:
         try:
             return text.format(**fmt)
-        except KeyError, IndexError:
+        except (KeyError, IndexError):
             return text
     return text

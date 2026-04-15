@@ -67,7 +67,7 @@ def _handle_get_job_details(*, user, params):
             status=Vacancy.Status.PUBLISHED,
             is_deleted=False,
         )
-    except Vacancy.DoesNotExist, ValueError:
+    except (Vacancy.DoesNotExist, ValueError):
         raise ApplicationError("Job not found. It may have been removed or is no longer available.") from None
 
     data = {

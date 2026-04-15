@@ -46,7 +46,7 @@ def _handle_get_application_details(*, user, params):
         application = Application.objects.select_related("vacancy", "vacancy__company", "vacancy__employer").get(
             id=application_id, candidate=user, is_deleted=False
         )
-    except Application.DoesNotExist, ValueError:
+    except (Application.DoesNotExist, ValueError):
         raise ApplicationError("Application not found.") from None
 
     data = {

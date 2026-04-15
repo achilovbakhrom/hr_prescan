@@ -75,7 +75,7 @@ class VoiceChatMessageApi(APIView):
         # Parse duration (seconds)
         try:
             duration = float(request.data.get("duration", 0))
-        except TypeError, ValueError:
+        except (TypeError, ValueError):
             duration = 0.0
 
         from apps.interviews.chat_service import process_voice_message

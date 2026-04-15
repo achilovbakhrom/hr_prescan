@@ -41,7 +41,7 @@ def parse_deep_link_vacancy(*, payload: str) -> UUID | None:
     raw = payload[len(DEEP_LINK_PREFIX) :]
     try:
         return UUID(raw)
-    except ValueError, TypeError:
+    except (ValueError, TypeError):
         return None
 
 

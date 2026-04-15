@@ -73,7 +73,7 @@ class LogoutApi(APIView):
         try:
             token = RefreshToken(serializer.validated_data["refresh"])
             token.blacklist()
-        except TokenError, InvalidToken:
+        except (TokenError, InvalidToken):
             return Response(
                 {"detail": str(MSG_INVALID_TOKEN)},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -96,7 +96,7 @@ class TokenRefreshApi(APIView):
 
         try:
             refresh = RefreshToken(serializer.validated_data["refresh"])
-        except TokenError, InvalidToken:
+        except (TokenError, InvalidToken):
             return Response(
                 {"detail": str(MSG_INVALID_REFRESH_TOKEN)},
                 status=status.HTTP_401_UNAUTHORIZED,

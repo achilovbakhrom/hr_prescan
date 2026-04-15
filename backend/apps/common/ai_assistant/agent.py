@@ -71,7 +71,7 @@ def process_ai_command(*, user, message, context=None):
             if isinstance(msg, ToolMessage):
                 try:
                     tool_result = json.loads(msg.content) if isinstance(msg.content, str) else msg.content
-                except json.JSONDecodeError, TypeError:
+                except (json.JSONDecodeError, TypeError):
                     tool_result = {"message": str(msg.content)}
                 # Update the last unresolved action with actual result
                 for a in reversed(actions_taken):

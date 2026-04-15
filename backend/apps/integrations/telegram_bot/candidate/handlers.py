@@ -176,7 +176,7 @@ def _handle_apply_callback(
 ) -> None:
     try:
         vacancy_id = UUID(vacancy_arg)
-    except ValueError, TypeError:
+    except (ValueError, TypeError):
         return
     session = get_session(role=ROLE_CANDIDATE, telegram_id=user.telegram_id)
     confirm_apply(

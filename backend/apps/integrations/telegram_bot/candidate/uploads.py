@@ -104,7 +104,7 @@ def handle_document(
     if pending:
         try:
             vacancy_id = UUID(pending)
-        except ValueError, TypeError:
+        except (ValueError, TypeError):
             return
         from apps.integrations.telegram_bot.candidate.apply import confirm_apply
 
