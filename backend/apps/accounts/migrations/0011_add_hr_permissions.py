@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('accounts', '0010_add_salary_negotiable'),
+        ("accounts", "0010_add_salary_negotiable"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='invitation',
-            name='permissions',
+            model_name="invitation",
+            name="permissions",
             field=models.JSONField(blank=True, default=list),
         ),
         migrations.AddField(
-            model_name='user',
-            name='hr_permissions',
+            model_name="user",
+            name="hr_permissions",
             field=models.JSONField(blank=True, default=list),
         ),
     ]

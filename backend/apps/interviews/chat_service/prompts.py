@@ -16,22 +16,20 @@ def build_system_prompt(interview: Interview) -> str:
 
     # Filter competencies and criteria by step
     competencies = list(
-        vacancy.questions.filter(is_active=True, step=step)
-        .order_by("order")
-        .values_list("text", "category")
+        vacancy.questions.filter(is_active=True, step=step).order_by("order").values_list("text", "category")
     )
-    competencies_text = "\n".join(
-        f"- [{cat}] {text}" for text, cat in competencies
-    ) if competencies else "No specific competencies defined."
+    competencies_text = (
+        "\n".join(f"- [{cat}] {text}" for text, cat in competencies)
+        if competencies
+        else "No specific competencies defined."
+    )
 
-    criteria = list(
-        vacancy.criteria.filter(step=step)
-        .order_by("order")
-        .values_list("name", "description", "weight")
+    criteria = list(vacancy.criteria.filter(step=step).order_by("order").values_list("name", "description", "weight"))
+    criteria_text = (
+        "\n".join(f"- {name} (weight: {weight}): {desc}" for name, desc, weight in criteria)
+        if criteria
+        else "No specific criteria defined."
     )
-    criteria_text = "\n".join(
-        f"- {name} (weight: {weight}): {desc}" for name, desc, weight in criteria
-    ) if criteria else "No specific criteria defined."
 
     cv_section = _build_cv_section(application)
     company_info_section, company_info = _build_company_info_section(vacancy)
@@ -48,8 +46,8 @@ def build_system_prompt(interview: Interview) -> str:
 ## Vacancy Details
 - Title: {vacancy.title}
 - Description: {vacancy.description[:500]}
-- Requirements: {(vacancy.requirements or 'Not specified')[:500]}
-- Skills needed: {', '.join(vacancy.skills) if vacancy.skills else 'Not specified'}
+- Requirements: {(vacancy.requirements or "Not specified")[:500]}
+- Skills needed: {", ".join(vacancy.skills) if vacancy.skills else "Not specified"}
 - Experience level: {vacancy.get_experience_level_display()}
 {cv_section}{additional_prompt}
 ## Competencies to Evaluate
@@ -96,11 +94,11 @@ def _build_cv_section(application) -> str:
         cv_data = application.cv_parsed_data
         return f"""
 ## Candidate's CV Summary
-- Skills: {', '.join(cv_data.get('skills', [])) or 'Not available'}
-- Experience: {cv_data.get('experience_years', 'Unknown')} years
-- Education: {cv_data.get('education', 'Not available')}
-- Languages: {', '.join(lang if isinstance(lang, str) else f"{lang.get('language', '')} ({lang.get('level', '')})" for lang in cv_data.get('languages', [])) or 'Not available'}
-- Summary: {cv_data.get('summary', 'Not available')}
+- Skills: {", ".join(cv_data.get("skills", [])) or "Not available"}
+- Experience: {cv_data.get("experience_years", "Unknown")} years
+- Education: {cv_data.get("education", "Not available")}
+- Languages: {", ".join(lang if isinstance(lang, str) else f"{lang.get('language', '')} ({lang.get('level', '')})" for lang in cv_data.get("languages", [])) or "Not available"}
+- Summary: {cv_data.get("summary", "Not available")}
 
 Use this CV data to ask targeted follow-up questions and verify claims.
 """
@@ -161,7 +159,7 @@ def _prescanning_behavior(vacancy, company_info: str) -> str:
 - Typically ask 4-6 questions total
 
 ## Prescanning Approach
-1. Greet the candidate briefly{' and introduce the company' if company_info else ''}, then ask them to introduce themselves
+1. Greet the candidate briefly{" and introduce the company" if company_info else ""}, then ask them to introduce themselves
 2. For each competency you need to assess, come up with a natural question that checks whether the candidate has the skill — don't read competency descriptions aloud
 3. If the candidate's answer is vague, ask a short follow-up to check real understanding
 4. Keep it light — you're checking basic fit, not conducting a deep technical interview

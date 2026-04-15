@@ -3,6 +3,7 @@
 Each ``TelegramClient`` instance is bound to a single bot token, so the
 codebase can host multiple bots (HR + candidate) side-by-side.
 """
+
 from __future__ import annotations
 
 import logging

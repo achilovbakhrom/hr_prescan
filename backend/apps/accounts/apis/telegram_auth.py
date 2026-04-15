@@ -3,14 +3,13 @@ import hmac
 import logging
 import time
 
+from django.conf import settings
 from rest_framework import serializers, status
 from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-
-from django.conf import settings
 
 from apps.accounts.models import User
 from apps.accounts.serializers import UserOutputSerializer
@@ -122,9 +121,7 @@ class TelegramAuthApi(APIView):
         """
         received_hash = data["hash"]
         check_data = {k: v for k, v in data.items() if k != "hash" and v != ""}
-        data_check_string = "\n".join(
-            f"{k}={v}" for k, v in sorted(check_data.items())
-        )
+        data_check_string = "\n".join(f"{k}={v}" for k, v in sorted(check_data.items()))
 
         bot_token = settings.TELEGRAM_LOGIN_WIDGET_TOKEN
         if not bot_token:

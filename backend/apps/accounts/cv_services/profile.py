@@ -43,7 +43,7 @@ def _populate_profile_from_parsed(*, profile, data):
             setattr(profile, field, data[field])
             update_fields.append(field)
     if update_fields:
-        profile.save(update_fields=update_fields + ["updated_at"])
+        profile.save(update_fields=[*update_fields, "updated_at"])
 
     # Work experiences
     for exp in data.get("work_experiences", []):

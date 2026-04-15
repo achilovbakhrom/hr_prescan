@@ -3,6 +3,7 @@
 Used by both bots: candidates can answer interview questions by voice, and HR
 can issue voice commands. Returns plain text or ``None`` on failure.
 """
+
 from __future__ import annotations
 
 import logging
@@ -50,6 +51,6 @@ def transcribe_voice(*, client: TelegramClient, file_id: str) -> str | None:
             ),
         )
         return (response.text or "").strip()
-    except Exception as exc:  # noqa: BLE001 — Gemini SDK raises various types
+    except Exception as exc:
         logger.error("Telegram voice transcription error: %s", exc)
         return None

@@ -9,11 +9,6 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, Spec
 
 from apps.accounts.apis import PublicCvViewApi
 from apps.accounts.urls import candidate_profile_urlpatterns, hr_urlpatterns
-from apps.common.urls_admin import admin_urlpatterns
-from apps.subscriptions.urls import (
-    hr_urlpatterns as subscription_hr_urlpatterns,
-    public_urlpatterns as subscription_public_urlpatterns,
-)
 from apps.applications.urls import (
     candidate_urlpatterns as application_candidate_urlpatterns,
 )
@@ -27,23 +22,18 @@ from apps.applications.urls import (
     public_urlpatterns as application_public_urlpatterns,
 )
 from apps.common.apis import HRDashboardApi
-from apps.common.apis_search import HRGlobalSearchApi
 from apps.common.apis_ai import AIAssistantApi
 from apps.common.apis_candidate_ai import CandidateAIAssistantApi
 from apps.common.apis_candidate_dashboard import CandidateDashboardApi
-from apps.common.apis_translate import BatchTranslateApi, TranslateAIContentApi
-from apps.common.apis_hr_analytics import HRAnalyticsApi
 from apps.common.apis_country import CountryListApi
 from apps.common.apis_education_level import EducationLevelListApi
+from apps.common.apis_hr_analytics import HRAnalyticsApi
 from apps.common.apis_industry import IndustryListApi
 from apps.common.apis_language import LanguageListApi
+from apps.common.apis_search import HRGlobalSearchApi
 from apps.common.apis_skill import SkillListApi
-from apps.notifications.urls import (
-    candidate_urlpatterns as notification_candidate_urlpatterns,
-    hr_bulk_urlpatterns as notification_hr_bulk_urlpatterns,
-    hr_candidate_urlpatterns as notification_hr_candidate_urlpatterns,
-    notification_urlpatterns,
-)
+from apps.common.apis_translate import BatchTranslateApi, TranslateAIContentApi
+from apps.common.urls_admin import admin_urlpatterns
 from apps.integrations.urls import (
     hr_telegram_urlpatterns,
     telegram_urlpatterns,

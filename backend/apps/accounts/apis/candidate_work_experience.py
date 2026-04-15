@@ -21,7 +21,9 @@ class WorkExperienceListCreateApi(APIView):
         position = serializers.CharField(max_length=255)
         employment_type = serializers.ChoiceField(
             choices=CandidateProfile.EmploymentType.choices,
-            required=False, allow_blank=True, default="",
+            required=False,
+            allow_blank=True,
+            default="",
         )
         location = serializers.CharField(max_length=255, required=False, allow_blank=True, default="")
         start_date = serializers.DateField()
@@ -70,7 +72,8 @@ class WorkExperienceDetailApi(APIView):
         position = serializers.CharField(max_length=255, required=False)
         employment_type = serializers.ChoiceField(
             choices=CandidateProfile.EmploymentType.choices,
-            required=False, allow_blank=True,
+            required=False,
+            allow_blank=True,
         )
         location = serializers.CharField(max_length=255, required=False, allow_blank=True)
         start_date = serializers.DateField(required=False)

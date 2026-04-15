@@ -4,22 +4,20 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Country',
+            name="Country",
             fields=[
-                ('code', models.CharField(max_length=2, primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=100)),
+                ("code", models.CharField(max_length=2, primary_key=True, serialize=False)),
+                ("name", models.CharField(max_length=100)),
             ],
             options={
-                'verbose_name_plural': 'countries',
-                'ordering': ['name'],
+                "verbose_name_plural": "countries",
+                "ordering": ["name"],
             },
         ),
     ]

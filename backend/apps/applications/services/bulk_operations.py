@@ -89,9 +89,7 @@ def bulk_move_by_filter(
     # Validate transition
     allowed = STATUS_TRANSITIONS.get(from_status, set())
     if to_status not in allowed:
-        raise ApplicationError(
-            str(MSG_STATUS_TRANSITION_INVALID).format(current=from_status, target=to_status)
-        )
+        raise ApplicationError(str(MSG_STATUS_TRANSITION_INVALID).format(current=from_status, target=to_status))
 
     qs = Application.objects.filter(
         vacancy_id=vacancy_id,

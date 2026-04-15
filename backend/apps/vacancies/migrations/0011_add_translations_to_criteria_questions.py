@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('vacancies', '0010_add_language_and_translation_fields'),
+        ("vacancies", "0010_add_language_and_translation_fields"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='interviewquestion',
-            name='translations',
+            model_name="interviewquestion",
+            name="translations",
             field=models.JSONField(blank=True, default=dict),
         ),
         migrations.AddField(
-            model_name='vacancycriteria',
-            name='translations',
+            model_name="vacancycriteria",
+            name="translations",
             field=models.JSONField(blank=True, default=dict),
         ),
     ]

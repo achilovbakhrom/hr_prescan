@@ -1,5 +1,7 @@
 from uuid import UUID
 
+from django.db import IntegrityError
+
 from apps.accounts.models import User
 from apps.applications.models import Application
 from apps.common.exceptions import ApplicationError
@@ -12,7 +14,6 @@ from apps.common.messages import (
 )
 from apps.interviews.models import Interview
 from apps.vacancies.models import Vacancy
-from django.db import IntegrityError
 
 # Valid status transitions: current_status -> set of allowed next statuses
 STATUS_TRANSITIONS: dict[str, set[str]] = {
@@ -164,9 +165,7 @@ def update_application_status(
     allowed = STATUS_TRANSITIONS.get(current, set())
 
     if status not in allowed:
-        raise ApplicationError(
-            str(MSG_STATUS_TRANSITION_INVALID).format(current=current, target=status)
-        )
+        raise ApplicationError(str(MSG_STATUS_TRANSITION_INVALID).format(current=current, target=status))
 
     # Reset to Applied = full pipeline restart
     if status == Application.Status.APPLIED and current != Application.Status.APPLIED:
@@ -192,5 +191,3 @@ def _reset_pipeline(*, application: Application) -> None:
         screening_mode=Interview.ScreeningMode.CHAT,
         status=Interview.Status.PENDING,
     )
-
-

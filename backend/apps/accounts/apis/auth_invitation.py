@@ -27,9 +27,10 @@ class CheckInvitationApi(APIView):
             return Response({"detail": "Token is required."}, status=status.HTTP_400_BAD_REQUEST)
 
         from apps.accounts.models import Invitation
+
         try:
             invitation = Invitation.objects.select_related("company").get(token=token)
-        except (Invitation.DoesNotExist, ValueError):
+        except Invitation.DoesNotExist, ValueError:
             return Response({"detail": "Invalid invitation."}, status=status.HTTP_404_NOT_FOUND)
 
         if invitation.is_accepted:
@@ -40,11 +41,13 @@ class CheckInvitationApi(APIView):
 
         existing_user = User.objects.filter(email=invitation.email).exists()
 
-        return Response({
-            "email": invitation.email,
-            "company_name": invitation.company.name,
-            "existing_user": existing_user,
-        })
+        return Response(
+            {
+                "email": invitation.email,
+                "company_name": invitation.company.name,
+                "existing_user": existing_user,
+            }
+        )
 
 
 class AcceptCompanyInvitationApi(APIView):
@@ -88,7 +91,8 @@ class CompleteCompanySetupApi(APIView):
         company_name = serializers.CharField(max_length=255)
         industries = serializers.ListField(
             child=serializers.SlugField(max_length=50),
-            required=False, default=list,
+            required=False,
+            default=list,
         )
         size = serializers.ChoiceField(choices=Company.Size.choices)
         country = serializers.CharField(max_length=2)
@@ -147,7 +151,9 @@ class CompleteOnboardingApi(APIView):
         request.user.refresh_from_db()
         refresh = RefreshToken.for_user(request.user)
 
-        return Response({
-            "tokens": {"access": str(refresh.access_token), "refresh": str(refresh)},
-            "user": UserOutputSerializer(request.user).data,
-        })
+        return Response(
+            {
+                "tokens": {"access": str(refresh.access_token), "refresh": str(refresh)},
+                "user": UserOutputSerializer(request.user).data,
+            }
+        )

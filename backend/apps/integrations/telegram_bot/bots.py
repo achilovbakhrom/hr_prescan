@@ -4,6 +4,7 @@ Centralising this lets the webhook view, polling command, and handlers all
 look up "the HR client" or "the candidate client" without each one having to
 know the env var names.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -55,10 +56,12 @@ def dispatch_update(*, role: str, update_data: dict) -> None:
     """Send a Telegram update payload to the right bot's handler."""
     if role == ROLE_HR:
         from apps.integrations.telegram_bot.hr.handlers import handle_update as hr_handle
+
         hr_handle(update_data)
         return
     if role == ROLE_CANDIDATE:
         from apps.integrations.telegram_bot.candidate.handlers import handle_update as cand_handle
+
         cand_handle(update_data)
         return
     raise ValueError(f"Unknown bot role: {role!r}")

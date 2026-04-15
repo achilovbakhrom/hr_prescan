@@ -1,6 +1,5 @@
 from django.db import migrations
 
-
 # (code, name_ru, name_uz) for all 256 countries
 COUNTRY_TRANSLATIONS = [
     ("AF", "Афганистан", "Afgʻoniston"),

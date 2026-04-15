@@ -34,7 +34,8 @@ class InterviewTranscriptApi(APIView):
             )
 
         interview = get_interview_by_id(
-            interview_id=interview_id, company=company,
+            interview_id=interview_id,
+            company=company,
         )
         if interview is None:
             return Response(
@@ -72,7 +73,8 @@ class InterviewRecordingApi(APIView):
             )
 
         interview = get_interview_by_id(
-            interview_id=interview_id, company=company,
+            interview_id=interview_id,
+            company=company,
         )
         if interview is None:
             return Response(

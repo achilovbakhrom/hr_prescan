@@ -36,6 +36,7 @@ class CandidateCVListCreateApi(APIView):
             if not obj.file:
                 return None
             from apps.applications.services import generate_cv_download_url
+
             try:
                 return generate_cv_download_url(cv_file_path=obj.file)
             except Exception:
@@ -43,6 +44,7 @@ class CandidateCVListCreateApi(APIView):
 
     def get(self, request: Request) -> Response:
         from apps.accounts.models import CandidateProfile
+
         profile = CandidateProfile.objects.filter(user=request.user).first()
         if profile is None:
             return Response([], status=status.HTTP_200_OK)
@@ -146,7 +148,8 @@ class CvGeneratePdfApi(APIView):
 
     class InputSerializer(serializers.Serializer):
         template = serializers.ChoiceField(
-            choices=["classic", "modern", "minimal"], default="classic",
+            choices=["classic", "modern", "minimal"],
+            default="classic",
         )
         name = serializers.CharField(max_length=255, required=False, default="My CV")
 

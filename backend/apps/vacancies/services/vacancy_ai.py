@@ -39,14 +39,16 @@ def generate_interview_questions(*, vacancy: Vacancy, step: str = ScreeningStep.
             contents=[
                 types.Content(
                     role="user",
-                    parts=[types.Part(text=
-                        f"Role: {vacancy.title}\n"
-                        f"Experience level: {vacancy.experience_level}\n"
-                        f"Description: {vacancy.description[:1000]}\n"
-                        f"Requirements: {(vacancy.requirements or 'N/A')[:1000]}\n"
-                        f"Skills: {skills_text}\n"
-                        f"Evaluation criteria: {criteria_text}"
-                    )],
+                    parts=[
+                        types.Part(
+                            text=f"Role: {vacancy.title}\n"
+                            f"Experience level: {vacancy.experience_level}\n"
+                            f"Description: {vacancy.description[:1000]}\n"
+                            f"Requirements: {(vacancy.requirements or 'N/A')[:1000]}\n"
+                            f"Skills: {skills_text}\n"
+                            f"Evaluation criteria: {criteria_text}"
+                        )
+                    ],
                 ),
             ],
             config=types.GenerateContentConfig(
@@ -104,12 +106,14 @@ def generate_vacancy_keywords(*, vacancy: Vacancy) -> list[str]:
         contents=[
             types.Content(
                 role="user",
-                parts=[types.Part(text=
-                    f"Title: {vacancy.title}\n"
-                    f"Description: {vacancy.description[:2000]}\n"
-                    f"Requirements: {(vacancy.requirements or 'N/A')[:1000]}\n"
-                    f"Skills: {', '.join(vacancy.skills) if vacancy.skills else 'N/A'}"
-                )],
+                parts=[
+                    types.Part(
+                        text=f"Title: {vacancy.title}\n"
+                        f"Description: {vacancy.description[:2000]}\n"
+                        f"Requirements: {(vacancy.requirements or 'N/A')[:1000]}\n"
+                        f"Skills: {', '.join(vacancy.skills) if vacancy.skills else 'N/A'}"
+                    )
+                ],
             ),
         ],
         config=types.GenerateContentConfig(

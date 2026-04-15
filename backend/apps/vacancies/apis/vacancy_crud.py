@@ -30,10 +30,16 @@ class VacancyListCreateApi(APIView):
         responsibilities = serializers.CharField(required=False, allow_blank=True, default="")
         skills = serializers.ListField(child=serializers.CharField(), required=False, default=list)
         salary_min = serializers.DecimalField(
-            max_digits=12, decimal_places=2, required=False, allow_null=True,
+            max_digits=12,
+            decimal_places=2,
+            required=False,
+            allow_null=True,
         )
         salary_max = serializers.DecimalField(
-            max_digits=12, decimal_places=2, required=False, allow_null=True,
+            max_digits=12,
+            decimal_places=2,
+            required=False,
+            allow_null=True,
         )
         salary_currency = serializers.CharField(max_length=3, required=False, default="USD")
         location = serializers.CharField(max_length=255, required=False, allow_blank=True, default="")

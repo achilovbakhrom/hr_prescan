@@ -8,6 +8,7 @@ Usage:
 Defaults to ``--role hr`` for backwards compatibility.
 For production, use webhook mode instead (setup_telegram_webhook).
 """
+
 import logging
 import time
 
@@ -41,15 +42,12 @@ class Command(BaseCommand):
         config = get_bot_config(role=role)
         if not config.token:
             raise CommandError(
-                f"Telegram {role} bot token is not configured. "
-                f"Set TELEGRAM_{role.upper()}_BOT_TOKEN in .env."
+                f"Telegram {role} bot token is not configured. Set TELEGRAM_{role.upper()}_BOT_TOKEN in .env."
             )
 
         client = get_client(role=role)
         client.delete_webhook()
-        self.stdout.write(self.style.SUCCESS(
-            f"Webhook deleted. Starting {role} bot in polling mode..."
-        ))
+        self.stdout.write(self.style.SUCCESS(f"Webhook deleted. Starting {role} bot in polling mode..."))
 
         offset = 0
         while True:
@@ -65,7 +63,7 @@ class Command(BaseCommand):
                     self.stdout.write(f"[{role}] update {update['update_id']}")
                     try:
                         dispatch_update(role=role, update_data=update)
-                    except Exception as exc:  # noqa: BLE001
+                    except Exception as exc:
                         logger.error("Error processing update: %s", exc, exc_info=True)
             except KeyboardInterrupt:
                 self.stdout.write(self.style.SUCCESS(f"\n{role} bot stopped."))

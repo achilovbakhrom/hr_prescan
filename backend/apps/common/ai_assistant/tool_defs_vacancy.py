@@ -138,8 +138,7 @@ VACANCY_TOOL_DEFINITIONS = [
         "function": {
             "name": "delete_vacancy",
             "description": (
-                "Permanently delete a draft or archived vacancy. "
-                "Cannot delete published or paused vacancies."
+                "Permanently delete a draft or archived vacancy. Cannot delete published or paused vacancies."
             ),
             "parameters": {
                 "type": "object",

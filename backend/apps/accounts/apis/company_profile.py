@@ -99,6 +99,7 @@ class InviteHRApi(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         from apps.accounts.models import Invitation
+
         try:
             invitation = Invitation.objects.get(
                 id=invitation_id,
@@ -159,11 +160,7 @@ class MyCompaniesApi(APIView):
             read_only_fields = fields
 
     def get(self, request: Request) -> Response:
-        memberships = (
-            CompanyMembership.objects
-            .filter(user=request.user)
-            .select_related("company")
-        )
+        memberships = CompanyMembership.objects.filter(user=request.user).select_related("company")
         return Response(
             self.OutputSerializer(memberships, many=True).data,
             status=status.HTTP_200_OK,

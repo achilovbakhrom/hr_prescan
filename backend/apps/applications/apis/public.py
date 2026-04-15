@@ -1,4 +1,3 @@
-
 from rest_framework import serializers, status
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import AllowAny
@@ -43,7 +42,8 @@ class SubmitApplicationApi(APIView):
                 raise ApplicationError("Authentication required to use profile CV.")
             try:
                 cv = CandidateCV.objects.select_related("profile").get(
-                    pk=cv_id, profile__user=request.user,
+                    pk=cv_id,
+                    profile__user=request.user,
                 )
             except CandidateCV.DoesNotExist:
                 raise ApplicationError("CV not found.") from None

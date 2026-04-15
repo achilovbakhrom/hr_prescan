@@ -34,9 +34,7 @@ class TranslateInputSerializer(serializers.Serializer):
     def validate(self, attrs):
         key = (attrs["model"], attrs["field"])
         if key not in TRANSLATABLE_FIELDS:
-            raise serializers.ValidationError(
-                f"Invalid model/field combination: {attrs['model']}/{attrs['field']}"
-            )
+            raise serializers.ValidationError(f"Invalid model/field combination: {attrs['model']}/{attrs['field']}")
         return attrs
 
 

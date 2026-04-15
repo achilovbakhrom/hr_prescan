@@ -6,7 +6,9 @@ from apps.accounts.permissions import HRPermissions
 
 class CompanyOutputSerializer(serializers.ModelSerializer):
     industries = serializers.SlugRelatedField(
-        many=True, read_only=True, slug_field="slug",
+        many=True,
+        read_only=True,
+        slug_field="slug",
     )
 
     class Meta:

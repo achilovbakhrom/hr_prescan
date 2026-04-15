@@ -35,24 +35,33 @@ class VacancyDetailApi(APIView):
         responsibilities = serializers.CharField(required=False, allow_blank=True)
         skills = serializers.ListField(child=serializers.CharField(), required=False)
         salary_min = serializers.DecimalField(
-            max_digits=12, decimal_places=2, required=False, allow_null=True,
+            max_digits=12,
+            decimal_places=2,
+            required=False,
+            allow_null=True,
         )
         salary_max = serializers.DecimalField(
-            max_digits=12, decimal_places=2, required=False, allow_null=True,
+            max_digits=12,
+            decimal_places=2,
+            required=False,
+            allow_null=True,
         )
         salary_currency = serializers.CharField(max_length=3, required=False)
         location = serializers.CharField(max_length=255, required=False, allow_blank=True)
         is_remote = serializers.BooleanField(required=False)
         employment_type = serializers.ChoiceField(
-            choices=Vacancy.EmploymentType.choices, required=False,
+            choices=Vacancy.EmploymentType.choices,
+            required=False,
         )
         experience_level = serializers.ChoiceField(
-            choices=Vacancy.ExperienceLevel.choices, required=False,
+            choices=Vacancy.ExperienceLevel.choices,
+            required=False,
         )
         deadline = serializers.DateField(required=False, allow_null=True)
         visibility = serializers.ChoiceField(choices=Vacancy.Visibility.choices, required=False)
         interview_mode = serializers.ChoiceField(
-            choices=Vacancy.InterviewMode.choices, required=False,
+            choices=Vacancy.InterviewMode.choices,
+            required=False,
         )
         interview_enabled = serializers.BooleanField(required=False)
         cv_required = serializers.BooleanField(required=False)

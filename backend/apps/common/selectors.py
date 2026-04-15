@@ -96,8 +96,7 @@ def get_candidate_dashboard_stats(user: User) -> dict:
 def get_recommended_vacancies(user: User, limit: int = 5) -> QuerySet[Vacancy]:
     """Return recent published vacancies as recommendations for a candidate."""
     return (
-        Vacancy.objects
-        .filter(status=Vacancy.Status.PUBLISHED)
+        Vacancy.objects.filter(status=Vacancy.Status.PUBLISHED)
         .select_related("company")
         .order_by("-created_at")[:limit]
     )
@@ -107,7 +106,8 @@ def get_company_analytics(*, company: Company) -> dict:
     """Return company-level hiring analytics."""
     vacancies = Vacancy.objects.filter(company=company)
     applications = Application.objects.filter(
-        vacancy__company=company, is_deleted=False,
+        vacancy__company=company,
+        is_deleted=False,
     )
     interviews = Interview.objects.filter(
         application__vacancy__company=company,
@@ -168,13 +168,7 @@ def get_company_analytics(*, company: Company) -> dict:
         "interview_insights": {
             "total": total_interviews,
             "completed": completed_interviews,
-            "completion_rate": (
-                round(completed_interviews / total_interviews * 100)
-                if total_interviews > 0
-                else 0
-            ),
-            "average_score": (
-                round(float(avg_score), 1) if avg_score else None
-            ),
+            "completion_rate": (round(completed_interviews / total_interviews * 100) if total_interviews > 0 else 0),
+            "average_score": (round(float(avg_score), 1) if avg_score else None),
         },
     }

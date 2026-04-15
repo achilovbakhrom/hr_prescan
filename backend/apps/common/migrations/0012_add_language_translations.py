@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('common', '0011_seed_industry_translations'),
+        ("common", "0011_seed_industry_translations"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='language',
-            name='name_ru',
-            field=models.CharField(blank=True, default='', max_length=100),
+            model_name="language",
+            name="name_ru",
+            field=models.CharField(blank=True, default="", max_length=100),
         ),
         migrations.AddField(
-            model_name='language',
-            name='name_uz',
-            field=models.CharField(blank=True, default='', max_length=100),
+            model_name="language",
+            name="name_uz",
+            field=models.CharField(blank=True, default="", max_length=100),
         ),
     ]

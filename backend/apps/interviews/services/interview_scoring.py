@@ -26,9 +26,7 @@ def complete_session(
         ai_decision: "advance" to move candidate forward, "reject" to reject.
     """
     if interview.status != Interview.Status.IN_PROGRESS:
-        raise ApplicationError(
-            f"Cannot complete session with status '{interview.status}'."
-        )
+        raise ApplicationError(f"Cannot complete session with status '{interview.status}'.")
 
     from django.utils import timezone
 
@@ -154,7 +152,5 @@ def create_integrity_flags(
     ]
 
     created = InterviewIntegrityFlag.objects.bulk_create(flag_objects)
-    logger.info(
-        "Created %d integrity flags for interview %s.", len(created), interview_id
-    )
+    logger.info("Created %d integrity flags for interview %s.", len(created), interview_id)
     return created

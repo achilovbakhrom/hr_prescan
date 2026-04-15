@@ -4,6 +4,7 @@ A logged-in HR user generates a token from the web settings page; the bot
 deep-link ``t.me/<bot>?start=<token>`` carries the token to the bot, which
 matches it against an unused ``TelegramLinkCode`` and links the accounts.
 """
+
 from __future__ import annotations
 
 from apps.integrations.telegram_bot.client import TelegramClient
@@ -15,8 +16,8 @@ def handle_start(
     chat_id: int,
     telegram_id: int,
     telegram_username: str = "",
-    first_name: str = "",  # noqa: ARG001 — kept for symmetry with candidate bot
-    last_name: str = "",  # noqa: ARG001 — kept for symmetry with candidate bot
+    first_name: str = "",
+    last_name: str = "",
     payload: str = "",
 ) -> None:
     """Handle ``/start`` for the HR bot, optionally auto-linking via deep-link payload."""
@@ -26,10 +27,7 @@ def handle_start(
     if user:
         client.send_message(
             chat_id=chat_id,
-            text=(
-                f"Welcome back, {user.first_name}!\n\n"
-                "Type your request or /help to see what I can do."
-            ),
+            text=(f"Welcome back, {user.first_name}!\n\nType your request or /help to see what I can do."),
         )
         return
 
@@ -58,9 +56,9 @@ def try_link_code(
     *,
     client: TelegramClient,
     chat_id: int,
-    telegram_id: int,  # noqa: ARG001 — reserved for future use
-    telegram_username: str,  # noqa: ARG001 — reserved for future use
-    text: str,  # noqa: ARG001 — reserved for future use
+    telegram_id: int,
+    telegram_username: str,
+    text: str,
 ) -> None:
     """Handle messages from unlinked HR users (no auto-linking by free text)."""
     client.send_message(
@@ -91,7 +89,9 @@ def _try_deep_link(
         with transaction.atomic():
             link = (
                 TelegramLinkCode.objects.filter(
-                    code=token, is_used=False, expires_at__gt=timezone.now(),
+                    code=token,
+                    is_used=False,
+                    expires_at__gt=timezone.now(),
                 )
                 .select_related("user")
                 .select_for_update()
@@ -102,8 +102,7 @@ def _try_deep_link(
                 client.send_message(
                     chat_id=chat_id,
                     text=(
-                        "This link has expired or is invalid.\n\n"
-                        "Please generate a new one from Settings -> Telegram."
+                        "This link has expired or is invalid.\n\nPlease generate a new one from Settings -> Telegram."
                     ),
                 )
                 return

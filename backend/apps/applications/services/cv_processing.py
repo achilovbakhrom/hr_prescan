@@ -88,9 +88,7 @@ def analyze_cv_with_ai(*, application_id: UUID) -> None:
         contents=[
             types.Content(
                 role="user",
-                parts=[types.Part(text=
-                    f"Parse this CV:\n\n{application.cv_parsed_text[:8000]}"
-                )],
+                parts=[types.Part(text=f"Parse this CV:\n\n{application.cv_parsed_text[:8000]}")],
             ),
         ],
         config=types.GenerateContentConfig(
@@ -130,9 +128,7 @@ def calculate_match_score(*, application_id: UUID) -> None:
     import json as _json
 
     try:
-        application = Application.objects.select_related("vacancy").get(
-            id=application_id
-        )
+        application = Application.objects.select_related("vacancy").get(id=application_id)
     except Application.DoesNotExist:
         logger.error("calculate_match_score: application %s not found", application_id)
         return
@@ -151,13 +147,15 @@ def calculate_match_score(*, application_id: UUID) -> None:
         contents=[
             types.Content(
                 role="user",
-                parts=[types.Part(text=
-                    f"VACANCY: {vacancy.title}\n"
-                    f"Requirements: {vacancy.requirements or 'N/A'}\n"
-                    f"Skills needed: {', '.join(vacancy.skills) if vacancy.skills else 'N/A'}\n"
-                    f"Experience level: {vacancy.experience_level}\n\n"
-                    f"CANDIDATE CV SUMMARY:\n{cv_text[:4000]}"
-                )],
+                parts=[
+                    types.Part(
+                        text=f"VACANCY: {vacancy.title}\n"
+                        f"Requirements: {vacancy.requirements or 'N/A'}\n"
+                        f"Skills needed: {', '.join(vacancy.skills) if vacancy.skills else 'N/A'}\n"
+                        f"Experience level: {vacancy.experience_level}\n\n"
+                        f"CANDIDATE CV SUMMARY:\n{cv_text[:4000]}"
+                    )
+                ],
             ),
         ],
         config=types.GenerateContentConfig(
@@ -185,7 +183,5 @@ def calculate_match_score(*, application_id: UUID) -> None:
     detected_lang = match_data.get("content_language", "en")
     notes = match_data.get("notes", "")
     application.match_notes_translations = {detected_lang: notes} if notes else {}
-    application.save(
-        update_fields=["match_score", "match_details", "match_notes_translations", "updated_at"]
-    )
+    application.save(update_fields=["match_score", "match_details", "match_notes_translations", "updated_at"])
     logger.info("calculate_match_score: score=%.1f for application %s", application.match_score, application_id)

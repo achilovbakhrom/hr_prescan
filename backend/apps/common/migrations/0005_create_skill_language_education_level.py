@@ -4,42 +4,41 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('common', '0004_seed_industries'),
+        ("common", "0004_seed_industries"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='EducationLevel',
+            name="EducationLevel",
             fields=[
-                ('slug', models.SlugField(primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=100)),
-                ('order', models.IntegerField(default=0)),
+                ("slug", models.SlugField(primary_key=True, serialize=False)),
+                ("name", models.CharField(max_length=100)),
+                ("order", models.IntegerField(default=0)),
             ],
             options={
-                'ordering': ['order'],
+                "ordering": ["order"],
             },
         ),
         migrations.CreateModel(
-            name='Language',
+            name="Language",
             fields=[
-                ('code', models.CharField(max_length=10, primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=100)),
+                ("code", models.CharField(max_length=10, primary_key=True, serialize=False)),
+                ("name", models.CharField(max_length=100)),
             ],
             options={
-                'ordering': ['name'],
+                "ordering": ["name"],
             },
         ),
         migrations.CreateModel(
-            name='Skill',
+            name="Skill",
             fields=[
-                ('slug', models.SlugField(max_length=100, primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=150)),
-                ('category', models.CharField(blank=True, default='', max_length=50)),
+                ("slug", models.SlugField(max_length=100, primary_key=True, serialize=False)),
+                ("name", models.CharField(max_length=150)),
+                ("category", models.CharField(blank=True, default="", max_length=50)),
             ],
             options={
-                'ordering': ['category', 'name'],
+                "ordering": ["category", "name"],
             },
         ),
     ]

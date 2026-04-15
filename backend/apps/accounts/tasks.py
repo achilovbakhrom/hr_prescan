@@ -1,5 +1,4 @@
 import logging
-from urllib.parse import urljoin
 
 from celery import shared_task
 from django.conf import settings

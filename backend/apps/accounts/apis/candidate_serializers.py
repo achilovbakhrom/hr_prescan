@@ -94,22 +94,26 @@ class CandidateProfileOutputSerializer(serializers.Serializer):
 
     def get_work_experiences(self, obj):
         return WorkExperienceOutputSerializer(
-            obj.work_experiences.all(), many=True,
+            obj.work_experiences.all(),
+            many=True,
         ).data
 
     def get_educations(self, obj):
         return EducationOutputSerializer(
-            obj.educations.all(), many=True,
+            obj.educations.all(),
+            many=True,
         ).data
 
     def get_languages(self, obj):
         return LanguageOutputSerializer(
-            obj.languages.all(), many=True,
+            obj.languages.all(),
+            many=True,
         ).data
 
     def get_certifications(self, obj):
         return CertificationOutputSerializer(
-            obj.certifications.all(), many=True,
+            obj.certifications.all(),
+            many=True,
         ).data
 
     def get_completeness(self, obj):

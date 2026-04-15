@@ -29,12 +29,14 @@ def generate_greeting(interview: Interview) -> str:
         contents=[
             types.Content(
                 role="user",
-                parts=[types.Part(text=
-                    f"[SYSTEM: The candidate has just opened the {step_label} chat. "
-                    "Send a brief, warm greeting (2-3 sentences). Introduce yourself and "
-                    "the company briefly if company info is available. Then ask the candidate "
-                    "to tell you about themselves.]"
-                )],
+                parts=[
+                    types.Part(
+                        text=f"[SYSTEM: The candidate has just opened the {step_label} chat. "
+                        "Send a brief, warm greeting (2-3 sentences). Introduce yourself and "
+                        "the company briefly if company info is available. Then ask the candidate "
+                        "to tell you about themselves.]"
+                    )
+                ],
             ),
         ],
         config=types.GenerateContentConfig(
@@ -66,9 +68,7 @@ def _get_ai_response_and_update_history(interview: Interview, candidate_entry: d
     gemini_contents = []
     for msg in chat_history:
         role = "model" if msg["role"] == "ai" else "user"
-        gemini_contents.append(
-            types.Content(role=role, parts=[types.Part(text=msg["text"])])
-        )
+        gemini_contents.append(types.Content(role=role, parts=[types.Part(text=msg["text"])]))
 
     # Call Gemini
     response = client.models.generate_content(
@@ -98,11 +98,13 @@ def _get_ai_response_and_update_history(interview: Interview, candidate_entry: d
     ai_timestamp = timezone.now().isoformat()
 
     # Append AI response to history
-    chat_history.append({
-        "role": "ai",
-        "text": clean_ai_text,
-        "timestamp": ai_timestamp,
-    })
+    chat_history.append(
+        {
+            "role": "ai",
+            "text": clean_ai_text,
+            "timestamp": ai_timestamp,
+        }
+    )
 
     # Save updated history
     interview.chat_history = chat_history

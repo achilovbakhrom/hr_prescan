@@ -64,7 +64,9 @@ DEFAULT_CRITERIA = [
 
 
 def create_default_criteria(
-    *, vacancy: Vacancy, step: str = ScreeningStep.PRESCANNING,
+    *,
+    vacancy: Vacancy,
+    step: str = ScreeningStep.PRESCANNING,
 ) -> list[VacancyCriteria]:
     """Create the default set of evaluation criteria for the given step."""
     criteria_list = []
@@ -131,7 +133,8 @@ def delete_vacancy_criteria(*, criteria: VacancyCriteria) -> None:
     a 0 score.
     """
     siblings = VacancyCriteria.objects.filter(
-        vacancy_id=criteria.vacancy_id, step=criteria.step,
+        vacancy_id=criteria.vacancy_id,
+        step=criteria.step,
     ).exclude(id=criteria.id)
     if not siblings.exists():
         raise ApplicationError(str(MSG_CANNOT_DELETE_LAST_CRITERIA))

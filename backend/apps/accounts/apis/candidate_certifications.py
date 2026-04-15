@@ -19,12 +19,18 @@ class CertificationListCreateApi(APIView):
     class InputSerializer(serializers.Serializer):
         name = serializers.CharField(max_length=255)
         issuing_organization = serializers.CharField(
-            max_length=255, required=False, allow_blank=True, default="",
+            max_length=255,
+            required=False,
+            allow_blank=True,
+            default="",
         )
         issue_date = serializers.DateField(required=False, allow_null=True, default=None)
         expiry_date = serializers.DateField(required=False, allow_null=True, default=None)
         credential_url = serializers.URLField(
-            max_length=500, required=False, allow_blank=True, default="",
+            max_length=500,
+            required=False,
+            allow_blank=True,
+            default="",
         )
         order = serializers.IntegerField(required=False, default=0)
 
@@ -64,12 +70,16 @@ class CertificationDetailApi(APIView):
     class InputSerializer(serializers.Serializer):
         name = serializers.CharField(max_length=255, required=False)
         issuing_organization = serializers.CharField(
-            max_length=255, required=False, allow_blank=True,
+            max_length=255,
+            required=False,
+            allow_blank=True,
         )
         issue_date = serializers.DateField(required=False, allow_null=True)
         expiry_date = serializers.DateField(required=False, allow_null=True)
         credential_url = serializers.URLField(
-            max_length=500, required=False, allow_blank=True,
+            max_length=500,
+            required=False,
+            allow_blank=True,
         )
         order = serializers.IntegerField(required=False)
 

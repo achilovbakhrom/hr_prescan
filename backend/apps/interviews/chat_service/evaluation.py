@@ -45,21 +45,22 @@ def evaluate_chat_interview(interview: Interview, *, ai_decision: str = "advance
     if not criteria_list:
         logger.warning(
             "No criteria for vacancy %s step %s — auto-creating default criteria.",
-            vacancy.id, step,
+            vacancy.id,
+            step,
         )
         from apps.vacancies.services import create_default_criteria
 
         create_default_criteria(vacancy=vacancy, step=step)
         criteria_list = list(
-            vacancy.criteria.filter(step=step)
-            .order_by("order")
-            .values("id", "name", "description", "weight")
+            vacancy.criteria.filter(step=step).order_by("order").values("id", "name", "description", "weight")
         )
 
-    criteria_json = json.dumps([
-        {"id": str(c["id"]), "name": c["name"], "description": c["description"], "weight": c["weight"]}
-        for c in criteria_list
-    ])
+    criteria_json = json.dumps(
+        [
+            {"id": str(c["id"]), "name": c["name"], "description": c["description"], "weight": c["weight"]}
+            for c in criteria_list
+        ]
+    )
 
     step_label = "prescanning" if step == Interview.SessionType.PRESCANNING else "interview"
 
@@ -88,7 +89,8 @@ def evaluate_chat_interview(interview: Interview, *, ai_decision: str = "advance
     except json.JSONDecodeError:
         logger.error(
             "Failed to parse evaluation JSON for session %s. Raw response: %s",
-            interview.id, raw[:500],
+            interview.id,
+            raw[:500],
         )
         complete_session(
             interview=interview,
@@ -113,7 +115,7 @@ def _build_eval_prompt(vacancy, criteria_json: str, transcript_text: str, step_l
 {vacancy.description}
 
 ## Requirements
-{vacancy.requirements or 'Not specified'}
+{vacancy.requirements or "Not specified"}
 
 ## Evaluation Criteria
 {criteria_json}
@@ -181,5 +183,9 @@ def _save_scores_and_complete(
 
     logger.info(
         "Evaluation complete for session %s (%s): score=%.1f, decision=%s, %d criteria scored",
-        interview.id, step, interview.overall_score or 0, ai_decision, len(score_objects),
+        interview.id,
+        step,
+        interview.overall_score or 0,
+        ai_decision,
+        len(score_objects),
     )

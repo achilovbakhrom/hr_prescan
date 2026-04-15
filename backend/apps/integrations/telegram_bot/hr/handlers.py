@@ -4,6 +4,7 @@ Routes incoming Telegram updates to the existing LangChain assistant
 (``apps.common.ai_assistant.process_ai_command``). The HR bot is currently
 free-text driven; PR3 will add an inline-keyboard menu layer on top of this.
 """
+
 from __future__ import annotations
 
 import logging

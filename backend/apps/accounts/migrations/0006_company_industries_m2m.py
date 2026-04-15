@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('accounts', '0005_user_onboarding_completed'),
-        ('common', '0003_create_industry'),
+        ("accounts", "0005_user_onboarding_completed"),
+        ("common", "0003_create_industry"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='company',
-            name='industry',
+            model_name="company",
+            name="industry",
         ),
         migrations.AddField(
-            model_name='company',
-            name='industries',
-            field=models.ManyToManyField(blank=True, related_name='companies', to='common.industry'),
+            model_name="company",
+            name="industries",
+            field=models.ManyToManyField(blank=True, related_name="companies", to="common.industry"),
         ),
     ]

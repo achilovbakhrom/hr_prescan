@@ -7,6 +7,7 @@ clicks Apply on a vacancy). We persist a small JSON blob in Redis keyed by
 Two bots share the same Redis instance but use disjoint key prefixes via the
 ``role`` parameter (``hr`` / ``candidate``).
 """
+
 from __future__ import annotations
 
 from typing import Any

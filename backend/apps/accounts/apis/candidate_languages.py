@@ -59,7 +59,9 @@ class CandidateLanguageListCreateApi(APIView):
             )
 
         item = CandidateLanguage.objects.create(
-            profile=profile, language=language, **data,
+            profile=profile,
+            language=language,
+            **data,
         )
         item = CandidateLanguage.objects.select_related("language").get(pk=item.pk)
 
@@ -77,7 +79,8 @@ class CandidateLanguageDetailApi(APIView):
     class InputSerializer(serializers.Serializer):
         language = serializers.CharField(max_length=10, required=False)
         proficiency = serializers.ChoiceField(
-            choices=CandidateLanguage.Proficiency.choices, required=False,
+            choices=CandidateLanguage.Proficiency.choices,
+            required=False,
         )
 
     class OutputSerializer(serializers.Serializer):

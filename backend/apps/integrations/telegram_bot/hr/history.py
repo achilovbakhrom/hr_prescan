@@ -3,6 +3,7 @@
 Extracted from the original handlers.py so the routing module stays under the
 200-line limit. The HR LangChain agent uses this for multi-turn context.
 """
+
 from __future__ import annotations
 
 from django.core.cache import cache
@@ -13,7 +14,7 @@ MAX_HISTORY_ENTRIES = 20  # 10 turns
 CONTEXT_LOOKBACK = 10
 
 
-def get_hr_context(*, telegram_id: int, text: str) -> dict:  # noqa: ARG001 — keeps signature stable for callers
+def get_hr_context(*, telegram_id: int, text: str) -> dict:
     """Build the LangChain context dict from cached HR history."""
     history = cache.get(HISTORY_KEY_TEMPLATE.format(telegram_id=telegram_id), [])
     context: dict = {}

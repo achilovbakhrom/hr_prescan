@@ -19,10 +19,7 @@ def _create_livekit_token(
 ) -> str:
     """Create a LiveKit access token with the given grants."""
     if not LIVEKIT_API_KEY or not LIVEKIT_API_SECRET:
-        raise ApplicationError(
-            "LiveKit credentials not configured. "
-            "Set LIVEKIT_API_KEY and LIVEKIT_API_SECRET."
-        )
+        raise ApplicationError("LiveKit credentials not configured. Set LIVEKIT_API_KEY and LIVEKIT_API_SECRET.")
 
     token = (
         AccessToken(LIVEKIT_API_KEY, LIVEKIT_API_SECRET)

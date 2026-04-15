@@ -46,7 +46,8 @@ class ScheduleHumanInterviewApi(APIView):
             )
 
         application = get_application_by_id(
-            application_id=application_id, company=company,
+            application_id=application_id,
+            company=company,
         )
         if application is None:
             return Response(
@@ -82,7 +83,8 @@ class ObserverTokenApi(APIView):
             )
 
         interview = get_interview_by_id(
-            interview_id=interview_id, company=company,
+            interview_id=interview_id,
+            company=company,
         )
         if interview is None:
             return Response(
@@ -116,7 +118,8 @@ class ResetInterviewApi(APIView):
             )
 
         interview = get_interview_by_id(
-            interview_id=interview_id, company=company,
+            interview_id=interview_id,
+            company=company,
         )
         if interview is None:
             return Response(

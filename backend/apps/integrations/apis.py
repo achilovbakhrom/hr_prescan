@@ -53,10 +53,12 @@ class TelegramLinkCodeApi(APIView):
         link = TelegramLinkCode.generate(user=request.user)
         bot_username = settings.TELEGRAM_HR_BOT_USERNAME.lstrip("@")
         link_url = f"https://t.me/{bot_username}?start={link.code}"
-        return Response({
-            "link_url": link_url,
-            "expires_at": link.expires_at.isoformat(),
-        })
+        return Response(
+            {
+                "link_url": link_url,
+                "expires_at": link.expires_at.isoformat(),
+            }
+        )
 
 
 class TelegramStatusApi(APIView):

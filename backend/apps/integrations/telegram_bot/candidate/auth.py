@@ -8,6 +8,7 @@ again returns the existing user, so the flow is idempotent.
 This module is intentionally narrow: only signup. The /start payload (deep
 link to a vacancy) is handled separately in ``apply.py``.
 """
+
 from __future__ import annotations
 
 import logging
@@ -57,12 +58,14 @@ def get_or_create_candidate_user(
             user.telegram_id = telegram_id
             user.telegram_username = telegram_username
             user.onboarding_completed = False
-            user.save(update_fields=[
-                "telegram_id",
-                "telegram_username",
-                "onboarding_completed",
-                "updated_at",
-            ])
+            user.save(
+                update_fields=[
+                    "telegram_id",
+                    "telegram_username",
+                    "onboarding_completed",
+                    "updated_at",
+                ]
+            )
     except IntegrityError:
         # Concurrent create from another webhook update for the same identity.
         existing = User.objects.filter(telegram_id=telegram_id).first()
@@ -75,8 +78,9 @@ def get_or_create_candidate_user(
     # Bind any anonymous applications that already match this identity.
     try:
         from apps.applications.services import bind_existing_applications
+
         bind_existing_applications(user=user)
-    except Exception as exc:  # noqa: BLE001 — non-fatal
+    except Exception as exc:
         logger.warning("bind_existing_applications failed for tg_id=%s: %s", telegram_id, exc)
 
     return user

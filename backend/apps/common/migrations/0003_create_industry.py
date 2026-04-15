@@ -4,21 +4,20 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('common', '0002_seed_countries'),
+        ("common", "0002_seed_countries"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Industry',
+            name="Industry",
             fields=[
-                ('slug', models.SlugField(primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=100)),
+                ("slug", models.SlugField(primary_key=True, serialize=False)),
+                ("name", models.CharField(max_length=100)),
             ],
             options={
-                'verbose_name_plural': 'industries',
-                'ordering': ['name'],
+                "verbose_name_plural": "industries",
+                "ordering": ["name"],
             },
         ),
     ]

@@ -81,9 +81,7 @@ def get_message_thread(
     """Return the message thread between two users, optionally scoped to an application."""
     from django.db.models import Q
 
-    qs = Message.objects.filter(
-        Q(sender=user, recipient=other_user) | Q(sender=other_user, recipient=user)
-    )
+    qs = Message.objects.filter(Q(sender=user, recipient=other_user) | Q(sender=other_user, recipient=user))
 
     if application is not None:
         qs = qs.filter(application=application)

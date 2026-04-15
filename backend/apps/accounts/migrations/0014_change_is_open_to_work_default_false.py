@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('accounts', '0013_add_company_custom_industry'),
+        ("accounts", "0013_add_company_custom_industry"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='candidateprofile',
-            name='is_open_to_work',
+            model_name="candidateprofile",
+            name="is_open_to_work",
             field=models.BooleanField(default=False),
         ),
     ]

@@ -4,6 +4,7 @@ Inline keyboards attach buttons to messages and emit ``callback_data`` strings
 when pressed. We keep callback_data short (Telegram caps it at 64 bytes) and
 use a colon-separated convention: ``<scope>:<action>:<arg1>:<arg2>``.
 """
+
 from __future__ import annotations
 
 from typing import Any
@@ -55,9 +56,7 @@ def paginated_list(
     end = start + page_size
     visible = items[start:end]
 
-    rows: list[list[dict[str, Any]]] = [
-        [button(text=label, callback_data=cb)] for label, cb in visible
-    ]
+    rows: list[list[dict[str, Any]]] = [[button(text=label, callback_data=cb)] for label, cb in visible]
 
     nav: list[dict[str, Any]] = []
     if page > 0:

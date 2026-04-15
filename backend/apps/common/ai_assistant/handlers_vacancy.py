@@ -1,4 +1,5 @@
 """Handlers for vacancy-related AI assistant operations."""
+
 from apps.common.ai_assistant.resolvers import resolve_vacancy
 
 
@@ -49,8 +50,14 @@ def handle_create_vacancy(*, user, params):
 
     # Ignore garbage/explanatory text the LLM may generate
     garbage_patterns = [
-        "not provided", "not specified", "unknown", "couldn't",
-        "could not", "n/a", "none", "no company",
+        "not provided",
+        "not specified",
+        "unknown",
+        "couldn't",
+        "could not",
+        "n/a",
+        "none",
+        "no company",
     ]
     if employer_name and not any(p in employer_name.lower() for p in garbage_patterns):
         employer = EmployerCompany.objects.filter(company=user.company, name__icontains=employer_name).first()
@@ -64,8 +71,13 @@ def handle_create_vacancy(*, user, params):
 
     kwargs = {}
     for field in (
-        "salary_min", "salary_max", "salary_currency", "location",
-        "is_remote", "employment_type", "experience_level",
+        "salary_min",
+        "salary_max",
+        "salary_currency",
+        "location",
+        "is_remote",
+        "employment_type",
+        "experience_level",
     ):
         if params.get(field) is not None:
             kwargs[field] = params[field]

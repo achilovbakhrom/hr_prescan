@@ -128,12 +128,15 @@ def get_monthly_interview_volume(months: int = 6) -> list[dict]:
     """Count interviews per month for the last N months."""
     now = timezone.now()
     start_date = (now - timedelta(days=months * 30)).replace(
-        day=1, hour=0, minute=0, second=0, microsecond=0,
+        day=1,
+        hour=0,
+        minute=0,
+        second=0,
+        microsecond=0,
     )
 
     data = (
-        Interview.objects
-        .filter(created_at__gte=start_date)
+        Interview.objects.filter(created_at__gte=start_date)
         .annotate(month=TruncMonth("created_at"))
         .values("month")
         .annotate(count=Count("id"))
@@ -152,8 +155,7 @@ def get_monthly_interview_volume(months: int = 6) -> list[dict]:
 def get_subscription_distribution() -> list[dict]:
     """Count companies by subscription tier."""
     data = (
-        CompanySubscription.objects
-        .filter(is_active=True)
+        CompanySubscription.objects.filter(is_active=True)
         .values("plan__tier", "plan__name")
         .annotate(count=Count("id"))
         .order_by("plan__tier")
@@ -173,12 +175,15 @@ def get_monthly_registrations(months: int = 6) -> list[dict]:
     """Count users registered per month, grouped by role."""
     now = timezone.now()
     start_date = (now - timedelta(days=months * 30)).replace(
-        day=1, hour=0, minute=0, second=0, microsecond=0,
+        day=1,
+        hour=0,
+        minute=0,
+        second=0,
+        microsecond=0,
     )
 
     data = (
-        User.objects
-        .filter(created_at__gte=start_date)
+        User.objects.filter(created_at__gte=start_date)
         .annotate(month=TruncMonth("created_at"))
         .values("month", "role")
         .annotate(count=Count("id"))

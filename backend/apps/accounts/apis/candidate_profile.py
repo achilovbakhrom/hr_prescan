@@ -37,23 +37,29 @@ class CandidateProfileApi(APIView):
         github_url = serializers.URLField(max_length=500, required=False, allow_blank=True)
         website_url = serializers.URLField(max_length=500, required=False, allow_blank=True)
         desired_salary_min = serializers.DecimalField(
-            max_digits=12, decimal_places=2, required=False, allow_null=True,
+            max_digits=12,
+            decimal_places=2,
+            required=False,
+            allow_null=True,
         )
         desired_salary_max = serializers.DecimalField(
-            max_digits=12, decimal_places=2, required=False, allow_null=True,
+            max_digits=12,
+            decimal_places=2,
+            required=False,
+            allow_null=True,
         )
         desired_salary_currency = serializers.CharField(max_length=3, required=False)
         desired_salary_negotiable = serializers.BooleanField(required=False)
         desired_employment_type = serializers.ChoiceField(
             choices=CandidateProfile.EmploymentType.choices,
-            required=False, allow_blank=True,
+            required=False,
+            allow_blank=True,
         )
         is_open_to_work = serializers.BooleanField(required=False)
 
     def _get_full_profile(self, pk):
         return (
-            CandidateProfile.objects
-            .select_related("user")
+            CandidateProfile.objects.select_related("user")
             .prefetch_related(
                 "skills",
                 "work_experiences",

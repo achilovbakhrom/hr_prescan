@@ -22,7 +22,11 @@ from apps.common.messages import (
 
 
 def invite_hr(
-    *, company: Company, email: str, invited_by: User, permissions: list[str] | None = None,
+    *,
+    company: Company,
+    email: str,
+    invited_by: User,
+    permissions: list[str] | None = None,
 ) -> Invitation:
     """Create an HR invitation and send the invitation email.
 
@@ -133,7 +137,8 @@ def switch_company(*, user: User, company_id: UUID) -> User:
     """Switch the user's active company. Must have a membership."""
     try:
         membership = CompanyMembership.objects.select_related("company").get(
-            user=user, company_id=company_id,
+            user=user,
+            company_id=company_id,
         )
     except CompanyMembership.DoesNotExist as exc:
         raise ApplicationError("You are not a member of this company.") from exc

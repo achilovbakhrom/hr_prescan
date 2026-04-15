@@ -95,8 +95,7 @@ def get_company_applications_filtered(
         ordering = "-created_at"
 
     qs = (
-        Application.objects
-        .filter(vacancy__company=company, is_deleted=False)
+        Application.objects.filter(vacancy__company=company, is_deleted=False)
         .select_related("candidate", "vacancy", "vacancy__company")
         .prefetch_related("sessions")
     )

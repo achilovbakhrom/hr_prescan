@@ -9,6 +9,7 @@ If the vacancy requires a CV and none is uploaded yet, the bot prompts and
 remembers the pending apply on the session so the user can resume after
 sending the document.
 """
+
 from __future__ import annotations
 
 import logging
@@ -37,10 +38,10 @@ def parse_deep_link_vacancy(*, payload: str) -> UUID | None:
     """Extract a vacancy UUID from a /start payload like ``vac_<uuid>``."""
     if not payload or not payload.startswith(DEEP_LINK_PREFIX):
         return None
-    raw = payload[len(DEEP_LINK_PREFIX):]
+    raw = payload[len(DEEP_LINK_PREFIX) :]
     try:
         return UUID(raw)
-    except (ValueError, TypeError):
+    except ValueError, TypeError:
         return None
 
 
@@ -53,11 +54,7 @@ def show_vacancy_card(
 ) -> None:
     """Render a vacancy detail card with Apply / Back buttons."""
     vacancy = get_vacancy_by_id(vacancy_id=vacancy_id)
-    if (
-        vacancy is None
-        or vacancy.status != Vacancy.Status.PUBLISHED
-        or vacancy.visibility != Vacancy.Visibility.PUBLIC
-    ):
+    if vacancy is None or vacancy.status != Vacancy.Status.PUBLISHED or vacancy.visibility != Vacancy.Visibility.PUBLIC:
         client.send_message(
             chat_id=chat_id,
             text=t("candidate.vacancy_not_found", lang=lang),

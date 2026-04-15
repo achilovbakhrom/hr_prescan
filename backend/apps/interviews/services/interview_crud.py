@@ -19,9 +19,7 @@ logger = logging.getLogger(__name__)
 def cancel_interview(*, interview: Interview) -> Interview:
     """Cancel a pending or in-progress session and revert application status."""
     if interview.status not in (Interview.Status.PENDING, Interview.Status.IN_PROGRESS):
-        raise ApplicationError(
-            str(MSG_CANNOT_CANCEL_SESSION).format(status=interview.status)
-        )
+        raise ApplicationError(str(MSG_CANNOT_CANCEL_SESSION).format(status=interview.status))
 
     interview.status = Interview.Status.CANCELLED
     interview.save(update_fields=["status", "updated_at"])
@@ -46,9 +44,7 @@ def start_interview(*, interview: Interview) -> Interview:
     from apps.interviews.services.interview_livekit import generate_candidate_token
 
     if interview.status != Interview.Status.PENDING:
-        raise ApplicationError(
-            str(MSG_CANNOT_START_SESSION).format(status=interview.status)
-        )
+        raise ApplicationError(str(MSG_CANNOT_START_SESSION).format(status=interview.status))
 
     interview.status = Interview.Status.IN_PROGRESS
     interview.started_at = timezone.now()
@@ -76,11 +72,13 @@ def start_interview(*, interview: Interview) -> Interview:
                 f"Let's start — could you briefly introduce yourself and tell me "
                 f"why you're interested in this role?"
             )
-        interview.chat_history = [{
-            "role": "ai",
-            "text": greeting,
-            "timestamp": timezone.now().isoformat(),
-        }]
+        interview.chat_history = [
+            {
+                "role": "ai",
+                "text": greeting,
+                "timestamp": timezone.now().isoformat(),
+            }
+        ]
         update_fields.append("chat_history")
 
     interview.save(update_fields=update_fields)
@@ -95,9 +93,7 @@ def reset_interview(*, interview: Interview) -> Interview:
     session_type. Returns the newly created session.
     """
     if interview.status not in (Interview.Status.IN_PROGRESS, Interview.Status.CANCELLED):
-        raise ApplicationError(
-            f"Cannot reset session with status '{interview.status}'."
-        )
+        raise ApplicationError(f"Cannot reset session with status '{interview.status}'.")
 
     application = interview.application
 

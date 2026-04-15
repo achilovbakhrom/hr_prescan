@@ -31,8 +31,13 @@ known-first-party = ["apps", "config", "integrations"]
 [tool.ruff.lint.per-file-ignores]
 # Tests: hardcoded passwords/tokens are expected fixtures; long assertion lines OK.
 "**/tests/**/*.py" = ["S101", "S105", "S106", "S108", "S311", "E501"]
-# Auto-generated migrations have long help_text strings Django produces.
-"**/migrations/*.py" = ["E501", "DJ001"]
+# Auto-generated migrations have long help_text strings; data-seed migrations
+# contain legitimate Uzbek/Russian strings that Ruff flags as ambiguous unicode.
+"**/migrations/*.py" = ["E501", "DJ001", "RUF001", "RUF003", "RUF022"]
+# i18n / AI prompt files have long translated strings and legit non-ASCII.
+"**/i18n.py" = ["RUF001", "E501"]
+"**/prompts.py" = ["E501", "RUF001"]
+"**/tool_definitions.py" = ["E501", "RUF001"]
 "**/settings/**/*.py" = ["F401", "F403"]
 
 [tool.mypy]

@@ -6,7 +6,6 @@ logger = logging.getLogger(__name__)
 
 def _handle_prepare_for_interview(*, user, params):
     from django.conf import settings
-
     from google import genai
     from google.genai import types
 
@@ -32,7 +31,7 @@ def _handle_prepare_for_interview(*, user, params):
                 f"Skills: {', '.join(vacancy.skills) if vacancy.skills else 'N/A'}\n"
                 f"Experience Level: {vacancy.experience_level}\n"
             )
-        except (Vacancy.DoesNotExist, ValueError):
+        except Vacancy.DoesNotExist, ValueError:
             pass  # Fall through to use vacancy_title
 
     if not vacancy_title and not vacancy_context:

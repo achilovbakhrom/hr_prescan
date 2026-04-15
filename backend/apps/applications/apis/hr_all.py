@@ -18,7 +18,8 @@ class HRAllCandidatesListApi(APIView):
 
     class FilterSerializer(serializers.Serializer):
         status = serializers.ChoiceField(
-            choices=Application.Status.choices, required=False,
+            choices=Application.Status.choices,
+            required=False,
         )
         vacancy_id = serializers.UUIDField(required=False)
         ordering = serializers.ChoiceField(
@@ -34,10 +35,14 @@ class HRAllCandidatesListApi(APIView):
             default="-created_at",
         )
         min_score = serializers.DecimalField(
-            max_digits=5, decimal_places=2, required=False,
+            max_digits=5,
+            decimal_places=2,
+            required=False,
         )
         max_score = serializers.DecimalField(
-            max_digits=5, decimal_places=2, required=False,
+            max_digits=5,
+            decimal_places=2,
+            required=False,
         )
         search = serializers.CharField(required=False)
 

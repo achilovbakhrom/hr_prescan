@@ -2,10 +2,25 @@
        migrate makemigrations createsuperuser shell \
        lint format typecheck test \
        up-monitoring up-management up-all \
-       clean reset-db backup-db \
+       clean reset-db backup-db ensure-env \
        local-setup local-infra local-backend local-backend-all local-frontend local-stop local-stop-all \
        local-test local-test-backend local-test-frontend local-test-e2e \
        local-telegram local-telegram-webhook
+
+# Ensure a project-root .env exists so docker compose variable
+# interpolation (LIVEKIT_API_KEY etc.) finds the values. On servers this
+# symlink is created during provisioning; for local dev we auto-create it.
+# No-op if .env already exists.
+ensure-env:
+	@if [ ! -e .env ]; then \
+		if [ -e backend/.env ]; then \
+			ln -s backend/.env .env; \
+			echo "Created .env -> backend/.env symlink for docker compose."; \
+		else \
+			echo "ERROR: backend/.env not found. Run 'make local-setup' or copy backend/.env.example."; \
+			exit 1; \
+		fi; \
+	fi
 
 # ─── General ──────────────────────────────────────────────────────────────────
 

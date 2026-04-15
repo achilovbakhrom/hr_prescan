@@ -4,6 +4,7 @@ Usage:
     python manage.py setup_telegram_webhook https://example.com/api/telegram/hr/webhook/ --role hr
     python manage.py setup_telegram_webhook https://example.com/api/telegram/candidate/webhook/ --role candidate
 """
+
 from django.core.management.base import BaseCommand, CommandError
 
 from apps.integrations.telegram_bot.bots import (
@@ -37,19 +38,12 @@ class Command(BaseCommand):
         config = get_bot_config(role=role)
 
         if not config.token:
-            raise CommandError(
-                f"Telegram {role} bot token is not set. "
-                f"Set TELEGRAM_{role.upper()}_BOT_TOKEN in env."
-            )
+            raise CommandError(f"Telegram {role} bot token is not set. Set TELEGRAM_{role.upper()}_BOT_TOKEN in env.")
 
         client = get_client(role=role)
         result = client.set_webhook(url=url, secret_token=config.webhook_secret)
         if result.get("ok"):
-            self.stdout.write(self.style.SUCCESS(
-                f"{role} webhook set successfully: {url}"
-            ))
+            self.stdout.write(self.style.SUCCESS(f"{role} webhook set successfully: {url}"))
             self.stdout.write(f"Description: {result.get('description', '')}")
         else:
-            raise CommandError(
-                f"Failed to set {role} webhook: {result.get('description', 'Unknown error')}"
-            )
+            raise CommandError(f"Failed to set {role} webhook: {result.get('description', 'Unknown error')}")

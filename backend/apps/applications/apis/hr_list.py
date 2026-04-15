@@ -31,7 +31,8 @@ class HRApplicationListApi(APIView):
 
     class FilterSerializer(serializers.Serializer):
         status = serializers.ChoiceField(
-            choices=Application.Status.choices, required=False,
+            choices=Application.Status.choices,
+            required=False,
         )
         ordering = serializers.ChoiceField(
             choices=[
@@ -46,10 +47,14 @@ class HRApplicationListApi(APIView):
             default="-created_at",
         )
         min_score = serializers.DecimalField(
-            max_digits=5, decimal_places=2, required=False,
+            max_digits=5,
+            decimal_places=2,
+            required=False,
         )
         max_score = serializers.DecimalField(
-            max_digits=5, decimal_places=2, required=False,
+            max_digits=5,
+            decimal_places=2,
+            required=False,
         )
         search = serializers.CharField(required=False)
 
@@ -102,7 +107,8 @@ class HRApplicationDetailApi(APIView):
             )
 
         application = get_application_by_id(
-            application_id=application_id, company=company,
+            application_id=application_id,
+            company=company,
         )
         if application is None:
             return Response(
@@ -131,7 +137,8 @@ class HRCvDownloadApi(APIView):
             )
 
         application = get_application_by_id(
-            application_id=application_id, company=company,
+            application_id=application_id,
+            company=company,
         )
         if application is None:
             return Response(

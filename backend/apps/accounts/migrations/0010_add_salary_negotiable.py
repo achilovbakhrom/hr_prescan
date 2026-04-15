@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('accounts', '0009_add_share_token_to_profile'),
+        ("accounts", "0009_add_share_token_to_profile"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='candidateprofile',
-            name='desired_salary_negotiable',
+            model_name="candidateprofile",
+            name="desired_salary_negotiable",
             field=models.BooleanField(default=False),
         ),
     ]

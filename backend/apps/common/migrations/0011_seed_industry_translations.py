@@ -1,6 +1,5 @@
 from django.db import migrations
 
-
 # (slug, name_ru, name_uz) for all industries
 INDUSTRY_TRANSLATIONS = [
     ("accounting", "Бухгалтерия", "Buxgalteriya"),

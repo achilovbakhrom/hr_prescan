@@ -11,6 +11,7 @@ Splits incoming updates into:
 Authentication is implicit: every Telegram identity that messages this bot is
 auto-onboarded as a candidate ``User`` (see ``candidate/auth.py``).
 """
+
 from __future__ import annotations
 
 import logging
@@ -69,7 +70,11 @@ def handle_update(update_data: dict) -> None:
     document = message.get("document")
     if document:
         handle_document(
-            client=client, chat_id=chat_id, user=user, document=document, lang=lang,
+            client=client,
+            chat_id=chat_id,
+            user=user,
+            document=document,
+            lang=lang,
         )
         return
 
@@ -89,7 +94,11 @@ def handle_update(update_data: dict) -> None:
     if text == "/start" or text.startswith("/start "):
         payload = text[7:].strip() if text.startswith("/start ") else ""
         _handle_start(
-            client=client, chat_id=chat_id, user=user, payload=payload, lang=lang,
+            client=client,
+            chat_id=chat_id,
+            user=user,
+            payload=payload,
+            lang=lang,
         )
         return
 
@@ -145,7 +154,11 @@ def _process_callback(*, client, callback: dict) -> None:
 
     if action == CB_VAC_APPLY and arg:
         _handle_apply_callback(
-            client=client, chat_id=chat_id, user=user, vacancy_arg=arg, lang=lang,
+            client=client,
+            chat_id=chat_id,
+            user=user,
+            vacancy_arg=arg,
+            lang=lang,
         )
     elif action == CB_MENU:
         _send_main_menu(client=client, chat_id=chat_id, lang=lang)
@@ -154,11 +167,16 @@ def _process_callback(*, client, callback: dict) -> None:
 
 
 def _handle_apply_callback(
-    *, client, chat_id: int, user, vacancy_arg: str, lang: str,
+    *,
+    client,
+    chat_id: int,
+    user,
+    vacancy_arg: str,
+    lang: str,
 ) -> None:
     try:
         vacancy_id = UUID(vacancy_arg)
-    except (ValueError, TypeError):
+    except ValueError, TypeError:
         return
     session = get_session(role=ROLE_CANDIDATE, telegram_id=user.telegram_id)
     confirm_apply(

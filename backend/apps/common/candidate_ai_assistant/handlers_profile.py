@@ -6,7 +6,6 @@ logger = logging.getLogger(__name__)
 
 def _handle_improve_cv_section(*, user, params):
     from django.conf import settings
-
     from google import genai
     from google.genai import types
 
@@ -72,7 +71,6 @@ def _handle_improve_cv_section(*, user, params):
 
 def _handle_suggest_skills(*, user, params):
     from django.conf import settings
-
     from google import genai
     from google.genai import types
 

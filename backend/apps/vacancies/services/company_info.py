@@ -133,9 +133,9 @@ def _generate_company_info_with_ai(*, text: str, source_label: str = "document")
             contents=[
                 types.Content(
                     role="user",
-                    parts=[types.Part(text=
-                        f"Generate a company info summary from this {source_label}:\n\n{text[:6000]}"
-                    )],
+                    parts=[
+                        types.Part(text=f"Generate a company info summary from this {source_label}:\n\n{text[:6000]}")
+                    ],
                 ),
             ],
             config=types.GenerateContentConfig(

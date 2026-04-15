@@ -25,6 +25,7 @@ logger = logging.getLogger(__name__)
 # Helpers (shared with internal_score)
 # ---------------------------------------------------------------------------
 
+
 def validate_internal_key(request: Request) -> bool:
     """Check that the request carries a valid internal API key."""
     key = request.headers.get("X-Internal-Key", "")
@@ -42,6 +43,7 @@ def forbidden_response() -> Response:
 # View
 # ---------------------------------------------------------------------------
 
+
 class InternalInterviewContextApi(APIView):
     """GET /api/internal/interviews/<id>/context/
 
@@ -56,8 +58,7 @@ class InternalInterviewContextApi(APIView):
             return forbidden_response()
 
         interview = (
-            Interview.objects
-            .select_related(
+            Interview.objects.select_related(
                 "application",
                 "application__vacancy",
                 "application__vacancy__company",
@@ -80,18 +81,12 @@ class InternalInterviewContextApi(APIView):
 
         # Gather questions filtered by step
         questions = list(
-            vacancy.questions
-            .filter(is_active=True, step=step)
-            .order_by("order")
-            .values("text", "category")
+            vacancy.questions.filter(is_active=True, step=step).order_by("order").values("text", "category")
         )
 
         # Gather criteria filtered by step
         criteria = list(
-            vacancy.criteria
-            .filter(step=step)
-            .order_by("order")
-            .values("id", "name", "description", "weight")
+            vacancy.criteria.filter(step=step).order_by("order").values("id", "name", "description", "weight")
         )
         # Convert UUIDs to strings for JSON serialisation
         for c in criteria:

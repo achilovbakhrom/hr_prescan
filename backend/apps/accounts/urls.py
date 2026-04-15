@@ -2,7 +2,6 @@ from django.urls import path
 
 from apps.accounts.apis import (
     AcceptCompanyInvitationApi,
-    CheckInvitationApi,
     AcceptInvitationApi,
     CandidateCVActivateApi,
     CandidateCVDetailApi,
@@ -13,9 +12,10 @@ from apps.accounts.apis import (
     CandidateProfileSkillsApi,
     CertificationDetailApi,
     CertificationListCreateApi,
+    CheckInvitationApi,
+    CompanyProfileApi,
     CompleteCompanySetupApi,
     CompleteOnboardingApi,
-    CompanyProfileApi,
     CvAiChatApi,
     CvAiGenerateApi,
     CvGeneratePdfApi,

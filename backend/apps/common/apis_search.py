@@ -42,8 +42,7 @@ class HRGlobalSearchApi(APIView):
             return Response({"vacancies": [], "candidates": []}, status=status.HTTP_200_OK)
 
         vacancies = (
-            Vacancy.objects
-            .filter(company=company, is_deleted=False)
+            Vacancy.objects.filter(company=company, is_deleted=False)
             .filter(Q(title__icontains=q) | Q(description__icontains=q))
             .order_by("-created_at")[:RESULT_LIMIT]
         )
@@ -57,11 +56,9 @@ class HRGlobalSearchApi(APIView):
         ]
 
         applications = (
-            Application.objects
-            .filter(vacancy__company=company, is_deleted=False)
+            Application.objects.filter(vacancy__company=company, is_deleted=False)
             .filter(
-                Q(candidate_name__icontains=q)
-                | Q(candidate_email__icontains=q),
+                Q(candidate_name__icontains=q) | Q(candidate_email__icontains=q),
             )
             .select_related("vacancy")
             .order_by("-created_at")[:RESULT_LIMIT]

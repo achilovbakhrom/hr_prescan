@@ -32,7 +32,9 @@ def send_scheduling_confirmation_email(interview_id: str) -> None:
             "candidate_name": application.candidate_name,
             "vacancy_title": vacancy.title,
             "company_name": vacancy.company.name,
-            "scheduled_at": interview.scheduled_at.strftime("%B %d, %Y at %H:%M UTC") if interview.scheduled_at else "TBD",
+            "scheduled_at": interview.scheduled_at.strftime("%B %d, %Y at %H:%M UTC")
+            if interview.scheduled_at
+            else "TBD",
             "duration": vacancy.interview_duration or 30,
             "interview_url": interview_url,
         },
@@ -64,7 +66,9 @@ def send_interview_reminder(interview_id: str) -> None:
         context={
             "candidate_name": application.candidate_name,
             "vacancy_title": vacancy.title,
-            "scheduled_at": interview.scheduled_at.strftime("%B %d, %Y at %H:%M UTC") if interview.scheduled_at else "Soon",
+            "scheduled_at": interview.scheduled_at.strftime("%B %d, %Y at %H:%M UTC")
+            if interview.scheduled_at
+            else "Soon",
             "interview_url": interview_url,
         },
     )

@@ -7,6 +7,7 @@ object key on the bot session so the next Apply tap can use it.
 If the user already has a pending apply (set by ``apply.confirm_apply`` when
 they tried to apply without a CV), we resume the apply automatically here.
 """
+
 from __future__ import annotations
 
 import io
@@ -86,7 +87,7 @@ def handle_document(
 
     try:
         cv_key = upload_cv_to_s3(file_obj=upload, vacancy_id=bucket_scope)
-    except Exception as exc:  # noqa: BLE001 — surface as generic error to user
+    except Exception as exc:
         logger.error("CV upload failed for tg_id=%s: %s", user.telegram_id, exc)
         client.send_message(chat_id=chat_id, text=t("common.error_generic", lang=lang))
         return
@@ -103,7 +104,7 @@ def handle_document(
     if pending:
         try:
             vacancy_id = UUID(pending)
-        except (ValueError, TypeError):
+        except ValueError, TypeError:
             return
         from apps.integrations.telegram_bot.candidate.apply import confirm_apply
 

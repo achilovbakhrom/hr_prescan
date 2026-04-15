@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 # Serializers (kept co-located — they are only used by internal APIs)
 # ---------------------------------------------------------------------------
 
+
 class _InterviewScoreInputSerializer(serializers.Serializer):
     criteria_id = serializers.UUIDField()
     score = serializers.IntegerField(min_value=1, max_value=10)
@@ -56,6 +57,7 @@ class _InterviewResultsInputSerializer(serializers.Serializer):
 # View
 # ---------------------------------------------------------------------------
 
+
 class InternalInterviewResultsApi(APIView):
     """POST /api/internal/interviews/<id>/results/
 
@@ -69,12 +71,7 @@ class InternalInterviewResultsApi(APIView):
         if not validate_internal_key(request):
             return forbidden_response()
 
-        interview = (
-            Interview.objects
-            .select_related("application")
-            .filter(id=interview_id)
-            .first()
-        )
+        interview = Interview.objects.select_related("application").filter(id=interview_id).first()
 
         if interview is None:
             return Response(

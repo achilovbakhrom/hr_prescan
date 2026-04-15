@@ -7,6 +7,7 @@ to one of our three supported languages and look up strings here.
 Strings are intentionally short and split per scope (candidate / hr / common)
 to keep this module under the 200-line file limit.
 """
+
 from __future__ import annotations
 
 from typing import Any
@@ -132,6 +133,6 @@ def t(key: str, *, lang: str = DEFAULT_LANGUAGE, **fmt: Any) -> str:
     if fmt:
         try:
             return text.format(**fmt)
-        except (KeyError, IndexError):
+        except KeyError, IndexError:
             return text
     return text

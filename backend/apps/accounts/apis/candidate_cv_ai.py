@@ -51,8 +51,7 @@ class CvParseApi(APIView):
 
         # Return updated profile using the full output serializer
         profile = (
-            CandidateProfile.objects
-            .select_related("user")
+            CandidateProfile.objects.select_related("user")
             .prefetch_related(
                 "skills",
                 "work_experiences",
@@ -129,8 +128,7 @@ class CvAiGenerateApi(APIView):
         )
 
         profile = (
-            CandidateProfile.objects
-            .select_related("user")
+            CandidateProfile.objects.select_related("user")
             .prefetch_related(
                 "skills",
                 "work_experiences",

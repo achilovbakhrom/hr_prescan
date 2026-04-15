@@ -13,7 +13,9 @@ class CompanyMembership(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="memberships")
     company = models.ForeignKey(
-        "accounts.Company", on_delete=models.CASCADE, related_name="memberships",
+        "accounts.Company",
+        on_delete=models.CASCADE,
+        related_name="memberships",
     )
     role = models.CharField(max_length=20, choices=User.Role.choices, default=User.Role.HR)
     hr_permissions = models.JSONField(default=list, blank=True)

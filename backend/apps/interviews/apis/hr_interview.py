@@ -44,7 +44,8 @@ class HRApplicationInterviewApi(APIView):
             )
 
         application = get_application_by_id(
-            application_id=application_id, company=company,
+            application_id=application_id,
+            company=company,
         )
         if application is None:
             return Response(
@@ -53,8 +54,7 @@ class HRApplicationInterviewApi(APIView):
             )
 
         sessions_qs = (
-            Interview.objects
-            .filter(application=application)
+            Interview.objects.filter(application=application)
             .exclude(status=Interview.Status.CANCELLED)
             .select_related("application__vacancy__company")
             .prefetch_related("scores__criteria", "integrity_flags")
@@ -89,7 +89,8 @@ class HRInterviewListApi(APIView):
 
     class FilterSerializer(serializers.Serializer):
         status = serializers.ChoiceField(
-            choices=Interview.Status.choices, required=False,
+            choices=Interview.Status.choices,
+            required=False,
         )
 
     def get(self, request: Request) -> Response:
@@ -129,7 +130,8 @@ class HRInterviewDetailApi(APIView):
             )
 
         interview = get_interview_by_id(
-            interview_id=interview_id, company=company,
+            interview_id=interview_id,
+            company=company,
         )
         if interview is None:
             return Response(
@@ -158,7 +160,8 @@ class CancelInterviewApi(APIView):
             )
 
         interview = get_interview_by_id(
-            interview_id=interview_id, company=company,
+            interview_id=interview_id,
+            company=company,
         )
         if interview is None:
             return Response(

@@ -46,10 +46,12 @@ def cv_chat_next_message(*, messages):
     client = genai.Client(api_key=settings.GOOGLE_API_KEY)
 
     contents = [types.Content(role="user", parts=[types.Part(text=_CV_CHAT_SYSTEM)])]
-    contents.append(types.Content(
-        role="model",
-        parts=[types.Part(text="Understood. I'll guide the user through building their CV.")],
-    ))
+    contents.append(
+        types.Content(
+            role="model",
+            parts=[types.Part(text="Understood. I'll guide the user through building their CV.")],
+        )
+    )
 
     for msg in messages:
         role = "model" if msg["role"] == "assistant" else "user"
@@ -83,10 +85,7 @@ def cv_chat_generate(*, user, messages):
     profile = get_or_create_candidate_profile(user=user)
     client = genai.Client(api_key=settings.GOOGLE_API_KEY)
 
-    conversation_text = "\n".join(
-        f"{'AI' if m['role'] == 'assistant' else 'User'}: {m['content']}"
-        for m in messages
-    )
+    conversation_text = "\n".join(f"{'AI' if m['role'] == 'assistant' else 'User'}: {m['content']}" for m in messages)
 
     prompt = f"""Based on this conversation between an AI career assistant and a user, extract all CV information and generate a complete professional CV.
 

@@ -40,7 +40,8 @@ class CandidateDashboardApi(APIView):
                 **stats,
                 "profile_completeness": profile_completeness,
                 "recommended_vacancies": RecommendedVacancySerializer(
-                    recommended, many=True,
+                    recommended,
+                    many=True,
                 ).data,
             },
             status=status.HTTP_200_OK,

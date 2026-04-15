@@ -14,8 +14,7 @@ def generate_cv_pdf(*, profile, template_name="classic", cv_name="My CV"):
 
     # 1. Prefetch all related data
     profile = (
-        CandidateProfile.objects
-        .select_related("user")
+        CandidateProfile.objects.select_related("user")
         .prefetch_related(
             "skills",
             "work_experiences",

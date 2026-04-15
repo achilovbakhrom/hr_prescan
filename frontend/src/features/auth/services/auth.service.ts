@@ -4,8 +4,6 @@ import type {
   AcceptInvitationRequest,
   GoogleAuthResponse,
   GoogleAuthRole,
-  GoogleRegisterCompanyRequest,
-  GoogleRegisterCompanyResponse,
   LoginRequest,
   LoginResponse,
   PendingInvitation,
