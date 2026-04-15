@@ -8,19 +8,17 @@ import InputIcon from 'primevue/inputicon'
 import { useCandidateStore } from '@/features/candidates/stores/candidate.store'
 import type { Application, ApplicationStatus } from '@/shared/types/candidate.types'
 
-const candidateViewMode = defineModel<'kanban' | 'table'>('viewMode', { required: true })
-const statusFilter = defineModel<string | undefined>('statusFilter', { required: true })
-const orderingFilter = defineModel<string>('orderingFilter', { required: true })
-const searchQuery = defineModel<string>('searchQuery', { required: true })
-
 defineProps<{
   selectedCandidates: Application[]
 }>()
-
 const emit = defineEmits<{
   searchInput: []
   bulkAction: [event: { value: ApplicationStatus }]
 }>()
+const candidateViewMode = defineModel<'kanban' | 'table'>('viewMode', { required: true })
+const statusFilter = defineModel<string | undefined>('statusFilter', { required: true })
+const orderingFilter = defineModel<string>('orderingFilter', { required: true })
+const searchQuery = defineModel<string>('searchQuery', { required: true })
 
 const { t } = useI18n()
 const candidateStore = useCandidateStore()
@@ -59,17 +57,27 @@ const bulkActionOptions = computed(() => [
     <div class="flex shrink-0 items-center rounded-lg border border-gray-200 p-0.5">
       <button
         class="rounded-md px-2.5 py-1 text-xs font-medium transition-colors sm:px-3 sm:py-1.5 sm:text-sm"
-        :class="candidateViewMode === 'kanban' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:text-gray-700'"
+        :class="
+          candidateViewMode === 'kanban'
+            ? 'bg-gray-900 text-white'
+            : 'text-gray-500 hover:text-gray-700'
+        "
         @click="candidateViewMode = 'kanban'"
       >
-        <i class="pi pi-th-large sm:mr-1.5"></i><span class="hidden sm:inline">{{ t('candidates.board') }}</span>
+        <i class="pi pi-th-large sm:mr-1.5"></i
+        ><span class="hidden sm:inline">{{ t('candidates.board') }}</span>
       </button>
       <button
         class="rounded-md px-2.5 py-1 text-xs font-medium transition-colors sm:px-3 sm:py-1.5 sm:text-sm"
-        :class="candidateViewMode === 'table' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:text-gray-700'"
+        :class="
+          candidateViewMode === 'table'
+            ? 'bg-gray-900 text-white'
+            : 'text-gray-500 hover:text-gray-700'
+        "
         @click="candidateViewMode = 'table'"
       >
-        <i class="pi pi-list sm:mr-1.5"></i><span class="hidden sm:inline">{{ t('candidates.table') }}</span>
+        <i class="pi pi-list sm:mr-1.5"></i
+        ><span class="hidden sm:inline">{{ t('candidates.table') }}</span>
       </button>
     </div>
 
@@ -106,7 +114,9 @@ const bulkActionOptions = computed(() => [
 
     <!-- Bulk actions -->
     <template v-if="selectedCandidates.length > 0">
-      <span class="hidden shrink-0 text-xs text-gray-500 sm:inline">{{ t('candidates.selected', { count: selectedCandidates.length }) }}</span>
+      <span class="hidden shrink-0 text-xs text-gray-500 sm:inline">{{
+        t('candidates.selected', { count: selectedCandidates.length })
+      }}</span>
       <Dropdown
         :model-value="null"
         :options="bulkActionOptions"
@@ -119,6 +129,8 @@ const bulkActionOptions = computed(() => [
     </template>
 
     <!-- Count -->
-    <span class="ml-auto shrink-0 text-xs text-gray-400">{{ candidateStore.candidates.length }}</span>
+    <span class="ml-auto shrink-0 text-xs text-gray-400">{{
+      candidateStore.candidates.length
+    }}</span>
   </div>
 </template>

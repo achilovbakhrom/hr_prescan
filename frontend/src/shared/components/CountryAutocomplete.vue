@@ -28,8 +28,7 @@ const selectedCountry = ref<Country | null>(null)
 onMounted(async () => {
   countries.value = await fetchCountries()
   if (props.modelValue) {
-    selectedCountry.value =
-      countries.value.find((c) => c.code === props.modelValue) ?? null
+    selectedCountry.value = countries.value.find((c) => c.code === props.modelValue) ?? null
   }
 })
 
@@ -52,9 +51,7 @@ function translatedLabel(item: Country): string {
 }
 
 function search(event: { query: string }): void {
-  filteredCountries.value = countries.value.filter((c) =>
-    matchesTranslatedName(c, event.query),
-  )
+  filteredCountries.value = countries.value.filter((c) => matchesTranslatedName(c, event.query))
 }
 
 function onSelect(event: { value: Country }): void {

@@ -3,11 +3,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ApplicationStatusBadge from './ApplicationStatusBadge.vue'
 import TranslatableText from '@/shared/components/TranslatableText.vue'
-import type {
-  ApplicationDetail,
-} from '../types/candidate.types'
-
-const { t } = useI18n()
+import type { ApplicationDetail } from '../types/candidate.types'
 
 const props = defineProps<{
   candidate: ApplicationDetail
@@ -22,6 +18,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:aiSummaryTranslations': [tr: Record<string, string>]
 }>()
+
+const { t } = useI18n()
 
 const { t } = useI18n()
 
@@ -53,9 +51,23 @@ function scoreColor(score: number): string {
 
 const recommendation = computed(() => {
   if (overallScore.value === null) return null
-  if (overallScore.value >= 75) return { label: t('candidates.recommendation.moveForward'), icon: 'pi-check-circle', cls: 'bg-green-50 border-green-200 text-green-800' }
-  if (overallScore.value >= 55) return { label: t('candidates.recommendation.consider'), icon: 'pi-exclamation-circle', cls: 'bg-yellow-50 border-yellow-200 text-yellow-800' }
-  return { label: t('candidates.recommendation.notRecommended'), icon: 'pi-times-circle', cls: 'bg-red-50 border-red-200 text-red-800' }
+  if (overallScore.value >= 75)
+    return {
+      label: t('candidates.recommendation.moveForward'),
+      icon: 'pi-check-circle',
+      cls: 'bg-green-50 border-green-200 text-green-800',
+    }
+  if (overallScore.value >= 55)
+    return {
+      label: t('candidates.recommendation.consider'),
+      icon: 'pi-exclamation-circle',
+      cls: 'bg-yellow-50 border-yellow-200 text-yellow-800',
+    }
+  return {
+    label: t('candidates.recommendation.notRecommended'),
+    icon: 'pi-times-circle',
+    cls: 'bg-red-50 border-red-200 text-red-800',
+  }
 })
 </script>
 
@@ -159,7 +171,9 @@ const recommendation = computed(() => {
           {{ overallScore }}%
         </p>
         <p v-else class="mt-0.5 text-base text-gray-300 sm:mt-1 sm:text-lg">—</p>
-        <p v-if="overallScore !== null" class="mt-0.5 hidden text-[10px] text-gray-400 sm:block">{{ t('candidates.overviewDetails.combinedScore') }}</p>
+        <p v-if="overallScore !== null" class="mt-0.5 hidden text-[10px] text-gray-400 sm:block">
+          {{ t('candidates.overviewDetails.combinedScore') }}
+        </p>
       </div>
     </div>
 

@@ -57,7 +57,9 @@ const { t } = useI18n()
         <div>
           <p class="text-sm text-gray-500">{{ t('admin.dashboard.monthlyRevenue') }}</p>
           <p class="text-2xl font-bold">
-            ${{ (analytics.estimatedMonthlyRevenue || analytics.monthlyRevenue || 0).toLocaleString() }}
+            ${{
+              (analytics.estimatedMonthlyRevenue || analytics.monthlyRevenue || 0).toLocaleString()
+            }}
           </p>
         </div>
       </div>

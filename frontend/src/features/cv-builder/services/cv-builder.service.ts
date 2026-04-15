@@ -156,16 +156,14 @@ export const cvBuilderService = {
   },
 
   async cvAiGenerate(messages: CvChatMessage[]): Promise<CandidateProfile> {
-    const { data: profile } = await apiClient.post<CandidateProfile>(`${BASE}/cv/ai-generate`, { messages })
+    const { data: profile } = await apiClient.post<CandidateProfile>(`${BASE}/cv/ai-generate`, {
+      messages,
+    })
     return profile
   },
 
   // CV Section Improvement (AI)
-  async improveCvSection(
-    section: string,
-    content: string,
-    jobTitle?: string,
-  ): Promise<string> {
+  async improveCvSection(section: string, content: string, jobTitle?: string): Promise<string> {
     const { data } = await apiClient.post<{ improved: string }>(`${BASE}/cv/improve-section`, {
       section,
       content,

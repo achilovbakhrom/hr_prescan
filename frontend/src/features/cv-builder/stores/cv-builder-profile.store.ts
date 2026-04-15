@@ -12,13 +12,39 @@ import type {
 } from '../types/cv-builder.types'
 
 const EMPTY_PROFILE: CandidateProfile = {
-  id: '', headline: '', summary: '', location: '', dateOfBirth: null,
-  linkedinUrl: '', githubUrl: '', websiteUrl: '',
-  desiredSalaryMin: null, desiredSalaryMax: null, desiredSalaryCurrency: 'USD',
-  desiredSalaryNegotiable: false, desiredEmploymentType: '',
-  isOpenToWork: false, shareToken: '', photo: null,
-  skills: [], workExperiences: [], educations: [], languages: [], certifications: [], cvs: [],
-  completeness: { score: 0, sections: { personal: false, summary: false, experience: false, education: false, skills: false, languages: false } },
+  id: '',
+  headline: '',
+  summary: '',
+  location: '',
+  dateOfBirth: null,
+  linkedinUrl: '',
+  githubUrl: '',
+  websiteUrl: '',
+  desiredSalaryMin: null,
+  desiredSalaryMax: null,
+  desiredSalaryCurrency: 'USD',
+  desiredSalaryNegotiable: false,
+  desiredEmploymentType: '',
+  isOpenToWork: false,
+  shareToken: '',
+  photo: null,
+  skills: [],
+  workExperiences: [],
+  educations: [],
+  languages: [],
+  certifications: [],
+  cvs: [],
+  completeness: {
+    score: 0,
+    sections: {
+      personal: false,
+      summary: false,
+      experience: false,
+      education: false,
+      skills: false,
+      languages: false,
+    },
+  },
 }
 
 export const useCvBuilderProfileStore = defineStore('cvBuilderProfile', () => {
@@ -71,35 +97,60 @@ export const useCvBuilderProfileStore = defineStore('cvBuilderProfile', () => {
     }
   }
 
-  const updateProfile = (d: ProfileUpdatePayload) => withSave(() => cvBuilderService.updateProfile(d))
+  const updateProfile = (d: ProfileUpdatePayload) =>
+    withSave(() => cvBuilderService.updateProfile(d))
   const updateSkills = (s: string[]) => withSave(() => cvBuilderService.updateSkills(s))
 
   // Work Experiences
-  const createWorkExperience = (d: WorkExperiencePayload) => withSave(() => cvBuilderService.createWorkExperience(d))
-  const updateWorkExperience = (id: string, d: WorkExperiencePayload) => withSave(() => cvBuilderService.updateWorkExperience(id, d))
-  const deleteWorkExperience = (id: string) => withSave(() => cvBuilderService.deleteWorkExperience(id))
+  const createWorkExperience = (d: WorkExperiencePayload) =>
+    withSave(() => cvBuilderService.createWorkExperience(d))
+  const updateWorkExperience = (id: string, d: WorkExperiencePayload) =>
+    withSave(() => cvBuilderService.updateWorkExperience(id, d))
+  const deleteWorkExperience = (id: string) =>
+    withSave(() => cvBuilderService.deleteWorkExperience(id))
 
   // Educations
-  const createEducation = (d: EducationPayload) => withSave(() => cvBuilderService.createEducation(d))
-  const updateEducation = (id: string, d: EducationPayload) => withSave(() => cvBuilderService.updateEducation(id, d))
+  const createEducation = (d: EducationPayload) =>
+    withSave(() => cvBuilderService.createEducation(d))
+  const updateEducation = (id: string, d: EducationPayload) =>
+    withSave(() => cvBuilderService.updateEducation(id, d))
   const deleteEducation = (id: string) => withSave(() => cvBuilderService.deleteEducation(id))
 
   // Languages
   const createLanguage = (d: LanguagePayload) => withSave(() => cvBuilderService.createLanguage(d))
-  const updateLanguage = (id: string, d: LanguagePayload) => withSave(() => cvBuilderService.updateLanguage(id, d))
+  const updateLanguage = (id: string, d: LanguagePayload) =>
+    withSave(() => cvBuilderService.updateLanguage(id, d))
   const deleteLanguage = (id: string) => withSave(() => cvBuilderService.deleteLanguage(id))
 
   // Certifications
-  const createCertification = (d: CertificationPayload) => withSave(() => cvBuilderService.createCertification(d))
-  const updateCertification = (id: string, d: CertificationPayload) => withSave(() => cvBuilderService.updateCertification(id, d))
-  const deleteCertification = (id: string) => withSave(() => cvBuilderService.deleteCertification(id))
+  const createCertification = (d: CertificationPayload) =>
+    withSave(() => cvBuilderService.createCertification(d))
+  const updateCertification = (id: string, d: CertificationPayload) =>
+    withSave(() => cvBuilderService.updateCertification(id, d))
+  const deleteCertification = (id: string) =>
+    withSave(() => cvBuilderService.deleteCertification(id))
 
   return {
-    profile, loading, saving, error, fieldErrors,
-    clearErrors, fetchProfile, updateProfile, updateSkills,
-    createWorkExperience, updateWorkExperience, deleteWorkExperience,
-    createEducation, updateEducation, deleteEducation,
-    createLanguage, updateLanguage, deleteLanguage,
-    createCertification, updateCertification, deleteCertification,
+    profile,
+    loading,
+    saving,
+    error,
+    fieldErrors,
+    clearErrors,
+    fetchProfile,
+    updateProfile,
+    updateSkills,
+    createWorkExperience,
+    updateWorkExperience,
+    deleteWorkExperience,
+    createEducation,
+    updateEducation,
+    deleteEducation,
+    createLanguage,
+    updateLanguage,
+    deleteLanguage,
+    createCertification,
+    updateCertification,
+    deleteCertification,
   }
 })

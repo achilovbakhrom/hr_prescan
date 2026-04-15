@@ -62,7 +62,9 @@ function populateForm(): void {
   isOpenToWork.value = p.isOpenToWork ?? false
 }
 
-onMounted(() => { populateForm() })
+onMounted(() => {
+  populateForm()
+})
 
 function formatDate(date: Date | null): string | null {
   if (!date) return null
@@ -103,26 +105,37 @@ async function handleSave(): Promise<void> {
 
   const schema = createPersonalInfoSchema(t)
   const errors = await validateForm(schema, {
-    headline: headline.value, summary: summary.value, location: location.value,
-    linkedinUrl: linkedinUrl.value || undefined, githubUrl: githubUrl.value || undefined,
+    headline: headline.value,
+    summary: summary.value,
+    location: location.value,
+    linkedinUrl: linkedinUrl.value || undefined,
+    githubUrl: githubUrl.value || undefined,
     websiteUrl: websiteUrl.value || undefined,
     desiredSalaryNegotiable: desiredSalaryNegotiable.value,
-    desiredSalaryMin: desiredSalaryMin.value, desiredSalaryMax: desiredSalaryMax.value,
+    desiredSalaryMin: desiredSalaryMin.value,
+    desiredSalaryMax: desiredSalaryMax.value,
     desiredEmploymentType: desiredEmploymentType.value,
   })
   if (errors) {
     fieldErrors.value = errors
     await nextTick()
-    document.querySelector('.p-invalid, [data-field-error="true"]')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    document
+      .querySelector('.p-invalid, [data-field-error="true"]')
+      ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     return
   }
 
   try {
     await store.updateProfile({
-      headline: headline.value, summary: summary.value, location: location.value,
+      headline: headline.value,
+      summary: summary.value,
+      location: location.value,
       dateOfBirth: formatDate(dateOfBirth.value),
-      linkedinUrl: linkedinUrl.value, githubUrl: githubUrl.value, websiteUrl: websiteUrl.value,
-      desiredSalaryMin: desiredSalaryMin.value, desiredSalaryMax: desiredSalaryMax.value,
+      linkedinUrl: linkedinUrl.value,
+      githubUrl: githubUrl.value,
+      websiteUrl: websiteUrl.value,
+      desiredSalaryMin: desiredSalaryMin.value,
+      desiredSalaryMax: desiredSalaryMax.value,
       desiredSalaryCurrency: desiredSalaryCurrency.value || undefined,
       desiredSalaryNegotiable: desiredSalaryNegotiable.value,
       desiredEmploymentType: desiredEmploymentType.value || undefined,
@@ -137,7 +150,8 @@ async function handleSave(): Promise<void> {
       errorMessage.value = err instanceof Error ? err.message : t('common.error')
     }
     await nextTick()
-    document.querySelector('.p-invalid, [data-field-error="true"]')
+    document
+      .querySelector('.p-invalid, [data-field-error="true"]')
       ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }
 }
@@ -153,41 +167,104 @@ defineExpose({ save: handleSave })
     <form class="flex flex-col gap-5" @submit.prevent="handleSave">
       <div class="flex flex-col gap-1">
         <div class="flex items-center justify-between">
-          <label for="headline" class="text-sm font-medium text-gray-700">{{ t('cvBuilder.personal.headline') }} <span class="text-red-500">*</span></label>
-          <Button :label="t('cvBuilder.improveWithAi')" icon="pi pi-sparkles" severity="secondary" text size="small" :loading="improvingHeadline" :disabled="!headline.trim()" @click="handleImproveHeadline" />
+          <label for="headline" class="text-sm font-medium text-gray-700"
+            >{{ t('cvBuilder.personal.headline') }} <span class="text-red-500">*</span></label
+          >
+          <Button
+            :label="t('cvBuilder.improveWithAi')"
+            icon="pi pi-sparkles"
+            severity="secondary"
+            text
+            size="small"
+            :loading="improvingHeadline"
+            :disabled="!headline.trim()"
+            @click="handleImproveHeadline"
+          />
         </div>
-        <InputText id="headline" v-model="headline" :placeholder="t('cvBuilder.personal.headlinePlaceholder')" class="w-full" :invalid="hasError('headline')" />
+        <InputText
+          id="headline"
+          v-model="headline"
+          :placeholder="t('cvBuilder.personal.headlinePlaceholder')"
+          class="w-full"
+          :invalid="hasError('headline')"
+        />
         <small v-if="hasError('headline')" class="text-red-500">{{ fieldError('headline') }}</small>
       </div>
 
       <div class="flex flex-col gap-1">
         <div class="flex items-center justify-between">
-          <label for="summary" class="text-sm font-medium text-gray-700">{{ t('cvBuilder.personal.summary') }} <span class="text-red-500">*</span></label>
-          <Button :label="t('cvBuilder.improveWithAi')" icon="pi pi-sparkles" severity="secondary" text size="small" :loading="improvingSection" :disabled="!summary.trim()" @click="handleImproveSummary" />
+          <label for="summary" class="text-sm font-medium text-gray-700"
+            >{{ t('cvBuilder.personal.summary') }} <span class="text-red-500">*</span></label
+          >
+          <Button
+            :label="t('cvBuilder.improveWithAi')"
+            icon="pi pi-sparkles"
+            severity="secondary"
+            text
+            size="small"
+            :loading="improvingSection"
+            :disabled="!summary.trim()"
+            @click="handleImproveSummary"
+          />
         </div>
-        <Editor v-model="summary" :data-field-error="hasError('summary') || undefined" editorStyle="height: 150px" :class="{ 'border border-red-500 rounded-md': hasError('summary') }" />
+        <Editor
+          v-model="summary"
+          :data-field-error="hasError('summary') || undefined"
+          editorStyle="height: 150px"
+          :class="{ 'border border-red-500 rounded-md': hasError('summary') }"
+        />
         <small v-if="hasError('summary')" class="text-red-500">{{ fieldError('summary') }}</small>
       </div>
 
       <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div class="flex flex-col gap-1">
-          <label for="location" class="text-sm font-medium text-gray-700">{{ t('cvBuilder.personal.location') }}</label>
-          <InputText id="location" v-model="location" :placeholder="t('cvBuilder.personal.locationPlaceholder')" class="w-full" :invalid="hasError('location')" />
-          <small v-if="hasError('location')" class="text-red-500">{{ fieldError('location') }}</small>
+          <label for="location" class="text-sm font-medium text-gray-700">{{
+            t('cvBuilder.personal.location')
+          }}</label>
+          <InputText
+            id="location"
+            v-model="location"
+            :placeholder="t('cvBuilder.personal.locationPlaceholder')"
+            class="w-full"
+            :invalid="hasError('location')"
+          />
+          <small v-if="hasError('location')" class="text-red-500">{{
+            fieldError('location')
+          }}</small>
         </div>
         <div class="flex flex-col gap-1">
-          <label for="dateOfBirth" class="text-sm font-medium text-gray-700">{{ t('cvBuilder.personal.dateOfBirth') }}</label>
-          <DatePicker id="dateOfBirth" v-model="dateOfBirth" dateFormat="yy-mm-dd" :placeholder="t('cvBuilder.personal.dateOfBirthPlaceholder')" showIcon class="w-full" :invalid="hasError('dateOfBirth')" />
-          <small v-if="hasError('dateOfBirth')" class="text-red-500">{{ fieldError('dateOfBirth') }}</small>
+          <label for="dateOfBirth" class="text-sm font-medium text-gray-700">{{
+            t('cvBuilder.personal.dateOfBirth')
+          }}</label>
+          <DatePicker
+            id="dateOfBirth"
+            v-model="dateOfBirth"
+            dateFormat="yy-mm-dd"
+            :placeholder="t('cvBuilder.personal.dateOfBirthPlaceholder')"
+            showIcon
+            class="w-full"
+            :invalid="hasError('dateOfBirth')"
+          />
+          <small v-if="hasError('dateOfBirth')" class="text-red-500">{{
+            fieldError('dateOfBirth')
+          }}</small>
         </div>
       </div>
 
-      <PersonalInfoLinks v-model:linkedin-url="linkedinUrl" v-model:github-url="githubUrl" v-model:website-url="websiteUrl" :field-errors="fieldErrors" />
+      <PersonalInfoLinks
+        v-model:linkedin-url="linkedinUrl"
+        v-model:github-url="githubUrl"
+        v-model:website-url="websiteUrl"
+        :field-errors="fieldErrors"
+      />
 
       <PersonalInfoSalary
-        v-model:salary-min="desiredSalaryMin" v-model:salary-max="desiredSalaryMax"
-        v-model:currency="desiredSalaryCurrency" v-model:negotiable="desiredSalaryNegotiable"
-        v-model:employment-type="desiredEmploymentType" v-model:is-open-to-work="isOpenToWork"
+        v-model:salary-min="desiredSalaryMin"
+        v-model:salary-max="desiredSalaryMax"
+        v-model:currency="desiredSalaryCurrency"
+        v-model:negotiable="desiredSalaryNegotiable"
+        v-model:employment-type="desiredEmploymentType"
+        v-model:is-open-to-work="isOpenToWork"
         :field-errors="fieldErrors"
       />
     </form>

@@ -11,7 +11,10 @@ export function useInterviewData() {
   async function fetchInterviewData(candidateId: string, hasInterview: boolean): Promise<void> {
     // Fetch prescanning interview data
     try {
-      const data = (await candidateService.getCandidateInterview(candidateId, 'prescanning')) as Record<string, unknown>
+      const data = (await candidateService.getCandidateInterview(
+        candidateId,
+        'prescanning',
+      )) as Record<string, unknown>
       prescanningScore.value = (data.overallScore as number) ?? null
       aiSummary.value = (data.aiSummary as string) ?? null
       aiSummaryTranslations.value = (data.aiSummaryTranslations as Record<string, string>) ?? {}
@@ -23,7 +26,10 @@ export function useInterviewData() {
     // Fetch interview data if interview is enabled
     if (hasInterview) {
       try {
-        const data = (await candidateService.getCandidateInterview(candidateId, 'interview')) as Record<string, unknown>
+        const data = (await candidateService.getCandidateInterview(
+          candidateId,
+          'interview',
+        )) as Record<string, unknown>
         interviewScore.value = (data.overallScore as number) ?? null
         if (!aiSummary.value) {
           aiSummary.value = (data.aiSummary as string) ?? null

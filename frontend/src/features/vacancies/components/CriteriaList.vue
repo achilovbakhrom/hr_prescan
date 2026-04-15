@@ -11,9 +11,16 @@ import Tag from 'primevue/tag'
 import { getLocale } from '@/shared/i18n'
 import type { VacancyCriteria } from '../types/vacancy.types'
 
-const { t } = useI18n()
-
 const props = defineProps<{ criteria: VacancyCriteria[]; loading?: boolean }>()
+
+const emit = defineEmits<{
+  add: [data: { name: string; description?: string; weight?: number }]
+  update: [criteriaId: string, data: Partial<VacancyCriteria>]
+  delete: [criteriaId: string]
+  translateAll: []
+}>()
+
+const { t } = useI18n()
 
 const currentLocale = computed(() => getLocale())
 
@@ -32,13 +39,6 @@ function getTranslatedDescription(c: VacancyCriteria): string {
   const parts = translated.split(': ')
   return parts.length > 1 ? parts.slice(1).join(': ') : c.description
 }
-const emit = defineEmits<{
-  add: [data: { name: string; description?: string; weight?: number }]
-  update: [criteriaId: string, data: Partial<VacancyCriteria>]
-  delete: [criteriaId: string]
-  translateAll: []
-}>()
-
 const { t } = useI18n()
 
 const showDialog = ref(false)
@@ -95,7 +95,12 @@ function handleSubmit(): void {
           size="small"
           @click="emit('translateAll')"
         />
-        <Button :label="t('vacancies.addCriteria')" icon="pi pi-plus" size="small" @click="openAdd" />
+        <Button
+          :label="t('vacancies.addCriteria')"
+          icon="pi pi-plus"
+          size="small"
+          @click="openAdd"
+        />
       </div>
     </div>
     <DataTable :value="criteria" :loading="loading" striped-rows>

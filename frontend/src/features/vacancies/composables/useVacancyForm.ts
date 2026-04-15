@@ -58,13 +58,28 @@ export function useVacancyForm(
   }
 
   const FIELD_TAB_MAP: Record<string, number> = {
-    title: 0, description: 0, requirements: 0, responsibilities: 0,
-    skills: 0, salaryMin: 0, salaryMax: 0, salaryCurrency: 0,
-    location: 0, isRemote: 0, employmentType: 0, experienceLevel: 0, deadline: 0,
-    employerId: 1, companyInfo: 1,
+    title: 0,
+    description: 0,
+    requirements: 0,
+    responsibilities: 0,
+    skills: 0,
+    salaryMin: 0,
+    salaryMax: 0,
+    salaryCurrency: 0,
+    location: 0,
+    isRemote: 0,
+    employmentType: 0,
+    experienceLevel: 0,
+    deadline: 0,
+    employerId: 1,
+    companyInfo: 1,
     prescanningPrompt: 2,
-    interviewEnabled: 3, interviewMode: 3, interviewDuration: 3, interviewPrompt: 3,
-    visibility: 4, cvRequired: 4,
+    interviewEnabled: 3,
+    interviewMode: 3,
+    interviewDuration: 3,
+    interviewPrompt: 3,
+    visibility: 4,
+    cvRequired: 4,
   }
 
   watch(errors, (errs) => {
@@ -99,11 +114,16 @@ export function useVacancyForm(
   })
 
   function syncFromInitialData(d: Partial<CreateVacancyRequest>): void {
-    title.value = d.title ?? ''; description.value = d.description ?? ''
-    requirements.value = d.requirements ?? ''; responsibilities.value = d.responsibilities ?? ''
-    skills.value = d.skills ?? []; salaryMin.value = d.salaryMin ?? null
-    salaryMax.value = d.salaryMax ?? null; salaryCurrency.value = d.salaryCurrency ?? 'USD'
-    location.value = d.location ?? ''; isRemote.value = d.isRemote ?? false
+    title.value = d.title ?? ''
+    description.value = d.description ?? ''
+    requirements.value = d.requirements ?? ''
+    responsibilities.value = d.responsibilities ?? ''
+    skills.value = d.skills ?? []
+    salaryMin.value = d.salaryMin ?? null
+    salaryMax.value = d.salaryMax ?? null
+    salaryCurrency.value = d.salaryCurrency ?? 'USD'
+    location.value = d.location ?? ''
+    isRemote.value = d.isRemote ?? false
     employmentType.value = d.employmentType ?? 'full_time'
     experienceLevel.value = d.experienceLevel ?? 'middle'
     deadline.value = d.deadline ? new Date(d.deadline) : null
@@ -121,19 +141,25 @@ export function useVacancyForm(
 
   function buildPayload(): CreateVacancyRequest {
     return {
-      title: title.value, description: description.value,
+      title: title.value,
+      description: description.value,
       requirements: requirements.value || undefined,
       responsibilities: responsibilities.value || undefined,
       skills: skills.value.length > 0 ? skills.value : undefined,
-      salaryMin: salaryMin.value, salaryMax: salaryMax.value,
+      salaryMin: salaryMin.value,
+      salaryMax: salaryMax.value,
       salaryCurrency: salaryCurrency.value,
-      location: location.value || undefined, isRemote: isRemote.value,
-      employmentType: employmentType.value, experienceLevel: experienceLevel.value,
+      location: location.value || undefined,
+      isRemote: isRemote.value,
+      employmentType: employmentType.value,
+      experienceLevel: experienceLevel.value,
       deadline: deadline.value ? deadline.value.toISOString().split('T')[0] : null,
-      visibility: visibility.value, cvRequired: cvRequired.value,
+      visibility: visibility.value,
+      cvRequired: cvRequired.value,
       prescanningPrompt: prescanningPrompt.value || undefined,
       prescanningLanguage: prescanningLanguage.value,
-      interviewEnabled: interviewEnabled.value, interviewMode: interviewMode.value,
+      interviewEnabled: interviewEnabled.value,
+      interviewMode: interviewMode.value,
       interviewDuration: interviewDuration.value,
       interviewPrompt: interviewPrompt.value || undefined,
       companyInfo: companyInfo.value || undefined,
@@ -142,12 +168,37 @@ export function useVacancyForm(
   }
 
   return {
-    title, description, requirements, responsibilities, skills,
-    salaryMin, salaryMax, salaryCurrency, location, isRemote,
-    employmentType, experienceLevel, deadline, visibility, cvRequired,
-    prescanningPrompt, prescanningLanguage, interviewEnabled, interviewMode,
-    interviewDuration, interviewPrompt, companyInfo, employerId,
-    employersList, loadingEmployers, selectedEmployer, activeTab,
-    canSave, hasError, fieldError, syncFromInitialData, buildPayload,
+    title,
+    description,
+    requirements,
+    responsibilities,
+    skills,
+    salaryMin,
+    salaryMax,
+    salaryCurrency,
+    location,
+    isRemote,
+    employmentType,
+    experienceLevel,
+    deadline,
+    visibility,
+    cvRequired,
+    prescanningPrompt,
+    prescanningLanguage,
+    interviewEnabled,
+    interviewMode,
+    interviewDuration,
+    interviewPrompt,
+    companyInfo,
+    employerId,
+    employersList,
+    loadingEmployers,
+    selectedEmployer,
+    activeTab,
+    canSave,
+    hasError,
+    fieldError,
+    syncFromInitialData,
+    buildPayload,
   }
 }

@@ -25,7 +25,7 @@ const vacancyId = computed(() => route.params.id as string)
 const vacancy = computed(() => vacancyStore.currentVacancy)
 
 const VALID_SECTIONS = ['details', 'prescanning', 'interview', 'candidates', 'settings'] as const
-type SectionKey = typeof VALID_SECTIONS[number]
+type SectionKey = (typeof VALID_SECTIONS)[number]
 
 function defaultSection(): SectionKey {
   const v = vacancy.value
@@ -41,52 +41,88 @@ const activeSection = computed<SectionKey>({
     if (q && (VALID_SECTIONS as readonly string[]).includes(q)) return q as SectionKey
     return defaultSection()
   },
-  set: (val) => { router.replace({ query: { ...route.query, section: val } }) },
+  set: (val) => {
+    router.replace({ query: { ...route.query, section: val } })
+  },
 })
 
 function navigateSection(key: string): void {
   if ((VALID_SECTIONS as readonly string[]).includes(key)) activeSection.value = key as SectionKey
 }
 
-const prescanningQuestions = computed(() => vacancy.value?.questions.filter((q) => q.step === 'prescanning') ?? [])
-const interviewQuestions = computed(() => vacancy.value?.questions.filter((q) => q.step === 'interview') ?? [])
-const prescanningCriteria = computed(() => vacancy.value?.criteria.filter((c) => c.step === 'prescanning') ?? [])
-const interviewCriteria = computed(() => vacancy.value?.criteria.filter((c) => c.step === 'interview') ?? [])
+const prescanningQuestions = computed(
+  () => vacancy.value?.questions.filter((q) => q.step === 'prescanning') ?? [],
+)
+const interviewQuestions = computed(
+  () => vacancy.value?.questions.filter((q) => q.step === 'interview') ?? [],
+)
+const prescanningCriteria = computed(
+  () => vacancy.value?.criteria.filter((c) => c.step === 'prescanning') ?? [],
+)
+const interviewCriteria = computed(
+  () => vacancy.value?.criteria.filter((c) => c.step === 'interview') ?? [],
+)
 
 const candidatesTotal = computed(() => vacancy.value?.candidatesTotal ?? 0)
 const candidatesShortlisted = computed(() => vacancy.value?.candidatesShortlisted ?? 0)
 
-onMounted(() => { vacancyStore.fetchVacancyDetail(vacancyId.value) })
+onMounted(() => {
+  vacancyStore.fetchVacancyDetail(vacancyId.value)
+})
 
 async function handleStatusChange(status: VacancyStatus): Promise<void> {
   try {
     await vacancyStore.changeStatus(vacancyId.value, status)
-    const messageKey = status === 'published' ? 'vacancies.toast.published'
-      : status === 'paused'    ? 'vacancies.toast.paused'
-      : status === 'archived'  ? 'vacancies.toast.archived'
-      : 'common.saved'
+    const messageKey =
+      status === 'published'
+        ? 'vacancies.toast.published'
+        : status === 'paused'
+          ? 'vacancies.toast.paused'
+          : status === 'archived'
+            ? 'vacancies.toast.archived'
+            : 'common.saved'
     toast.add({ severity: 'success', summary: t(messageKey), life: 2500 })
   } catch {
     toast.add({ severity: 'error', summary: vacancyStore.error || t('common.error'), life: 4500 })
   }
 }
 
-async function handleBatchTranslate(itemType: 'criteria' | 'questions', step: 'prescanning' | 'interview'): Promise<void> {
+async function handleBatchTranslate(
+  itemType: 'criteria' | 'questions',
+  step: 'prescanning' | 'interview',
+): Promise<void> {
   try {
-    const result = await batchTranslateItems({ vacancyId: vacancyId.value, itemType, step, targetLanguage: getLocale() })
+    const result = await batchTranslateItems({
+      vacancyId: vacancyId.value,
+      itemType,
+      step,
+      targetLanguage: getLocale(),
+    })
     if (vacancy.value) {
       const itemList = itemType === 'criteria' ? vacancy.value.criteria : vacancy.value.questions
-      for (const translated of result.items) { const item = itemList.find((i) => i.id === translated.id); if (item) item.translations = translated.translations }
+      for (const translated of result.items) {
+        const item = itemList.find((i) => i.id === translated.id)
+        if (item) item.translations = translated.translations
+      }
     }
-  } catch { /* silent */ }
+  } catch {
+    /* silent */
+  }
 }
 </script>
 
 <template>
   <div class="space-y-4 sm:space-y-5">
-    <p v-if="vacancyStore.error && Object.keys(vacancyStore.fieldErrors).length === 0" class="text-sm text-red-600">{{ vacancyStore.error }}</p>
+    <p
+      v-if="vacancyStore.error && Object.keys(vacancyStore.fieldErrors).length === 0"
+      class="text-sm text-red-600"
+    >
+      {{ vacancyStore.error }}
+    </p>
 
-    <div v-if="!vacancy && vacancyStore.loading" class="py-12 text-center"><i class="pi pi-spinner pi-spin text-3xl text-gray-400"></i></div>
+    <div v-if="!vacancy && vacancyStore.loading" class="py-12 text-center">
+      <i class="pi pi-spinner pi-spin text-3xl text-gray-400"></i>
+    </div>
 
     <template v-else-if="vacancy">
       <!-- Persistent header (always visible regardless of section) -->

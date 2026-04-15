@@ -5,8 +5,6 @@ import ToggleSwitch from 'primevue/toggleswitch'
 import Button from 'primevue/button'
 import type { CvFile } from '../types/cv-builder.types'
 
-const { t } = useI18n()
-
 defineProps<{
   cv: CvFile
   actionLoading: string | null
@@ -18,9 +16,15 @@ const emit = defineEmits<{
   delete: [cv: CvFile]
 }>()
 
+const { t } = useI18n()
+
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString(undefined, {
-    year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
   })
 }
 
@@ -41,13 +45,21 @@ function templateLabel(template: string): string {
   >
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div class="flex items-center gap-3">
-        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg" :class="cv.isActive ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'">
+        <div
+          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg"
+          :class="cv.isActive ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'"
+        >
           <i class="pi pi-file-pdf text-lg"></i>
         </div>
         <div class="min-w-0">
           <div class="flex items-center gap-2">
             <p class="truncate font-medium text-gray-900">{{ cv.name }}</p>
-            <Tag v-if="cv.isActive" :value="t('myCvs.active')" severity="success" class="!text-[10px]" />
+            <Tag
+              v-if="cv.isActive"
+              :value="t('myCvs.active')"
+              severity="success"
+              class="!text-[10px]"
+            />
           </div>
           <div class="flex flex-wrap items-center gap-2 text-xs text-gray-500">
             <span>{{ templateLabel(cv.template) }}</span>
@@ -59,12 +71,37 @@ function templateLabel(template: string): string {
 
       <div class="flex items-center gap-3">
         <div class="flex items-center gap-2">
-          <span class="text-xs text-gray-500">{{ cv.isActive ? t('myCvs.active') : t('myCvs.inactive') }}</span>
-          <ToggleSwitch :modelValue="cv.isActive" :disabled="actionLoading === cv.id" @update:modelValue="emit('toggleActive', cv)" />
+          <span class="text-xs text-gray-500">{{
+            cv.isActive ? t('myCvs.active') : t('myCvs.inactive')
+          }}</span>
+          <ToggleSwitch
+            :modelValue="cv.isActive"
+            :disabled="actionLoading === cv.id"
+            @update:modelValue="emit('toggleActive', cv)"
+          />
         </div>
         <span class="h-5 w-px bg-gray-200"></span>
-        <Button v-if="cv.downloadUrl" icon="pi pi-eye" severity="secondary" text rounded size="small" v-tooltip.top="t('myCvs.view')" @click="emit('view', cv)" />
-        <Button icon="pi pi-trash" severity="danger" text rounded size="small" v-tooltip.top="cv.isActive ? t('myCvs.deactivateFirst') : t('common.delete')" :loading="actionLoading === cv.id" :disabled="cv.isActive" @click="emit('delete', cv)" />
+        <Button
+          v-if="cv.downloadUrl"
+          icon="pi pi-eye"
+          severity="secondary"
+          text
+          rounded
+          size="small"
+          v-tooltip.top="t('myCvs.view')"
+          @click="emit('view', cv)"
+        />
+        <Button
+          icon="pi pi-trash"
+          severity="danger"
+          text
+          rounded
+          size="small"
+          v-tooltip.top="cv.isActive ? t('myCvs.deactivateFirst') : t('common.delete')"
+          :loading="actionLoading === cv.id"
+          :disabled="cv.isActive"
+          @click="emit('delete', cv)"
+        />
       </div>
     </div>
   </div>

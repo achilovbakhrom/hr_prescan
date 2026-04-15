@@ -17,7 +17,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   'update:modelValue': [value: string[]]
-  'hasOther': [value: boolean]
+  hasOther: [value: boolean]
 }>()
 
 const { t } = useI18n()
@@ -26,16 +26,12 @@ const industries = ref<Industry[]>([])
 const filteredIndustries = ref<Industry[]>([])
 const selectedIndustries = ref<Industry[]>([])
 
-const hasOtherSelected = computed(() =>
-  selectedIndustries.value.some((i) => i.slug === 'other'),
-)
+const hasOtherSelected = computed(() => selectedIndustries.value.some((i) => i.slug === 'other'))
 
 onMounted(async () => {
   industries.value = await fetchIndustries()
   if (props.modelValue.length) {
-    selectedIndustries.value = industries.value.filter((i) =>
-      props.modelValue.includes(i.slug),
-    )
+    selectedIndustries.value = industries.value.filter((i) => props.modelValue.includes(i.slug))
   }
   emit('hasOther', hasOtherSelected.value)
 })
@@ -47,9 +43,7 @@ watch(
       selectedIndustries.value = []
       return
     }
-    selectedIndustries.value = industries.value.filter((i) =>
-      slugs.includes(i.slug),
-    )
+    selectedIndustries.value = industries.value.filter((i) => slugs.includes(i.slug))
   },
 )
 
@@ -71,7 +65,10 @@ function onChange(value: Industry[]): void {
     'update:modelValue',
     value.map((i) => i.slug),
   )
-  emit('hasOther', value.some((i) => i.slug === 'other'))
+  emit(
+    'hasOther',
+    value.some((i) => i.slug === 'other'),
+  )
 }
 </script>
 

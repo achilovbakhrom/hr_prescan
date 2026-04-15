@@ -14,7 +14,8 @@ const activeCompanyId = computed(() => authStore.user?.company?.id ?? 'personal'
 
 const companyOptions = computed(() => {
   const options: { label: string; value: string }[] = []
-  if (authStore.companies.length > 0) options.push({ label: t('common.personal'), value: 'personal' })
+  if (authStore.companies.length > 0)
+    options.push({ label: t('common.personal'), value: 'personal' })
   for (const m of authStore.companies) options.push({ label: m.company.name, value: m.company.id })
   return options
 })

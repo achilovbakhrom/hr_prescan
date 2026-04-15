@@ -19,14 +19,27 @@ const errorMessage = ref<string | null>(null)
     <Message v-if="successMessage" severity="success" class="mb-4">{{ successMessage }}</Message>
     <Message v-if="errorMessage" severity="error" class="mb-4">{{ errorMessage }}</Message>
 
-    <div v-if="settingsStore.loading && !settingsStore.companyProfile" class="py-12 text-center text-gray-500">
+    <div
+      v-if="settingsStore.loading && !settingsStore.companyProfile"
+      class="py-12 text-center text-gray-500"
+    >
       {{ t('settings.company.loadingProfile') }}
     </div>
 
     <CompanyProfileForm
       v-else
-      @success="(msg) => { successMessage = msg; errorMessage = null }"
-      @error="(msg) => { errorMessage = msg; successMessage = null }"
+      @success="
+        (msg) => {
+          successMessage = msg
+          errorMessage = null
+        }
+      "
+      @error="
+        (msg) => {
+          errorMessage = msg
+          successMessage = null
+        }
+      "
     />
   </div>
 </template>

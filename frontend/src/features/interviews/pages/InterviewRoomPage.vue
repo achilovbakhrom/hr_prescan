@@ -56,7 +56,10 @@ const room = useInterviewRoom(() => token.value)
       />
 
       <!-- CONNECTING -->
-      <div v-else-if="room.connectionState.value === 'connecting'" class="flex flex-1 items-center justify-center">
+      <div
+        v-else-if="room.connectionState.value === 'connecting'"
+        class="flex flex-1 items-center justify-center"
+      >
         <div class="text-center">
           <i class="pi pi-spinner pi-spin mb-4 text-5xl text-blue-400"></i>
           <p class="text-lg text-white">{{ t('interviews.roomPage.joiningInterview') }}</p>
@@ -64,17 +67,27 @@ const room = useInterviewRoom(() => token.value)
       </div>
 
       <!-- ERROR -->
-      <div v-else-if="room.connectionState.value === 'error'" class="flex flex-1 items-center justify-center p-8">
+      <div
+        v-else-if="room.connectionState.value === 'error'"
+        class="flex flex-1 items-center justify-center p-8"
+      >
         <div class="w-full max-w-md rounded-2xl bg-[#303134] p-8 text-center shadow-2xl">
           <div
             class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-500/20"
           >
             <i class="pi pi-exclamation-triangle text-2xl text-red-400"></i>
           </div>
-          <h2 class="mb-2 text-lg font-medium text-white">{{ t('interviews.roomPage.somethingWentWrong') }}</h2>
+          <h2 class="mb-2 text-lg font-medium text-white">
+            {{ t('interviews.roomPage.somethingWentWrong') }}
+          </h2>
           <p class="mb-6 text-sm text-gray-400">{{ room.errorMessage.value }}</p>
           <div class="flex justify-center gap-3">
-            <Button :label="t('errors.goBack')" severity="secondary" outlined @click="room.connectionState.value = 'idle'" />
+            <Button
+              :label="t('errors.goBack')"
+              severity="secondary"
+              outlined
+              @click="room.connectionState.value = 'idle'"
+            />
             <Button :label="t('errors.tryAgain')" icon="pi pi-refresh" @click="room.startPreview" />
           </div>
         </div>
@@ -99,17 +112,29 @@ const room = useInterviewRoom(() => token.value)
       />
 
       <!-- ENDED -->
-      <div v-else-if="room.connectionState.value === 'ended'" class="flex flex-1 items-center justify-center p-8">
+      <div
+        v-else-if="room.connectionState.value === 'ended'"
+        class="flex flex-1 items-center justify-center p-8"
+      >
         <div class="w-full max-w-md rounded-2xl bg-[#303134] p-8 text-center shadow-2xl">
           <div
             class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-500/20"
           >
             <i class="pi pi-check text-3xl text-green-400"></i>
           </div>
-          <h2 class="mb-2 text-xl font-medium text-white">{{ t('interviews.status.completed') }}</h2>
-          <p class="mb-1 text-gray-400">{{ t('interviews.roomPage.duration') }} {{ room.formattedTime.value }}</p>
+          <h2 class="mb-2 text-xl font-medium text-white">
+            {{ t('interviews.status.completed') }}
+          </h2>
+          <p class="mb-1 text-gray-400">
+            {{ t('interviews.roomPage.duration') }} {{ room.formattedTime.value }}
+          </p>
           <p class="mb-6 text-sm text-gray-500">{{ t('interviews.roomPage.thankYou') }}</p>
-          <Button :label="t('errors.goHome')" icon="pi pi-home" class="w-full" @click="room.router.push('/')" />
+          <Button
+            :label="t('errors.goHome')"
+            icon="pi pi-home"
+            class="w-full"
+            @click="room.router.push('/')"
+          />
         </div>
       </div>
     </template>

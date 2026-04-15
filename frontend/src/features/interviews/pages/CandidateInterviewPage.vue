@@ -48,17 +48,16 @@ function handleJoinInterview(): void {
         class="rounded-lg border border-green-200 bg-green-50 p-8 text-center"
       >
         <i class="pi pi-check-circle mb-4 text-5xl text-green-500"></i>
-        <h1 class="mb-2 text-2xl font-bold text-gray-900">{{ t('interviews.candidatePage.thankYou') }}</h1>
+        <h1 class="mb-2 text-2xl font-bold text-gray-900">
+          {{ t('interviews.candidatePage.thankYou') }}
+        </h1>
         <p class="text-gray-600">
           {{ t('interviews.candidatePage.completedMessage') }}
         </p>
       </div>
 
       <!-- Pre-interview state -->
-      <div
-        v-else
-        class="rounded-lg border border-gray-200 bg-white p-8"
-      >
+      <div v-else class="rounded-lg border border-gray-200 bg-white p-8">
         <h1 class="mb-6 text-2xl font-bold text-gray-900">
           {{ t('interviews.candidatePage.yourInterview') }}
         </h1>
@@ -79,7 +78,9 @@ function handleJoinInterview(): void {
               <div class="flex justify-between">
                 <dt class="text-gray-500">{{ t('interviews.preCheck.duration') }}</dt>
                 <dd class="font-medium">
-                  {{ t('interviews.preCheck.durationMinutes', { minutes: interview.durationMinutes }) }}
+                  {{
+                    t('interviews.preCheck.durationMinutes', { minutes: interview.durationMinutes })
+                  }}
                 </dd>
               </div>
               <div class="flex justify-between">

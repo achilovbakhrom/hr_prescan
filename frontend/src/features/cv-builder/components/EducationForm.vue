@@ -37,41 +37,65 @@ function formatDate(date: Date | null): string {
 }
 
 function resetForm(): void {
-  institution.value = ''; degree.value = ''; educationLevel.value = ''
-  fieldOfStudy.value = ''; startDate.value = null; endDate.value = null
-  description.value = ''; editingId.value = null; fieldErrors.value = {}
+  institution.value = ''
+  degree.value = ''
+  educationLevel.value = ''
+  fieldOfStudy.value = ''
+  startDate.value = null
+  endDate.value = null
+  description.value = ''
+  editingId.value = null
+  fieldErrors.value = {}
 }
 
-function openAddForm(): void { resetForm(); showForm.value = true }
-
-function openEditForm(edu: Education): void {
-  institution.value = edu.institution; degree.value = edu.degree
-  educationLevel.value = edu.educationLevel?.slug ?? ''; fieldOfStudy.value = edu.fieldOfStudy
-  startDate.value = edu.startDate ? new Date(edu.startDate) : null
-  endDate.value = edu.endDate ? new Date(edu.endDate) : null
-  description.value = edu.description; editingId.value = edu.id; fieldErrors.value = {}
+function openAddForm(): void {
+  resetForm()
   showForm.value = true
 }
 
-function cancelForm(): void { showForm.value = false; resetForm() }
+function openEditForm(edu: Education): void {
+  institution.value = edu.institution
+  degree.value = edu.degree
+  educationLevel.value = edu.educationLevel?.slug ?? ''
+  fieldOfStudy.value = edu.fieldOfStudy
+  startDate.value = edu.startDate ? new Date(edu.startDate) : null
+  endDate.value = edu.endDate ? new Date(edu.endDate) : null
+  description.value = edu.description
+  editingId.value = edu.id
+  fieldErrors.value = {}
+  showForm.value = true
+}
+
+function cancelForm(): void {
+  showForm.value = false
+  resetForm()
+}
 
 function buildPayload(): EducationPayload {
   return {
-    institution: institution.value, degree: degree.value, educationLevel: educationLevel.value,
-    fieldOfStudy: fieldOfStudy.value, startDate: formatDate(startDate.value),
-    endDate: formatDate(endDate.value) || null, description: description.value,
+    institution: institution.value,
+    degree: degree.value,
+    educationLevel: educationLevel.value,
+    fieldOfStudy: fieldOfStudy.value,
+    startDate: formatDate(startDate.value),
+    endDate: formatDate(endDate.value) || null,
+    description: description.value,
   }
 }
 
 async function handleSave(): Promise<void> {
-  successMessage.value = null; errorMessage.value = null; fieldErrors.value = {}
+  successMessage.value = null
+  errorMessage.value = null
+  fieldErrors.value = {}
 
   const schema = createEducationSchema(t)
   const errors = await validateForm(schema, buildPayload() as unknown as Record<string, unknown>)
   if (errors) {
     fieldErrors.value = errors
     await nextTick()
-    document.querySelector('.p-invalid, [data-field-error="true"]')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    document
+      .querySelector('.p-invalid, [data-field-error="true"]')
+      ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     return
   }
 
@@ -83,19 +107,31 @@ async function handleSave(): Promise<void> {
       await store.createEducation(buildPayload())
       successMessage.value = t('cvBuilder.education.addSuccess')
     }
-    showForm.value = false; resetForm()
+    showForm.value = false
+    resetForm()
   } catch (err: unknown) {
-    if (err instanceof ApiValidationError) { fieldErrors.value = err.fieldErrors; errorMessage.value = err.message }
-    else { errorMessage.value = err instanceof Error ? err.message : t('common.error') }
+    if (err instanceof ApiValidationError) {
+      fieldErrors.value = err.fieldErrors
+      errorMessage.value = err.message
+    } else {
+      errorMessage.value = err instanceof Error ? err.message : t('common.error')
+    }
     await nextTick()
-    document.querySelector('.p-invalid, [data-field-error="true"]')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    document
+      .querySelector('.p-invalid, [data-field-error="true"]')
+      ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }
 }
 
 async function handleDelete(id: string): Promise<void> {
-  successMessage.value = null; errorMessage.value = null
-  try { await store.deleteEducation(id); successMessage.value = t('cvBuilder.education.deleteSuccess') }
-  catch (err: unknown) { errorMessage.value = err instanceof Error ? err.message : t('common.error') }
+  successMessage.value = null
+  errorMessage.value = null
+  try {
+    await store.deleteEducation(id)
+    successMessage.value = t('cvBuilder.education.deleteSuccess')
+  } catch (err: unknown) {
+    errorMessage.value = err instanceof Error ? err.message : t('common.error')
+  }
 }
 </script>
 
@@ -105,21 +141,43 @@ async function handleDelete(id: string): Promise<void> {
     <Message v-if="errorMessage" severity="error" class="mb-4">{{ errorMessage }}</Message>
 
     <div v-if="educations.length && !showForm" class="flex flex-col gap-4">
-      <EducationItem v-for="edu in educations" :key="edu.id" :education="edu" @edit="openEditForm" @delete="handleDelete" />
+      <EducationItem
+        v-for="edu in educations"
+        :key="edu.id"
+        :education="edu"
+        @edit="openEditForm"
+        @delete="handleDelete"
+      />
     </div>
 
-    <div v-if="!educations.length && !showForm" class="py-8 text-center text-gray-500">{{ t('cvBuilder.education.empty') }}</div>
+    <div v-if="!educations.length && !showForm" class="py-8 text-center text-gray-500">
+      {{ t('cvBuilder.education.empty') }}
+    </div>
 
     <div v-if="!showForm" class="mt-4">
-      <Button :label="t('cvBuilder.education.add')" icon="pi pi-plus" severity="secondary" outlined @click="openAddForm" />
+      <Button
+        :label="t('cvBuilder.education.add')"
+        icon="pi pi-plus"
+        severity="secondary"
+        outlined
+        @click="openAddForm"
+      />
     </div>
 
     <EducationFormFields
       v-if="showForm"
-      v-model:institution="institution" v-model:degree="degree" v-model:education-level="educationLevel"
-      v-model:field-of-study="fieldOfStudy" v-model:start-date="startDate" v-model:end-date="endDate"
-      v-model:description="description" :editing-id="editingId" :saving="store.saving" :field-errors="fieldErrors"
-      @save="handleSave" @cancel="cancelForm"
+      v-model:institution="institution"
+      v-model:degree="degree"
+      v-model:education-level="educationLevel"
+      v-model:field-of-study="fieldOfStudy"
+      v-model:start-date="startDate"
+      v-model:end-date="endDate"
+      v-model:description="description"
+      :editing-id="editingId"
+      :saving="store.saving"
+      :field-errors="fieldErrors"
+      @save="handleSave"
+      @cancel="cancelForm"
     />
   </div>
 </template>

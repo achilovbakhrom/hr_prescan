@@ -22,9 +22,7 @@ function hasError(field: string): boolean {
 <template>
   <div class="grid grid-cols-1 gap-5 sm:grid-cols-3">
     <div class="flex flex-col gap-1">
-      <label for="linkedinUrl" class="text-sm font-medium text-gray-700">
-        LinkedIn
-      </label>
+      <label for="linkedinUrl" class="text-sm font-medium text-gray-700"> LinkedIn </label>
       <InputText
         id="linkedinUrl"
         :model-value="linkedinUrl"
@@ -33,13 +31,13 @@ function hasError(field: string): boolean {
         :invalid="'linkedinUrl' in fieldErrors"
         @update:model-value="emit('update:linkedinUrl', $event as string)"
       />
-      <small v-if="'linkedinUrl' in fieldErrors" class="text-red-500">{{ fieldErrors.linkedinUrl }}</small>
+      <small v-if="'linkedinUrl' in fieldErrors" class="text-red-500">{{
+        fieldErrors.linkedinUrl
+      }}</small>
     </div>
 
     <div class="flex flex-col gap-1">
-      <label for="githubUrl" class="text-sm font-medium text-gray-700">
-        GitHub
-      </label>
+      <label for="githubUrl" class="text-sm font-medium text-gray-700"> GitHub </label>
       <InputText
         id="githubUrl"
         :model-value="githubUrl"
@@ -48,13 +46,13 @@ function hasError(field: string): boolean {
         :invalid="'githubUrl' in fieldErrors"
         @update:model-value="emit('update:githubUrl', $event as string)"
       />
-      <small v-if="'githubUrl' in fieldErrors" class="text-red-500">{{ fieldErrors.githubUrl }}</small>
+      <small v-if="'githubUrl' in fieldErrors" class="text-red-500">{{
+        fieldErrors.githubUrl
+      }}</small>
     </div>
 
     <div class="flex flex-col gap-1">
-      <label for="websiteUrl" class="text-sm font-medium text-gray-700">
-        Website
-      </label>
+      <label for="websiteUrl" class="text-sm font-medium text-gray-700"> Website </label>
       <InputText
         id="websiteUrl"
         :model-value="websiteUrl"
@@ -63,7 +61,9 @@ function hasError(field: string): boolean {
         :invalid="'websiteUrl' in fieldErrors"
         @update:model-value="emit('update:websiteUrl', $event as string)"
       />
-      <small v-if="'websiteUrl' in fieldErrors" class="text-red-500">{{ fieldErrors.websiteUrl }}</small>
+      <small v-if="'websiteUrl' in fieldErrors" class="text-red-500">{{
+        fieldErrors.websiteUrl
+      }}</small>
     </div>
   </div>
 </template>

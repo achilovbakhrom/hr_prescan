@@ -165,6 +165,29 @@
       "companyDescription": "Vakansiyalar joylashtiring va nomzodlarni AI yordamida tekshiring",
       "industry": "Soha",
       "country": "Davlat"
+    },
+    "companySetup": {
+      "title": "Kompaniyangizni sozlang",
+      "subtitle": "Tajribani moslashtirishimiz uchun kompaniyangiz haqida biroz ma'lumot bering.",
+      "companyName": "Kompaniya nomi",
+      "companyNamePlaceholder": "Acme MChJ",
+      "companyNameRequired": "Kompaniya nomi majburiy",
+      "industries": "Sohalar",
+      "industriesRequired": "Kamida bitta sohani tanlang",
+      "size": "Kompaniya hajmi",
+      "sizePlaceholder": "Kompaniya hajmini tanlang",
+      "sizeRequired": "Kompaniya hajmi majburiy",
+      "sizeSmall": "Kichik (1-10 xodim)",
+      "sizeMedium": "O'rta (11-50 xodim)",
+      "sizeLarge": "Katta (51-250 xodim)",
+      "sizeEnterprise": "Korporatsiya (250+ xodim)",
+      "country": "Davlat",
+      "countryRequired": "Davlat majburiy",
+      "email": "Ish email manzili",
+      "emailPlaceholder": "you@company.com",
+      "emailRequired": "To'g'ri email manzilini kiriting",
+      "submit": "Davom etish",
+      "submitError": "Sozlashni yakunlab bo'lmadi. Qaytadan urinib ko'ring."
     }
   },
   "landing": {

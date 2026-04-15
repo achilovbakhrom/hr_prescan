@@ -5,8 +5,6 @@ import Column from 'primevue/column'
 import ApplicationStatusBadge from './ApplicationStatusBadge.vue'
 import type { Application } from '../types/candidate.types'
 
-const { t } = useI18n()
-
 defineProps<{
   candidates: Application[]
   loading: boolean
@@ -20,6 +18,8 @@ const emit = defineEmits<{
   viewDetail: [candidate: Application]
 }>()
 
+const { t } = useI18n()
+
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString()
 }
@@ -30,7 +30,8 @@ function formatDate(dateStr: string): string {
     :selection="selectedCandidates"
     :value="candidates"
     :loading="loading"
-    striped-rows row-hover
+    striped-rows
+    row-hover
     class="cursor-pointer"
     data-key="id"
     @update:selection="emit('update:selectedCandidates', $event)"
@@ -45,11 +46,24 @@ function formatDate(dateStr: string): string {
       </template>
     </Column>
     <Column :header="t('common.status')">
-      <template #body="{ data }"><ApplicationStatusBadge :status="(data as Application).status" /></template>
+      <template #body="{ data }"
+        ><ApplicationStatusBadge :status="(data as Application).status"
+      /></template>
     </Column>
     <Column :header="t('candidates.matchScore')" sortable sort-field="matchScore">
       <template #body="{ data }">
-        <span v-if="(data as Application).matchScore !== null" class="rounded-md px-2 py-0.5 text-xs font-medium" :class="(data as Application).matchScore! >= 70 ? 'bg-emerald-50 text-emerald-700' : (data as Application).matchScore! >= 40 ? 'bg-amber-50 text-amber-700' : 'bg-red-50 text-red-700'">{{ (data as Application).matchScore }}%</span>
+        <span
+          v-if="(data as Application).matchScore !== null"
+          class="rounded-md px-2 py-0.5 text-xs font-medium"
+          :class="
+            (data as Application).matchScore! >= 70
+              ? 'bg-emerald-50 text-emerald-700'
+              : (data as Application).matchScore! >= 40
+                ? 'bg-amber-50 text-amber-700'
+                : 'bg-red-50 text-red-700'
+          "
+          >{{ (data as Application).matchScore }}%</span
+        >
         <span v-else class="text-xs text-gray-400">{{ t('interviews.status.pending') }}</span>
       </template>
     </Column>

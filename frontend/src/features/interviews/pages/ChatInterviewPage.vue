@@ -42,13 +42,19 @@ const {
     <!-- Loading -->
     <div v-if="loading" class="flex flex-1 items-center justify-center">
       <div class="text-center">
-        <div class="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600"></div>
+        <div
+          class="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600"
+        ></div>
         <p class="text-sm text-gray-500">{{ t('interviews.chatPage.preparing') }}</p>
       </div>
     </div>
 
     <!-- Error states -->
-    <ChatErrorState v-else-if="errorState" :error-state="errorState" :error-message="errorMessage" />
+    <ChatErrorState
+      v-else-if="errorState"
+      :error-state="errorState"
+      :error-message="errorMessage"
+    />
 
     <!-- Chat interface -->
     <template v-else-if="interview">
@@ -65,8 +71,12 @@ const {
             </div>
             <div>
               <p class="text-sm font-medium text-gray-900">{{ interview.vacancyTitle }}</p>
-              <p v-if="interview.employerName || interview.companyName" class="text-xs text-gray-500">
-                <i class="pi pi-building mr-0.5"></i>{{ interview.employerName || interview.companyName }}
+              <p
+                v-if="interview.employerName || interview.companyName"
+                class="text-xs text-gray-500"
+              >
+                <i class="pi pi-building mr-0.5"></i
+                >{{ interview.employerName || interview.companyName }}
               </p>
               <p class="text-xs text-gray-500">{{ t('interviews.chatPage.inProgress') }}</p>
             </div>
@@ -79,7 +89,15 @@ const {
               {{ messages.length }}
             </span>
             <i class="pi pi-chevron-up text-gray-400"></i>
-            <Button icon="pi pi-times" severity="secondary" text rounded size="small" title="Close" @click.stop="isClosed = true" />
+            <Button
+              icon="pi pi-times"
+              severity="secondary"
+              text
+              rounded
+              size="small"
+              title="Close"
+              @click.stop="isClosed = true"
+            />
           </div>
         </div>
       </div>
@@ -97,8 +115,12 @@ const {
               </div>
               <div>
                 <h1 class="text-base font-semibold text-gray-900">{{ interview.vacancyTitle }}</h1>
-                <p v-if="interview.employerName || interview.companyName" class="text-xs text-gray-500">
-                  <i class="pi pi-building mr-1"></i>{{ interview.employerName || interview.companyName }}
+                <p
+                  v-if="interview.employerName || interview.companyName"
+                  class="text-xs text-gray-500"
+                >
+                  <i class="pi pi-building mr-1"></i
+                  >{{ interview.employerName || interview.companyName }}
                 </p>
                 <div class="flex items-center gap-1.5">
                   <span
@@ -141,11 +163,23 @@ const {
             <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-yellow-100">
               <i class="pi pi-exclamation-triangle text-xl text-yellow-600"></i>
             </div>
-            <h2 class="mb-2 text-lg font-semibold text-gray-900">{{ t('interviews.chatPage.leaveTitle') }}</h2>
+            <h2 class="mb-2 text-lg font-semibold text-gray-900">
+              {{ t('interviews.chatPage.leaveTitle') }}
+            </h2>
             <p class="mb-5 text-sm text-gray-500">{{ t('interviews.chatPage.leaveMessage') }}</p>
             <div class="flex gap-3">
-              <Button :label="t('interviews.chatPage.stayButton')" class="flex-1" @click="showLeaveConfirm = false" />
-              <Button :label="t('interviews.chatPage.leaveButton')" severity="secondary" outlined class="flex-1" @click="router.push('/jobs')" />
+              <Button
+                :label="t('interviews.chatPage.stayButton')"
+                class="flex-1"
+                @click="showLeaveConfirm = false"
+              />
+              <Button
+                :label="t('interviews.chatPage.leaveButton')"
+                severity="secondary"
+                outlined
+                class="flex-1"
+                @click="router.push('/jobs')"
+              />
             </div>
           </div>
         </div>

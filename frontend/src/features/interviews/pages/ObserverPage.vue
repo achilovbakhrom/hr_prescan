@@ -75,9 +75,7 @@ async function handleLeave(): Promise<void> {
         <p class="text-gray-700">
           {{ t('interviews.observerPage.notInProgress') }}
         </p>
-        <p class="mt-2 text-sm text-gray-500">
-          {{ t('common.status') }}: {{ interview.status }}
-        </p>
+        <p class="mt-2 text-sm text-gray-500">{{ t('common.status') }}: {{ interview.status }}</p>
         <p class="mt-2 text-sm text-gray-500">Status: {{ interview.status }}</p>
       </div>
 

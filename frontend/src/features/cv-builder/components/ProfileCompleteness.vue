@@ -40,24 +40,18 @@ const progressColor = computed(() => {
       </h2>
       <span
         class="rounded-full px-2.5 py-0.5 text-xs font-medium"
-        :class="progressColor.replace('bg-', 'bg-') + '/10 ' + progressColor.replace('bg-', 'text-')"
+        :class="
+          progressColor.replace('bg-', 'bg-') + '/10 ' + progressColor.replace('bg-', 'text-')
+        "
       >
         {{ completeness.score }}%
       </span>
     </div>
 
-    <ProgressBar
-      :value="completeness.score"
-      :showValue="false"
-      class="mb-4 h-2"
-    />
+    <ProgressBar :value="completeness.score" :showValue="false" class="mb-4 h-2" />
 
     <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
-      <div
-        v-for="section in sections"
-        :key="section.label"
-        class="flex items-center gap-2 text-sm"
-      >
+      <div v-for="section in sections" :key="section.label" class="flex items-center gap-2 text-sm">
         <i
           class="text-xs"
           :class="section.done ? 'pi pi-check-circle text-green-500' : 'pi pi-circle text-gray-300'"

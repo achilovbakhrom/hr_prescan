@@ -86,7 +86,9 @@ onMounted(async () => {
       <template v-if="errorState === 'completed'">
         <div class="rounded-lg border border-green-200 bg-green-50 p-8">
           <i class="pi pi-check-circle mb-4 text-5xl text-green-500"></i>
-          <h1 class="mb-2 text-2xl font-bold text-gray-900">{{ t('interviews.gatewayPage.interviewCompleted') }}</h1>
+          <h1 class="mb-2 text-2xl font-bold text-gray-900">
+            {{ t('interviews.gatewayPage.interviewCompleted') }}
+          </h1>
           <p class="mb-4 text-gray-600">
             {{ t('interviews.gatewayPage.completedMessage') }}
           </p>
@@ -100,7 +102,9 @@ onMounted(async () => {
       <template v-else-if="errorState === 'expired'">
         <div class="rounded-lg border border-yellow-200 bg-yellow-50 p-8">
           <i class="pi pi-clock mb-4 text-5xl text-yellow-500"></i>
-          <h1 class="mb-2 text-2xl font-bold text-gray-900">{{ t('interviews.gatewayPage.linkExpired') }}</h1>
+          <h1 class="mb-2 text-2xl font-bold text-gray-900">
+            {{ t('interviews.gatewayPage.linkExpired') }}
+          </h1>
           <p class="mb-4 text-gray-600">
             {{ errorMessage || t('interviews.states.expired') }}
           </p>
@@ -114,7 +118,9 @@ onMounted(async () => {
       <template v-else-if="errorState === 'closed'">
         <div class="rounded-lg border border-gray-200 bg-gray-50 p-8">
           <i class="pi pi-ban mb-4 text-5xl text-gray-400"></i>
-          <h1 class="mb-2 text-2xl font-bold text-gray-900">{{ t('interviews.gatewayPage.vacancyClosed') }}</h1>
+          <h1 class="mb-2 text-2xl font-bold text-gray-900">
+            {{ t('interviews.gatewayPage.vacancyClosed') }}
+          </h1>
           <p class="mb-4 text-gray-600">
             {{ errorMessage || t('interviews.states.closed') }}
           </p>
@@ -128,7 +134,9 @@ onMounted(async () => {
       <template v-else>
         <div class="rounded-lg border border-red-200 bg-red-50 p-8">
           <i class="pi pi-exclamation-triangle mb-4 text-5xl text-red-400"></i>
-          <h1 class="mb-2 text-2xl font-bold text-gray-900">{{ t('interviews.gatewayPage.somethingWentWrong') }}</h1>
+          <h1 class="mb-2 text-2xl font-bold text-gray-900">
+            {{ t('interviews.gatewayPage.somethingWentWrong') }}
+          </h1>
           <p class="mb-4 text-gray-600">{{ errorMessage }}</p>
           <Button :label="t('errors.tryAgain')" icon="pi pi-refresh" @click="$router.go(0)" />
         </div>

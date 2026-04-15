@@ -30,7 +30,9 @@ function fetchCandidates(): void {
 }
 
 watch([statusFilter, orderingFilter], fetchCandidates)
-onMounted(() => { fetchCandidates() })
+onMounted(() => {
+  fetchCandidates()
+})
 
 function onSearchInput(): void {
   if (searchTimeout) clearTimeout(searchTimeout)

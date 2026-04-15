@@ -19,10 +19,7 @@ export const settingsService = {
   },
 
   async inviteHR(data: InviteHRRequest): Promise<Invitation> {
-    const response = await apiClient.post<{ invitation: Invitation }>(
-      '/hr/company/invite',
-      data,
-    )
+    const response = await apiClient.post<{ invitation: Invitation }>('/hr/company/invite', data)
     return response.data.invitation
   },
 
@@ -46,10 +43,7 @@ export const settingsService = {
     userId: string,
     data: { isActive?: boolean; hrPermissions?: string[] },
   ): Promise<TeamMember> {
-    const response = await apiClient.patch<TeamMember>(
-      `/hr/company/team/${userId}`,
-      data,
-    )
+    const response = await apiClient.patch<TeamMember>(`/hr/company/team/${userId}`, data)
     return response.data
   },
 

@@ -68,7 +68,11 @@ async function handleSave(payload: WorkExperiencePayload, editingId: string | nu
 
   const schema = createWorkExperienceSchema(t)
   const errors = await validateForm(schema, payload as unknown as Record<string, unknown>)
-  if (errors) { fieldErrors.value = errors; scrollToFirstError(); return }
+  if (errors) {
+    fieldErrors.value = errors
+    scrollToFirstError()
+    return
+  }
 
   try {
     if (editingId) {
@@ -110,7 +114,8 @@ async function handleDelete(id: string): Promise<void> {
 
     <div v-if="experiences.length && !showForm" class="flex flex-col gap-4">
       <WorkExperienceItem
-        v-for="exp in experiences" :key="exp.id"
+        v-for="exp in experiences"
+        :key="exp.id"
         :experience="exp"
         @edit="openEditForm"
         @delete="handleDelete"
@@ -122,7 +127,13 @@ async function handleDelete(id: string): Promise<void> {
     </div>
 
     <div v-if="!showForm" class="mt-4">
-      <Button :label="t('cvBuilder.experience.add')" icon="pi pi-plus" severity="secondary" outlined @click="openAddForm" />
+      <Button
+        :label="t('cvBuilder.experience.add')"
+        icon="pi pi-plus"
+        severity="secondary"
+        outlined
+        @click="openAddForm"
+      />
     </div>
 
     <WorkExperienceEditForm

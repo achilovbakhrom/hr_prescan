@@ -122,24 +122,14 @@ function permissionCount(member: TeamMember): string {
         :key="opt.value"
         class="flex cursor-pointer items-center gap-3 rounded-md px-2 py-2 transition-colors hover:bg-gray-50"
       >
-        <Checkbox
-          v-model="editPermissions"
-          :value="opt.value"
-        />
+        <Checkbox v-model="editPermissions" :value="opt.value" />
         <span class="text-sm font-medium text-gray-800">{{ t(opt.labelKey) }}</span>
       </label>
     </div>
     <template #footer>
       <div class="flex justify-end gap-2">
-        <Button
-          :label="t('common.cancel')"
-          severity="secondary"
-          @click="editingMember = null"
-        />
-        <Button
-          :label="t('settings.company.save')"
-          @click="savePermissions"
-        />
+        <Button :label="t('common.cancel')" severity="secondary" @click="editingMember = null" />
+        <Button :label="t('settings.company.save')" @click="savePermissions" />
       </div>
     </template>
   </Dialog>

@@ -64,11 +64,7 @@ function onDragOver(event: DragEvent): void {
       >
         <i class="pi pi-ellipsis-v text-xs"></i>
       </button>
-      <Menu
-        ref="menuRef"
-        :model="menuItems"
-        :popup="true"
-      />
+      <Menu ref="menuRef" :model="menuItems" :popup="true" />
     </div>
 
     <!-- Cards -->

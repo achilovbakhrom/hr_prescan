@@ -52,7 +52,11 @@ onMounted(async () => {
               {{ subscriptionStore.currentSubscription.plan.name }}
             </p>
             <p class="mt-1 text-sm text-gray-500">
-              {{ t('subscriptions.billed', { period: subscriptionStore.currentSubscription.billingPeriod }) }}
+              {{
+                t('subscriptions.billed', {
+                  period: subscriptionStore.currentSubscription.billingPeriod,
+                })
+              }}
             </p>
           </div>
           <span
@@ -63,14 +67,22 @@ onMounted(async () => {
                 : 'bg-red-100 text-red-700'
             "
           >
-            {{ subscriptionStore.currentSubscription.isActive ? t('subscriptions.statusActive') : t('subscriptions.statusCancelled') }}
+            {{
+              subscriptionStore.currentSubscription.isActive
+                ? t('subscriptions.statusActive')
+                : t('subscriptions.statusCancelled')
+            }}
           </span>
         </div>
 
         <div class="mt-4 text-sm text-gray-600">
           <p>
             {{ t('subscriptions.currentPeriod') }}
-            {{ new Date(subscriptionStore.currentSubscription.currentPeriodStart).toLocaleDateString() }}
+            {{
+              new Date(
+                subscriptionStore.currentSubscription.currentPeriodStart,
+              ).toLocaleDateString()
+            }}
             —
             {{
               new Date(subscriptionStore.currentSubscription.currentPeriodEnd).toLocaleDateString()

@@ -63,7 +63,9 @@ onMounted(() => {
         </div>
         <div class="flex justify-between">
           <dt class="text-gray-500">{{ t('interviews.preCheck.duration') }}</dt>
-          <dd class="font-medium">{{ t('interviews.preCheck.durationMinutes', { minutes: interview.durationMinutes }) }}</dd>
+          <dd class="font-medium">
+            {{ t('interviews.preCheck.durationMinutes', { minutes: interview.durationMinutes }) }}
+          </dd>
         </div>
       </dl>
     </div>

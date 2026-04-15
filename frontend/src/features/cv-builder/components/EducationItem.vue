@@ -3,8 +3,6 @@ import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import type { Education } from '../types/cv-builder.types'
 
-const { t } = useI18n()
-
 defineProps<{
   education: Education
 }>()
@@ -13,6 +11,8 @@ const emit = defineEmits<{
   edit: [edu: Education]
   delete: [id: string]
 }>()
+
+const { t } = useI18n()
 
 function formatDisplayDate(dateStr: string | null): string {
   if (!dateStr) return ''
@@ -33,13 +33,33 @@ function formatDisplayDate(dateStr: string | null): string {
         </div>
         <p class="mt-1 text-xs text-gray-500">
           {{ formatDisplayDate(education.startDate) }}
-          <template v-if="education.endDate">&mdash; {{ formatDisplayDate(education.endDate) }}</template>
+          <template v-if="education.endDate"
+            >&mdash; {{ formatDisplayDate(education.endDate) }}</template
+          >
         </p>
-        <p v-if="education.description" class="mt-2 text-sm text-gray-600">{{ education.description }}</p>
+        <p v-if="education.description" class="mt-2 text-sm text-gray-600">
+          {{ education.description }}
+        </p>
       </div>
       <div class="ml-3 flex shrink-0 gap-1">
-        <Button icon="pi pi-pencil" severity="secondary" text rounded size="small" @click="emit('edit', education)" :aria-label="t('common.edit')" />
-        <Button icon="pi pi-trash" severity="danger" text rounded size="small" @click="emit('delete', education.id)" :aria-label="t('common.delete')" />
+        <Button
+          icon="pi pi-pencil"
+          severity="secondary"
+          text
+          rounded
+          size="small"
+          @click="emit('edit', education)"
+          :aria-label="t('common.edit')"
+        />
+        <Button
+          icon="pi pi-trash"
+          severity="danger"
+          text
+          rounded
+          size="small"
+          @click="emit('delete', education.id)"
+          :aria-label="t('common.delete')"
+        />
       </div>
     </div>
   </div>

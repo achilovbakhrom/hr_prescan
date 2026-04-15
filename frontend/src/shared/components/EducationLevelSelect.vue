@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import Select from 'primevue/select'
-import { fetchEducationLevels, type EducationLevel } from '@/shared/services/education-level.service'
+import {
+  fetchEducationLevels,
+  type EducationLevel,
+} from '@/shared/services/education-level.service'
 import { useI18n } from 'vue-i18n'
 
 withDefaults(

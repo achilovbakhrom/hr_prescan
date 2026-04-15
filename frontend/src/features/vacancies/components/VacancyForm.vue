@@ -16,15 +16,16 @@ import VacancyInterviewTab from './VacancyInterviewTab.vue'
 import VacancySettingsTab from './VacancySettingsTab.vue'
 import CreateEmployerDialog from './CreateEmployerDialog.vue'
 
-const { t } = useI18n()
-
 const props = defineProps<{
   initialData?: Partial<CreateVacancyRequest>
   loading?: boolean
   fieldErrors?: FieldErrors
   errorMessage?: string | null
 }>()
+
 const emit = defineEmits<{ save: [data: CreateVacancyRequest] }>()
+
+const { t } = useI18n()
 
 const form = useVacancyForm(
   () => props.initialData,
@@ -33,7 +34,9 @@ const form = useVacancyForm(
 
 watch(
   () => props.initialData,
-  (d) => { if (d) form.syncFromInitialData(d) },
+  (d) => {
+    if (d) form.syncFromInitialData(d)
+  },
 )
 
 const showCreateDialog = ref(false)
@@ -116,7 +119,13 @@ function handleSave(): void {
     </TabView>
 
     <div class="mt-4 flex justify-end border-t border-gray-100 pt-4">
-      <Button type="submit" :label="t('common.save')" icon="pi pi-check" :loading="loading" :disabled="!form.canSave.value" />
+      <Button
+        type="submit"
+        :label="t('common.save')"
+        icon="pi pi-check"
+        :loading="loading"
+        :disabled="!form.canSave.value"
+      />
     </div>
   </form>
 

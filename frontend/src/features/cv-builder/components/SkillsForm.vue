@@ -51,12 +51,7 @@ async function handleSave(): Promise<void> {
 
     <div class="flex flex-col gap-4">
       <div v-if="currentSkills.length" class="flex flex-wrap gap-2">
-        <Tag
-          v-for="skill in currentSkills"
-          :key="skill.slug"
-          :value="skill.name"
-          severity="info"
-        />
+        <Tag v-for="skill in currentSkills" :key="skill.slug" :value="skill.name" severity="info" />
       </div>
 
       <div v-if="!currentSkills.length" class="py-4 text-center text-sm text-gray-500">
@@ -71,11 +66,7 @@ async function handleSave(): Promise<void> {
       </div>
 
       <div class="flex justify-end pt-2">
-        <Button
-          :label="t('common.save')"
-          :loading="store.saving"
-          @click="handleSave"
-        />
+        <Button :label="t('common.save')" :loading="store.saving" @click="handleSave" />
       </div>
     </div>
   </div>

@@ -81,7 +81,9 @@ async function handleGenerate(): Promise<void> {
   try {
     await store.cvAiGenerate(messages.value)
     successMessage.value = t('cvBuilder.aiGenerate.success')
-    setTimeout(() => { visible.value = false }, 1500)
+    setTimeout(() => {
+      visible.value = false
+    }, 1500)
   } catch (err: unknown) {
     errorMessage.value = err instanceof Error ? err.message : t('common.error')
   } finally {
@@ -119,10 +121,7 @@ defineExpose({ open })
   >
     <div class="flex h-[65vh] max-h-[500px] flex-col">
       <!-- Chat messages -->
-      <div
-        ref="chatContainer"
-        class="flex-1 space-y-3 overflow-y-auto p-4"
-      >
+      <div ref="chatContainer" class="flex-1 space-y-3 overflow-y-auto p-4">
         <div
           v-for="(msg, i) in messages"
           :key="i"
@@ -131,9 +130,11 @@ defineExpose({ open })
         >
           <div
             class="max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed"
-            :class="msg.role === 'user'
-              ? 'rounded-br-md bg-blue-600 text-white'
-              : 'rounded-bl-md bg-gray-100 text-gray-800'"
+            :class="
+              msg.role === 'user'
+                ? 'rounded-br-md bg-blue-600 text-white'
+                : 'rounded-bl-md bg-gray-100 text-gray-800'
+            "
           >
             {{ msg.content }}
           </div>
@@ -143,9 +144,18 @@ defineExpose({ open })
         <div v-if="thinking" class="flex justify-start">
           <div class="rounded-2xl rounded-bl-md bg-gray-100 px-4 py-2.5">
             <div class="flex gap-1">
-              <span class="h-2 w-2 animate-bounce rounded-full bg-gray-400" style="animation-delay: 0ms"></span>
-              <span class="h-2 w-2 animate-bounce rounded-full bg-gray-400" style="animation-delay: 150ms"></span>
-              <span class="h-2 w-2 animate-bounce rounded-full bg-gray-400" style="animation-delay: 300ms"></span>
+              <span
+                class="h-2 w-2 animate-bounce rounded-full bg-gray-400"
+                style="animation-delay: 0ms"
+              ></span>
+              <span
+                class="h-2 w-2 animate-bounce rounded-full bg-gray-400"
+                style="animation-delay: 150ms"
+              ></span>
+              <span
+                class="h-2 w-2 animate-bounce rounded-full bg-gray-400"
+                style="animation-delay: 300ms"
+              ></span>
             </div>
           </div>
         </div>
@@ -153,16 +163,23 @@ defineExpose({ open })
         <!-- Generating overlay -->
         <div v-if="generating" class="flex flex-col items-center gap-2 py-4">
           <i class="pi pi-spinner pi-spin text-2xl text-blue-500"></i>
-          <p class="text-xs font-medium text-gray-500">{{ t('cvBuilder.aiGenerate.generating') }}</p>
+          <p class="text-xs font-medium text-gray-500">
+            {{ t('cvBuilder.aiGenerate.generating') }}
+          </p>
         </div>
 
         <!-- Success -->
-        <Message v-if="successMessage" severity="success" class="!mt-2">{{ successMessage }}</Message>
+        <Message v-if="successMessage" severity="success" class="!mt-2">{{
+          successMessage
+        }}</Message>
         <Message v-if="errorMessage" severity="error" class="!mt-2">{{ errorMessage }}</Message>
       </div>
 
       <!-- Generate button (when ready) -->
-      <div v-if="ready && !generating && !successMessage" class="border-t border-gray-100 px-4 py-3">
+      <div
+        v-if="ready && !generating && !successMessage"
+        class="border-t border-gray-100 px-4 py-3"
+      >
         <Button
           :label="t('cvBuilder.aiGenerate.generate')"
           icon="pi pi-sparkles"

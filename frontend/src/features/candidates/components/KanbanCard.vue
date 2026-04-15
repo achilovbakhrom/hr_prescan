@@ -85,7 +85,10 @@ function onDragStart(event: DragEvent): void {
       <div
         v-if="getOverallScore(candidate) != null"
         class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 text-xs font-bold"
-        :class="[getScoreColor(getOverallScore(candidate)!), getScoreRingColor(getOverallScore(candidate)!)]"
+        :class="[
+          getScoreColor(getOverallScore(candidate)!),
+          getScoreRingColor(getOverallScore(candidate)!),
+        ]"
         :title="`Overall score: ${getOverallScore(candidate)}%`"
       >
         {{ getOverallScore(candidate) }}
@@ -107,7 +110,11 @@ function onDragStart(event: DragEvent): void {
 
     <!-- Bottom: individual score badges -->
     <div
-      v-if="candidate.matchScore !== null || candidate.prescanningScore != null || candidate.interviewScore != null"
+      v-if="
+        candidate.matchScore !== null ||
+        candidate.prescanningScore != null ||
+        candidate.interviewScore != null
+      "
       class="mt-2 flex flex-wrap gap-1"
     >
       <span

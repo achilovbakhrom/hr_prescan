@@ -27,23 +27,82 @@ function hasPermission(permission?: HRPermission): boolean {
 }
 
 const navItems = computed<NavItem[]>(() => [
-  { label: t('nav.dashboard'), icon: 'pi pi-home', to: '/dashboard', roles: [USER_ROLES.ADMIN, USER_ROLES.HR, USER_ROLES.CANDIDATE] },
-  { label: t('nav.vacancies'), icon: 'pi pi-briefcase', to: '/vacancies', roles: [USER_ROLES.ADMIN, USER_ROLES.HR], permission: 'manage_vacancies' },
-  { label: t('nav.allCandidates'), icon: 'pi pi-users', to: '/candidates', roles: [USER_ROLES.ADMIN, USER_ROLES.HR], permission: 'manage_candidates' },
-  { label: t('nav.interviews'), icon: 'pi pi-calendar', to: '/interviews', roles: [USER_ROLES.ADMIN, USER_ROLES.HR], permission: 'manage_interviews' },
-  { label: t('nav.hrAnalytics'), icon: 'pi pi-chart-bar', to: '/analytics', roles: [USER_ROLES.ADMIN, USER_ROLES.HR], permission: 'view_analytics' },
-  { label: t('employers.title'), icon: 'pi pi-building', to: '/employers', roles: [USER_ROLES.ADMIN, USER_ROLES.HR], permission: 'manage_vacancies' },
-  { label: t('nav.team'), icon: 'pi pi-users', to: '/settings/team', roles: [USER_ROLES.ADMIN, USER_ROLES.HR], permission: 'manage_team' },
-  { label: t('settings.company.title'), icon: 'pi pi-cog', to: '/settings/company', roles: [USER_ROLES.ADMIN, USER_ROLES.HR], permission: 'manage_settings' },
-  { label: t('nav.subscription'), icon: 'pi pi-credit-card', to: '/subscription', roles: [USER_ROLES.ADMIN] },
-  { label: t('nav.myApplications'), icon: 'pi pi-file', to: '/my-applications', roles: [USER_ROLES.CANDIDATE] },
+  {
+    label: t('nav.dashboard'),
+    icon: 'pi pi-home',
+    to: '/dashboard',
+    roles: [USER_ROLES.ADMIN, USER_ROLES.HR, USER_ROLES.CANDIDATE],
+  },
+  {
+    label: t('nav.vacancies'),
+    icon: 'pi pi-briefcase',
+    to: '/vacancies',
+    roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
+    permission: 'manage_vacancies',
+  },
+  {
+    label: t('nav.allCandidates'),
+    icon: 'pi pi-users',
+    to: '/candidates',
+    roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
+    permission: 'manage_candidates',
+  },
+  {
+    label: t('nav.interviews'),
+    icon: 'pi pi-calendar',
+    to: '/interviews',
+    roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
+    permission: 'manage_interviews',
+  },
+  {
+    label: t('nav.hrAnalytics'),
+    icon: 'pi pi-chart-bar',
+    to: '/analytics',
+    roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
+    permission: 'view_analytics',
+  },
+  {
+    label: t('employers.title'),
+    icon: 'pi pi-building',
+    to: '/employers',
+    roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
+    permission: 'manage_vacancies',
+  },
+  {
+    label: t('nav.team'),
+    icon: 'pi pi-users',
+    to: '/settings/team',
+    roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
+    permission: 'manage_team',
+  },
+  {
+    label: t('settings.company.title'),
+    icon: 'pi pi-cog',
+    to: '/settings/company',
+    roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
+    permission: 'manage_settings',
+  },
+  {
+    label: t('nav.subscription'),
+    icon: 'pi pi-credit-card',
+    to: '/subscription',
+    roles: [USER_ROLES.ADMIN],
+  },
+  {
+    label: t('nav.myApplications'),
+    icon: 'pi pi-file',
+    to: '/my-applications',
+    roles: [USER_ROLES.CANDIDATE],
+  },
   { label: t('nav.myCvs'), icon: 'pi pi-file-pdf', to: '/my-cvs', roles: [USER_ROLES.CANDIDATE] },
 ])
 
 const filteredItems = computed(() => {
   const userRole = authStore.user?.role
   if (!userRole) return []
-  return navItems.value.filter((item) => item.roles.includes(userRole) && hasPermission(item.permission))
+  return navItems.value.filter(
+    (item) => item.roles.includes(userRole) && hasPermission(item.permission),
+  )
 })
 
 function isActive(path: string): boolean {
@@ -58,7 +117,9 @@ function isActive(path: string): boolean {
         <RouterLink
           :to="item.to"
           class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors"
-          :class="isActive(item.to) ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-100'"
+          :class="
+            isActive(item.to) ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-100'
+          "
           :aria-current="isActive(item.to) ? 'page' : undefined"
         >
           <i :class="item.icon" class="text-base"></i>

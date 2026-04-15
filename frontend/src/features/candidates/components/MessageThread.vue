@@ -6,11 +6,11 @@ import InputText from 'primevue/inputtext'
 import { candidateService } from '../services/candidate.service'
 import type { Message } from '../types/message.types'
 
-const { t } = useI18n()
-
 const props = defineProps<{
   candidateId: string
 }>()
+
+const { t } = useI18n()
 
 const messages = ref<Message[]>([])
 const newMessage = ref('')
@@ -73,10 +73,7 @@ onMounted(fetchMessages)
         <i class="pi pi-spinner pi-spin text-gray-400"></i>
       </div>
 
-      <div
-        v-else-if="messages.length === 0"
-        class="py-8 text-center text-sm text-gray-500"
-      >
+      <div v-else-if="messages.length === 0" class="py-8 text-center text-sm text-gray-500">
         {{ t('candidates.messageThread.noMessages') }}
       </div>
 

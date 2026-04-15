@@ -29,16 +29,21 @@ const cvRequired = ref(props.vacancy.cvRequired)
 const interviewEnabled = ref(props.vacancy.interviewEnabled)
 const saving = ref(false)
 
-watch(() => props.vacancy, (v) => {
-  visibility.value = v.visibility
-  cvRequired.value = v.cvRequired
-  interviewEnabled.value = v.interviewEnabled
-}, { deep: true })
+watch(
+  () => props.vacancy,
+  (v) => {
+    visibility.value = v.visibility
+    cvRequired.value = v.cvRequired
+    interviewEnabled.value = v.interviewEnabled
+  },
+  { deep: true },
+)
 
-const dirty = computed(() =>
-  visibility.value !== props.vacancy.visibility
-  || cvRequired.value !== props.vacancy.cvRequired
-  || interviewEnabled.value !== props.vacancy.interviewEnabled,
+const dirty = computed(
+  () =>
+    visibility.value !== props.vacancy.visibility ||
+    cvRequired.value !== props.vacancy.cvRequired ||
+    interviewEnabled.value !== props.vacancy.interviewEnabled,
 )
 
 async function save(): Promise<void> {
@@ -57,7 +62,9 @@ async function save(): Promise<void> {
   }
 }
 
-const canDelete = computed(() => props.vacancy.status === 'draft' || props.vacancy.status === 'archived')
+const canDelete = computed(
+  () => props.vacancy.status === 'draft' || props.vacancy.status === 'archived',
+)
 
 function confirmDelete(): void {
   confirm.require({
@@ -84,12 +91,22 @@ function confirmDelete(): void {
   <div class="space-y-6">
     <!-- Visibility & CV -->
     <section class="rounded-xl border border-gray-100 bg-white p-5">
-      <h3 class="mb-4 text-sm font-semibold text-gray-900">{{ t('vacancies.settings.visibility') }}</h3>
+      <h3 class="mb-4 text-sm font-semibold text-gray-900">
+        {{ t('vacancies.settings.visibility') }}
+      </h3>
 
       <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
         <div>
-          <label class="mb-1 block text-xs font-medium text-gray-600">{{ t('vacancies.form.visibility') }}</label>
-          <Dropdown v-model="visibility" :options="visibilityOptions" option-label="label" option-value="value" class="w-full" />
+          <label class="mb-1 block text-xs font-medium text-gray-600">{{
+            t('vacancies.form.visibility')
+          }}</label>
+          <Dropdown
+            v-model="visibility"
+            :options="visibilityOptions"
+            option-label="label"
+            option-value="value"
+            class="w-full"
+          />
           <p class="mt-1 text-xs text-gray-400">{{ t('vacancies.form.visibilityPublicHint') }}</p>
         </div>
         <div class="flex items-start gap-3 pt-5">
@@ -104,7 +121,9 @@ function confirmDelete(): void {
 
     <!-- Interview enable -->
     <section class="rounded-xl border border-gray-100 bg-white p-5">
-      <h3 class="mb-4 text-sm font-semibold text-gray-900">{{ t('vacancies.settings.interviewStep') }}</h3>
+      <h3 class="mb-4 text-sm font-semibold text-gray-900">
+        {{ t('vacancies.settings.interviewStep') }}
+      </h3>
       <div class="flex items-start gap-3">
         <ToggleSwitch v-model="interviewEnabled" />
         <div>
@@ -120,7 +139,9 @@ function confirmDelete(): void {
 
     <!-- Danger zone -->
     <section class="rounded-xl border border-red-200 bg-red-50/40 p-5">
-      <h3 class="mb-2 text-sm font-semibold text-red-700">{{ t('vacancies.settings.dangerZone') }}</h3>
+      <h3 class="mb-2 text-sm font-semibold text-red-700">
+        {{ t('vacancies.settings.dangerZone') }}
+      </h3>
       <p class="mb-3 text-xs text-red-600">{{ t('vacancies.settings.dangerZoneHint') }}</p>
       <Button
         :label="t('vacancies.settings.deleteVacancy')"
@@ -130,7 +151,9 @@ function confirmDelete(): void {
         :disabled="!canDelete"
         @click="confirmDelete"
       />
-      <p v-if="!canDelete" class="mt-2 text-xs text-gray-500">{{ t('vacancies.settings.deleteOnlyDraftArchived') }}</p>
+      <p v-if="!canDelete" class="mt-2 text-xs text-gray-500">
+        {{ t('vacancies.settings.deleteOnlyDraftArchived') }}
+      </p>
     </section>
   </div>
 </template>

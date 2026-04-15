@@ -30,14 +30,20 @@ const { t } = useI18n()
     >
       <!-- AI message -->
       <div v-if="msg.role === 'ai'" class="flex max-w-[80%] gap-2.5">
-        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-700 shadow-sm">
+        <div
+          class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-700 shadow-sm"
+        >
           <i class="pi pi-comments text-xs text-white"></i>
         </div>
         <div class="min-w-0">
           <div class="rounded-2xl rounded-tl-sm bg-white px-4 py-3 shadow-sm ring-1 ring-gray-100">
-            <p class="whitespace-pre-wrap text-[13px] leading-relaxed text-gray-800">{{ msg.text }}</p>
+            <p class="whitespace-pre-wrap text-[13px] leading-relaxed text-gray-800">
+              {{ msg.text }}
+            </p>
           </div>
-          <span class="mt-1 block pl-1 text-[10px] text-gray-400">{{ formatTime(msg.timestamp) }}</span>
+          <span class="mt-1 block pl-1 text-[10px] text-gray-400">{{
+            formatTime(msg.timestamp)
+          }}</span>
         </div>
       </div>
 
@@ -76,14 +82,22 @@ const { t } = useI18n()
     <!-- Typing indicator -->
     <div v-if="isTyping" class="flex justify-start">
       <div class="flex max-w-[80%] gap-2.5">
-        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-700 shadow-sm">
+        <div
+          class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-700 shadow-sm"
+        >
           <i class="pi pi-comments text-xs text-white"></i>
         </div>
         <div class="rounded-2xl rounded-tl-sm bg-white px-5 py-3.5 shadow-sm ring-1 ring-gray-100">
           <div class="flex items-center gap-1.5">
             <span class="typing-dot h-2 w-2 rounded-full bg-gray-400"></span>
-            <span class="typing-dot h-2 w-2 rounded-full bg-gray-400" style="animation-delay: 0.15s"></span>
-            <span class="typing-dot h-2 w-2 rounded-full bg-gray-400" style="animation-delay: 0.3s"></span>
+            <span
+              class="typing-dot h-2 w-2 rounded-full bg-gray-400"
+              style="animation-delay: 0.15s"
+            ></span>
+            <span
+              class="typing-dot h-2 w-2 rounded-full bg-gray-400"
+              style="animation-delay: 0.3s"
+            ></span>
           </div>
         </div>
       </div>
@@ -93,7 +107,9 @@ const { t } = useI18n()
 
 <style scoped>
 @keyframes typing {
-  0%, 60%, 100% {
+  0%,
+  60%,
+  100% {
     transform: translateY(0);
     opacity: 0.4;
   }

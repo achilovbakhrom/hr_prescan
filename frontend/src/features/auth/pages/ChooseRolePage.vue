@@ -18,9 +18,14 @@ async function handleRoleSelect(role: 'candidate' | 'hr'): Promise<void> {
   errorMessage.value = null
   try {
     await authStore.completeOnboarding(role)
-    await router.push({ name: ROUTE_NAMES.DASHBOARD })
+    if (role === 'hr') {
+      await router.push({ name: ROUTE_NAMES.COMPANY_SETUP })
+    } else {
+      await router.push({ name: ROUTE_NAMES.DASHBOARD })
+    }
   } catch (err: unknown) {
-    errorMessage.value = err instanceof Error ? err.message : 'Something went wrong. Please try again.'
+    errorMessage.value =
+      err instanceof Error ? err.message : 'Something went wrong. Please try again.'
   } finally {
     loading.value = false
   }
@@ -42,12 +47,18 @@ async function handleRoleSelect(role: 'candidate' | 'hr'): Promise<void> {
           :disabled="loading"
           @click="handleRoleSelect('candidate')"
         >
-          <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-green-100 sm:h-14 sm:w-14">
+          <div
+            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-green-100 sm:h-14 sm:w-14"
+          >
             <i class="pi pi-user text-xl text-green-600 sm:text-2xl" />
           </div>
           <div>
-            <p class="text-base font-semibold text-gray-900 sm:text-lg">{{ t('auth.chooseRole.candidate') }}</p>
-            <p class="mt-1 text-sm text-gray-500">{{ t('auth.chooseRole.candidateDescription') }}</p>
+            <p class="text-base font-semibold text-gray-900 sm:text-lg">
+              {{ t('auth.chooseRole.candidate') }}
+            </p>
+            <p class="mt-1 text-sm text-gray-500">
+              {{ t('auth.chooseRole.candidateDescription') }}
+            </p>
           </div>
         </button>
 
@@ -56,11 +67,15 @@ async function handleRoleSelect(role: 'candidate' | 'hr'): Promise<void> {
           :disabled="loading"
           @click="handleRoleSelect('hr')"
         >
-          <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-100 sm:h-14 sm:w-14">
+          <div
+            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-100 sm:h-14 sm:w-14"
+          >
             <i class="pi pi-building text-xl text-blue-600 sm:text-2xl" />
           </div>
           <div>
-            <p class="text-base font-semibold text-gray-900 sm:text-lg">{{ t('auth.chooseRole.company') }}</p>
+            <p class="text-base font-semibold text-gray-900 sm:text-lg">
+              {{ t('auth.chooseRole.company') }}
+            </p>
             <p class="mt-1 text-sm text-gray-500">{{ t('auth.chooseRole.companyDescription') }}</p>
           </div>
         </button>

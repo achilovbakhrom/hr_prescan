@@ -28,10 +28,14 @@ function onInput(event: Event) {
   <!-- Completed overlay -->
   <div v-if="isCompleted" class="border-t border-gray-200 bg-white px-4 py-6">
     <div class="mx-auto max-w-3xl text-center">
-      <div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-green-100">
+      <div
+        class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-green-100"
+      >
         <i class="pi pi-check text-2xl text-green-600"></i>
       </div>
-      <h2 class="mb-1 text-lg font-semibold text-gray-900">{{ t('interviews.chatPage.interviewComplete') }}</h2>
+      <h2 class="mb-1 text-lg font-semibold text-gray-900">
+        {{ t('interviews.chatPage.interviewComplete') }}
+      </h2>
       <p class="mb-4 text-sm text-gray-500">{{ t('interviews.chatPage.thankYouReview') }}</p>
       <div class="flex justify-center gap-3">
         <RouterLink
@@ -72,7 +76,11 @@ function onInput(event: Event) {
       <button
         v-else
         class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-all"
-        :class="canSend ? 'bg-blue-600 text-white shadow-md hover:bg-blue-700 hover:shadow-lg' : 'bg-gray-200 text-gray-400'"
+        :class="
+          canSend
+            ? 'bg-blue-600 text-white shadow-md hover:bg-blue-700 hover:shadow-lg'
+            : 'bg-gray-200 text-gray-400'
+        "
         :disabled="!canSend"
         @click="emit('send')"
       >

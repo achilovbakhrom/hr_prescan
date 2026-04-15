@@ -4,8 +4,6 @@ import InputNumber from 'primevue/inputnumber'
 import Select from 'primevue/select'
 import ToggleSwitch from 'primevue/toggleswitch'
 
-const { t } = useI18n()
-
 defineProps<{
   salaryMin: number | null
   salaryMax: number | null
@@ -24,6 +22,8 @@ const emit = defineEmits<{
   'update:employmentType': [value: string]
   'update:isOpenToWork': [value: boolean]
 }>()
+
+const { t } = useI18n()
 
 const currencyOptions = [
   { label: 'USD', value: 'USD' },
@@ -65,7 +65,9 @@ const employmentTypeOptions = [
           :invalid="'desiredSalaryMin' in fieldErrors"
           @update:model-value="emit('update:salaryMin', $event)"
         />
-        <small v-if="'desiredSalaryMin' in fieldErrors" class="text-red-500">{{ fieldErrors.desiredSalaryMin }}</small>
+        <small v-if="'desiredSalaryMin' in fieldErrors" class="text-red-500">{{
+          fieldErrors.desiredSalaryMin
+        }}</small>
       </div>
 
       <div class="flex flex-col gap-1">
@@ -80,7 +82,9 @@ const employmentTypeOptions = [
           :invalid="'desiredSalaryMax' in fieldErrors"
           @update:model-value="emit('update:salaryMax', $event)"
         />
-        <small v-if="'desiredSalaryMax' in fieldErrors" class="text-red-500">{{ fieldErrors.desiredSalaryMax }}</small>
+        <small v-if="'desiredSalaryMax' in fieldErrors" class="text-red-500">{{
+          fieldErrors.desiredSalaryMax
+        }}</small>
       </div>
 
       <div class="flex flex-col gap-1">
@@ -98,7 +102,9 @@ const employmentTypeOptions = [
           :invalid="'desiredSalaryCurrency' in fieldErrors"
           @update:model-value="emit('update:currency', $event as string)"
         />
-        <small v-if="'desiredSalaryCurrency' in fieldErrors" class="text-red-500">{{ fieldErrors.desiredSalaryCurrency }}</small>
+        <small v-if="'desiredSalaryCurrency' in fieldErrors" class="text-red-500">{{
+          fieldErrors.desiredSalaryCurrency
+        }}</small>
       </div>
     </div>
 
@@ -118,7 +124,9 @@ const employmentTypeOptions = [
           :invalid="'desiredEmploymentType' in fieldErrors"
           @update:model-value="emit('update:employmentType', $event as string)"
         />
-        <small v-if="'desiredEmploymentType' in fieldErrors" class="text-red-500">{{ fieldErrors.desiredEmploymentType }}</small>
+        <small v-if="'desiredEmploymentType' in fieldErrors" class="text-red-500">{{
+          fieldErrors.desiredEmploymentType
+        }}</small>
       </div>
 
       <div class="flex items-center gap-3 pt-6">

@@ -25,12 +25,36 @@ const submitted = ref(false)
 const emailInvalid = ref(false)
 
 const permissionOptions: { value: HRPermission; labelKey: string; descKey: string }[] = [
-  { value: 'manage_vacancies', labelKey: 'permissions.manageVacancies', descKey: 'permissions.manageVacanciesDesc' },
-  { value: 'manage_candidates', labelKey: 'permissions.manageCandidates', descKey: 'permissions.manageCandidatesDesc' },
-  { value: 'manage_interviews', labelKey: 'permissions.manageInterviews', descKey: 'permissions.manageInterviewsDesc' },
-  { value: 'manage_team', labelKey: 'permissions.manageTeam', descKey: 'permissions.manageTeamDesc' },
-  { value: 'view_analytics', labelKey: 'permissions.viewAnalytics', descKey: 'permissions.viewAnalyticsDesc' },
-  { value: 'manage_settings', labelKey: 'permissions.manageSettings', descKey: 'permissions.manageSettingsDesc' },
+  {
+    value: 'manage_vacancies',
+    labelKey: 'permissions.manageVacancies',
+    descKey: 'permissions.manageVacanciesDesc',
+  },
+  {
+    value: 'manage_candidates',
+    labelKey: 'permissions.manageCandidates',
+    descKey: 'permissions.manageCandidatesDesc',
+  },
+  {
+    value: 'manage_interviews',
+    labelKey: 'permissions.manageInterviews',
+    descKey: 'permissions.manageInterviewsDesc',
+  },
+  {
+    value: 'manage_team',
+    labelKey: 'permissions.manageTeam',
+    descKey: 'permissions.manageTeamDesc',
+  },
+  {
+    value: 'view_analytics',
+    labelKey: 'permissions.viewAnalytics',
+    descKey: 'permissions.viewAnalyticsDesc',
+  },
+  {
+    value: 'manage_settings',
+    labelKey: 'permissions.manageSettings',
+    descKey: 'permissions.manageSettingsDesc',
+  },
 ]
 
 watch(
@@ -94,11 +118,7 @@ function handleSubmit(): void {
             :key="opt.value"
             class="flex cursor-pointer items-start gap-3 rounded-md px-2 py-1.5 transition-colors hover:bg-white"
           >
-            <Checkbox
-              v-model="selectedPermissions"
-              :value="opt.value"
-              class="mt-0.5"
-            />
+            <Checkbox v-model="selectedPermissions" :value="opt.value" class="mt-0.5" />
             <div class="min-w-0">
               <span class="text-sm font-medium text-gray-800">{{ t(opt.labelKey) }}</span>
               <p class="text-xs text-gray-500">{{ t(opt.descKey) }}</p>

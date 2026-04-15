@@ -84,6 +84,17 @@ export const authService = {
     return response.data
   },
 
+  async completeCompanySetup(data: {
+    company_name: string
+    industries: string[]
+    size: string
+    country: string
+    email?: string
+  }): Promise<LoginResponse> {
+    const response = await apiClient.post<LoginResponse>('/auth/complete-company-setup/', data)
+    return response.data
+  },
+
   async getMyCompanies(): Promise<CompanyMembership[]> {
     const response = await apiClient.get<CompanyMembership[]>('/auth/my-companies')
     return response.data

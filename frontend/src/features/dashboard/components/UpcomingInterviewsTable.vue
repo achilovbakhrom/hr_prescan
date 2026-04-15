@@ -6,11 +6,11 @@ import Column from 'primevue/column'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { UpcomingInterview } from '../types/dashboard.types'
 
-const { t } = useI18n()
-
 defineProps<{
   interviews: UpcomingInterview[]
 }>()
+
+const { t } = useI18n()
 
 const router = useRouter()
 

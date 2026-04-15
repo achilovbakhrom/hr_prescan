@@ -3,11 +3,7 @@ import { defineStore } from 'pinia'
 import { extractApiError, type FieldErrors } from '@/shared/api/errors'
 import { cvBuilderService } from '../services/cv-builder.service'
 import { useCvBuilderProfileStore } from './cv-builder-profile.store'
-import type {
-  CvGenerateResult,
-  CvChatMessage,
-  CvChatResponse,
-} from '../types/cv-builder.types'
+import type { CvGenerateResult, CvChatMessage, CvChatResponse } from '../types/cv-builder.types'
 
 export const useCvBuilderCvStore = defineStore('cvBuilderCv', () => {
   const parsing = ref(false)
@@ -31,10 +27,7 @@ export const useCvBuilderCvStore = defineStore('cvBuilderCv', () => {
   }
 
   // CV PDF Generation
-  async function generatePdf(
-    template: string,
-    name?: string,
-  ): Promise<CvGenerateResult> {
+  async function generatePdf(template: string, name?: string): Promise<CvGenerateResult> {
     const profileStore = useCvBuilderProfileStore()
     generating.value = true
     clearErrors()

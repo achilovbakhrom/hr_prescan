@@ -12,9 +12,8 @@ import Select from 'primevue/select'
 import { getLocale } from '@/shared/i18n'
 import type { InterviewQuestion } from '../types/vacancy.types'
 
-const { t } = useI18n()
-
 const props = defineProps<{ questions: InterviewQuestion[]; loading?: boolean }>()
+
 const emit = defineEmits<{
   add: [data: { text: string; category?: string }]
   update: [questionId: string, data: Partial<InterviewQuestion>]
@@ -22,6 +21,8 @@ const emit = defineEmits<{
   generate: []
   translateAll: []
 }>()
+
+const { t } = useI18n()
 
 const currentLocale = computed(() => getLocale())
 
@@ -90,8 +91,20 @@ function handleSubmit(): void {
           size="small"
           @click="emit('translateAll')"
         />
-        <Button :label="t('vacancies.generateQuestions')" icon="pi pi-sparkles" severity="info" size="small" :loading="loading" @click="emit('generate')" />
-        <Button :label="t('vacancies.addQuestion')" icon="pi pi-plus" size="small" @click="openAdd" />
+        <Button
+          :label="t('vacancies.generateQuestions')"
+          icon="pi pi-sparkles"
+          severity="info"
+          size="small"
+          :loading="loading"
+          @click="emit('generate')"
+        />
+        <Button
+          :label="t('vacancies.addQuestion')"
+          icon="pi pi-plus"
+          size="small"
+          @click="openAdd"
+        />
       </div>
     </div>
     <DataTable :value="questions" :loading="loading" striped-rows>
@@ -135,15 +148,38 @@ function handleSubmit(): void {
         </template>
       </Column>
       <template #empty>
-        <div class="py-8 text-center text-gray-500">No competencies yet. Add manually or generate with AI.</div>
+        <div class="py-8 text-center text-gray-500">
+          No competencies yet. Add manually or generate with AI.
+        </div>
       </template>
     </DataTable>
-    <Dialog v-model:visible="showDialog" :header="isEditing ? 'Edit Competency' : t('vacancies.addQuestion')" :style="{ width: '500px' }" modal>
+    <Dialog
+      v-model:visible="showDialog"
+      :header="isEditing ? 'Edit Competency' : t('vacancies.addQuestion')"
+      :style="{ width: '500px' }"
+      modal
+    >
       <div class="space-y-4">
-        <div><label class="mb-1 block text-sm font-medium">Competency *</label>
-          <Textarea v-model="formText" class="w-full" rows="3" placeholder="e.g. Candidate should demonstrate proficiency with React hooks" /></div>
-        <div><label class="mb-1 block text-sm font-medium">Category</label>
-          <Select v-model="formCategory" :options="categoryOptions" option-label="label" option-value="value" class="w-full" placeholder="Select category" /></div>
+        <div>
+          <label class="mb-1 block text-sm font-medium">Competency *</label>
+          <Textarea
+            v-model="formText"
+            class="w-full"
+            rows="3"
+            placeholder="e.g. Candidate should demonstrate proficiency with React hooks"
+          />
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium">Category</label>
+          <Select
+            v-model="formCategory"
+            :options="categoryOptions"
+            option-label="label"
+            option-value="value"
+            class="w-full"
+            placeholder="Select category"
+          />
+        </div>
       </div>
       <template #footer>
         <Button :label="t('common.cancel')" severity="secondary" text @click="showDialog = false" />

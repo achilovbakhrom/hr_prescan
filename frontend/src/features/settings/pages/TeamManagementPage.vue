@@ -39,9 +39,7 @@ async function handleUpdatePermissions(userId: string, permissions: HRPermission
     await settingsStore.updateMemberPermissions(userId, permissions)
   } catch (err: unknown) {
     errorMessage.value =
-      err instanceof Error
-        ? err.message
-        : 'Failed to update permissions. Please try again.'
+      err instanceof Error ? err.message : 'Failed to update permissions. Please try again.'
   }
 }
 
@@ -50,10 +48,7 @@ async function handleCancelInvitation(invitationId: string): Promise<void> {
   try {
     await settingsStore.cancelInvitation(invitationId)
   } catch (err: unknown) {
-    errorMessage.value =
-      err instanceof Error
-        ? err.message
-        : 'Failed to cancel invitation.'
+    errorMessage.value = err instanceof Error ? err.message : 'Failed to cancel invitation.'
   }
 }
 

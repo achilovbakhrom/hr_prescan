@@ -61,26 +61,24 @@ function handleSave(): void {
       </div>
     </div>
 
-    <div
-      v-if="store.loading && !store.profile"
-      class="py-12 text-center text-gray-500"
-    >
+    <div v-if="store.loading && !store.profile" class="py-12 text-center text-gray-500">
       {{ t('common.loading') }}
     </div>
 
     <template v-else-if="store.profile">
-      <ProfileCompleteness
-        :completeness="store.profile.completeness"
-        class="mb-6"
-      />
+      <ProfileCompleteness :completeness="store.profile.completeness" class="mb-6" />
 
       <!-- Global store error (non-field) -->
-      <Message v-if="store.error && Object.keys(store.fieldErrors).length === 0" severity="error" class="mb-4">
+      <Message
+        v-if="store.error && Object.keys(store.fieldErrors).length === 0"
+        severity="error"
+        class="mb-4"
+      >
         {{ store.error }}
       </Message>
 
       <div class="rounded-lg bg-white shadow-sm">
-        <Tabs :value="activeTab" @update:value="(v: string | number) => activeTab = String(v)">
+        <Tabs :value="activeTab" @update:value="(v: string | number) => (activeTab = String(v))">
           <TabList>
             <Tab value="0">
               <span class="hidden sm:inline">{{ t('cvBuilder.tabs.personal') }}</span>

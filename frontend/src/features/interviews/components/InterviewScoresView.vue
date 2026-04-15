@@ -38,7 +38,7 @@ function scoreColor(score: number): string {
         model="interview_score"
         :object-id="score.id"
         field="ai_notes"
-        @translated="(tr) => score.aiNotesTranslations = tr"
+        @translated="(tr) => (score.aiNotesTranslations = tr)"
       >
         <template #default="{ text }">
           <p class="text-xs text-gray-500">{{ text }}</p>

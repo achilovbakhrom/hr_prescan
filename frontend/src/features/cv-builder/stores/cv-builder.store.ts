@@ -22,7 +22,9 @@ export const useCvBuilderStore = defineStore('cvBuilder', () => {
   // Unified reactive state
   const profile = computed({
     get: () => profileStore.profile,
-    set: (v) => { profileStore.profile = v },
+    set: (v) => {
+      profileStore.profile = v
+    },
   })
   const loading = computed(() => profileStore.loading)
   const saving = computed(() => profileStore.saving)
@@ -45,7 +47,8 @@ export const useCvBuilderStore = defineStore('cvBuilder', () => {
   const updateProfile = (d: ProfileUpdatePayload) => profileStore.updateProfile(d)
   const updateSkills = (s: string[]) => profileStore.updateSkills(s)
   const createWorkExperience = (d: WorkExperiencePayload) => profileStore.createWorkExperience(d)
-  const updateWorkExperience = (id: string, d: WorkExperiencePayload) => profileStore.updateWorkExperience(id, d)
+  const updateWorkExperience = (id: string, d: WorkExperiencePayload) =>
+    profileStore.updateWorkExperience(id, d)
   const deleteWorkExperience = (id: string) => profileStore.deleteWorkExperience(id)
   const createEducation = (d: EducationPayload) => profileStore.createEducation(d)
   const updateEducation = (id: string, d: EducationPayload) => profileStore.updateEducation(id, d)
@@ -54,7 +57,8 @@ export const useCvBuilderStore = defineStore('cvBuilder', () => {
   const updateLanguage = (id: string, d: LanguagePayload) => profileStore.updateLanguage(id, d)
   const deleteLanguage = (id: string) => profileStore.deleteLanguage(id)
   const createCertification = (d: CertificationPayload) => profileStore.createCertification(d)
-  const updateCertification = (id: string, d: CertificationPayload) => profileStore.updateCertification(id, d)
+  const updateCertification = (id: string, d: CertificationPayload) =>
+    profileStore.updateCertification(id, d)
   const deleteCertification = (id: string) => profileStore.deleteCertification(id)
 
   // Delegate to CV store

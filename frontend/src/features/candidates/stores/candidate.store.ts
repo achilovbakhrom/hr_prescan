@@ -34,9 +34,12 @@ export const useCandidateStore = defineStore('candidate', () => {
     }
   }
 
-  async function fetchAllCandidates(
-    params?: { status?: string; ordering?: string; search?: string; vacancyId?: string },
-  ): Promise<void> {
+  async function fetchAllCandidates(params?: {
+    status?: string
+    ordering?: string
+    search?: string
+    vacancyId?: string
+  }): Promise<void> {
     candidates.value = []
     loading.value = true
     error.value = null

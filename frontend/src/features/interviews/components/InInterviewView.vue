@@ -8,8 +8,6 @@ import ConnectionStatus from '@/features/video/components/ConnectionStatus.vue'
 import InterviewTimer from '@/features/video/components/InterviewTimer.vue'
 import { useLiveKit } from '@/features/video/composables/useLiveKit'
 
-const { t } = useI18n()
-
 const props = defineProps<{
   interview: InterviewDetail
   livekitUrl: string
@@ -18,6 +16,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   end: []
 }>()
+
+const { t } = useI18n()
 
 const showLeaveDialog = ref(false)
 
@@ -83,10 +83,7 @@ async function confirmLeave(): Promise<void> {
             <i class="pi pi-user text-4xl text-gray-400"></i>
           </div>
           <p class="text-sm text-gray-400">{{ t('interviews.inInterview.aiInterviewer') }}</p>
-          <p
-            v-if="connectionState === 'connecting'"
-            class="mt-2 text-xs text-gray-500"
-          >
+          <p v-if="connectionState === 'connecting'" class="mt-2 text-xs text-gray-500">
             {{ t('interviews.inInterview.connecting') }}
           </p>
         </div>

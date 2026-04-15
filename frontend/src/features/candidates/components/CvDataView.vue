@@ -29,13 +29,24 @@ const hasData = computed(() => {
 </script>
 
 <template>
-  <div v-if="props.cvFile" class="mb-4 flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3">
+  <div
+    v-if="props.cvFile"
+    class="mb-4 flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3"
+  >
     <i class="pi pi-file-pdf text-2xl text-red-500"></i>
     <div class="min-w-0 flex-1">
-      <p class="truncate text-sm font-medium text-gray-700">{{ props.cvFilename || t('candidates.cvData.file') }}</p>
+      <p class="truncate text-sm font-medium text-gray-700">
+        {{ props.cvFilename || t('candidates.cvData.file') }}
+      </p>
       <p class="text-xs text-gray-400">{{ t('candidates.cvData.clickToDownload') }}</p>
     </div>
-    <Button :label="t('candidates.cv')" icon="pi pi-download" size="small" outlined @click="emit('downloadCv')" />
+    <Button
+      :label="t('candidates.cv')"
+      icon="pi pi-download"
+      size="small"
+      outlined
+      @click="emit('downloadCv')"
+    />
   </div>
 
   <div

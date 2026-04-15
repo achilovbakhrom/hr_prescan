@@ -66,7 +66,9 @@ function handleGoogleError(msg: string): void {
   errorMessage.value = msg
 }
 
-async function handleTelegramSuccess(data: Parameters<typeof authStore.telegramLogin>[0]): Promise<void> {
+async function handleTelegramSuccess(
+  data: Parameters<typeof authStore.telegramLogin>[0],
+): Promise<void> {
   errorMessage.value = null
   try {
     await authStore.telegramLogin(data)
@@ -77,8 +79,7 @@ async function handleTelegramSuccess(data: Parameters<typeof authStore.telegramL
       await router.push(redirect || { name: ROUTE_NAMES.DASHBOARD })
     }
   } catch (err: unknown) {
-    errorMessage.value =
-      err instanceof Error ? err.message : 'Telegram sign-in failed.'
+    errorMessage.value = err instanceof Error ? err.message : 'Telegram sign-in failed.'
   }
 }
 
@@ -100,10 +101,7 @@ function handleTelegramError(msg: string): void {
 
       <GoogleSignInButton @success="handleGoogleSuccess" @error="handleGoogleError" />
 
-      <TelegramSignInButton
-        @success="handleTelegramSuccess"
-        @error="handleTelegramError"
-      />
+      <TelegramSignInButton @success="handleTelegramSuccess" @error="handleTelegramError" />
 
       <div class="mb-4 flex items-center gap-3">
         <div class="h-px flex-1 bg-gray-200"></div>
@@ -165,7 +163,6 @@ function handleTelegramError(msg: string): void {
           {{ t('auth.login.register') }}
         </RouterLink>
       </p>
-
     </div>
   </div>
 </template>

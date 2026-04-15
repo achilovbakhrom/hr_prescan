@@ -172,6 +172,29 @@
       "companyDescription": "Публикуйте вакансии и проводите AI-скрининг кандидатов",
       "industry": "Отрасль",
       "country": "Страна"
+    },
+    "companySetup": {
+      "title": "Настройка компании",
+      "subtitle": "Расскажите немного о вашей компании, чтобы мы настроили интерфейс под вас.",
+      "companyName": "Название компании",
+      "companyNamePlaceholder": "ООО «Ромашка»",
+      "companyNameRequired": "Укажите название компании",
+      "industries": "Отрасли",
+      "industriesRequired": "Выберите хотя бы одну отрасль",
+      "size": "Размер компании",
+      "sizePlaceholder": "Выберите размер компании",
+      "sizeRequired": "Укажите размер компании",
+      "sizeSmall": "Малая (1–10 сотрудников)",
+      "sizeMedium": "Средняя (11–50 сотрудников)",
+      "sizeLarge": "Крупная (51–250 сотрудников)",
+      "sizeEnterprise": "Корпорация (250+ сотрудников)",
+      "country": "Страна",
+      "countryRequired": "Укажите страну",
+      "email": "Рабочий email",
+      "emailPlaceholder": "you@company.com",
+      "emailRequired": "Введите корректный email",
+      "submit": "Продолжить",
+      "submitError": "Не удалось завершить настройку. Попробуйте ещё раз."
     }
   },
   "landing": {

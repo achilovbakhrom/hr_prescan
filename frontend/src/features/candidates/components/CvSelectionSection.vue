@@ -72,26 +72,50 @@ function onFileSelect(event: FileUploadSelectEvent): void {
     <template v-else-if="activeCv">
       <div class="flex flex-col gap-3">
         <div class="flex items-center gap-2">
-          <RadioButton v-model="cvMode" inputId="cv-active" value="active" @update:model-value="onModeChange" />
+          <RadioButton
+            v-model="cvMode"
+            inputId="cv-active"
+            value="active"
+            @update:model-value="onModeChange"
+          />
           <label for="cv-active" class="cursor-pointer text-sm">
             {{ t('candidates.application.useActiveCv', { name: activeCv.name }) }}
           </label>
         </div>
         <div class="flex items-center gap-2">
-          <RadioButton v-model="cvMode" inputId="cv-upload" value="upload" @update:model-value="onModeChange" />
+          <RadioButton
+            v-model="cvMode"
+            inputId="cv-upload"
+            value="upload"
+            @update:model-value="onModeChange"
+          />
           <label for="cv-upload" class="cursor-pointer text-sm">
             {{ t('candidates.application.uploadNewCv') }}
           </label>
         </div>
         <div v-if="cvMode === 'upload'" class="pl-6">
-          <FileUpload mode="basic" accept=".pdf,.docx" :max-file-size="10000000" :choose-label="t('candidates.application.chooseCv')" :auto="false" @select="onFileSelect" />
+          <FileUpload
+            mode="basic"
+            accept=".pdf,.docx"
+            :max-file-size="10000000"
+            :choose-label="t('candidates.application.chooseCv')"
+            :auto="false"
+            @select="onFileSelect"
+          />
           <small class="text-gray-400">{{ t('candidates.application.acceptedFormats') }}</small>
         </div>
       </div>
     </template>
 
     <template v-else>
-      <FileUpload mode="basic" accept=".pdf,.docx" :max-file-size="10000000" :choose-label="t('candidates.application.chooseCv')" :auto="false" @select="onFileSelect" />
+      <FileUpload
+        mode="basic"
+        accept=".pdf,.docx"
+        :max-file-size="10000000"
+        :choose-label="t('candidates.application.chooseCv')"
+        :auto="false"
+        @select="onFileSelect"
+      />
       <small class="text-gray-400">{{ t('candidates.application.acceptedFormats') }}</small>
     </template>
   </div>

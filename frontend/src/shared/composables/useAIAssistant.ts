@@ -33,13 +33,17 @@ let skipSave = false
 let activeRole = ''
 
 // Persist on every change
-watch(messages, (val) => {
-  if (skipSave) {
-    skipSave = false
-    return
-  }
-  if (activeRole) saveHistory(val, activeRole)
-}, { deep: true })
+watch(
+  messages,
+  (val) => {
+    if (skipSave) {
+      skipSave = false
+      return
+    }
+    if (activeRole) saveHistory(val, activeRole)
+  },
+  { deep: true },
+)
 
 export function useAIAssistant() {
   const route = useRoute()

@@ -7,6 +7,7 @@ export const ROUTE_NAMES = {
   REGISTER: 'register',
   VERIFY_EMAIL: 'verify-email',
   CHOOSE_ROLE: 'choose-role',
+  COMPANY_SETUP: 'company-setup',
 
   // App
   PROFILE: 'profile',

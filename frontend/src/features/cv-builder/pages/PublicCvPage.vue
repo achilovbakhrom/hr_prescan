@@ -66,13 +66,31 @@ function proficiencyLabel(value: string): string {
           <span v-if="profile.location">
             <i class="pi pi-map-marker mr-1 text-xs"></i>{{ profile.location }}
           </span>
-          <a v-if="profile.linkedinUrl" :href="profile.linkedinUrl" target="_blank" rel="noopener" class="text-blue-600 hover:underline">
+          <a
+            v-if="profile.linkedinUrl"
+            :href="profile.linkedinUrl"
+            target="_blank"
+            rel="noopener"
+            class="text-blue-600 hover:underline"
+          >
             <i class="pi pi-linkedin mr-1 text-xs"></i>LinkedIn
           </a>
-          <a v-if="profile.githubUrl" :href="profile.githubUrl" target="_blank" rel="noopener" class="text-gray-700 hover:underline">
+          <a
+            v-if="profile.githubUrl"
+            :href="profile.githubUrl"
+            target="_blank"
+            rel="noopener"
+            class="text-gray-700 hover:underline"
+          >
             <i class="pi pi-github mr-1 text-xs"></i>GitHub
           </a>
-          <a v-if="profile.websiteUrl" :href="profile.websiteUrl" target="_blank" rel="noopener" class="text-blue-600 hover:underline">
+          <a
+            v-if="profile.websiteUrl"
+            :href="profile.websiteUrl"
+            target="_blank"
+            rel="noopener"
+            class="text-blue-600 hover:underline"
+          >
             <i class="pi pi-globe mr-1 text-xs"></i>Website
           </a>
         </div>
@@ -80,35 +98,53 @@ function proficiencyLabel(value: string): string {
 
       <!-- Summary -->
       <div v-if="profile.summary" class="mb-8">
-        <h2 class="mb-2 text-sm font-semibold uppercase tracking-wider text-gray-400">{{ t('publicCv.summary') }}</h2>
+        <h2 class="mb-2 text-sm font-semibold uppercase tracking-wider text-gray-400">
+          {{ t('publicCv.summary') }}
+        </h2>
         <!-- eslint-disable-next-line vue/no-v-html -->
-        <div class="prose prose-sm max-w-none text-gray-700" v-html="sanitizeHtml(profile.summary)"></div>
+        <div
+          class="prose prose-sm max-w-none text-gray-700"
+          v-html="sanitizeHtml(profile.summary)"
+        ></div>
       </div>
 
       <!-- Experience -->
       <div v-if="profile.workExperiences.length" class="mb-8">
-        <h2 class="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-400">{{ t('publicCv.experience') }}</h2>
+        <h2 class="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-400">
+          {{ t('publicCv.experience') }}
+        </h2>
         <div class="space-y-4 border-l-2 border-blue-200 pl-4">
           <div v-for="exp in profile.workExperiences" :key="exp.id" class="relative">
-            <div class="absolute -left-[1.35rem] top-1.5 h-2.5 w-2.5 rounded-full bg-blue-500"></div>
+            <div
+              class="absolute -left-[1.35rem] top-1.5 h-2.5 w-2.5 rounded-full bg-blue-500"
+            ></div>
             <p class="font-semibold text-gray-900">{{ exp.position }}</p>
             <p class="text-sm text-gray-600">
               {{ exp.companyName }}
               <span v-if="exp.location" class="text-gray-400"> &middot; {{ exp.location }}</span>
             </p>
             <p class="text-xs text-gray-400">
-              {{ formatDate(exp.startDate) }} &mdash; {{ exp.isCurrent ? t('publicCv.present') : formatDate(exp.endDate) }}
+              {{ formatDate(exp.startDate) }} &mdash;
+              {{ exp.isCurrent ? t('publicCv.present') : formatDate(exp.endDate) }}
             </p>
-            <p v-if="exp.description" class="mt-1 whitespace-pre-line text-sm text-gray-600">{{ exp.description }}</p>
+            <p v-if="exp.description" class="mt-1 whitespace-pre-line text-sm text-gray-600">
+              {{ exp.description }}
+            </p>
           </div>
         </div>
       </div>
 
       <!-- Education -->
       <div v-if="profile.educations.length" class="mb-8">
-        <h2 class="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-400">{{ t('publicCv.education') }}</h2>
+        <h2 class="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-400">
+          {{ t('publicCv.education') }}
+        </h2>
         <div class="space-y-3">
-          <div v-for="edu in profile.educations" :key="edu.id" class="rounded-lg border border-gray-100 bg-gray-50 p-3">
+          <div
+            v-for="edu in profile.educations"
+            :key="edu.id"
+            class="rounded-lg border border-gray-100 bg-gray-50 p-3"
+          >
             <p class="font-semibold text-gray-900">{{ edu.degree || edu.institution }}</p>
             <p v-if="edu.degree" class="text-sm text-gray-600">{{ edu.institution }}</p>
             <p v-if="edu.fieldOfStudy" class="text-sm text-gray-500">{{ edu.fieldOfStudy }}</p>
@@ -122,15 +158,24 @@ function proficiencyLabel(value: string): string {
 
       <!-- Skills -->
       <div v-if="profile.skills.length" class="mb-8">
-        <h2 class="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-400">{{ t('publicCv.skills') }}</h2>
+        <h2 class="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-400">
+          {{ t('publicCv.skills') }}
+        </h2>
         <div class="flex flex-wrap gap-2">
-          <Tag v-for="skill in profile.skills" :key="skill.slug" :value="skill.name" severity="info" />
+          <Tag
+            v-for="skill in profile.skills"
+            :key="skill.slug"
+            :value="skill.name"
+            severity="info"
+          />
         </div>
       </div>
 
       <!-- Languages -->
       <div v-if="profile.languages.length" class="mb-8">
-        <h2 class="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-400">{{ t('publicCv.languages') }}</h2>
+        <h2 class="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-400">
+          {{ t('publicCv.languages') }}
+        </h2>
         <div class="flex flex-wrap gap-2">
           <span
             v-for="lang in profile.languages"
@@ -145,13 +190,27 @@ function proficiencyLabel(value: string): string {
 
       <!-- Certifications -->
       <div v-if="profile.certifications.length" class="mb-8">
-        <h2 class="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-400">{{ t('publicCv.certifications') }}</h2>
+        <h2 class="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-400">
+          {{ t('publicCv.certifications') }}
+        </h2>
         <div class="space-y-2">
-          <div v-for="cert in profile.certifications" :key="cert.id" class="flex items-center gap-2 text-sm">
+          <div
+            v-for="cert in profile.certifications"
+            :key="cert.id"
+            class="flex items-center gap-2 text-sm"
+          >
             <i class="pi pi-verified text-blue-500"></i>
             <span class="font-medium text-gray-900">{{ cert.name }}</span>
-            <span v-if="cert.issuingOrganization" class="text-gray-500">&mdash; {{ cert.issuingOrganization }}</span>
-            <a v-if="cert.credentialUrl" :href="cert.credentialUrl" target="_blank" rel="noopener" class="text-blue-600 hover:underline">
+            <span v-if="cert.issuingOrganization" class="text-gray-500"
+              >&mdash; {{ cert.issuingOrganization }}</span
+            >
+            <a
+              v-if="cert.credentialUrl"
+              :href="cert.credentialUrl"
+              target="_blank"
+              rel="noopener"
+              class="text-blue-600 hover:underline"
+            >
               <i class="pi pi-external-link text-xs"></i>
             </a>
           </div>

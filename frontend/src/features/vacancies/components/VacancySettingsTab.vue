@@ -6,13 +6,12 @@ import ToggleSwitch from 'primevue/toggleswitch'
 import { getVisibilityOptions } from '../constants/formOptions'
 import type { VacancyVisibility } from '../types/vacancy.types'
 
-const visibility = defineModel<VacancyVisibility>('visibility', { required: true })
-const cvRequired = defineModel<boolean>('cvRequired', { required: true })
-
 defineProps<{
   hasError: (field: string) => boolean
   fieldError: (field: string) => string
 }>()
+const visibility = defineModel<VacancyVisibility>('visibility', { required: true })
+const cvRequired = defineModel<boolean>('cvRequired', { required: true })
 
 const { t } = useI18n()
 const visibilityOptions = computed(() => getVisibilityOptions(t))
@@ -23,8 +22,17 @@ const visibilityOptions = computed(() => getVisibilityOptions(t))
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
       <div>
         <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.visibility') }}</label>
-        <Dropdown v-model="visibility" :options="visibilityOptions" option-label="label" option-value="value" class="w-full" :invalid="hasError('visibility')" />
-        <small v-if="hasError('visibility')" class="text-red-500">{{ fieldError('visibility') }}</small>
+        <Dropdown
+          v-model="visibility"
+          :options="visibilityOptions"
+          option-label="label"
+          option-value="value"
+          class="w-full"
+          :invalid="hasError('visibility')"
+        />
+        <small v-if="hasError('visibility')" class="text-red-500">{{
+          fieldError('visibility')
+        }}</small>
         <p class="mt-1 text-xs text-gray-400">{{ t('vacancies.form.visibilityPublicHint') }}</p>
       </div>
       <div class="flex items-start gap-3 pt-6">

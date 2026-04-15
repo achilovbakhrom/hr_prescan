@@ -28,7 +28,11 @@ const employmentOptions = computed(() => [
   { value: 'full_time', label: t('vacancies.employment.fullTime'), icon: 'pi pi-clock' },
   { value: 'part_time', label: t('vacancies.employment.partTime'), icon: 'pi pi-hourglass' },
   { value: 'contract', label: t('vacancies.employment.contract'), icon: 'pi pi-file' },
-  { value: 'internship', label: t('vacancies.employment.internship'), icon: 'pi pi-graduation-cap' },
+  {
+    value: 'internship',
+    label: t('vacancies.employment.internship'),
+    icon: 'pi pi-graduation-cap',
+  },
 ])
 
 const experienceOptions = computed(() => [
@@ -45,8 +49,12 @@ const experienceOptions = computed(() => [
   <aside v-if="!showMobile" class="hidden w-56 shrink-0 lg:block">
     <div class="sticky top-4 space-y-6">
       <div v-if="activeFilterCount > 0" class="flex items-center justify-between">
-        <span class="text-xs font-medium text-gray-500">{{ activeFilterCount }} {{ t('jobBoard.activeFilters') }}</span>
-        <button class="text-xs text-blue-600 hover:underline" @click="emit('clearFilters')">{{ t('jobBoard.clearAll') }}</button>
+        <span class="text-xs font-medium text-gray-500"
+          >{{ activeFilterCount }} {{ t('jobBoard.activeFilters') }}</span
+        >
+        <button class="text-xs text-blue-600 hover:underline" @click="emit('clearFilters')">
+          {{ t('jobBoard.clearAll') }}
+        </button>
       </div>
 
       <div>
@@ -61,12 +69,19 @@ const experienceOptions = computed(() => [
       </div>
 
       <div>
-        <h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">{{ t('vacancies.form.employmentType') }}</h3>
+        <h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+          {{ t('vacancies.form.employmentType') }}
+        </h3>
         <div class="space-y-1">
           <button
-            v-for="opt in employmentOptions" :key="opt.value"
+            v-for="opt in employmentOptions"
+            :key="opt.value"
             class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors"
-            :class="employmentType === opt.value ? 'bg-blue-50 font-medium text-blue-700' : 'text-gray-600 hover:bg-gray-100'"
+            :class="
+              employmentType === opt.value
+                ? 'bg-blue-50 font-medium text-blue-700'
+                : 'text-gray-600 hover:bg-gray-100'
+            "
             @click="emit('toggleEmployment', opt.value)"
           >
             <i :class="opt.icon" class="text-xs"></i>
@@ -76,12 +91,19 @@ const experienceOptions = computed(() => [
       </div>
 
       <div>
-        <h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">{{ t('vacancies.form.experienceLevel') }}</h3>
+        <h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+          {{ t('vacancies.form.experienceLevel') }}
+        </h3>
         <div class="space-y-1">
           <button
-            v-for="opt in experienceOptions" :key="opt.value"
+            v-for="opt in experienceOptions"
+            :key="opt.value"
             class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors"
-            :class="experienceLevel === opt.value ? 'bg-blue-50 font-medium text-blue-700' : 'text-gray-600 hover:bg-gray-100'"
+            :class="
+              experienceLevel === opt.value
+                ? 'bg-blue-50 font-medium text-blue-700'
+                : 'text-gray-600 hover:bg-gray-100'
+            "
             @click="emit('toggleExperience', opt.value)"
           >
             {{ opt.label }}
@@ -90,7 +112,9 @@ const experienceOptions = computed(() => [
       </div>
 
       <div>
-        <h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">{{ t('jobBoard.salaryRange') }}</h3>
+        <h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+          {{ t('jobBoard.salaryRange') }}
+        </h3>
         <div class="space-y-2">
           <InputNumber
             :model-value="salaryMin"
@@ -118,10 +142,7 @@ const experienceOptions = computed(() => [
   </aside>
 
   <!-- Mobile filter drawer -->
-  <div
-    v-else
-    class="mb-4 space-y-4 rounded-xl border border-gray-200 bg-white p-4 lg:hidden"
-  >
+  <div v-else class="mb-4 space-y-4 rounded-xl border border-gray-200 bg-white p-4 lg:hidden">
     <button
       class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors"
       :class="remoteOnly ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100'"
@@ -132,12 +153,19 @@ const experienceOptions = computed(() => [
     </button>
 
     <div>
-      <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">{{ t('vacancies.form.employmentType') }}</p>
+      <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+        {{ t('vacancies.form.employmentType') }}
+      </p>
       <div class="flex flex-wrap gap-2">
         <button
-          v-for="opt in employmentOptions" :key="opt.value"
+          v-for="opt in employmentOptions"
+          :key="opt.value"
           class="rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
-          :class="employmentType === opt.value ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600'"
+          :class="
+            employmentType === opt.value
+              ? 'border-blue-200 bg-blue-50 text-blue-700'
+              : 'border-gray-200 text-gray-600'
+          "
           @click="emit('toggleEmployment', opt.value)"
         >
           {{ opt.label }}
@@ -146,12 +174,19 @@ const experienceOptions = computed(() => [
     </div>
 
     <div>
-      <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">{{ t('vacancies.form.experienceLevel') }}</p>
+      <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+        {{ t('vacancies.form.experienceLevel') }}
+      </p>
       <div class="flex flex-wrap gap-2">
         <button
-          v-for="opt in experienceOptions" :key="opt.value"
+          v-for="opt in experienceOptions"
+          :key="opt.value"
           class="rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
-          :class="experienceLevel === opt.value ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600'"
+          :class="
+            experienceLevel === opt.value
+              ? 'border-blue-200 bg-blue-50 text-blue-700'
+              : 'border-gray-200 text-gray-600'
+          "
           @click="emit('toggleExperience', opt.value)"
         >
           {{ opt.label }}
@@ -160,7 +195,9 @@ const experienceOptions = computed(() => [
     </div>
 
     <div>
-      <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">{{ t('jobBoard.salaryRange') }}</p>
+      <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+        {{ t('jobBoard.salaryRange') }}
+      </p>
       <div class="flex gap-2">
         <InputNumber
           :model-value="props.salaryMin"

@@ -63,13 +63,13 @@ export const candidateService = {
     return response.data
   },
 
-  async getAllCandidates(
-    params?: { status?: string; ordering?: string; search?: string; vacancyId?: string },
-  ): Promise<Application[]> {
-    const response = await apiClient.get<Application[]>(
-      '/hr/candidates',
-      { params },
-    )
+  async getAllCandidates(params?: {
+    status?: string
+    ordering?: string
+    search?: string
+    vacancyId?: string
+  }): Promise<Application[]> {
+    const response = await apiClient.get<Application[]>('/hr/candidates', { params })
     return response.data
   },
 

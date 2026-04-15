@@ -27,9 +27,7 @@ const selectedSkills = ref<Skill[]>([])
 onMounted(async () => {
   skills.value = await fetchSkills()
   if (props.modelValue.length) {
-    selectedSkills.value = skills.value.filter((s) =>
-      props.modelValue.includes(s.slug),
-    )
+    selectedSkills.value = skills.value.filter((s) => props.modelValue.includes(s.slug))
   }
 })
 
@@ -40,9 +38,7 @@ watch(
       selectedSkills.value = []
       return
     }
-    selectedSkills.value = skills.value.filter((s) =>
-      slugs.includes(s.slug),
-    )
+    selectedSkills.value = skills.value.filter((s) => slugs.includes(s.slug))
   },
 )
 

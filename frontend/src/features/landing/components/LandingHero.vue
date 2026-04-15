@@ -129,7 +129,9 @@ onMounted(() => {
                 <i class="pi pi-comments text-sm text-white"></i>
               </div>
               <div>
-                <p class="text-sm font-semibold text-white">{{ t('interviews.chat.aiPrescanning') }}</p>
+                <p class="text-sm font-semibold text-white">
+                  {{ t('interviews.chat.aiPrescanning') }}
+                </p>
                 <div class="flex items-center gap-1.5">
                   <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
                   <span class="text-xs text-blue-100">{{ t('interviews.chat.online') }}</span>

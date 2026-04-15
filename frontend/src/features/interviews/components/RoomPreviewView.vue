@@ -36,7 +36,9 @@ const { t } = useI18n()
           class="h-full w-full object-cover"
         ></video>
         <div v-if="isCameraOff" class="flex h-full w-full items-center justify-center">
-          <div class="flex h-24 w-24 items-center justify-center rounded-full bg-blue-600 text-3xl font-medium text-white">
+          <div
+            class="flex h-24 w-24 items-center justify-center rounded-full bg-blue-600 text-3xl font-medium text-white"
+          >
             {{ interview.candidateName ? getInitials(interview.candidateName) : '?' }}
           </div>
         </div>
@@ -53,7 +55,9 @@ const { t } = useI18n()
         </button>
         <button
           class="flex h-12 w-12 items-center justify-center rounded-full transition-colors"
-          :class="isCameraOff ? 'bg-red-500 text-white' : 'bg-[#3c4043] text-white hover:bg-[#4a4d50]'"
+          :class="
+            isCameraOff ? 'bg-red-500 text-white' : 'bg-[#3c4043] text-white hover:bg-[#4a4d50]'
+          "
           @click="emit('toggleCamera')"
         >
           <i :class="isCameraOff ? 'pi pi-eye-slash' : 'pi pi-eye'" class="text-lg"></i>
@@ -63,7 +67,9 @@ const { t } = useI18n()
 
     <!-- Join panel -->
     <div class="w-72 shrink-0 text-center">
-      <h2 class="mb-1 text-xl font-medium text-white">{{ t('interviews.roomPage.readyToJoin') }}</h2>
+      <h2 class="mb-1 text-xl font-medium text-white">
+        {{ t('interviews.roomPage.readyToJoin') }}
+      </h2>
       <p class="mb-6 text-sm text-gray-400">{{ interview.vacancyTitle }}</p>
       <Button
         :label="t('interviews.roomPage.joinNow')"
@@ -72,10 +78,7 @@ const { t } = useI18n()
         size="large"
         @click="emit('joinRoom')"
       />
-      <button
-        class="mt-3 text-sm text-gray-400 hover:text-white"
-        @click="emit('cancel')"
-      >
+      <button class="mt-3 text-sm text-gray-400 hover:text-white" @click="emit('cancel')">
         {{ t('interviews.roomPage.goBack') }}
       </button>
     </div>

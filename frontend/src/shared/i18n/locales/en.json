@@ -172,6 +172,29 @@
       "companyDescription": "Post vacancies and screen candidates with AI",
       "industry": "Industry",
       "country": "Country"
+    },
+    "companySetup": {
+      "title": "Set up your company",
+      "subtitle": "Tell us a bit about your company so we can tailor the experience.",
+      "companyName": "Company name",
+      "companyNamePlaceholder": "Acme Inc.",
+      "companyNameRequired": "Company name is required",
+      "industries": "Industries",
+      "industriesRequired": "Select at least one industry",
+      "size": "Company size",
+      "sizePlaceholder": "Select company size",
+      "sizeRequired": "Company size is required",
+      "sizeSmall": "Small (1-10 employees)",
+      "sizeMedium": "Medium (11-50 employees)",
+      "sizeLarge": "Large (51-250 employees)",
+      "sizeEnterprise": "Enterprise (250+ employees)",
+      "country": "Country",
+      "countryRequired": "Country is required",
+      "email": "Work email",
+      "emailPlaceholder": "you@company.com",
+      "emailRequired": "Please enter a valid email address",
+      "submit": "Continue",
+      "submitError": "Could not complete setup. Please try again."
     }
   },
   "landing": {

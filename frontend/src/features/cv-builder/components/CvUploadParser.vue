@@ -46,7 +46,9 @@ async function handleParse(): Promise<void> {
     await store.parseCv(selectedFile.value)
     successMessage.value = t('cvBuilder.cvParse.success')
     selectedFile.value = null
-    setTimeout(() => { visible.value = false }, 1500)
+    setTimeout(() => {
+      visible.value = false
+    }, 1500)
   } catch (err: unknown) {
     errorMessage.value = err instanceof Error ? err.message : t('common.error')
   }
@@ -56,12 +58,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <Button
-    :label="t('cvBuilder.cvParse.title')"
-    icon="pi pi-upload"
-    size="small"
-    @click="open"
-  />
+  <Button :label="t('cvBuilder.cvParse.title')" icon="pi pi-upload" size="small" @click="open" />
 
   <Dialog
     v-model:visible="visible"

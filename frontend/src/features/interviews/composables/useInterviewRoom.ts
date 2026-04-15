@@ -1,9 +1,13 @@
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import {
-  Room, RoomEvent, Track,
-  type RemoteTrack, type RemoteTrackPublication,
-  type RemoteParticipant, type LocalTrackPublication,
+  Room,
+  RoomEvent,
+  Track,
+  type RemoteTrack,
+  type RemoteTrackPublication,
+  type RemoteParticipant,
+  type LocalTrackPublication,
 } from 'livekit-client'
 import { interviewService } from '../services/interview.service'
 import type { InterviewDetail } from '../types/interview.types'
@@ -32,14 +36,22 @@ export function useInterviewRoom(token: () => string) {
   let room: Room | null = null
 
   const formattedTime = computed(() => {
-    const m = Math.floor(elapsedTime.value / 60), s = elapsedTime.value % 60
+    const m = Math.floor(elapsedTime.value / 60),
+      s = elapsedTime.value % 60
     return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
   })
-  const canJoin = computed(() =>
-    interview.value?.status === 'pending' || interview.value?.status === 'in_progress',
+  const canJoin = computed(
+    () => interview.value?.status === 'pending' || interview.value?.status === 'in_progress',
   )
   function getInitials(name: string): string {
-    return name.split(' ').map((n) => n.charAt(0)).slice(0, 2).join('').toUpperCase() || '?'
+    return (
+      name
+        .split(' ')
+        .map((n) => n.charAt(0))
+        .slice(0, 2)
+        .join('')
+        .toUpperCase() || '?'
+    )
   }
 
   async function startPreview(): Promise<void> {
@@ -61,18 +73,32 @@ export function useInterviewRoom(token: () => string) {
   function togglePreviewMic(): void {
     if (!previewStream.value) return
     isMuted.value = !isMuted.value
-    previewStream.value.getAudioTracks().forEach((t) => { t.enabled = !isMuted.value })
+    previewStream.value.getAudioTracks().forEach((t) => {
+      t.enabled = !isMuted.value
+    })
   }
   function togglePreviewCamera(): void {
     if (!previewStream.value) return
     isCameraOff.value = !isCameraOff.value
-    previewStream.value.getVideoTracks().forEach((t) => { t.enabled = !isCameraOff.value })
+    previewStream.value.getVideoTracks().forEach((t) => {
+      t.enabled = !isCameraOff.value
+    })
   }
-  function cancelPreview(): void { stopPreview(); connectionState.value = 'idle' }
+  function cancelPreview(): void {
+    stopPreview()
+    connectionState.value = 'idle'
+  }
 
-  function handleTrackSubscribed(track: RemoteTrack, _pub: RemoteTrackPublication, participant: RemoteParticipant): void {
+  function handleTrackSubscribed(
+    track: RemoteTrack,
+    _pub: RemoteTrackPublication,
+    participant: RemoteParticipant,
+  ): void {
     remoteParticipantName.value = participant.name || participant.identity || 'AI Interviewer'
-    if (track.kind === Track.Kind.Video) { hasRemoteVideo.value = true; if (remoteVideoEl.value) track.attach(remoteVideoEl.value) }
+    if (track.kind === Track.Kind.Video) {
+      hasRemoteVideo.value = true
+      if (remoteVideoEl.value) track.attach(remoteVideoEl.value)
+    }
     if (track.kind === Track.Kind.Audio && remoteAudioEl.value) track.attach(remoteAudioEl.value)
   }
   function handleTrackUnsubscribed(track: RemoteTrack): void {
@@ -82,19 +108,47 @@ export function useInterviewRoom(token: () => string) {
   function handleParticipantConnected(p: RemoteParticipant): void {
     remoteParticipantName.value = p.name || p.identity || 'AI Interviewer'
   }
-  function startTimer(): void { elapsedTime.value = 0; timerInterval = setInterval(() => { elapsedTime.value++ }, 1000) }
-  function stopTimer(): void { if (timerInterval) { clearInterval(timerInterval); timerInterval = null } }
-  function handleDisconnected(): void { connectionState.value = 'ended'; stopTimer() }
-  function disconnect(): void { if (room) { room.disconnect(); room = null }; stopTimer() }
+  function startTimer(): void {
+    elapsedTime.value = 0
+    timerInterval = setInterval(() => {
+      elapsedTime.value++
+    }, 1000)
+  }
+  function stopTimer(): void {
+    if (timerInterval) {
+      clearInterval(timerInterval)
+      timerInterval = null
+    }
+  }
+  function handleDisconnected(): void {
+    connectionState.value = 'ended'
+    stopTimer()
+  }
+  function disconnect(): void {
+    if (room) {
+      room.disconnect()
+      room = null
+    }
+    stopTimer()
+  }
 
   async function joinRoom(): Promise<void> {
     stopPreview()
-    if (!LIVEKIT_URL) { errorMessage.value = 'LiveKit server URL is not configured.'; connectionState.value = 'error'; return }
-    if (!interview.value?.candidateToken) { errorMessage.value = 'No interview token available. Please try again.'; connectionState.value = 'error'; return }
+    if (!LIVEKIT_URL) {
+      errorMessage.value = 'LiveKit server URL is not configured.'
+      connectionState.value = 'error'
+      return
+    }
+    if (!interview.value?.candidateToken) {
+      errorMessage.value = 'No interview token available. Please try again.'
+      connectionState.value = 'error'
+      return
+    }
     connectionState.value = 'connecting'
     errorMessage.value = null
     try {
-      if (interview.value.status === 'pending') interview.value = await interviewService.startInterview(token())
+      if (interview.value.status === 'pending')
+        interview.value = await interviewService.startInterview(token())
       room = new Room()
       room.on(RoomEvent.TrackSubscribed, handleTrackSubscribed)
       room.on(RoomEvent.TrackUnsubscribed, handleTrackUnsubscribed)
@@ -111,7 +165,8 @@ export function useInterviewRoom(token: () => string) {
       room.remoteParticipants.forEach((p) => {
         remoteParticipantName.value = p.name || p.identity || 'AI Interviewer'
         p.trackPublications.forEach((pub) => {
-          if (pub.track) handleTrackSubscribed(pub.track as RemoteTrack, pub as RemoteTrackPublication, p)
+          if (pub.track)
+            handleTrackSubscribed(pub.track as RemoteTrack, pub as RemoteTrackPublication, p)
         })
       })
       connectionState.value = 'connected'
@@ -121,30 +176,70 @@ export function useInterviewRoom(token: () => string) {
       connectionState.value = 'error'
     }
   }
-  function toggleMute(): void { if (!room) return; isMuted.value = !isMuted.value; room.localParticipant.setMicrophoneEnabled(!isMuted.value) }
-  function toggleCamera(): void { if (!room) return; isCameraOff.value = !isCameraOff.value; room.localParticipant.setCameraEnabled(!isCameraOff.value) }
-  function leaveInterview(): void { disconnect(); connectionState.value = 'ended' }
+  function toggleMute(): void {
+    if (!room) return
+    isMuted.value = !isMuted.value
+    room.localParticipant.setMicrophoneEnabled(!isMuted.value)
+  }
+  function toggleCamera(): void {
+    if (!room) return
+    isCameraOff.value = !isCameraOff.value
+    room.localParticipant.setCameraEnabled(!isCameraOff.value)
+  }
+  function leaveInterview(): void {
+    disconnect()
+    connectionState.value = 'ended'
+  }
 
   onMounted(async () => {
     try {
       const data = await interviewService.getInterviewByToken(token())
       interview.value = data
-      if (data.status === 'completed') fetchError.value = 'This interview has already been completed.'
+      if (data.status === 'completed')
+        fetchError.value = 'This interview has already been completed.'
       else if (data.status === 'expired') fetchError.value = 'This interview link has expired.'
       else if (data.status === 'cancelled') fetchError.value = 'This vacancy has been closed.'
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { detail?: string; message?: string } } }
-      fetchError.value = axiosErr.response?.data?.detail ?? axiosErr.response?.data?.message ?? 'Failed to load interview.'
-    } finally { loading.value = false }
+      fetchError.value =
+        axiosErr.response?.data?.detail ??
+        axiosErr.response?.data?.message ??
+        'Failed to load interview.'
+    } finally {
+      loading.value = false
+    }
   })
-  onBeforeUnmount(() => { stopPreview(); disconnect() })
+  onBeforeUnmount(() => {
+    stopPreview()
+    disconnect()
+  })
 
   return {
-    interview, loading, fetchError, connectionState, errorMessage,
-    previewVideoEl, localVideoEl, remoteVideoEl, remoteAudioEl,
-    isMuted, isCameraOff, hasRemoteVideo, remoteParticipantName,
-    formattedTime, canJoin, getInitials,
-    startPreview, stopPreview, cancelPreview, togglePreviewMic, togglePreviewCamera,
-    joinRoom, toggleMute, toggleCamera, leaveInterview, router,
+    interview,
+    loading,
+    fetchError,
+    connectionState,
+    errorMessage,
+    previewVideoEl,
+    localVideoEl,
+    remoteVideoEl,
+    remoteAudioEl,
+    isMuted,
+    isCameraOff,
+    hasRemoteVideo,
+    remoteParticipantName,
+    formattedTime,
+    canJoin,
+    getInitials,
+    startPreview,
+    stopPreview,
+    cancelPreview,
+    togglePreviewMic,
+    togglePreviewCamera,
+    joinRoom,
+    toggleMute,
+    toggleCamera,
+    leaveInterview,
+    router,
   }
 }

@@ -74,8 +74,8 @@ watch(
 
 function search(event: { query: string }): void {
   const query = event.query.toLowerCase()
-  filteredLanguages.value = displayLanguages.value.filter((l) =>
-    l.displayName.toLowerCase().includes(query) || l.name.toLowerCase().includes(query),
+  filteredLanguages.value = displayLanguages.value.filter(
+    (l) => l.displayName.toLowerCase().includes(query) || l.name.toLowerCase().includes(query),
   )
 }
 

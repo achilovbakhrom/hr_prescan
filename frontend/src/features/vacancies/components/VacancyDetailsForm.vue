@@ -39,7 +39,13 @@ const initialData = (): Partial<CreateVacancyRequest> => ({
 
 const form = useVacancyForm(initialData, () => vacancyStore.fieldErrors)
 
-watch(() => props.vacancy, () => { form.syncFromInitialData(initialData()) }, { deep: true })
+watch(
+  () => props.vacancy,
+  () => {
+    form.syncFromInitialData(initialData())
+  },
+  { deep: true },
+)
 
 const showCreateDialog = ref(false)
 const saving = ref(false)
@@ -81,7 +87,10 @@ async function handleSave(): Promise<void> {
 
 <template>
   <form class="space-y-6" @submit.prevent="handleSave">
-    <Message v-if="vacancyStore.error && Object.keys(vacancyStore.fieldErrors).length === 0" severity="error">
+    <Message
+      v-if="vacancyStore.error && Object.keys(vacancyStore.fieldErrors).length === 0"
+      severity="error"
+    >
       {{ vacancyStore.error }}
     </Message>
 
@@ -119,8 +128,16 @@ async function handleSave(): Promise<void> {
       />
     </section>
 
-    <div class="sticky bottom-0 -mx-3 flex justify-end border-t border-gray-100 bg-white/95 px-3 py-3 backdrop-blur sm:-mx-5 sm:px-5">
-      <Button type="submit" :label="t('common.save')" icon="pi pi-check" :loading="saving" :disabled="!form.canSave.value" />
+    <div
+      class="sticky bottom-0 -mx-3 flex justify-end border-t border-gray-100 bg-white/95 px-3 py-3 backdrop-blur sm:-mx-5 sm:px-5"
+    >
+      <Button
+        type="submit"
+        :label="t('common.save')"
+        icon="pi pi-check"
+        :loading="saving"
+        :disabled="!form.canSave.value"
+      />
     </div>
 
     <CreateEmployerDialog v-model:visible="showCreateDialog" @created="handleEmployerCreated" />

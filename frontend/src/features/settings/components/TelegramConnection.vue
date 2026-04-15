@@ -4,12 +4,12 @@ import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import { settingsService } from '../services/settings.service'
 
-const { t } = useI18n()
-
 const emit = defineEmits<{
   error: [msg: string]
   success: [msg: string]
 }>()
+
+const { t } = useI18n()
 
 const telegramLinked = ref(false)
 const telegramUsername = ref('')
@@ -21,7 +21,9 @@ onMounted(async () => {
     const status = await settingsService.getTelegramStatus()
     telegramLinked.value = status.linked
     telegramUsername.value = status.telegramUsername ?? ''
-  } catch { /* silent */ }
+  } catch {
+    /* silent */
+  }
 })
 
 async function handleGenerateCode(): Promise<void> {
@@ -29,16 +31,23 @@ async function handleGenerateCode(): Promise<void> {
   try {
     const result = await settingsService.generateTelegramLinkCode()
     telegramLinkUrl.value = result.linkUrl
-  } catch { emit('error', 'Failed to generate Telegram link code') }
-  finally { generatingCode.value = false }
+  } catch {
+    emit('error', 'Failed to generate Telegram link code')
+  } finally {
+    generatingCode.value = false
+  }
 }
 
 async function handleUnlink(): Promise<void> {
   try {
     await settingsService.unlinkTelegram()
-    telegramLinked.value = false; telegramUsername.value = ''; telegramLinkUrl.value = ''
+    telegramLinked.value = false
+    telegramUsername.value = ''
+    telegramLinkUrl.value = ''
     emit('success', t('telegram.disconnected'))
-  } catch { emit('error', 'Failed to disconnect Telegram') }
+  } catch {
+    emit('error', 'Failed to disconnect Telegram')
+  }
 }
 </script>
 
@@ -57,22 +66,41 @@ async function handleUnlink(): Promise<void> {
     <div v-if="telegramLinked" class="flex items-center justify-between">
       <div class="flex items-center gap-2">
         <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
-        <span class="text-sm text-gray-700">{{ t('telegram.connected') }}: @{{ telegramUsername }}</span>
+        <span class="text-sm text-gray-700"
+          >{{ t('telegram.connected') }}: @{{ telegramUsername }}</span
+        >
       </div>
-      <Button :label="t('telegram.disconnect')" severity="danger" text size="small" @click="handleUnlink" />
+      <Button
+        :label="t('telegram.disconnect')"
+        severity="danger"
+        text
+        size="small"
+        @click="handleUnlink"
+      />
     </div>
 
     <div v-else>
       <div v-if="telegramLinkUrl" class="text-center">
         <p class="mb-3 text-sm text-gray-600">{{ t('telegram.deepLinkHint') }}</p>
-        <a :href="telegramLinkUrl" target="_blank" rel="noopener noreferrer" class="mb-3 inline-flex items-center gap-2 rounded-xl bg-blue-500 px-6 py-3 font-semibold text-white transition-colors hover:bg-blue-600">
+        <a
+          :href="telegramLinkUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="mb-3 inline-flex items-center gap-2 rounded-xl bg-blue-500 px-6 py-3 font-semibold text-white transition-colors hover:bg-blue-600"
+        >
           <i class="pi pi-send"></i>{{ t('telegram.openBot') }}
         </a>
         <p class="text-xs text-gray-400">{{ t('telegram.linkCodeExpires') }}</p>
       </div>
       <div v-else class="text-center">
         <p class="mb-3 text-sm text-gray-500">{{ t('telegram.notConnected') }}</p>
-        <Button :label="t('telegram.connect')" icon="pi pi-link" size="small" :loading="generatingCode" @click="handleGenerateCode" />
+        <Button
+          :label="t('telegram.connect')"
+          icon="pi pi-link"
+          size="small"
+          :loading="generatingCode"
+          @click="handleGenerateCode"
+        />
       </div>
     </div>
   </div>

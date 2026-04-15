@@ -125,7 +125,10 @@ async function handleWatchLive(): Promise<void> {
             />
           </div>
         </div>
-        <div v-if="isScheduled || isInProgress" class="mt-4 rounded border border-blue-100 bg-blue-50 p-3">
+        <div
+          v-if="isScheduled || isInProgress"
+          class="mt-4 rounded border border-blue-100 bg-blue-50 p-3"
+        >
           <p class="text-sm font-medium text-blue-800">{{ t('interviews.detailPage.roomLink') }}</p>
           <p class="mt-1 text-sm text-blue-600">
             {{ roomUrl }}
@@ -139,7 +142,11 @@ async function handleWatchLive(): Promise<void> {
           model="interview"
           :object-id="interview.id"
           field="ai_summary"
-          @translated="(t) => { if (interview) interview.aiSummaryTranslations = t }"
+          @translated="
+            (t) => {
+              if (interview) interview.aiSummaryTranslations = t
+            }
+          "
         >
           <template #default="{ text }">
             <p class="mt-4 rounded bg-gray-50 p-3 text-sm text-gray-700">
@@ -167,10 +174,7 @@ async function handleWatchLive(): Promise<void> {
         </TabPanel>
         <TabPanel value="3" :header="t('interviews.detailPage.tabRecording')">
           <div class="py-4">
-            <div
-              v-if="interview.recordingPath"
-              class="rounded-lg border border-gray-200 p-6"
-            >
+            <div v-if="interview.recordingPath" class="rounded-lg border border-gray-200 p-6">
               <p class="mb-2 text-sm font-medium text-gray-700">
                 {{ t('interviews.detailPage.recordingPath') }}
               </p>

@@ -8,8 +8,6 @@ import { useConfirm } from 'primevue/useconfirm'
 import type { ApplicationStatus } from '../types/candidate.types'
 import SendEmailDialog from './SendEmailDialog.vue'
 
-const { t } = useI18n()
-
 const props = defineProps<{
   candidateId: string
   candidateName: string
@@ -22,6 +20,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   statusChange: [status: ApplicationStatus]
 }>()
+
+const { t } = useI18n()
 
 const confirm = useConfirm()
 const showEmailDialog = ref(false)
@@ -58,15 +58,53 @@ const statusOptions = computed(() => {
   return options
 })
 
-const STATUS_CONFIG: Record<ApplicationStatus, { messageKey: string; icon: string; acceptClass: string; acceptKey: string } | undefined> = {
-  prescanned:  { messageKey: 'candidates.dialogs.msgPrescanned',  icon: 'pi pi-check',              acceptClass: 'p-button-info',    acceptKey: 'candidates.dialogs.yesMove' },
-  interviewed: { messageKey: 'candidates.dialogs.msgInterviewed', icon: 'pi pi-check',              acceptClass: 'p-button-info',    acceptKey: 'candidates.dialogs.yesMove' },
-  shortlisted: { messageKey: 'candidates.dialogs.msgShortlisted', icon: 'pi pi-check-circle',       acceptClass: 'p-button-success', acceptKey: 'candidates.dialogs.yesShortlist' },
-  hired:       { messageKey: 'candidates.dialogs.msgHired',       icon: 'pi pi-check-circle',       acceptClass: 'p-button-success', acceptKey: 'candidates.dialogs.yesHire' },
-  rejected:    { messageKey: 'candidates.dialogs.msgRejected',    icon: 'pi pi-exclamation-triangle', acceptClass: 'p-button-danger',  acceptKey: 'candidates.dialogs.yesReject' },
-  archived:    { messageKey: 'candidates.dialogs.msgArchived',    icon: 'pi pi-inbox',              acceptClass: '',                 acceptKey: 'candidates.dialogs.yesArchive' },
-  applied:     { messageKey: 'candidates.dialogs.msgApplied',     icon: 'pi pi-refresh',            acceptClass: '',                 acceptKey: 'candidates.dialogs.yesReset' },
-  expired:     undefined,
+const STATUS_CONFIG: Record<
+  ApplicationStatus,
+  { messageKey: string; icon: string; acceptClass: string; acceptKey: string } | undefined
+> = {
+  prescanned: {
+    messageKey: 'candidates.dialogs.msgPrescanned',
+    icon: 'pi pi-check',
+    acceptClass: 'p-button-info',
+    acceptKey: 'candidates.dialogs.yesMove',
+  },
+  interviewed: {
+    messageKey: 'candidates.dialogs.msgInterviewed',
+    icon: 'pi pi-check',
+    acceptClass: 'p-button-info',
+    acceptKey: 'candidates.dialogs.yesMove',
+  },
+  shortlisted: {
+    messageKey: 'candidates.dialogs.msgShortlisted',
+    icon: 'pi pi-check-circle',
+    acceptClass: 'p-button-success',
+    acceptKey: 'candidates.dialogs.yesShortlist',
+  },
+  hired: {
+    messageKey: 'candidates.dialogs.msgHired',
+    icon: 'pi pi-check-circle',
+    acceptClass: 'p-button-success',
+    acceptKey: 'candidates.dialogs.yesHire',
+  },
+  rejected: {
+    messageKey: 'candidates.dialogs.msgRejected',
+    icon: 'pi pi-exclamation-triangle',
+    acceptClass: 'p-button-danger',
+    acceptKey: 'candidates.dialogs.yesReject',
+  },
+  archived: {
+    messageKey: 'candidates.dialogs.msgArchived',
+    icon: 'pi pi-inbox',
+    acceptClass: '',
+    acceptKey: 'candidates.dialogs.yesArchive',
+  },
+  applied: {
+    messageKey: 'candidates.dialogs.msgApplied',
+    icon: 'pi pi-refresh',
+    acceptClass: '',
+    acceptKey: 'candidates.dialogs.yesReset',
+  },
+  expired: undefined,
 }
 
 function handleStatusChange(event: { value: ApplicationStatus }): void {
@@ -76,9 +114,10 @@ function handleStatusChange(event: { value: ApplicationStatus }): void {
 
   confirm.require({
     message: t(config.messageKey, { name: props.candidateName }),
-    header: status === 'applied'
-      ? t('candidates.dialogs.resetHeader')
-      : t('candidates.dialogs.statusChangeHeader'),
+    header:
+      status === 'applied'
+        ? t('candidates.dialogs.resetHeader')
+        : t('candidates.dialogs.statusChangeHeader'),
     icon: config.icon,
     acceptClass: config.acceptClass,
     acceptLabel: t(config.acceptKey),

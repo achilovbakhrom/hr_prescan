@@ -53,10 +53,14 @@ onMounted(() => adminStore.fetchAnalytics())
 
       <!-- Charts Placeholder -->
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div class="flex h-64 items-center justify-center rounded-lg border border-gray-200 bg-white">
+        <div
+          class="flex h-64 items-center justify-center rounded-lg border border-gray-200 bg-white"
+        >
           <p class="text-gray-400">{{ t('admin.analytics.revenueChartSoon') }}</p>
         </div>
-        <div class="flex h-64 items-center justify-center rounded-lg border border-gray-200 bg-white">
+        <div
+          class="flex h-64 items-center justify-center rounded-lg border border-gray-200 bg-white"
+        >
           <p class="text-gray-400">{{ t('admin.analytics.userGrowthChartSoon') }}</p>
         </div>
       </div>

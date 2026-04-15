@@ -174,7 +174,12 @@ function sourceLabel(source: string): string {
             model="employer"
             :object-id="employerStore.currentEmployer.id"
             field="description"
-            @translated="(tr) => { if (employerStore.currentEmployer) employerStore.currentEmployer.descriptionTranslations = tr }"
+            @translated="
+              (tr) => {
+                if (employerStore.currentEmployer)
+                  employerStore.currentEmployer.descriptionTranslations = tr
+              }
+            "
           >
             <template #default="{ text }">
               <p class="whitespace-pre-line text-gray-700">{{ text }}</p>

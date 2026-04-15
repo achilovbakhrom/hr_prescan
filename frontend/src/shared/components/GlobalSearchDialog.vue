@@ -77,11 +77,16 @@ const hasResults = () => results.value.vacancies.length + results.value.candidat
         v-model="query"
         :placeholder="t('common.searchPlaceholder')"
         class="flex-1 border-0 shadow-none focus:ring-0"
-        :pt="{ root: { class: 'border-0 shadow-none focus:shadow-none focus:ring-0 px-0 text-base' } }"
+        :pt="{
+          root: { class: 'border-0 shadow-none focus:shadow-none focus:ring-0 px-0 text-base' },
+        }"
         @input="onInput"
         @keyup.escape="visible = false"
       />
-      <kbd class="hidden rounded border border-gray-200 bg-gray-50 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 sm:inline">ESC</kbd>
+      <kbd
+        class="hidden rounded border border-gray-200 bg-gray-50 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 sm:inline"
+        >ESC</kbd
+      >
     </div>
 
     <div class="max-h-96 overflow-y-auto">
@@ -99,7 +104,11 @@ const hasResults = () => results.value.vacancies.length + results.value.candidat
 
       <template v-else>
         <div v-if="results.vacancies.length > 0">
-          <div class="px-4 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-widest text-gray-400">{{ t('nav.vacancies') }}</div>
+          <div
+            class="px-4 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-widest text-gray-400"
+          >
+            {{ t('nav.vacancies') }}
+          </div>
           <button
             v-for="v in results.vacancies"
             :key="`v-${v.id}`"
@@ -113,7 +122,11 @@ const hasResults = () => results.value.vacancies.length + results.value.candidat
         </div>
 
         <div v-if="results.candidates.length > 0">
-          <div class="px-4 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-widest text-gray-400">{{ t('nav.candidates') }}</div>
+          <div
+            class="px-4 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-widest text-gray-400"
+          >
+            {{ t('nav.candidates') }}
+          </div>
           <button
             v-for="c in results.candidates"
             :key="`c-${c.id}`"
@@ -123,7 +136,9 @@ const hasResults = () => results.value.vacancies.length + results.value.candidat
             <i class="pi pi-user text-sm text-emerald-500"></i>
             <div class="min-w-0 flex-1">
               <p class="truncate text-sm font-medium text-gray-900">{{ c.candidateName }}</p>
-              <p class="truncate text-xs text-gray-500">{{ c.candidateEmail }} · {{ c.vacancyTitle }}</p>
+              <p class="truncate text-xs text-gray-500">
+                {{ c.candidateEmail }} · {{ c.vacancyTitle }}
+              </p>
             </div>
             <span class="text-xs text-gray-400">{{ c.status }}</span>
           </button>

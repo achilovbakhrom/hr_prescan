@@ -11,11 +11,11 @@ import { extractErrorMessage } from '@/shared/api/errors'
 import { employerService } from '@/features/employers/services/employer.service'
 import type { EmployerCompany } from '@/features/employers/types/employer.types'
 
-const visible = defineModel<boolean>('visible', { required: true })
-
 const emit = defineEmits<{
   created: [employer: EmployerCompany]
 }>()
+
+const visible = defineModel<boolean>('visible', { required: true })
 
 const { t } = useI18n()
 
@@ -97,11 +97,23 @@ async function handleCreateFromFile(event: { files: File | File[] }): Promise<vo
     @show="resetForm"
   >
     <div class="space-y-4">
-      <SelectButton v-model="createMode" :options="createModeOptions" option-label="label" option-value="value" class="w-full" />
+      <SelectButton
+        v-model="createMode"
+        :options="createModeOptions"
+        option-label="label"
+        option-value="value"
+        class="w-full"
+      />
 
       <div>
-        <label class="mb-1 block text-sm font-medium">{{ t('employers.name') }} <span class="text-red-500">*</span></label>
-        <InputText v-model="newEmployerName" class="w-full" :placeholder="t('employers.namePlaceholder')" />
+        <label class="mb-1 block text-sm font-medium"
+          >{{ t('employers.name') }} <span class="text-red-500">*</span></label
+        >
+        <InputText
+          v-model="newEmployerName"
+          class="w-full"
+          :placeholder="t('employers.namePlaceholder')"
+        />
       </div>
 
       <template v-if="createMode === 'manual'">
@@ -122,7 +134,11 @@ async function handleCreateFromFile(event: { files: File | File[] }): Promise<vo
       <template v-if="createMode === 'website'">
         <div>
           <label class="mb-1 block text-sm font-medium">{{ t('employers.websiteUrl') }}</label>
-          <InputText v-model="newEmployerUrl" class="w-full" :placeholder="t('employers.urlPlaceholder')" />
+          <InputText
+            v-model="newEmployerUrl"
+            class="w-full"
+            :placeholder="t('employers.urlPlaceholder')"
+          />
           <p class="mt-1 text-xs text-gray-400">AI will extract company info from this page</p>
         </div>
       </template>

@@ -4,8 +4,6 @@ import Dropdown from 'primevue/dropdown'
 import Button from 'primevue/button'
 import type { EmployerCompany } from '@/features/employers/types/employer.types'
 
-const employerId = defineModel<string | null>('employerId', { required: true })
-
 defineProps<{
   employersList: EmployerCompany[]
   loadingEmployers: boolean
@@ -15,6 +13,8 @@ defineProps<{
 const emit = defineEmits<{
   openCreateDialog: []
 }>()
+
+const employerId = defineModel<string | null>('employerId', { required: true })
 
 const { t } = useI18n()
 </script>
@@ -54,21 +54,42 @@ const { t } = useI18n()
           v-if="selectedEmployer.logo"
           class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white ring-1 ring-gray-200"
         >
-          <img :src="selectedEmployer.logo" :alt="selectedEmployer.name" class="h-full w-full object-contain" />
+          <img
+            :src="selectedEmployer.logo"
+            :alt="selectedEmployer.name"
+            class="h-full w-full object-contain"
+          />
         </div>
-        <div v-else class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+        <div
+          v-else
+          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600"
+        >
           <i class="pi pi-building"></i>
         </div>
         <div class="min-w-0 flex-1">
           <p class="font-semibold text-gray-900">{{ selectedEmployer.name }}</p>
-          <p v-if="selectedEmployer.industry" class="text-xs text-gray-500">{{ selectedEmployer.industry }}</p>
-          <a v-if="selectedEmployer.website" :href="selectedEmployer.website" target="_blank" class="text-xs text-blue-500 hover:underline">
+          <p v-if="selectedEmployer.industry" class="text-xs text-gray-500">
+            {{ selectedEmployer.industry }}
+          </p>
+          <a
+            v-if="selectedEmployer.website"
+            :href="selectedEmployer.website"
+            target="_blank"
+            class="text-xs text-blue-500 hover:underline"
+          >
             {{ selectedEmployer.website }}
           </a>
         </div>
       </div>
-      <p v-if="selectedEmployer.description" class="mt-3 whitespace-pre-line text-sm leading-relaxed text-gray-600">
-        {{ selectedEmployer.description.length > 300 ? selectedEmployer.description.slice(0, 300) + '...' : selectedEmployer.description }}
+      <p
+        v-if="selectedEmployer.description"
+        class="mt-3 whitespace-pre-line text-sm leading-relaxed text-gray-600"
+      >
+        {{
+          selectedEmployer.description.length > 300
+            ? selectedEmployer.description.slice(0, 300) + '...'
+            : selectedEmployer.description
+        }}
       </p>
     </div>
 

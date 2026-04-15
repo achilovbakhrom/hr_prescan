@@ -83,5 +83,4 @@ describe('LoginPage', () => {
     expect(registerLink).toBeDefined()
     expect(registerLink!.text()).toBe('Register')
   })
-
 })

@@ -2,11 +2,11 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-const { t } = useI18n()
-
 const props = defineProps<{
   recordingUrl: string | null
 }>()
+
+const { t } = useI18n()
 
 const isVideo = computed(() => {
   if (!props.recordingUrl) return false
@@ -18,7 +18,9 @@ const isVideo = computed(() => {
 <template>
   <div class="rounded-lg border border-gray-200 p-6">
     <template v-if="recordingUrl">
-      <p class="mb-3 text-sm font-medium text-gray-700">{{ t('interviews.recordingPlayer.title') }}</p>
+      <p class="mb-3 text-sm font-medium text-gray-700">
+        {{ t('interviews.recordingPlayer.title') }}
+      </p>
       <video
         v-if="isVideo"
         :src="recordingUrl"
@@ -28,13 +30,7 @@ const isVideo = computed(() => {
       >
         {{ t('interviews.recordingPlayer.videoUnsupported') }}
       </video>
-      <audio
-        v-else
-        :src="recordingUrl"
-        controls
-        class="w-full"
-        preload="metadata"
-      >
+      <audio v-else :src="recordingUrl" controls class="w-full" preload="metadata">
         {{ t('interviews.recordingPlayer.audioUnsupported') }}
       </audio>
     </template>

@@ -133,7 +133,10 @@ function navigateToDetail(id: string): void {
             >
               <i class="pi pi-filter text-xs"></i>
               {{ t('common.filters') }}
-              <span v-if="activeFilterCount > 0" class="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white">
+              <span
+                v-if="activeFilterCount > 0"
+                class="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white"
+              >
                 {{ activeFilterCount }}
               </span>
             </button>

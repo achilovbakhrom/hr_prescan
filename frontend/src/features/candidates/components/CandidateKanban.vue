@@ -11,15 +11,11 @@ import type { ColumnDef } from './KanbanColumn.vue'
 import type { Application, ApplicationStatus } from '../types/candidate.types'
 import { buildColumnMenuItems } from '../composables/useKanbanMenuItems'
 
-const { t } = useI18n()
-const router = useRouter()
-
 const props = defineProps<{
   candidates: Application[]
   loading: boolean
   interviewEnabled?: boolean
 }>()
-
 const emit = defineEmits<{
   statusChange: [id: string, status: ApplicationStatus]
   batchMove: [fromStatus: ApplicationStatus, toStatus: ApplicationStatus]
@@ -34,15 +30,66 @@ const emit = defineEmits<{
   batchMoveByDays: [fromStatus: ApplicationStatus, toStatus: ApplicationStatus, days: number]
   softDeleteAll: [status: ApplicationStatus]
 }>()
+const { t } = useI18n()
+const router = useRouter()
 
 const columns = computed<ColumnDef[]>(() => [
-  { status: 'applied', label: t('candidates.status.applied'), color: 'text-blue-700', bgColor: 'bg-blue-50', borderColor: 'border-blue-200', dotColor: 'bg-blue-500' },
-  { status: 'prescanned', label: t('candidates.status.prescanned'), color: 'text-teal-700', bgColor: 'bg-teal-50', borderColor: 'border-teal-200', dotColor: 'bg-teal-500' },
-  { status: 'interviewed', label: t('candidates.status.interviewed'), color: 'text-emerald-700', bgColor: 'bg-emerald-50', borderColor: 'border-emerald-200', dotColor: 'bg-emerald-500' },
-  { status: 'shortlisted', label: t('candidates.status.shortlisted'), color: 'text-violet-700', bgColor: 'bg-violet-50', borderColor: 'border-violet-200', dotColor: 'bg-violet-500' },
-  { status: 'hired', label: t('candidates.status.hired'), color: 'text-green-700', bgColor: 'bg-green-50', borderColor: 'border-green-200', dotColor: 'bg-green-500' },
-  { status: 'rejected', label: t('candidates.status.rejected'), color: 'text-red-700', bgColor: 'bg-red-50', borderColor: 'border-red-200', dotColor: 'bg-red-500' },
-  { status: 'archived', label: t('candidates.status.archived'), color: 'text-gray-600', bgColor: 'bg-gray-100', borderColor: 'border-gray-200', dotColor: 'bg-gray-400' },
+  {
+    status: 'applied',
+    label: t('candidates.status.applied'),
+    color: 'text-blue-700',
+    bgColor: 'bg-blue-50',
+    borderColor: 'border-blue-200',
+    dotColor: 'bg-blue-500',
+  },
+  {
+    status: 'prescanned',
+    label: t('candidates.status.prescanned'),
+    color: 'text-teal-700',
+    bgColor: 'bg-teal-50',
+    borderColor: 'border-teal-200',
+    dotColor: 'bg-teal-500',
+  },
+  {
+    status: 'interviewed',
+    label: t('candidates.status.interviewed'),
+    color: 'text-emerald-700',
+    bgColor: 'bg-emerald-50',
+    borderColor: 'border-emerald-200',
+    dotColor: 'bg-emerald-500',
+  },
+  {
+    status: 'shortlisted',
+    label: t('candidates.status.shortlisted'),
+    color: 'text-violet-700',
+    bgColor: 'bg-violet-50',
+    borderColor: 'border-violet-200',
+    dotColor: 'bg-violet-500',
+  },
+  {
+    status: 'hired',
+    label: t('candidates.status.hired'),
+    color: 'text-green-700',
+    bgColor: 'bg-green-50',
+    borderColor: 'border-green-200',
+    dotColor: 'bg-green-500',
+  },
+  {
+    status: 'rejected',
+    label: t('candidates.status.rejected'),
+    color: 'text-red-700',
+    bgColor: 'bg-red-50',
+    borderColor: 'border-red-200',
+    dotColor: 'bg-red-500',
+  },
+  {
+    status: 'archived',
+    label: t('candidates.status.archived'),
+    color: 'text-gray-600',
+    bgColor: 'bg-gray-100',
+    borderColor: 'border-gray-200',
+    dotColor: 'bg-gray-400',
+  },
 ])
 
 const visibleColumns = computed(() =>
@@ -62,9 +109,19 @@ const columnCounts = computed(() => {
 // Threshold dialog
 const showThreshold = ref(false)
 const thresholdVal = ref<number | null>(null)
-const thresholdCtx = ref<{ from: ApplicationStatus; to: ApplicationStatus; field: string; dir: 'below' | 'above' }>({ from: 'applied', to: 'rejected', field: 'match_score', dir: 'below' })
+const thresholdCtx = ref<{
+  from: ApplicationStatus
+  to: ApplicationStatus
+  field: string
+  dir: 'below' | 'above'
+}>({ from: 'applied', to: 'rejected', field: 'match_score', dir: 'below' })
 
-function openThresholdDialog(from: ApplicationStatus, to: ApplicationStatus, field: string, dir: 'below' | 'above') {
+function openThresholdDialog(
+  from: ApplicationStatus,
+  to: ApplicationStatus,
+  field: string,
+  dir: 'below' | 'above',
+) {
   thresholdCtx.value = { from, to, field, dir }
   thresholdVal.value = dir === 'below' ? 4 : 7
   showThreshold.value = true
@@ -79,18 +136,28 @@ function confirmThreshold() {
 
 const thresholdTitle = computed(() => {
   const c = thresholdCtx.value
-  const fl = c.field === 'match_score' ? 'CV match' : c.field === 'prescanning_score' ? 'prescanning score' : 'interview score'
+  const fl =
+    c.field === 'match_score'
+      ? 'CV match'
+      : c.field === 'prescanning_score'
+        ? 'prescanning score'
+        : 'interview score'
   return `${c.to === 'rejected' ? 'Reject' : 'Shortlist'} where ${fl} ${c.dir}...`
 })
-const thresholdMax = computed(() => thresholdCtx.value.field === 'match_score' ? 100 : 10)
+const thresholdMax = computed(() => (thresholdCtx.value.field === 'match_score' ? 100 : 10))
 
 // Days dialog
 const showDays = ref(false)
 const daysVal = ref<number | null>(7)
-const daysCtx = ref<{ from: ApplicationStatus; to: ApplicationStatus }>({ from: 'applied', to: 'rejected' })
+const daysCtx = ref<{ from: ApplicationStatus; to: ApplicationStatus }>({
+  from: 'applied',
+  to: 'rejected',
+})
 
 function openDaysDialog(from: ApplicationStatus, to: ApplicationStatus) {
-  daysCtx.value = { from, to }; daysVal.value = 7; showDays.value = true
+  daysCtx.value = { from, to }
+  daysVal.value = 7
+  showDays.value = true
 }
 
 function confirmDays() {
@@ -128,30 +195,63 @@ function onDrop(event: DragEvent, status: ApplicationStatus): void {
 
   <div v-else class="flex gap-3 overflow-x-auto pb-4 sm:gap-4">
     <KanbanColumn
-      v-for="col in visibleColumns" :key="col.status"
+      v-for="col in visibleColumns"
+      :key="col.status"
       :column="col"
       :candidates="getCandidates(col.status)"
       :menu-items="getMenuItems(col.status)"
-      @drop="onDrop($event, col.status)" @dragover="() => {}"
-      @view-candidate="viewCandidate" @drag-start="() => {}"
+      @drop="onDrop($event, col.status)"
+      @dragover="() => {}"
+      @view-candidate="viewCandidate"
+      @drag-start="() => {}"
     />
   </div>
 
-  <Dialog v-model:visible="showThreshold" :header="thresholdTitle" modal :style="{ width: '360px' }">
+  <Dialog
+    v-model:visible="showThreshold"
+    :header="thresholdTitle"
+    modal
+    :style="{ width: '360px' }"
+  >
     <div class="flex flex-col gap-3">
-      <label class="text-sm text-gray-600">{{ thresholdCtx.dir === 'below' ? 'Score below' : 'Score above' }}</label>
-      <InputNumber v-model="thresholdVal" :min="0" :max="thresholdMax" show-buttons class="w-full" />
+      <label class="text-sm text-gray-600">{{
+        thresholdCtx.dir === 'below' ? 'Score below' : 'Score above'
+      }}</label>
+      <InputNumber
+        v-model="thresholdVal"
+        :min="0"
+        :max="thresholdMax"
+        show-buttons
+        class="w-full"
+      />
     </div>
     <template #footer>
-      <Button :label="t('common.cancel')" severity="secondary" text @click="showThreshold = false" />
+      <Button
+        :label="t('common.cancel')"
+        severity="secondary"
+        text
+        @click="showThreshold = false"
+      />
       <Button :label="t('common.confirm')" @click="confirmThreshold" />
     </template>
   </Dialog>
 
-  <Dialog v-model:visible="showDays" header="Reject idle candidates" modal :style="{ width: '360px' }">
+  <Dialog
+    v-model:visible="showDays"
+    header="Reject idle candidates"
+    modal
+    :style="{ width: '360px' }"
+  >
     <div class="flex flex-col gap-3">
       <label class="text-sm text-gray-600">Applied more than ... days ago</label>
-      <InputNumber v-model="daysVal" :min="1" :max="365" show-buttons suffix=" days" class="w-full" />
+      <InputNumber
+        v-model="daysVal"
+        :min="1"
+        :max="365"
+        show-buttons
+        suffix=" days"
+        class="w-full"
+      />
     </div>
     <template #footer>
       <Button :label="t('common.cancel')" severity="secondary" text @click="showDays = false" />

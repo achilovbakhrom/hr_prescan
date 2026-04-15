@@ -11,6 +11,10 @@ import IndustryAutocomplete from '@/shared/components/IndustryAutocomplete.vue'
 import { useSettingsStore } from '../stores/settings.store'
 import type { CompanySize } from '@/shared/types/auth.types'
 
+const emit = defineEmits<{
+  success: [msg: string]
+  error: [msg: string]
+}>()
 const { t } = useI18n()
 const settingsStore = useSettingsStore()
 
@@ -24,11 +28,6 @@ const description = ref('')
 const submitted = ref(false)
 const showCustomIndustry = ref(false)
 const errors = ref({ name: false, size: false, country: false })
-
-const emit = defineEmits<{
-  success: [msg: string]
-  error: [msg: string]
-}>()
 
 const sizeOptions = computed(() => [
   { label: t('settings.company.sizeSmall'), value: 'small' as CompanySize },
@@ -91,39 +90,92 @@ async function handleSave(): Promise<void> {
   <form class="flex flex-col gap-5 rounded-lg bg-white p-6 shadow-sm" @submit.prevent="handleSave">
     <div class="flex flex-col gap-1">
       <label class="mb-2 text-sm font-medium text-gray-700">{{ t('settings.company.logo') }}</label>
-      <FileUpload mode="basic" accept="image/*" :max-file-size="2000000" :choose-label="t('settings.company.uploadLogo')" class="w-auto" disabled />
+      <FileUpload
+        mode="basic"
+        accept="image/*"
+        :max-file-size="2000000"
+        :choose-label="t('settings.company.uploadLogo')"
+        class="w-auto"
+        disabled
+      />
       <small class="text-gray-500">{{ t('settings.company.logoComingSoon') }}</small>
     </div>
     <div class="flex flex-col gap-1">
-      <label for="name" class="text-sm font-medium text-gray-700">{{ t('settings.company.name') }}</label>
-      <InputText id="name" v-model="name" :placeholder="t('settings.company.namePlaceholder')" :invalid="submitted && errors.name" class="w-full" />
-      <small v-if="submitted && errors.name" class="text-red-500">{{ t('settings.company.nameRequired') }}</small>
+      <label for="name" class="text-sm font-medium text-gray-700">{{
+        t('settings.company.name')
+      }}</label>
+      <InputText
+        id="name"
+        v-model="name"
+        :placeholder="t('settings.company.namePlaceholder')"
+        :invalid="submitted && errors.name"
+        class="w-full"
+      />
+      <small v-if="submitted && errors.name" class="text-red-500">{{
+        t('settings.company.nameRequired')
+      }}</small>
     </div>
     <div class="flex flex-col gap-1">
-      <label for="industry" class="text-sm font-medium text-gray-700">{{ t('settings.company.industry') }}</label>
+      <label for="industry" class="text-sm font-medium text-gray-700">{{
+        t('settings.company.industry')
+      }}</label>
       <IndustryAutocomplete v-model="industries" @hasOther="onHasOther" />
     </div>
     <div v-if="showCustomIndustry" class="flex flex-col gap-1">
-      <label for="customIndustry" class="text-sm font-medium text-gray-700">{{ t('common.customIndustry') }}</label>
-      <InputText id="customIndustry" v-model="customIndustry" :placeholder="t('common.customIndustryPlaceholder')" class="w-full" />
+      <label for="customIndustry" class="text-sm font-medium text-gray-700">{{
+        t('common.customIndustry')
+      }}</label>
+      <InputText
+        id="customIndustry"
+        v-model="customIndustry"
+        :placeholder="t('common.customIndustryPlaceholder')"
+        class="w-full"
+      />
     </div>
     <div class="flex flex-col gap-1">
-      <label for="size" class="text-sm font-medium text-gray-700">{{ t('settings.company.size') }}</label>
-      <Select id="size" v-model="size" :options="sizeOptions" option-label="label" option-value="value" :placeholder="t('settings.company.sizePlaceholder')" :invalid="submitted && errors.size" class="w-full" />
-      <small v-if="submitted && errors.size" class="text-red-500">{{ t('settings.company.sizeRequired') }}</small>
+      <label for="size" class="text-sm font-medium text-gray-700">{{
+        t('settings.company.size')
+      }}</label>
+      <Select
+        id="size"
+        v-model="size"
+        :options="sizeOptions"
+        option-label="label"
+        option-value="value"
+        :placeholder="t('settings.company.sizePlaceholder')"
+        :invalid="submitted && errors.size"
+        class="w-full"
+      />
+      <small v-if="submitted && errors.size" class="text-red-500">{{
+        t('settings.company.sizeRequired')
+      }}</small>
     </div>
     <div class="flex flex-col gap-1">
-      <label for="country" class="text-sm font-medium text-gray-700">{{ t('settings.company.country') }}</label>
+      <label for="country" class="text-sm font-medium text-gray-700">{{
+        t('settings.company.country')
+      }}</label>
       <CountryAutocomplete v-model="country" :invalid="submitted && errors.country" />
-      <small v-if="submitted && errors.country" class="text-red-500">{{ t('settings.company.countryRequired') }}</small>
+      <small v-if="submitted && errors.country" class="text-red-500">{{
+        t('settings.company.countryRequired')
+      }}</small>
     </div>
     <div class="flex flex-col gap-1">
-      <label for="website" class="text-sm font-medium text-gray-700">{{ t('settings.company.website') }}</label>
+      <label for="website" class="text-sm font-medium text-gray-700">{{
+        t('settings.company.website')
+      }}</label>
       <InputText id="website" v-model="website" placeholder="https://example.com" class="w-full" />
     </div>
     <div class="flex flex-col gap-1">
-      <label for="description" class="text-sm font-medium text-gray-700">{{ t('settings.company.description') }}</label>
-      <Textarea id="description" v-model="description" :placeholder="t('settings.company.descriptionPlaceholder')" rows="4" class="w-full" />
+      <label for="description" class="text-sm font-medium text-gray-700">{{
+        t('settings.company.description')
+      }}</label>
+      <Textarea
+        id="description"
+        v-model="description"
+        :placeholder="t('settings.company.descriptionPlaceholder')"
+        rows="4"
+        class="w-full"
+      />
     </div>
     <div class="flex justify-end pt-2">
       <Button type="submit" :label="t('settings.company.save')" :loading="settingsStore.loading" />

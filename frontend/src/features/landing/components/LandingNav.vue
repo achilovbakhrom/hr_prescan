@@ -95,7 +95,9 @@ const navLinks = [
             class="flex items-center gap-2 rounded-lg px-2 py-1 transition-colors hover:bg-gray-100"
             @click="toggleUserMenu"
           >
-            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-medium text-blue-700">
+            <div
+              class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-medium text-blue-700"
+            >
               {{ authStore.user?.firstName?.charAt(0) }}{{ authStore.user?.lastName?.charAt(0) }}
             </div>
             <span class="hidden text-sm font-medium text-gray-700 sm:inline">
@@ -177,7 +179,10 @@ const navLinks = [
               text
               severity="secondary"
               class="justify-start"
-              @click="router.push({ name: ROUTE_NAMES.PROFILE }); mobileOpen = false"
+              @click="
+                router.push({ name: ROUTE_NAMES.PROFILE })
+                mobileOpen = false
+              "
             />
             <Button
               :label="t('nav.logout')"
@@ -185,7 +190,12 @@ const navLinks = [
               text
               severity="secondary"
               class="justify-start"
-              @click="authStore.logout().then(() => { router.push({ name: ROUTE_NAMES.LOGIN }); mobileOpen = false })"
+              @click="
+                authStore.logout().then(() => {
+                  router.push({ name: ROUTE_NAMES.LOGIN })
+                  mobileOpen = false
+                })
+              "
             />
           </template>
         </div>
