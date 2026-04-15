@@ -2,9 +2,24 @@
        migrate makemigrations createsuperuser shell \
        lint format typecheck test \
        up-monitoring up-management up-all \
-       clean reset-db backup-db \
+       clean reset-db backup-db ensure-env \
        local-setup local-infra local-backend local-backend-all local-frontend local-stop \
        local-test local-test-backend local-test-frontend local-test-e2e
+
+# Ensure a project-root .env exists so docker compose variable
+# interpolation (LIVEKIT_API_KEY etc.) finds the values. On servers this
+# symlink is created during provisioning; for local dev we auto-create it.
+# No-op if .env already exists.
+ensure-env:
+	@if [ ! -e .env ]; then \
+		if [ -e backend/.env ]; then \
+			ln -s backend/.env .env; \
+			echo "Created .env -> backend/.env symlink for docker compose."; \
+		else \
+			echo "ERROR: backend/.env not found. Run 'make local-setup' or copy backend/.env.example."; \
+			exit 1; \
+		fi; \
+	fi
 
 # ─── General ──────────────────────────────────────────────────────────────────
 
@@ -17,6 +32,7 @@ help: ## Show this help
 setup: ## First-time setup: copy env, build images, start services, run migrations
 	@test -f backend/.env || cp backend/.env.example backend/.env
 	@test -f frontend/.env || cp frontend/.env.example frontend/.env
+	@$(MAKE) ensure-env
 	@echo "✅ .env files ready (edit backend/.env and frontend/.env)"
 	docker compose build
 	docker compose up -d
@@ -36,7 +52,7 @@ setup: ## First-time setup: copy env, build images, start services, run migratio
 
 # ─── Docker ───────────────────────────────────────────────────────────────────
 
-up: ## Start all dev services
+up: ensure-env ## Start all dev services
 	docker compose up -d
 
 down: ## Stop all services
@@ -145,7 +161,7 @@ local-setup: ## First-time local dev setup: venv, deps, infra, migrate
 	@echo "  make local-backend   # Django only on :8000"
 	@echo "  make local-frontend  # Vite only on :5173"
 
-local-infra: ## Start only infra in Docker (stop app containers to free ports)
+local-infra: ensure-env ## Start only infra in Docker (stop app containers to free ports)
 	-@docker compose stop django celery-worker celery-beat frontend nginx 2>/dev/null || true
 	docker compose up -d postgres redis rabbitmq minio livekit
 
