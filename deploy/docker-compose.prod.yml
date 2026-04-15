@@ -56,6 +56,9 @@ services:
       - S3_SECRET_KEY=${S3_SECRET_KEY}
       - MINIO_ENDPOINT=${MINIO_ENDPOINT}
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
+      # Derived from DOMAIN so email links (verify, invite, interview) point
+      # at the same host the server is running on. No separate env var needed.
+      - FRONTEND_URL=https://${DOMAIN}
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
       - OTEL_SERVICE_NAME=hr-prescan-backend
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
@@ -160,6 +163,7 @@ services:
       - POSTGRES_HOST=postgres
       - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
       - RABBITMQ_URL=amqp://${RABBITMQ_USER}:${RABBITMQ_PASS}@rabbitmq:5672//
+      - FRONTEND_URL=https://${DOMAIN}
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
       - OTEL_SERVICE_NAME=hr-prescan-celery
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
@@ -189,6 +193,7 @@ services:
       - POSTGRES_HOST=postgres
       - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
       - RABBITMQ_URL=amqp://${RABBITMQ_USER}:${RABBITMQ_PASS}@rabbitmq:5672//
+      - FRONTEND_URL=https://${DOMAIN}
     restart: unless-stopped
     deploy:
       resources:
