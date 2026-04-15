@@ -3,7 +3,7 @@
        lint format typecheck test \
        up-monitoring up-management up-all \
        clean reset-db backup-db ensure-env \
-       local-setup local-infra local-backend local-backend-all local-frontend local-stop \
+       local-setup local-infra local-backend local-backend-all local-frontend local-stop local-stop-all \
        local-test local-test-backend local-test-frontend local-test-e2e
 
 # Ensure a project-root .env exists so docker compose variable
@@ -241,6 +241,20 @@ local-stop: ## Stop everything (infra + background processes)
 	-@pkill -f "vite" 2>/dev/null || true
 	docker compose down
 	@echo "All stopped."
+
+local-stop-all: ## Force-kill all local backend/frontend processes + stop Docker
+	@echo "Force-killing all processes..."
+	-@pkill -9 -f "manage.py runserver" 2>/dev/null && echo "  Django stopped" || true
+	-@pkill -9 -f "celery -A config" 2>/dev/null && echo "  Celery worker stopped" || true
+	-@pkill -9 -f "celery.*config" 2>/dev/null && echo "  Celery beat stopped" || true
+	-@pkill -9 -f "vite" 2>/dev/null && echo "  Vite stopped" || true
+	-@pkill -9 -f "node.*frontend" 2>/dev/null && echo "  Node frontend stopped" || true
+	-@lsof -ti :8000 | xargs kill -9 2>/dev/null && echo "  Port 8000 freed" || true
+	-@lsof -ti :5173 | xargs kill -9 2>/dev/null && echo "  Port 5173 freed" || true
+	-@lsof -ti :8100 | xargs kill -9 2>/dev/null && echo "  Port 8100 freed" || true
+	-@lsof -ti :5180 | xargs kill -9 2>/dev/null && echo "  Port 5180 freed" || true
+	docker compose down
+	@echo "All force-stopped."
 
 # ─── Testing (local) ─────────────────────────────────────────────────────────
 
