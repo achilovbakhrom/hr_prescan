@@ -10,6 +10,7 @@
     "close": "Закрыть",
     "search": "Поиск",
     "filter": "Фильтр",
+    "filters": "Фильтры",
     "export": "Экспорт",
     "loading": "Загрузка...",
     "noData": "Данные отсутствуют",
@@ -27,7 +28,15 @@
     "clearFilters": "Сбросить фильтры",
     "copyLink": "Копировать ссылку",
     "copied": "Скопировано!",
+    "viewDetails": "Подробнее",
+    "searchPlaceholder": "Поиск по вакансиям, кандидатам...",
+    "searchHint": "Начните вводить, чтобы найти вакансии и кандидатов",
     "viewAll": "Показать все",
+    "personal": "Личный",
+    "enabled": "Включено",
+    "disabled": "Отключено",
+    "active": "Активен",
+    "inactive": "Неактивен",
     "showMore": "Показать ещё",
     "showLess": "Свернуть",
     "createdAt": "Создано",
@@ -35,14 +44,25 @@
     "total": "всего",
     "error": "Произошла непредвиденная ошибка",
     "success": "Успешно",
+    "saved": "Сохранено",
     "or": "или",
-    "required_field": "Это поле обязательно"
+    "required_field": "Это поле обязательно",
+    "skills": "Навыки",
+    "language": "Язык",
+    "educationLevel": "Уровень образования",
+    "translate": "Перевести",
+    "translating": "Перевод...",
+    "name": "Название",
+    "description": "Описание",
+    "customIndustry": "Укажите вашу отрасль",
+    "customIndustryPlaceholder": "Введите название отрасли"
   },
   "nav": {
     "dashboard": "Панель управления",
     "vacancies": "Вакансии",
     "candidates": "Кандидаты",
-    "interviews": "Собеседования",
+    "interviews": "Сессии интервью",
+    "allCandidates": "Все кандидаты",
     "settings": "Настройки",
     "notifications": "Уведомления",
     "subscriptions": "Подписка",
@@ -58,9 +78,21 @@
     "signIn": "Войти",
     "signUp": "Регистрация",
     "signOut": "Выйти",
-    "forEmployers": "Работодателям",
     "browseJobs": "Поиск вакансий",
-    "myApplications": "Мои заявки"
+    "jobs": "Вакансии",
+    "myApplications": "Мои заявки",
+    "cvBuilder": "Конструктор CV",
+    "myCvs": "Мои CV",
+    "hrAnalytics": "Аналитика"
+  },
+  "validation": {
+    "required": "Это поле обязательно",
+    "maxLength": "Не более {max} символов",
+    "invalidUrl": "Введите корректный URL",
+    "invalidDate": "Введите корректную дату",
+    "positiveNumber": "Должно быть положительным числом",
+    "salaryRange": "Максимальная зарплата должна быть больше минимальной",
+    "endDateAfterStart": "Дата окончания должна быть позже даты начала"
   },
   "auth": {
     "login": {
@@ -76,12 +108,15 @@
       "invalidCredentials": "Неверный email или пароль",
       "accountDeactivated": "Аккаунт деактивирован",
       "orSignInWithEmail": "или войдите через email",
-      "invalidEmail": "Введите корректный email.",
-      "passwordRequired": "Пароль обязателен.",
-      "loginFailed": "Не удалось войти. Попробуйте ещё раз.",
-      "googleFailed": "Не удалось войти через Google.",
-      "wantToHire": "Хотите нанимать?",
-      "registerCompany": "Зарегистрируйте компанию"
+      "emailPlaceholder": "Введите ваш email",
+      "emailInvalid": "Введите корректный адрес электронной почты.",
+      "passwordPlaceholder": "Введите пароль",
+      "passwordRequired": "Пароль обязателен."
+    },
+    "telegram": {
+      "signIn": "Войти через Telegram",
+      "signingIn": "Выполняется вход...",
+      "requestFailed": "Не удалось войти через Telegram. Попробуйте снова."
     },
     "register": {
       "title": "Создание аккаунта",
@@ -101,83 +136,15 @@
       "success": "Регистрация прошла успешно! Проверьте электронную почту для подтверждения.",
       "passwordMismatch": "Пароли не совпадают",
       "passwordTooShort": "Пароль должен содержать не менее 8 символов",
-      "firstNameRequired": "Имя обязательно.",
-      "lastNameRequired": "Фамилия обязательна.",
-      "invalidEmail": "Введите корректный email.",
-      "registrationFailed": "Не удалось зарегистрироваться. Попробуйте ещё раз.",
-      "googleFailed": "Не удалось войти через Google.",
-      "orRegisterWithEmail": "или зарегистрируйтесь через email",
-      "checkEmail": "Проверьте электронную почту",
-      "verificationSent": "Мы отправили ссылку для подтверждения на",
-      "verificationSentSuffix": ". Проверьте входящие и перейдите по ссылке для активации аккаунта.",
-      "backToLogin": "Вернуться ко входу",
-      "wantToHire": "Хотите нанимать?",
-      "registerCompany": "Зарегистрируйте компанию"
-    },
-    "companyRegister": {
-      "title": "Регистрация компании",
-      "subtitle": "Начните скрининг кандидатов с помощью ИИ",
-      "step1": "Данные компании",
-      "step2": "Аккаунт администратора",
-      "companyName": "Название компании",
-      "industry": "Отрасль",
-      "size": "Размер компании",
-      "country": "Страна",
-      "website": "Веб-сайт",
-      "adminEmail": "Email администратора",
-      "adminPassword": "Пароль",
-      "adminFirstName": "Имя",
-      "adminLastName": "Фамилия",
-      "companyNamePlaceholder": "Введите название компании",
-      "industryPlaceholder": "напр. Технологии, Здравоохранение, Финансы",
-      "sizePlaceholder": "Выберите размер компании",
-      "countryPlaceholder": "Начните вводить страну",
-      "adminFirstNamePlaceholder": "Имя",
-      "adminLastNamePlaceholder": "Фамилия",
-      "adminEmailPlaceholder": "Введите email администратора",
-      "adminPasswordPlaceholder": "Минимум 8 символов",
+      "firstNamePlaceholder": "Имя",
+      "lastNamePlaceholder": "Фамилия",
+      "emailPlaceholder": "Введите ваш email",
+      "passwordPlaceholder": "Минимум 8 символов",
       "confirmPasswordPlaceholder": "Подтвердите пароль",
-      "confirmPassword": "Подтвердите пароль",
-      "companyNameRequired": "Название компании обязательно.",
-      "industryRequired": "Отрасль обязательна.",
-      "sizeRequired": "Размер компании обязателен.",
-      "countryRequired": "Страна обязательна.",
-      "firstNameRequired": "Имя обязательно.",
-      "lastNameRequired": "Фамилия обязательна.",
-      "invalidEmail": "Введите корректный email.",
-      "passwordTooShort": "Пароль должен содержать не менее 8 символов.",
-      "passwordMismatch": "Пароли не совпадают.",
-      "registrationFailed": "Не удалось зарегистрироваться. Попробуйте ещё раз.",
-      "next": "Далее",
-      "back": "Назад",
-      "submit": "Зарегистрировать компанию",
-      "success": {
-        "title": "Проверьте электронную почту",
-        "body": "Мы отправили ссылку для подтверждения на {email}. Проверьте входящие и перейдите по ссылке для активации аккаунта.",
-        "backToLogin": "Вернуться ко входу"
-      },
-      "successMessage": "Компания зарегистрирована! Подтвердите электронную почту.",
-      "googleSignedInAs": "Вход через Google как {email}. Заполните данные компании, чтобы продолжить.",
-      "cancelGoogle": "Отменить и использовать другой аккаунт",
-      "sizes": {
-        "small": "1–50 сотрудников",
-        "medium": "51–200 сотрудников",
-        "large": "201–1000 сотрудников",
-        "enterprise": "1000+ сотрудников"
-      }
-    },
-    "rolePicker": {
-      "title": "Как вы будете использовать HR PreScan?",
-      "subtitle": "Расскажите немного о себе, чтобы мы настроили подходящий интерфейс.",
-      "cancel": "Отмена",
-      "candidate": {
-        "title": "Я ищу работу",
-        "description": "Смотрите открытые вакансии и подавайте заявки."
-      },
-      "hr": {
-        "title": "Я нанимаю",
-        "description": "Размещайте вакансии и отбирайте кандидатов с помощью ИИ."
-      }
+      "firstNameRequired": "Введите имя.",
+      "lastNameRequired": "Введите фамилию.",
+      "emailInvalid": "Введите корректный email.",
+      "orRegisterWithEmail": "или зарегистрируйтесь по email"
     },
     "verifyEmail": {
       "title": "Подтверждение электронной почты",
@@ -195,7 +162,17 @@
       "submit": "Принять и создать аккаунт",
       "success": "Приглашение принято! Теперь вы можете войти."
     },
-    "signInWithGoogle": "Войти через Google"
+    "signInWithGoogle": "Войти через Google",
+    "signInWithTelegram": "Войти через Telegram",
+    "chooseRole": {
+      "title": "Как вы хотите использовать PreScreen AI?",
+      "candidate": "Ищу работу",
+      "candidateDescription": "Просматривайте вакансии и проходите AI-интервью",
+      "company": "Нанимаю сотрудников",
+      "companyDescription": "Публикуйте вакансии и проводите AI-скрининг кандидатов",
+      "industry": "Отрасль",
+      "country": "Страна"
+    }
   },
   "landing": {
     "hero": {
@@ -311,7 +288,65 @@
     "createVacancy": "Создать вакансию",
     "viewCandidates": "Посмотреть кандидатов",
     "noRecentApplications": "Нет недавних заявок",
-    "noUpcomingInterviews": "Нет предстоящих собеседований"
+    "noUpcomingInterviews": "Нет предстоящих собеседований",
+    "subtitle": "Вот что происходит сегодня",
+    "stats": {
+      "active": "активных",
+      "draft": "черновиков",
+      "completed": "завершено",
+      "aiInterviewsDone": "ИИ-собеседования завершены",
+      "allTime": "За всё время",
+      "applications": "Заявки",
+      "min": "мин"
+    },
+    "table": {
+      "candidate": "Кандидат",
+      "vacancy": "Вакансия",
+      "score": "Балл",
+      "date": "Дата",
+      "dateTime": "Дата/Время"
+    },
+    "scheduledInterviewsHint": "Запланированные собеседования появятся здесь",
+    "trackApplications": "Отслеживайте статус ваших заявок",
+    "viewEditProfile": "Просмотр и редактирование профиля",
+    "candidate": {
+      "profileCompleteness": "Заполненность профиля",
+      "completeProfileHint": "Заполните профиль для лучшего подбора вакансий",
+      "total": "Всего заявок",
+      "applied": "Поданные",
+      "inProgress": "В процессе",
+      "shortlisted": "В шорт-листе",
+      "hired": "Приняты",
+      "editCv": "Редактировать CV",
+      "recommendedJobs": "Рекомендуемые вакансии",
+      "noRecommendations": "Пока нет рекомендаций",
+      "noRecommendationsHint": "Новые вакансии появятся здесь"
+    }
+  },
+  "analytics": {
+    "title": "Аналитика",
+    "subtitle": "Аналитика найма на уровне компании",
+    "totalApplications": "Всего заявок",
+    "totalInterviews": "Всего собеседований",
+    "completionRate": "Процент завершения",
+    "avgInterviewScore": "Средний балл собеседования",
+    "hiringFunnel": "Воронка найма",
+    "vacancyPerformance": "Топ вакансий по заявкам",
+    "noData": "Данных о заявках пока нет",
+    "noVacancies": "Опубликованных вакансий пока нет",
+    "funnel": {
+      "applied": "Подали заявку",
+      "prescanned": "Прескрининг",
+      "interviewed": "Собеседование",
+      "shortlisted": "В шорт-листе",
+      "hired": "Наняты",
+      "rejected": "Отклонены"
+    },
+    "table": {
+      "vacancy": "Вакансия",
+      "applications": "Заявки",
+      "avgScore": "Средний балл"
+    }
   },
   "vacancies": {
     "title": "Вакансии",
@@ -384,6 +419,8 @@
       "prescanningPrompt": "Дополнительные инструкции для ИИ",
       "prescanningPromptHint": "Направляйте поведение ИИ во время прескрининга. Он уже знает детали вакансии.",
       "prescanningPromptPlaceholder": "например, Уделите внимание опыту работы с микросервисной архитектурой...",
+      "prescanningLanguage": "Язык прескрининга",
+      "prescanningLanguageHint": "Язык, на котором ИИ-агент будет вести прескрининг",
       "interviewOptional": "Второй этап — ИИ-собеседование",
       "interviewHint": "Включите углублённое собеседование для кандидатов, прошедших прескрининг.",
       "interviewMode": "Формат собеседования",
@@ -439,14 +476,44 @@
     "noVacancies": "Вакансий пока нет",
     "noVacanciesHint": "Создайте первую вакансию, чтобы начать получать заявки",
     "noArchivedVacancies": "Нет архивных вакансий",
+    "noArchivedVacanciesHint": "Архивные вакансии появятся здесь",
+    "shown": "{count} показано",
     "shareLink": "Поделиться ссылкой",
-    "questions": "Вопросы",
+    "questions": "Компетенции",
     "criteria": "Критерии",
+    "competency": "Компетенция",
     "generateQuestions": "Сгенерировать с ИИ",
-    "addQuestion": "Добавить вопрос",
+    "addQuestion": "Добавить компетенцию",
     "addCriteria": "Добавить критерий",
     "deleteConfirm": "Вы уверены, что хотите безвозвратно удалить эту вакансию?",
     "deleteConfirmHeader": "Удаление вакансии",
+    "deleteConfirmMessage": "Безвозвратно удалить «{title}»? Это действие нельзя отменить.",
+    "deletedSuccess": "Вакансия удалена",
+    "atAGlance": "Сводка",
+    "section": {
+      "details": "Описание"
+    },
+    "details": {
+      "jobInfo": "Информация о вакансии",
+      "company": "Компания"
+    },
+    "screening": {
+      "languageAndInstructions": "Язык и инструкции",
+      "languageHint": "На каком языке ИИ общается с кандидатами и дополнительные указания для агента."
+    },
+    "settings": {
+      "visibility": "Видимость и заявки",
+      "interviewStep": "Этап интервью",
+      "dangerZone": "Опасная зона",
+      "dangerZoneHint": "Необратимые действия. Будьте осторожны.",
+      "deleteVacancy": "Удалить вакансию",
+      "deleteOnlyDraftArchived": "Удалить можно только черновики и архивные вакансии."
+    },
+    "toast": {
+      "published": "Вакансия опубликована",
+      "paused": "Вакансия приостановлена",
+      "archived": "Вакансия в архиве"
+    },
     "keywords": "Ключевые слова",
     "regenerateKeywords": "Обновить ключевые слова",
     "keywordsHint": "Ключевые слова для поиска, сгенерированные ИИ"
@@ -478,6 +545,7 @@
     "cv": "Резюме",
     "prescanning": "Прескрининг",
     "interview": "Собеседование",
+    "analysis": "Анализ",
     "notes": "Заметки",
     "messages": "Сообщения",
     "actions": {
@@ -486,9 +554,13 @@
       "reject": "Отклонить",
       "archive": "В архив",
       "reset": "Сбросить статус",
-      "restore": "Восстановить",
+      "restore": "Вернуть в «Подал заявку»",
       "sendEmail": "Отправить письмо",
-      "resetSession": "Сбросить сессию"
+      "resetSession": "Сбросить сессию",
+      "messages": "Сообщения",
+      "changeStatus": "Изменить статус",
+      "moveToPrescanned": "В прескрининг",
+      "moveToInterviewed": "В интервью"
     },
     "application": {
       "title": "Отклик на вакансию",
@@ -502,7 +574,29 @@
       "submitting": "Отправка...",
       "success": "Заявка успешно отправлена!",
       "startPrescanning": "Начать прескрининг сейчас",
-      "doItLater": "Сделаю позже"
+      "doItLater": "Сделаю позже",
+      "prescanReady": "Прескрининг готов к прохождению",
+      "prescanReadyHint": "Вы можете начать ИИ-прескрининг в чате сейчас или сделать это позже по ссылке ниже.",
+      "prescanLink": "Ссылка на прескрининг",
+      "linkSentToEmail": "Мы также отправили ссылку на прескрининг на ваш email.",
+      "tip": "Совет",
+      "tipText": "Создайте аккаунт, чтобы отслеживать статус заявки и получить доступ к результатам собеседования.",
+      "createAccount": "Создать аккаунт",
+      "browseMoreJobs": "Посмотреть другие вакансии",
+      "backToJob": "Назад к описанию вакансии",
+      "chooseCv": "Выбрать резюме",
+      "acceptedFormats": "Допустимые форматы: PDF, DOCX (макс. 10 МБ)",
+      "loggedInAs": "Вы подаёте заявку как {name}",
+      "useActiveCv": "Использовать моё CV: {name}",
+      "uploadNewCv": "Загрузить новое CV",
+      "noCvsYet": "CV пока не создано. Вы можете загрузить файл или создать CV в конструкторе.",
+      "answerQuestions": "Ответьте на несколько вопросов для начала",
+      "clickToOpenChat": "Нажмите, чтобы открыть чат прескрининга",
+      "validation": {
+        "nameRequired": "Имя обязательно",
+        "emailRequired": "Email обязателен",
+        "emailInvalid": "Неверный формат email"
+      }
     },
     "dialogs": {
       "bulkConfirmHeader": "Подтверждение массового действия",
@@ -512,14 +606,93 @@
       "resetMessage": "Сбросить {name} в статус «Подал заявку»? Активные сессии будут отменены, будет создана новая ссылка на прескрининг.",
       "moveMessage": "Переместить {name} в статус «{status}»?",
       "yesReset": "Да, сбросить",
-      "yesMove": "Да, переместить"
+      "yesMove": "Да, переместить",
+      "yesShortlist": "Да, в шорт-лист",
+      "yesHire": "Да, нанять",
+      "yesReject": "Да, отклонить",
+      "yesArchive": "Да, в архив",
+      "msgPrescanned": "{name}: кандидат будет отмечен как прошедший прескрининг.",
+      "msgInterviewed": "{name}: кандидат будет отмечен как прошедший интервью.",
+      "msgShortlisted": "{name}: кандидат будет добавлен в шорт-лист.",
+      "msgHired": "{name}: кандидат будет отмечен как нанятый.",
+      "msgRejected": "{name}: кандидат будет отклонён.",
+      "msgArchived": "{name}: кандидат будет перемещён в архив. Его можно будет восстановить позже.",
+      "msgApplied": "{name}: статус будет сброшен в начальное состояние."
     },
+    "notesPlaceholder": "Добавьте заметки об этом кандидате...",
     "noCandidates": "Кандидатов пока нет",
     "noCandidatesHint": "Кандидаты появятся здесь после подачи заявок",
     "matchScore": "Балл соответствия",
     "prescanScore": "Балл прескрининга",
     "interviewScore": "Балл собеседования",
-    "overallScore": "Общий балл"
+    "overallScore": "Общий балл",
+    "overviewDetails": {
+      "notProvided": "Не указано",
+      "combinedScore": "Комбинированный балл"
+    },
+    "cvData": {
+      "file": "Файл резюме",
+      "clickToDownload": "Нажмите для скачивания",
+      "analyzing": "Анализ резюме...",
+      "analyzingHint": "Извлечение навыков, опыта и расчёт балла соответствия. Это занимает около 20 секунд.",
+      "extracting": "Извлечение навыков, опыта, образования и расчёт балла соответствия.",
+      "matchingSkills": "Совпадающие навыки",
+      "missingSkills": "Отсутствующие навыки",
+      "notParsed": "Данные резюме ещё не обработаны",
+      "summary": "Резюме",
+      "contacts": "Контакты",
+      "skills": "Навыки",
+      "experience": "Опыт",
+      "education": "Образование",
+      "inField": "по специальности",
+      "languages": "Языки",
+      "certifications": "Сертификаты",
+      "years": "лет"
+    },
+    "recommendation": {
+      "moveForward": "Рекомендуется к продвижению",
+      "consider": "Рассмотреть для следующего этапа",
+      "notRecommended": "Не рекомендуется к продвижению",
+      "strong": "Сильный кандидат — рекомендуется к продвижению",
+      "moderate": "Средний кандидат — рассмотреть для следующего этапа",
+      "weak": "Слабый кандидат — не рекомендуется к продвижению"
+    },
+    "matchScoreView": {
+      "noAnalysis": "Анализ будет доступен после обработки резюме и завершения прескрининга/собеседования.",
+      "basedOnResume": "На основе анализа резюме",
+      "aiPrescanResult": "Результат ИИ-прескрининга",
+      "aiInterviewResult": "Результат ИИ-собеседования",
+      "combinedAssessment": "Комбинированная оценка",
+      "notRecommendedLabel": "Не рекомендован",
+      "considerLabel": "На рассмотрении",
+      "recommendedLabel": "Рекомендован",
+      "aiNotes": "Оценка соответствия ИИ"
+    },
+    "messageThread": {
+      "noMessages": "Сообщений пока нет",
+      "placeholder": "Введите сообщение..."
+    },
+    "email": {
+      "sentSuccess": "Письмо успешно отправлено",
+      "to": "Кому",
+      "subject": "Тема",
+      "subjectPlaceholder": "Тема письма",
+      "body": "Текст",
+      "bodyPlaceholder": "Текст письма"
+    },
+    "myApplication": {
+      "progress": "Прогресс заявки",
+      "appliedOn": "Подано",
+      "cvBeingAnalyzed": "Ваше резюме анализируется. Балл соответствия скоро появится здесь.",
+      "downloadCv": "Скачать резюме",
+      "noCvUploaded": "Резюме не загружено"
+    },
+    "board": "Доска",
+    "sort": "Сортировка",
+    "selected": "{count} выбрано",
+    "bulkActions": "Массовые действия",
+    "noMatchingCandidates": "Нет кандидатов по запросу «{query}»",
+    "noCandidatesApplied": "Кандидатов пока не поступало"
   },
   "interviews": {
     "title": "Собеседования",
@@ -534,6 +707,8 @@
       "aiPrescanning": "ИИ-прескрининг",
       "aiInterview": "ИИ-собеседование",
       "chatScreening": "Скрининг в чате",
+      "online": "Онлайн",
+      "typeYourAnswer": "Введите ваш ответ...",
       "minimize": "Свернуть",
       "expand": "Развернуть",
       "close": "Закрыть"
@@ -568,7 +743,159 @@
       "camera": "Камера",
       "microphone": "Микрофон",
       "join": "Присоединиться к собеседованию",
-      "permissionDenied": "Доступ к камере/микрофону запрещён"
+      "permissionDenied": "Доступ к камере/микрофону запрещён",
+      "prepareTitle": "Подготовка к собеседованию",
+      "position": "Должность",
+      "scheduled": "Запланировано",
+      "duration": "Длительность",
+      "durationMinutes": "{minutes} минут",
+      "allowCameraAccess": "Нажмите кнопку ниже, чтобы разрешить доступ к камере и микрофону.",
+      "allowCameraMic": "Разрешить камеру и микрофон",
+      "beforeYouJoin": "Перед подключением",
+      "stableConnection": "Убедитесь в стабильном интернет-соединении",
+      "quietRoom": "Используйте хорошо освещённое, тихое помещение",
+      "faceVisible": "Держите лицо видимым на протяжении всего собеседования",
+      "aiConducted": "Собеседование будет проводиться ИИ-агентом",
+      "speakClearly": "Говорите чётко и не торопитесь с ответами",
+      "allowCameraMicAccess": "Разрешите доступ к камере и микрофону"
+    },
+    "postInterview": {
+      "title": "Собеседование завершено",
+      "thankYou": "Спасибо за прохождение собеседования. Ваши ответы были записаны.",
+      "resultsByEmail": "Вы получите результаты по электронной почте. Наша команда рассмотрит ваше собеседование и свяжется с вами.",
+      "backToDashboard": "Вернуться на главную"
+    },
+    "inInterview": {
+      "aiInterviewer": "ИИ-интервьюер",
+      "connecting": "Подключение...",
+      "leaveTitle": "Покинуть собеседование?",
+      "leaveMessage": "Вы уверены, что хотите уйти? Собеседование завершится и не может быть перезапущено.",
+      "leaveButton": "Покинуть собеседование"
+    },
+    "integrity": {
+      "overallScore": "Общая оценка честности",
+      "flagsDetected": "На основе {count} обнаруженных нарушений",
+      "noFlags": "Нарушений не обнаружено. Собеседование прошло все проверки.",
+      "details": "Подробности",
+      "recorded": "Зафиксировано:",
+      "flagLabels": {
+        "face_not_visible": "Лицо не видно",
+        "multiple_faces": "Несколько лиц",
+        "gaze_deviation": "Отклонение взгляда",
+        "audio_anomaly": "Аномалия звука",
+        "cv_inconsistency": "Несоответствие резюме"
+      },
+      "flagDetails": {
+        "face_not_visible": "Лицо кандидата не было видно в видеопотоке.",
+        "multiple_faces": "В кадре было обнаружено более одного человека.",
+        "gaze_deviation": "Взгляд кандидата значительно отклонялся от камеры.",
+        "audio_anomaly": "Во время собеседования были обнаружены необычные звуковые паттерны.",
+        "cv_inconsistency": "Обнаружены расхождения между резюме кандидата и ответами на собеседовании."
+      },
+      "scoreLabels": {
+        "good": "Хорошо",
+        "fair": "Удовлетворительно",
+        "poor": "Плохо",
+        "critical": "Критично"
+      }
+    },
+    "recordingPlayer": {
+      "title": "Запись собеседования",
+      "videoUnsupported": "Ваш браузер не поддерживает воспроизведение видео.",
+      "audioUnsupported": "Ваш браузер не поддерживает воспроизведение аудио.",
+      "noRecording": "Запись недоступна."
+    },
+    "candidatePage": {
+      "thankYou": "Спасибо!",
+      "completedMessage": "Ваше собеседование завершено. Мы рассмотрим ваши ответы и свяжемся с вами.",
+      "yourInterview": "Ваше собеседование",
+      "instructions": "Инструкции",
+      "cameraMicTest": "Проверка камеры и микрофона",
+      "deviceTestNote": "Проверка устройств будет доступна после интеграции LiveKit.",
+      "joinInterview": "Присоединиться к собеседованию"
+    },
+    "chatPage": {
+      "preparing": "Подготовка собеседования...",
+      "interviewCompleted": "Собеседование завершено",
+      "browseMoreJobs": "Посмотреть другие вакансии",
+      "linkExpired": "Ссылка истекла",
+      "vacancyClosed": "Вакансия закрыта",
+      "somethingWentWrong": "Что-то пошло не так",
+      "inProgress": "ИИ-собеседование в процессе — нажмите, чтобы развернуть",
+      "leaveTitle": "Покинуть собеседование?",
+      "leaveMessage": "Ваш прогресс сохранён. Вы можете вернуться в любое время по той же ссылке.",
+      "leaveButton": "Уйти",
+      "today": "Сегодня",
+      "interviewComplete": "Собеседование завершено!",
+      "thankYouReview": "Спасибо за уделённое время. Мы рассмотрим ваши ответы и свяжемся с вами.",
+      "createAccount": "Создать аккаунт для отслеживания статуса",
+      "browseJobs": "Посмотреть другие вакансии",
+      "enterHint": "Enter — отправить, Shift+Enter — новая строка",
+      "stayButton": "Остаться"
+    },
+    "confirmationPage": {
+      "confirmed": "Ваше собеседование подтверждено. Вот подробности:",
+      "date": "Дата",
+      "time": "Время",
+      "downloadCalendar": "Скачать приглашение в календарь",
+      "goToRoom": "Перейти в комнату собеседования"
+    },
+    "detailPage": {
+      "title": "Детали собеседования",
+      "openRoom": "Открыть комнату",
+      "watchLive": "Смотреть в прямом эфире",
+      "roomLink": "Ссылка на комнату собеседования",
+      "roomLinkHint": "Поделитесь этой ссылкой с кандидатом для подключения к ИИ-собеседованию.",
+      "recordingPath": "Путь к записи",
+      "playbackNote": "Воспроизведение аудио/видео будет доступно в будущих обновлениях.",
+      "noRecording": "Запись недоступна.",
+      "tabScores": "Оценки",
+      "tabTranscript": "Транскрипция",
+      "tabIntegrity": "Честность",
+      "tabRecording": "Запись"
+    },
+    "gatewayPage": {
+      "loading": "Загрузка собеседования...",
+      "interviewCompleted": "Собеседование завершено",
+      "completedMessage": "Вы уже завершили это собеседование. Ваши ответы рассматриваются.",
+      "browseMoreJobs": "Посмотреть другие вакансии",
+      "linkExpired": "Ссылка истекла",
+      "vacancyClosed": "Вакансия закрыта",
+      "somethingWentWrong": "Что-то пошло не так"
+    },
+    "roomPage": {
+      "aiVideoInterview": "ИИ видеособеседование",
+      "beforeYouJoin": "Перед подключением:",
+      "stableConnection": "Стабильное интернет-соединение",
+      "quietRoom": "Тихое, хорошо освещённое помещение",
+      "allowCameraMic": "Разрешите камеру и микрофон",
+      "faceVisible": "Держите лицо видимым",
+      "checkDevicesJoin": "Проверить устройства и подключиться",
+      "cannotJoin": "Собеседование в статусе {status}. Подключение невозможно.",
+      "readyToJoin": "Готовы подключиться?",
+      "joinNow": "Подключиться",
+      "goBack": "Назад",
+      "joiningInterview": "Подключение к собеседованию...",
+      "somethingWentWrong": "Что-то пошло не так",
+      "aiInterview": "ИИ-собеседование",
+      "connected": "Подключено",
+      "you": "Вы",
+      "unmute": "Включить микрофон",
+      "mute": "Выключить микрофон",
+      "turnOnCamera": "Включить камеру",
+      "turnOffCamera": "Выключить камеру",
+      "leaveInterview": "Покинуть собеседование",
+      "leave": "Уйти",
+      "duration": "Длительность:",
+      "thankYou": "Спасибо! Ваши ответы рассматриваются нашим ИИ. Вы скоро получите результаты."
+    },
+    "observerPage": {
+      "title": "Наблюдение за собеседованием",
+      "notInProgress": "Это собеседование сейчас не проводится. Наблюдать можно только за активными собеседованиями.",
+      "observerMode": "Режим наблюдения",
+      "listeningAudio": "Прослушивание аудио собеседования",
+      "audioOnlyNote": "Режим наблюдения — только аудио, без видео и микрофона",
+      "leaveObservation": "Прекратить наблюдение"
     }
   },
   "settings": {
@@ -580,7 +907,17 @@
       "email": "Электронная почта",
       "phone": "Телефон",
       "save": "Сохранить изменения",
-      "saved": "Профиль успешно обновлён"
+      "saved": "Профиль успешно обновлён",
+      "emailCannotChange": "Email нельзя изменить",
+      "accountInfo": "Информация об аккаунте",
+      "emailVerified": "Email подтверждён:",
+      "companyLabel": "Компания:",
+      "noCompany": "Не привязан к компании",
+      "pendingInvitations": "Ожидающие приглашения ({count})",
+      "invitedBy": "Пригласил(а) {name}",
+      "expires": "Истекает {date}",
+      "accept": "Принять",
+      "acceptInvitationHint": "Принятие приглашения переключит вас на эту компанию."
     },
     "company": {
       "title": "Профиль компании",
@@ -591,7 +928,25 @@
       "website": "Веб-сайт",
       "description": "Описание",
       "logo": "Логотип",
-      "save": "Сохранить изменения"
+      "save": "Сохранить изменения",
+      "loadingProfile": "Загрузка профиля компании...",
+      "uploadLogo": "Загрузить логотип",
+      "logoComingSoon": "Загрузка логотипа скоро будет доступна.",
+      "namePlaceholder": "Введите название компании",
+      "nameRequired": "Название компании обязательно.",
+      "industryPlaceholder": "например, Технологии, Здравоохранение, Финансы",
+      "industryRequired": "Отрасль обязательна.",
+      "sizePlaceholder": "Выберите размер компании",
+      "sizeRequired": "Размер компании обязателен.",
+      "countryPlaceholder": "Введите страну",
+      "countryRequired": "Страна обязательна.",
+      "descriptionPlaceholder": "Расскажите о вашей компании",
+      "updateSuccess": "Профиль компании успешно обновлён.",
+      "updateError": "Не удалось обновить профиль. Попробуйте ещё раз.",
+      "sizeSmall": "1-50 сотрудников",
+      "sizeMedium": "51-200 сотрудников",
+      "sizeLarge": "201-1000 сотрудников",
+      "sizeEnterprise": "1000+ сотрудников"
     },
     "team": {
       "title": "Управление командой",
@@ -602,7 +957,12 @@
       "invitations": "Ожидающие приглашения",
       "activate": "Активировать",
       "deactivate": "Деактивировать",
-      "role": "Роль"
+      "role": "Роль",
+      "roles": {
+        "admin": "Администратор",
+        "hr": "HR-менеджер",
+        "candidate": "Кандидат"
+      }
     },
     "language": "Язык",
     "theme": "Тема"
@@ -628,7 +988,18 @@
     "vacanciesUsed": "Вакансии",
     "interviewsUsed": "ИИ-сессии",
     "storageUsed": "Хранилище",
-    "hrUsersUsed": "HR-пользователи"
+    "hrUsersUsed": "HR-пользователи",
+    "billed": "Оплата {period}",
+    "statusActive": "Активна",
+    "statusCancelled": "Отменена",
+    "currentPeriod": "Текущий период:",
+    "cancelSubscription": "Отменить подписку",
+    "areYouSure": "Вы уверены?",
+    "yesCancel": "Да, отменить",
+    "keepPlan": "Оставить план",
+    "availablePlans": "Доступные планы",
+    "billingHistory": "История оплат",
+    "billingHistoryComingSoon": "История оплат будет доступна в ближайшее время."
   },
   "admin": {
     "title": "Панель администратора",
@@ -657,6 +1028,19 @@
       "role": "Роль",
       "company": "Компания",
       "status": "Статус"
+    },
+    "analytics": {
+      "activeSubscriptions": "Активные подписки",
+      "revenueTrend": "Динамика дохода",
+      "interviewVolume": "Объём собеседований",
+      "subscriptionDistribution": "Распределение подписок",
+      "userRegistrations": "Регистрации пользователей",
+      "chartPlaceholder": "Заглушка графика",
+      "revenueChartSoon": "График дохода (скоро)",
+      "userGrowthChartSoon": "График роста пользователей (скоро)",
+      "candidates": "Кандидаты",
+      "hrManagers": "HR-менеджеры",
+      "admins": "Администраторы"
     }
   },
   "notifications": {
@@ -674,6 +1058,7 @@
     "forbidden": "Доступ запрещён",
     "forbiddenHint": "У вас нет прав для доступа к этой странице.",
     "forbiddenDesc": "У вас нет прав для доступа к этой странице.",
+    "needAccess": "Нужен доступ? Обратитесь к администратору или",
     "serverError": "Ошибка сервера",
     "serverErrorHint": "Что-то пошло не так. Пожалуйста, попробуйте позже.",
     "serverErrorDesc": "Что-то пошло не так. Наша команда уже уведомлена.",
@@ -736,7 +1121,8 @@
     "noJobsHint": "Попробуйте изменить фильтры или условия поиска",
     "apply": "Откликнуться",
     "viewDetails": "Подробнее",
-    "postedOn": "Опубликовано"
+    "postedOn": "Опубликовано",
+    "openPositions": "{count} открытых позиций"
   },
   "telegram": {
     "title": "Telegram",
@@ -745,10 +1131,10 @@
     "notConnected": "Telegram не подключён",
     "connect": "Подключить Telegram",
     "disconnect": "Отключить",
-    "linkCode": "Код привязки",
-    "linkCodeHint": "Отправьте этот код боту @PreScreenAI_bot в Telegram",
-    "linkCodeExpires": "Действует 10 минут",
-    "generating": "Генерация кода...",
+    "deepLinkHint": "Нажмите кнопку ниже, чтобы открыть Telegram и подключиться автоматически",
+    "openBot": "Открыть в Telegram",
+    "linkCodeExpires": "Ссылка действует 10 минут",
+    "generating": "Генерация ссылки...",
     "disconnected": "Telegram отключён"
   },
   "aiAssistant": {
@@ -757,8 +1143,261 @@
     "placeholder": "Спросите что угодно...",
     "welcome": "Чем могу помочь?",
     "welcomeHint": "Я могу управлять вакансиями, кандидатами, интервью, компаниями и многим другим. Просто спросите на естественном языке.",
+    "welcomeHintCandidate": "Я могу помочь найти вакансии, улучшить CV, отслеживать заявки и подготовиться к интервью.",
     "sending": "Думаю...",
     "error": "Что-то пошло не так. Попробуйте ещё раз.",
-    "clearHistory": "Очистить историю"
+    "clearHistory": "Очистить историю",
+    "hints": {
+      "searchJobs": "Поиск вакансий",
+      "improveCv": "Помочь улучшить CV",
+      "myApplications": "Мои заявки",
+      "listVacancies": "Список вакансий",
+      "dashboardStats": "Статистика дашборда",
+      "help": "Помощь"
+    }
+  },
+  "cvBuilder": {
+    "title": "Конструктор CV",
+    "tabs": {
+      "personal": "Личные данные",
+      "experience": "Опыт работы",
+      "education": "Образование",
+      "skills": "Навыки",
+      "languages": "Языки",
+      "certifications": "Сертификаты"
+    },
+    "completeness": {
+      "title": "Полнота профиля",
+      "personal": "Личные данные",
+      "summary": "О себе",
+      "experience": "Опыт работы",
+      "education": "Образование",
+      "skills": "Навыки",
+      "languages": "Языки"
+    },
+    "personal": {
+      "headline": "Заголовок",
+      "headlinePlaceholder": "например, Senior Frontend Developer",
+      "summary": "О себе",
+      "summaryPlaceholder": "Расскажите о себе...",
+      "location": "Местоположение",
+      "locationPlaceholder": "например, Москва, Россия",
+      "dateOfBirth": "Дата рождения",
+      "dateOfBirthPlaceholder": "Выберите дату",
+      "linkedinUrl": "LinkedIn",
+      "githubUrl": "GitHub",
+      "websiteUrl": "Сайт",
+      "salaryNegotiable": "Зарплата договорная",
+      "salaryMin": "Мин. зарплата",
+      "salaryMinPlaceholder": "Минимум",
+      "salaryMax": "Макс. зарплата",
+      "salaryMaxPlaceholder": "Максимум",
+      "currency": "Валюта",
+      "currencyPlaceholder": "Выберите валюту",
+      "employmentType": "Тип занятости",
+      "employmentTypePlaceholder": "Выберите тип",
+      "openToWork": "Открыт к предложениям",
+      "saveSuccess": "Личные данные успешно обновлены"
+    },
+    "employmentTypes": {
+      "fullTime": "Полная занятость",
+      "partTime": "Частичная занятость",
+      "contract": "Контракт",
+      "internship": "Стажировка"
+    },
+    "experience": {
+      "add": "Добавить опыт",
+      "addTitle": "Добавить опыт работы",
+      "editTitle": "Редактировать опыт работы",
+      "companyName": "Название компании",
+      "position": "Должность",
+      "employmentType": "Тип занятости",
+      "employmentTypePlaceholder": "Выберите тип",
+      "location": "Местоположение",
+      "startDate": "Дата начала",
+      "endDate": "Дата окончания",
+      "currentlyWorking": "Работаю здесь сейчас",
+      "description": "Описание",
+      "present": "По настоящее время",
+      "empty": "Опыт работы пока не добавлен",
+      "addSuccess": "Опыт работы успешно добавлен",
+      "updateSuccess": "Опыт работы успешно обновлён",
+      "deleteSuccess": "Опыт работы успешно удалён"
+    },
+    "education": {
+      "add": "Добавить образование",
+      "addTitle": "Добавить образование",
+      "editTitle": "Редактировать образование",
+      "institution": "Учебное заведение",
+      "degree": "Степень",
+      "educationLevel": "Уровень образования",
+      "fieldOfStudy": "Направление",
+      "startDate": "Дата начала",
+      "endDate": "Дата окончания",
+      "description": "Описание",
+      "empty": "Образование пока не добавлено",
+      "addSuccess": "Образование успешно добавлено",
+      "updateSuccess": "Образование успешно обновлено",
+      "deleteSuccess": "Образование успешно удалено"
+    },
+    "skills": {
+      "selectSkills": "Найдите и выберите навыки",
+      "empty": "Навыки пока не добавлены",
+      "saveSuccess": "Навыки успешно обновлены"
+    },
+    "languages": {
+      "add": "Добавить язык",
+      "addTitle": "Добавить язык",
+      "editTitle": "Редактировать язык",
+      "language": "Язык",
+      "proficiency": "Уровень владения",
+      "proficiencyPlaceholder": "Выберите уровень",
+      "empty": "Языки пока не добавлены",
+      "addSuccess": "Язык успешно добавлен",
+      "updateSuccess": "Язык успешно обновлён",
+      "deleteSuccess": "Язык успешно удалён"
+    },
+    "proficiencies": {
+      "beginner": "Начальный",
+      "elementary": "Элементарный",
+      "intermediate": "Средний",
+      "upperIntermediate": "Выше среднего",
+      "advanced": "Продвинутый",
+      "native": "Родной"
+    },
+    "certifications": {
+      "add": "Добавить сертификат",
+      "addTitle": "Добавить сертификат",
+      "editTitle": "Редактировать сертификат",
+      "name": "Название сертификата",
+      "issuingOrganization": "Организация",
+      "issueDate": "Дата выдачи",
+      "expiryDate": "Срок действия",
+      "credentialUrl": "URL документа",
+      "viewCredential": "Посмотреть документ",
+      "issued": "Выдан",
+      "expires": "Истекает",
+      "empty": "Сертификаты пока не добавлены",
+      "addSuccess": "Сертификат успешно добавлен",
+      "updateSuccess": "Сертификат успешно обновлён",
+      "deleteSuccess": "Сертификат успешно удалён"
+    },
+    "improveWithAi": "Улучшить с ИИ",
+    "aiGenerate": {
+      "button": "Создать CV с ИИ",
+      "title": "ИИ-генератор CV",
+      "subtitle": "Ответьте на несколько вопросов, и ИИ создаст полное профессиональное CV.",
+      "warning": "Текущие данные CV будут заменены.",
+      "jobTitle": "Должность / Желаемая позиция",
+      "jobTitlePlaceholder": "напр. Senior Frontend Developer",
+      "experienceSummary": "Опыт работы",
+      "experienceSummaryPlaceholder": "Кратко опишите опыт: компании, роли, годы, ключевые достижения...",
+      "educationSummary": "Образование",
+      "educationSummaryPlaceholder": "Университет, степень, специальность, год окончания...",
+      "skills": "Ключевые навыки",
+      "skillsPlaceholder": "напр. React, TypeScript, Node.js, управление командой...",
+      "languages": "Языки",
+      "languagesPlaceholder": "напр. Английский — свободно, Русский — родной",
+      "location": "Местоположение",
+      "locationPlaceholder": "напр. Москва, Россия",
+      "generate": "Сгенерировать CV",
+      "generating": "ИИ генерирует ваше CV...",
+      "success": "CV успешно создано! Проверьте и отредактируйте при необходимости.",
+      "inputPlaceholder": "Введите ваш ответ..."
+    },
+    "cvParse": {
+      "title": "Загрузить и распарсить CV",
+      "description": "Загрузите существующее CV (PDF или DOCX) и наш ИИ автоматически заполнит ваш профиль.",
+      "chooseFile": "Выбрать файл",
+      "parseButton": "Распарсить с ИИ",
+      "parsing": "Парсим ваше CV с помощью ИИ...",
+      "success": "CV успешно распарсено! Ваш профиль обновлён."
+    },
+    "cvGenerate": {
+      "title": "Генерация PDF",
+      "description": "Выберите шаблон и сгенерируйте профессиональный PDF из данных вашего профиля.",
+      "cvName": "Название CV",
+      "cvNamePlaceholder": "например, Моё CV",
+      "generateButton": "Сгенерировать PDF",
+      "success": "PDF успешно сгенерирован!",
+      "templates": {
+        "classic": {
+          "name": "Классический",
+          "description": "Традиционный одноколоночный, профессиональный стиль"
+        },
+        "modern": {
+          "name": "Современный",
+          "description": "Двухколоночный макет с боковой панелью"
+        },
+        "minimal": {
+          "name": "Минимальный",
+          "description": "Чистый дизайн с большим количеством пространства"
+        }
+      }
+    }
+  },
+  "publicCv": {
+    "notFound": "CV не найдено",
+    "notFoundHint": "Это CV может быть скрыто или ссылка недействительна.",
+    "summary": "О себе",
+    "experience": "Опыт работы",
+    "education": "Образование",
+    "skills": "Навыки",
+    "languages": "Языки",
+    "certifications": "Сертификаты",
+    "present": "По настоящее время"
+  },
+  "myCvs": {
+    "title": "Мои CV",
+    "goToBuilder": "Конструктор CV",
+    "empty": "CV пока нет",
+    "emptyHint": "Перейдите в конструктор CV, чтобы создать первое CV и сгенерировать PDF.",
+    "active": "Активное",
+    "activated": "CV успешно активировано.",
+    "deleted": "CV удалено.",
+    "deleteConfirm": "Вы уверены, что хотите удалить \"{name}\"?",
+    "download": "Скачать",
+    "activate": "Сделать активным",
+    "inactive": "Неактивное",
+    "deactivated": "CV деактивировано.",
+    "deactivateFirst": "Сначала деактивируйте CV",
+    "deleteProfile": "Удалить CV",
+    "deleteProfileConfirm": "Вы уверены, что хотите удалить CV? Все данные профиля, опыт работы, образование и сгенерированные PDF будут удалены безвозвратно.",
+    "profileDeleted": "CV успешно удалено.",
+    "view": "Просмотреть CV",
+    "activeLabel": "Активное CV",
+    "noActiveCv": "Нет активного CV. Сгенерируйте PDF и активируйте его, чтобы работодатели могли его видеть.",
+    "cvIsVisible": "Ваше CV доступно публично",
+    "cvIsHidden": "Ваше CV скрыто от публичного просмотра",
+    "cvVisible": "Ваше CV теперь доступно публично.",
+    "cvHidden": "Ваше CV теперь скрыто.",
+    "loadError": "Не удалось загрузить CV.",
+    "generatedPdfs": "Сгенерированные PDF",
+    "profileCard": {
+      "noHeadline": "Заголовок не указан"
+    },
+    "templates": {
+      "classic": "Классический",
+      "modern": "Современный",
+      "minimal": "Минимальный"
+    }
+  },
+  "permissions": {
+    "title": "Права доступа",
+    "manageVacancies": "Управление вакансиями",
+    "manageVacanciesDesc": "Создание, редактирование, публикация и архивирование вакансий",
+    "manageCandidates": "Управление кандидатами",
+    "manageCandidatesDesc": "Просмотр кандидатов, изменение статуса, отклонение, найм",
+    "manageInterviews": "Управление интервью",
+    "manageInterviewsDesc": "Планирование, просмотр и отмена интервью",
+    "manageTeam": "Управление командой",
+    "manageTeamDesc": "Приглашение пользователей и управление правами",
+    "viewAnalytics": "Просмотр аналитики",
+    "viewAnalyticsDesc": "Доступ к панели HR аналитики",
+    "manageSettings": "Управление настройками",
+    "manageSettingsDesc": "Настройки компании и подписки",
+    "selectPermissions": "Выберите права для этого пользователя",
+    "allPermissions": "Все права (Админ компании)",
+    "noPermissions": "Нет назначенных прав"
   }
 }

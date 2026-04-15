@@ -1,0 +1,16 @@
+{% extends "emails/base.html" %}
+{% block content %}
+<h1>Interview Scheduled</h1>
+<p>Hi {{ candidate_name }},</p>
+<p>Your interview for <strong>{{ vacancy_title }}</strong> at <strong>{{ company_name }}</strong> has been scheduled.</p>
+<div class="highlight">
+  <p><strong>Date:</strong> {{ scheduled_at }}</p>
+  <p><strong>Duration:</strong> {{ duration }} minutes</p>
+</div>
+{% if interview_url %}
+<p style="text-align: center; margin: 24px 0;">
+  <a href="{{ interview_url }}" class="btn">Join Interview</a>
+</p>
+{% endif %}
+<p>Please make sure to be ready a few minutes before the scheduled time.</p>
+{% endblock %}

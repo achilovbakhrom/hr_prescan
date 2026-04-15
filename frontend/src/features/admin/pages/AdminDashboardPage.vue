@@ -38,7 +38,7 @@ onMounted(() => adminStore.fetchAnalytics())
           </p>
         </div>
         <div class="rounded-lg border border-gray-200 bg-white p-4">
-          <p class="text-sm text-gray-500">Active Subscriptions</p>
+          <p class="text-sm text-gray-500">{{ t('admin.analytics.activeSubscriptions') }}</p>
           <p class="mt-1 text-2xl font-bold">
             {{ adminStore.analytics.activeSubscriptions }}
           </p>
@@ -53,15 +53,11 @@ onMounted(() => adminStore.fetchAnalytics())
 
       <!-- Charts Placeholder -->
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div
-          class="flex h-64 items-center justify-center rounded-lg border border-gray-200 bg-white"
-        >
-          <p class="text-gray-400">Revenue Chart (coming soon)</p>
+        <div class="flex h-64 items-center justify-center rounded-lg border border-gray-200 bg-white">
+          <p class="text-gray-400">{{ t('admin.analytics.revenueChartSoon') }}</p>
         </div>
-        <div
-          class="flex h-64 items-center justify-center rounded-lg border border-gray-200 bg-white"
-        >
-          <p class="text-gray-400">User Growth Chart (coming soon)</p>
+        <div class="flex h-64 items-center justify-center rounded-lg border border-gray-200 bg-white">
+          <p class="text-gray-400">{{ t('admin.analytics.userGrowthChartSoon') }}</p>
         </div>
       </div>
     </template>

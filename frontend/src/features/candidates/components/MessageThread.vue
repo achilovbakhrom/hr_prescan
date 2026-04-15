@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import { candidateService } from '../services/candidate.service'
 import type { Message } from '../types/message.types'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   candidateId: string
@@ -62,7 +65,7 @@ onMounted(fetchMessages)
 <template>
   <div class="flex h-96 flex-col rounded-lg border border-gray-200">
     <div class="border-b border-gray-100 px-4 py-3">
-      <h3 class="text-sm font-semibold text-gray-900">Messages</h3>
+      <h3 class="text-sm font-semibold text-gray-900">{{ t('candidates.messages') }}</h3>
     </div>
 
     <div ref="threadContainer" class="flex-1 space-y-3 overflow-y-auto p-4">
@@ -70,8 +73,11 @@ onMounted(fetchMessages)
         <i class="pi pi-spinner pi-spin text-gray-400"></i>
       </div>
 
-      <div v-else-if="messages.length === 0" class="py-8 text-center text-sm text-gray-500">
-        No messages yet
+      <div
+        v-else-if="messages.length === 0"
+        class="py-8 text-center text-sm text-gray-500"
+      >
+        {{ t('candidates.messageThread.noMessages') }}
       </div>
 
       <div v-for="msg in messages" :key="msg.id" class="flex flex-col gap-1">
@@ -92,7 +98,7 @@ onMounted(fetchMessages)
     <div class="flex gap-2 border-t border-gray-100 p-3">
       <InputText
         v-model="newMessage"
-        placeholder="Type a message..."
+        :placeholder="t('candidates.messageThread.placeholder')"
         class="flex-1"
         @keyup.enter="handleSend"
       />

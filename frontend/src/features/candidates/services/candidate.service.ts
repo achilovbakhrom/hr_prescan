@@ -30,6 +30,9 @@ export const candidateService = {
     if (data.cvFile) {
       formData.append('cv_file', data.cvFile)
     }
+    if (data.cvId) {
+      formData.append('cv_id', data.cvId)
+    }
     const response = await apiClient.post<Application>(
       `/public/vacancies/${vacancyId}/apply`,
       formData,
@@ -57,6 +60,16 @@ export const candidateService = {
     const response = await apiClient.get<Application[]>(`/hr/vacancies/${vacancyId}/candidates`, {
       params,
     })
+    return response.data
+  },
+
+  async getAllCandidates(
+    params?: { status?: string; ordering?: string; search?: string; vacancyId?: string },
+  ): Promise<Application[]> {
+    const response = await apiClient.get<Application[]>(
+      '/hr/candidates',
+      { params },
+    )
     return response.data
   },
 

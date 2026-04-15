@@ -5,13 +5,14 @@ import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { USER_ROLES } from '@/shared/constants/roles'
 import { useAIAssistant } from '@/shared/composables/useAIAssistant'
-import type { UserRole } from '@/shared/types/auth.types'
+import type { HRPermission, UserRole } from '@/shared/types/auth.types'
 
 interface NavItem {
   label: string
   icon: string
   to: string
   roles: UserRole[]
+  permission?: HRPermission
 }
 
 interface NavSection {
@@ -28,6 +29,14 @@ const authStore = useAuthStore()
 const { t } = useI18n()
 const aiAssistant = useAIAssistant()
 
+function hasPermission(permission?: HRPermission): boolean {
+  if (!permission) return true
+  const user = authStore.user
+  if (!user) return false
+  if (user.role === 'admin') return true
+  return (user.hrPermissions || []).includes(permission)
+}
+
 const sections = computed<NavSection[]>(() => [
   {
     items: [
@@ -42,84 +51,26 @@ const sections = computed<NavSection[]>(() => [
   {
     title: t('vacancies.title'),
     items: [
-      {
-        label: t('nav.vacancies'),
-        icon: 'pi pi-briefcase',
-        to: '/vacancies',
-        roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
-      },
-      {
-        label: t('employers.title'),
-        icon: 'pi pi-building',
-        to: '/employers',
-        roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
-      },
-      {
-        label: t('nav.interviews'),
-        icon: 'pi pi-video',
-        to: '/interviews',
-        roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
-      },
+      { label: t('nav.vacancies'), icon: 'pi pi-briefcase', to: '/vacancies', roles: [USER_ROLES.ADMIN, USER_ROLES.HR], permission: 'manage_vacancies' },
+      { label: t('nav.allCandidates'), icon: 'pi pi-users', to: '/candidates', roles: [USER_ROLES.ADMIN, USER_ROLES.HR], permission: 'manage_candidates' },
+      { label: t('nav.interviews'), icon: 'pi pi-video', to: '/interviews', roles: [USER_ROLES.ADMIN, USER_ROLES.HR], permission: 'manage_interviews' },
+      { label: t('nav.hrAnalytics'), icon: 'pi pi-chart-bar', to: '/analytics', roles: [USER_ROLES.ADMIN, USER_ROLES.HR], permission: 'view_analytics' },
     ],
   },
   {
     title: t('candidates.title'),
     items: [
-      {
-        label: t('nav.browseJobs'),
-        icon: 'pi pi-search',
-        to: '/jobs',
-        roles: [USER_ROLES.CANDIDATE],
-      },
-      {
-        label: t('nav.myApplications'),
-        icon: 'pi pi-file',
-        to: '/my-applications',
-        roles: [USER_ROLES.CANDIDATE],
-      },
-    ],
-  },
-  {
-    title: t('nav.admin'),
-    items: [
-      { label: t('nav.admin'), icon: 'pi pi-shield', to: '/admin', roles: [USER_ROLES.ADMIN] },
-      {
-        label: t('nav.companies'),
-        icon: 'pi pi-building',
-        to: '/admin/companies',
-        roles: [USER_ROLES.ADMIN],
-      },
-      { label: t('nav.users'), icon: 'pi pi-users', to: '/admin/users', roles: [USER_ROLES.ADMIN] },
-      { label: t('nav.plans'), icon: 'pi pi-list', to: '/admin/plans', roles: [USER_ROLES.ADMIN] },
-      {
-        label: t('nav.analytics'),
-        icon: 'pi pi-chart-bar',
-        to: '/admin/analytics',
-        roles: [USER_ROLES.ADMIN],
-      },
+      { label: t('nav.myApplications'), icon: 'pi pi-file', to: '/my-applications', roles: [USER_ROLES.CANDIDATE] },
+      { label: t('nav.myCvs'), icon: 'pi pi-file-pdf', to: '/my-cvs', roles: [USER_ROLES.CANDIDATE] },
     ],
   },
   {
     title: t('nav.settings'),
     items: [
-      {
-        label: t('settings.company.title'),
-        icon: 'pi pi-cog',
-        to: '/settings/company',
-        roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
-      },
-      {
-        label: t('nav.team'),
-        icon: 'pi pi-users',
-        to: '/settings/team',
-        roles: [USER_ROLES.ADMIN],
-      },
-      {
-        label: t('nav.subscription'),
-        icon: 'pi pi-credit-card',
-        to: '/subscription',
-        roles: [USER_ROLES.ADMIN],
-      },
+      { label: t('employers.title'), icon: 'pi pi-building', to: '/employers', roles: [USER_ROLES.ADMIN, USER_ROLES.HR], permission: 'manage_vacancies' },
+      { label: t('settings.company.title'), icon: 'pi pi-cog', to: '/settings/company', roles: [USER_ROLES.ADMIN, USER_ROLES.HR], permission: 'manage_settings' },
+      { label: t('nav.team'), icon: 'pi pi-users', to: '/settings/team', roles: [USER_ROLES.ADMIN, USER_ROLES.HR], permission: 'manage_team' },
+      { label: t('nav.subscription'), icon: 'pi pi-credit-card', to: '/subscription', roles: [USER_ROLES.ADMIN] },
     ],
   },
 ])
@@ -130,13 +81,14 @@ const filteredSections = computed(() => {
   return sections.value
     .map((section) => ({
       ...section,
-      items: section.items.filter((item) => item.roles.includes(userRole)),
+      items: section.items.filter((item) =>
+        item.roles.includes(userRole) && hasPermission(item.permission),
+      ),
     }))
     .filter((section) => section.items.length > 0)
 })
 
 function isActive(path: string): boolean {
-  if (path === '/admin') return route.path === '/admin'
   return route.path === path || route.path.startsWith(path + '/')
 }
 </script>

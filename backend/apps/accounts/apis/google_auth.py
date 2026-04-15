@@ -1,7 +1,6 @@
 import logging
 
 from django.conf import settings
-from django.db import transaction
 from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token
 from rest_framework import serializers, status
@@ -11,16 +10,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from apps.accounts.models import Company, User
-from apps.accounts.serializers import CompanyOutputSerializer, UserOutputSerializer
-from apps.accounts.services import create_company_with_admin
+from apps.accounts.models import User
+from apps.accounts.serializers import UserOutputSerializer
 from apps.applications.services import bind_existing_applications
-from apps.common.exceptions import ApplicationError
 from apps.common.messages import (
     MSG_ACCOUNT_DEACTIVATED,
     MSG_GOOGLE_NO_EMAIL,
     MSG_INVALID_GOOGLE_TOKEN,
-    MSG_USER_EXISTS,
 )
 
 logger = logging.getLogger(__name__)
@@ -127,7 +123,9 @@ class GoogleAuthApi(APIView):
                 role=User.Role.CANDIDATE,
                 email_verified=True,
             )
-            logger.info("Created new candidate via Google auth: %s", email)
+            user.onboarding_completed = False
+            user.save(update_fields=["onboarding_completed", "updated_at"])
+            logger.info("Created new user via Google auth: %s", email)
             bind_existing_applications(user=user)
 
         elif not user.is_active:
@@ -155,78 +153,3 @@ class GoogleAuthApi(APIView):
         )
 
 
-class GoogleCompanyRegisterApi(APIView):
-    """POST /api/auth/google/register-company/
-
-    Completes the "sign in with Google → I'm hiring" flow. Verifies the
-    Google credential, creates a Company + HR admin user tied to that
-    Google identity in one transaction, and returns JWT tokens.
-
-    This mirrors CompanyRegisterApi but replaces the email+password pair
-    with a Google ID token. No password is stored on the user.
-    """
-
-    permission_classes = [AllowAny]
-
-    class InputSerializer(serializers.Serializer):
-        credential = serializers.CharField(help_text="Google ID token (JWT)")
-        company_name = serializers.CharField(max_length=255)
-        industry = serializers.CharField(max_length=255)
-        size = serializers.ChoiceField(choices=Company.Size.choices)
-        country = serializers.CharField(max_length=100)
-        website = serializers.URLField(max_length=500, required=False, allow_blank=True)
-        description = serializers.CharField(required=False, allow_blank=True)
-
-    @transaction.atomic
-    def post(self, request: Request) -> Response:
-        serializer = self.InputSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        credential = serializer.validated_data.pop("credential")
-        idinfo = _verify_google_credential(credential)
-        if idinfo is None:
-            return Response(
-                {"detail": str(MSG_INVALID_GOOGLE_TOKEN)},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
-
-        email = idinfo.get("email")
-        if not email:
-            return Response(
-                {"detail": str(MSG_GOOGLE_NO_EMAIL)},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        if User.objects.filter(email=email).exists():
-            return Response(
-                {"detail": str(MSG_USER_EXISTS)},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        try:
-            company, user = create_company_with_admin(
-                **serializer.validated_data,
-                admin_email=email,
-                admin_password=None,
-                admin_first_name=idinfo.get("given_name", ""),
-                admin_last_name=idinfo.get("family_name", ""),
-            )
-        except ApplicationError as exc:
-            return Response({"detail": exc.message}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Google identity → email already verified.
-        user.email_verified = True
-        user.save(update_fields=["email_verified", "updated_at"])
-
-        refresh = RefreshToken.for_user(user)
-        return Response(
-            {
-                "tokens": {
-                    "access": str(refresh.access_token),
-                    "refresh": str(refresh),
-                },
-                "company": CompanyOutputSerializer(company).data,
-                "user": UserOutputSerializer(user).data,
-            },
-            status=status.HTTP_201_CREATED,
-        )

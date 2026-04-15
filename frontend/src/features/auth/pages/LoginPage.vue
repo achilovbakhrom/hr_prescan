@@ -7,7 +7,7 @@ import Password from 'primevue/password'
 import Button from 'primevue/button'
 import Message from 'primevue/message'
 import GoogleSignInButton from '../components/GoogleSignInButton.vue'
-import RolePickerDialog from '../components/RolePickerDialog.vue'
+import TelegramSignInButton from '../components/TelegramSignInButton.vue'
 import { useAuthStore } from '../stores/auth.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { GoogleAuthRole } from '../types/auth.types'
@@ -62,18 +62,12 @@ async function handleGoogleSuccess(credential: string): Promise<void> {
   errorMessage.value = null
   googleCredential.value = credential
   try {
-    const response = await authStore.googleLogin(credential)
-    if (isGoogleTokensResponse(response)) {
+    await authStore.googleLogin(credential)
+    if (authStore.user?.onboardingCompleted === false) {
+      await router.push({ name: ROUTE_NAMES.CHOOSE_ROLE })
+    } else {
       const redirect = router.currentRoute.value.query.redirect as string
       await router.push(redirect || { name: ROUTE_NAMES.DASHBOARD })
-      return
-    }
-    if (isGoogleNeedsRoleResponse(response)) {
-      rolePickerVisible.value = true
-      return
-    }
-    if (isGoogleNeedsCompanyResponse(response)) {
-      await router.push({ name: ROUTE_NAMES.COMPANY_REGISTER })
     }
   } catch (err: unknown) {
     errorMessage.value = err instanceof Error ? err.message : t('auth.login.googleFailed')
@@ -106,6 +100,26 @@ async function handleRolePick(role: GoogleAuthRole): Promise<void> {
 function handleGoogleError(msg: string): void {
   errorMessage.value = msg
 }
+
+async function handleTelegramSuccess(data: Parameters<typeof authStore.telegramLogin>[0]): Promise<void> {
+  errorMessage.value = null
+  try {
+    await authStore.telegramLogin(data)
+    if (authStore.user?.onboardingCompleted === false) {
+      await router.push({ name: ROUTE_NAMES.CHOOSE_ROLE })
+    } else {
+      const redirect = router.currentRoute.value.query.redirect as string
+      await router.push(redirect || { name: ROUTE_NAMES.DASHBOARD })
+    }
+  } catch (err: unknown) {
+    errorMessage.value =
+      err instanceof Error ? err.message : 'Telegram sign-in failed.'
+  }
+}
+
+function handleTelegramError(msg: string): void {
+  errorMessage.value = msg
+}
 </script>
 
 <template>
@@ -125,6 +139,11 @@ function handleGoogleError(msg: string): void {
         v-model:visible="rolePickerVisible"
         :loading="rolePickerLoading"
         @pick="handleRolePick"
+      />
+
+      <TelegramSignInButton
+        @success="handleTelegramSuccess"
+        @error="handleTelegramError"
       />
 
       <div class="mb-4 flex items-center gap-3">
@@ -147,7 +166,7 @@ function handleGoogleError(msg: string): void {
             class="w-full"
           />
           <small v-if="submitted && emailInvalid" class="text-red-500">
-            {{ t('auth.login.invalidEmail') }}
+            {{ t('auth.login.emailInvalid') }}
           </small>
         </div>
 
@@ -188,15 +207,6 @@ function handleGoogleError(msg: string): void {
         </RouterLink>
       </p>
 
-      <p class="mt-2 text-center text-sm text-gray-600">
-        {{ t('auth.login.wantToHire') }}
-        <RouterLink
-          :to="{ name: ROUTE_NAMES.COMPANY_REGISTER }"
-          class="font-medium text-blue-600 hover:text-blue-500"
-        >
-          {{ t('auth.login.registerCompany') }}
-        </RouterLink>
-      </p>
     </div>
   </div>
 </template>

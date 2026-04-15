@@ -1,9 +1,9 @@
 """
-Voice message transcription service — handles S3 upload and Whisper transcription.
+Voice message transcription service — handles S3 upload and Gemini transcription.
 
 Responsibilities:
 - Upload voice message audio files to S3/MinIO
-- Transcribe audio using OpenAI Whisper API
+- Transcribe audio using Google Gemini multimodal API
 """
 
 import logging
@@ -12,7 +12,8 @@ import uuid
 import boto3
 from botocore.config import Config as BotoConfig
 from django.conf import settings
-from openai import OpenAI
+from google import genai
+from google.genai import types
 
 from apps.common.exceptions import ApplicationError
 from apps.common.messages import MSG_AUDIO_TRANSCRIPTION_FAILED
@@ -47,16 +48,29 @@ def upload_voice_message_to_s3(*, file_obj, interview_id: str, filename: str = "
 
 
 def transcribe_audio(*, file_bytes: bytes, filename: str = "audio.webm") -> str:
-    """Transcribe audio using OpenAI Whisper API. Returns transcript text."""
-    client = OpenAI(api_key=settings.OPENAI_API_KEY, timeout=30.0)
+    """Transcribe audio using Google Gemini multimodal API. Returns transcript text."""
+    client = genai.Client(api_key=settings.GOOGLE_API_KEY)
+
+    mime_type = "audio/webm"
+    if filename.endswith(".ogg"):
+        mime_type = "audio/ogg"
+    elif filename.endswith(".mp3"):
+        mime_type = "audio/mp3"
 
     try:
-        transcript = client.audio.transcriptions.create(
-            model="whisper-1",
-            file=(filename, file_bytes, "audio/webm"),
+        response = client.models.generate_content(
+            model=settings.GEMINI_MODEL,
+            contents=[
+                types.Part.from_bytes(data=file_bytes, mime_type=mime_type),
+                "Transcribe this audio accurately. The speaker may use Russian, English, "
+                "or a mix. Return only the transcription text, nothing else.",
+            ],
+            config=types.GenerateContentConfig(
+                thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
+            ),
         )
     except Exception as e:
-        logger.error("Whisper transcription failed: %s", e)
+        logger.error("Gemini transcription failed: %s", e)
         raise ApplicationError(str(MSG_AUDIO_TRANSCRIPTION_FAILED)) from e
 
-    return transcript.text
+    return response.text.strip()

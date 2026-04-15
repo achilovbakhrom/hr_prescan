@@ -18,6 +18,7 @@ class InterviewContext:
     company_name: str
     duration_minutes: int
     cv_summary: str
+    language: str = "en"
     questions: list[dict] = field(default_factory=list)   # [{text, category}]
     criteria: list[dict] = field(default_factory=list)     # [{id, name, description, weight}]
 
@@ -43,6 +44,7 @@ async def fetch_interview_context(*, room_name: str) -> InterviewContext:
         company_name=data["company_name"],
         duration_minutes=data["duration_minutes"],
         cv_summary=data.get("cv_summary", "No CV data available."),
+        language=data.get("language", "en"),
         questions=data.get("questions", []),
         criteria=data.get("criteria", []),
     )

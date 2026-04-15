@@ -28,7 +28,12 @@ export interface Interview {
   status: InterviewStatus
   livekitRoomName: string
   overallScore: number | null
+  language: string
   createdAt: string
+  /** Employer company name returned by some API endpoints */
+  employerName?: string | null
+  /** Company name returned by some API endpoints */
+  companyName?: string | null
 }
 
 export interface ChatMessage {
@@ -47,6 +52,8 @@ export interface InterviewDetail extends Interview {
   transcript: TranscriptEntry[]
   chatHistory: ChatMessage[]
   aiSummary: string
+  aiSummaryTranslations: Record<string, string>
+  language: string
   scores: InterviewScore[]
   integrityFlags: IntegrityFlag[]
   updatedAt: string
@@ -56,4 +63,6 @@ export interface TranscriptEntry {
   speaker: string
   text: string
   timestamp: number
+  /** Legacy field name used in some transcript formats */
+  role?: string
 }

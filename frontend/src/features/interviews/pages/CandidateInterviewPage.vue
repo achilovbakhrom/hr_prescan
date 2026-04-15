@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import { useInterviewStore } from '../stores/interview.store'
 import InterviewStatusBadge from '../components/InterviewStatusBadge.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
+
+const { t } = useI18n()
 
 const route = useRoute()
 const router = useRouter()
@@ -45,35 +48,42 @@ function handleJoinInterview(): void {
         class="rounded-lg border border-green-200 bg-green-50 p-8 text-center"
       >
         <i class="pi pi-check-circle mb-4 text-5xl text-green-500"></i>
-        <h1 class="mb-2 text-2xl font-bold text-gray-900">Thank You!</h1>
+        <h1 class="mb-2 text-2xl font-bold text-gray-900">{{ t('interviews.candidatePage.thankYou') }}</h1>
         <p class="text-gray-600">
-          Your interview has been completed. We will review your responses and get back to you soon.
+          {{ t('interviews.candidatePage.completedMessage') }}
         </p>
       </div>
 
       <!-- Pre-interview state -->
-      <div v-else class="rounded-lg border border-gray-200 bg-white p-8">
-        <h1 class="mb-6 text-2xl font-bold text-gray-900">Your Interview</h1>
+      <div
+        v-else
+        class="rounded-lg border border-gray-200 bg-white p-8"
+      >
+        <h1 class="mb-6 text-2xl font-bold text-gray-900">
+          {{ t('interviews.candidatePage.yourInterview') }}
+        </h1>
 
         <div class="space-y-4">
           <div class="rounded-lg bg-gray-50 p-4">
             <dl class="space-y-2 text-sm">
               <div class="flex justify-between">
-                <dt class="text-gray-500">Position</dt>
+                <dt class="text-gray-500">{{ t('interviews.preCheck.position') }}</dt>
                 <dd class="font-medium">{{ interview.vacancyTitle }}</dd>
               </div>
               <div class="flex justify-between">
-                <dt class="text-gray-500">Scheduled</dt>
+                <dt class="text-gray-500">{{ t('interviews.preCheck.scheduled') }}</dt>
                 <dd class="font-medium">
                   {{ formatDate(interview.createdAt) }}
                 </dd>
               </div>
               <div class="flex justify-between">
-                <dt class="text-gray-500">Duration</dt>
-                <dd class="font-medium">{{ interview.durationMinutes }} minutes</dd>
+                <dt class="text-gray-500">{{ t('interviews.preCheck.duration') }}</dt>
+                <dd class="font-medium">
+                  {{ t('interviews.preCheck.durationMinutes', { minutes: interview.durationMinutes }) }}
+                </dd>
               </div>
               <div class="flex justify-between">
-                <dt class="text-gray-500">Status</dt>
+                <dt class="text-gray-500">{{ t('common.status') }}</dt>
                 <dd>
                   <InterviewStatusBadge :status="interview.status" />
                 </dd>
@@ -82,25 +92,29 @@ function handleJoinInterview(): void {
           </div>
 
           <div class="rounded-lg border border-blue-100 bg-blue-50 p-4">
-            <h3 class="mb-2 text-sm font-semibold text-blue-800">Instructions</h3>
+            <h3 class="mb-2 text-sm font-semibold text-blue-800">
+              {{ t('interviews.candidatePage.instructions') }}
+            </h3>
             <ul class="list-inside list-disc space-y-1 text-sm text-blue-700">
-              <li>Ensure you have a stable internet connection</li>
-              <li>Use a well-lit, quiet room</li>
-              <li>Allow camera and microphone access</li>
-              <li>Keep your face visible throughout the interview</li>
+              <li>{{ t('interviews.preCheck.stableConnection') }}</li>
+              <li>{{ t('interviews.preCheck.quietRoom') }}</li>
+              <li>{{ t('interviews.preCheck.allowCameraMicAccess') }}</li>
+              <li>{{ t('interviews.preCheck.faceVisible') }}</li>
             </ul>
           </div>
 
           <div class="rounded-lg border border-gray-200 p-4">
-            <h3 class="mb-2 text-sm font-semibold text-gray-700">Camera & Microphone Test</h3>
+            <h3 class="mb-2 text-sm font-semibold text-gray-700">
+              {{ t('interviews.candidatePage.cameraMicTest') }}
+            </h3>
             <p class="text-xs text-gray-500">
-              Device testing will be available when LiveKit is integrated.
+              {{ t('interviews.candidatePage.deviceTestNote') }}
             </p>
           </div>
 
           <Button
             v-if="isScheduled || isInProgress"
-            label="Join Interview"
+            :label="t('interviews.candidatePage.joinInterview')"
             icon="pi pi-video"
             class="w-full"
             @click="handleJoinInterview"

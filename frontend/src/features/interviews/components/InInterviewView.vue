@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { InterviewDetail } from '../types/interview.types'
 import VideoPreview from '@/features/video/components/VideoPreview.vue'
 import MediaControls from '@/features/video/components/MediaControls.vue'
 import ConnectionStatus from '@/features/video/components/ConnectionStatus.vue'
 import InterviewTimer from '@/features/video/components/InterviewTimer.vue'
 import { useLiveKit } from '@/features/video/composables/useLiveKit'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   interview: InterviewDetail
@@ -79,9 +82,12 @@ async function confirmLeave(): Promise<void> {
           >
             <i class="pi pi-user text-4xl text-gray-400"></i>
           </div>
-          <p class="text-sm text-gray-400">AI Interviewer</p>
-          <p v-if="connectionState === 'connecting'" class="mt-2 text-xs text-gray-500">
-            Connecting...
+          <p class="text-sm text-gray-400">{{ t('interviews.inInterview.aiInterviewer') }}</p>
+          <p
+            v-if="connectionState === 'connecting'"
+            class="mt-2 text-xs text-gray-500"
+          >
+            {{ t('interviews.inInterview.connecting') }}
           </p>
         </div>
       </div>
@@ -111,22 +117,24 @@ async function confirmLeave(): Promise<void> {
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
     >
       <div class="mx-4 w-full max-w-sm rounded-lg bg-white p-6 shadow-xl">
-        <h3 class="mb-2 text-lg font-semibold text-gray-900">Leave Interview?</h3>
+        <h3 class="mb-2 text-lg font-semibold text-gray-900">
+          {{ t('interviews.inInterview.leaveTitle') }}
+        </h3>
         <p class="mb-6 text-sm text-gray-600">
-          Are you sure you want to leave? The interview will end and cannot be restarted.
+          {{ t('interviews.inInterview.leaveMessage') }}
         </p>
         <div class="flex justify-end gap-3">
           <button
             class="rounded-md px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
             @click="cancelLeave"
           >
-            Cancel
+            {{ t('common.cancel') }}
           </button>
           <button
             class="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-500"
             @click="confirmLeave"
           >
-            Leave Interview
+            {{ t('interviews.inInterview.leaveButton') }}
           </button>
         </div>
       </div>

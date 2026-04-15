@@ -66,7 +66,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -147,6 +147,11 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 20,
     "EXCEPTION_HANDLER": "rest_framework.views.exception_handler",
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_THROTTLE_RATES": {
+        "auth": "10/minute",
+        "ai_scoring": "20/hour",
+        "file_upload": "30/hour",
+    },
 }
 
 # drf-spectacular — OpenAPI / Swagger
@@ -181,6 +186,7 @@ USE_TZ = True
 LANGUAGES = [
     ("en", "English"),
     ("ru", "Russian"),
+    ("uz", "Uzbek"),
 ]
 
 LOCALE_PATHS = [
@@ -273,25 +279,48 @@ SIMPLE_JWT = {
 # Google OAuth
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
 
-# OpenAI
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
-OPENAI_CHAT_MODEL = os.environ.get("OPENAI_CHAT_MODEL", "gpt-4o-mini")
+# Google Gemini
+GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY", "")
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3-flash-preview")
 
-# Telegram bot
-TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
-TELEGRAM_WEBHOOK_SECRET = os.environ.get("TELEGRAM_WEBHOOK_SECRET", "")
+# Telegram bots
+# Two separate bots: one for HRs (manage vacancies, candidates, etc.) and one
+# for candidates (browse jobs, apply, take prescan interview). Each needs its
+# own token/username/webhook secret. The legacy single-bot env vars
+# (TELEGRAM_BOT_TOKEN/USERNAME/WEBHOOK_SECRET/WEBHOOK_URL) remain readable as a
+# fallback for the HR bot so existing deployments keep working.
+TELEGRAM_HR_BOT_TOKEN = os.environ.get(
+    "TELEGRAM_HR_BOT_TOKEN", os.environ.get("TELEGRAM_BOT_TOKEN", ""),
+)
+TELEGRAM_HR_BOT_USERNAME = os.environ.get(
+    "TELEGRAM_HR_BOT_USERNAME", os.environ.get("TELEGRAM_BOT_USERNAME", ""),
+)
+TELEGRAM_HR_WEBHOOK_SECRET = os.environ.get(
+    "TELEGRAM_HR_WEBHOOK_SECRET", os.environ.get("TELEGRAM_WEBHOOK_SECRET", ""),
+)
+TELEGRAM_HR_WEBHOOK_URL = os.environ.get(
+    "TELEGRAM_HR_WEBHOOK_URL", os.environ.get("TELEGRAM_WEBHOOK_URL", ""),
+)
 
-# Email (read from env so prod SMTP actually works)
+TELEGRAM_CANDIDATE_BOT_TOKEN = os.environ.get("TELEGRAM_CANDIDATE_BOT_TOKEN", "")
+TELEGRAM_CANDIDATE_BOT_USERNAME = os.environ.get("TELEGRAM_CANDIDATE_BOT_USERNAME", "")
+TELEGRAM_CANDIDATE_WEBHOOK_SECRET = os.environ.get("TELEGRAM_CANDIDATE_WEBHOOK_SECRET", "")
+TELEGRAM_CANDIDATE_WEBHOOK_URL = os.environ.get("TELEGRAM_CANDIDATE_WEBHOOK_URL", "")
+
+# Token used by the Telegram Login Widget on the candidate web auth pages.
+# Prefers the candidate bot, falls back to HR bot for backwards-compat.
+TELEGRAM_LOGIN_WIDGET_TOKEN = (
+    TELEGRAM_CANDIDATE_BOT_TOKEN or TELEGRAM_HR_BOT_TOKEN
+)
+
+# Frontend URL (for Telegram bot "Open website" button, etc.)
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:5173")
+
+# Email
 EMAIL_BACKEND = os.environ.get("EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend")
-EMAIL_HOST = os.environ.get("EMAIL_HOST", "localhost")
-EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "25"))
-EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "False").lower() in ("true", "1", "yes")
-EMAIL_USE_SSL = os.environ.get("EMAIL_USE_SSL", "False").lower() in ("true", "1", "yes")
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.gmail.com")
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
+EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True").lower() in ("true", "1")
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
-DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "noreply@prescreen-app.com")
-SERVER_EMAIL = DEFAULT_FROM_EMAIL
-EMAIL_TIMEOUT = 30
-
-# Base URL of the frontend — used in verification/invitation email links.
-FRONTEND_BASE_URL = os.environ.get("FRONTEND_BASE_URL", "http://localhost:5173")
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "PreScreen AI <noreply@prescreenai.com>")

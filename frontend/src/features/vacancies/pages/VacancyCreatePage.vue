@@ -18,7 +18,7 @@ async function handleSave(data: CreateVacancyRequest): Promise<void> {
       params: { id: vacancy.id },
     })
   } catch {
-    // Error is handled by the store
+    // Errors are shown via fieldErrors/error passed to VacancyForm
   }
 }
 </script>
@@ -32,10 +32,11 @@ async function handleSave(data: CreateVacancyRequest): Promise<void> {
       <h1 class="text-2xl font-bold">{{ t('vacancies.createTitle') }}</h1>
     </div>
 
-    <p v-if="vacancyStore.error" class="text-sm text-red-600">
-      {{ vacancyStore.error }}
-    </p>
-
-    <VacancyForm :loading="vacancyStore.loading" @save="handleSave" />
+    <VacancyForm
+      :loading="vacancyStore.loading"
+      :field-errors="vacancyStore.fieldErrors"
+      :error-message="vacancyStore.error"
+      @save="handleSave"
+    />
   </div>
 </template>

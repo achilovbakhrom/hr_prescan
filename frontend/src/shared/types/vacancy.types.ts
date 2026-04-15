@@ -24,6 +24,7 @@ export interface Vacancy {
   interviewMode: InterviewMode
   interviewEnabled: boolean
   cvRequired: boolean
+  prescanningLanguage: string
   companyInfo: string
   shareToken: string
   interviewDuration: number
@@ -38,4 +39,8 @@ export interface Vacancy {
   createdByEmail: string
   createdAt: string
   updatedAt: string
+  /** Employer company name returned by some API endpoints */
+  employerName?: string | null
+  /** Company name returned by some API endpoints */
+  companyName?: string | null
 }

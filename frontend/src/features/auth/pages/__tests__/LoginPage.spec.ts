@@ -84,15 +84,4 @@ describe('LoginPage', () => {
     expect(registerLink!.text()).toBe('Register')
   })
 
-  it('shows link to company register page', () => {
-    const wrapper = shallowMount(LoginPage, { global: globalConfig })
-
-    const links = wrapper.findAll('a')
-    const companyLink = links.find((link) => {
-      const to = link.attributes('data-to')
-      return to && to.includes(ROUTE_NAMES.COMPANY_REGISTER)
-    })
-    expect(companyLink).toBeDefined()
-    expect(companyLink!.text()).toBe('Register your company')
-  })
 })

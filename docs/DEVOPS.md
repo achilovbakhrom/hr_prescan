@@ -110,7 +110,7 @@ pip install opentelemetry-api \
 
 **Key traces to capture:**
 - Full interview lifecycle: application → CV parsing → scheduling → interview → scoring
-- External API latency: Deepgram, OpenAI, ElevenLabs response times
+- External API latency: Deepgram, Google Gemini, ElevenLabs response times
 - Database query performance
 - Celery task chains
 
@@ -168,7 +168,7 @@ LOGGING = {
 | DB connections > 80% | Connection pool exhaustion | Critical |
 | Disk usage > 85% | Storage running low | Warning |
 | Interview agent crash | LiveKit Agent not responding | Critical |
-| External API failure | Deepgram/OpenAI/ElevenLabs errors | Critical |
+| External API failure | Deepgram/Google Gemini/ElevenLabs errors | Critical |
 | SSL certificate expiry < 14 days | Certificate about to expire | Warning |
 
 ---
@@ -610,7 +610,7 @@ certbot:
 
 - **Never** store secrets in docker-compose files or git
 - Use `.env` files (not committed) or Docker secrets
-- Rotate API keys (Deepgram, OpenAI, ElevenLabs) periodically
+- Rotate API keys (Deepgram, Google Gemini, ElevenLabs) periodically
 - Use separate credentials for dev/staging/prod
 
 ```bash
@@ -618,7 +618,7 @@ certbot:
 POSTGRES_PASSWORD=<generated>
 DJANGO_SECRET_KEY=<generated>
 DEEPGRAM_API_KEY=<from-dashboard>
-OPENAI_API_KEY=<from-dashboard>
+GOOGLE_API_KEY=<from-dashboard>
 ELEVENLABS_API_KEY=<from-dashboard>
 LIVEKIT_API_SECRET=<generated>
 JWT_SECRET_KEY=<generated>

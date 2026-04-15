@@ -1,22 +1,30 @@
-from apps.interviews.apis.candidate import (
-    CandidateInterviewApi,
+from apps.interviews.apis.candidate_chat import (
     ChatHistoryApi,
     ChatMessageApi,
+)
+from apps.interviews.apis.candidate_interview import (
+    CandidateInterviewApi,
     InterviewRoomJoinApi,
     PublicInterviewApi,
     StartInterviewApi,
+)
+from apps.interviews.apis.candidate_voice import (
     VoiceChatMessageApi,
     VoiceMessageAudioApi,
 )
-from apps.interviews.apis.hr import (
+from apps.interviews.apis.hr_interview import (
     CancelInterviewApi,
     HRApplicationInterviewApi,
     HRInterviewDetailApi,
     HRInterviewListApi,
-    HRVoiceMessageAudioApi,
+)
+from apps.interviews.apis.hr_review import (
     IntegrityFlagsApi,
     InterviewRecordingApi,
     InterviewTranscriptApi,
+)
+from apps.interviews.apis.hr_schedule import (
+    HRVoiceMessageAudioApi,
     ObserverTokenApi,
     ResetInterviewApi,
     ScheduleHumanInterviewApi,

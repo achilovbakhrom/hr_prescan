@@ -65,20 +65,35 @@ async function handleSend(): Promise<void> {
   >
     <div v-if="sent" class="py-4 text-center">
       <i class="pi pi-check-circle mb-2 text-3xl text-green-500"></i>
-      <p class="text-sm text-gray-700">Email sent successfully</p>
+      <p class="text-sm text-gray-700">{{ t('candidates.email.sentSuccess') }}</p>
     </div>
 
     <div v-else class="space-y-4">
-      <p class="text-sm text-gray-500">To: {{ props.candidateEmail }}</p>
+      <p class="text-sm text-gray-500">
+        {{ t('candidates.email.to') }}: {{ props.candidateEmail }}
+      </p>
 
       <div>
-        <label class="mb-1 block text-sm font-medium text-gray-700"> Subject </label>
-        <InputText v-model="subject" class="w-full" placeholder="Email subject" />
+        <label class="mb-1 block text-sm font-medium text-gray-700">
+          {{ t('candidates.email.subject') }}
+        </label>
+        <InputText
+          v-model="subject"
+          class="w-full"
+          :placeholder="t('candidates.email.subjectPlaceholder')"
+        />
       </div>
 
       <div>
-        <label class="mb-1 block text-sm font-medium text-gray-700"> Body </label>
-        <Textarea v-model="body" class="w-full" rows="6" placeholder="Email body" />
+        <label class="mb-1 block text-sm font-medium text-gray-700">
+          {{ t('candidates.email.body') }}
+        </label>
+        <Textarea
+          v-model="body"
+          class="w-full"
+          rows="6"
+          :placeholder="t('candidates.email.bodyPlaceholder')"
+        />
       </div>
     </div>
 

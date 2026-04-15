@@ -3,6 +3,7 @@ from django.urls import path
 from apps.applications.apis import (
     CandidateApplicationDetailApi,
     CandidateApplicationListApi,
+    HRAllCandidatesListApi,
     HRApplicationDetailApi,
     HRApplicationListApi,
     HRApplicationNotesApi,
@@ -54,6 +55,11 @@ hr_vacancy_urlpatterns = [
 
 # Direct candidate endpoints: mounted at /api/hr/candidates/
 hr_candidate_urlpatterns = [
+    path(
+        "",
+        HRAllCandidatesListApi.as_view(),
+        name="hr-all-candidates",
+    ),
     path(
         "bulk-status/",
         HRBulkStatusApi.as_view(),

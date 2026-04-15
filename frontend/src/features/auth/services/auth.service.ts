@@ -1,4 +1,5 @@
 import { apiClient } from '@/shared/api/client'
+import type { CompanyMembership } from '@/shared/types/auth.types'
 import type {
   AcceptInvitationRequest,
   GoogleAuthResponse,
@@ -8,7 +9,6 @@ import type {
   LoginRequest,
   LoginResponse,
   PendingInvitation,
-  RegisterCompanyRequest,
   RegisterRequest,
   User,
 } from '../types/auth.types'
@@ -51,24 +51,21 @@ export const authService = {
     await apiClient.post('/auth/accept-invitation/', data)
   },
 
-  async registerCompany(data: RegisterCompanyRequest): Promise<void> {
-    await apiClient.post('/auth/company-register/', data)
-  },
-
-  async googleAuth(credential: string, role?: GoogleAuthRole): Promise<GoogleAuthResponse> {
-    const payload: { credential: string; role?: GoogleAuthRole } = { credential }
-    if (role) payload.role = role
-    const response = await apiClient.post<GoogleAuthResponse>('/auth/google/', payload)
+  async googleAuth(credential: string): Promise<LoginResponse> {
+    const response = await apiClient.post<LoginResponse>('/auth/google', { credential })
     return response.data
   },
 
-  async googleRegisterCompany(
-    data: GoogleRegisterCompanyRequest,
-  ): Promise<GoogleRegisterCompanyResponse> {
-    const response = await apiClient.post<GoogleRegisterCompanyResponse>(
-      '/auth/google/register-company/',
-      data,
-    )
+  async telegramAuth(data: {
+    id: number
+    first_name: string
+    last_name: string
+    username: string
+    photo_url: string
+    auth_date: number
+    hash: string
+  }): Promise<LoginResponse> {
+    const response = await apiClient.post<LoginResponse>('/auth/telegram/', data)
     return response.data
   },
 
@@ -81,6 +78,26 @@ export const authService = {
     const response = await apiClient.post<{ user: User }>('/auth/accept-company-invitation/', {
       token,
     })
+    return response.data
+  },
+
+  async completeOnboarding(role: 'candidate' | 'hr'): Promise<LoginResponse> {
+    const response = await apiClient.post<LoginResponse>('/auth/complete-onboarding', { role })
+    return response.data
+  },
+
+  async getMyCompanies(): Promise<CompanyMembership[]> {
+    const response = await apiClient.get<CompanyMembership[]>('/auth/my-companies')
+    return response.data
+  },
+
+  async switchCompany(companyId: string): Promise<User> {
+    const response = await apiClient.post<User>('/auth/switch-company', { companyId })
+    return response.data
+  },
+
+  async switchToPersonal(): Promise<User> {
+    const response = await apiClient.post<User>('/auth/switch-personal')
     return response.data
   },
 }

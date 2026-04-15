@@ -2,7 +2,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { setLocale, getLocale } from '@/shared/i18n'
 
-export type SupportedLocale = 'en' | 'ru'
+export type SupportedLocale = 'en' | 'ru' | 'uz'
 
 export interface LocaleOption {
   code: SupportedLocale
@@ -13,6 +13,7 @@ export interface LocaleOption {
 export const LOCALE_OPTIONS: LocaleOption[] = [
   { code: 'en', label: 'English', flag: '🇺🇸' },
   { code: 'ru', label: 'Русский', flag: '🇷🇺' },
+  { code: 'uz', label: "O'zbekcha", flag: '🇺🇿' },
 ]
 
 export function useLocale() {
@@ -29,7 +30,9 @@ export function useLocale() {
   }
 
   function toggleLocale(): void {
-    const next = currentLocale.value === 'en' ? 'ru' : 'en'
+    const order: SupportedLocale[] = ['en', 'ru', 'uz']
+    const idx = order.indexOf(currentLocale.value)
+    const next = order[(idx + 1) % order.length]
     switchLocale(next)
   }
 

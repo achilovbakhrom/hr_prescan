@@ -22,6 +22,8 @@ const emit = defineEmits<{
   addCriteria: [data: { name: string; description?: string; weight?: number; step?: string }]
   updateCriteria: [criteriaId: string, data: Partial<VacancyCriteria>]
   deleteCriteria: [criteriaId: string]
+  translateQuestions: []
+  translateCriteria: []
 }>()
 
 const { t } = useI18n()
@@ -44,6 +46,7 @@ const { t } = useI18n()
             @update="(qId, d) => emit('updateQuestion', qId, d)"
             @delete="(qId) => emit('deleteQuestion', qId)"
             @generate="() => emit('generateQuestions')"
+            @translate-all="() => emit('translateQuestions')"
           />
         </div>
       </TabPanel>
@@ -60,6 +63,7 @@ const { t } = useI18n()
             @add="(d) => emit('addCriteria', { ...d, step })"
             @update="(cId, d) => emit('updateCriteria', cId, d)"
             @delete="(cId) => emit('deleteCriteria', cId)"
+            @translate-all="() => emit('translateCriteria')"
           />
         </div>
       </TabPanel>

@@ -23,10 +23,31 @@ export interface AdminUser {
   createdAt: string
 }
 
+export interface MonthlyInterviewVolume {
+  month: string
+  count: number
+}
+
+export interface SubscriptionDistribution {
+  tier: string
+  name: string
+  count: number
+}
+
+export interface MonthlyRegistration {
+  month: string
+  role: string
+  count: number
+}
+
 export interface PlatformAnalytics {
   totalCompanies: number
   totalUsers: number
   totalInterviews: number
   activeSubscriptions: number
   monthlyRevenue: number
+  estimatedMonthlyRevenue: number
+  monthlyInterviewVolume: MonthlyInterviewVolume[]
+  subscriptionDistribution: SubscriptionDistribution[]
+  monthlyRegistrations: MonthlyRegistration[]
 }

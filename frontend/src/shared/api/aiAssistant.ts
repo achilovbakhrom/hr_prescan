@@ -22,8 +22,10 @@ export interface AIResponse {
 export async function sendAICommand(
   message: string,
   context?: Record<string, unknown>,
+  role?: 'admin' | 'hr' | 'candidate',
 ): Promise<AIResponse> {
-  const response = await apiClient.post<AIResponse>('/hr/ai-assistant', {
+  const endpoint = role === 'candidate' ? '/candidate/ai-assistant' : '/hr/ai-assistant'
+  const response = await apiClient.post<AIResponse>(endpoint, {
     message,
     context,
   })

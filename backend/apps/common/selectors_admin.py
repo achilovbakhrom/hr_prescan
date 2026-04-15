@@ -1,4 +1,7 @@
+from datetime import timedelta
+
 from django.db.models import Count, Q, QuerySet, Sum
+from django.db.models.functions import TruncMonth
 from django.utils import timezone
 
 from apps.accounts.models import Company, User
@@ -115,4 +118,78 @@ def get_platform_analytics() -> dict:
         "new_users_this_month": new_users_this_month,
         "interviews_this_month": interviews_this_month,
         "subscription_tier_breakdown": list(tier_breakdown),
+        "monthly_interview_volume": get_monthly_interview_volume(),
+        "subscription_distribution": get_subscription_distribution(),
+        "monthly_registrations": get_monthly_registrations(),
     }
+
+
+def get_monthly_interview_volume(months: int = 6) -> list[dict]:
+    """Count interviews per month for the last N months."""
+    now = timezone.now()
+    start_date = (now - timedelta(days=months * 30)).replace(
+        day=1, hour=0, minute=0, second=0, microsecond=0,
+    )
+
+    data = (
+        Interview.objects
+        .filter(created_at__gte=start_date)
+        .annotate(month=TruncMonth("created_at"))
+        .values("month")
+        .annotate(count=Count("id"))
+        .order_by("month")
+    )
+
+    return [
+        {
+            "month": entry["month"].strftime("%Y-%m"),
+            "count": entry["count"],
+        }
+        for entry in data
+    ]
+
+
+def get_subscription_distribution() -> list[dict]:
+    """Count companies by subscription tier."""
+    data = (
+        CompanySubscription.objects
+        .filter(is_active=True)
+        .values("plan__tier", "plan__name")
+        .annotate(count=Count("id"))
+        .order_by("plan__tier")
+    )
+
+    return [
+        {
+            "tier": entry["plan__tier"],
+            "name": entry["plan__name"],
+            "count": entry["count"],
+        }
+        for entry in data
+    ]
+
+
+def get_monthly_registrations(months: int = 6) -> list[dict]:
+    """Count users registered per month, grouped by role."""
+    now = timezone.now()
+    start_date = (now - timedelta(days=months * 30)).replace(
+        day=1, hour=0, minute=0, second=0, microsecond=0,
+    )
+
+    data = (
+        User.objects
+        .filter(created_at__gte=start_date)
+        .annotate(month=TruncMonth("created_at"))
+        .values("month", "role")
+        .annotate(count=Count("id"))
+        .order_by("month", "role")
+    )
+
+    return [
+        {
+            "month": entry["month"].strftime("%Y-%m"),
+            "role": entry["role"],
+            "count": entry["count"],
+        }
+        for entry in data
+    ]

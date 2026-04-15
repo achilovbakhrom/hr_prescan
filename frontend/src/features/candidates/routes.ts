@@ -19,6 +19,12 @@ export const candidateRoutes: RouteRecordRaw[] = [
 
 export const hrCandidateRoutes: RouteRecordRaw[] = [
   {
+    path: '/candidates',
+    name: ROUTE_NAMES.CANDIDATE_LIST,
+    component: () => import('./pages/CandidateListPage.vue'),
+    meta: { requiresAuth: true, roles: [USER_ROLES.ADMIN, USER_ROLES.HR] },
+  },
+  {
     path: '/candidates/:id',
     name: ROUTE_NAMES.CANDIDATE_DETAIL,
     component: () => import('./pages/CandidateDetailPage.vue'),

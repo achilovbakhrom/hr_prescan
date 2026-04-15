@@ -21,9 +21,9 @@ export const authRoutes: RouteRecordRaw[] = [
     meta: { requiresAuth: false },
   },
   {
-    path: '/register-company',
-    name: ROUTE_NAMES.COMPANY_REGISTER,
-    component: () => import('./pages/CompanyRegisterPage.vue'),
+    path: '/choose-role',
+    name: ROUTE_NAMES.CHOOSE_ROLE,
+    component: () => import('./pages/ChooseRolePage.vue'),
     meta: { requiresAuth: false },
   },
 ]
