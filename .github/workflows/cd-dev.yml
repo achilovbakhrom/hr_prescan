@@ -58,9 +58,9 @@ jobs:
             VITE_API_URL=https://dev.prescreen-app.com/api
             VITE_LIVEKIT_URL=wss://dev.prescreen-app.com/ws/
             VITE_GOOGLE_CLIENT_ID=64156241192-ul3jng69g72u46vadaf8h4kt1jpahbpm.apps.googleusercontent.com
-            VITE_TELEGRAM_BOT_USERNAME=hr_prescreen_ai_dev_bot
-            VITE_TELEGRAM_BOT_ID=8686090273
-            VITE_TELEGRAM_CANDIDATE_BOT_USERNAME=hr_prescreen_candidate_dev_bot
+            VITE_TELEGRAM_BOT_USERNAME=candidate_preview_ai_dev_bot
+            VITE_TELEGRAM_BOT_ID=8640891941
+            VITE_TELEGRAM_CANDIDATE_BOT_USERNAME=candidate_preview_ai_dev_bot
             VITE_BILLING_ENABLED=false
           cache-from: type=gha,scope=frontend-dev
           cache-to: type=gha,mode=max,scope=frontend-dev
