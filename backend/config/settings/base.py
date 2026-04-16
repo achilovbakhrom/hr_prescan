@@ -282,6 +282,7 @@ GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
 # Google Gemini
 GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY", "")
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3-flash-preview")
+GEMINI_TRANSLATION_MODEL = os.environ.get("GEMINI_TRANSLATION_MODEL", "gemini-2.0-flash-lite")
 
 # Telegram bots
 # Two separate bots: one for HRs (manage vacancies, candidates, etc.) and one

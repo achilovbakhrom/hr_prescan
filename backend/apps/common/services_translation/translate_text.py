@@ -111,7 +111,7 @@ def translate_ai_content(
     try:
         client = genai.Client(api_key=settings.GOOGLE_API_KEY)
         response = client.models.generate_content(
-            model=settings.GEMINI_MODEL,
+            model=settings.GEMINI_TRANSLATION_MODEL,
             contents=[
                 types.Content(
                     role="user",
