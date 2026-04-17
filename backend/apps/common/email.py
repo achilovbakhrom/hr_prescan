@@ -15,6 +15,20 @@ from django.utils.html import strip_tags
 logger = logging.getLogger(__name__)
 
 
+def _is_suppressed(recipient: str) -> bool:
+    """Return True if the recipient's domain is on the suppress list.
+
+    Driven by `settings.EMAIL_SUPPRESS_DOMAINS` (comma-separated env var).
+    Used to drop outbound emails to test / synthetic accounts so E2E runs
+    don't spam real inboxes. Production deployments leave the list empty.
+    """
+    suppress = getattr(settings, "EMAIL_SUPPRESS_DOMAINS", None)
+    if not suppress:
+        return False
+    _, _, domain = recipient.partition("@")
+    return domain.lower() in suppress
+
+
 def send_templated_email(
     *,
     to: str | list[str],
@@ -36,6 +50,15 @@ def send_templated_email(
     if isinstance(to, str):
         to = [to]
 
+    # Drop recipients whose domain is suppressed (E2E test accounts, synthetic
+    # telegram.local addresses). If that leaves nobody, short-circuit.
+    kept = [addr for addr in to if not _is_suppressed(addr)]
+    dropped = [addr for addr in to if _is_suppressed(addr)]
+    if dropped:
+        logger.info("Email suppressed (test domain): subject=%r, to=%s", subject, dropped)
+    if not kept:
+        return True
+
     ctx = {
         "frontend_url": settings.FRONTEND_URL,
         "app_name": "PreScreen AI",
@@ -49,14 +72,14 @@ def send_templated_email(
         subject=subject,
         body=text_body,
         from_email=settings.DEFAULT_FROM_EMAIL,
-        to=to,
+        to=kept,
     )
     msg.attach_alternative(html_body, "text/html")
 
     try:
         msg.send()
-        logger.info("Email sent: subject=%r, to=%s", subject, to)
+        logger.info("Email sent: subject=%r, to=%s", subject, kept)
         return True
     except Exception:
-        logger.exception("Failed to send email: subject=%r, to=%s", subject, to)
+        logger.exception("Failed to send email: subject=%r, to=%s", subject, kept)
         return False

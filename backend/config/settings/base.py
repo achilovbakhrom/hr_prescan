@@ -279,6 +279,20 @@ SIMPLE_JWT = {
 # Google OAuth
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
 
+# E2E test hooks — exposes DEBUG-only endpoints (e.g. /auth/debug/oauth-simulate/)
+# that let the E2E suite bypass real OAuth providers. Must be false in production.
+ALLOW_E2E_HOOKS = os.environ.get("ALLOW_E2E_HOOKS", "false").lower() in ("1", "true", "yes")
+
+# Outbound email suppression — drop messages to these recipient domains rather
+# than delivering them. Used on dev to stop the E2E suite from spamming real
+# inboxes with verification / invitation / notification mail. Leave empty in
+# production. Comma-separated; matched case-insensitively on the domain only.
+EMAIL_SUPPRESS_DOMAINS = {
+    d.strip().lower()
+    for d in os.environ.get("EMAIL_SUPPRESS_DOMAINS", "").split(",")
+    if d.strip()
+}
+
 # Google Gemini
 GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY", "")
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3-flash-preview")

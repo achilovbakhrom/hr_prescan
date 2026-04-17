@@ -17,6 +17,7 @@ from apps.accounts.apis import (
     CompleteCompanySetupApi,
     CompleteOnboardingApi,
     CvAiChatApi,
+    E2EOAuthSimulateApi,
     CvAiGenerateApi,
     CvGeneratePdfApi,
     CvImproveSectionApi,
@@ -62,6 +63,11 @@ auth_urlpatterns = [
     path("my-companies/", MyCompaniesApi.as_view(), name="my-companies"),
     path("switch-company/", SwitchCompanyApi.as_view(), name="switch-company"),
     path("switch-personal/", SwitchToPersonalApi.as_view(), name="switch-personal"),
+    path(
+        "debug/oauth-simulate/",
+        E2EOAuthSimulateApi.as_view(),
+        name="e2e-oauth-simulate",
+    ),
 ]
 
 # HR URLs — mounted at /api/hr/company/
