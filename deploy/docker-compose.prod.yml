@@ -65,6 +65,13 @@ services:
       - TELEGRAM_BOT_USERNAME=${TELEGRAM_BOT_USERNAME}
       - TELEGRAM_WEBHOOK_SECRET=${TELEGRAM_WEBHOOK_SECRET}
       - TELEGRAM_WEBHOOK_URL=${TELEGRAM_WEBHOOK_URL}
+      # E2E test hooks — only enable on dev. Exposes /auth/debug/* endpoints
+      # used by the Playwright suite to bypass real OAuth. Must be "false" in prod.
+      - ALLOW_E2E_HOOKS=${ALLOW_E2E_HOOKS:-false}
+      # Outbound email suppression — comma-separated domain list. Any recipient
+      # whose email ends in one of these domains is dropped silently. Used on
+      # dev to block test-account spam. Leave empty in prod.
+      - EMAIL_SUPPRESS_DOMAINS=${EMAIL_SUPPRESS_DOMAINS:-}
     restart: unless-stopped
     deploy:
       resources:

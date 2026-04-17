@@ -61,6 +61,7 @@ from apps.accounts.apis.company_team import (
     TeamListApi,
     TeamMemberDetailApi,
 )
+from apps.accounts.apis.e2e_hooks import E2EOAuthSimulateApi
 from apps.accounts.apis.google_auth import GoogleAuthApi
 from apps.accounts.apis.telegram_auth import TelegramAuthApi
 
@@ -85,6 +86,7 @@ __all__ = [
     "CvGeneratePdfApi",
     "CvImproveSectionApi",
     "CvParseApi",
+    "E2EOAuthSimulateApi",
     "EducationDetailApi",
     "EducationListCreateApi",
     "GoogleAuthApi",

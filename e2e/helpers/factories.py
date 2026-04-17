@@ -38,25 +38,40 @@ def register_candidate(api: ApiClient) -> dict[str, Any]:
 
 
 def register_company(api: ApiClient) -> dict[str, Any]:
-    """Register a company with an admin user. Returns {company, user, tokens, email, password}."""
+    """Register a new company with an admin user by chaining the real public flow:
+    register candidate → login → complete-company-setup. There's no single-shot
+    "company-register" endpoint on the backend.
+
+    Returns {company, user, tokens, email, password}.
+    """
     email = unique_email("admin")
     password = "TestPass123!"
-    resp = api.post("/auth/company-register/", data={
-        "company_name": f"E2E Corp {uuid.uuid4().hex[:6]}",
-        "admin_email": email,
-        "admin_first_name": "Admin",
-        "admin_last_name": "User",
-        "admin_password": password,
-        "size": "small",
-        "country": "Uzbekistan",
+
+    resp = api.post("/auth/register/", data={
+        "email": email,
+        "password": password,
+        "first_name": "Admin",
+        "last_name": "User",
     })
-    assert resp.status == 201, f"Company register failed: {resp.text()}"
-    # Login to get tokens
+    assert resp.status == 201, f"Register failed: {resp.text()}"
+
     login_data = api.login(email, password)
+
+    resp = api.post("/auth/complete-company-setup/", data={
+        "company_name": f"E2E Corp {uuid.uuid4().hex[:6]}",
+        "size": "small",
+        "country": "UZ",
+        "industries": [],
+    })
+    assert resp.status in (200, 201), f"complete-company-setup failed: {resp.text()}"
+    setup = resp.json()
+    # Refresh tokens returned by the setup endpoint take the new ADMIN role into account
+    api.set_token(setup["tokens"]["access"])
+
     return {
-        "company": login_data["user"]["company"],
-        "user": login_data["user"],
-        "tokens": login_data["tokens"],
+        "company": setup["user"]["company"],
+        "user": setup["user"],
+        "tokens": setup["tokens"],
         "email": email,
         "password": password,
     }
@@ -155,3 +170,27 @@ def submit_application(api: ApiClient, vacancy_id: str) -> dict[str, Any]:
     )
     assert resp.status == 201, f"Apply failed: {resp.text()}"
     return {**resp.json(), "candidate_email": email}
+
+
+def oauth_simulate(
+    api: ApiClient,
+    state: str,
+    provider: str = "google",
+    email: str | None = None,
+) -> dict[str, Any]:
+    """Call the backend E2E hook to simulate a post-OAuth user in a given state.
+
+    `state` is one of: "new_candidate", "onboarded_candidate", "new_hr_needs_company".
+    Requires ALLOW_E2E_HOOKS=true on the server. Skips the calling test if the
+    endpoint returns 404.
+    """
+    import pytest
+
+    payload: dict[str, Any] = {"state": state, "provider": provider}
+    if email:
+        payload["email"] = email
+    resp = api.post("/auth/debug/oauth-simulate/", data=payload)
+    if resp.status == 404:
+        pytest.skip("ALLOW_E2E_HOOKS not enabled on target server")
+    assert resp.status == 200, f"oauth-simulate failed ({resp.status}): {resp.text()}"
+    return resp.json()
