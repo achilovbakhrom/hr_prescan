@@ -11,6 +11,8 @@ const props = defineProps<{
   model: string
   objectId: string
   field: string
+  /** Use `/translate/` (any auth) instead of `/hr/translate/` (HR-only). */
+  scope?: 'hr' | 'public'
 }>()
 
 const emit = defineEmits<{
@@ -44,6 +46,7 @@ async function handleTranslate() {
       objectId: props.objectId,
       field: props.field,
       targetLanguage: currentLocale.value,
+      scope: props.scope,
     })
     const updated = { ...props.translations, [result.language]: result.translatedText }
     emit('translated', updated)

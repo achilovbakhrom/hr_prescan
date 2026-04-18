@@ -37,6 +37,10 @@ export interface Vacancy {
   candidatesHired: number
   keywords: string[]
   telegramCode: number | null
+  titleTranslations?: Record<string, string>
+  descriptionTranslations?: Record<string, string>
+  requirementsTranslations?: Record<string, string>
+  responsibilitiesTranslations?: Record<string, string>
   createdByEmail: string
   createdAt: string
   updatedAt: string
