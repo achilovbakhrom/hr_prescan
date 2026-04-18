@@ -43,6 +43,11 @@ export const authService = {
     return response.data
   },
 
+  async updateMe(data: { language?: 'en' | 'ru' | 'uz' }): Promise<User> {
+    const response = await apiClient.patch<User>('/auth/me/', data)
+    return response.data
+  },
+
   async acceptInvitation(data: AcceptInvitationRequest): Promise<void> {
     await apiClient.post('/auth/accept-invitation/', data)
   },
