@@ -103,17 +103,41 @@ def process_candidate_ai_command(*, user, message, context=None):
         )
 
 
+def _is_failure(action):
+    result = action.get("result", {})
+    return bool(result.get("error")) or result.get("success") is False
+
+
+def _suppress_stale_failures(actions_taken):
+    """Drop failed actions that a later successful call to the same tool superseded.
+
+    The ReAct agent can retry — e.g. it asks for something the user hasn't
+    saved yet, fails, takes a corrective step, then re-tries the original
+    tool successfully. Surfacing the stale error confuses the user.
+    """
+    last_success_idx = {}
+    for i, a in enumerate(actions_taken):
+        if not _is_failure(a):
+            last_success_idx[a["tool"]] = i
+
+    effective = []
+    for i, a in enumerate(actions_taken):
+        if _is_failure(a) and i < last_success_idx.get(a["tool"], -1):
+            continue
+        effective.append(a)
+    return effective
+
+
 def _build_final_response(*, gpt_message, actions_taken):
     """Build the final response, appending error details if any tools failed."""
-    has_errors = any(
-        a.get("result", {}).get("error") or a.get("result", {}).get("success") is False for a in actions_taken
-    )
+    effective_actions = _suppress_stale_failures(actions_taken)
+    has_errors = any(_is_failure(a) for a in effective_actions)
 
     message = gpt_message or "Done."
 
     if has_errors:
         error_details = []
-        for a in actions_taken:
+        for a in effective_actions:
             err = a.get("result", {}).get("error")
             if err:
                 error_details.append(f"- {a['tool']}: {err}")
