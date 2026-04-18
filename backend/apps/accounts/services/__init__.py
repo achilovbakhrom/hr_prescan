@@ -14,12 +14,12 @@ from apps.accounts.services.company import (
 from apps.accounts.services.membership import (
     accept_invitation,
     accept_invitation_existing_user,
-    activate_user,
-    deactivate_user,
     invite_hr,
+    set_default_company,
     switch_company,
     switch_to_personal,
 )
+from apps.accounts.services.team_management import activate_user, deactivate_user
 
 __all__ = [
     "accept_invitation",
@@ -34,6 +34,7 @@ __all__ = [
     "generate_email_verification_token",
     "invite_hr",
     "register_user",
+    "set_default_company",
     "switch_company",
     "switch_to_personal",
     "update_company_profile",
