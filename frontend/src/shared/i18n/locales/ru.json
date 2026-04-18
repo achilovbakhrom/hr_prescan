@@ -1220,7 +1220,16 @@
       "employmentType": "Тип занятости",
       "employmentTypePlaceholder": "Выберите тип",
       "openToWork": "Открыт к предложениям",
-      "saveSuccess": "Личные данные успешно обновлены"
+      "saveSuccess": "Личные данные успешно обновлены",
+      "photo": "Фото профиля",
+      "photoHint": "JPEG, PNG или WEBP. До 5 МБ.",
+      "uploadPhoto": "Загрузить фото",
+      "changePhoto": "Изменить фото",
+      "removePhoto": "Удалить",
+      "photoUploadSuccess": "Фото загружено",
+      "photoRemoveSuccess": "Фото удалено",
+      "photoInvalidType": "Допустимы только JPEG, PNG или WEBP",
+      "photoTooLarge": "Фото должно быть меньше 5 МБ"
     },
     "employmentTypes": {
       "fullTime": "Полная занятость",

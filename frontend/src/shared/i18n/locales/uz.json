@@ -1213,7 +1213,16 @@
       "employmentType": "Bandlik turi",
       "employmentTypePlaceholder": "Turni tanlang",
       "openToWork": "Ishga tayyorman",
-      "saveSuccess": "Shaxsiy ma'lumot muvaffaqiyatli yangilandi"
+      "saveSuccess": "Shaxsiy ma'lumot muvaffaqiyatli yangilandi",
+      "photo": "Profil rasmi",
+      "photoHint": "JPEG, PNG yoki WEBP. 5 MB gacha.",
+      "uploadPhoto": "Rasm yuklash",
+      "changePhoto": "Rasmni almashtirish",
+      "removePhoto": "O'chirish",
+      "photoUploadSuccess": "Rasm yuklandi",
+      "photoRemoveSuccess": "Rasm o'chirildi",
+      "photoInvalidType": "Faqat JPEG, PNG yoki WEBP ruxsat etiladi",
+      "photoTooLarge": "Rasm 5 MB dan kichik bo'lishi kerak"
     },
     "employmentTypes": {
       "fullTime": "To'liq stavka",

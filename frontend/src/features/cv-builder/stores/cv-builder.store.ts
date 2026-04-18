@@ -46,6 +46,8 @@ export const useCvBuilderStore = defineStore('cvBuilder', () => {
   const fetchProfile = profileStore.fetchProfile.bind(profileStore)
   const updateProfile = (d: ProfileUpdatePayload) => profileStore.updateProfile(d)
   const updateSkills = (s: string[]) => profileStore.updateSkills(s)
+  const uploadPhoto = (file: File) => profileStore.uploadPhoto(file)
+  const deletePhoto = () => profileStore.deletePhoto()
   const createWorkExperience = (d: WorkExperiencePayload) => profileStore.createWorkExperience(d)
   const updateWorkExperience = (id: string, d: WorkExperiencePayload) =>
     profileStore.updateWorkExperience(id, d)
@@ -81,6 +83,8 @@ export const useCvBuilderStore = defineStore('cvBuilder', () => {
     fetchProfile,
     updateProfile,
     updateSkills,
+    uploadPhoto,
+    deletePhoto,
     createWorkExperience,
     updateWorkExperience,
     deleteWorkExperience,

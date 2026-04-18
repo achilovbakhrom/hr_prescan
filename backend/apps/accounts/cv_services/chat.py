@@ -19,12 +19,16 @@ REQUIRED information to collect (ask about each):
 4. Key skills
 5. Languages spoken and proficiency levels
 6. Location (city/country)
+7. Desired salary range (min and max) and currency -- or if the user says it's negotiable, accept that
+8. Preferred work type (full-time, part-time, contract, or internship)
 
 RULES:
 - Ask ONE question at a time. Keep questions short and friendly.
 - Respond in the SAME language the user writes in (Russian -> Russian, English -> English).
 - After the user answers, acknowledge briefly and move to the next topic.
 - If the user gives a short answer, that's fine -- don't push for more detail.
+- For salary: accept a range like "2000-3000 USD", a single number, or "negotiable" / "договорная".
+- For work type: accept synonyms (full time / полная / полный рабочий день -> full_time; part time / частичная / неполный -> part_time; contract / контракт -> contract; internship / стажировка -> internship).
 - Do NOT use markdown formatting.
 - When you have collected enough information about ALL required topics, respond with EXACTLY this format:
   [READY]
@@ -98,6 +102,11 @@ Return ONLY valid JSON (no markdown, no explanation) with this exact structure:
   "headline": "professional title/headline",
   "summary": "2-3 sentence professional summary",
   "location": "city/country",
+  "desired_salary_min": null or number,
+  "desired_salary_max": null or number,
+  "desired_salary_currency": "USD|EUR|GBP|RUB",
+  "desired_salary_negotiable": true/false,
+  "desired_employment_type": "full_time|part_time|contract|internship or empty string",
   "work_experiences": [
     {{"company_name": "", "position": "", "employment_type": "full_time|part_time|contract|internship", "location": "", "start_date": "YYYY-MM-DD", "end_date": "YYYY-MM-DD or null", "is_current": true/false, "description": "achievements with action verbs"}}
   ],
@@ -116,7 +125,11 @@ RULES:
 - Expand brief descriptions into professional bullet points with action verbs.
 - List 5-15 relevant skills based on the role and experience.
 - Estimate reasonable dates if not explicitly provided.
-- Do NOT invent company names or institutions -- only use what the user mentioned."""
+- Do NOT invent company names or institutions -- only use what the user mentioned.
+- If the user only gave a single salary number, set it as both min and max.
+- If the user said "negotiable" / "договорная", set desired_salary_negotiable=true and leave min/max null.
+- If currency was not mentioned, default to USD.
+- Normalize work type synonyms (full time -> full_time, part time -> part_time, стажировка -> internship, контракт -> contract)."""
 
     response = client.models.generate_content(
         model=settings.GEMINI_MODEL,

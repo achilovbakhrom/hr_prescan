@@ -1220,7 +1220,16 @@
       "employmentType": "Employment Type",
       "employmentTypePlaceholder": "Select type",
       "openToWork": "Open to Work",
-      "saveSuccess": "Personal info updated successfully"
+      "saveSuccess": "Personal info updated successfully",
+      "photo": "Profile Photo",
+      "photoHint": "JPEG, PNG or WEBP. Up to 5 MB.",
+      "uploadPhoto": "Upload Photo",
+      "changePhoto": "Change Photo",
+      "removePhoto": "Remove",
+      "photoUploadSuccess": "Photo uploaded",
+      "photoRemoveSuccess": "Photo removed",
+      "photoInvalidType": "Only JPEG, PNG, or WEBP images are allowed",
+      "photoTooLarge": "Photo must be smaller than 5 MB"
     },
     "employmentTypes": {
       "fullTime": "Full Time",

@@ -42,6 +42,32 @@ def _populate_profile_from_parsed(*, profile, data):
         if data.get(field):
             setattr(profile, field, data[field])
             update_fields.append(field)
+
+    # Salary / employment preferences (accept None/empty values as unset)
+    valid_employment_types = {choice[0] for choice in CandidateProfile.EmploymentType.choices}
+    employment_type = data.get("desired_employment_type")
+    if employment_type in valid_employment_types:
+        profile.desired_employment_type = employment_type
+        update_fields.append("desired_employment_type")
+
+    for numeric_field in ("desired_salary_min", "desired_salary_max"):
+        value = data.get(numeric_field)
+        if value is not None:
+            try:
+                setattr(profile, numeric_field, value)
+                update_fields.append(numeric_field)
+            except (TypeError, ValueError):
+                logger.warning("Invalid %s value from parsed CV: %r", numeric_field, value)
+
+    currency = data.get("desired_salary_currency")
+    if currency:
+        profile.desired_salary_currency = currency[:3].upper()
+        update_fields.append("desired_salary_currency")
+
+    if "desired_salary_negotiable" in data:
+        profile.desired_salary_negotiable = bool(data.get("desired_salary_negotiable"))
+        update_fields.append("desired_salary_negotiable")
+
     if update_fields:
         profile.save(update_fields=[*update_fields, "updated_at"])
 

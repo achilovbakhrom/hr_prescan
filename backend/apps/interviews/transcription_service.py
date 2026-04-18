@@ -35,7 +35,9 @@ def _get_s3_client():
 def upload_voice_message_to_s3(*, file_obj, interview_id: str, filename: str = "audio.webm") -> str:
     """Upload voice message to S3. Returns object key."""
     ext = filename.rsplit(".", 1)[-1] if "." in filename else "webm"
-    key = f"voice-messages/{interview_id}/{uuid.uuid4()}.{ext}"
+    prefix = (getattr(settings, "S3_KEY_PREFIX", "") or "").strip("/")
+    base = f"voice-messages/{interview_id}/{uuid.uuid4()}.{ext}"
+    key = f"{prefix}/{base}" if prefix else base
 
     s3 = _get_s3_client()
     s3.upload_fileobj(

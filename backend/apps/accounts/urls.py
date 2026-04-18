@@ -9,6 +9,7 @@ from apps.accounts.apis import (
     CandidateLanguageDetailApi,
     CandidateLanguageListCreateApi,
     CandidateProfileApi,
+    CandidateProfilePhotoApi,
     CandidateProfileSkillsApi,
     CertificationDetailApi,
     CertificationListCreateApi,
@@ -17,11 +18,11 @@ from apps.accounts.apis import (
     CompleteCompanySetupApi,
     CompleteOnboardingApi,
     CvAiChatApi,
-    E2EOAuthSimulateApi,
     CvAiGenerateApi,
     CvGeneratePdfApi,
     CvImproveSectionApi,
     CvParseApi,
+    E2EOAuthSimulateApi,
     EducationDetailApi,
     EducationListCreateApi,
     GoogleAuthApi,
@@ -81,6 +82,7 @@ hr_urlpatterns = [
 # Candidate profile URLs — mounted at /api/candidate/profile/
 candidate_profile_urlpatterns = [
     path("", CandidateProfileApi.as_view(), name="candidate-profile"),
+    path("photo/", CandidateProfilePhotoApi.as_view(), name="candidate-profile-photo"),
     path("skills/", CandidateProfileSkillsApi.as_view(), name="candidate-profile-skills"),
     path("work-experiences/", WorkExperienceListCreateApi.as_view(), name="work-experience-list"),
     path("work-experiences/<uuid:pk>/", WorkExperienceDetailApi.as_view(), name="work-experience-detail"),

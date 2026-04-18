@@ -40,6 +40,7 @@ from apps.accounts.apis.candidate_languages import (
     CandidateLanguageDetailApi,
     CandidateLanguageListCreateApi,
 )
+from apps.accounts.apis.candidate_photo import CandidateProfilePhotoApi
 from apps.accounts.apis.candidate_profile import (
     CandidateProfileApi,
     CandidateProfileSkillsApi,
@@ -74,6 +75,7 @@ __all__ = [
     "CandidateLanguageDetailApi",
     "CandidateLanguageListCreateApi",
     "CandidateProfileApi",
+    "CandidateProfilePhotoApi",
     "CandidateProfileSkillsApi",
     "CertificationDetailApi",
     "CertificationListCreateApi",

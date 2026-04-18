@@ -99,6 +99,7 @@ export interface CandidateProfile {
   isOpenToWork: boolean
   shareToken: string
   photo: string | null
+  photoUrl: string | null
   skills: SkillItem[]
   workExperiences: WorkExperience[]
   educations: Education[]

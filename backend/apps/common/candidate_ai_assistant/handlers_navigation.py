@@ -1,15 +1,15 @@
 CANDIDATE_PAGE_ROUTES = {
-    "dashboard": "/candidate/dashboard",
+    "dashboard": "/dashboard",
     "jobs": "/jobs",
-    "my-applications": "/candidate/applications",
-    "cv-builder": "/candidate/cv-builder",
-    "profile": "/candidate/profile",
+    "my-applications": "/my-applications",
+    "cv-builder": "/cv-builder",
+    "profile": "/profile",
 }
 
 
 def _handle_candidate_navigate_to_page(*, user, params):
     page = params.get("page", "dashboard")
-    path = CANDIDATE_PAGE_ROUTES.get(page, "/candidate/dashboard")
+    path = CANDIDATE_PAGE_ROUTES.get(page, "/dashboard")
 
     return {
         "success": True,

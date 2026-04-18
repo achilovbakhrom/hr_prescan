@@ -81,6 +81,7 @@ class CandidateProfileOutputSerializer(serializers.Serializer):
     is_open_to_work = serializers.BooleanField()
     share_token = serializers.CharField()
     photo = serializers.CharField()
+    photo_url = serializers.SerializerMethodField()
     skills = serializers.SerializerMethodField()
     cvs = serializers.SerializerMethodField()
     work_experiences = serializers.SerializerMethodField()
@@ -88,6 +89,16 @@ class CandidateProfileOutputSerializer(serializers.Serializer):
     languages = serializers.SerializerMethodField()
     certifications = serializers.SerializerMethodField()
     completeness = serializers.SerializerMethodField()
+
+    def get_photo_url(self, obj):
+        if not obj.photo:
+            return ""
+        from apps.accounts.cv_services import generate_profile_photo_url
+
+        try:
+            return generate_profile_photo_url(key=obj.photo)
+        except Exception:
+            return ""
 
     def get_skills(self, obj):
         return SkillOutputSerializer(obj.skills.all(), many=True).data
