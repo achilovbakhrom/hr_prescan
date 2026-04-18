@@ -56,7 +56,7 @@ function convertKeysToCamelCase(obj: unknown): unknown {
   return obj
 }
 
-const baseURL = (import.meta.env.VITE_API_URL as string).replace(/\/$/, '')
+const baseURL = ((import.meta.env.VITE_API_URL as string | undefined) ?? '/api').replace(/\/$/, '')
 
 export const apiClient = axios.create({
   baseURL,
@@ -175,7 +175,7 @@ apiClient.interceptors.response.use(
     try {
       const tokens = JSON.parse(raw) as { access: string; refresh: string }
       const response = await axios.post<{ access: string }>(
-        `${import.meta.env.VITE_API_URL}/auth/token/refresh/`,
+        `${baseURL}/auth/token/refresh/`,
         { refresh: tokens.refresh },
       )
 
