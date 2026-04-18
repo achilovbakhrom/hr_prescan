@@ -48,9 +48,13 @@ class Vacancy(BaseModel):
         related_name="created_vacancies",
     )
     title = models.CharField(max_length=255)
+    title_translations = models.JSONField(default=dict, blank=True)
     description = models.TextField()
+    description_translations = models.JSONField(default=dict, blank=True)
     requirements = models.TextField(blank=True)
+    requirements_translations = models.JSONField(default=dict, blank=True)
     responsibilities = models.TextField(blank=True)
+    responsibilities_translations = models.JSONField(default=dict, blank=True)
     skills = models.JSONField(default=list)
     salary_min = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
     salary_max = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)

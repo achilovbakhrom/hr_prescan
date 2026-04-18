@@ -21,32 +21,63 @@ LANGUAGE_NAMES = {
 # For JSON subfields (match_details.notes, cv_parsed_data.summary),
 # source_field is the JSONField name and we extract the subkey.
 TRANSLATABLE_FIELDS = {
+    # HR-only: AI-generated evaluation content
     ("interview", "ai_summary"): {
         "model": "interviews.Interview",
         "source_field": "ai_summary",
         "translations_field": "ai_summary_translations",
+        "public": False,
     },
     ("interview_score", "ai_notes"): {
         "model": "interviews.InterviewScore",
         "source_field": "ai_notes",
         "translations_field": "ai_notes_translations",
+        "public": False,
     },
     ("application", "match_notes"): {
         "model": "applications.Application",
         "source_field": "match_details",
         "source_subkey": "notes",
         "translations_field": "match_notes_translations",
+        "public": False,
     },
     ("application", "cv_summary"): {
         "model": "applications.Application",
         "source_field": "cv_parsed_data",
         "source_subkey": "summary",
         "translations_field": "cv_summary_translations",
+        "public": False,
     },
+    # Publicly visible content — translatable by any authenticated user
     ("employer", "description"): {
         "model": "vacancies.EmployerCompany",
         "source_field": "description",
         "translations_field": "description_translations",
+        "public": True,
+    },
+    ("vacancy", "title"): {
+        "model": "vacancies.Vacancy",
+        "source_field": "title",
+        "translations_field": "title_translations",
+        "public": True,
+    },
+    ("vacancy", "description"): {
+        "model": "vacancies.Vacancy",
+        "source_field": "description",
+        "translations_field": "description_translations",
+        "public": True,
+    },
+    ("vacancy", "requirements"): {
+        "model": "vacancies.Vacancy",
+        "source_field": "requirements",
+        "translations_field": "requirements_translations",
+        "public": True,
+    },
+    ("vacancy", "responsibilities"): {
+        "model": "vacancies.Vacancy",
+        "source_field": "responsibilities",
+        "translations_field": "responsibilities_translations",
+        "public": True,
     },
 }
 
