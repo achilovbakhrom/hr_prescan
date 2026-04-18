@@ -8,7 +8,6 @@ import type {
   EducationPayload,
   LanguagePayload,
   CertificationPayload,
-  CvChatMessage,
 } from '../types/cv-builder.types'
 
 /**
@@ -67,8 +66,6 @@ export const useCvBuilderStore = defineStore('cvBuilder', () => {
   const generatePdf = cvStore.generatePdf.bind(cvStore)
   const parseCv = cvStore.parseCv.bind(cvStore)
   const improveCvSection = cvStore.improveCvSection.bind(cvStore)
-  const cvAiChat = (m: CvChatMessage[]) => cvStore.cvAiChat(m)
-  const cvAiGenerate = (m: CvChatMessage[]) => cvStore.cvAiGenerate(m)
 
   return {
     profile,
@@ -100,7 +97,5 @@ export const useCvBuilderStore = defineStore('cvBuilder', () => {
     generatePdf,
     parseCv,
     improveCvSection,
-    cvAiChat,
-    cvAiGenerate,
   }
 })

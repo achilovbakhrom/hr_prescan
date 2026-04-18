@@ -42,6 +42,7 @@ The AI agent evaluates candidates at each step and decides whether to advance th
 - No account required to apply or complete prescanning/interview
 - Account creation is optional (allows tracking application status and reusing profile across vacancies)
 - Uploads CV/resume (optional but recommended)
+- Builds and exports a CV through the candidate AI assistant (single chat surface — no separate "AI Generate CV" / "AI Chat" buttons on the CV builder)
 - Completes AI prescanning (always via chat) after applying
 - If advanced by AI, completes AI interview (chat or meet, depending on vacancy configuration)
 - Can start prescanning immediately after applying or return later via the link

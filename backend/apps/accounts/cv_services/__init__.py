@@ -1,9 +1,5 @@
-from apps.accounts.cv_services.chat import (
-    cv_chat_generate,
-    cv_chat_next_message,
-    improve_cv_section,
-)
 from apps.accounts.cv_services.generation import generate_cv_pdf
+from apps.accounts.cv_services.improve import improve_cv_section
 from apps.accounts.cv_services.parsing import parse_cv_with_ai
 from apps.accounts.cv_services.photo import (
     ALLOWED_PHOTO_CONTENT_TYPES,
@@ -25,8 +21,6 @@ __all__ = [
     "MAX_PHOTO_SIZE_BYTES",
     "_populate_profile_from_parsed",
     "calculate_profile_completeness",
-    "cv_chat_generate",
-    "cv_chat_next_message",
     "delete_profile_photo_from_s3",
     "generate_cv_pdf",
     "generate_profile_photo_url",

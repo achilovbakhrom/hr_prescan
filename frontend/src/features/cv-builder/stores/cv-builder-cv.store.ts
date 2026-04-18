@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 import { extractApiError, type FieldErrors } from '@/shared/api/errors'
 import { cvBuilderService } from '../services/cv-builder.service'
 import { useCvBuilderProfileStore } from './cv-builder-profile.store'
-import type { CvGenerateResult, CvChatMessage, CvChatResponse } from '../types/cv-builder.types'
+import type { CvGenerateResult } from '../types/cv-builder.types'
 
 export const useCvBuilderCvStore = defineStore('cvBuilderCv', () => {
   const parsing = ref(false)
@@ -77,29 +77,6 @@ export const useCvBuilderCvStore = defineStore('cvBuilderCv', () => {
     }
   }
 
-  // AI CV Chat
-  async function cvAiChat(messages: CvChatMessage[]): Promise<CvChatResponse> {
-    try {
-      return await cvBuilderService.cvAiChat(messages)
-    } catch (err: unknown) {
-      handleError(err)
-    }
-  }
-
-  async function cvAiGenerate(messages: CvChatMessage[]): Promise<void> {
-    const profileStore = useCvBuilderProfileStore()
-    generating.value = true
-    clearErrors()
-    try {
-      profileStore.profile = await cvBuilderService.cvAiGenerate(messages)
-    } catch (err: unknown) {
-      generating.value = false
-      handleError(err)
-    } finally {
-      generating.value = false
-    }
-  }
-
   return {
     parsing,
     generating,
@@ -110,7 +87,5 @@ export const useCvBuilderCvStore = defineStore('cvBuilderCv', () => {
     generatePdf,
     parseCv,
     improveCvSection,
-    cvAiChat,
-    cvAiGenerate,
   }
 })
