@@ -6,8 +6,6 @@ from rest_framework.views import APIView
 
 from apps.accounts.apis.candidate_serializers import CandidateProfileOutputSerializer
 from apps.accounts.cv_services import (
-    cv_chat_generate,
-    cv_chat_next_message,
     improve_cv_section,
     parse_cv_with_ai,
 )
@@ -26,7 +24,6 @@ class CvParseApi(APIView):
         if not cv_file:
             return Response({"detail": "No file provided."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Validate file size (10 MB max)
         max_size = 10 * 1024 * 1024
         if cv_file.size > max_size:
             return Response(
@@ -34,7 +31,6 @@ class CvParseApi(APIView):
                 status=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
             )
 
-        # Validate file type
         ext = cv_file.name.rsplit(".", 1)[-1].lower() if "." in cv_file.name else ""
         if ext not in ("pdf", "docx"):
             return Response(
@@ -49,7 +45,6 @@ class CvParseApi(APIView):
             filename=cv_file.name,
         )
 
-        # Return updated profile using the full output serializer
         profile = (
             CandidateProfile.objects.select_related("user")
             .prefetch_related(
@@ -84,62 +79,3 @@ class CvImproveSectionApi(APIView):
 
         improved = improve_cv_section(**serializer.validated_data)
         return Response({"improved": improved}, status=status.HTTP_200_OK)
-
-
-class _MessageSerializer(serializers.Serializer):
-    role = serializers.ChoiceField(choices=["user", "assistant"])
-    content = serializers.CharField()
-
-
-class CvAiChatApi(APIView):
-    """POST /api/candidate/profile/cv/ai-chat/ — conversational CV builder.
-
-    Send messages array. AI returns next question or status=ready when done.
-    """
-
-    permission_classes = [IsCandidate]
-
-    class InputSerializer(serializers.Serializer):
-        messages = _MessageSerializer(many=True)
-
-    def post(self, request: Request) -> Response:
-        serializer = self.InputSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        result = cv_chat_next_message(messages=serializer.validated_data["messages"])
-        return Response(result, status=status.HTTP_200_OK)
-
-
-class CvAiGenerateApi(APIView):
-    """POST /api/candidate/profile/cv/ai-generate/ — generate CV from chat conversation."""
-
-    permission_classes = [IsCandidate]
-
-    class InputSerializer(serializers.Serializer):
-        messages = _MessageSerializer(many=True)
-
-    def post(self, request: Request) -> Response:
-        serializer = self.InputSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        profile = cv_chat_generate(
-            user=request.user,
-            messages=serializer.validated_data["messages"],
-        )
-
-        profile = (
-            CandidateProfile.objects.select_related("user")
-            .prefetch_related(
-                "skills",
-                "work_experiences",
-                "educations__education_level",
-                "languages__language",
-                "certifications",
-                "cvs",
-            )
-            .get(pk=profile.pk)
-        )
-        return Response(
-            CandidateProfileOutputSerializer(profile).data,
-            status=status.HTTP_201_CREATED,
-        )

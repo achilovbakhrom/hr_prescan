@@ -1,3 +1,5 @@
+from apps.common.candidate_ai_assistant.tool_definitions_cv import CV_TOOL_DEFINITIONS
+
 CANDIDATE_TOOL_DEFINITIONS = [
     {
         "type": "function",
@@ -69,52 +71,7 @@ CANDIDATE_TOOL_DEFINITIONS = [
             },
         },
     },
-    {
-        "type": "function",
-        "function": {
-            "name": "improve_cv_section",
-            "description": "AI-powered CV text improvement. Rewrites a section of the candidate's CV to be more professional and impactful.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "section": {
-                        "type": "string",
-                        "enum": ["summary", "experience_description"],
-                        "description": "Which CV section to improve",
-                    },
-                    "content": {
-                        "type": "string",
-                        "description": "The current text of the CV section to improve",
-                    },
-                    "job_title": {
-                        "type": "string",
-                        "description": "Target job title to tailor the improvement for",
-                    },
-                },
-                "required": ["section", "content"],
-            },
-        },
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "suggest_skills",
-            "description": "AI-powered skill suggestions based on a job title or description. Helps candidates identify relevant skills to highlight.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "job_title": {
-                        "type": "string",
-                        "description": "Job title to suggest skills for",
-                    },
-                    "description": {
-                        "type": "string",
-                        "description": "Job description or role context",
-                    },
-                },
-            },
-        },
-    },
+    *CV_TOOL_DEFINITIONS,
     {
         "type": "function",
         "function": {
