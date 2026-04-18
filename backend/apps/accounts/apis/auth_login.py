@@ -112,13 +112,41 @@ class TokenRefreshApi(APIView):
 
 
 class MeApi(APIView):
-    """GET /api/auth/me/ — get current user profile."""
+    """GET /api/auth/me/ — get current user profile.
+
+    PATCH /api/auth/me/ — update mutable profile fields (currently: language).
+    """
 
     permission_classes = [IsAuthenticated]
+
+    class InputSerializer(serializers.Serializer):
+        language = serializers.ChoiceField(
+            choices=[("en", "en"), ("ru", "ru"), ("uz", "uz")],
+            required=False,
+        )
 
     def get(self, request: Request) -> Response:
         user = get_user_by_email(email=request.user.email)
         return Response(UserOutputSerializer(user).data, status=status.HTTP_200_OK)
+
+    def patch(self, request: Request) -> Response:
+        serializer = self.InputSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        if not data:
+            return Response(
+                UserOutputSerializer(request.user).data,
+                status=status.HTTP_200_OK,
+            )
+
+        update_fields = []
+        if "language" in data:
+            request.user.language = data["language"]
+            update_fields.append("language")
+        if update_fields:
+            request.user.save(update_fields=[*update_fields, "updated_at"])
+
+        return Response(UserOutputSerializer(request.user).data, status=status.HTTP_200_OK)
 
 
 class MyInvitationsApi(APIView):

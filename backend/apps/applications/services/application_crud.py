@@ -73,6 +73,7 @@ def submit_application(
     cv_file_path: str = "",
     cv_original_filename: str = "",
     candidate: User | None = None,
+    channel: str = "web",
 ) -> dict:
     """Submit a new application to a vacancy.
 
@@ -117,6 +118,7 @@ def submit_application(
         screening_mode=Interview.ScreeningMode.CHAT,
         status=Interview.Status.PENDING,
         language=vacancy.prescanning_language,
+        channel=channel,
     )
 
     return {

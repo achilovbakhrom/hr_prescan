@@ -15,6 +15,7 @@ import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { Vacancy } from '../types/vacancy.types'
 import type { EmployerCompany } from '@/features/employers/types/employer.types'
 import { sanitizeHtml } from '@/shared/utils/sanitize'
+import TranslatableText from '@/shared/components/TranslatableText.vue'
 
 interface VacancyWithEmployer extends Vacancy {
   employer?: EmployerCompany
@@ -181,23 +182,59 @@ onMounted(async () => {
           <h2 class="mb-2 text-base font-semibold sm:text-lg">
             {{ t('vacancies.form.description') }}
           </h2>
-          <!-- eslint-disable-next-line vue/no-v-html -->
-          <div
-            class="prose prose-sm max-w-none text-gray-700"
-            v-html="sanitizeHtml(vacancy.description)"
-          ></div>
+          <TranslatableText
+            :text="vacancy.description"
+            :translations="vacancy.descriptionTranslations || {}"
+            model="vacancy"
+            :object-id="vacancy.id"
+            field="description"
+            scope="public"
+            @translated="(tr) => (vacancy!.descriptionTranslations = tr)"
+          >
+            <template #default="{ text }">
+              <!-- eslint-disable-next-line vue/no-v-html -->
+              <div
+                class="prose prose-sm max-w-none text-gray-700"
+                v-html="sanitizeHtml(text)"
+              ></div>
+            </template>
+          </TranslatableText>
         </div>
         <div v-if="vacancy.requirements" class="mb-5 sm:mb-6">
           <h2 class="mb-2 text-base font-semibold sm:text-lg">
             {{ t('vacancies.form.requirements') }}
           </h2>
-          <p class="whitespace-pre-line text-sm text-gray-700">{{ vacancy.requirements }}</p>
+          <TranslatableText
+            :text="vacancy.requirements"
+            :translations="vacancy.requirementsTranslations || {}"
+            model="vacancy"
+            :object-id="vacancy.id"
+            field="requirements"
+            scope="public"
+            @translated="(tr) => (vacancy!.requirementsTranslations = tr)"
+          >
+            <template #default="{ text }">
+              <p class="whitespace-pre-line text-sm text-gray-700">{{ text }}</p>
+            </template>
+          </TranslatableText>
         </div>
         <div v-if="vacancy.responsibilities" class="mb-5 sm:mb-6">
           <h2 class="mb-2 text-base font-semibold sm:text-lg">
             {{ t('vacancies.form.responsibilities') }}
           </h2>
-          <p class="whitespace-pre-line text-sm text-gray-700">{{ vacancy.responsibilities }}</p>
+          <TranslatableText
+            :text="vacancy.responsibilities"
+            :translations="vacancy.responsibilitiesTranslations || {}"
+            model="vacancy"
+            :object-id="vacancy.id"
+            field="responsibilities"
+            scope="public"
+            @translated="(tr) => (vacancy!.responsibilitiesTranslations = tr)"
+          >
+            <template #default="{ text }">
+              <p class="whitespace-pre-line text-sm text-gray-700">{{ text }}</p>
+            </template>
+          </TranslatableText>
         </div>
         <div v-if="vacancy.deadline" class="text-xs text-gray-500 sm:text-sm">
           <i class="pi pi-clock mr-1"></i>{{ t('vacancies.form.deadline') }}:

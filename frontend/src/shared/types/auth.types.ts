@@ -28,6 +28,7 @@ export interface User {
   company: Company | null
   emailVerified: boolean
   onboardingCompleted: boolean
+  language: 'en' | 'ru' | 'uz'
 }
 
 export type UserRole = 'admin' | 'hr' | 'candidate'

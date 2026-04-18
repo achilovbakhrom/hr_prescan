@@ -32,7 +32,7 @@ from apps.common.apis_industry import IndustryListApi
 from apps.common.apis_language import LanguageListApi
 from apps.common.apis_search import HRGlobalSearchApi
 from apps.common.apis_skill import SkillListApi
-from apps.common.apis_translate import BatchTranslateApi, TranslateAIContentApi
+from apps.common.apis_translate import BatchTranslateApi, TranslateAIContentApi, TranslatePublicContentApi
 from apps.common.urls_admin import admin_urlpatterns
 from apps.integrations.urls import (
     hr_telegram_urlpatterns,
@@ -97,6 +97,7 @@ urlpatterns = [
     path("api/hr/analytics/", HRAnalyticsApi.as_view(), name="hr-analytics"),
     path("api/hr/translate/", TranslateAIContentApi.as_view(), name="hr-translate"),
     path("api/hr/translate/batch/", BatchTranslateApi.as_view(), name="hr-translate-batch"),
+    path("api/translate/", TranslatePublicContentApi.as_view(), name="public-translate"),
     path("api/notifications/", include((notification_urlpatterns, "notifications"))),
     path("api/public/countries/", CountryListApi.as_view(), name="public-countries"),
     path("api/public/industries/", IndustryListApi.as_view(), name="public-industries"),

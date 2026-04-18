@@ -50,6 +50,7 @@ class UserOutputSerializer(serializers.ModelSerializer):
             "is_active",
             "email_verified",
             "onboarding_completed",
+            "language",
             "created_at",
             "updated_at",
         ]

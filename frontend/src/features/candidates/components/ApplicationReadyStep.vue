@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 
-defineProps<{
+const props = defineProps<{
   prescanUrl: string
   linkCopied: boolean
+  telegramCode?: number | null
 }>()
 
 const emit = defineEmits<{
@@ -13,6 +15,28 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+
+const telegramBotUsername = (import.meta.env.VITE_TELEGRAM_CANDIDATE_BOT_USERNAME as string | undefined) ?? ''
+
+const telegramDeepLink = computed(() => {
+  if (!telegramBotUsername || !props.telegramCode) return ''
+  return `https://t.me/${telegramBotUsername}?start=vac_${props.telegramCode}`
+})
+
+const telegramCopied = ref(false)
+
+async function copyTelegramLink(): Promise<void> {
+  if (!telegramDeepLink.value) return
+  try {
+    await navigator.clipboard.writeText(telegramDeepLink.value)
+    telegramCopied.value = true
+    setTimeout(() => {
+      telegramCopied.value = false
+    }, 2000)
+  } catch {
+    /* clipboard unavailable; user can copy manually */
+  }
+}
 </script>
 
 <template>
@@ -73,6 +97,41 @@ const { t } = useI18n()
       <p class="mb-3 text-xs text-gray-500 sm:mb-4 sm:text-sm">
         <i class="pi pi-envelope mr-1"></i>{{ t('candidates.application.linkSentToEmail') }}
       </p>
+
+      <div
+        v-if="telegramDeepLink"
+        class="mb-4 rounded-lg border border-sky-200 bg-sky-50 p-3 text-left sm:mb-6 sm:p-4"
+      >
+        <div class="mb-2 flex items-center gap-2">
+          <i class="pi pi-telegram text-sky-600"></i>
+          <p class="text-xs font-semibold text-sky-900 sm:text-sm">
+            {{ t('candidates.application.telegramOption') }}
+          </p>
+        </div>
+        <p class="mb-3 text-xs text-sky-800 sm:text-sm">
+          {{ t('candidates.application.telegramOptionHint') }}
+        </p>
+        <div class="flex flex-col gap-2 sm:flex-row">
+          <Button
+            as="a"
+            :href="telegramDeepLink"
+            target="_blank"
+            rel="noopener"
+            :label="t('candidates.application.openInTelegram')"
+            icon="pi pi-external-link"
+            size="small"
+            class="w-full sm:w-auto"
+          />
+          <Button
+            :label="telegramCopied ? t('common.copied') : t('candidates.application.copyTelegramLink')"
+            :icon="telegramCopied ? 'pi pi-check' : 'pi pi-copy'"
+            :severity="telegramCopied ? 'success' : 'secondary'"
+            size="small"
+            class="w-full sm:w-auto"
+            @click="copyTelegramLink"
+          />
+        </div>
+      </div>
 
       <div class="rounded-lg border border-blue-100 bg-blue-50 p-3 text-left sm:p-4">
         <p class="text-xs text-blue-800 sm:text-sm">

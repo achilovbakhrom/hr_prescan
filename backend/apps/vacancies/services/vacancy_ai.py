@@ -12,12 +12,20 @@ from apps.vacancies.models import InterviewQuestion, ScreeningStep, Vacancy
 
 logger = logging.getLogger(__name__)
 
+LANGUAGE_NAMES = {"en": "English", "ru": "Russian", "uz": "Uzbek"}
+
+
+def _language_instruction(lang_code: str) -> str:
+    name = LANGUAGE_NAMES.get(lang_code, "English")
+    return f"Write ALL output text (including the 'text' field of each competency) in {name}. Do not mix languages."
+
 
 def generate_interview_questions(*, vacancy: Vacancy, step: str = ScreeningStep.PRESCANNING) -> list[InterviewQuestion]:
     """Generate questions using Gemini based on vacancy details and step type."""
     skills_text = ", ".join(vacancy.skills) if vacancy.skills else "not specified"
     criteria = list(vacancy.criteria.filter(step=step).values_list("name", flat=True))
     criteria_text = ", ".join(criteria) if criteria else "general assessment"
+    language_instruction = _language_instruction(vacancy.prescanning_language)
 
     if step == ScreeningStep.PRESCANNING:
         step_instruction = (
@@ -55,6 +63,7 @@ def generate_interview_questions(*, vacancy: Vacancy, step: str = ScreeningStep.
                 thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
                 system_instruction=(
                     f"You are an expert HR interviewer. {step_instruction}\n\n"
+                    f"{language_instruction}\n\n"
                     "Each competency is a SKILL GOAL -- something the AI interviewer "
                     "should evaluate the candidate on. These are NOT literal questions. "
                     "The AI interviewer will decide how to probe each competency through "

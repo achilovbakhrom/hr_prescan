@@ -10,8 +10,13 @@ export async function translateContent(params: {
   objectId: string
   field: string
   targetLanguage: string
+  /** Use `/translate/` (any auth) instead of `/hr/translate/` (HR-only). */
+  scope?: 'hr' | 'public'
 }): Promise<TranslateResponse> {
-  const response = await apiClient.post<TranslateResponse>('/hr/translate', params)
+  const endpoint = params.scope === 'public' ? '/translate' : '/hr/translate'
+  const { scope: _scope, ...body } = params
+  void _scope
+  const response = await apiClient.post<TranslateResponse>(endpoint, body)
   return response.data
 }
 

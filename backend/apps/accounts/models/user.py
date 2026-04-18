@@ -68,6 +68,19 @@ class User(AbstractBaseUser, PermissionsMixin):
     telegram_id = models.BigIntegerField(unique=True, null=True, blank=True)
     telegram_username = models.CharField(max_length=255, blank=True, default="")
 
+    # UI language — source of truth for AI assistants and default vacancy language.
+    # Kept in sync with the frontend locale via PATCH /api/auth/me/.
+    class Language(models.TextChoices):
+        EN = "en", "English"
+        RU = "ru", "Russian"
+        UZ = "uz", "Uzbek"
+
+    language = models.CharField(
+        max_length=5,
+        choices=Language.choices,
+        default=Language.EN,
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

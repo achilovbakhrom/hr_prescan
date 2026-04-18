@@ -7,6 +7,25 @@ logger = logging.getLogger(__name__)
 
 
 @shared_task
+def evaluate_telegram_interview(interview_id: str) -> None:
+    """Evaluate a Telegram-based prescreening interview with Gemini and complete it."""
+    from apps.interviews.chat_service.evaluation import evaluate_chat_interview
+    from apps.interviews.models import Interview
+
+    try:
+        interview = Interview.objects.select_related(
+            "application__vacancy__company",
+            "application__vacancy__employer",
+        ).get(id=interview_id)
+    except Interview.DoesNotExist:
+        logger.error("evaluate_telegram_interview: session %s not found", interview_id)
+        return
+
+    evaluate_chat_interview(interview)
+    logger.info("evaluate_telegram_interview: completed for session %s", interview_id)
+
+
+@shared_task
 def send_scheduling_confirmation_email(interview_id: str) -> None:
     """Send confirmation email when an interview is scheduled."""
     from apps.common.email import send_templated_email

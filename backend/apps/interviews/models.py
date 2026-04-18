@@ -24,6 +24,10 @@ class Interview(BaseModel):
         PRESCANNING = "prescanning", "Prescanning"
         INTERVIEW = "interview", "Interview"
 
+    class Channel(models.TextChoices):
+        WEB = "web", "Web"
+        TELEGRAM = "telegram", "Telegram"
+
     application = models.ForeignKey(
         "applications.Application",
         on_delete=models.CASCADE,
@@ -72,6 +76,11 @@ class Interview(BaseModel):
         default="en",
     )
     ai_summary_translations = models.JSONField(default=dict, blank=True)
+    channel = models.CharField(
+        max_length=10,
+        choices=Channel.choices,
+        default=Channel.WEB,
+    )
 
     class Meta:
         ordering = ["-created_at"]

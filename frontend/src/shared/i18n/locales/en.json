@@ -602,6 +602,10 @@
       "prescanReadyHint": "You can start your AI prescanning chat now, or do it later using the link below.",
       "prescanLink": "Prescanning Link",
       "linkSentToEmail": "We've also sent the prescanning link to your email.",
+      "telegramOption": "Prefer Telegram?",
+      "telegramOptionHint": "Open our Telegram bot to finish the prescanning chat there. Works great on mobile.",
+      "openInTelegram": "Open in Telegram",
+      "copyTelegramLink": "Copy Telegram link",
       "tip": "Tip",
       "tipText": "Create an account to track your application status and access your interview results.",
       "createAccount": "Create an account",
@@ -615,6 +619,9 @@
       "noCvsYet": "No CVs generated yet. You can upload one or create one in the CV Builder.",
       "answerQuestions": "Answer a few questions to get started",
       "clickToOpenChat": "Click to open prescanning chat",
+      "prescanComplete": "Prescreening complete!",
+      "prescanCompleteHint": "We'll review your answers and get back to you by email.",
+      "browseVacancies": "Browse vacancies",
       "validation": {
         "nameRequired": "Name is required",
         "emailRequired": "Email is required",
@@ -853,6 +860,7 @@
       "thankYouReview": "Thank you for your time. We'll review your responses and be in touch.",
       "createAccount": "Create Account to Track Status",
       "browseJobs": "Browse More Jobs",
+      "youCanCloseThis": "You're all done! You can close this window.",
       "enterHint": "Press Enter to send, Shift+Enter for new line",
       "stayButton": "Stay"
     },

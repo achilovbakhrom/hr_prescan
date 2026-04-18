@@ -1,17 +1,17 @@
-"""Candidate bot — auto-signup on first /start.
+"""Candidate bot — user auth helpers.
 
-Telegram never gives us an email address, so we mint a placeholder
-``tg_<id>@telegram.local`` (matching the existing TelegramAuthApi convention)
-and create a candidate ``User`` row. The same telegram_id reaching the bot
-again returns the existing user, so the flow is idempotent.
-
-This module is intentionally narrow: only signup. The /start payload (deep
-link to a vacancy) is handled separately in ``apply.py``.
+Covers two cases:
+  1. Auto-signup on first message (get_or_create_candidate_user) — Telegram-only
+     account with placeholder email, no password set yet.
+  2. Registration completion (complete_registration) — sets real name, phone and
+     a generated password; returns the password so the bot can DM it.
 """
 
 from __future__ import annotations
 
 import logging
+import secrets
+import string
 
 from django.db import IntegrityError, transaction
 
@@ -20,6 +20,12 @@ from apps.accounts.models import User
 logger = logging.getLogger(__name__)
 
 PLACEHOLDER_EMAIL_DOMAIN = "telegram.local"
+_PASSWORD_CHARS = string.ascii_letters + string.digits
+_PASSWORD_LENGTH = 10
+
+
+def generate_password() -> str:
+    return "".join(secrets.choice(_PASSWORD_CHARS) for _ in range(_PASSWORD_LENGTH))
 
 
 def get_or_create_candidate_user(
@@ -31,8 +37,8 @@ def get_or_create_candidate_user(
 ) -> User:
     """Return the candidate User for this Telegram identity, creating it if needed.
 
-    Idempotent and concurrency-safe: if two webhook updates race to create the
-    same user, the second one catches the IntegrityError and re-fetches.
+    Idempotent and concurrency-safe. New users have a placeholder email and no
+    phone — registration is completed separately via complete_registration().
     """
     if not isinstance(telegram_id, int) or telegram_id <= 0:
         raise ValueError(f"Invalid telegram_id: {telegram_id!r}")
@@ -67,7 +73,6 @@ def get_or_create_candidate_user(
                 ]
             )
     except IntegrityError:
-        # Concurrent create from another webhook update for the same identity.
         existing = User.objects.filter(telegram_id=telegram_id).first()
         if existing is not None:
             return existing
@@ -75,7 +80,6 @@ def get_or_create_candidate_user(
 
     logger.info("Created candidate user via Telegram bot: tg_id=%s", telegram_id)
 
-    # Bind any anonymous applications that already match this identity.
     try:
         from apps.applications.services import bind_existing_applications
 
@@ -84,3 +88,25 @@ def get_or_create_candidate_user(
         logger.warning("bind_existing_applications failed for tg_id=%s: %s", telegram_id, exc)
 
     return user
+
+
+def complete_registration(
+    *,
+    user: User,
+    full_name: str,
+    phone: str,
+) -> str:
+    """Set real name, phone and a generated password. Returns the plain password."""
+    parts = full_name.strip().split(None, 1)
+    first_name = parts[0]
+    last_name = parts[1] if len(parts) > 1 else ""
+
+    password = generate_password()
+    user.first_name = first_name
+    user.last_name = last_name
+    user.phone = phone
+    user.set_password(password)
+    user.save(update_fields=["first_name", "last_name", "phone", "password", "updated_at"])
+
+    logger.info("Registration completed for tg_id=%s", user.telegram_id)
+    return password
