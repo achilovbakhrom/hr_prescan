@@ -289,9 +289,7 @@ GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
 # that let the E2E suite bypass real OAuth providers. Must be false in production.
 ALLOW_E2E_HOOKS = os.environ.get("ALLOW_E2E_HOOKS", "false").lower() in ("1", "true", "yes")
 
-GEOIP2_DB_PATH = os.environ.get(
-    "GEOIP2_DB_PATH", str(BASE_DIR / "data" / "dbip-country-lite.mmdb")
-)
+GEOIP2_DB_PATH = os.environ.get("GEOIP2_DB_PATH", str(BASE_DIR / "data" / "dbip-country-lite.mmdb"))
 
 # Outbound email suppression — drop messages to these recipient domains rather
 # than delivering them. Used on dev to stop the E2E suite from spamming real

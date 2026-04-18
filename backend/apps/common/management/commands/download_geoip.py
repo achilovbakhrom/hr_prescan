@@ -45,14 +45,12 @@ class Command(BaseCommand):
         if target.exists() and not options["force"]:
             age_days = (time.time() - target.stat().st_mtime) / 86400
             if age_days < options["max_age_days"]:
-                self.stdout.write(
-                    f"GeoIP DB is fresh ({age_days:.1f}d < {options['max_age_days']}d) — skipping."
-                )
+                self.stdout.write(f"GeoIP DB is fresh ({age_days:.1f}d < {options['max_age_days']}d) — skipping.")
                 return
 
         try:
             self._download(target)
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             self.stderr.write(f"[WARN] GeoIP download failed: {exc} — continuing without DB.")
 
     def _download(self, target: pathlib.Path) -> None:

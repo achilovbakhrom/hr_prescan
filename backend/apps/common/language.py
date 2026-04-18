@@ -45,7 +45,7 @@ def _get_reader() -> Reader | None:
                 from geoip2.database import Reader
 
                 _reader = Reader(db_path)
-            except Exception:  # noqa: BLE001
+            except Exception:
                 logger.exception("Failed to open GeoIP2 DB at %s", db_path)
                 return None
     return _reader
@@ -76,7 +76,7 @@ def _from_ip(request: Request) -> str | None:
         return None
     try:
         response = reader.country(ip)
-    except Exception:  # noqa: BLE001
+    except Exception:
         return None
     country_code = (response.country.iso_code or "").upper()
     return COUNTRY_TO_LANGUAGE.get(country_code)
@@ -89,8 +89,4 @@ def detect_language(request: Request) -> str:
         if pref in SUPPORTED_LANGUAGES:
             return pref
 
-    return (
-        _from_accept_language(request)
-        or _from_ip(request)
-        or DEFAULT_LANGUAGE
-    )
+    return _from_accept_language(request) or _from_ip(request) or DEFAULT_LANGUAGE
