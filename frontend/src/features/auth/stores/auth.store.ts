@@ -1,6 +1,8 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { extractErrorMessage } from '@/shared/api/errors'
+import { setLocale } from '@/shared/i18n'
+import { saveUserLanguage } from '@/shared/services/language.service'
 import { authService } from '../services/auth.service'
 import { loadTokens, saveTokens, clearTokens } from './auth-tokens'
 import type { CompanyMembership } from '@/shared/types/auth.types'
@@ -11,6 +13,23 @@ import type {
   LoginRequest,
   RegisterRequest,
 } from '../types/auth.types'
+
+type UILocale = 'en' | 'ru' | 'uz'
+const isUILocale = (v: unknown): v is UILocale => v === 'en' || v === 'ru' || v === 'uz'
+
+function syncPreferredLanguage(u: User | null): void {
+  if (!u) return
+  const stored = localStorage.getItem('hr_prescan_locale')
+  if (isUILocale(u.language)) {
+    if (stored !== u.language) setLocale(u.language)
+  } else if (isUILocale(stored)) {
+    saveUserLanguage(stored)
+      .then(() => {
+        u.language = stored
+      })
+      .catch((err: unknown) => console.warn('[auth] back-fill language failed', err))
+  }
+}
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
@@ -40,6 +59,7 @@ export const useAuthStore = defineStore('auth', () => {
     tokens.value = resp.tokens
     user.value = resp.user
     saveTokens(resp.tokens)
+    syncPreferredLanguage(user.value)
   }
 
   async function login(data: LoginRequest): Promise<void> {
@@ -84,6 +104,7 @@ export const useAuthStore = defineStore('auth', () => {
     if (!tokens.value?.access) return
     try {
       user.value = await authService.getMe()
+      syncPreferredLanguage(user.value)
     } catch {
       user.value = null
       tokens.value = null

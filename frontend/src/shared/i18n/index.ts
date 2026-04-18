@@ -139,3 +139,16 @@ export function getLocale(): string {
   // vue-i18n Composition mode exposes locale as a WritableComputedRef but types it as string
   return (i18n.global.locale as unknown as WritableComputedRef<string>).value ?? i18n.global.locale
 }
+
+export async function detectAndApplyLocale(): Promise<void> {
+  if (localStorage.getItem(LOCALE_STORAGE_KEY)) return
+  try {
+    const { detectLanguage } = await import('@/shared/services/language.service')
+    const detected = await detectLanguage()
+    if (detected === 'en' || detected === 'ru' || detected === 'uz') {
+      setLocale(detected)
+    }
+  } catch (err) {
+    console.warn('[i18n] language detection failed', err)
+  }
+}
