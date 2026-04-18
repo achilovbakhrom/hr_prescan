@@ -131,8 +131,8 @@ Use this CV data to ask targeted follow-up questions and verify claims.
 def _build_company_info_section(vacancy) -> tuple[str, str]:
     """Build the company info section. Returns (section_text, raw_company_info)."""
     company_info = ""
-    if vacancy.employer and vacancy.employer.description:
-        company_info = vacancy.employer.description
+    if vacancy.company and vacancy.company.description:
+        company_info = vacancy.company.description
     elif vacancy.company_info:
         company_info = vacancy.company_info
 

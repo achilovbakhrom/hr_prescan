@@ -34,11 +34,18 @@ VACANCY_TOOL_DEFINITIONS = [
                             "never meta-commentary like 'no description provided'."
                         ),
                     },
-                    "employer_name": {
+                    "company_name": {
                         "type": "string",
                         "description": (
-                            "Employer company name. Leave empty if not specified "
-                            "by user — do NOT fill with explanatory text."
+                            "Name of the company this vacancy belongs to. Only needed when the user has "
+                            "more than one company; otherwise leave empty. Do NOT fill with explanatory text."
+                        ),
+                    },
+                    "use_default": {
+                        "type": "boolean",
+                        "description": (
+                            "Set true if the user explicitly said to use their default company. "
+                            "Ignored when they have only one company."
                         ),
                     },
                     "salary_min": {"type": "number"},

@@ -13,6 +13,13 @@ from apps.common.ai_assistant.handlers_application import (
     handle_list_candidates,
     handle_update_candidate_status,
 )
+from apps.common.ai_assistant.handlers_companies import (
+    handle_create_company,
+    handle_delete_company,
+    handle_list_companies,
+    handle_set_default_company,
+    handle_update_company,
+)
 from apps.common.ai_assistant.handlers_company import (
     handle_clear_chat_history,
     handle_invite_hr,
@@ -25,13 +32,6 @@ from apps.common.ai_assistant.handlers_dashboard import (
     handle_get_subscription_info,
     handle_get_usage,
     handle_get_vacancy_summary,
-)
-from apps.common.ai_assistant.handlers_employer import (
-    handle_create_employer,
-    handle_create_employer_from_url,
-    handle_delete_employer,
-    handle_list_employers,
-    handle_update_employer,
 )
 from apps.common.ai_assistant.handlers_interview import (
     handle_cancel_interview,
@@ -54,7 +54,7 @@ from apps.common.ai_assistant.tool_defs_actions import (
     TEAM_TOOL_DEFINITIONS,
 )
 from apps.common.ai_assistant.tool_defs_candidate import CANDIDATE_TOOL_DEFINITIONS
-from apps.common.ai_assistant.tool_defs_employer import EMPLOYER_TOOL_DEFINITIONS
+from apps.common.ai_assistant.tool_defs_companies import COMPANY_TOOL_DEFINITIONS
 from apps.common.ai_assistant.tool_defs_interview import (
     DASHBOARD_TOOL_DEFINITIONS,
     INTERVIEW_TOOL_DEFINITIONS,
@@ -65,13 +65,9 @@ from apps.common.exceptions import ApplicationError
 
 logger = logging.getLogger(__name__)
 
-# ---------------------------------------------------------------------------
-# Aggregated tool definitions from all domain modules
-# ---------------------------------------------------------------------------
-
 TOOL_DEFINITIONS = (
     VACANCY_TOOL_DEFINITIONS
-    + EMPLOYER_TOOL_DEFINITIONS
+    + COMPANY_TOOL_DEFINITIONS
     + CANDIDATE_TOOL_DEFINITIONS
     + INTERVIEW_TOOL_DEFINITIONS
     + DASHBOARD_TOOL_DEFINITIONS
@@ -79,10 +75,6 @@ TOOL_DEFINITIONS = (
     + TEAM_TOOL_DEFINITIONS
     + FRONTEND_ACTION_TOOL_DEFINITIONS
 )
-
-# ---------------------------------------------------------------------------
-# Tool name -> handler function mapping
-# ---------------------------------------------------------------------------
 
 TOOL_MAP = {
     "list_vacancies": handle_list_vacancies,
@@ -94,11 +86,11 @@ TOOL_MAP = {
     "delete_vacancy": handle_delete_vacancy,
     "generate_questions": handle_generate_questions,
     "regenerate_keywords": handle_regenerate_keywords,
-    "list_employers": handle_list_employers,
-    "create_employer": handle_create_employer,
-    "create_employer_from_url": handle_create_employer_from_url,
-    "update_employer": handle_update_employer,
-    "delete_employer": handle_delete_employer,
+    "list_companies": handle_list_companies,
+    "create_company": handle_create_company,
+    "update_company": handle_update_company,
+    "delete_company": handle_delete_company,
+    "set_default_company": handle_set_default_company,
     "list_candidates": handle_list_candidates,
     "update_candidate_status": handle_update_candidate_status,
     "bulk_update_status": handle_bulk_update_status,
@@ -154,7 +146,6 @@ def build_langchain_tools(user):
         properties = schema.get("properties", {})
         required_fields = set(schema.get("required", []))
 
-        # Build Pydantic model fields dynamically from JSON schema
         model_fields = {}
         for field_name, field_info in properties.items():
             json_type = field_info.get("type", "string")
@@ -176,7 +167,6 @@ def build_langchain_tools(user):
 
         input_model = create_model(f"{name}_Input", **model_fields)
 
-        # Closure: bind tool_name and user so each tool calls the right handler
         def _make_fn(tool_name, bound_user):
             def fn(**kwargs):
                 clean_args = {k: v for k, v in kwargs.items() if v is not None}

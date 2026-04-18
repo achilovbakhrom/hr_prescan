@@ -165,26 +165,3 @@ def complete_company_setup(
     return company
 
 
-def update_company_profile(*, company: Company, data: dict) -> Company:
-    """Update company fields (name, industries, size, country, website, description, logo)."""
-    from apps.common.models import Industry
-
-    allowed_fields = {"name", "size", "country", "website", "description", "logo", "custom_industry"}
-    update_fields = []
-
-    if "industries" in data:
-        industry_slugs = data.pop("industries")
-        industry_objs = Industry.objects.filter(slug__in=industry_slugs)
-        company.industries.set(industry_objs)
-
-    for field, value in data.items():
-        if field in allowed_fields:
-            setattr(company, field, value)
-            update_fields.append(field)
-
-    if not update_fields:
-        return company
-
-    update_fields.append("updated_at")
-    company.save(update_fields=update_fields)
-    return company

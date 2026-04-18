@@ -155,8 +155,9 @@ class CandidateInterviewOutputSerializer(serializers.ModelSerializer):
         return obj.application.vacancy.company.name
 
     def get_employer_name(self, obj: Interview) -> str | None:
-        employer = obj.application.vacancy.employer
-        return employer.name if employer else None
+        # Compatibility shim: returns the company name. The 'employer' concept was removed;
+        # the frontend will drop this field in PR 3 and switch to company_name.
+        return obj.application.vacancy.company.name
 
 
 class PublicInterviewOutputSerializer(serializers.ModelSerializer):
@@ -190,5 +191,5 @@ class PublicInterviewOutputSerializer(serializers.ModelSerializer):
         return obj.application.vacancy.company.name
 
     def get_employer_name(self, obj: Interview) -> str | None:
-        employer = obj.application.vacancy.employer
-        return employer.name if employer else None
+        # Compatibility shim (see CandidateInterviewOutputSerializer).
+        return obj.application.vacancy.company.name

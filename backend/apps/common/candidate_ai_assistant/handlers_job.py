@@ -30,7 +30,6 @@ def _handle_search_jobs(*, user, params):
             "id": str(v.id),
             "title": v.title,
             "company": v.company.name if v.company else "",
-            "employer": v.employer.name if v.employer else "",
             "location": v.location,
             "is_remote": v.is_remote,
             "employment_type": v.employment_type,
@@ -62,7 +61,7 @@ def _handle_get_job_details(*, user, params):
 
     vacancy_id = params.get("vacancy_id", "")
     try:
-        vacancy = Vacancy.objects.select_related("company", "employer").get(
+        vacancy = Vacancy.objects.select_related("company").get(
             id=vacancy_id,
             status=Vacancy.Status.PUBLISHED,
             is_deleted=False,
@@ -77,7 +76,6 @@ def _handle_get_job_details(*, user, params):
         "requirements": vacancy.requirements,
         "responsibilities": vacancy.responsibilities,
         "company": vacancy.company.name if vacancy.company else "",
-        "employer": vacancy.employer.name if vacancy.employer else "",
         "location": vacancy.location,
         "is_remote": vacancy.is_remote,
         "employment_type": vacancy.employment_type,

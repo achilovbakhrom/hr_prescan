@@ -52,7 +52,6 @@ from apps.accounts.apis.candidate_work_experience import (
 )
 from apps.accounts.apis.company_profile import (
     AcceptInvitationApi,
-    CompanyProfileApi,
     InviteHRApi,
     MyCompaniesApi,
 )
@@ -65,6 +64,11 @@ from apps.accounts.apis.company_team import (
 from apps.accounts.apis.e2e_hooks import E2EOAuthSimulateApi
 from apps.accounts.apis.google_auth import GoogleAuthApi
 from apps.accounts.apis.telegram_auth import TelegramAuthApi
+from apps.accounts.apis.user_companies import (
+    UserCompanyDetailApi,
+    UserCompanyListCreateApi,
+    UserCompanySetDefaultApi,
+)
 
 __all__ = [
     "AcceptCompanyInvitationApi",
@@ -80,7 +84,6 @@ __all__ = [
     "CertificationDetailApi",
     "CertificationListCreateApi",
     "CheckInvitationApi",
-    "CompanyProfileApi",
     "CompleteCompanySetupApi",
     "CompleteOnboardingApi",
     "CvAiChatApi",
@@ -107,6 +110,9 @@ __all__ = [
     "TeamMemberDetailApi",
     "TelegramAuthApi",
     "TokenRefreshApi",
+    "UserCompanyDetailApi",
+    "UserCompanyListCreateApi",
+    "UserCompanySetDefaultApi",
     "VerifyEmailApi",
     "WorkExperienceDetailApi",
     "WorkExperienceListCreateApi",

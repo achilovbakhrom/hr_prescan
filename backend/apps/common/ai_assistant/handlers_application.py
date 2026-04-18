@@ -6,7 +6,7 @@ from apps.common.ai_assistant.resolvers import resolve_application, resolve_vaca
 def handle_list_candidates(*, user, params):
     from apps.applications.selectors import get_vacancy_applications
 
-    vacancy = resolve_vacancy(company=user.company, title=params.get("vacancy_title", ""))
+    vacancy = resolve_vacancy(user=user, title=params.get("vacancy_title", ""))
     applications = get_vacancy_applications(vacancy=vacancy, status=params.get("status"))
     data = [
         {
@@ -30,7 +30,7 @@ def handle_update_candidate_status(*, user, params):
     from apps.applications.services import update_application_status
 
     application = resolve_application(
-        company=user.company,
+        user=user,
         candidate_email_or_name=params.get("candidate_email_or_name", ""),
         vacancy_title=params.get("vacancy_title"),
     )
@@ -54,7 +54,7 @@ def handle_update_candidate_status(*, user, params):
 def handle_bulk_update_status(*, user, params):
     from apps.applications.services import bulk_move_by_filter
 
-    vacancy = resolve_vacancy(company=user.company, title=params.get("vacancy_title", ""))
+    vacancy = resolve_vacancy(user=user, title=params.get("vacancy_title", ""))
     count = bulk_move_by_filter(
         vacancy_id=vacancy.id,
         from_status=params.get("from_status", ""),
@@ -76,7 +76,7 @@ def handle_add_candidate_note(*, user, params):
     from apps.applications.services import add_hr_note
 
     application = resolve_application(
-        company=user.company,
+        user=user,
         candidate_email_or_name=params.get("candidate_email_or_name", ""),
         vacancy_title=params.get("vacancy_title"),
     )

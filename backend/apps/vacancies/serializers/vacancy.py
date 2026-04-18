@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
+from apps.accounts.serializers import CompanyOutputSerializer
 from apps.vacancies.models import InterviewQuestion, Vacancy, VacancyCriteria
-from apps.vacancies.serializers.employer import EmployerCompanyOutputSerializer
 
 
 class VacancyCriteriaOutputSerializer(serializers.ModelSerializer):
@@ -51,7 +51,8 @@ class VacancyListOutputSerializer(serializers.ModelSerializer):
     candidates_rejected = serializers.IntegerField(read_only=True, default=0)
     candidates_hired = serializers.IntegerField(read_only=True, default=0)
     created_by_email = serializers.EmailField(source="created_by.email", read_only=True)
-    employer_name = serializers.CharField(source="employer.name", read_only=True, default=None, allow_null=True)
+    company_name = serializers.CharField(source="company.name", read_only=True)
+    company_id = serializers.UUIDField(source="company.id", read_only=True)
 
     class Meta:
         model = Vacancy
@@ -77,7 +78,8 @@ class VacancyListOutputSerializer(serializers.ModelSerializer):
             "candidates_rejected",
             "candidates_hired",
             "created_by_email",
-            "employer_name",
+            "company_id",
+            "company_name",
             "created_at",
             "updated_at",
         ]
@@ -89,7 +91,7 @@ class VacancyDetailOutputSerializer(serializers.ModelSerializer):
 
     criteria = VacancyCriteriaOutputSerializer(many=True, read_only=True)
     questions = InterviewQuestionOutputSerializer(many=True, read_only=True)
-    employer = EmployerCompanyOutputSerializer(read_only=True)
+    company = CompanyOutputSerializer(read_only=True)
     created_by_email = serializers.EmailField(source="created_by.email", read_only=True)
     candidates_total = serializers.SerializerMethodField()
     candidates_shortlisted = serializers.SerializerMethodField()
@@ -129,7 +131,7 @@ class VacancyDetailOutputSerializer(serializers.ModelSerializer):
             "interview_prompt",
             "prescanning_language",
             "keywords",
-            "employer",
+            "company",
             "criteria",
             "questions",
             "candidates_total",
@@ -145,7 +147,6 @@ class PublicVacancyListOutputSerializer(serializers.ModelSerializer):
     """Public vacancy list -- includes salary and skills for job seekers."""
 
     company_name = serializers.CharField(source="company.name", read_only=True)
-    employer_name = serializers.CharField(source="employer.name", read_only=True, default=None, allow_null=True)
 
     class Meta:
         model = Vacancy
@@ -158,7 +159,6 @@ class PublicVacancyListOutputSerializer(serializers.ModelSerializer):
             "employment_type",
             "experience_level",
             "company_name",
-            "employer_name",
             "cv_required",
             "skills",
             "salary_min",
@@ -173,8 +173,7 @@ class PublicVacancyListOutputSerializer(serializers.ModelSerializer):
 class PublicVacancyDetailOutputSerializer(serializers.ModelSerializer):
     """Public vacancy detail -- includes requirements but no salary or internal info."""
 
-    company_name = serializers.CharField(source="company.name", read_only=True)
-    employer = EmployerCompanyOutputSerializer(read_only=True)
+    company = CompanyOutputSerializer(read_only=True)
 
     class Meta:
         model = Vacancy
@@ -189,8 +188,7 @@ class PublicVacancyDetailOutputSerializer(serializers.ModelSerializer):
             "is_remote",
             "employment_type",
             "experience_level",
-            "company_name",
-            "employer",
+            "company",
             "cv_required",
             "deadline",
             "interview_duration",

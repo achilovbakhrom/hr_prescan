@@ -49,7 +49,6 @@ def get_interview_by_token(
             "application",
             "application__vacancy",
             "application__vacancy__company",
-            "application__vacancy__employer",
             "application__candidate",
         )
         .filter(interview_token=interview_token)
@@ -68,7 +67,6 @@ def get_interview_for_candidate(
             "application",
             "application__vacancy",
             "application__vacancy__company",
-            "application__vacancy__employer",
         )
         .filter(
             id=interview_id,

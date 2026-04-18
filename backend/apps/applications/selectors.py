@@ -124,7 +124,7 @@ def get_application_by_id(
     company: Company | None = None,
 ) -> Application | None:
     """Get a single application, optionally scoped to a company via vacancy."""
-    qs = Application.objects.select_related("vacancy", "vacancy__company", "vacancy__employer", "candidate")
+    qs = Application.objects.select_related("vacancy", "vacancy__company", "candidate")
     if company:
         qs = qs.filter(vacancy__company=company)
     return qs.filter(id=application_id).first()
@@ -137,7 +137,7 @@ def get_candidate_applications(
     """Return all applications by a candidate email for their dashboard."""
     return (
         Application.objects.filter(candidate_email=candidate_email)
-        .select_related("vacancy", "vacancy__company", "vacancy__employer")
+        .select_related("vacancy", "vacancy__company")
         .order_by("-created_at")
     )
 
@@ -149,7 +149,7 @@ def get_candidate_application_by_id(
 ) -> Application | None:
     """Get a single application for a candidate view."""
     return (
-        Application.objects.select_related("vacancy", "vacancy__company", "vacancy__employer")
+        Application.objects.select_related("vacancy", "vacancy__company")
         .filter(id=application_id, candidate_email=candidate_email)
         .first()
     )

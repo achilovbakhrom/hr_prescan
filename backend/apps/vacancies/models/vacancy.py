@@ -99,13 +99,6 @@ class Vacancy(BaseModel):
         choices=[("en", "English"), ("ru", "Russian"), ("uz", "Uzbek")],
         default="en",
     )
-    employer = models.ForeignKey(
-        "vacancies.EmployerCompany",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="vacancies",
-    )
     is_deleted = models.BooleanField(default=False)
     keywords = models.JSONField(default=list, blank=True)  # AI-generated search keywords
     search_vector = SearchVectorField(null=True, blank=True)

@@ -85,7 +85,6 @@ def handle_interview_answer(
     try:
         interview = Interview.objects.select_related(
             "application__vacancy__company",
-            "application__vacancy__employer",
         ).get(id=interview_id)
     except (Interview.DoesNotExist, Exception):
         client.send_message(chat_id=chat_id, text=t("common.error_generic", lang=lang))

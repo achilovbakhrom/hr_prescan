@@ -58,20 +58,6 @@ class UserOutputSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
-class CompanyProfileInputSerializer(serializers.Serializer):
-    name = serializers.CharField(max_length=255, required=False)
-    industries = serializers.ListField(
-        child=serializers.SlugField(max_length=50),
-        required=False,
-    )
-    size = serializers.ChoiceField(choices=Company.Size.choices, required=False)
-    country = serializers.CharField(max_length=100, required=False)
-    website = serializers.URLField(max_length=500, required=False, allow_blank=True)
-    description = serializers.CharField(required=False, allow_blank=True)
-    logo = serializers.CharField(max_length=500, required=False, allow_blank=True)
-    custom_industry = serializers.CharField(max_length=255, required=False, allow_blank=True)
-
-
 class InviteHRInputSerializer(serializers.Serializer):
     email = serializers.EmailField()
     permissions = serializers.ListField(

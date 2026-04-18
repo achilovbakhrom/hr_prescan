@@ -122,11 +122,10 @@ class CandidateApplicationListOutputSerializer(serializers.ModelSerializer):
         source="vacancy.company.name",
         read_only=True,
     )
+    # Compatibility shim: employer_name mirrors company_name until the frontend drops it in PR 3.
     employer_name = serializers.CharField(
-        source="vacancy.employer.name",
+        source="vacancy.company.name",
         read_only=True,
-        default=None,
-        allow_null=True,
     )
 
     class Meta:
