@@ -1,3 +1,5 @@
+import logging
+
 from rest_framework import status
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.request import Request
@@ -14,6 +16,8 @@ from apps.accounts.cv_services import (
     upload_profile_photo_to_s3,
 )
 from apps.accounts.permissions import IsCandidate
+
+logger = logging.getLogger(__name__)
 
 
 class CandidateProfilePhotoApi(APIView):
@@ -51,8 +55,8 @@ class CandidateProfilePhotoApi(APIView):
         if previous_key and previous_key != key:
             try:
                 delete_profile_photo_from_s3(key=previous_key)
-            except Exception:  # noqa: BLE001 — best-effort cleanup
-                pass
+            except Exception:
+                logger.exception("Failed to delete previous profile photo: %s", previous_key)
 
         return Response(
             {"photo": key, "photo_url": generate_profile_photo_url(key=key)},
@@ -70,7 +74,7 @@ class CandidateProfilePhotoApi(APIView):
 
         try:
             delete_profile_photo_from_s3(key=previous_key)
-        except Exception:  # noqa: BLE001 — best-effort cleanup
-            pass
+        except Exception:
+            logger.exception("Failed to delete profile photo: %s", previous_key)
 
         return Response(status=status.HTTP_204_NO_CONTENT)

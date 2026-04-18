@@ -20,10 +20,15 @@ def _get_s3_client():
     )
 
 
+def _with_prefix(path: str) -> str:
+    prefix = getattr(settings, "S3_KEY_PREFIX", "") or ""
+    return f"{prefix}/{path}" if prefix else path
+
+
 def upload_profile_photo_to_s3(*, file_obj, user_id) -> str:
     """Upload a profile photo to S3/MinIO and return the object key."""
     ext = file_obj.name.rsplit(".", 1)[-1].lower() if "." in file_obj.name else "jpg"
-    key = f"profile-photos/{user_id}/{uuid.uuid4()}.{ext}"
+    key = _with_prefix(f"profile-photos/{user_id}/{uuid.uuid4()}.{ext}")
 
     s3 = _get_s3_client()
     s3.upload_fileobj(

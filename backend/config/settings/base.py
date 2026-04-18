@@ -131,6 +131,9 @@ AWS_S3_ENDPOINT_URL = os.environ.get("MINIO_ENDPOINT", "http://localhost:9000")
 AWS_S3_REGION_NAME = os.environ.get("AWS_S3_REGION_NAME", "us-east-1")
 AWS_S3_FILE_OVERWRITE = False
 AWS_DEFAULT_ACL = None
+# Prefix prepended to every uploaded S3 key so the same bucket can host multiple environments.
+# Typical values: "local", "dev", "prod". Empty means no prefix (backward-compatible).
+S3_KEY_PREFIX = os.environ.get("S3_KEY_PREFIX", "").strip("/")
 
 # Django REST Framework
 REST_FRAMEWORK = {
@@ -288,9 +291,7 @@ ALLOW_E2E_HOOKS = os.environ.get("ALLOW_E2E_HOOKS", "false").lower() in ("1", "t
 # inboxes with verification / invitation / notification mail. Leave empty in
 # production. Comma-separated; matched case-insensitively on the domain only.
 EMAIL_SUPPRESS_DOMAINS = {
-    d.strip().lower()
-    for d in os.environ.get("EMAIL_SUPPRESS_DOMAINS", "").split(",")
-    if d.strip()
+    d.strip().lower() for d in os.environ.get("EMAIL_SUPPRESS_DOMAINS", "").split(",") if d.strip()
 }
 
 # Google Gemini

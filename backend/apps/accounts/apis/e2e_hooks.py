@@ -44,9 +44,7 @@ class E2EOAuthSimulateApi(APIView):
     permission_classes = [AllowAny]
 
     class InputSerializer(serializers.Serializer):
-        state = serializers.ChoiceField(
-            choices=["new_candidate", "onboarded_candidate", "new_hr_needs_company"]
-        )
+        state = serializers.ChoiceField(choices=["new_candidate", "onboarded_candidate", "new_hr_needs_company"])
         provider = serializers.ChoiceField(choices=["google", "telegram"], default="google")
         email = serializers.EmailField(required=False)
 
@@ -93,9 +91,7 @@ class E2EOAuthSimulateApi(APIView):
             user.company = None
             user.onboarding_completed = True
 
-        user.save(
-            update_fields=["role", "company", "onboarding_completed", "updated_at"]
-        )
+        user.save(update_fields=["role", "company", "onboarding_completed", "updated_at"])
 
         refresh = RefreshToken.for_user(user)
         return Response(

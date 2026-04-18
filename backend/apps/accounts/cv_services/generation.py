@@ -34,8 +34,10 @@ def generate_cv_pdf(*, profile, template_name="classic", cv_name="My CV"):
     # 3. Convert to PDF
     pdf_bytes = HTML(string=html_string).write_pdf()
 
-    # 4. Upload to MinIO
-    file_key = f"cv-generated/{profile.user_id}/{uuid.uuid4()}.pdf"
+    # 4. Upload to object storage
+    prefix = (getattr(settings, "S3_KEY_PREFIX", "") or "").strip("/")
+    base = f"cv-generated/{profile.user_id}/{uuid.uuid4()}.pdf"
+    file_key = f"{prefix}/{base}" if prefix else base
     s3 = _get_s3_client()
     s3.put_object(
         Bucket=settings.AWS_STORAGE_BUCKET_NAME,

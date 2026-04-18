@@ -32,7 +32,6 @@ from apps.accounts.apis.candidate_cv_ai import (
     CvParseApi,
 )
 from apps.accounts.apis.candidate_cv_public import PublicCvViewApi
-from apps.accounts.apis.candidate_photo import CandidateProfilePhotoApi
 from apps.accounts.apis.candidate_education import (
     EducationDetailApi,
     EducationListCreateApi,
@@ -41,6 +40,7 @@ from apps.accounts.apis.candidate_languages import (
     CandidateLanguageDetailApi,
     CandidateLanguageListCreateApi,
 )
+from apps.accounts.apis.candidate_photo import CandidateProfilePhotoApi
 from apps.accounts.apis.candidate_profile import (
     CandidateProfileApi,
     CandidateProfileSkillsApi,

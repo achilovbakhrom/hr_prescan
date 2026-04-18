@@ -97,7 +97,7 @@ class CandidateProfileOutputSerializer(serializers.Serializer):
 
         try:
             return generate_profile_photo_url(key=obj.photo)
-        except Exception:  # noqa: BLE001 — don't fail the whole response if S3 is unreachable
+        except Exception:
             return ""
 
     def get_skills(self, obj):
