@@ -28,6 +28,7 @@ const EMPTY_PROFILE: CandidateProfile = {
   isOpenToWork: false,
   shareToken: '',
   photo: null,
+  photoUrl: null,
   skills: [],
   workExperiences: [],
   educations: [],
@@ -100,6 +101,8 @@ export const useCvBuilderProfileStore = defineStore('cvBuilderProfile', () => {
   const updateProfile = (d: ProfileUpdatePayload) =>
     withSave(() => cvBuilderService.updateProfile(d))
   const updateSkills = (s: string[]) => withSave(() => cvBuilderService.updateSkills(s))
+  const uploadPhoto = (file: File) => withSave(() => cvBuilderService.uploadPhoto(file))
+  const deletePhoto = () => withSave(() => cvBuilderService.deletePhoto())
 
   // Work Experiences
   const createWorkExperience = (d: WorkExperiencePayload) =>
@@ -140,6 +143,8 @@ export const useCvBuilderProfileStore = defineStore('cvBuilderProfile', () => {
     fetchProfile,
     updateProfile,
     updateSkills,
+    uploadPhoto,
+    deletePhoto,
     createWorkExperience,
     updateWorkExperience,
     deleteWorkExperience,

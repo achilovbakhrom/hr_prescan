@@ -139,6 +139,22 @@ export const cvBuilderService = {
     return data
   },
 
+  // Profile photo
+  async uploadPhoto(file: File): Promise<{ photo: string; photoUrl: string }> {
+    const formData = new FormData()
+    formData.append('photo', file)
+    const { data } = await apiClient.post<{ photo: string; photoUrl: string }>(
+      `${BASE}/photo`,
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } },
+    )
+    return data
+  },
+
+  async deletePhoto(): Promise<void> {
+    await apiClient.delete(`${BASE}/photo`)
+  },
+
   // CV Parsing (AI)
   async parseCv(file: File): Promise<CandidateProfile> {
     const formData = new FormData()

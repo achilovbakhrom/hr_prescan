@@ -32,6 +32,7 @@ from apps.accounts.apis.candidate_cv_ai import (
     CvParseApi,
 )
 from apps.accounts.apis.candidate_cv_public import PublicCvViewApi
+from apps.accounts.apis.candidate_photo import CandidateProfilePhotoApi
 from apps.accounts.apis.candidate_education import (
     EducationDetailApi,
     EducationListCreateApi,
@@ -74,6 +75,7 @@ __all__ = [
     "CandidateLanguageDetailApi",
     "CandidateLanguageListCreateApi",
     "CandidateProfileApi",
+    "CandidateProfilePhotoApi",
     "CandidateProfileSkillsApi",
     "CertificationDetailApi",
     "CertificationListCreateApi",
