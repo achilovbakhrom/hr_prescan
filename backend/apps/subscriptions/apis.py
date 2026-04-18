@@ -5,17 +5,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.permissions import HasHRPermission, HRPermissions, IsAdmin
-from apps.subscriptions.models import CompanySubscription, SubscriptionPlan
-from apps.subscriptions.selectors import get_all_plans, get_company_subscription, get_plan_by_tier
+from apps.subscriptions.models import SubscriptionPlan, UserSubscription
+from apps.subscriptions.selectors import get_all_plans, get_plan_by_tier, get_user_subscription
 from apps.subscriptions.services import (
     cancel_subscription,
     get_subscription_usage,
-    subscribe_company,
+    subscribe_user,
 )
-
-# ---------------------------------------------------------------------------
-# Serializers
-# ---------------------------------------------------------------------------
 
 
 class PlanOutputSerializer(serializers.Serializer):
@@ -31,7 +27,7 @@ class PlanOutputSerializer(serializers.Serializer):
     max_storage_gb = serializers.IntegerField()
 
 
-class CompanySubscriptionOutputSerializer(serializers.Serializer):
+class UserSubscriptionOutputSerializer(serializers.Serializer):
     id = serializers.UUIDField()
     plan = PlanOutputSerializer()
     billing_period = serializers.CharField()
@@ -44,14 +40,9 @@ class CompanySubscriptionOutputSerializer(serializers.Serializer):
 class SubscribeInputSerializer(serializers.Serializer):
     plan_tier = serializers.ChoiceField(choices=SubscriptionPlan.Tier.choices)
     billing_period = serializers.ChoiceField(
-        choices=CompanySubscription.BillingPeriod.choices,
-        default=CompanySubscription.BillingPeriod.MONTHLY,
+        choices=UserSubscription.BillingPeriod.choices,
+        default=UserSubscription.BillingPeriod.MONTHLY,
     )
-
-
-# ---------------------------------------------------------------------------
-# Views
-# ---------------------------------------------------------------------------
 
 
 class PlanListApi(APIView):
@@ -65,7 +56,7 @@ class PlanListApi(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class CompanySubscriptionApi(APIView):
+class UserSubscriptionApi(APIView):
     """
     GET  /api/hr/subscription/ — current subscription
     POST /api/hr/subscription/ — subscribe or change plan
@@ -74,49 +65,34 @@ class CompanySubscriptionApi(APIView):
     permission_classes = [IsAdmin]
 
     def get(self, request: Request) -> Response:
-        company = request.user.company
-        if company is None:
-            return Response(
-                {"detail": "You are not associated with a company."},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-        subscription = get_company_subscription(company=company)
+        subscription = get_user_subscription(user=request.user)
         if subscription is None:
             return Response(
                 {"detail": "No active subscription."},
                 status=status.HTTP_404_NOT_FOUND,
             )
-
-        serializer = CompanySubscriptionOutputSerializer(subscription)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(
+            UserSubscriptionOutputSerializer(subscription).data,
+            status=status.HTTP_200_OK,
+        )
 
     def post(self, request: Request) -> Response:
-        company = request.user.company
-        if company is None:
-            return Response(
-                {"detail": "You are not associated with a company."},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
         input_serializer = SubscribeInputSerializer(data=request.data)
         input_serializer.is_valid(raise_exception=True)
 
         plan = get_plan_by_tier(tier=input_serializer.validated_data["plan_tier"])
         if plan is None:
-            return Response(
-                {"detail": "Plan not found."},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+            return Response({"detail": "Plan not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        subscription = subscribe_company(
-            company=company,
+        subscription = subscribe_user(
+            user=request.user,
             plan=plan,
             billing_period=input_serializer.validated_data["billing_period"],
         )
-
-        serializer = CompanySubscriptionOutputSerializer(subscription)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(
+            UserSubscriptionOutputSerializer(subscription).data,
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class CancelSubscriptionApi(APIView):
@@ -125,14 +101,7 @@ class CancelSubscriptionApi(APIView):
     permission_classes = [IsAdmin]
 
     def post(self, request: Request) -> Response:
-        company = request.user.company
-        if company is None:
-            return Response(
-                {"detail": "You are not associated with a company."},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-        subscription = get_company_subscription(company=company)
+        subscription = get_user_subscription(user=request.user)
         if subscription is None:
             return Response(
                 {"detail": "No active subscription to cancel."},
@@ -140,8 +109,10 @@ class CancelSubscriptionApi(APIView):
             )
 
         subscription = cancel_subscription(subscription=subscription)
-        serializer = CompanySubscriptionOutputSerializer(subscription)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(
+            UserSubscriptionOutputSerializer(subscription).data,
+            status=status.HTTP_200_OK,
+        )
 
 
 class SubscriptionUsageApi(APIView):
@@ -151,12 +122,5 @@ class SubscriptionUsageApi(APIView):
     hr_permission = HRPermissions.MANAGE_SETTINGS
 
     def get(self, request: Request) -> Response:
-        company = request.user.company
-        if company is None:
-            return Response(
-                {"detail": "You are not associated with a company."},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-        usage = get_subscription_usage(company=company)
+        usage = get_subscription_usage(user=request.user)
         return Response(usage, status=status.HTTP_200_OK)

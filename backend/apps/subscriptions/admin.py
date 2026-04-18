@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from apps.subscriptions.models import CompanySubscription, SubscriptionPlan
+from apps.subscriptions.models import SubscriptionPlan, UserSubscription
 
 
 @admin.register(SubscriptionPlan)
@@ -10,9 +10,9 @@ class SubscriptionPlanAdmin(admin.ModelAdmin):
     search_fields = ("name",)
 
 
-@admin.register(CompanySubscription)
-class CompanySubscriptionAdmin(admin.ModelAdmin):
-    list_display = ("company", "plan", "billing_period", "is_active", "current_period_end")
+@admin.register(UserSubscription)
+class UserSubscriptionAdmin(admin.ModelAdmin):
+    list_display = ("user", "plan", "billing_period", "is_active", "current_period_end")
     list_filter = ("billing_period", "is_active")
-    search_fields = ("company__name",)
-    raw_id_fields = ("company", "plan")
+    search_fields = ("user__email",)
+    raw_id_fields = ("user", "plan")

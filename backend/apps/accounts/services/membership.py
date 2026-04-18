@@ -53,12 +53,21 @@ def invite_hr(
 
 
 def _create_membership_from_invitation(user: User, invitation: Invitation) -> None:
-    """Create a CompanyMembership from an invitation and switch the user to that company."""
+    """Create a CompanyMembership from an invitation and switch the user to that company.
+
+    If the user has no existing default membership, this one becomes default.
+    """
     perms = invitation.permissions or []
+    has_default = CompanyMembership.objects.filter(user=user, is_default=True).exists()
+
     CompanyMembership.objects.update_or_create(
         user=user,
         company=invitation.company,
-        defaults={"role": User.Role.HR, "hr_permissions": perms},
+        defaults={
+            "role": User.Role.HR,
+            "hr_permissions": perms,
+            "is_default": not has_default,
+        },
     )
     # Switch active company
     user.company = invitation.company
@@ -157,6 +166,27 @@ def switch_to_personal(*, user: User) -> User:
     user.hr_permissions = []
     user.save(update_fields=["company", "role", "hr_permissions", "updated_at"])
     return user
+
+
+@transaction.atomic
+def set_default_company(*, user: User, company_id: UUID) -> CompanyMembership:
+    """Toggle the user's default flag onto one of their memberships.
+
+    Unsets any previous default for the user in the same transaction. The caller is expected
+    to have verified the user owns a membership to ``company_id`` (raises otherwise).
+    """
+    try:
+        target = CompanyMembership.objects.get(user=user, company_id=company_id)
+    except CompanyMembership.DoesNotExist as exc:
+        raise ApplicationError("You are not a member of this company.") from exc
+
+    if target.is_default:
+        return target  # idempotent
+
+    CompanyMembership.objects.filter(user=user, is_default=True).update(is_default=False)
+    target.is_default = True
+    target.save(update_fields=["is_default"])
+    return target
 
 
 def deactivate_user(*, user: User, deactivated_by: User) -> User:

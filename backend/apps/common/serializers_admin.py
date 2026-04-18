@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from apps.accounts.models import Company, User
+from apps.accounts.models import User
 
 
 class AdminCompanyListOutputSerializer(serializers.Serializer):
@@ -9,9 +9,9 @@ class AdminCompanyListOutputSerializer(serializers.Serializer):
     industry = serializers.CharField()
     size = serializers.CharField()
     country = serializers.CharField()
-    subscription_status = serializers.CharField()
     user_count = serializers.IntegerField()
     vacancy_count = serializers.IntegerField()
+    is_deleted = serializers.BooleanField()
     created_at = serializers.DateTimeField()
 
 
@@ -23,17 +23,14 @@ class AdminCompanyDetailOutputSerializer(serializers.Serializer):
     country = serializers.CharField()
     website = serializers.URLField(allow_null=True)
     description = serializers.CharField(allow_null=True)
-    subscription_status = serializers.CharField()
-    trial_ends_at = serializers.DateTimeField(allow_null=True)
+    is_deleted = serializers.BooleanField()
+    deleted_at = serializers.DateTimeField(allow_null=True)
     created_at = serializers.DateTimeField()
     updated_at = serializers.DateTimeField()
 
 
 class AdminCompanyUpdateInputSerializer(serializers.Serializer):
-    subscription_status = serializers.ChoiceField(
-        choices=Company.SubscriptionStatus.choices,
-        required=False,
-    )
+    is_deleted = serializers.BooleanField(required=False)
 
 
 class AdminUserListOutputSerializer(serializers.Serializer):
@@ -44,6 +41,7 @@ class AdminUserListOutputSerializer(serializers.Serializer):
     role = serializers.CharField()
     is_active = serializers.BooleanField()
     is_staff = serializers.BooleanField()
+    subscription_status = serializers.CharField()
     company_name = serializers.SerializerMethodField()
     created_at = serializers.DateTimeField()
 
@@ -61,6 +59,8 @@ class AdminUserDetailOutputSerializer(serializers.Serializer):
     is_active = serializers.BooleanField()
     is_staff = serializers.BooleanField()
     email_verified = serializers.BooleanField()
+    subscription_status = serializers.CharField()
+    trial_ends_at = serializers.DateTimeField(allow_null=True)
     company_name = serializers.SerializerMethodField()
     created_at = serializers.DateTimeField()
     updated_at = serializers.DateTimeField()
@@ -72,3 +72,7 @@ class AdminUserDetailOutputSerializer(serializers.Serializer):
 class AdminUserUpdateInputSerializer(serializers.Serializer):
     is_active = serializers.BooleanField(required=False)
     is_staff = serializers.BooleanField(required=False)
+    subscription_status = serializers.ChoiceField(
+        choices=User.SubscriptionStatus.choices,
+        required=False,
+    )
