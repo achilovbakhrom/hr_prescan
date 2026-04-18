@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ApplicationStatusBadge from './ApplicationStatusBadge.vue'
+import TranslatableText from '@/shared/components/TranslatableText.vue'
 import type { ApplicationDetail } from '../types/candidate.types'
 
 const props = defineProps<{
@@ -10,6 +11,12 @@ const props = defineProps<{
   prescanningScore?: number | null
   interviewScore?: number | null
   aiSummary?: string | null
+  aiSummaryTranslations?: Record<string, string>
+  aiSummaryInterviewId?: string
+}>()
+
+const emit = defineEmits<{
+  'update:aiSummaryTranslations': [tr: Record<string, string>]
 }>()
 
 const { t } = useI18n()
@@ -44,18 +51,18 @@ const recommendation = computed(() => {
   if (overallScore.value === null) return null
   if (overallScore.value >= 75)
     return {
-      label: 'Recommend to move forward',
+      label: t('candidates.recommendation.moveForward'),
       icon: 'pi-check-circle',
       cls: 'bg-green-50 border-green-200 text-green-800',
     }
   if (overallScore.value >= 55)
     return {
-      label: 'Consider for next round',
+      label: t('candidates.recommendation.consider'),
       icon: 'pi-exclamation-circle',
       cls: 'bg-yellow-50 border-yellow-200 text-yellow-800',
     }
   return {
-    label: 'Not recommended to proceed',
+    label: t('candidates.recommendation.notRecommended'),
     icon: 'pi-times-circle',
     cls: 'bg-red-50 border-red-200 text-red-800',
   }
@@ -76,7 +83,7 @@ const recommendation = computed(() => {
       <div>
         <p class="text-sm text-gray-500">{{ t('candidates.application.phone') }}</p>
         <p class="font-medium">
-          {{ props.candidate.candidatePhone || 'Not provided' }}
+          {{ props.candidate.candidatePhone || t('candidates.overviewDetails.notProvided') }}
         </p>
       </div>
       <div>
@@ -98,10 +105,8 @@ const recommendation = computed(() => {
     >
       <i class="pi pi-spinner pi-spin text-blue-500"></i>
       <div>
-        <p class="text-sm font-medium text-blue-800">CV is being analyzed...</p>
-        <p class="text-xs text-blue-600">
-          Extracting skills, experience, and calculating match score. This takes about 20 seconds.
-        </p>
+        <p class="text-sm font-medium text-blue-800">{{ t('candidates.cvData.analyzing') }}</p>
+        <p class="text-xs text-blue-600">{{ t('candidates.cvData.analyzingHint') }}</p>
       </div>
     </div>
 
@@ -165,7 +170,7 @@ const recommendation = computed(() => {
         </p>
         <p v-else class="mt-0.5 text-base text-gray-300 sm:mt-1 sm:text-lg">—</p>
         <p v-if="overallScore !== null" class="mt-0.5 hidden text-[10px] text-gray-400 sm:block">
-          Combined score
+          {{ t('candidates.overviewDetails.combinedScore') }}
         </p>
       </div>
     </div>
@@ -176,7 +181,20 @@ const recommendation = computed(() => {
         <i class="pi mt-0.5 text-lg" :class="recommendation.icon"></i>
         <div>
           <p class="font-semibold">{{ recommendation.label }}</p>
-          <p v-if="props.aiSummary" class="mt-1 text-sm opacity-80">{{ props.aiSummary }}</p>
+          <TranslatableText
+            v-if="props.aiSummary && props.aiSummaryInterviewId"
+            :text="props.aiSummary"
+            :translations="props.aiSummaryTranslations || {}"
+            model="interview"
+            :object-id="props.aiSummaryInterviewId"
+            field="ai_summary"
+            @translated="(tr) => emit('update:aiSummaryTranslations', tr)"
+          >
+            <template #default="{ text }">
+              <p class="mt-1 text-sm opacity-80">{{ text }}</p>
+            </template>
+          </TranslatableText>
+          <p v-else-if="props.aiSummary" class="mt-1 text-sm opacity-80">{{ props.aiSummary }}</p>
         </div>
       </div>
     </div>

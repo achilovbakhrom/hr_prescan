@@ -6,7 +6,8 @@ export const ROUTE_NAMES = {
   LOGIN: 'login',
   REGISTER: 'register',
   VERIFY_EMAIL: 'verify-email',
-  COMPANY_REGISTER: 'company-register',
+  CHOOSE_ROLE: 'choose-role',
+  COMPANY_SETUP: 'company-setup',
 
   // App
   PROFILE: 'profile',
@@ -21,6 +22,7 @@ export const ROUTE_NAMES = {
   MY_APPLICATIONS: 'my-applications',
   MY_APPLICATION_DETAIL: 'my-application-detail',
   VACANCY_CANDIDATES: 'vacancy-candidates',
+  CANDIDATE_LIST: 'candidate-list',
   CANDIDATE_DETAIL: 'candidate-detail',
   INTERVIEW_LIST: 'interview-list',
   INTERVIEW_DETAIL: 'interview-detail',
@@ -39,6 +41,14 @@ export const ROUTE_NAMES = {
   ADMIN_USERS: 'admin-users',
   ADMIN_ANALYTICS: 'admin-analytics',
   ADMIN_PLANS: 'admin-plans',
+
+  // HR Analytics
+  HR_ANALYTICS: 'hr-analytics',
+
+  // CV Builder
+  CV_BUILDER: 'cv-builder',
+  MY_CVS: 'my-cvs',
+  PUBLIC_CV: 'public-cv',
 
   // Employers
   EMPLOYER_LIST: 'employer-list',

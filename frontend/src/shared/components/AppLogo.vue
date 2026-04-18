@@ -2,9 +2,15 @@
 withDefaults(
   defineProps<{
     size?: 'sm' | 'md' | 'lg'
+    /** When true (default), the logo is a link to `/`. Set false for decorative use. */
+    linked?: boolean
+    /** Override the destination route (defaults to `/`). */
+    to?: string
   }>(),
   {
     size: 'sm',
+    linked: true,
+    to: '/',
   },
 )
 
@@ -16,9 +22,12 @@ const sizeMap = {
 </script>
 
 <template>
-  <div
+  <component
+    :is="linked ? 'RouterLink' : 'div'"
+    :to="linked ? to : undefined"
     class="flex items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 shadow-sm"
     :class="sizeMap[size].wrapper"
+    aria-label="Home"
   >
     <svg
       :width="sizeMap[size].svg"
@@ -54,5 +63,5 @@ const sizeMap = {
       <!-- AI sparkle right -->
       <path d="M36 15l1 2L39 18l-2 1L36 21l-1-2L33 18l2-1z" fill="rgba(255,255,255,0.7)" />
     </svg>
-  </div>
+  </component>
 </template>

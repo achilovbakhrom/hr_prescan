@@ -94,15 +94,9 @@ function initials(): string {
         <template v-else>
           <RouterLink
             :to="{ name: ROUTE_NAMES.LOGIN }"
-            class="text-sm font-medium text-gray-600 hover:text-gray-900"
-          >
-            {{ t('nav.signIn') }}
-          </RouterLink>
-          <RouterLink
-            :to="{ name: ROUTE_NAMES.COMPANY_REGISTER }"
             class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
           >
-            {{ t('nav.forEmployers') }}
+            {{ t('nav.signIn') }}
           </RouterLink>
         </template>
       </div>

@@ -8,14 +8,14 @@ from apps.common.models import BaseModel
 
 
 class TelegramLinkCode(BaseModel):
-    """One-time 6-digit code for linking a Telegram account to a platform user."""
+    """One-time token for linking a Telegram account via deep link."""
 
     user = models.ForeignKey(
         "accounts.User",
         on_delete=models.CASCADE,
         related_name="telegram_link_codes",
     )
-    code = models.CharField(max_length=6, unique=True)
+    code = models.CharField(max_length=64, unique=True)
     expires_at = models.DateTimeField()
     is_used = models.BooleanField(default=False)
 
@@ -23,16 +23,15 @@ class TelegramLinkCode(BaseModel):
         ordering = ["-created_at"]
 
     def __str__(self) -> str:
-        return f"TelegramLinkCode({self.code}) for {self.user_id}"
+        return f"TelegramLinkCode({self.code[:8]}...) for {self.user_id}"
 
     @staticmethod
     def generate(*, user):
-        """Create a fresh 6-digit link code, removing any previous unused codes."""
-        # Delete old unused codes for this user
+        """Create a fresh link token, removing any previous unused tokens."""
         TelegramLinkCode.objects.filter(user=user, is_used=False).delete()
-        code = "".join(str(secrets.randbelow(10)) for _ in range(6))
+        token = secrets.token_urlsafe(24)
         return TelegramLinkCode.objects.create(
             user=user,
-            code=code,
+            code=token,
             expires_at=timezone.now() + timedelta(minutes=10),
         )

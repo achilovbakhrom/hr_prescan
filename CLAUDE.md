@@ -18,7 +18,7 @@ All detailed docs live in `docs/`:
 
 - **Backend:** Django, DRF, Celery, PostgreSQL, Redis, RabbitMQ
 - **Frontend:** Vue 3, TypeScript, Pinia, PrimeVue, Tailwind CSS
-- **AI Interview:** LiveKit + Deepgram STT + GPT-4o + ElevenLabs TTS
+- **AI Interview:** LiveKit + Deepgram STT + Gemini 3.0 Flash + ElevenLabs TTS
 - **Storage:** MinIO (S3-compatible)
 - **Deployment:** Docker Compose, GitHub Actions CI/CD
 
@@ -59,6 +59,7 @@ All detailed docs live in `docs/`:
 - Use `select_related` / `prefetch_related` to avoid N+1 queries.
 - Use `@transaction.atomic` for multi-model operations.
 - Permission classes on every API view.
+- **File size limit: 200 lines max per file.** If a file exceeds 200 lines, split it. For APIs: split by resource (e.g., `apis/profile.py`, `apis/education.py`). For services: split by domain concern. For AI assistants: extract handlers into separate modules. No exceptions — refactor before adding more code to an oversized file.
 
 ### Frontend — Feature-Sliced Design (FSD)
 
@@ -73,12 +74,14 @@ All detailed docs live in `docs/`:
 - `<script setup>` with typed `defineProps` / `defineEmits`.
 - PrimeVue for UI components, Tailwind for utility styling.
 - **Mobile responsiveness**: every UI change must be tested and work on mobile (375px+). Use Tailwind responsive prefixes (`sm:`, `md:`, `lg:`). Mobile-first approach — default styles for mobile, override for larger screens.
+- **File size limit: 200 lines max per Vue component / TS file.** If a component exceeds 200 lines, extract sub-components or composables. Pages compose from smaller components — they should not contain large inline logic.
 
 ## Mandatory Rules
 
 - **Before starting any task** (bug fix, refactor, new feature, or anything else), assess whether the change affects business logic — user flows, statuses, pipelines, scoring, vacancy lifecycle, candidate pipeline, API contracts, or any behavior documented in `docs/BUSINESS_LOGIC.md`.
 - **If it does affect business logic**, update `docs/BUSINESS_LOGIC.md` as part of the same task — not as a follow-up. The code and the docs must stay in sync at all times.
 - **If unsure** whether a change affects business logic, err on the side of updating the doc.
+- **Code review before push**: After completing any code change (feature, bug fix, refactor — anything), run `/review` on the changed files BEFORE committing or pushing. Do NOT push code that hasn't been reviewed. Fix all critical issues and warnings found by the review before pushing.
 
 ## Important Notes
 

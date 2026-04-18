@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import TranslatableText from '@/shared/components/TranslatableText.vue'
 
 const props = defineProps<{
   overallScore: number | null
   matchDetails: MatchDetails | null
+  matchNotesTranslations?: Record<string, string>
+  applicationId?: string
   prescanningScore: number | null
   interviewScore: number | null
 }>()
@@ -53,18 +56,18 @@ const recommendation = computed(() => {
   if (combinedScore.value === null) return null
   if (combinedScore.value >= 75)
     return {
-      label: 'Strong Candidate — Recommend to move forward',
+      label: t('candidates.recommendation.strong'),
       color: 'bg-green-100 text-green-800 border-green-200',
       icon: 'pi-check-circle text-green-600',
     }
   if (combinedScore.value >= 55)
     return {
-      label: 'Moderate Candidate — Consider for next round',
+      label: t('candidates.recommendation.moderate'),
       color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
       icon: 'pi-exclamation-circle text-yellow-600',
     }
   return {
-    label: 'Weak Candidate — Not recommended to proceed',
+    label: t('candidates.recommendation.weak'),
     color: 'bg-red-100 text-red-800 border-red-200',
     icon: 'pi-times-circle text-red-600',
   }
@@ -84,9 +87,11 @@ function scoreTextColor(score: number): string {
 
 const scoreBreakdownLabel = computed(() => {
   const parts: string[] = []
-  if (cvScore.value !== null) parts.push(`CV ${cvScore.value}%`)
-  if (prescanningScoreNorm.value !== null) parts.push(`Prescanning ${prescanningScoreNorm.value}%`)
-  if (interviewScoreNorm.value !== null) parts.push(`Interview ${interviewScoreNorm.value}%`)
+  if (cvScore.value !== null) parts.push(`${t('candidates.cv')} ${cvScore.value}%`)
+  if (prescanningScoreNorm.value !== null)
+    parts.push(`${t('candidates.prescanning')} ${prescanningScoreNorm.value}%`)
+  if (interviewScoreNorm.value !== null)
+    parts.push(`${t('candidates.interview')} ${interviewScoreNorm.value}%`)
   return parts.join(' · ')
 })
 </script>
@@ -101,7 +106,7 @@ const scoreBreakdownLabel = computed(() => {
     "
     class="py-8 text-center text-sm text-gray-400"
   >
-    Analysis will be available after CV processing and prescanning/interview completion.
+    {{ t('candidates.matchScoreView.noAnalysis') }}
   </div>
 
   <div v-else class="space-y-6">
@@ -112,7 +117,9 @@ const scoreBreakdownLabel = computed(() => {
         <div>
           <p class="font-semibold">{{ recommendation.label }}</p>
           <p v-if="combinedScore !== null" class="mt-0.5 text-sm opacity-75">
-            Combined score: {{ combinedScore }}% ({{ scoreBreakdownLabel }})
+            {{ t('candidates.overviewDetails.combinedScore') }}: {{ combinedScore }}% ({{
+              scoreBreakdownLabel
+            }})
           </p>
         </div>
       </div>
@@ -131,7 +138,9 @@ const scoreBreakdownLabel = computed(() => {
           <p class="text-xl font-bold sm:text-3xl" :class="scoreTextColor(cvScore)">
             {{ cvScore }}%
           </p>
-          <p class="mt-1 hidden text-xs text-gray-400 sm:block">Based on resume analysis</p>
+          <p class="mt-1 hidden text-xs text-gray-400 sm:block">
+            {{ t('candidates.matchScoreView.basedOnResume') }}
+          </p>
         </div>
         <p v-else class="text-xl text-gray-300 sm:text-2xl">—</p>
       </div>
@@ -147,7 +156,9 @@ const scoreBreakdownLabel = computed(() => {
           <p class="text-xl font-bold sm:text-3xl" :class="scoreTextColor(prescanningScoreNorm!)">
             {{ props.prescanningScore }}/10
           </p>
-          <p class="mt-1 hidden text-xs text-gray-400 sm:block">AI prescanning result</p>
+          <p class="mt-1 hidden text-xs text-gray-400 sm:block">
+            {{ t('candidates.matchScoreView.aiPrescanResult') }}
+          </p>
         </div>
         <p v-else class="text-xl text-gray-300 sm:text-2xl">—</p>
       </div>
@@ -163,7 +174,9 @@ const scoreBreakdownLabel = computed(() => {
           <p class="text-xl font-bold sm:text-3xl" :class="scoreTextColor(interviewScoreNorm!)">
             {{ props.interviewScore }}/10
           </p>
-          <p class="mt-1 hidden text-xs text-gray-400 sm:block">AI interview result</p>
+          <p class="mt-1 hidden text-xs text-gray-400 sm:block">
+            {{ t('candidates.matchScoreView.aiInterviewResult') }}
+          </p>
         </div>
         <p v-else class="text-xl text-gray-300 sm:text-2xl">—</p>
       </div>
@@ -182,7 +195,9 @@ const scoreBreakdownLabel = computed(() => {
           <p class="text-xl font-bold sm:text-3xl" :class="scoreTextColor(combinedScore)">
             {{ combinedScore }}%
           </p>
-          <p class="mt-1 hidden text-xs text-gray-400 sm:block">Combined score</p>
+          <p class="mt-1 hidden text-xs text-gray-400 sm:block">
+            {{ t('candidates.overviewDetails.combinedScore') }}
+          </p>
         </div>
         <p v-else class="text-xl text-gray-300 sm:text-2xl">—</p>
       </div>
@@ -191,7 +206,9 @@ const scoreBreakdownLabel = computed(() => {
     <!-- Score Bar -->
     <div v-if="combinedScore !== null" class="rounded-lg border border-gray-200 bg-white p-4">
       <div class="mb-2 flex items-center justify-between">
-        <span class="text-sm font-medium text-gray-700">Combined Assessment</span>
+        <span class="text-sm font-medium text-gray-700">{{
+          t('candidates.matchScoreView.combinedAssessment')
+        }}</span>
         <span class="text-sm font-bold" :class="scoreTextColor(combinedScore)"
           >{{ combinedScore }}%</span
         >
@@ -205,13 +222,33 @@ const scoreBreakdownLabel = computed(() => {
       </div>
       <div class="mt-1 flex justify-between text-[10px] text-gray-400">
         <span>0%</span>
-        <span>Not Recommended</span>
+        <span>{{ t('candidates.matchScoreView.notRecommendedLabel') }}</span>
         <span>|</span>
-        <span>Consider</span>
+        <span>{{ t('candidates.matchScoreView.considerLabel') }}</span>
         <span>|</span>
-        <span>Recommended</span>
+        <span>{{ t('candidates.matchScoreView.recommendedLabel') }}</span>
         <span>100%</span>
       </div>
+    </div>
+
+    <!-- AI Match Notes -->
+    <div v-if="props.matchDetails?.notes" class="rounded-lg border border-gray-200 bg-white p-4">
+      <p class="mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+        {{ t('candidates.matchScoreView.aiNotes') }}
+      </p>
+      <TranslatableText
+        v-if="props.applicationId"
+        :text="props.matchDetails.notes"
+        :translations="props.matchNotesTranslations || {}"
+        model="application"
+        :object-id="props.applicationId"
+        field="match_notes"
+      >
+        <template #default="{ text }">
+          <p class="text-sm text-gray-700 leading-relaxed">{{ text }}</p>
+        </template>
+      </TranslatableText>
+      <p v-else class="text-sm text-gray-700 leading-relaxed">{{ props.matchDetails.notes }}</p>
     </div>
   </div>
 </template>

@@ -76,9 +76,9 @@ jobs:
             VITE_API_URL=https://prescreen-app.com/api
             VITE_LIVEKIT_URL=wss://prescreen-app.com/ws/
             VITE_GOOGLE_CLIENT_ID=64156241192-ul3jng69g72u46vadaf8h4kt1jpahbpm.apps.googleusercontent.com
-            VITE_TELEGRAM_BOT_USERNAME=hr_prescreen_ai_bot
-            VITE_TELEGRAM_BOT_ID=8419067285
-            VITE_TELEGRAM_CANDIDATE_BOT_USERNAME=hr_prescreen_candidate_dev_bot
+            VITE_TELEGRAM_BOT_USERNAME=candidate_preview_ai_bot
+            VITE_TELEGRAM_BOT_ID=8677262832
+            VITE_TELEGRAM_CANDIDATE_BOT_USERNAME=candidate_preview_ai_bot
             VITE_BILLING_ENABLED=false
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,scope=frontend
@@ -147,6 +147,19 @@ jobs:
              IMAGE_TAG=${{ github.sha }} \
                docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml \
                up -d --wait postgres redis rabbitmq minio livekit"
+
+      # Validate the new image imports cleanly — Django's `check` walks
+      # the full URL tree, so any SyntaxError / ImportError inside app
+      # modules surfaces here instead of after swap-in when the site is
+      # already 504-ing. Fail-fast: if this fails we never roll the
+      # broken image into rotation.
+      - name: Validate new backend image (django check)
+        run: |
+          ssh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} \
+            "cd ${{ secrets.PROD_DEPLOY_PATH }} && \
+             IMAGE_TAG=${{ github.sha }} \
+               docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml \
+               run --rm --no-deps django python manage.py check --deploy --fail-level=ERROR"
 
       # The backend image's entrypoint.sh applies migrations and collectstatic
       # on every container start before launching gunicorn, so no explicit

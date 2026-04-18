@@ -5,6 +5,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.accounts.models import CandidateCV
 from apps.applications.serializers import ApplicationDetailOutputSerializer
 from apps.applications.services import submit_application, upload_cv_to_s3
 from apps.common.exceptions import ApplicationError
@@ -26,25 +27,44 @@ class SubmitApplicationApi(APIView):
             default="",
         )
         cv_file = serializers.FileField(required=False, allow_null=True, default=None)
+        cv_id = serializers.UUIDField(required=False, allow_null=True, default=None)
+
+    def _resolve_cv(self, request, data, vacancy_id):
+        """Resolve CV from uploaded file or existing profile CV."""
+        cv_file = data.pop("cv_file", None)
+        cv_id = data.pop("cv_id", None)
+
+        if cv_file and cv_id:
+            raise ApplicationError("Provide either cv_file or cv_id, not both.")
+
+        if cv_id:
+            if not (request.user and request.user.is_authenticated):
+                raise ApplicationError("Authentication required to use profile CV.")
+            try:
+                cv = CandidateCV.objects.select_related("profile").get(
+                    pk=cv_id,
+                    profile__user=request.user,
+                )
+            except CandidateCV.DoesNotExist:
+                raise ApplicationError("CV not found.") from None
+            return cv.file, cv.name
+
+        if cv_file:
+            return upload_cv_to_s3(file_obj=cv_file, vacancy_id=vacancy_id), cv_file.name
+
+        return "", ""
 
     def post(self, request: Request, vacancy_id: str) -> Response:
         serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         data = serializer.validated_data
-        cv_file = data.pop("cv_file", None)
 
-        # Upload CV to S3/MinIO if provided
-        cv_file_path = ""
-        cv_original_filename = ""
-        if cv_file:
-            cv_original_filename = cv_file.name
-            cv_file_path = upload_cv_to_s3(
-                file_obj=cv_file,
-                vacancy_id=vacancy_id,
-            )
+        try:
+            cv_file_path, cv_original_filename = self._resolve_cv(request, data, vacancy_id)
+        except ApplicationError as e:
+            return Response({"detail": e.message}, status=status.HTTP_400_BAD_REQUEST)
 
-        # If user is authenticated, attach as candidate
         candidate = None
         if request.user and request.user.is_authenticated:
             candidate = request.user

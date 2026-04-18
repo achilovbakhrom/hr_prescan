@@ -2,13 +2,18 @@ import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { sendAICommand, type AIMessage, type FrontendAction } from '../api/aiAssistant'
 import { extractErrorMessage } from '../api/errors'
+import { useAuthStore } from '@/features/auth/stores/auth.store'
 
-const STORAGE_KEY = 'prescreen_ai_assistant_history'
+const STORAGE_KEY_PREFIX = 'prescreen_ai_assistant_history'
 const MAX_MESSAGES = 200 // 100 prompts × 2 (user + assistant)
 
-function loadHistory(): AIMessage[] {
+function getStorageKey(role: string): string {
+  return `${STORAGE_KEY_PREFIX}_${role}`
+}
+
+function loadHistory(role: string): AIMessage[] {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
+    const raw = localStorage.getItem(getStorageKey(role))
     if (raw) return JSON.parse(raw) as AIMessage[]
   } catch {
     /* corrupted data */
@@ -16,21 +21,42 @@ function loadHistory(): AIMessage[] {
   return []
 }
 
-function saveHistory(msgs: AIMessage[]): void {
+function saveHistory(msgs: AIMessage[], role: string): void {
   const trimmed = msgs.slice(-MAX_MESSAGES)
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed))
+  localStorage.setItem(getStorageKey(role), JSON.stringify(trimmed))
 }
 
 const isOpen = ref(false)
-const messages = ref<AIMessage[]>(loadHistory())
+const messages = ref<AIMessage[]>([])
 const sending = ref(false)
+let skipSave = false
+let activeRole = ''
 
 // Persist on every change
-watch(messages, (val) => saveHistory(val), { deep: true })
+watch(
+  messages,
+  (val) => {
+    if (skipSave) {
+      skipSave = false
+      return
+    }
+    if (activeRole) saveHistory(val, activeRole)
+  },
+  { deep: true },
+)
 
 export function useAIAssistant() {
   const route = useRoute()
   const router = useRouter()
+  const authStore = useAuthStore()
+
+  // Load role-specific chat history when role changes
+  const role = authStore.user?.role || 'hr'
+  if (role !== activeRole) {
+    activeRole = role
+    skipSave = true
+    messages.value = loadHistory(role)
+  }
 
   function toggle() {
     isOpen.value = !isOpen.value
@@ -87,7 +113,8 @@ export function useAIAssistant() {
         context.conversationHistory = recentHistory
       }
 
-      const response = await sendAICommand(text, context)
+      const userRole = authStore.user?.role
+      const response = await sendAICommand(text, context, userRole)
       messages.value.push({
         role: 'assistant',
         content: response.message,
@@ -109,8 +136,9 @@ export function useAIAssistant() {
   }
 
   function clearHistory() {
-    messages.value = []
-    localStorage.removeItem(STORAGE_KEY)
+    skipSave = true
+    messages.value.splice(0, messages.value.length)
+    localStorage.removeItem(getStorageKey(activeRole))
   }
 
   return { isOpen, messages, sending, toggle, open, close, sendMessage, clearHistory }

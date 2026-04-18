@@ -4,40 +4,58 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.accounts.permissions import IsAdmin, IsHRManager
+from apps.accounts.permissions import HasHRPermission
+from apps.integrations.telegram_bot.bots import (
+    ROLE_CANDIDATE,
+    ROLE_HR,
+    VALID_ROLES,
+    get_bot_config,
+)
 
 
 class TelegramWebhookApi(APIView):
-    """POST /api/telegram/webhook/ — receive updates from Telegram."""
+    """POST /api/telegram/<role>/webhook/ — receive updates from a Telegram bot.
+
+    The ``role`` URL kwarg distinguishes the HR bot from the candidate bot so
+    each can verify its own secret token and dispatch to its own handler.
+    """
 
     permission_classes = [AllowAny]
 
-    def post(self, request):
-        # Verify webhook secret
+    def post(self, request, role: str):
+        if role not in VALID_ROLES:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        config = get_bot_config(role=role)
+        if not config.token:
+            # Bot isn't configured on this deployment — fail loudly so the
+            # operator notices instead of silently dropping updates.
+            return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
         secret = request.headers.get("X-Telegram-Bot-Api-Secret-Token", "")
-        if settings.TELEGRAM_WEBHOOK_SECRET and secret != settings.TELEGRAM_WEBHOOK_SECRET:
+        if config.webhook_secret and secret != config.webhook_secret:
             return Response(status=status.HTTP_403_FORBIDDEN)
 
-        # Dispatch to Celery for async processing
         from apps.integrations.tasks import process_telegram_update
 
-        process_telegram_update.delay(request.data)
-
+        process_telegram_update.delay(request.data, role)
         return Response({"ok": True}, status=status.HTTP_200_OK)
 
 
 class TelegramLinkCodeApi(APIView):
-    """GET /api/hr/telegram/link-code/ — generate a 6-digit link code."""
+    """GET /api/hr/telegram/link-code/ — generate a deep link for HRs to connect Telegram."""
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
 
     def get(self, request):
         from apps.integrations.models import TelegramLinkCode
 
         link = TelegramLinkCode.generate(user=request.user)
+        bot_username = settings.TELEGRAM_HR_BOT_USERNAME.lstrip("@")
+        link_url = f"https://t.me/{bot_username}?start={link.code}"
         return Response(
             {
-                "code": link.code,
+                "link_url": link_url,
                 "expires_at": link.expires_at.isoformat(),
             }
         )
@@ -46,7 +64,7 @@ class TelegramLinkCodeApi(APIView):
 class TelegramStatusApi(APIView):
     """GET /api/hr/telegram/status/ — check Telegram connection status."""
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
 
     def get(self, request):
         user = request.user
@@ -61,7 +79,7 @@ class TelegramStatusApi(APIView):
 class TelegramUnlinkApi(APIView):
     """POST /api/hr/telegram/unlink/ — disconnect Telegram account."""
 
-    permission_classes = [IsHRManager | IsAdmin]
+    permission_classes = [HasHRPermission]
 
     def post(self, request):
         user = request.user
@@ -69,3 +87,14 @@ class TelegramUnlinkApi(APIView):
         user.telegram_username = ""
         user.save(update_fields=["telegram_id", "telegram_username", "updated_at"])
         return Response({"detail": "Telegram account disconnected."})
+
+
+# Re-exported here for clarity in URL routing.
+__all__ = [
+    "ROLE_CANDIDATE",
+    "ROLE_HR",
+    "TelegramLinkCodeApi",
+    "TelegramStatusApi",
+    "TelegramUnlinkApi",
+    "TelegramWebhookApi",
+]

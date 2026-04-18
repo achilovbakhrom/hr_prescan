@@ -7,10 +7,12 @@ import asyncio
 import base64
 import json
 import logging
+import os
 import time
 from dataclasses import dataclass, field
 
-from openai import AsyncOpenAI
+from google import genai
+from google.genai import types
 
 logger = logging.getLogger("interview-agent")
 
@@ -57,7 +59,7 @@ class IntegrityMonitor:
         self._flags: list[IntegrityFlagRecord] = []
         self._running: bool = False
         self._task: asyncio.Task | None = None
-        self._client = AsyncOpenAI()
+        self._client = genai.Client(api_key=os.environ.get("GOOGLE_API_KEY", ""))
 
         # Transcript accumulation for audio anomaly detection
         self._transcript_entries: list[dict] = []
@@ -156,7 +158,7 @@ class IntegrityMonitor:
     # ------------------------------------------------------------------
 
     async def _analyze_frame(self, frame_b64: str, timestamp_seconds: int) -> None:
-        """Send a video frame to OpenAI Vision to check for integrity issues.
+        """Send a video frame to Gemini Vision to check for integrity issues.
 
         Checks for:
         - Face present / face missing
@@ -176,29 +178,24 @@ class IntegrityMonitor:
         )
 
         try:
-            response = await self._client.chat.completions.create(
-                model="gpt-4o",
-                messages=[
-                    {
-                        "role": "user",
-                        "content": [
-                            {"type": "text", "text": prompt},
-                            {
-                                "type": "image_url",
-                                "image_url": {
-                                    "url": f"data:image/jpeg;base64,{frame_b64}",
-                                    "detail": "low",
-                                },
-                            },
-                        ],
-                    }
+            response = await self._client.aio.models.generate_content(
+                model=os.environ.get("GEMINI_MODEL", "gemini-3-flash-preview"),
+                contents=[
+                    types.Part.from_bytes(
+                        data=base64.b64decode(frame_b64),
+                        mime_type="image/jpeg",
+                    ),
+                    prompt,
                 ],
-                response_format={"type": "json_object"},
-                max_tokens=200,
-                temperature=0,
+                config=types.GenerateContentConfig(
+                    thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
+                    response_mime_type="application/json",
+                    max_output_tokens=200,
+                    temperature=0,
+                ),
             )
 
-            result = json.loads(response.choices[0].message.content)
+            result = json.loads(response.text)
             logger.debug("Frame analysis result at %ds: %s", timestamp_seconds, result)
 
             # Evaluate results and add flags

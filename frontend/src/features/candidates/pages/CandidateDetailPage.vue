@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
 import { useCandidateStore } from '../stores/candidate.store'
+import { useInterviewData } from '../composables/useInterviewData'
 import CandidateOverview from '../components/CandidateOverview.vue'
 import CvDataView from '../components/CvDataView.vue'
 import MatchScoreView from '../components/MatchScoreView.vue'
 import HRNotesPanel from '../components/HRNotesPanel.vue'
 import CandidateActions from '../components/CandidateActions.vue'
-import MessageThread from '../components/MessageThread.vue'
 import InterviewReviewPanel from '../components/InterviewReviewPanel.vue'
 import { candidateService } from '../services/candidate.service'
 import type { ApplicationStatus } from '../types/candidate.types'
@@ -19,6 +19,15 @@ const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const candidateStore = useCandidateStore()
+const {
+  prescanningScore,
+  interviewScore,
+  aiSummary,
+  aiSummaryTranslations,
+  aiSummaryInterviewId,
+  fetchInterviewData,
+} = useInterviewData()
+
 const candidateId = computed(() => route.params.id as string)
 const candidate = computed(() => candidateStore.currentCandidate)
 const hasInterview = computed(() => candidate.value?.interviewEnabled ?? false)
@@ -26,13 +35,12 @@ const hasInterview = computed(() => candidate.value?.interviewEnabled ?? false)
 const tabNames = computed(() => {
   const base = ['overview', 'cv', 'prescanning']
   if (hasInterview.value) base.push('interview')
-  base.push('analysis', 'notes', 'messages')
+  base.push('analysis', 'notes')
   return base
 })
 const activeTab = computed({
   get: () => {
-    const tab = route.query.tab as string
-    const idx = tabNames.value.indexOf(tab)
+    const idx = tabNames.value.indexOf(route.query.tab as string)
     return idx >= 0 ? idx : 0
   },
   set: (val: number) => {
@@ -40,48 +48,21 @@ const activeTab = computed({
   },
 })
 
-const prescanningScore = ref<number | null>(null)
-const interviewScore = ref<number | null>(null)
-const aiSummary = ref<string | null>(null)
-
 onMounted(async () => {
   await candidateStore.fetchCandidateDetail(candidateId.value)
-  // Fetch prescanning interview data
-  try {
-    const data = (await candidateService.getCandidateInterview(
-      candidateId.value,
-      'prescanning',
-    )) as Record<string, unknown>
-    prescanningScore.value = (data.overallScore as number) ?? null
-    aiSummary.value = (data.aiSummary as string) ?? null
-  } catch {
-    // no prescanning interview yet
-  }
-  // Fetch interview data if interview is enabled
-  if (candidate.value?.interviewEnabled) {
-    try {
-      const data = (await candidateService.getCandidateInterview(
-        candidateId.value,
-        'interview',
-      )) as Record<string, unknown>
-      interviewScore.value = (data.overallScore as number) ?? null
-      if (!aiSummary.value) {
-        aiSummary.value = (data.aiSummary as string) ?? null
-      }
-    } catch {
-      // no interview yet
-    }
-  }
+  await fetchInterviewData(candidateId.value, candidate.value?.interviewEnabled ?? false)
 })
+
+function handleAiSummaryTranslated(tr: Record<string, string>): void {
+  aiSummaryTranslations.value = tr
+}
 
 async function handleStatusChange(status: ApplicationStatus): Promise<void> {
   await candidateStore.updateStatus(candidateId.value, status).catch(() => {})
 }
-
 async function handleSaveNotes(note: string): Promise<void> {
   await candidateStore.addNote(candidateId.value, note).catch(() => {})
 }
-
 async function handleDownloadCv(): Promise<void> {
   if (!candidate.value?.cvFile) return
   try {
@@ -91,20 +72,13 @@ async function handleDownloadCv(): Promise<void> {
     window.open(candidate.value.cvFile, '_blank')
   }
 }
-
-function handleOpenMessages(): void {
-  router.replace({ query: { ...route.query, tab: 'messages' } })
-}
-
 function formatScore(score: number | null | undefined): string {
-  if (score === null || score === undefined) return ''
-  return String(Math.round(score))
+  return score === null || score === undefined ? '' : String(Math.round(score))
 }
 </script>
 
 <template>
   <div class="space-y-3 sm:space-y-4">
-    <!-- Header -->
     <div class="flex items-center gap-2 sm:gap-3">
       <button
         class="shrink-0 rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
@@ -122,10 +96,7 @@ function formatScore(score: number | null | undefined): string {
       </div>
     </div>
 
-    <p v-if="candidateStore.error" class="text-sm text-red-600">
-      {{ candidateStore.error }}
-    </p>
-
+    <p v-if="candidateStore.error" class="text-sm text-red-600">{{ candidateStore.error }}</p>
     <div v-if="!candidate && candidateStore.loading" class="py-12 text-center">
       <i class="pi pi-spinner pi-spin text-3xl text-gray-400"></i>
     </div>
@@ -139,14 +110,13 @@ function formatScore(score: number | null | undefined): string {
         :current-status="candidate.status"
         :loading="candidateStore.loading"
         @status-change="handleStatusChange"
-        @open-messages="handleOpenMessages"
       />
 
       <TabView v-model:activeIndex="activeTab" scrollable>
         <TabPanel value="0">
-          <template #header>
-            <span class="text-xs sm:text-sm">{{ t('candidates.overview') }}</span>
-          </template>
+          <template #header
+            ><span class="text-xs sm:text-sm">{{ t('candidates.overview') }}</span></template
+          >
           <div class="py-3 sm:py-4">
             <CandidateOverview
               :candidate="candidate"
@@ -154,6 +124,9 @@ function formatScore(score: number | null | undefined): string {
               :prescanning-score="prescanningScore"
               :interview-score="interviewScore"
               :ai-summary="aiSummary"
+              :ai-summary-translations="aiSummaryTranslations"
+              :ai-summary-interview-id="aiSummaryInterviewId ?? undefined"
+              @update:ai-summary-translations="handleAiSummaryTranslated"
             />
           </div>
         </TabPanel>
@@ -181,6 +154,9 @@ function formatScore(score: number | null | undefined): string {
               :cv-filename="candidate.cvOriginalFilename"
               :match-score="candidate.matchScore"
               :match-details="candidate.matchDetails"
+              :match-notes-translations="candidate.matchNotesTranslations"
+              :cv-summary-translations="candidate.cvSummaryTranslations"
+              :application-id="candidate.id"
               @download-cv="handleDownloadCv"
             />
           </div>
@@ -229,13 +205,15 @@ function formatScore(score: number | null | undefined): string {
         </TabPanel>
 
         <TabPanel :value="String(hasInterview ? 4 : 3)">
-          <template #header>
-            <span class="text-xs sm:text-sm">Analysis</span>
-          </template>
+          <template #header
+            ><span class="text-xs sm:text-sm">{{ t('candidates.analysis') }}</span></template
+          >
           <div class="py-3 sm:py-4">
             <MatchScoreView
               :overall-score="candidate.matchScore"
               :match-details="candidate.matchDetails"
+              :match-notes-translations="candidate.matchNotesTranslations"
+              :application-id="candidate.id"
               :prescanning-score="prescanningScore"
               :interview-score="interviewScore"
             />
@@ -243,24 +221,15 @@ function formatScore(score: number | null | undefined): string {
         </TabPanel>
 
         <TabPanel :value="String(hasInterview ? 5 : 4)">
-          <template #header>
-            <span class="text-xs sm:text-sm">{{ t('candidates.notes') }}</span>
-          </template>
+          <template #header
+            ><span class="text-xs sm:text-sm">{{ t('candidates.notes') }}</span></template
+          >
           <div class="py-3 sm:py-4">
             <HRNotesPanel
               :notes="candidate.hrNotes"
               :loading="candidateStore.loading"
               @save="handleSaveNotes"
             />
-          </div>
-        </TabPanel>
-
-        <TabPanel :value="String(hasInterview ? 6 : 5)">
-          <template #header>
-            <span class="text-xs sm:text-sm">{{ t('candidates.messages') }}</span>
-          </template>
-          <div class="py-3 sm:py-4">
-            <MessageThread :candidate-id="candidate.id" />
           </div>
         </TabPanel>
       </TabView>

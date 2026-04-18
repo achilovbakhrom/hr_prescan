@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  @page {
+    size: A4;
+    margin: 0;
+  }
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 10pt;
+    line-height: 1.5;
+    color: #333;
+  }
+  .page-wrapper {
+    width: 100%;
+    min-height: 297mm;
+  }
+  .sidebar {
+    float: left;
+    width: 30%;
+    background: #2c3e50;
+    color: #ecf0f1;
+    min-height: 297mm;
+    padding: 20mm 10mm;
+  }
+  .main-content {
+    float: right;
+    width: 70%;
+    padding: 20mm 15mm 20mm 12mm;
+  }
+  .clearfix::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+
+  /* Sidebar styles */
+  .sidebar h2 {
+    font-size: 10pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1pt;
+    color: #3498db;
+    border-bottom: 1pt solid #3498db;
+    padding-bottom: 4pt;
+    margin-top: 16pt;
+    margin-bottom: 8pt;
+  }
+  .sidebar h2:first-child {
+    margin-top: 0;
+  }
+  .sidebar .contact-item {
+    font-size: 9pt;
+    margin-bottom: 5pt;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  .sidebar .contact-label {
+    font-size: 8pt;
+    color: #95a5a6;
+    text-transform: uppercase;
+    letter-spacing: 0.5pt;
+  }
+  .sidebar .skill-tag {
+    display: inline-block;
+    background: rgba(52, 152, 219, 0.2);
+    color: #ecf0f1;
+    padding: 2pt 7pt;
+    margin: 2pt 2pt;
+    border-radius: 3pt;
+    font-size: 8.5pt;
+  }
+  .sidebar .language-item {
+    margin-bottom: 5pt;
+  }
+  .sidebar .language-name {
+    font-size: 9.5pt;
+    font-weight: 600;
+  }
+  .sidebar .language-level {
+    font-size: 8.5pt;
+    color: #95a5a6;
+  }
+
+  /* Main content styles */
+  .main-name {
+    font-size: 24pt;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 2pt;
+  }
+  .main-headline {
+    font-size: 12pt;
+    color: #7f8c8d;
+    margin-bottom: 12pt;
+  }
+  .main-content h2 {
+    font-size: 12pt;
+    font-weight: 700;
+    color: #2c3e50;
+    text-transform: uppercase;
+    letter-spacing: 0.5pt;
+    border-bottom: 2pt solid #3498db;
+    padding-bottom: 3pt;
+    margin-top: 16pt;
+    margin-bottom: 8pt;
+  }
+  .main-content h2:first-of-type {
+    margin-top: 0;
+  }
+  .summary-text {
+    font-size: 10pt;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 6pt;
+  }
+  .entry {
+    margin-bottom: 10pt;
+  }
+  .entry-title {
+    font-size: 11pt;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 1pt;
+  }
+  .entry-subtitle {
+    font-size: 9.5pt;
+    color: #3498db;
+    font-weight: 600;
+    margin-bottom: 1pt;
+  }
+  .entry-meta {
+    font-size: 9pt;
+    color: #7f8c8d;
+    margin-bottom: 3pt;
+  }
+  .entry-description {
+    font-size: 9.5pt;
+    color: #555;
+    line-height: 1.5;
+  }
+  .cert-item {
+    margin-bottom: 6pt;
+  }
+  .cert-name {
+    font-size: 10pt;
+    font-weight: 600;
+    color: #2c3e50;
+  }
+  .cert-org {
+    font-size: 9pt;
+    color: #7f8c8d;
+  }
+</style>
+</head>
+<body>
+<div class="page-wrapper clearfix">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <!-- Contact -->
+    <h2>Contact</h2>
+    {% if user.email %}
+      <div class="contact-item">
+        <div class="contact-label">Email</div>
+        {{ user.email }}
+      </div>
+    {% endif %}
+    {% if user.phone %}
+      <div class="contact-item">
+        <div class="contact-label">Phone</div>
+        {{ user.phone }}
+      </div>
+    {% endif %}
+    {% if profile.location %}
+      <div class="contact-item">
+        <div class="contact-label">Location</div>
+        {{ profile.location }}
+      </div>
+    {% endif %}
+    {% if profile.linkedin_url %}
+      <div class="contact-item">
+        <div class="contact-label">LinkedIn</div>
+        {{ profile.linkedin_url }}
+      </div>
+    {% endif %}
+    {% if profile.github_url %}
+      <div class="contact-item">
+        <div class="contact-label">GitHub</div>
+        {{ profile.github_url }}
+      </div>
+    {% endif %}
+    {% if profile.website_url %}
+      <div class="contact-item">
+        <div class="contact-label">Website</div>
+        {{ profile.website_url }}
+      </div>
+    {% endif %}
+
+    <!-- Skills -->
+    {% if profile.skills.all %}
+    <h2>Skills</h2>
+    <div>
+      {% for skill in profile.skills.all %}
+        <span class="skill-tag">{{ skill.name }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Languages -->
+    {% if profile.languages.all %}
+    <h2>Languages</h2>
+    {% for lang in profile.languages.all %}
+      <div class="language-item">
+        <div class="language-name">{{ lang.language.name }}</div>
+        <div class="language-level">{{ lang.get_proficiency_display }}</div>
+      </div>
+    {% endfor %}
+    {% endif %}
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="main-name">{{ user.first_name }} {{ user.last_name }}</div>
+    {% if profile.headline %}
+      <div class="main-headline">{{ profile.headline }}</div>
+    {% endif %}
+
+    <!-- Summary -->
+    {% if profile.summary %}
+    <h2>Profile</h2>
+    <div class="summary-text">{{ profile.summary|linebreaksbr }}</div>
+    {% endif %}
+
+    <!-- Experience -->
+    {% if profile.work_experiences.all %}
+    <h2>Experience</h2>
+    {% for exp in profile.work_experiences.all %}
+    <div class="entry">
+      <div class="entry-title">{{ exp.position }}</div>
+      <div class="entry-subtitle">{{ exp.company_name }}</div>
+      <div class="entry-meta">
+        {{ exp.start_date|date:"M Y" }} &ndash;
+        {% if exp.is_current %}Present{% elif exp.end_date %}{{ exp.end_date|date:"M Y" }}{% endif %}
+        {% if exp.location %} &middot; {{ exp.location }}{% endif %}
+      </div>
+      {% if exp.description %}
+        <div class="entry-description">{{ exp.description }}</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <!-- Education -->
+    {% if profile.educations.all %}
+    <h2>Education</h2>
+    {% for edu in profile.educations.all %}
+    <div class="entry">
+      <div class="entry-title">{{ edu.institution }}</div>
+      <div class="entry-subtitle">
+        {% if edu.degree %}{{ edu.degree }}{% endif %}
+        {% if edu.field_of_study %} in {{ edu.field_of_study }}{% endif %}
+      </div>
+      <div class="entry-meta">
+        {% if edu.start_date %}{{ edu.start_date|date:"Y" }}{% endif %}
+        {% if edu.end_date %} &ndash; {{ edu.end_date|date:"Y" }}{% endif %}
+      </div>
+      {% if edu.description %}
+        <div class="entry-description">{{ edu.description }}</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <!-- Certifications -->
+    {% if profile.certifications.all %}
+    <h2>Certifications</h2>
+    {% for cert in profile.certifications.all %}
+      <div class="cert-item">
+        <div class="cert-name">{{ cert.name }}</div>
+        {% if cert.issuing_organization %}
+          <div class="cert-org">{{ cert.issuing_organization }}{% if cert.issue_date %} &middot; {{ cert.issue_date|date:"M Y" }}{% endif %}</div>
+        {% endif %}
+      </div>
+    {% endfor %}
+    {% endif %}
+  </div>
+
+</div>
+</body>
+</html>

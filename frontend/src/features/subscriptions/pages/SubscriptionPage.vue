@@ -52,7 +52,11 @@ onMounted(async () => {
               {{ subscriptionStore.currentSubscription.plan.name }}
             </p>
             <p class="mt-1 text-sm text-gray-500">
-              Billed {{ subscriptionStore.currentSubscription.billingPeriod }}
+              {{
+                t('subscriptions.billed', {
+                  period: subscriptionStore.currentSubscription.billingPeriod,
+                })
+              }}
             </p>
           </div>
           <span
@@ -63,13 +67,17 @@ onMounted(async () => {
                 : 'bg-red-100 text-red-700'
             "
           >
-            {{ subscriptionStore.currentSubscription.isActive ? 'Active' : 'Cancelled' }}
+            {{
+              subscriptionStore.currentSubscription.isActive
+                ? t('subscriptions.statusActive')
+                : t('subscriptions.statusCancelled')
+            }}
           </span>
         </div>
 
         <div class="mt-4 text-sm text-gray-600">
           <p>
-            Current period:
+            {{ t('subscriptions.currentPeriod') }}
             {{
               new Date(
                 subscriptionStore.currentSubscription.currentPeriodStart,
@@ -85,16 +93,26 @@ onMounted(async () => {
         <div v-if="subscriptionStore.currentSubscription.isActive" class="mt-4">
           <Button
             v-if="!showCancelConfirm"
-            label="Cancel Subscription"
+            :label="t('subscriptions.cancelSubscription')"
             severity="danger"
             outlined
             size="small"
             @click="showCancelConfirm = true"
           />
           <div v-else class="flex items-center gap-2">
-            <span class="text-sm text-red-600">Are you sure?</span>
-            <Button label="Yes, cancel" severity="danger" size="small" @click="handleCancel" />
-            <Button label="Keep plan" outlined size="small" @click="showCancelConfirm = false" />
+            <span class="text-sm text-red-600">{{ t('subscriptions.areYouSure') }}</span>
+            <Button
+              :label="t('subscriptions.yesCancel')"
+              severity="danger"
+              size="small"
+              @click="handleCancel"
+            />
+            <Button
+              :label="t('subscriptions.keepPlan')"
+              outlined
+              size="small"
+              @click="showCancelConfirm = false"
+            />
           </div>
         </div>
       </div>
@@ -105,23 +123,23 @@ onMounted(async () => {
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <UsageMeter
             :label="t('subscriptions.vacanciesUsed')"
-            :used="subscriptionStore.usage.vacancies.used"
-            :limit="subscriptionStore.usage.vacancies.limit"
+            :used="subscriptionStore.usage?.vacancies?.used ?? 0"
+            :limit="subscriptionStore.usage?.vacancies?.limit ?? 0"
           />
           <UsageMeter
             :label="t('subscriptions.interviewsUsed')"
-            :used="subscriptionStore.usage.interviews.used"
-            :limit="subscriptionStore.usage.interviews.limit"
+            :used="subscriptionStore.usage?.interviews?.used ?? 0"
+            :limit="subscriptionStore.usage?.interviews?.limit ?? 0"
           />
           <UsageMeter
             :label="t('subscriptions.hrUsersUsed')"
-            :used="subscriptionStore.usage.hrUsers.used"
-            :limit="subscriptionStore.usage.hrUsers.limit"
+            :used="subscriptionStore.usage?.hrUsers?.used ?? 0"
+            :limit="subscriptionStore.usage?.hrUsers?.limit ?? 0"
           />
           <UsageMeter
             :label="t('subscriptions.storageUsed')"
-            :used="subscriptionStore.usage.storage.usedGb"
-            :limit="subscriptionStore.usage.storage.limitGb"
+            :used="subscriptionStore.usage?.storage?.usedGb ?? 0"
+            :limit="subscriptionStore.usage?.storage?.limitGb ?? 0"
             unit="GB"
           />
         </div>
@@ -129,7 +147,7 @@ onMounted(async () => {
 
       <!-- Upgrade -->
       <div class="rounded-lg border border-gray-200 bg-white p-6">
-        <h2 class="mb-4 text-lg font-semibold">Available Plans</h2>
+        <h2 class="mb-4 text-lg font-semibold">{{ t('subscriptions.availablePlans') }}</h2>
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
           <PlanCard
             v-for="plan in subscriptionStore.plans"
@@ -144,8 +162,10 @@ onMounted(async () => {
 
       <!-- Billing History Placeholder -->
       <div class="rounded-lg border border-gray-200 bg-white p-6">
-        <h2 class="mb-4 text-lg font-semibold">Billing History</h2>
-        <p class="text-sm text-gray-500">Billing history will be available soon.</p>
+        <h2 class="mb-4 text-lg font-semibold">{{ t('subscriptions.billingHistory') }}</h2>
+        <p class="text-sm text-gray-500">
+          {{ t('subscriptions.billingHistoryComingSoon') }}
+        </p>
       </div>
     </template>
   </div>

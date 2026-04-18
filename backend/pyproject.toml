@@ -1,4 +1,7 @@
 [tool.ruff]
+# Must match Dockerfile's python:3.12-slim — otherwise ruff parses code
+# with a newer grammar than CI runs, silently accepting syntax that will
+# SyntaxError at import time in the container (e.g. `except X, Y:`).
 target-version = "py312"
 line-length = 120
 src = ["."]
@@ -26,14 +29,33 @@ ignore = [
 ]
 
 [tool.ruff.lint.isort]
-known-first-party = ["apps", "config"]
+known-first-party = ["apps", "config", "integrations"]
 
 [tool.ruff.lint.per-file-ignores]
 # Tests: hardcoded passwords/tokens are expected fixtures; long assertion lines OK.
 "**/tests/**/*.py" = ["S101", "S105", "S106", "S108", "S311", "E501"]
-# Auto-generated migrations have long help_text strings Django produces.
-"**/migrations/*.py" = ["E501", "DJ001"]
+# Auto-generated migrations have long help_text strings; data-seed migrations
+# contain legitimate Uzbek/Russian strings that Ruff flags as ambiguous unicode.
+"**/migrations/*.py" = ["E501", "DJ001", "RUF001", "RUF003", "RUF022"]
+# i18n / AI prompt files have long translated strings and legit non-ASCII.
+"**/i18n.py" = ["RUF001", "E501"]
+"**/prompts.py" = ["E501", "RUF001"]
+"**/tool_definitions.py" = ["E501", "RUF001"]
 "**/settings/**/*.py" = ["F401", "F403"]
+# AI service files contain long prompt strings (inline JSON schemas,
+# few-shot examples); and `type` is a domain term (notification type)
+# not the Python builtin.
+"**/cv_services/*.py" = ["E501"]
+"**/applications/services/cv_processing.py" = ["E501"]
+"**/vacancies/services/vacancy_ai.py" = ["E501"]
+"**/notifications/services/*.py" = ["A002"]
+"**/telegram_bot/candidate/apply.py" = ["RUF001"]
+"**/apis_candidate_dashboard.py" = ["S110"]
+"**/services/company_info.py" = ["S104"]
+"**/config/celery.py" = ["E402"]
+# Service __init__.py files re-export from submodules after a conditional
+# import block — E402 is a false positive for this pattern.
+"**/services/__init__.py" = ["E402"]
 
 [tool.mypy]
 python_version = "3.12"

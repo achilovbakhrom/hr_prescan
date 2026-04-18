@@ -82,6 +82,17 @@ export const useSettingsStore = defineStore('settings', () => {
     }
   }
 
+  async function cancelInvitation(invitationId: string): Promise<void> {
+    try {
+      await settingsService.cancelInvitation(invitationId)
+      invitations.value = invitations.value.filter((i) => i.id !== invitationId)
+    } catch (err: unknown) {
+      const message = extractErrorMessage(err)
+      error.value = message
+      throw new Error(message)
+    }
+  }
+
   async function toggleMemberActive(userId: string): Promise<void> {
     const member = team.value.find((m) => m.id === userId)
     if (!member) return
@@ -89,6 +100,22 @@ export const useSettingsStore = defineStore('settings', () => {
     try {
       const updated = await settingsService.updateTeamMember(userId, {
         isActive: !member.isActive,
+      })
+      const index = team.value.findIndex((m) => m.id === userId)
+      if (index !== -1) {
+        team.value[index] = updated
+      }
+    } catch (err: unknown) {
+      const message = extractErrorMessage(err)
+      error.value = message
+      throw new Error(message)
+    }
+  }
+
+  async function updateMemberPermissions(userId: string, permissions: string[]): Promise<void> {
+    try {
+      const updated = await settingsService.updateTeamMember(userId, {
+        hrPermissions: permissions,
       })
       const index = team.value.findIndex((m) => m.id === userId)
       if (index !== -1) {
@@ -112,6 +139,8 @@ export const useSettingsStore = defineStore('settings', () => {
     inviteHR,
     fetchTeam,
     fetchInvitations,
+    cancelInvitation,
     toggleMemberActive,
+    updateMemberPermissions,
   }
 })

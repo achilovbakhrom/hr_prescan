@@ -39,7 +39,7 @@ function goBack(): void {
     </div>
     <div class="mt-16 text-center">
       <p class="text-sm text-gray-400">
-        Need access? Contact your administrator or
+        {{ t('errors.needAccess') }}
         <a href="mailto:support@hrprescan.com" class="text-blue-600 hover:underline"
           >support@hrprescan.com</a
         >

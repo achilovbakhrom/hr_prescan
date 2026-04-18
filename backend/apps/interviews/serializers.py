@@ -7,6 +7,7 @@ class InterviewScoreOutputSerializer(serializers.ModelSerializer):
     """Serializer for per-criteria interview scores."""
 
     criteria_name = serializers.CharField(source="criteria.name", read_only=True)
+    criteria_translations = serializers.JSONField(source="criteria.translations", read_only=True)
 
     class Meta:
         model = InterviewScore
@@ -14,8 +15,10 @@ class InterviewScoreOutputSerializer(serializers.ModelSerializer):
             "id",
             "criteria",
             "criteria_name",
+            "criteria_translations",
             "score",
             "ai_notes",
+            "ai_notes_translations",
         ]
         read_only_fields = fields
 
@@ -57,6 +60,7 @@ class InterviewOutputSerializer(serializers.ModelSerializer):
             "duration_minutes",
             "status",
             "overall_score",
+            "language",
             "created_at",
         ]
         read_only_fields = fields
@@ -98,6 +102,8 @@ class InterviewDetailOutputSerializer(serializers.ModelSerializer):
             "chat_history",
             "overall_score",
             "ai_summary",
+            "ai_summary_translations",
+            "language",
             "scores",
             "integrity_flags",
             "created_at",

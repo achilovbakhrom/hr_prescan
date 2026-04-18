@@ -8,7 +8,7 @@ from apps.integrations.apis import (
 )
 
 telegram_urlpatterns = [
-    path("webhook/", TelegramWebhookApi.as_view(), name="telegram-webhook"),
+    path("<str:role>/webhook/", TelegramWebhookApi.as_view(), name="telegram-webhook"),
 ]
 
 hr_telegram_urlpatterns = [

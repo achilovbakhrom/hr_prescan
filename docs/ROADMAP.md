@@ -89,7 +89,7 @@ Mark tasks with `[x]` as they are completed.
 - [x] 4.5 Vacancy lifecycle API (publish, pause, close)
 - [x] 4.6 Vacancy share link generation (unique URL for external sharing)
 - [x] 4.7 Public job board API (list public vacancies, search, filter)
-- [x] 4.8 AI question generation — service that generates interview questions from vacancy description (OpenAI integration)
+- [x] 4.8 AI question generation — service that generates interview questions from vacancy description (Google Gemini integration)
 - [x] 4.9 HR question editing API (review, edit, add, remove AI-suggested questions)
 - [x] 4.10 Frontend: vacancy creation form
 - [x] 4.11 Frontend: vacancy list page (with status badges, candidate counts)
@@ -109,8 +109,8 @@ Mark tasks with `[x]` as they are completed.
 - [x] 5.3 Optional candidate account creation (link applications to account)
 - [ ] 5.4 CV upload to MinIO via presigned URL
 - [x] 5.5 Celery task: parse CV (extract text from PDF/DOCX)
-- [x] 5.6 Celery task: AI CV analysis (extract skills, experience, education — OpenAI)
-- [x] 5.7 Celery task: CV match scoring (compare CV vs vacancy requirements — OpenAI)
+- [x] 5.6 Celery task: AI CV analysis (extract skills, experience, education — Google Gemini)
+- [x] 5.7 Celery task: CV match scoring (compare CV vs vacancy requirements — Google Gemini)
 - [x] 5.8 Candidate status management API (update status: applied → shortlisted → rejected)
 - [x] 5.9 Frontend: application form (public vacancy page)
 - [x] 5.10 Frontend: candidate dashboard (if logged in — my applications, statuses)
@@ -143,7 +143,7 @@ Mark tasks with `[x]` as they are completed.
 **Goal:** AI agent conducts video interviews with candidates.
 
 - [x] 7.1 Create LiveKit Agent project (Python, separate Dockerfile)
-- [x] 7.2 Setup VoicePipelineAgent (Deepgram STT + GPT LLM + ElevenLabs TTS)
+- [x] 7.2 Setup VoicePipelineAgent (Deepgram STT + Gemini LLM + ElevenLabs TTS)
 - [x] 7.3 Agent: fetch interview context from Django API via RabbitMQ (vacancy, CV data, questions)
 - [x] 7.4 Agent: system prompt engineering (interviewer persona, question flow, language handling)
 - [x] 7.5 Agent: conduct structured interview (greet → ask questions → follow-ups → close)

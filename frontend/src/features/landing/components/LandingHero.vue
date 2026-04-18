@@ -97,7 +97,7 @@ onMounted(() => {
               icon-pos="right"
               size="large"
               class="w-full sm:w-auto"
-              @click="router.push({ name: ROUTE_NAMES.COMPANY_REGISTER })"
+              @click="router.push({ name: ROUTE_NAMES.REGISTER })"
             />
             <Button
               :label="t('landing.hero.browseJobs')"
@@ -129,10 +129,12 @@ onMounted(() => {
                 <i class="pi pi-comments text-sm text-white"></i>
               </div>
               <div>
-                <p class="text-sm font-semibold text-white">AI Prescanning</p>
+                <p class="text-sm font-semibold text-white">
+                  {{ t('interviews.chat.aiPrescanning') }}
+                </p>
                 <div class="flex items-center gap-1.5">
                   <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
-                  <span class="text-xs text-blue-100">Online</span>
+                  <span class="text-xs text-blue-100">{{ t('interviews.chat.online') }}</span>
                 </div>
               </div>
             </div>
@@ -197,7 +199,7 @@ onMounted(() => {
             <!-- Chat input mockup -->
             <div class="flex items-center gap-2 border-t border-gray-100 px-5 py-3">
               <div class="flex-1 rounded-full bg-gray-50 px-4 py-2.5">
-                <span class="text-sm text-gray-400">Type your answer...</span>
+                <span class="text-sm text-gray-400">{{ t('interviews.chat.typeYourAnswer') }}</span>
               </div>
               <div class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-600">
                 <i class="pi pi-send text-xs text-white"></i>

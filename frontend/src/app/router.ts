@@ -16,7 +16,7 @@ import {
 import { notificationRoutes } from '@/features/notifications/routes'
 import { settingsRoutes } from '@/features/settings/routes'
 import { subscriptionRoutes, publicSubscriptionRoutes } from '@/features/subscriptions/routes'
-import { adminRoutes } from '@/features/admin/routes'
+import { cvBuilderRoutes, publicCvRoutes } from '@/features/cv-builder/routes'
 import { employerRoutes } from '@/features/employers/routes'
 import { landingRoutes } from '@/features/landing/routes'
 import { legalRoutes } from '@/features/legal/routes'
@@ -49,6 +49,7 @@ const routes: RouteRecordRaw[] = [
       ...publicSubscriptionRoutes,
       ...candidateInterviewRoutes,
       ...legalRoutes,
+      ...publicCvRoutes,
     ],
   },
 
@@ -61,12 +62,12 @@ const routes: RouteRecordRaw[] = [
       ...vacancyRoutes,
       ...employerRoutes,
       ...candidateRoutes,
+      ...cvBuilderRoutes,
       ...hrCandidateRoutes,
       ...hrInterviewRoutes,
       ...notificationRoutes,
       ...settingsRoutes,
       ...subscriptionRoutes,
-      ...adminRoutes,
     ],
   },
 
@@ -98,13 +99,30 @@ router.beforeEach(async (to) => {
     return { name: ROUTE_NAMES.LOGIN, query: { redirect: to.fullPath } }
   }
 
-  const isAuthPage =
-    to.name === ROUTE_NAMES.LOGIN ||
-    to.name === ROUTE_NAMES.REGISTER ||
-    to.name === ROUTE_NAMES.COMPANY_REGISTER
+  const isAuthPage = to.name === ROUTE_NAMES.LOGIN || to.name === ROUTE_NAMES.REGISTER
 
   if (isAuthPage && authStore.isAuthenticated) {
     return { name: ROUTE_NAMES.DASHBOARD }
+  }
+
+  // Redirect to role picker if onboarding not completed
+  if (
+    authStore.isAuthenticated &&
+    authStore.user?.onboardingCompleted === false &&
+    to.name !== ROUTE_NAMES.CHOOSE_ROLE
+  ) {
+    return { name: ROUTE_NAMES.CHOOSE_ROLE }
+  }
+
+  // HR users must have a company — force them to /company-setup until they do
+  if (
+    authStore.isAuthenticated &&
+    authStore.user?.onboardingCompleted === true &&
+    authStore.user.role === 'hr' &&
+    !authStore.user.company &&
+    to.name !== ROUTE_NAMES.COMPANY_SETUP
+  ) {
+    return { name: ROUTE_NAMES.COMPANY_SETUP }
   }
 
   const allowedRoles = to.meta.roles

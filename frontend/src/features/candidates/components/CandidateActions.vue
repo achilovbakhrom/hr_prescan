@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import Dropdown from 'primevue/dropdown'
 import ConfirmDialog from 'primevue/confirmdialog'
@@ -19,8 +19,9 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   statusChange: [status: ApplicationStatus]
-  openMessages: []
 }>()
+
+const { t } = useI18n()
 
 const confirm = useConfirm()
 const showEmailDialog = ref(false)
@@ -29,108 +30,98 @@ const statusOptions = computed(() => {
   const options: { label: string; value: ApplicationStatus }[] = []
   const s = props.currentStatus
 
-  // Forward moves
   if (s === 'applied') {
-    options.push({ label: 'Move to Prescanned', value: 'prescanned' })
+    options.push({ label: t('candidates.actions.moveToPrescanned'), value: 'prescanned' })
   }
   if (s === 'prescanned') {
-    options.push({ label: 'Move to Interviewed', value: 'interviewed' })
+    options.push({ label: t('candidates.actions.moveToInterviewed'), value: 'interviewed' })
   }
   if (s !== 'shortlisted' && s !== 'hired' && s !== 'archived') {
-    options.push({ label: 'Shortlist', value: 'shortlisted' })
+    options.push({ label: t('candidates.actions.shortlist'), value: 'shortlisted' })
   }
   if (s !== 'hired' && s !== 'archived') {
-    options.push({ label: 'Hire', value: 'hired' })
+    options.push({ label: t('candidates.actions.hire'), value: 'hired' })
   }
-
-  // Reject (from any active status)
   if (s !== 'rejected' && s !== 'hired' && s !== 'archived') {
-    options.push({ label: 'Reject', value: 'rejected' })
+    options.push({ label: t('candidates.actions.reject'), value: 'rejected' })
   }
-
-  // Archive
   if (s === 'rejected' || s === 'expired' || s === 'shortlisted' || s === 'hired') {
-    options.push({ label: 'Archive', value: 'archived' })
+    options.push({ label: t('candidates.actions.archive'), value: 'archived' })
   }
-
-  // Reset (from any non-applied, non-archived)
   if (s !== 'applied' && s !== 'archived') {
-    options.push({ label: 'Reset to Applied', value: 'applied' })
+    options.push({ label: t('candidates.actions.reset'), value: 'applied' })
   }
-
-  // Unarchive
   if (s === 'archived') {
-    options.push({ label: 'Restore to Applied', value: 'applied' })
+    options.push({ label: t('candidates.actions.restore'), value: 'applied' })
   }
 
   return options
 })
 
-const statusMessages: Record<
-  string,
-  { message: string; icon: string; acceptClass: string; acceptLabel: string }
+const STATUS_CONFIG: Record<
+  ApplicationStatus,
+  { messageKey: string; icon: string; acceptClass: string; acceptKey: string } | undefined
 > = {
   prescanned: {
-    message: 'This will mark the candidate as prescanned.',
+    messageKey: 'candidates.dialogs.msgPrescanned',
     icon: 'pi pi-check',
     acceptClass: 'p-button-info',
-    acceptLabel: 'Yes, move',
+    acceptKey: 'candidates.dialogs.yesMove',
   },
   interviewed: {
-    message: 'This will mark the candidate as interviewed.',
+    messageKey: 'candidates.dialogs.msgInterviewed',
     icon: 'pi pi-check',
     acceptClass: 'p-button-info',
-    acceptLabel: 'Yes, move',
+    acceptKey: 'candidates.dialogs.yesMove',
   },
   shortlisted: {
-    message: 'This will move them to the shortlist.',
+    messageKey: 'candidates.dialogs.msgShortlisted',
     icon: 'pi pi-check-circle',
     acceptClass: 'p-button-success',
-    acceptLabel: 'Yes, shortlist',
+    acceptKey: 'candidates.dialogs.yesShortlist',
   },
   hired: {
-    message: 'This will mark the candidate as hired.',
+    messageKey: 'candidates.dialogs.msgHired',
     icon: 'pi pi-check-circle',
     acceptClass: 'p-button-success',
-    acceptLabel: 'Yes, hire',
+    acceptKey: 'candidates.dialogs.yesHire',
   },
   rejected: {
-    message: 'This will reject the candidate.',
+    messageKey: 'candidates.dialogs.msgRejected',
     icon: 'pi pi-exclamation-triangle',
     acceptClass: 'p-button-danger',
-    acceptLabel: 'Yes, reject',
+    acceptKey: 'candidates.dialogs.yesReject',
   },
   archived: {
-    message: 'This will archive the candidate. They can be restored later.',
+    messageKey: 'candidates.dialogs.msgArchived',
     icon: 'pi pi-inbox',
     acceptClass: '',
-    acceptLabel: 'Yes, archive',
+    acceptKey: 'candidates.dialogs.yesArchive',
   },
   applied: {
-    message: 'This will reset them back to the initial state.',
+    messageKey: 'candidates.dialogs.msgApplied',
     icon: 'pi pi-refresh',
     acceptClass: '',
-    acceptLabel: 'Yes, reset',
+    acceptKey: 'candidates.dialogs.yesReset',
   },
+  expired: undefined,
 }
 
 function handleStatusChange(event: { value: ApplicationStatus }): void {
   const status = event.value
-  const config = statusMessages[status] ?? {
-    message: `Change status to "${status.replace(/_/g, ' ')}"?`,
-    icon: 'pi pi-question-circle',
-    acceptClass: '',
-    acceptLabel: 'Confirm',
-  }
+  const config = STATUS_CONFIG[status]
+  if (!config) return
 
   confirm.require({
-    message: `${props.candidateName}: ${config.message}`,
+    message: t(config.messageKey, { name: props.candidateName }),
     header:
-      status === 'applied' ? 'Reset Candidate Status' : `Confirm ${status.replace(/_/g, ' ')}`,
+      status === 'applied'
+        ? t('candidates.dialogs.resetHeader')
+        : t('candidates.dialogs.statusChangeHeader'),
     icon: config.icon,
     acceptClass: config.acceptClass,
-    acceptLabel: config.acceptLabel,
-    rejectLabel: 'Cancel',
+    acceptLabel: t(config.acceptKey),
+    rejectLabel: t('common.cancel'),
     accept: () => emit('statusChange', status),
   })
 }
@@ -139,27 +130,19 @@ function handleStatusChange(event: { value: ApplicationStatus }): void {
 <template>
   <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
     <Button
-      label="Send Email"
+      :label="t('candidates.actions.sendEmail')"
       icon="pi pi-envelope"
       size="small"
       severity="secondary"
       outlined
       @click="showEmailDialog = true"
     />
-    <Button
-      label="Messages"
-      icon="pi pi-comments"
-      size="small"
-      severity="secondary"
-      outlined
-      @click="emit('openMessages')"
-    />
     <Dropdown
       :model-value="null"
       :options="statusOptions"
       option-label="label"
       option-value="value"
-      placeholder="Change status"
+      :placeholder="t('candidates.actions.changeStatus')"
       :disabled="props.loading"
       @change="handleStatusChange"
     />

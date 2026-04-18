@@ -25,7 +25,7 @@ from tests.factories import CompanyFactory, UserFactory
 
 @pytest.mark.django_db
 class TestRegisterUser:
-    @patch("apps.accounts.services.send_verification_email")
+    @patch("apps.accounts.services.auth.send_verification_email")
     def test_register_creates_candidate_user(self, mock_send):
         """register_user creates a user with role=candidate and email_verified=False."""
         user = register_user(
@@ -43,7 +43,7 @@ class TestRegisterUser:
         assert user.company is None
         mock_send.delay.assert_called_once_with(user_id=str(user.id))
 
-    @patch("apps.accounts.services.send_verification_email")
+    @patch("apps.accounts.services.auth.send_verification_email")
     def test_register_duplicate_email_fails(self, mock_send):
         """Registering with an existing email raises ApplicationError."""
         UserFactory(email="duplicate@example.com")
@@ -56,7 +56,7 @@ class TestRegisterUser:
                 last_name="Brown",
             )
 
-    @patch("apps.accounts.services.send_verification_email")
+    @patch("apps.accounts.services.auth.send_verification_email")
     @patch("apps.applications.services.bind_existing_applications")
     def test_register_binds_existing_applications(self, mock_bind, mock_send):
         """After registration, bind_existing_applications can be called for the user."""
@@ -110,7 +110,7 @@ class TestVerifyEmail:
 
 @pytest.mark.django_db
 class TestCreateCompanyWithAdmin:
-    @patch("apps.accounts.services.send_verification_email")
+    @patch("apps.accounts.services.company.send_verification_email")
     def test_creates_company_and_admin(self, mock_send):
         """Creates both a Company and an admin User."""
         company, admin = create_company_with_admin(
@@ -131,7 +131,7 @@ class TestCreateCompanyWithAdmin:
         assert admin.email == "admin@acme.com"
         mock_send.delay.assert_called_once()
 
-    @patch("apps.accounts.services.send_verification_email")
+    @patch("apps.accounts.services.company.send_verification_email")
     def test_admin_linked_to_company(self, mock_send):
         """The admin user's company field points to the newly created company."""
         company, admin = create_company_with_admin(
@@ -148,7 +148,7 @@ class TestCreateCompanyWithAdmin:
         assert admin.company_id == company.id
         assert admin.company.name == "Beta Inc"
 
-    @patch("apps.accounts.services.send_verification_email")
+    @patch("apps.accounts.services.company.send_verification_email")
     def test_duplicate_admin_email_fails(self, mock_send):
         """Fails if the admin email is already taken."""
         UserFactory(email="taken@example.com")
@@ -173,7 +173,7 @@ class TestCreateCompanyWithAdmin:
 
 @pytest.mark.django_db
 class TestInviteHR:
-    @patch("apps.accounts.services.send_invitation_email")
+    @patch("apps.accounts.services.membership.send_invitation_email")
     def test_invite_creates_invitation(self, mock_send):
         """Creates an Invitation with correct fields."""
         company = CompanyFactory()
@@ -192,7 +192,7 @@ class TestInviteHR:
         assert invitation.token is not None
         mock_send.delay.assert_called_once_with(invitation_id=str(invitation.id))
 
-    @patch("apps.accounts.services.send_invitation_email")
+    @patch("apps.accounts.services.membership.send_invitation_email")
     def test_invite_duplicate_pending_fails(self, mock_send):
         """Cannot invite the same email twice to the same company while pending."""
         company = CompanyFactory()
@@ -203,7 +203,7 @@ class TestInviteHR:
         with pytest.raises(ApplicationError, match="already been sent"):
             invite_hr(company=company, email="hr@example.com", invited_by=admin)
 
-    @patch("apps.accounts.services.send_invitation_email")
+    @patch("apps.accounts.services.membership.send_invitation_email")
     def test_invitation_has_expiry(self, mock_send):
         """Invitation expires_at is set to approximately 7 days from now."""
         company = CompanyFactory()
@@ -221,7 +221,7 @@ class TestInviteHR:
         expected_max = after + timedelta(days=7)
         assert expected_min <= invitation.expires_at <= expected_max
 
-    @patch("apps.accounts.services.send_invitation_email")
+    @patch("apps.accounts.services.membership.send_invitation_email")
     def test_invite_existing_user_email_fails(self, mock_send):
         """Cannot invite an email that already belongs to a registered user."""
         company = CompanyFactory()
@@ -239,7 +239,7 @@ class TestInviteHR:
 
 @pytest.mark.django_db
 class TestAcceptInvitation:
-    @patch("apps.accounts.services.send_invitation_email")
+    @patch("apps.accounts.services.membership.send_invitation_email")
     def test_accept_creates_hr_user(self, mock_send):
         """Accepting an invitation creates a user with role=hr linked to the company."""
         company = CompanyFactory()
@@ -257,7 +257,7 @@ class TestAcceptInvitation:
         assert user.company_id == company.id
         assert user.email == "newhr@example.com"
 
-    @patch("apps.accounts.services.send_invitation_email")
+    @patch("apps.accounts.services.membership.send_invitation_email")
     def test_accept_marks_invitation_accepted(self, mock_send):
         """After acceptance, invitation.is_accepted becomes True."""
         company = CompanyFactory()
@@ -274,7 +274,7 @@ class TestAcceptInvitation:
         invitation.refresh_from_db()
         assert invitation.is_accepted is True
 
-    @patch("apps.accounts.services.send_invitation_email")
+    @patch("apps.accounts.services.membership.send_invitation_email")
     def test_accept_expired_invitation_fails(self, mock_send):
         """Accepting an expired invitation raises ApplicationError."""
         company = CompanyFactory()
@@ -293,7 +293,7 @@ class TestAcceptInvitation:
                 last_name="Test",
             )
 
-    @patch("apps.accounts.services.send_invitation_email")
+    @patch("apps.accounts.services.membership.send_invitation_email")
     def test_accept_already_accepted_fails(self, mock_send):
         """Accepting an already accepted invitation raises ApplicationError."""
         company = CompanyFactory()
@@ -324,7 +324,7 @@ class TestAcceptInvitation:
 
 @pytest.mark.django_db
 class TestAcceptInvitationExistingUser:
-    @patch("apps.accounts.services.send_invitation_email")
+    @patch("apps.accounts.services.membership.send_invitation_email")
     def test_switches_company_and_role(self, mock_send):
         """Existing user gets the invitation's company and role=hr."""
         company = CompanyFactory()
@@ -349,7 +349,7 @@ class TestAcceptInvitationExistingUser:
         assert result.company_id == company.id
         assert result.role == User.Role.HR
 
-    @patch("apps.accounts.services.send_invitation_email")
+    @patch("apps.accounts.services.membership.send_invitation_email")
     def test_accept_existing_marks_invitation_accepted(self, mock_send):
         """Invitation is marked as accepted after existing user accepts."""
         company = CompanyFactory()
@@ -370,7 +370,7 @@ class TestAcceptInvitationExistingUser:
         invitation.refresh_from_db()
         assert invitation.is_accepted is True
 
-    @patch("apps.accounts.services.send_invitation_email")
+    @patch("apps.accounts.services.membership.send_invitation_email")
     def test_accept_existing_wrong_email_fails(self, mock_send):
         """Fails if the user's email does not match the invitation email."""
         company = CompanyFactory()

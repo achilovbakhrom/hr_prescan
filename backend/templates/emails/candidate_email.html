@@ -1,0 +1,11 @@
+{% extends "emails/base.html" %}
+{% block content %}
+<h1>{{ email_subject }}</h1>
+<p>Hi {{ candidate_name }},</p>
+<div class="highlight">
+  <p>{{ email_body }}</p>
+</div>
+<p style="font-size: 12px; color: #9ca3af; margin-top: 16px;">
+  This email was sent regarding your application for <strong>{{ vacancy_title }}</strong> at <strong>{{ company_name }}</strong>.
+</p>
+{% endblock %}

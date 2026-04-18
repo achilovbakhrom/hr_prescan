@@ -24,6 +24,7 @@ export type StepType = 'prescanning' | 'interview'
 export interface VacancyDetail extends Vacancy {
   prescanningPrompt: string
   interviewPrompt: string
+  prescanningLanguage: string
   criteria: VacancyCriteria[]
   questions: InterviewQuestion[]
   createdByEmail: string
@@ -38,6 +39,7 @@ export interface VacancyCriteria {
   isDefault: boolean
   order: number
   step: StepType
+  translations: Record<string, string>
 }
 
 export interface InterviewQuestion {
@@ -48,6 +50,7 @@ export interface InterviewQuestion {
   order: number
   isActive: boolean
   step: StepType
+  translations: Record<string, string>
 }
 
 export interface CreateVacancyRequest {
@@ -73,6 +76,7 @@ export interface CreateVacancyRequest {
   employerId?: string
   prescanningPrompt?: string
   interviewPrompt?: string
+  prescanningLanguage?: string
 }
 
 export type UpdateVacancyRequest = Partial<CreateVacancyRequest>

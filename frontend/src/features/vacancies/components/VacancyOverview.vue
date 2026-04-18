@@ -102,7 +102,7 @@ function formatSalary(): string {
         <p class="text-sm text-gray-500">{{ t('vacancies.form.interviewOptional') }}</p>
         <p class="font-medium">
           <Tag
-            :value="vacancy.interviewEnabled ? 'Enabled' : 'Disabled'"
+            :value="vacancy.interviewEnabled ? t('common.enabled') : t('common.disabled')"
             :severity="vacancy.interviewEnabled ? 'success' : 'secondary'"
           />
         </p>

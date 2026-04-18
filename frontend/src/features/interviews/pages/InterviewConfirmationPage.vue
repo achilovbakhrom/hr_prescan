@@ -54,28 +54,32 @@ function handleGoToInterview(): void {
     <div v-else-if="interview" class="rounded-lg border border-green-200 bg-white p-8 text-center">
       <i class="pi pi-check-circle mb-4 text-5xl text-green-500"></i>
       <h1 class="mb-2 text-2xl font-bold text-gray-900">{{ t('interviews.status.scheduled') }}!</h1>
-      <p class="mb-6 text-gray-600">Your interview has been confirmed. Here are the details:</p>
+      <p class="mb-6 text-gray-600">
+        {{ t('interviews.confirmationPage.confirmed') }}
+      </p>
 
       <div class="mb-6 rounded-lg bg-gray-50 p-4 text-left">
         <dl class="space-y-2 text-sm">
           <div class="flex justify-between">
-            <dt class="text-gray-500">Date</dt>
+            <dt class="text-gray-500">{{ t('interviews.confirmationPage.date') }}</dt>
             <dd class="font-medium">
               {{ formatDate(interview.createdAt) }}
             </dd>
           </div>
           <div class="flex justify-between">
-            <dt class="text-gray-500">Time</dt>
+            <dt class="text-gray-500">{{ t('interviews.confirmationPage.time') }}</dt>
             <dd class="font-medium">
               {{ formatTime(interview.createdAt) }}
             </dd>
           </div>
           <div class="flex justify-between">
-            <dt class="text-gray-500">Duration</dt>
-            <dd class="font-medium">{{ interview.durationMinutes }} minutes</dd>
+            <dt class="text-gray-500">{{ t('interviews.preCheck.duration') }}</dt>
+            <dd class="font-medium">
+              {{ t('interviews.preCheck.durationMinutes', { minutes: interview.durationMinutes }) }}
+            </dd>
           </div>
           <div class="flex justify-between">
-            <dt class="text-gray-500">Position</dt>
+            <dt class="text-gray-500">{{ t('interviews.preCheck.position') }}</dt>
             <dd class="font-medium">{{ interview.vacancyTitle }}</dd>
           </div>
         </dl>
@@ -83,13 +87,17 @@ function handleGoToInterview(): void {
 
       <div class="flex flex-col gap-3">
         <Button
-          label="Download Calendar Invite"
+          :label="t('interviews.confirmationPage.downloadCalendar')"
           icon="pi pi-download"
           severity="secondary"
           outlined
           @click="handleDownloadCalendar"
         />
-        <Button label="Go to Interview Room" icon="pi pi-video" @click="handleGoToInterview" />
+        <Button
+          :label="t('interviews.confirmationPage.goToRoom')"
+          icon="pi pi-video"
+          @click="handleGoToInterview"
+        />
       </div>
     </div>
   </div>

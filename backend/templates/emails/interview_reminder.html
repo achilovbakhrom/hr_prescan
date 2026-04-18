@@ -1,0 +1,15 @@
+{% extends "emails/base.html" %}
+{% block content %}
+<h1>Interview Reminder</h1>
+<p>Hi {{ candidate_name }},</p>
+<p>This is a friendly reminder that your interview for <strong>{{ vacancy_title }}</strong> is coming up soon.</p>
+<div class="highlight">
+  <p><strong>Scheduled:</strong> {{ scheduled_at }}</p>
+</div>
+{% if interview_url %}
+<p style="text-align: center; margin: 24px 0;">
+  <a href="{{ interview_url }}" class="btn">Join Interview</a>
+</p>
+{% endif %}
+<p>Good luck!</p>
+{% endblock %}

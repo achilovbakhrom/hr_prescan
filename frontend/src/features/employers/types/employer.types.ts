@@ -5,6 +5,7 @@ export interface EmployerCompany {
   logo: string
   website: string
   description: string
+  descriptionTranslations: Record<string, string>
   source: 'manual' | 'file' | 'website'
   createdAt: string
   updatedAt: string

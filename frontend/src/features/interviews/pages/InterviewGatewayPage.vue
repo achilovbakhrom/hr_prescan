@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import { interviewService } from '../services/interview.service'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { InterviewDetail } from '../types/interview.types'
+
+const { t } = useI18n()
 
 const route = useRoute()
 const router = useRouter()
@@ -74,7 +77,7 @@ onMounted(async () => {
     <!-- Loading spinner -->
     <div v-if="loading" class="text-center">
       <i class="pi pi-spinner pi-spin mb-4 text-4xl text-blue-500"></i>
-      <p class="text-gray-600">Loading your interview...</p>
+      <p class="text-gray-600">{{ t('interviews.gatewayPage.loading') }}</p>
     </div>
 
     <!-- Error states -->
@@ -83,12 +86,14 @@ onMounted(async () => {
       <template v-if="errorState === 'completed'">
         <div class="rounded-lg border border-green-200 bg-green-50 p-8">
           <i class="pi pi-check-circle mb-4 text-5xl text-green-500"></i>
-          <h1 class="mb-2 text-2xl font-bold text-gray-900">Interview Completed</h1>
+          <h1 class="mb-2 text-2xl font-bold text-gray-900">
+            {{ t('interviews.gatewayPage.interviewCompleted') }}
+          </h1>
           <p class="mb-4 text-gray-600">
-            You have already completed this interview. Your responses are being reviewed.
+            {{ t('interviews.gatewayPage.completedMessage') }}
           </p>
           <RouterLink to="/jobs" class="text-blue-600 hover:underline">
-            Browse more jobs
+            {{ t('interviews.gatewayPage.browseMoreJobs') }}
           </RouterLink>
         </div>
       </template>
@@ -97,15 +102,14 @@ onMounted(async () => {
       <template v-else-if="errorState === 'expired'">
         <div class="rounded-lg border border-yellow-200 bg-yellow-50 p-8">
           <i class="pi pi-clock mb-4 text-5xl text-yellow-500"></i>
-          <h1 class="mb-2 text-2xl font-bold text-gray-900">Link Expired</h1>
+          <h1 class="mb-2 text-2xl font-bold text-gray-900">
+            {{ t('interviews.gatewayPage.linkExpired') }}
+          </h1>
           <p class="mb-4 text-gray-600">
-            {{
-              errorMessage ||
-              'This interview link has expired. Please contact the hiring team for a new link.'
-            }}
+            {{ errorMessage || t('interviews.states.expired') }}
           </p>
           <RouterLink to="/jobs" class="text-blue-600 hover:underline">
-            Browse more jobs
+            {{ t('interviews.gatewayPage.browseMoreJobs') }}
           </RouterLink>
         </div>
       </template>
@@ -114,12 +118,14 @@ onMounted(async () => {
       <template v-else-if="errorState === 'closed'">
         <div class="rounded-lg border border-gray-200 bg-gray-50 p-8">
           <i class="pi pi-ban mb-4 text-5xl text-gray-400"></i>
-          <h1 class="mb-2 text-2xl font-bold text-gray-900">Vacancy Closed</h1>
+          <h1 class="mb-2 text-2xl font-bold text-gray-900">
+            {{ t('interviews.gatewayPage.vacancyClosed') }}
+          </h1>
           <p class="mb-4 text-gray-600">
-            {{ errorMessage || 'This vacancy is no longer accepting applications.' }}
+            {{ errorMessage || t('interviews.states.closed') }}
           </p>
           <RouterLink to="/jobs" class="text-blue-600 hover:underline">
-            Browse more jobs
+            {{ t('interviews.gatewayPage.browseMoreJobs') }}
           </RouterLink>
         </div>
       </template>
@@ -128,9 +134,11 @@ onMounted(async () => {
       <template v-else>
         <div class="rounded-lg border border-red-200 bg-red-50 p-8">
           <i class="pi pi-exclamation-triangle mb-4 text-5xl text-red-400"></i>
-          <h1 class="mb-2 text-2xl font-bold text-gray-900">Something Went Wrong</h1>
+          <h1 class="mb-2 text-2xl font-bold text-gray-900">
+            {{ t('interviews.gatewayPage.somethingWentWrong') }}
+          </h1>
           <p class="mb-4 text-gray-600">{{ errorMessage }}</p>
-          <Button label="Try Again" icon="pi pi-refresh" @click="$router.go(0)" />
+          <Button :label="t('errors.tryAgain')" icon="pi pi-refresh" @click="$router.go(0)" />
         </div>
       </template>
     </div>

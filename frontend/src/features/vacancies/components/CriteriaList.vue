@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
@@ -8,17 +8,37 @@ import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
 import Dialog from 'primevue/dialog'
 import Tag from 'primevue/tag'
+import { getLocale } from '@/shared/i18n'
 import type { VacancyCriteria } from '../types/vacancy.types'
 
-defineProps<{ criteria: VacancyCriteria[]; loading?: boolean }>()
+const props = defineProps<{ criteria: VacancyCriteria[]; loading?: boolean }>()
 
 const emit = defineEmits<{
   add: [data: { name: string; description?: string; weight?: number }]
   update: [criteriaId: string, data: Partial<VacancyCriteria>]
   delete: [criteriaId: string]
+  translateAll: []
 }>()
 
 const { t } = useI18n()
+
+const currentLocale = computed(() => getLocale())
+
+const showTranslateAll = computed(() => {
+  if (!props.criteria.length) return false
+  return props.criteria.some((c) => !c.translations?.[currentLocale.value])
+})
+
+function getTranslatedName(c: VacancyCriteria): string {
+  return c.translations?.[currentLocale.value]?.split(': ')?.[0] ?? c.name
+}
+
+function getTranslatedDescription(c: VacancyCriteria): string {
+  const translated = c.translations?.[currentLocale.value]
+  if (!translated) return c.description
+  const parts = translated.split(': ')
+  return parts.length > 1 ? parts.slice(1).join(': ') : c.description
+}
 
 const showDialog = ref(false)
 const isEditing = ref(false)
@@ -65,12 +85,31 @@ function handleSubmit(): void {
   <div>
     <div class="mb-4 flex items-center justify-between">
       <h3 class="text-lg font-semibold">{{ t('vacancies.criteria') }}</h3>
-      <Button :label="t('vacancies.addCriteria')" icon="pi pi-plus" size="small" @click="openAdd" />
+      <div class="flex gap-2">
+        <Button
+          v-if="showTranslateAll"
+          :label="t('common.translate')"
+          icon="pi pi-language"
+          severity="secondary"
+          size="small"
+          @click="emit('translateAll')"
+        />
+        <Button
+          :label="t('vacancies.addCriteria')"
+          icon="pi pi-plus"
+          size="small"
+          @click="openAdd"
+        />
+      </div>
     </div>
     <DataTable :value="criteria" :loading="loading" striped-rows>
       <Column field="order" header="#" style="width: 50px" />
-      <Column field="name" header="Name" />
-      <Column field="description" header="Description" />
+      <Column field="name" :header="t('common.name')">
+        <template #body="{ data }">{{ getTranslatedName(data) }}</template>
+      </Column>
+      <Column field="description" :header="t('common.description')">
+        <template #body="{ data }">{{ getTranslatedDescription(data) }}</template>
+      </Column>
       <Column field="weight" header="Weight" style="width: 100px" />
       <Column header="Default" style="width: 100px">
         <template #body="{ data }">

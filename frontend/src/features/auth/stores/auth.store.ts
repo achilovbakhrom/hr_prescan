@@ -2,156 +2,62 @@ import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { extractErrorMessage } from '@/shared/api/errors'
 import { authService } from '../services/auth.service'
+import { loadTokens, saveTokens, clearTokens } from './auth-tokens'
+import type { CompanyMembership } from '@/shared/types/auth.types'
 import type {
   AcceptInvitationRequest,
-  GoogleAuthResponse,
-  GoogleAuthRole,
-  GoogleRegisterCompanyRequest,
   User,
   AuthTokens,
   LoginRequest,
-  RegisterCompanyRequest,
   RegisterRequest,
 } from '../types/auth.types'
-import { isGoogleTokensResponse } from '../types/auth.types'
-
-export interface PendingGoogleSignup {
-  credential: string
-  email: string
-  firstName: string
-  lastName: string
-}
-
-const TOKENS_KEY = 'hr_prescan_tokens'
-
-function loadTokens(): AuthTokens | null {
-  const raw = localStorage.getItem(TOKENS_KEY)
-  if (!raw) return null
-  try {
-    return JSON.parse(raw) as AuthTokens
-  } catch {
-    localStorage.removeItem(TOKENS_KEY)
-    return null
-  }
-}
-
-function saveTokens(tokens: AuthTokens): void {
-  localStorage.setItem(TOKENS_KEY, JSON.stringify(tokens))
-}
-
-function clearTokens(): void {
-  localStorage.removeItem(TOKENS_KEY)
-}
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
   const tokens = ref<AuthTokens | null>(loadTokens())
+  const companies = ref<CompanyMembership[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
-  // In-memory only — never persisted to localStorage
-  const pendingGoogleSignup = ref<PendingGoogleSignup | null>(null)
 
   const isAuthenticated = computed(() => !!tokens.value?.access && !!user.value)
+  const hasMultipleCompanies = computed(() => companies.value.length > 1)
+
+  async function withLoading<T>(fn: () => Promise<T>): Promise<T> {
+    loading.value = true
+    error.value = null
+    try {
+      return await fn()
+    } catch (err: unknown) {
+      const msg = extractErrorMessage(err)
+      error.value = msg
+      throw new Error(msg)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  function setAuth(resp: { tokens: AuthTokens; user: User }): void {
+    tokens.value = resp.tokens
+    user.value = resp.user
+    saveTokens(resp.tokens)
+  }
 
   async function login(data: LoginRequest): Promise<void> {
-    loading.value = true
-    error.value = null
-    try {
-      const response = await authService.login(data)
-      tokens.value = response.tokens
-      user.value = response.user
-      saveTokens(response.tokens)
-    } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
-    } finally {
-      loading.value = false
-    }
+    await withLoading(async () => setAuth(await authService.login(data)))
   }
-
-  async function googleLogin(
-    credential: string,
-    role?: GoogleAuthRole,
-  ): Promise<GoogleAuthResponse> {
-    loading.value = true
-    error.value = null
-    try {
-      const response = await authService.googleAuth(credential, role)
-      if (isGoogleTokensResponse(response)) {
-        tokens.value = response.tokens
-        user.value = response.user
-        saveTokens(response.tokens)
-        pendingGoogleSignup.value = null
-      } else {
-        // needsRole or needsCompany — keep the credential for the next step
-        pendingGoogleSignup.value = {
-          credential,
-          email: response.email,
-          firstName: response.firstName,
-          lastName: response.lastName,
-        }
-      }
-      return response
-    } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
-    } finally {
-      loading.value = false
-    }
+  async function googleLogin(credential: string): Promise<void> {
+    await withLoading(async () => setAuth(await authService.googleAuth(credential)))
   }
-
-  async function googleRegisterCompany(
-    data: Omit<GoogleRegisterCompanyRequest, 'credential'>,
-  ): Promise<void> {
-    const pending = pendingGoogleSignup.value
-    if (!pending) {
-      throw new Error('No pending Google sign-up in progress')
-    }
-    loading.value = true
-    error.value = null
-    try {
-      const response = await authService.googleRegisterCompany({
-        ...data,
-        credential: pending.credential,
-      })
-      tokens.value = response.tokens
-      user.value = response.user
-      saveTokens(response.tokens)
-      pendingGoogleSignup.value = null
-    } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
-    } finally {
-      loading.value = false
-    }
+  async function telegramLogin(data: { tokens: AuthTokens; user: User }): Promise<void> {
+    setAuth(data)
   }
-
-  function clearPendingGoogleSignup(): void {
-    pendingGoogleSignup.value = null
-  }
-
   async function register(data: RegisterRequest): Promise<void> {
-    loading.value = true
-    error.value = null
-    try {
-      await authService.register(data)
-    } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
-    } finally {
-      loading.value = false
-    }
+    await withLoading(() => authService.register(data))
   }
 
   async function logout(): Promise<void> {
     try {
-      if (tokens.value?.refresh) {
-        await authService.logout(tokens.value.refresh)
-      }
+      if (tokens.value?.refresh) await authService.logout(tokens.value.refresh)
     } finally {
       user.value = null
       tokens.value = null
@@ -186,31 +92,44 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function acceptInvitation(data: AcceptInvitationRequest): Promise<void> {
-    loading.value = true
-    error.value = null
+    await withLoading(() => authService.acceptInvitation(data))
+  }
+
+  async function acceptCompanyInvitation(token: string): Promise<void> {
+    await withLoading(async () => {
+      const resp = await authService.acceptCompanyInvitation(token)
+      user.value = resp.user
+    })
+  }
+
+  async function completeOnboarding(role: 'candidate' | 'hr'): Promise<void> {
+    await withLoading(async () => setAuth(await authService.completeOnboarding(role)))
+  }
+
+  async function completeCompanySetup(
+    data: Parameters<typeof authService.completeCompanySetup>[0],
+  ): Promise<void> {
+    await withLoading(async () => setAuth(await authService.completeCompanySetup(data)))
+  }
+
+  async function fetchCompanies(): Promise<void> {
     try {
-      await authService.acceptInvitation(data)
-    } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
-    } finally {
-      loading.value = false
+      companies.value = await authService.getMyCompanies()
+    } catch {
+      companies.value = []
     }
   }
 
-  async function registerCompany(data: RegisterCompanyRequest): Promise<void> {
-    loading.value = true
-    error.value = null
-    try {
-      await authService.registerCompany(data)
-    } catch (err: unknown) {
-      const message = extractErrorMessage(err)
-      error.value = message
-      throw new Error(message)
-    } finally {
-      loading.value = false
-    }
+  async function switchCompany(companyId: string): Promise<void> {
+    await withLoading(async () => {
+      user.value = await authService.switchCompany(companyId)
+    })
+  }
+
+  async function switchToPersonal(): Promise<void> {
+    await withLoading(async () => {
+      user.value = await authService.switchToPersonal()
+    })
   }
 
   async function initAuth(): Promise<void> {
@@ -221,25 +140,31 @@ export const useAuthStore = defineStore('auth', () => {
     }
     tokens.value = stored
     await fetchUser()
+    if (user.value) await fetchCompanies()
   }
 
   return {
     user,
     tokens,
+    companies,
     loading,
     error,
     isAuthenticated,
-    pendingGoogleSignup,
+    hasMultipleCompanies,
     login,
     googleLogin,
-    googleRegisterCompany,
-    clearPendingGoogleSignup,
+    telegramLogin,
     register,
     logout,
     refreshAccessToken,
     acceptInvitation,
-    registerCompany,
+    acceptCompanyInvitation,
+    completeOnboarding,
+    completeCompanySetup,
     fetchUser,
+    fetchCompanies,
+    switchCompany,
+    switchToPersonal,
     initAuth,
   }
 })

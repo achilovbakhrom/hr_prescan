@@ -13,7 +13,7 @@ from tests.factories import ApplicationFactory, InterviewFactory
 
 
 class TestStartSession:
-    @patch("apps.interviews.services.generate_candidate_token", return_value="mock-token")
+    @patch("apps.interviews.services.interview_livekit.generate_candidate_token", return_value="mock-token")
     def test_start_session_sets_in_progress(self, _mock_token, vacancy):
         """Starting a session sets status to IN_PROGRESS and records started_at."""
         app = ApplicationFactory(vacancy=vacancy, status=Application.Status.APPLIED)
@@ -24,7 +24,7 @@ class TestStartSession:
             status=Interview.Status.PENDING,
         )
 
-        with patch("apps.interviews.services.generate_greeting", return_value="Hello!"):
+        with patch("apps.interviews.chat_service.generate_greeting", return_value="Hello!"):
             started = start_interview(interview=session)
 
         assert started.status == Interview.Status.IN_PROGRESS

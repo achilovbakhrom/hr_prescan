@@ -5,7 +5,7 @@
        clean reset-db backup-db ensure-env \
        local-setup local-infra local-backend local-backend-all local-frontend local-stop local-stop-all \
        local-test local-test-backend local-test-frontend local-test-e2e \
-       dev-db-tunnel dev-db-tunnel-stop
+       local-telegram local-telegram-webhook
 
 # Ensure a project-root .env exists so docker compose variable
 # interpolation (LIVEKIT_API_KEY etc.) finds the values. On servers this
@@ -231,8 +231,16 @@ local-createsuperuser: ## Create superuser (local)
 local-shell: ## Django shell (local)
 	cd backend && $(VENV)/python manage.py shell
 
-local-telegram: ## Run Telegram bot in polling mode (local dev)
-	cd backend && $(VENV)/python manage.py run_telegram_bot
+local-telegram: local-telegram-hr ## Run HR Telegram bot in polling mode (alias)
+
+local-telegram-hr: ## Run HR Telegram bot in polling mode (local dev)
+	cd backend && $(VENV)/python manage.py run_telegram_bot --role hr
+
+local-telegram-candidate: ## Run Candidate Telegram bot in polling mode (local dev)
+	cd backend && $(VENV)/python manage.py run_telegram_bot --role candidate
+
+local-telegram-webhook: ## Start ngrok tunnel + register Telegram webhook (local dev)
+	./deploy/scripts/telegram-ngrok.sh 8000
 
 local-stop: ## Stop everything (infra + background processes)
 	@echo "Stopping background processes..."
@@ -252,8 +260,6 @@ local-stop-all: ## Force-kill all local backend/frontend processes + stop Docker
 	-@pkill -9 -f "node.*frontend" 2>/dev/null && echo "  Node frontend stopped" || true
 	-@lsof -ti :8000 | xargs kill -9 2>/dev/null && echo "  Port 8000 freed" || true
 	-@lsof -ti :5173 | xargs kill -9 2>/dev/null && echo "  Port 5173 freed" || true
-	-@lsof -ti :8100 | xargs kill -9 2>/dev/null && echo "  Port 8100 freed" || true
-	-@lsof -ti :5180 | xargs kill -9 2>/dev/null && echo "  Port 5180 freed" || true
 	docker compose down
 	@echo "All force-stopped."
 
@@ -267,8 +273,14 @@ local-test-backend: ## Run backend tests (pytest)
 local-test-frontend: ## Run frontend unit tests (vitest)
 	cd frontend && npx vitest run --reporter=verbose
 
-local-test-e2e: ## Run E2E tests (playwright) — app must be running
-	cd frontend && npx playwright test --reporter=list
+local-test-e2e: ## Run all E2E tests (playwright) — app must be running
+	cd e2e && .venv/bin/python -m pytest -v
+
+local-test-e2e-api: ## Run E2E API tests only — backend must be running
+	cd e2e && .venv/bin/python -m pytest api/ -v
+
+local-test-e2e-ui: ## Run E2E UI tests only — app must be running
+	cd e2e && .venv/bin/python -m pytest ui/ -v
 
 # ─── Dev Server DB Tunnel ────────────────────────────────────────────────────
 # Creds live in .env.dev-server (gitignored). See .env.dev-server.example for keys.

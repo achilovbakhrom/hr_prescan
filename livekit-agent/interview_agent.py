@@ -5,7 +5,7 @@ import os
 import time
 
 from livekit.agents import VoicePipelineAgent
-from livekit.plugins import deepgram, elevenlabs, openai
+from livekit.plugins import deepgram, elevenlabs, google
 
 from context import fetch_interview_context
 from evaluator import evaluate_interview
@@ -32,8 +32,8 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
     )
 
     # Configure LLM
-    llm = openai.LLM(
-        model="gpt-4o-mini",
+    llm = google.LLM(
+        model="gemini-3-flash-preview",
         temperature=0.7,
     )
 
@@ -99,6 +99,7 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
                 transcript=transcript,
                 criteria=context.criteria,
                 cv_summary=context.cv_summary,
+                language=context.language,
                 integrity_flags=integrity_flags,
             )
         except Exception:

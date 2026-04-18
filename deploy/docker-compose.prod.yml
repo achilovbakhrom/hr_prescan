@@ -56,8 +56,22 @@ services:
       - S3_SECRET_KEY=${S3_SECRET_KEY}
       - MINIO_ENDPOINT=${MINIO_ENDPOINT}
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
+      # Derived from DOMAIN so email links (verify, invite, interview) point
+      # at the same host the server is running on. No separate env var needed.
+      - FRONTEND_URL=https://${DOMAIN}
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
       - OTEL_SERVICE_NAME=hr-prescan-backend
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_BOT_USERNAME=${TELEGRAM_BOT_USERNAME}
+      - TELEGRAM_WEBHOOK_SECRET=${TELEGRAM_WEBHOOK_SECRET}
+      - TELEGRAM_WEBHOOK_URL=${TELEGRAM_WEBHOOK_URL}
+      # E2E test hooks — only enable on dev. Exposes /auth/debug/* endpoints
+      # used by the Playwright suite to bypass real OAuth. Must be "false" in prod.
+      - ALLOW_E2E_HOOKS=${ALLOW_E2E_HOOKS:-false}
+      # Outbound email suppression — comma-separated domain list. Any recipient
+      # whose email ends in one of these domains is dropped silently. Used on
+      # dev to block test-account spam. Leave empty in prod.
+      - EMAIL_SUPPRESS_DOMAINS=${EMAIL_SUPPRESS_DOMAINS:-}
     restart: unless-stopped
     deploy:
       resources:
@@ -156,8 +170,12 @@ services:
       - POSTGRES_HOST=postgres
       - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
       - RABBITMQ_URL=amqp://${RABBITMQ_USER}:${RABBITMQ_PASS}@rabbitmq:5672//
+      - FRONTEND_URL=https://${DOMAIN}
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
       - OTEL_SERVICE_NAME=hr-prescan-celery
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_BOT_USERNAME=${TELEGRAM_BOT_USERNAME}
+      - TELEGRAM_WEBHOOK_SECRET=${TELEGRAM_WEBHOOK_SECRET}
     restart: unless-stopped
     deploy:
       resources:
@@ -182,6 +200,7 @@ services:
       - POSTGRES_HOST=postgres
       - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
       - RABBITMQ_URL=amqp://${RABBITMQ_USER}:${RABBITMQ_PASS}@rabbitmq:5672//
+      - FRONTEND_URL=https://${DOMAIN}
     restart: unless-stopped
     deploy:
       resources:

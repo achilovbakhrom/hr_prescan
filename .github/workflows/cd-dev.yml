@@ -58,9 +58,9 @@ jobs:
             VITE_API_URL=https://dev.prescreen-app.com/api
             VITE_LIVEKIT_URL=wss://dev.prescreen-app.com/ws/
             VITE_GOOGLE_CLIENT_ID=64156241192-ul3jng69g72u46vadaf8h4kt1jpahbpm.apps.googleusercontent.com
-            VITE_TELEGRAM_BOT_USERNAME=hr_prescreen_ai_dev_bot
-            VITE_TELEGRAM_BOT_ID=8686090273
-            VITE_TELEGRAM_CANDIDATE_BOT_USERNAME=hr_prescreen_candidate_dev_bot
+            VITE_TELEGRAM_BOT_USERNAME=candidate_preview_ai_dev_bot
+            VITE_TELEGRAM_BOT_ID=8640891941
+            VITE_TELEGRAM_CANDIDATE_BOT_USERNAME=candidate_preview_ai_dev_bot
             VITE_BILLING_ENABLED=false
           cache-from: type=gha,scope=frontend-dev
           cache-to: type=gha,mode=max,scope=frontend-dev
@@ -95,10 +95,15 @@ jobs:
 
     steps:
       - name: Sync compose files
+        # Deploy dir is a pure mirror of origin/dev — never edit files here.
+        # Using `reset --hard` instead of `pull` so any accidental local drift
+        # (e.g. a file touched on the server) doesn't wedge future deploys
+        # behind "would be overwritten by merge" errors.
         run: |
           git fetch origin dev
-          git checkout dev
-          git pull origin dev
+          git checkout -f dev
+          git reset --hard origin/dev
+          git clean -fd
 
       - name: Log in to GHCR
         run: |
@@ -112,6 +117,16 @@ jobs:
         run: |
           IMAGE_TAG=${{ github.sha }} \
             docker compose $CF up -d --wait postgres redis rabbitmq minio livekit
+
+      # Validate the new image imports cleanly — Django's `check` walks
+      # the full URL tree, so any SyntaxError / ImportError inside app
+      # modules surfaces here instead of after swap-in when the site is
+      # already 504-ing. Fail-fast: if this fails we never roll the
+      # broken image into rotation.
+      - name: Validate new backend image (django check)
+        run: |
+          IMAGE_TAG=${{ github.sha }} \
+            docker compose $CF run --rm --no-deps django python manage.py check --deploy --fail-level=ERROR
 
       # The backend image's entrypoint.sh applies migrations and collectstatic
       # on every container start before launching gunicorn, so no explicit

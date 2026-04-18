@@ -1,20 +1,28 @@
 from rest_framework import serializers
 
 from apps.accounts.models import Company, Invitation, User
+from apps.accounts.permissions import HRPermissions
 
 
 class CompanyOutputSerializer(serializers.ModelSerializer):
+    industries = serializers.SlugRelatedField(
+        many=True,
+        read_only=True,
+        slug_field="slug",
+    )
+
     class Meta:
         model = Company
         fields = [
             "id",
             "name",
-            "industry",
+            "industries",
             "size",
             "country",
             "logo",
             "website",
             "description",
+            "custom_industry",
             "subscription_status",
             "trial_ends_at",
             "created_at",
@@ -38,42 +46,37 @@ class UserOutputSerializer(serializers.ModelSerializer):
             "phone",
             "role",
             "company",
+            "hr_permissions",
             "is_active",
             "email_verified",
+            "onboarding_completed",
             "created_at",
             "updated_at",
         ]
         read_only_fields = fields
 
 
-class CompanyRegisterInputSerializer(serializers.Serializer):
-    # Company fields
-    company_name = serializers.CharField(max_length=255)
-    industry = serializers.CharField(max_length=255)
-    size = serializers.ChoiceField(choices=Company.Size.choices)
-    country = serializers.CharField(max_length=100)
-    website = serializers.URLField(max_length=500, required=False, allow_blank=True)
-    description = serializers.CharField(required=False, allow_blank=True)
-
-    # Admin user fields
-    admin_email = serializers.EmailField()
-    admin_password = serializers.CharField(min_length=8)
-    admin_first_name = serializers.CharField(max_length=150)
-    admin_last_name = serializers.CharField(max_length=150)
-
-
 class CompanyProfileInputSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=255, required=False)
-    industry = serializers.CharField(max_length=255, required=False)
+    industries = serializers.ListField(
+        child=serializers.SlugField(max_length=50),
+        required=False,
+    )
     size = serializers.ChoiceField(choices=Company.Size.choices, required=False)
     country = serializers.CharField(max_length=100, required=False)
     website = serializers.URLField(max_length=500, required=False, allow_blank=True)
     description = serializers.CharField(required=False, allow_blank=True)
     logo = serializers.CharField(max_length=500, required=False, allow_blank=True)
+    custom_industry = serializers.CharField(max_length=255, required=False, allow_blank=True)
 
 
 class InviteHRInputSerializer(serializers.Serializer):
     email = serializers.EmailField()
+    permissions = serializers.ListField(
+        child=serializers.ChoiceField(choices=HRPermissions.ALL),
+        required=False,
+        default=list,
+    )
 
 
 class AcceptInvitationInputSerializer(serializers.Serializer):
@@ -92,6 +95,7 @@ class InvitationOutputSerializer(serializers.ModelSerializer):
             "id",
             "email",
             "invited_by_email",
+            "permissions",
             "token",
             "is_accepted",
             "expires_at",
@@ -121,4 +125,8 @@ class PendingInvitationOutputSerializer(serializers.ModelSerializer):
 
 
 class TeamMemberUpdateSerializer(serializers.Serializer):
-    is_active = serializers.BooleanField()
+    is_active = serializers.BooleanField(required=False)
+    hr_permissions = serializers.ListField(
+        child=serializers.ChoiceField(choices=HRPermissions.ALL),
+        required=False,
+    )

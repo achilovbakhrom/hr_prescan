@@ -2,10 +2,11 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { extractErrorMessage } from '@/shared/api/errors'
 import { dashboardService } from '../services/dashboard.service'
-import type { DashboardStats } from '../types/dashboard.types'
+import type { DashboardStats, CandidateDashboardStats } from '../types/dashboard.types'
 
 export const useDashboardStore = defineStore('dashboard', () => {
   const stats = ref<DashboardStats | null>(null)
+  const candidateStats = ref<CandidateDashboardStats | null>(null)
   const loading = ref(false)
   const error = ref<string | null>(null)
 
@@ -21,10 +22,24 @@ export const useDashboardStore = defineStore('dashboard', () => {
     }
   }
 
+  async function fetchCandidateStats(): Promise<void> {
+    loading.value = true
+    error.value = null
+    try {
+      candidateStats.value = await dashboardService.getCandidateStats()
+    } catch (err: unknown) {
+      error.value = extractErrorMessage(err)
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     stats,
+    candidateStats,
     loading,
     error,
     fetchStats,
+    fetchCandidateStats,
   }
 })

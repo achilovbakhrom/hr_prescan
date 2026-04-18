@@ -8,7 +8,7 @@ export type {
 } from '@/shared/types/auth.types'
 
 // Import shared types needed by feature-specific interfaces
-import type { User, CompanySize, Company } from '@/shared/types/auth.types'
+import type { User } from '@/shared/types/auth.types'
 
 export interface LoginRequest {
   email: string
@@ -39,16 +39,7 @@ export interface AcceptInvitationRequest {
   lastName: string
 }
 
-export interface RegisterCompanyRequest {
-  companyName: string
-  industry: string
-  size: CompanySize
-  country: string
-  adminEmail: string
-  adminPassword: string
-  adminFirstName: string
-  adminLastName: string
-}
+// ---------- Google OAuth ----------
 
 export type GoogleAuthRole = 'candidate' | 'hr'
 
@@ -57,9 +48,8 @@ export interface GoogleAuthTokensResponse {
   user: User
 }
 
-// Backend returns snake_case (needs_role, first_name, last_name), but the
-// axios client has a global response interceptor that converts snake_case →
-// camelCase before it reaches callers. So the shapes below use camelCase.
+// Backend returns snake_case but the axios client has a response interceptor
+// that converts keys to camelCase before they reach callers.
 export interface GoogleAuthNeedsRoleResponse {
   needsRole: true
   email: string
@@ -95,20 +85,4 @@ export function isGoogleNeedsCompanyResponse(
   response: GoogleAuthResponse,
 ): response is GoogleAuthNeedsCompanyResponse {
   return 'needsCompany' in response && response.needsCompany === true
-}
-
-export interface GoogleRegisterCompanyRequest {
-  credential: string
-  companyName: string
-  industry: string
-  size: CompanySize
-  country: string
-  website?: string
-  description?: string
-}
-
-export interface GoogleRegisterCompanyResponse {
-  tokens: AuthTokens
-  company: Company
-  user: User
 }
