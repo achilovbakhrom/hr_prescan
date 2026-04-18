@@ -131,6 +131,9 @@ AWS_S3_ENDPOINT_URL = os.environ.get("MINIO_ENDPOINT", "http://localhost:9000")
 AWS_S3_REGION_NAME = os.environ.get("AWS_S3_REGION_NAME", "us-east-1")
 AWS_S3_FILE_OVERWRITE = False
 AWS_DEFAULT_ACL = None
+# Contabo Object Storage requires SigV4 and path-style addressing.
+AWS_S3_SIGNATURE_VERSION = "s3v4"
+AWS_S3_ADDRESSING_STYLE = "path"
 # Prefix prepended to every uploaded S3 key so the same bucket can host multiple environments.
 # Typical values: "local", "dev", "prod". Empty means no prefix (backward-compatible).
 S3_KEY_PREFIX = os.environ.get("S3_KEY_PREFIX", "").strip("/")
