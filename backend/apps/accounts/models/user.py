@@ -69,7 +69,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     telegram_username = models.CharField(max_length=255, blank=True, default="")
 
     # UI language — source of truth for AI assistants and default vacancy language.
-    # Kept in sync with the frontend locale via PATCH /api/auth/me/.
+    # Kept in sync with the frontend locale via PATCH /api/auth/me/, and seeded
+    # on first visit from IP-based GeoIP detection for anonymous users.
     class Language(models.TextChoices):
         EN = "en", "English"
         RU = "ru", "Russian"

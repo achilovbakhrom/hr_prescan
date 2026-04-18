@@ -27,6 +27,21 @@ export function useLocale() {
 
   function switchLocale(code: SupportedLocale): void {
     setLocale(code)
+
+    void (async () => {
+      try {
+        const [{ useAuthStore }, { saveUserLanguage }] = await Promise.all([
+          import('@/features/auth/stores/auth.store'),
+          import('@/shared/services/language.service'),
+        ])
+        const authStore = useAuthStore()
+        if (!authStore.isAuthenticated) return
+        await saveUserLanguage(code)
+        if (authStore.user) authStore.user.language = code
+      } catch (err) {
+        console.warn('[i18n] failed to persist language', err)
+      }
+    })()
   }
 
   function toggleLocale(): void {

@@ -7,7 +7,7 @@ import Aura from '@primevue/themes/aura'
 
 import App from './App.vue'
 import { router } from './router'
-import { i18n } from '@/shared/i18n'
+import { i18n, detectAndApplyLocale } from '@/shared/i18n'
 
 import '@/assets/styles/main.css'
 
@@ -28,3 +28,5 @@ app.use(ConfirmationService)
 app.use(ToastService)
 
 app.mount('#app')
+
+void detectAndApplyLocale()
