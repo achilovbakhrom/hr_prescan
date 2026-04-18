@@ -5,13 +5,13 @@ STATE_REG_NAME = "reg_name"
 STATE_REG_PHONE = "reg_phone"
 
 # Prescreening flow states
-STATE_PS_CODE = "ps_code"             # waiting for 6-digit vacancy code
-STATE_PS_CONFIRM_NAME = "ps_confirm_name"   # show stored name, ask confirm/change
-STATE_PS_CHANGE_NAME = "ps_change_name"     # waiting for new name text
-STATE_PS_CONFIRM_PHONE = "ps_confirm_phone" # show stored phone, ask confirm/change
-STATE_PS_CHANGE_PHONE = "ps_change_phone"   # waiting for new phone text
-STATE_PS_CV = "ps_cv"                 # waiting for CV upload (or skip)
-STATE_PS_INTERVIEW = "ps_interview"   # answering interview questions
+STATE_PS_CODE = "ps_code"  # waiting for 6-digit vacancy code
+STATE_PS_CONFIRM_NAME = "ps_confirm_name"  # show stored name, ask confirm/change
+STATE_PS_CHANGE_NAME = "ps_change_name"  # waiting for new name text
+STATE_PS_CONFIRM_PHONE = "ps_confirm_phone"  # show stored phone, ask confirm/change
+STATE_PS_CHANGE_PHONE = "ps_change_phone"  # waiting for new phone text
+STATE_PS_CV = "ps_cv"  # waiting for CV upload (or skip)
+STATE_PS_INTERVIEW = "ps_interview"  # answering interview questions
 
 # Session data keys
 SK_VACANCY_ID = "ps_vacancy_id"

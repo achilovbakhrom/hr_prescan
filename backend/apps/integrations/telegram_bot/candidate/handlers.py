@@ -1,4 +1,5 @@
 """Candidate bot — top-level update dispatcher."""
+
 from __future__ import annotations
 
 import logging
@@ -6,11 +7,16 @@ from uuid import UUID
 
 from apps.integrations.telegram_bot.bots import ROLE_CANDIDATE, get_client
 from apps.integrations.telegram_bot.candidate.apply import (
-    confirm_apply, parse_deep_link_vacancy, show_vacancy_card,
+    confirm_apply,
+    parse_deep_link_vacancy,
+    show_vacancy_card,
 )
 from apps.integrations.telegram_bot.candidate.auth import get_or_create_candidate_user
 from apps.integrations.telegram_bot.candidate.menus import (
-    CB_MENU, CB_VAC_APPLY, main_menu_keyboard, parse_callback,
+    CB_MENU,
+    CB_VAC_APPLY,
+    main_menu_keyboard,
+    parse_callback,
 )
 from apps.integrations.telegram_bot.candidate.states import STATE_PS_CV, STATE_PS_INTERVIEW
 from apps.integrations.telegram_bot.candidate.uploads import handle_document
@@ -68,8 +74,10 @@ def handle_update(update_data: dict) -> None:
 def _handle_text(*, client, chat_id: int, user, text: str, session: dict, lang: str) -> None:
     if not user.phone:
         from apps.integrations.telegram_bot.candidate.registration import (
-            handle_registration_text, prompt_registration,
+            handle_registration_text,
+            prompt_registration,
         )
+
         if session.get("state") in ("reg_name", "reg_phone"):
             handle_registration_text(client=client, chat_id=chat_id, user=user, text=text, session=session, lang=lang)
         else:
@@ -79,6 +87,7 @@ def _handle_text(*, client, chat_id: int, user, text: str, session: dict, lang: 
     state = session.get("state", "")
     if state.startswith("ps_"):
         from apps.integrations.telegram_bot.candidate.prescreening import handle_prescreening_text
+
         handle_prescreening_text(client=client, chat_id=chat_id, user=user, text=text, session=session, lang=lang)
         return
 
@@ -103,6 +112,7 @@ def _handle_document(*, client, chat_id: int, user, document: dict, session: dic
     state = session.get("state", "")
     if state == STATE_PS_CV:
         from apps.integrations.telegram_bot.candidate.prescreening import handle_cv_upload
+
         handle_cv_upload(client=client, chat_id=chat_id, user=user, document=document, session=session, lang=lang)
     elif state != STATE_PS_INTERVIEW:
         handle_document(client=client, chat_id=chat_id, user=user, document=document, lang=lang)
@@ -141,7 +151,10 @@ def _process_callback(*, client, callback: dict) -> None:
         except (ValueError, TypeError):
             return
         confirm_apply(
-            client=client, chat_id=chat_id, user=user, vacancy_id=vacancy_id,
+            client=client,
+            chat_id=chat_id,
+            user=user,
+            vacancy_id=vacancy_id,
             cv_file_path=session.get("cv_file_path", ""),
             cv_original_filename=session.get("cv_original_filename", ""),
             lang=lang,
@@ -150,6 +163,7 @@ def _process_callback(*, client, callback: dict) -> None:
         _send_main_menu(client=client, chat_id=chat_id, lang=lang)
     elif data.startswith("cand:ps:"):
         from apps.integrations.telegram_bot.candidate.prescreening import handle_prescreening_callback
+
         handle_prescreening_callback(client=client, chat_id=chat_id, user=user, data=data, session=session, lang=lang)
     else:
         logger.debug("Unhandled callback: %r", data)

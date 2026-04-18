@@ -122,10 +122,13 @@ class Vacancy(BaseModel):
 
     @classmethod
     def _generate_telegram_code(cls) -> int:
-        import random
+        import secrets
+
         existing = set(cls.objects.values_list("telegram_code", flat=True))
         while True:
-            code = random.randint(100_000, 999_999)
+            # 6-digit code, uniformly sampled; unguessability matters since the
+            # code is the sole proof-of-access for the Telegram prescreen flow.
+            code = 100_000 + secrets.randbelow(900_000)
             if code not in existing:
                 return code
 

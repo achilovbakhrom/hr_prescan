@@ -5,6 +5,7 @@ New users (no phone set) are walked through:
   2. Enter phone number
   → account updated, password generated and sent, main menu shown.
 """
+
 from __future__ import annotations
 
 import logging
@@ -109,6 +110,7 @@ def _handle_phone(
 
     # Show main menu
     from apps.integrations.telegram_bot.candidate.menus import main_menu_keyboard
+
     client.send_message(
         chat_id=chat_id,
         text=t("candidate.main_menu", lang=lang),

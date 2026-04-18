@@ -7,6 +7,7 @@ Flow:
                               either sends next question or completes the interview.
   _complete_interview()   → thanks user, clears session, fires async evaluation.
 """
+
 from __future__ import annotations
 
 import logging
@@ -92,8 +93,12 @@ def handle_interview_answer(
 
     questions = list(
         InterviewQuestion.objects.filter(
-            vacancy_id=vacancy_id, step="prescanning", is_active=True,
-        ).order_by("order").values_list("text", flat=True)
+            vacancy_id=vacancy_id,
+            step="prescanning",
+            is_active=True,
+        )
+        .order_by("order")
+        .values_list("text", flat=True)
     )
 
     # Append user's answer to chat_history
@@ -105,7 +110,9 @@ def handle_interview_answer(
     next_idx = idx + 1
     if next_idx < len(questions):
         update_session(role=ROLE_CANDIDATE, telegram_id=user.telegram_id, **{SK_QUESTION_IDX: next_idx})
-        _send_question(client=client, chat_id=chat_id, interview=interview, questions=questions, idx=next_idx, lang=lang)
+        _send_question(
+            client=client, chat_id=chat_id, interview=interview, questions=questions, idx=next_idx, lang=lang
+        )
     else:
         _complete_interview(client=client, chat_id=chat_id, user=user, interview=interview, lang=lang)
 

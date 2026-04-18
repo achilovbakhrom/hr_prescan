@@ -77,7 +77,7 @@ def notify_hr_company_telegram(
                 parse_mode="Markdown",
                 disable_web_page_preview=True,
             )
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             logger.warning("Telegram push failed for HR user %s: %s", user.id, exc)
 
 

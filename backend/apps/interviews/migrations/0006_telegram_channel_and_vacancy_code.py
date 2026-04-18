@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('interviews', '0005_add_translation_fields'),
+        ("interviews", "0005_add_translation_fields"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='interview',
-            name='channel',
-            field=models.CharField(choices=[('web', 'Web'), ('telegram', 'Telegram')], default='web', max_length=10),
+            model_name="interview",
+            name="channel",
+            field=models.CharField(choices=[("web", "Web"), ("telegram", "Telegram")], default="web", max_length=10),
         ),
     ]

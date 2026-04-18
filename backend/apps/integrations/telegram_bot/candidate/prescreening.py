@@ -1,10 +1,11 @@
 """Candidate bot — prescreening flow public API.
 
 Entry points called from handlers.py:
-  handle_prescreening_callback()  – inline-button actions
-  handle_prescreening_text()      – free-text input during flow
-  handle_cv_upload()              – document upload in ps_cv state
+  handle_prescreening_callback()  - inline-button actions
+  handle_prescreening_text()      - free-text input during flow
+  handle_cv_upload()              - document upload in ps_cv state
 """
+
 from __future__ import annotations
 
 import logging
@@ -77,6 +78,7 @@ def handle_prescreening_text(*, client, chat_id: int, user, text: str, session: 
         handle_new_phone(client=client, chat_id=chat_id, user=user, text=text, session=session, lang=lang)
     elif state == STATE_PS_INTERVIEW:
         from apps.integrations.telegram_bot.candidate.interview_flow import handle_interview_answer
+
         handle_interview_answer(client=client, chat_id=chat_id, user=user, text=text, session=session, lang=lang)
 
 
@@ -111,7 +113,7 @@ def handle_cv_upload(*, client, chat_id: int, user, document: dict, session: dic
     upload = _InMemoryUpload(name=file_name, content=content, content_type=mime_type)
     try:
         cv_key = upload_cv_to_s3(file_obj=upload, vacancy_id=vacancy_id)
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         logger.error("CV upload failed for tg_id=%s: %s", user.telegram_id, exc)
         client.send_message(chat_id=chat_id, text=t("common.error_generic", lang=lang))
         return
@@ -119,7 +121,9 @@ def handle_cv_upload(*, client, chat_id: int, user, document: dict, session: dic
     update_session(role=ROLE_CANDIDATE, telegram_id=user.telegram_id, **{SK_CV_PATH: cv_key, SK_CV_FILENAME: file_name})
     client.send_message(chat_id=chat_id, text=t("candidate.cv_uploaded", lang=lang))
     start_interview_submission(
-        client=client, chat_id=chat_id, user=user,
+        client=client,
+        chat_id=chat_id,
+        user=user,
         session={**session, SK_CV_PATH: cv_key, SK_CV_FILENAME: file_name},
         lang=lang,
     )

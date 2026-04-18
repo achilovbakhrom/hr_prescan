@@ -32,12 +32,16 @@ CB_PS_CV_SKIP = "cand:ps:cv_skip"
 
 
 def main_menu_keyboard(*, lang: str) -> dict:
-    return kb.inline_keyboard([
-        [kb.button(
-            text=t("candidate.btn_prescreening", lang=lang),
-            callback_data=CB_PS_START,
-        )],
-    ])
+    return kb.inline_keyboard(
+        [
+            [
+                kb.button(
+                    text=t("candidate.btn_prescreening", lang=lang),
+                    callback_data=CB_PS_START,
+                )
+            ],
+        ]
+    )
 
 
 def vacancy_actions_keyboard(*, vacancy_id: UUID, lang: str) -> dict:
@@ -61,28 +65,34 @@ def vacancy_actions_keyboard(*, vacancy_id: UUID, lang: str) -> dict:
 
 
 def confirm_name_keyboard(*, lang: str) -> dict:
-    return kb.inline_keyboard([
+    return kb.inline_keyboard(
         [
-            kb.button(text=t("candidate.btn_confirm", lang=lang), callback_data=CB_PS_NAME_CONFIRM),
-            kb.button(text=t("candidate.btn_change", lang=lang), callback_data=CB_PS_NAME_CHANGE),
-        ],
-    ])
+            [
+                kb.button(text=t("candidate.btn_confirm", lang=lang), callback_data=CB_PS_NAME_CONFIRM),
+                kb.button(text=t("candidate.btn_change", lang=lang), callback_data=CB_PS_NAME_CHANGE),
+            ],
+        ]
+    )
 
 
 def confirm_phone_keyboard(*, lang: str) -> dict:
-    return kb.inline_keyboard([
+    return kb.inline_keyboard(
         [
-            kb.button(text=t("candidate.btn_confirm", lang=lang), callback_data=CB_PS_PHONE_CONFIRM),
-            kb.button(text=t("candidate.btn_change", lang=lang), callback_data=CB_PS_PHONE_CHANGE),
-        ],
-    ])
+            [
+                kb.button(text=t("candidate.btn_confirm", lang=lang), callback_data=CB_PS_PHONE_CONFIRM),
+                kb.button(text=t("candidate.btn_change", lang=lang), callback_data=CB_PS_PHONE_CHANGE),
+            ],
+        ]
+    )
 
 
 def cv_keyboard(*, lang: str) -> dict:
     """Skip button for optional CV upload."""
-    return kb.inline_keyboard([
-        [kb.button(text=t("candidate.btn_skip_cv", lang=lang), callback_data=CB_PS_CV_SKIP)],
-    ])
+    return kb.inline_keyboard(
+        [
+            [kb.button(text=t("candidate.btn_skip_cv", lang=lang), callback_data=CB_PS_CV_SKIP)],
+        ]
+    )
 
 
 def parse_callback(*, data: str) -> tuple[str, str | None]:

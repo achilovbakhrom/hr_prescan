@@ -114,14 +114,34 @@ _STRINGS_EXT: dict[str, dict[str, str]] = {
         "uz": "📎 Bu vakansiya uchun rezyume talab qilinadi. Yuklab bering (PDF, DOCX, TXT):",
     },
     "candidate.ps_cv_optional": {
-        "en": "📎 You can attach your CV to strengthen your application (PDF, DOCX, TXT).\nCV is *not mandatory* for this position.",
-        "ru": "📎 Вы можете прикрепить резюме для усиления заявки (PDF, DOCX, TXT).\nРезюме *не обязательно* для этой вакансии.",
-        "uz": "📎 Arizangizni kuchaytirish uchun rezyume biriktiring (PDF, DOCX, TXT).\nBu vakansiya uchun rezyume *majburiy emas*.",
+        "en": (
+            "📎 You can attach your CV to strengthen your application (PDF, DOCX, TXT).\n"
+            "CV is *not mandatory* for this position."
+        ),
+        "ru": (
+            "📎 Вы можете прикрепить резюме для усиления заявки (PDF, DOCX, TXT).\n"
+            "Резюме *не обязательно* для этой вакансии."
+        ),
+        "uz": (
+            "📎 Arizangizni kuchaytirish uchun rezyume biriktiring (PDF, DOCX, TXT).\n"
+            "Bu vakansiya uchun rezyume *majburiy emas*."
+        ),
     },
     "candidate.ps_starting": {
-        "en": "🚀 Starting prescreening for *{title}*.\n\nPlease answer each question thoughtfully. You can reply with text or a voice message.",
-        "ru": "🚀 Начинаем прескрининг на вакансию *{title}*.\n\nОтвечайте обдуманно. Можно отвечать текстом или голосовым сообщением.",
-        "uz": "🚀 *{title}* vakansiyasi uchun preskreeningni boshlayapmiz.\n\nHar bir savolga o'ylab javob bering. Matn yoki ovozli xabar bilan javob berishingiz mumkin.",
+        "en": (
+            "🚀 Starting prescreening for *{title}*.\n\n"
+            "Please answer each question thoughtfully. "
+            "You can reply with text or a voice message."
+        ),
+        "ru": (
+            "🚀 Начинаем прескрининг на вакансию *{title}*.\n\n"
+            "Отвечайте обдуманно. Можно отвечать текстом или голосовым сообщением."
+        ),
+        "uz": (
+            "🚀 *{title}* vakansiyasi uchun preskreeningni boshlayapmiz.\n\n"
+            "Har bir savolga o'ylab javob bering. "
+            "Matn yoki ovozli xabar bilan javob berishingiz mumkin."
+        ),
     },
     "candidate.ps_question": {
         "en": "❓ *Question {n} of {total}*\n\n{text}",
@@ -134,8 +154,7 @@ _STRINGS_EXT: dict[str, dict[str, str]] = {
             "The HR team will review your prescreening results and get back to you."
         ),
         "ru": (
-            "✅ *Спасибо!* Ваши ответы отправлены.\n\n"
-            "HR-команда рассмотрит результаты прескрининга и свяжется с вами."
+            "✅ *Спасибо!* Ваши ответы отправлены.\n\nHR-команда рассмотрит результаты прескрининга и свяжется с вами."
         ),
         "uz": (
             "✅ *Rahmat!* Javoblaringiz yuborildi.\n\n"

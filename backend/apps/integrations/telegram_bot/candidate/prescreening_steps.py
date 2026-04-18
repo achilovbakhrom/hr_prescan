@@ -2,6 +2,7 @@
 
 Called only from prescreening.py — not part of the public bot API.
 """
+
 from __future__ import annotations
 
 import logging
@@ -41,9 +42,15 @@ def handle_vacancy_code(*, client, chat_id: int, user, text: str, lang: str) -> 
         client.send_message(chat_id=chat_id, text=t("candidate.ps_code_invalid", lang=lang))
         return
 
-    vacancy = Vacancy.objects.filter(
-        telegram_code=int(text), is_deleted=False, status=Vacancy.Status.PUBLISHED,
-    ).select_related("company").first()
+    vacancy = (
+        Vacancy.objects.filter(
+            telegram_code=int(text),
+            is_deleted=False,
+            status=Vacancy.Status.PUBLISHED,
+        )
+        .select_related("company")
+        .first()
+    )
 
     if not vacancy:
         client.send_message(chat_id=chat_id, text=t("candidate.ps_code_not_found", lang=lang, code=text))
@@ -51,14 +58,14 @@ def handle_vacancy_code(*, client, chat_id: int, user, text: str, lang: str) -> 
 
     name = user.full_name or ""
     update_session(
-        role=ROLE_CANDIDATE, telegram_id=user.telegram_id,
+        role=ROLE_CANDIDATE,
+        telegram_id=user.telegram_id,
         state=STATE_PS_CONFIRM_NAME,
         **{SK_VACANCY_ID: str(vacancy.id), SK_NAME: name},
     )
     client.send_message(
         chat_id=chat_id,
-        text=t("candidate.ps_confirm_name", lang=lang,
-               title=vacancy.title, company=vacancy.company.name, name=name),
+        text=t("candidate.ps_confirm_name", lang=lang, title=vacancy.title, company=vacancy.company.name, name=name),
         reply_markup=confirm_name_keyboard(lang=lang),
         parse_mode="Markdown",
     )
@@ -70,8 +77,9 @@ def handle_new_name(*, client, chat_id: int, user, text: str, session: dict, lan
         client.send_message(chat_id=chat_id, text=t("candidate.reg_invalid_name", lang=lang))
         return
     update_session(role=ROLE_CANDIDATE, telegram_id=user.telegram_id, **{SK_NAME: text.strip()})
-    go_to_confirm_phone(client=client, chat_id=chat_id, user=user,
-                        session={**session, SK_NAME: text.strip()}, lang=lang)
+    go_to_confirm_phone(
+        client=client, chat_id=chat_id, user=user, session={**session, SK_NAME: text.strip()}, lang=lang
+    )
 
 
 def handle_new_phone(*, client, chat_id: int, user, text: str, session: dict, lang: str) -> None:
@@ -79,15 +87,16 @@ def handle_new_phone(*, client, chat_id: int, user, text: str, session: dict, la
         client.send_message(chat_id=chat_id, text=t("candidate.reg_invalid_phone", lang=lang))
         return
     update_session(role=ROLE_CANDIDATE, telegram_id=user.telegram_id, **{SK_PHONE: text.strip()})
-    go_to_cv_step(client=client, chat_id=chat_id, user=user,
-                  session={**session, SK_PHONE: text.strip()}, lang=lang)
+    go_to_cv_step(client=client, chat_id=chat_id, user=user, session={**session, SK_PHONE: text.strip()}, lang=lang)
 
 
 def go_to_confirm_phone(*, client, chat_id: int, user, session: dict, lang: str) -> None:
     phone = user.phone or ""
     update_session(
-        role=ROLE_CANDIDATE, telegram_id=user.telegram_id,
-        state=STATE_PS_CONFIRM_PHONE, **{SK_PHONE: phone},
+        role=ROLE_CANDIDATE,
+        telegram_id=user.telegram_id,
+        state=STATE_PS_CONFIRM_PHONE,
+        **{SK_PHONE: phone},
     )
     client.send_message(
         chat_id=chat_id,
@@ -99,14 +108,17 @@ def go_to_confirm_phone(*, client, chat_id: int, user, session: dict, lang: str)
 
 def go_to_cv_step(*, client, chat_id: int, user, session: dict, lang: str) -> None:
     from apps.vacancies.models import Vacancy
+
     vacancy = Vacancy.objects.filter(id=session.get(SK_VACANCY_ID)).first()
     update_session(role=ROLE_CANDIDATE, telegram_id=user.telegram_id, state=STATE_PS_CV)
     if vacancy and vacancy.cv_required:
         client.send_message(chat_id=chat_id, text=t("candidate.ps_cv_required", lang=lang))
     else:
         client.send_message(
-            chat_id=chat_id, text=t("candidate.ps_cv_optional", lang=lang),
-            reply_markup=cv_keyboard(lang=lang), parse_mode="Markdown",
+            chat_id=chat_id,
+            text=t("candidate.ps_cv_optional", lang=lang),
+            reply_markup=cv_keyboard(lang=lang),
+            parse_mode="Markdown",
         )
 
 
@@ -138,8 +150,12 @@ def start_interview_submission(*, client, chat_id: int, user, session: dict, lan
 
     questions = list(
         InterviewQuestion.objects.filter(
-            vacancy_id=vacancy_id, step="prescanning", is_active=True,
-        ).order_by("order").values_list("text", flat=True)
+            vacancy_id=vacancy_id,
+            step="prescanning",
+            is_active=True,
+        )
+        .order_by("order")
+        .values_list("text", flat=True)
     )
     if not questions:
         client.send_message(chat_id=chat_id, text=t("candidate.ps_no_questions", lang=lang))
@@ -149,7 +165,9 @@ def start_interview_submission(*, client, chat_id: int, user, session: dict, lan
     vacancy = Vacancy.objects.filter(id=vacancy_id).first()
     update_session(role=ROLE_CANDIDATE, telegram_id=user.telegram_id, **{SK_VACANCY_ID: str(vacancy_id)})
     start_bot_interview(
-        client=client, chat_id=chat_id, user=user,
+        client=client,
+        chat_id=chat_id,
+        user=user,
         interview=result["prescan_session"],
         questions=questions,
         vacancy_title=vacancy.title if vacancy else "",

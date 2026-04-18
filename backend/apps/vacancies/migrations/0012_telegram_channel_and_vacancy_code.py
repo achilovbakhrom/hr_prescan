@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('vacancies', '0011_add_translations_to_criteria_questions'),
+        ("vacancies", "0011_add_translations_to_criteria_questions"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='vacancy',
-            name='telegram_code',
+            model_name="vacancy",
+            name="telegram_code",
             field=models.PositiveIntegerField(blank=True, null=True, unique=True),
         ),
     ]
