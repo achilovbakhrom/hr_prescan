@@ -36,6 +36,7 @@ export interface Vacancy {
   candidatesRejected: number
   candidatesHired: number
   keywords: string[]
+  telegramCode: number | null
   createdByEmail: string
   createdAt: string
   updatedAt: string

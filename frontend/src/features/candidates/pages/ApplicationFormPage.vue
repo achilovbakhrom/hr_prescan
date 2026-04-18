@@ -143,6 +143,7 @@ async function copyLink(): Promise<void> {
         v-else-if="step === 'ready'"
         :prescan-url="prescanUrl"
         :link-copied="linkCopied"
+        :telegram-code="vacancy?.telegramCode ?? null"
         @start-prescanning="startPrescanning"
         @copy-link="copyLink"
       />
