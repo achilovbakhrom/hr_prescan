@@ -194,6 +194,7 @@ class PublicVacancyDetailOutputSerializer(serializers.ModelSerializer):
             "cv_required",
             "deadline",
             "interview_duration",
+            "telegram_code",
             "created_at",
         ]
         read_only_fields = fields

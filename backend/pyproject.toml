@@ -39,6 +39,7 @@ known-first-party = ["apps", "config", "integrations"]
 "**/migrations/*.py" = ["E501", "DJ001", "RUF001", "RUF003", "RUF022"]
 # i18n / AI prompt files have long translated strings and legit non-ASCII.
 "**/i18n.py" = ["RUF001", "E501"]
+"**/i18n_ext.py" = ["RUF001", "E501"]
 "**/prompts.py" = ["E501", "RUF001"]
 "**/tool_definitions.py" = ["E501", "RUF001"]
 "**/settings/**/*.py" = ["F401", "F403"]

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 
@@ -14,9 +15,19 @@ const emit = defineEmits<{
   minimize: []
   restore: []
   dismiss: []
+  completed: []
 }>()
 
 const { t } = useI18n()
+
+function onMessage(event: MessageEvent): void {
+  if (event.data?.type === 'prescan_completed') {
+    emit('completed')
+  }
+}
+
+onMounted(() => window.addEventListener('message', onMessage))
+onUnmounted(() => window.removeEventListener('message', onMessage))
 </script>
 
 <template>

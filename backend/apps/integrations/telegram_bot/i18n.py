@@ -12,6 +12,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from apps.integrations.telegram_bot.i18n_ext import _STRINGS_EXT
+
 SUPPORTED_LANGUAGES = ("en", "ru", "uz")
 DEFAULT_LANGUAGE = "en"
 
@@ -123,6 +125,7 @@ _STRINGS: dict[str, dict[str, str]] = {
         "ru": "◀ Назад",
         "uz": "◀ Orqaga",
     },
+    **_STRINGS_EXT,
 }
 
 

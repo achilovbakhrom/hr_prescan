@@ -105,6 +105,7 @@ class Vacancy(BaseModel):
     is_deleted = models.BooleanField(default=False)
     keywords = models.JSONField(default=list, blank=True)  # AI-generated search keywords
     search_vector = SearchVectorField(null=True, blank=True)
+    telegram_code = models.PositiveIntegerField(unique=True, null=True, blank=True)
 
     class Meta:
         app_label = "vacancies"
@@ -113,6 +114,23 @@ class Vacancy(BaseModel):
         indexes = [
             GinIndex(fields=["search_vector"], name="vacancy_search_vector_gin"),
         ]
+
+    def save(self, *args, **kwargs):
+        if self.pk is None and self.telegram_code is None:
+            self.telegram_code = self._generate_telegram_code()
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def _generate_telegram_code(cls) -> int:
+        import secrets
+
+        existing = set(cls.objects.values_list("telegram_code", flat=True))
+        while True:
+            # 6-digit code, uniformly sampled; unguessability matters since the
+            # code is the sole proof-of-access for the Telegram prescreen flow.
+            code = 100_000 + secrets.randbelow(900_000)
+            if code not in existing:
+                return code
 
     def __str__(self) -> str:
         return f"{self.title} ({self.company.name})"
