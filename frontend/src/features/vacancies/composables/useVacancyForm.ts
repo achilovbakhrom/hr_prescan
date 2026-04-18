@@ -1,5 +1,6 @@
 import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import type { FieldErrors } from '@/shared/api/errors'
+import { getLocale } from '@/shared/i18n'
 import { employerService } from '@/features/employers/services/employer.service'
 import type { EmployerCompany } from '@/features/employers/types/employer.types'
 import type {
@@ -32,7 +33,7 @@ export function useVacancyForm(
   const visibility = ref<VacancyVisibility>(initialData()?.visibility ?? 'public')
   const cvRequired = ref(initialData()?.cvRequired ?? false)
   const prescanningPrompt = ref(initialData()?.prescanningPrompt ?? '')
-  const prescanningLanguage = ref(initialData()?.prescanningLanguage ?? 'en')
+  const prescanningLanguage = ref(initialData()?.prescanningLanguage ?? getLocale())
   const interviewEnabled = ref(initialData()?.interviewEnabled ?? false)
   const interviewMode = ref<InterviewMode>(initialData()?.interviewMode ?? 'chat')
   const interviewDuration = ref(initialData()?.interviewDuration ?? 30)

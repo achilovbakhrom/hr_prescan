@@ -31,6 +31,10 @@ def create_vacancy(
     **kwargs: object,
 ) -> Vacancy:
     """Create a vacancy with default evaluation criteria."""
+    # Default prescanning_language to the creator's current UI language
+    # unless the caller explicitly provided one.
+    if "prescanning_language" not in kwargs and getattr(created_by, "language", None):
+        kwargs["prescanning_language"] = created_by.language
     vacancy = Vacancy.objects.create(
         company=company,
         created_by=created_by,

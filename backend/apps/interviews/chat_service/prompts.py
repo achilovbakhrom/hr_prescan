@@ -8,11 +8,27 @@ from apps.interviews.chat_service._constants import (
 from apps.interviews.models import Interview
 
 
+def _effective_language(interview: Interview) -> str:
+    """Pick the language to respond in.
+
+    Priority:
+      1. Authenticated candidate's current `user.language` (follows UI locale
+         changes mid-chat).
+      2. Interview.language (set once at creation from vacancy.prescanning_language
+         — used for anonymous candidates).
+    """
+    candidate = interview.application.candidate if interview.application_id else None
+    if candidate and getattr(candidate, "language", ""):
+        return candidate.language
+    return interview.language or "en"
+
+
 def build_system_prompt(interview: Interview) -> str:
     """Build the system prompt for the AI agent, differentiated by session type."""
     application = interview.application
     vacancy = application.vacancy
     step = interview.session_type  # "prescanning" or "interview"
+    effective_lang = _effective_language(interview)
 
     # Filter competencies and criteria by step
     competencies = list(
@@ -77,7 +93,7 @@ When you have enough information to make a decision:
 - The marker must be the last thing in your message
 
 ## Language
-You MUST respond ONLY in {_language_name(interview.language)}. All your messages must be in {_language_name(interview.language)}.
+You MUST respond ONLY in {_language_name(effective_lang)}. All your messages must be in {_language_name(effective_lang)}.
 
 ## Style
 - Keep messages under 100 words
