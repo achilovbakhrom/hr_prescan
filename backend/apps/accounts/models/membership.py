@@ -44,13 +44,18 @@ def _default_invitation_expiry() -> timezone.datetime:
 
 
 class Invitation(models.Model):
-    """HR invitation to join a company."""
+    """HR invitation to join an account, scoped to one or more of the account's companies."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    company = models.ForeignKey(
-        "accounts.Company",
+    account_owner = models.ForeignKey(
+        User,
         on_delete=models.CASCADE,
+        related_name="received_account_invitations",
+    )
+    companies = models.ManyToManyField(
+        "accounts.Company",
         related_name="invitations",
+        blank=True,
     )
     email = models.EmailField()
     invited_by = models.ForeignKey(
@@ -71,14 +76,14 @@ class Invitation(models.Model):
         ordering = ["-created_at"]
         constraints = [
             models.UniqueConstraint(
-                fields=["company", "email"],
+                fields=["account_owner", "email"],
                 condition=models.Q(is_accepted=False),
-                name="unique_pending_invitation_per_company",
+                name="unique_pending_invitation_per_account",
             ),
         ]
 
     def __str__(self) -> str:
-        return f"Invitation for {self.email} to {self.company.name}"
+        return f"Invitation for {self.email} to {self.account_owner.email}'s account"
 
     @property
     def is_expired(self) -> bool:

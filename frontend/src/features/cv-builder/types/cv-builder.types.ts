@@ -159,16 +159,6 @@ export interface CertificationPayload {
   credentialUrl: string
 }
 
-export interface CvChatMessage {
-  role: 'user' | 'assistant'
-  content: string
-}
-
-export interface CvChatResponse {
-  status: 'continue' | 'ready'
-  message: string
-}
-
 export interface PublicCvProfile {
   firstName: string
   lastName: string

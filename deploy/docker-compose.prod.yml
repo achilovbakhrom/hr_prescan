@@ -65,6 +65,10 @@ services:
       - TELEGRAM_BOT_USERNAME=${TELEGRAM_BOT_USERNAME}
       - TELEGRAM_WEBHOOK_SECRET=${TELEGRAM_WEBHOOK_SECRET}
       - TELEGRAM_WEBHOOK_URL=${TELEGRAM_WEBHOOK_URL}
+      - TELEGRAM_CANDIDATE_BOT_TOKEN=${TELEGRAM_CANDIDATE_BOT_TOKEN}
+      - TELEGRAM_CANDIDATE_BOT_USERNAME=${TELEGRAM_CANDIDATE_BOT_USERNAME}
+      - TELEGRAM_CANDIDATE_WEBHOOK_SECRET=${TELEGRAM_CANDIDATE_WEBHOOK_SECRET}
+      - TELEGRAM_CANDIDATE_WEBHOOK_URL=${TELEGRAM_CANDIDATE_WEBHOOK_URL}
       # E2E test hooks — only enable on dev. Exposes /auth/debug/* endpoints
       # used by the Playwright suite to bypass real OAuth. Must be "false" in prod.
       - ALLOW_E2E_HOOKS=${ALLOW_E2E_HOOKS:-false}
@@ -72,6 +76,9 @@ services:
       # whose email ends in one of these domains is dropped silently. Used on
       # dev to block test-account spam. Leave empty in prod.
       - EMAIL_SUPPRESS_DOMAINS=${EMAIL_SUPPRESS_DOMAINS:-}
+      - GEOIP2_DB_PATH=/app/data/dbip-country-lite.mmdb
+    volumes:
+      - geoip_data:/app/data
     restart: unless-stopped
     deploy:
       resources:
@@ -176,6 +183,9 @@ services:
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - TELEGRAM_BOT_USERNAME=${TELEGRAM_BOT_USERNAME}
       - TELEGRAM_WEBHOOK_SECRET=${TELEGRAM_WEBHOOK_SECRET}
+      - TELEGRAM_CANDIDATE_BOT_TOKEN=${TELEGRAM_CANDIDATE_BOT_TOKEN}
+      - TELEGRAM_CANDIDATE_BOT_USERNAME=${TELEGRAM_CANDIDATE_BOT_USERNAME}
+      - TELEGRAM_CANDIDATE_WEBHOOK_SECRET=${TELEGRAM_CANDIDATE_WEBHOOK_SECRET}
     restart: unless-stopped
     deploy:
       resources:
@@ -275,6 +285,7 @@ volumes:
   rabbitmq_data:
   minio_data:
   certbot_webroot:
+  geoip_data:
 
 networks:
   frontend-net:

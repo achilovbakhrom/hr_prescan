@@ -54,6 +54,17 @@ class User(AbstractBaseUser, PermissionsMixin):
         related_name="users",
     )
 
+    # Account owner: the user whose subscription and companies this user shares.
+    # NULL means "I am my own account owner" (self-owned). For invited HR members,
+    # this points to the owner whose Companies they were invited into.
+    account_owner = models.ForeignKey(
+        "self",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="account_members",
+    )
+
     class SubscriptionStatus(models.TextChoices):
         TRIAL = "trial", "Trial"
         ACTIVE = "active", "Active"
@@ -90,7 +101,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     telegram_username = models.CharField(max_length=255, blank=True, default="")
 
     # UI language — source of truth for AI assistants and default vacancy language.
-    # Kept in sync with the frontend locale via PATCH /api/auth/me/.
+    # Kept in sync with the frontend locale via PATCH /api/auth/me/, and seeded
+    # on first visit from IP-based GeoIP detection for anonymous users.
     class Language(models.TextChoices):
         EN = "en", "English"
         RU = "ru", "Russian"
@@ -120,3 +132,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def full_name(self) -> str:
         return f"{self.first_name} {self.last_name}".strip()
+
+    @property
+    def effective_account_owner(self) -> User:
+        """The user whose subscription and companies this user operates under."""
+        return self.account_owner or self

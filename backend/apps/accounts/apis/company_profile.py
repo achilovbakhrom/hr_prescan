@@ -4,9 +4,9 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.accounts.models import CompanyMembership
+from apps.accounts.models import Company, CompanyMembership
 from apps.accounts.permissions import HasHRPermission, HRPermissions
-from apps.accounts.selectors import get_company_invitations
+from apps.accounts.selectors import get_account_invitations
 from apps.accounts.serializers import (
     AcceptInvitationInputSerializer,
     CompanyOutputSerializer,
@@ -20,7 +20,7 @@ from apps.common.messages import MSG_INVITATION_ACCEPTED, MSG_INVITATION_SENT
 
 
 class InviteHRApi(APIView):
-    """POST /api/hr/company/invite/ — invite an HR manager to the user's active company."""
+    """POST /api/hr/company/invite/ — invite an HR manager to the inviter's account."""
 
     permission_classes = [HasHRPermission]
     hr_permission = HRPermissions.MANAGE_TEAM
@@ -28,12 +28,14 @@ class InviteHRApi(APIView):
     def post(self, request: Request) -> Response:
         serializer = InviteHRInputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        company_ids = serializer.validated_data.get("company_ids") or []
+        companies = list(Company.objects.filter(id__in=company_ids)) if company_ids else []
 
         try:
             invitation = invite_hr(
-                company=request.user.company,
-                email=serializer.validated_data["email"],
                 invited_by=request.user,
+                email=serializer.validated_data["email"],
+                companies=companies or None,
                 permissions=serializer.validated_data.get("permissions", []),
             )
         except ApplicationError as e:
@@ -59,7 +61,7 @@ class InviteHRApi(APIView):
         try:
             invitation = Invitation.objects.get(
                 id=invitation_id,
-                company=request.user.company,
+                account_owner=request.user.effective_account_owner,
                 is_accepted=False,
             )
         except Invitation.DoesNotExist:
@@ -71,7 +73,7 @@ class InviteHRApi(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def get(self, request: Request) -> Response:
-        invitations = get_company_invitations(company=request.user.company)
+        invitations = get_account_invitations(account_owner=request.user.effective_account_owner)
         return Response(
             InvitationOutputSerializer(invitations, many=True).data,
             status=status.HTTP_200_OK,

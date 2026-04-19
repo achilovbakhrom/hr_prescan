@@ -3,7 +3,11 @@ import type { Invitation, InviteHRRequest, TeamMember } from '../types/settings.
 
 export const settingsService = {
   async inviteHR(data: InviteHRRequest): Promise<Invitation> {
-    const response = await apiClient.post<{ invitation: Invitation }>('/hr/company/invite', data)
+    const response = await apiClient.post<{ invitation: Invitation }>('/hr/company/invite', {
+      email: data.email,
+      permissions: data.permissions,
+      company_ids: data.companyIds ?? [],
+    })
     return response.data.invitation
   },
 

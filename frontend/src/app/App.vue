@@ -1,45 +1,25 @@
 <script setup lang="ts">
-import { watch } from 'vue'
 import { RouterView } from 'vue-router'
-import { useI18n } from 'vue-i18n'
 import CookieConsent from '@/shared/components/CookieConsent.vue'
 import AIAssistantDrawer from '@/shared/components/AIAssistantDrawer.vue'
-import { useAuthStore } from '@/features/auth/stores/auth.store'
-import { authService } from '@/features/auth/services/auth.service'
-import { setLocale } from '@/shared/i18n'
+import AnimatedBackground from '@/shared/components/AnimatedBackground.vue'
+import { useThemeStore } from '@/shared/stores/theme.store'
 
-const { locale } = useI18n()
-const authStore = useAuthStore()
+// Initialise theme store early so the `.dark` class is applied before any
+// route renders (watcher with `immediate: true` handles first paint).
+useThemeStore()
 
-// Keep the authenticated user's persisted language in sync with the UI locale
-// so backend AI assistants (prescreen chat, question generation) follow the
-// user's current language choice — even if they switch mid-session.
-watch(locale, (next) => {
-  const code = next as 'en' | 'ru' | 'uz'
-  if (!authStore.isAuthenticated) return
-  if (authStore.user?.language === code) return
-  authService
-    .updateMe({ language: code })
-    .then((u) => {
-      authStore.user = u
-    })
-    .catch(() => {
-      /* non-critical; retried on next /me refresh */
-    })
-})
-
-// On login (or /me refresh) pull the UI locale from the persisted user.language.
-watch(
-  () => authStore.user?.language,
-  (next) => {
-    if (next && next !== locale.value) setLocale(next)
-  },
-  { immediate: true },
-)
+// Locale ↔ user.language sync is owned by `useLocale.switchLocale` (write path)
+// and `auth.store.syncPreferredLanguage` (read path, called from setAuth /
+// fetchUser). Keeping them single-sourced avoids duplicate PATCH /auth/me/
+// calls that were tripping nginx's auth rate limit.
 </script>
 
 <template>
-  <RouterView />
+  <AnimatedBackground />
+  <div class="relative z-10">
+    <RouterView />
+  </div>
   <CookieConsent />
   <AIAssistantDrawer />
 </template>

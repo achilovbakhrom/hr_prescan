@@ -65,6 +65,9 @@ python-telegram-bot>=21.0,<23.0
 # Env file loading
 python-dotenv>=1.0,<2.0
 
+# IP geolocation (MaxMind GeoLite2) for server-side language detection
+geoip2>=4.8,<6.0
+
 # Dev tools
 ruff==0.15.10  # pin exact — formatter output changes between minors; CI must match local
 mypy>=1.10

@@ -41,6 +41,9 @@ except ClientError as exc:
         raise
 PY
 
+echo "Refreshing GeoIP DB (no-op if up to date or license key missing)..."
+python manage.py download_geoip || echo "[WARN] download_geoip failed — continuing without GeoIP"
+
 echo "Applying migrations..."
 python manage.py migrate --noinput
 

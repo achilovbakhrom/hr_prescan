@@ -16,6 +16,7 @@ TRIAL_DURATION_DAYS = 14
 
 def _create_company(
     *,
+    account_owner: User,
     name: str,
     industries: list[str] | None = None,
     custom_industry: str = "",
@@ -28,6 +29,7 @@ def _create_company(
     from apps.common.models import Industry
 
     company = Company.objects.create(
+        account_owner=account_owner,
         name=name,
         size=size,
         country=country,
@@ -93,7 +95,16 @@ def create_company_with_admin(
     description: str | None = None,
 ) -> tuple[Company, User]:
     """Create a company and its admin user in one transaction, starting a 14-day user trial."""
+    user = create_user(
+        email=admin_email,
+        password=admin_password,
+        first_name=admin_first_name,
+        last_name=admin_last_name,
+        role=User.Role.ADMIN,
+    )
+
     company = _create_company(
+        account_owner=user,
         name=company_name,
         industries=industries,
         size=size,
@@ -101,15 +112,8 @@ def create_company_with_admin(
         website=website,
         description=description,
     )
-
-    user = create_user(
-        email=admin_email,
-        password=admin_password,
-        first_name=admin_first_name,
-        last_name=admin_last_name,
-        role=User.Role.ADMIN,
-        company=company,
-    )
+    user.company = company
+    user.save(update_fields=["company", "updated_at"])
 
     _grant_trial_to_user(user)
 
@@ -142,6 +146,7 @@ def complete_company_setup(
         user.email = email
 
     company = _create_company(
+        account_owner=user,
         name=company_name,
         industries=industries,
         size=size,

@@ -9,6 +9,11 @@ from apps.common.candidate_ai_assistant.handlers_application import (
     _handle_get_application_details,
     _handle_list_my_applications,
 )
+from apps.common.candidate_ai_assistant.handlers_cv import (
+    _handle_build_my_cv,
+    _handle_generate_cv_pdf,
+    _handle_get_my_cv_status,
+)
 from apps.common.candidate_ai_assistant.handlers_interview import (
     _handle_prepare_for_interview,
 )
@@ -40,6 +45,9 @@ CANDIDATE_TOOL_MAP = {
     "get_application_details": _handle_get_application_details,
     "improve_cv_section": _handle_improve_cv_section,
     "suggest_skills": _handle_suggest_skills,
+    "get_my_cv_status": _handle_get_my_cv_status,
+    "build_my_cv": _handle_build_my_cv,
+    "generate_cv_pdf": _handle_generate_cv_pdf,
     "prepare_for_interview": _handle_prepare_for_interview,
     "navigate_to_page": _handle_candidate_navigate_to_page,
     "clear_chat_history": _handle_candidate_clear_chat_history,

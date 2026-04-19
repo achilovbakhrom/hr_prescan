@@ -12,11 +12,20 @@ const authStore = useAuthStore()
 
 const activeCompanyId = computed(() => authStore.user?.company?.id ?? 'personal')
 
+// Show the account owner as a prefix only when the current user isn't the owner —
+// i.e., they're an invited member operating under someone else's account.
+const accountPrefix = computed(() =>
+  authStore.user?.isAccountOwner === false && authStore.user.accountOwnerName
+    ? `${authStore.user.accountOwnerName} · `
+    : '',
+)
+
 const companyOptions = computed(() => {
   const options: { label: string; value: string }[] = []
   if (authStore.companies.length > 0)
     options.push({ label: t('common.personal'), value: 'personal' })
-  for (const m of authStore.companies) options.push({ label: m.company.name, value: m.company.id })
+  for (const m of authStore.companies)
+    options.push({ label: `${accountPrefix.value}${m.company.name}`, value: m.company.id })
   return options
 })
 

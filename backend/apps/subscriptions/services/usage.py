@@ -7,8 +7,9 @@ from apps.vacancies.models import Vacancy
 
 
 def _live_company_ids(user: User) -> list:
-    """Company IDs the user belongs to, excluding soft-deleted ones."""
-    return list(user.memberships.filter(company__is_deleted=False).values_list("company_id", flat=True))
+    """Live company IDs on the user's account (resolved via account owner)."""
+    owner = user.effective_account_owner
+    return list(owner.owned_companies.filter(is_deleted=False).values_list("id", flat=True))
 
 
 def check_vacancy_quota(*, user: User) -> bool:
@@ -112,8 +113,9 @@ def get_subscription_usage(*, user: User) -> dict:
         .count()
     )
 
-    is_trial = user.subscription_status == User.SubscriptionStatus.TRIAL
-    trial_ends_at = user.trial_ends_at.isoformat() if user.trial_ends_at else None
+    owner = user.effective_account_owner
+    is_trial = owner.subscription_status == User.SubscriptionStatus.TRIAL
+    trial_ends_at = owner.trial_ends_at.isoformat() if owner.trial_ends_at else None
 
     return {
         "has_subscription": True,

@@ -26,8 +26,6 @@ from apps.accounts.apis.candidate_cv import (
     CvGeneratePdfApi,
 )
 from apps.accounts.apis.candidate_cv_ai import (
-    CvAiChatApi,
-    CvAiGenerateApi,
     CvImproveSectionApi,
     CvParseApi,
 )
@@ -86,8 +84,6 @@ __all__ = [
     "CheckInvitationApi",
     "CompleteCompanySetupApi",
     "CompleteOnboardingApi",
-    "CvAiChatApi",
-    "CvAiGenerateApi",
     "CvGeneratePdfApi",
     "CvImproveSectionApi",
     "CvParseApi",

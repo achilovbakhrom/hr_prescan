@@ -17,11 +17,12 @@ import LanguagesForm from '../components/LanguagesForm.vue'
 import CertificationsForm from '../components/CertificationsForm.vue'
 import CvUploadParser from '../components/CvUploadParser.vue'
 import CvTemplateSelector from '../components/CvTemplateSelector.vue'
-import AiCvGenerator from '../components/AiCvGenerator.vue'
 import { useCvBuilderStore } from '../stores/cv-builder.store'
+import { useAIAssistant } from '@/shared/composables/useAIAssistant'
 
 const { t } = useI18n()
 const store = useCvBuilderStore()
+const aiAssistant = useAIAssistant()
 const activeTab = ref('0')
 const personalFormRef = ref<InstanceType<typeof PersonalInfoForm> | null>(null)
 
@@ -48,7 +49,13 @@ function handleSave(): void {
       </h1>
       <div v-if="store.profile" class="flex flex-wrap items-center gap-2">
         <CvUploadParser />
-        <AiCvGenerator />
+        <Button
+          :label="t('cvBuilder.askAssistant')"
+          icon="pi pi-sparkles"
+          severity="secondary"
+          size="small"
+          @click="aiAssistant.open()"
+        />
         <span class="hidden h-6 w-px bg-gray-200 sm:inline-block"></span>
         <CvTemplateSelector />
         <Button

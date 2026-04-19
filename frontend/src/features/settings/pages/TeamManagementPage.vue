@@ -20,13 +20,17 @@ onMounted(async () => {
   await Promise.all([settingsStore.fetchTeam(), settingsStore.fetchInvitations()])
 })
 
-async function handleInvite(email: string, permissions: HRPermission[]): Promise<void> {
+async function handleInvite(payload: {
+  email: string
+  permissions: HRPermission[]
+  companyIds: string[]
+}): Promise<void> {
   successMessage.value = null
   errorMessage.value = null
   try {
-    await settingsStore.inviteHR({ email, permissions })
+    await settingsStore.inviteHR(payload)
     showInviteDialog.value = false
-    successMessage.value = `Invitation sent to ${email}.`
+    successMessage.value = `Invitation sent to ${payload.email}.`
   } catch (err: unknown) {
     errorMessage.value =
       err instanceof Error ? err.message : 'Failed to send invitation. Please try again.'

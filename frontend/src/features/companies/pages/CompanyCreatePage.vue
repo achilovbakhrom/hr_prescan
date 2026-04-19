@@ -6,6 +6,8 @@ import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
 import Select from 'primevue/select'
 import Button from 'primevue/button'
+import CountryAutocomplete from '@/shared/components/CountryAutocomplete.vue'
+import IndustryAutocomplete from '@/shared/components/IndustryAutocomplete.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import { useCompanyStore } from '../stores/company.store'
 import type { Company } from '../types/company.types'
@@ -15,12 +17,13 @@ const router = useRouter()
 const companyStore = useCompanyStore()
 
 const name = ref('')
-const customIndustry = ref('')
+const industries = ref<string[]>([])
 const country = ref('')
 const website = ref('')
 const description = ref('')
 const size = ref<Company['size']>('small')
 const saving = ref(false)
+const submitted = ref(false)
 
 const sizeOptions: { label: string; value: Company['size'] }[] = [
   { label: t('companies.sizeSmall'), value: 'small' },
@@ -29,15 +32,25 @@ const sizeOptions: { label: string; value: Company['size'] }[] = [
   { label: t('companies.sizeEnterprise'), value: 'enterprise' },
 ]
 
+const errors = ref({ name: false, country: false, industries: false })
+
+function validate(): boolean {
+  errors.value.name = !name.value.trim()
+  errors.value.country = !country.value.trim()
+  errors.value.industries = industries.value.length === 0
+  return !Object.values(errors.value).some(Boolean)
+}
+
 async function handleSave(): Promise<void> {
-  if (!name.value || !country.value) return
+  submitted.value = true
+  if (!validate()) return
   saving.value = true
   try {
     const company = await companyStore.createCompany({
       name: name.value,
       size: size.value,
       country: country.value,
-      customIndustry: customIndustry.value || undefined,
+      industries: industries.value,
       website: website.value || undefined,
       description: description.value || undefined,
     })
@@ -70,17 +83,22 @@ async function handleSave(): Promise<void> {
     </div>
 
     <div class="mb-4">
-      <label class="mb-1 block text-sm font-medium"
-        >{{ t('companies.name') }} <span class="text-red-500">*</span></label
-      >
-      <InputText v-model="name" class="w-full" :placeholder="t('companies.namePlaceholder')" />
+      <label class="mb-1 block text-sm font-medium">
+        {{ t('companies.name') }} <span class="text-red-500">*</span>
+      </label>
+      <InputText
+        v-model="name"
+        class="w-full"
+        :placeholder="t('companies.namePlaceholder')"
+        :invalid="submitted && errors.name"
+      />
     </div>
 
     <div class="mb-4">
-      <label class="mb-1 block text-sm font-medium"
-        >{{ t('companies.country') }} <span class="text-red-500">*</span></label
-      >
-      <InputText v-model="country" class="w-full" />
+      <label class="mb-1 block text-sm font-medium">
+        {{ t('companies.country') }} <span class="text-red-500">*</span>
+      </label>
+      <CountryAutocomplete v-model="country" :invalid="submitted && errors.country" />
     </div>
 
     <div class="mb-4">
@@ -95,8 +113,10 @@ async function handleSave(): Promise<void> {
     </div>
 
     <div class="mb-4">
-      <label class="mb-1 block text-sm font-medium">{{ t('companies.industry') }}</label>
-      <InputText v-model="customIndustry" class="w-full" />
+      <label class="mb-1 block text-sm font-medium">
+        {{ t('companies.industry') }} <span class="text-red-500">*</span>
+      </label>
+      <IndustryAutocomplete v-model="industries" :invalid="submitted && errors.industries" />
     </div>
 
     <div class="mb-4">
@@ -114,7 +134,6 @@ async function handleSave(): Promise<void> {
         :label="t('common.save')"
         icon="pi pi-check"
         :loading="saving"
-        :disabled="!name || !country"
         @click="handleSave"
       />
     </div>

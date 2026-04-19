@@ -9,7 +9,8 @@ import { ROUTE_NAMES } from '@/shared/constants/routes'
 
 defineProps<{
   invitationEmail: string
-  companyName: string
+  accountOwnerName: string
+  companyNames: string[]
   errorMessage: string | null
   loading: boolean
 }>()
@@ -48,7 +49,10 @@ function handleSubmit(): void {
       {{ t('auth.acceptInvitation.title') }}
     </h1>
     <p class="mb-6 text-center text-sm text-gray-600">
-      Join <strong>{{ companyName }}</strong> as an HR team member.
+      Join <strong>{{ accountOwnerName }}</strong> as an HR team member<template
+        v-if="companyNames.length"
+      >
+        with access to <strong>{{ companyNames.join(', ') }}</strong></template>.
     </p>
 
     <Message v-if="errorMessage" severity="error" class="mb-4">{{ errorMessage }}</Message>

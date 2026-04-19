@@ -13,6 +13,13 @@ class Company(models.Model):
         ENTERPRISE = "enterprise", "Enterprise (1000+)"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # The account (owner user) this company belongs to. All companies are scoped
+    # to a single account; membership to a company grants access within that account.
+    account_owner = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.CASCADE,
+        related_name="owned_companies",
+    )
     name = models.CharField(max_length=255)
     industries = models.ManyToManyField(
         "common.Industry",

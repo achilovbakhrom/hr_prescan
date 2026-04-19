@@ -16,8 +16,6 @@ from apps.accounts.apis import (
     CheckInvitationApi,
     CompleteCompanySetupApi,
     CompleteOnboardingApi,
-    CvAiChatApi,
-    CvAiGenerateApi,
     CvGeneratePdfApi,
     CvImproveSectionApi,
     CvParseApi,
@@ -107,8 +105,6 @@ candidate_profile_urlpatterns = [
     path("cv/generate-pdf/", CvGeneratePdfApi.as_view(), name="cv-generate-pdf"),
     path("cv/parse/", CvParseApi.as_view(), name="cv-parse"),
     path("cv/improve-section/", CvImproveSectionApi.as_view(), name="cv-improve-section"),
-    path("cv/ai-chat/", CvAiChatApi.as_view(), name="cv-ai-chat"),
-    path("cv/ai-generate/", CvAiGenerateApi.as_view(), name="cv-ai-generate"),
 ]
 
 # Keep backward compatibility — urlpatterns used by existing include("apps.accounts.urls")

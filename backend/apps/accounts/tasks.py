@@ -46,20 +46,27 @@ def send_invitation_email(invitation_id: str) -> None:
     from apps.common.email import send_templated_email
 
     try:
-        invitation = Invitation.objects.select_related("company", "invited_by").get(id=invitation_id)
+        invitation = (
+            Invitation.objects.select_related("account_owner", "invited_by")
+            .prefetch_related("companies")
+            .get(id=invitation_id)
+        )
     except Invitation.DoesNotExist:
         logger.error("send_invitation_email: invitation %s not found", invitation_id)
         return
 
     existing_user = User.objects.filter(email=invitation.email).exists()
     invitation_url = f"{settings.FRONTEND_URL}/accept-invitation?token={invitation.token}"
+    company_names = [c.name for c in invitation.companies.all()]
+    account_label = invitation.account_owner.full_name or invitation.account_owner.email
 
     send_templated_email(
         to=invitation.email,
-        subject=f"You're invited to join {invitation.company.name} - PreScreen AI",
+        subject=f"You're invited to join {account_label} - PreScreen AI",
         template="invitation",
         context={
-            "company_name": invitation.company.name,
+            "account_name": account_label,
+            "company_names": company_names,
             "invited_by": invitation.invited_by.full_name,
             "invitation_url": invitation_url,
             "expires_at": invitation.expires_at.strftime("%B %d, %Y"),

@@ -10,6 +10,8 @@ import { authService } from '@/features/auth/services/auth.service'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import NotificationBell from '@/features/notifications/components/NotificationBell.vue'
 import LanguageSwitcher from '@/shared/components/LanguageSwitcher.vue'
+import ThemeToggle from '@/shared/components/ThemeToggle.vue'
+import BackgroundModeSwitcher from '@/shared/components/BackgroundModeSwitcher.vue'
 import CompanySwitcher from './CompanySwitcher.vue'
 import GlobalSearchDialog from './GlobalSearchDialog.vue'
 import { useNotificationPolling } from '@/features/notifications/composables/useNotificationPolling'
@@ -79,7 +81,9 @@ function handleMenuToggle(): void {
 </script>
 
 <template>
-  <header class="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4">
+  <header
+    class="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4 dark:border-gray-800 dark:bg-gray-950"
+  >
     <div class="flex items-center gap-3">
       <Button
         icon="pi pi-bars"
@@ -154,6 +158,8 @@ function handleMenuToggle(): void {
         <i class="pi pi-sparkles text-[10px]"></i><span class="hidden sm:inline">AI</span>
       </button>
 
+      <BackgroundModeSwitcher />
+      <ThemeToggle />
       <LanguageSwitcher />
       <NotificationBell />
 

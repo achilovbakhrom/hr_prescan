@@ -40,6 +40,13 @@ function getStatusLabel(invitation: Invitation): string {
 <template>
   <DataTable :value="invitations" striped-rows>
     <Column field="email" :header="t('admin.users.email')" />
+    <Column :header="t('settings.team.companies')">
+      <template #body="{ data }">
+        <span class="text-sm text-gray-700">
+          {{ ((data as Invitation).companies || []).map((c) => c.name).join(', ') || '—' }}
+        </span>
+      </template>
+    </Column>
     <Column :header="t('common.status')">
       <template #body="{ data }">
         <Tag
