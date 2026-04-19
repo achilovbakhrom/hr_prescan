@@ -13,7 +13,6 @@ import Dropdown from 'primevue/dropdown'
 import ConfirmDialog from 'primevue/confirmdialog'
 import { useConfirm } from 'primevue/useconfirm'
 import GlassSurface from '@/shared/components/GlassSurface.vue'
-import GlassCard from '@/shared/components/GlassCard.vue'
 import VacancyListTable from '../components/VacancyListTable.vue'
 import { useVacancyStore } from '../stores/vacancy.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
@@ -177,15 +176,13 @@ async function handleStatusChange(_event: Event, id: string, status: VacancyStat
       {{ vacancyStore.error }}
     </p>
 
-    <GlassCard class="!p-0 overflow-hidden">
-      <VacancyListTable
-        :vacancies="filteredVacancies"
-        :loading="vacancyStore.loading"
-        @open="openDetail"
-        @delete="confirmDelete"
-        @status-change="handleStatusChange"
-      />
-    </GlassCard>
+    <VacancyListTable
+      :vacancies="filteredVacancies"
+      :loading="vacancyStore.loading"
+      @open="openDetail"
+      @delete="confirmDelete"
+      @status-change="handleStatusChange"
+    />
 
     <ConfirmDialog />
   </div>

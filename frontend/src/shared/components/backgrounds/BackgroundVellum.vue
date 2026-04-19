@@ -67,7 +67,7 @@
   pointer-events: none;
 }
 
-:global(.dark) .vellum-noise {
+:global(.dark .vellum-noise) {
   opacity: 0.06;
   mix-blend-mode: screen;
 }

@@ -33,9 +33,9 @@ const errorMessage = ref('')
 const interview = ref<InterviewDetail | null>(null)
 
 onMounted(async () => {
-  // Aurora sets a calm but expressive stage for the gateway moment.
+  // Ensure a background is set for the gateway moment.
   if (themeStore.backgroundMode === 'off') {
-    themeStore.setBackgroundMode('aurora')
+    themeStore.setBackgroundMode('vellum')
   }
 
   try {

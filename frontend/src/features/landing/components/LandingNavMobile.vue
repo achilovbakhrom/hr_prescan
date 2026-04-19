@@ -8,6 +8,8 @@ import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
+import ThemeToggle from '@/shared/components/ThemeToggle.vue'
+import LanguageSwitcher from '@/shared/components/LanguageSwitcher.vue'
 
 interface NavLink {
   id: string
@@ -77,7 +79,6 @@ async function handleLogout(): Promise<void> {
             class="justify-start"
             @click="goToRoute(ROUTE_NAMES.LOGIN)"
           />
-          <Button :label="t('landing.hero.getStarted')" @click="goToRoute(ROUTE_NAMES.REGISTER)" />
         </template>
         <template v-else>
           <Button
@@ -94,6 +95,11 @@ async function handleLogout(): Promise<void> {
             @click="handleLogout"
           />
         </template>
+        <div class="my-3 border-t border-[color:var(--color-border-soft)]"></div>
+        <div class="flex items-center justify-end gap-2 px-2 py-2">
+          <LanguageSwitcher />
+          <ThemeToggle />
+        </div>
       </div>
     </div>
   </Transition>

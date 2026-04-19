@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { useThemeStore, type BackgroundMode } from '@/shared/stores/theme.store'
-import BackgroundAurora from './backgrounds/BackgroundAurora.vue'
 import BackgroundMesh from './backgrounds/BackgroundMesh.vue'
 import BackgroundConstellation from './backgrounds/BackgroundConstellation.vue'
 import BackgroundVellum from './backgrounds/BackgroundVellum.vue'
+import BackgroundAurora from './backgrounds/BackgroundAurora.vue'
+import BackgroundWaves from './backgrounds/BackgroundWaves.vue'
+import BackgroundRays from './backgrounds/BackgroundRays.vue'
 
 /**
  * AnimatedBackground — orchestrator.
@@ -15,15 +17,24 @@ import BackgroundVellum from './backgrounds/BackgroundVellum.vue'
  */
 
 const BG_KEY = 'hr_prescan_bg_mode'
-const RANDOM_POOL: BackgroundMode[] = ['aurora', 'mesh', 'constellation', 'vellum']
+const RANDOM_POOL: BackgroundMode[] = [
+  'mesh',
+  'constellation',
+  'vellum',
+  'aurora',
+  'waves',
+  'rays',
+]
 
 const themeStore = useThemeStore()
 
 const variantMap = {
-  aurora: BackgroundAurora,
   mesh: BackgroundMesh,
   constellation: BackgroundConstellation,
   vellum: BackgroundVellum,
+  aurora: BackgroundAurora,
+  waves: BackgroundWaves,
+  rays: BackgroundRays,
 } as const
 
 const current = computed(() => {
@@ -34,7 +45,7 @@ const current = computed(() => {
 
 onMounted(() => {
   // Random-on-first-load: only override when the key was never written.
-  // theme.store's readBackground() returns 'aurora' for null and writes on
+  // theme.store's readBackground() returns 'vellum' for null and writes on
   // legacy values — so checking null identifies truly first-time users.
   if (localStorage.getItem(BG_KEY) === null) {
     const pick = RANDOM_POOL[Math.floor(Math.random() * RANDOM_POOL.length)]

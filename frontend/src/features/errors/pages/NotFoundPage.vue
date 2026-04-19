@@ -18,8 +18,8 @@ function goBack(): void {
 </script>
 
 <template>
-  <!-- 404 — Aurora (playful) per spec §9. -->
-  <ErrorShell background="aurora" code="404">
+  <!-- 404 — Vellum background (Aurora removed). -->
+  <ErrorShell background="vellum" code="404">
     <template #title>
       <h1
         class="mt-4 text-2xl font-semibold tracking-tight text-[color:var(--color-text-primary)] sm:text-3xl"

@@ -3,7 +3,7 @@
  * JobSearchBar — glass hero for the public job board.
  *
  * T13: sits on top of the ambient background, using glass tokens so the
- * Aurora/Mesh/Constellation bleeds through.
+ * Mesh/Constellation/Vellum bleeds through.
  */
 import { useI18n } from 'vue-i18n'
 import InputText from 'primevue/inputtext'

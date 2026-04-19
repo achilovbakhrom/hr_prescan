@@ -7,7 +7,7 @@
  * to render AnimatedBackground + FloatingBackgroundPicker.
  *
  * Each error page forces its own background variant on mount
- * (spec §9): 404 → Aurora, 403 → Vellum, 500 → Mesh.
+ * (spec §9): 404 → Vellum, 403 → Vellum, 500 → Mesh.
  *
  * Layout: full-bleed background + centered GlassCard with big Prism
  * glyph, display-scale error number, one-line message + single CTA.
@@ -20,7 +20,7 @@ import { useThemeStore, type BackgroundMode } from '@/shared/stores/theme.store'
 
 const props = defineProps<{
   /** Which background to force on mount. */
-  background: Extract<BackgroundMode, 'aurora' | 'mesh' | 'vellum'>
+  background: Extract<BackgroundMode, 'mesh' | 'vellum'>
   /** Big number (e.g. "404"). */
   code: string
 }>()
@@ -81,7 +81,7 @@ onMounted(() => {
   filter: blur(32px);
 }
 
-:global(.dark) .error-wrap::before {
+:global(.dark .error-wrap::before) {
   opacity: 0.8;
 }
 

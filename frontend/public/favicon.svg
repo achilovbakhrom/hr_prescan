@@ -1,22 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="HR PreScan">
   <defs>
-    <linearGradient id="prismGrad" x1="14" y1="50" x2="48" y2="14" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#3b5bff"/>
-      <stop offset="1" stop-color="#7c5cff"/>
+    <linearGradient id="g" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4f8bff"/>
+      <stop offset="0.55" stop-color="#6d5cff"/>
+      <stop offset="1" stop-color="#a855f7"/>
     </linearGradient>
   </defs>
-  <polygon
-    points="10,16 32,10 50,16 50,48 32,54 10,48"
-    fill="url(#prismGrad)"
-    stroke="rgba(255,255,255,0.25)"
-    stroke-width="1"
-    stroke-linejoin="round"/>
-  <line x1="-2" y1="32" x2="10" y2="32"
-    stroke="#0b0f17" stroke-opacity="0.7" stroke-width="2" stroke-linecap="round"/>
-  <line x1="50" y1="22" x2="62" y2="16"
-    stroke="#ff9b73" stroke-width="2.5" stroke-linecap="round" opacity="1"/>
-  <line x1="50" y1="32" x2="62" y2="32"
-    stroke="#7c5cff" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
-  <line x1="50" y1="42" x2="62" y2="48"
-    stroke="#2563eb" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+  <rect x="0" y="0" width="64" height="64" rx="14" fill="url(#g)"/>
+  <g fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="20" cy="44" r="3.2" fill="#ffffff" stroke="none"/>
+    <path stroke-width="3.4" d="M20 34 A10 10 0 0 1 30 44"/>
+    <path stroke-width="3.4" d="M20 26 A18 18 0 0 1 38 44" opacity="0.75"/>
+    <path stroke-width="3.4" d="M20 18 A26 26 0 0 1 46 44" opacity="0.5"/>
+  </g>
 </svg>

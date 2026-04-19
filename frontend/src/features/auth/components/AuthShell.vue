@@ -103,7 +103,7 @@ const widthClass: Record<Width, string> = {
 }
 
 /* Dark mode: stronger glow so the card reads against near-black Vellum. */
-:global(.dark) .auth-wrap::before {
+:global(.dark .auth-wrap::before) {
   opacity: 0.8;
 }
 

@@ -18,6 +18,8 @@ import { i18n, detectAndApplyLocale } from '@/shared/i18n'
 
 import '@/assets/styles/main.css'
 import '@/assets/styles/primevue-overrides.css'
+// Dark-mode overrides load LAST so `!important` rules win over utilities.
+import '@/assets/styles/dark-mode.css'
 
 const app = createApp(App)
 

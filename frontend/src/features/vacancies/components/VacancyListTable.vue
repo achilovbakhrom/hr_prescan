@@ -1,13 +1,13 @@
 <script setup lang="ts">
 /**
- * VacancyListTable — DataTable rendering solid rows (legibility rule).
- * Glass chrome comes from PrimeVue overrides on pagination + the toolbar
- * that wraps the table. Mobile: horizontal scroll via the outer container.
+ * VacancyListGrid — card grid replacing the legacy DataTable.
+ * Each card is an interactive GlassSurface; status badge, title, company,
+ * stats (applied, posted), and the contextual primary action stack inside.
+ * Same emits contract as before (`open`, `delete`, `status-change`).
  */
 import { useI18n } from 'vue-i18n'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
 import Button from 'primevue/button'
+import GlassSurface from '@/shared/components/GlassSurface.vue'
 import VacancyStatusBadge from './VacancyStatusBadge.vue'
 import type { Vacancy, VacancyStatus } from '../types/vacancy.types'
 
@@ -31,112 +31,144 @@ function formatDate(dateStr: string): string {
     year: 'numeric',
   })
 }
-
-function onRowClick(event: { data: Vacancy }): void {
-  emit('open', event.data.id)
-}
 </script>
 
 <template>
-  <div class="overflow-x-auto">
-    <DataTable
-      :value="vacancies"
-      :loading="loading"
-      striped-rows
-      hoverable-rows
-      paginator
-      :rows="10"
-      :rows-per-page-options="[10, 25, 50]"
-      data-key="id"
-      class="vacancy-table cursor-pointer"
-      @row-click="onRowClick"
-    >
-      <Column field="title" :header="t('vacancies.title')" sortable>
-        <template #body="{ data }">
-          <div class="min-w-0">
-            <p class="truncate font-medium text-[color:var(--color-text-primary)]">
-              {{ (data as Vacancy).title }}
-            </p>
-            <p
-              v-if="(data as Vacancy).companyName"
-              class="truncate text-xs text-[color:var(--color-text-muted)]"
-            >
-              {{ (data as Vacancy).companyName }}
-            </p>
-          </div>
-        </template>
-      </Column>
-      <Column :header="t('common.status')" sort-field="status" sortable>
-        <template #body="{ data }">
-          <VacancyStatusBadge :status="(data as Vacancy).status" />
-        </template>
-      </Column>
-      <Column :header="t('vacancies.applied')" sort-field="candidatesTotal" sortable>
-        <template #body="{ data }">
-          <span class="font-mono text-sm text-[color:var(--color-text-primary)]">
-            {{ (data as Vacancy).candidatesTotal ?? 0 }}
-          </span>
-        </template>
-      </Column>
-      <Column :header="t('common.createdAt')" sort-field="createdAt" sortable>
-        <template #body="{ data }">
-          <span class="text-xs text-[color:var(--color-text-muted)]">
-            {{ formatDate((data as Vacancy).createdAt) }}
-          </span>
-        </template>
-      </Column>
-      <Column header="" :style="{ width: '14rem' }">
-        <template #body="{ data }">
-          <div class="flex items-center justify-end gap-1.5" @click.stop>
-            <Button
-              v-if="(data as Vacancy).status === 'draft'"
-              :label="t('vacancies.actions.publish')"
-              icon="pi pi-send"
-              size="small"
-              @click="emit('statusChange', $event, (data as Vacancy).id, 'published')"
-            />
-            <Button
-              v-if="(data as Vacancy).status === 'paused'"
-              :label="t('vacancies.actions.resume')"
-              icon="pi pi-play"
-              severity="success"
-              size="small"
-              @click="emit('statusChange', $event, (data as Vacancy).id, 'published')"
-            />
-            <Button
-              v-if="(data as Vacancy).status === 'published'"
-              :label="t('vacancies.actions.pause')"
-              icon="pi pi-pause"
-              severity="warn"
-              size="small"
-              outlined
-              @click="emit('statusChange', $event, (data as Vacancy).id, 'paused')"
-            />
-            <Button
-              v-if="(data as Vacancy).status === 'draft' || (data as Vacancy).status === 'archived'"
-              icon="pi pi-trash"
-              severity="danger"
-              text
-              rounded
-              size="small"
-              @click="emit('delete', $event, (data as Vacancy).id, (data as Vacancy).title)"
-            />
-          </div>
-        </template>
-      </Column>
+  <!-- Loading skeletons -->
+  <div
+    v-if="loading"
+    class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3"
+    aria-busy="true"
+  >
+    <div
+      v-for="n in 6"
+      :key="n"
+      class="vacancy-card-skeleton h-44 rounded-xl bg-[color:var(--color-surface-raised)]"
+    ></div>
+  </div>
 
-      <template #empty>
-        <div class="py-10 text-center text-[color:var(--color-text-muted)]">
-          <i class="pi pi-briefcase mb-2 text-3xl"></i>
-          <p class="text-sm">{{ t('vacancies.noVacancies') }}</p>
-        </div>
-      </template>
-    </DataTable>
+  <!-- Empty state -->
+  <div
+    v-else-if="vacancies.length === 0"
+    class="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[color:var(--color-border-soft)] py-16 text-center"
+  >
+    <i class="pi pi-briefcase text-3xl text-[color:var(--color-text-muted)]"></i>
+    <p class="text-sm text-[color:var(--color-text-muted)]">{{ t('vacancies.noVacancies') }}</p>
+  </div>
+
+  <!-- Card grid -->
+  <div v-else class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+    <GlassSurface
+      v-for="v in vacancies"
+      :key="v.id"
+      level="1"
+      interactive
+      :as="'article'"
+      class="group flex flex-col gap-3 !rounded-xl p-4"
+      role="button"
+      tabindex="0"
+      @click="emit('open', v.id)"
+      @keydown.enter.prevent="emit('open', v.id)"
+      @keydown.space.prevent="emit('open', v.id)"
+    >
+      <!-- Top row: status + delete affordance -->
+      <div class="flex items-start justify-between gap-2">
+        <VacancyStatusBadge :status="v.status" />
+        <button
+          v-if="v.status === 'draft' || v.status === 'archived'"
+          type="button"
+          class="rounded-md p-1.5 text-[color:var(--color-text-muted)] opacity-0 transition-all hover:bg-[color:var(--color-danger)]/10 hover:text-[color:var(--color-danger)] group-hover:opacity-100 focus-visible:opacity-100"
+          :aria-label="t('common.delete')"
+          @click.stop="emit('delete', $event, v.id, v.title)"
+        >
+          <i class="pi pi-trash text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Title + company -->
+      <div class="min-h-[3rem]">
+        <h3
+          class="line-clamp-2 text-base font-semibold leading-snug text-[color:var(--color-text-primary)]"
+        >
+          {{ v.title }}
+        </h3>
+        <p
+          v-if="v.companyName"
+          class="mt-0.5 truncate text-xs text-[color:var(--color-text-muted)]"
+        >
+          {{ v.companyName }}
+        </p>
+      </div>
+
+      <!-- Stats row -->
+      <div
+        class="flex items-center gap-4 border-t border-[color:var(--color-border-soft)] pt-3 text-xs text-[color:var(--color-text-muted)]"
+      >
+        <span class="inline-flex items-center gap-1.5">
+          <i class="pi pi-users text-[0.75rem]"></i>
+          <span class="font-medium text-[color:var(--color-text-primary)]">
+            {{ v.candidatesTotal ?? 0 }}
+          </span>
+          <span>{{ t('vacancies.applied').toLowerCase() }}</span>
+        </span>
+        <span class="inline-flex items-center gap-1.5">
+          <i class="pi pi-calendar text-[0.75rem]"></i>
+          {{ formatDate(v.createdAt) }}
+        </span>
+      </div>
+
+      <!-- Contextual primary action -->
+      <div class="flex items-center justify-end" @click.stop>
+        <Button
+          v-if="v.status === 'draft'"
+          :label="t('vacancies.actions.publish')"
+          icon="pi pi-send"
+          size="small"
+          @click="emit('statusChange', $event, v.id, 'published')"
+        />
+        <Button
+          v-else-if="v.status === 'paused'"
+          :label="t('vacancies.actions.resume')"
+          icon="pi pi-play"
+          severity="success"
+          size="small"
+          @click="emit('statusChange', $event, v.id, 'published')"
+        />
+        <Button
+          v-else-if="v.status === 'published'"
+          :label="t('vacancies.actions.pause')"
+          icon="pi pi-pause"
+          severity="warn"
+          size="small"
+          outlined
+          @click="emit('statusChange', $event, v.id, 'paused')"
+        />
+      </div>
+    </GlassSurface>
   </div>
 </template>
 
 <style scoped>
-.vacancy-table :deep(.p-datatable-tbody > tr) {
-  cursor: pointer;
+.vacancy-card-skeleton {
+  position: relative;
+  overflow: hidden;
+}
+.vacancy-card-skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklab, var(--color-surface-overlay, #fff) 28%, transparent),
+    transparent
+  );
+  transform: translateX(-100%);
+  animation: vacancy-skel 1.2s ease-in-out infinite;
+}
+@keyframes vacancy-skel {
+  to {
+    transform: translateX(100%);
+  }
 }
 </style>

@@ -13,6 +13,7 @@ import type { MenuItem } from 'primevue/menuitem'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import LanguageSwitcher from '@/shared/components/LanguageSwitcher.vue'
+import ThemeToggle from '@/shared/components/ThemeToggle.vue'
 import AppLogo from '@/shared/components/AppLogo.vue'
 import LandingNavMobile from './LandingNavMobile.vue'
 
@@ -89,50 +90,51 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
         </div>
 
         <div class="flex items-center gap-2">
-          <LanguageSwitcher class="hidden sm:inline-flex" />
+          <ThemeToggle class="hidden md:inline-flex" />
+          <LanguageSwitcher class="hidden md:inline-flex" />
           <template v-if="authStore.isAuthenticated">
-            <Button
-              :label="t('nav.dashboard')"
-              icon="pi pi-th-large"
-              text
-              severity="secondary"
-              size="small"
-              class="hidden sm:flex"
-              @click="router.push({ name: ROUTE_NAMES.DASHBOARD })"
-            />
-            <button
-              type="button"
-              class="flex items-center gap-2 rounded-md px-2 py-1 transition-colors duration-200 ease-ios hover:bg-[color:var(--color-surface-raised)]"
-              @click="toggleUserMenu"
-            >
-              <div
-                class="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--color-accent-soft)] text-sm font-medium text-[color:var(--color-accent)]"
+            <div class="hidden md:flex md:items-center md:gap-2">
+              <Button
+                :label="t('nav.dashboard')"
+                icon="pi pi-th-large"
+                text
+                severity="secondary"
+                size="small"
+                @click="router.push({ name: ROUTE_NAMES.DASHBOARD })"
+              />
+              <button
+                type="button"
+                class="flex items-center gap-2 rounded-md px-2 py-1 transition-colors duration-200 ease-ios hover:bg-[color:var(--color-surface-raised)]"
+                @click="toggleUserMenu"
               >
-                {{ authStore.user?.firstName?.charAt(0) }}{{ authStore.user?.lastName?.charAt(0) }}
-              </div>
-              <span
-                class="hidden text-sm font-medium text-[color:var(--color-text-primary)] sm:inline"
-              >
-                {{ authStore.user?.firstName }}
-              </span>
-            </button>
-            <Menu ref="userMenu" :model="menuItems" :popup="true" />
+                <div
+                  class="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--color-accent-soft)] text-sm font-medium text-[color:var(--color-accent)]"
+                >
+                  {{ authStore.user?.firstName?.charAt(0)
+                  }}{{ authStore.user?.lastName?.charAt(0) }}
+                </div>
+                <span class="text-sm font-medium text-[color:var(--color-text-primary)]">
+                  {{ authStore.user?.firstName }}
+                </span>
+              </button>
+              <Menu ref="userMenu" :model="menuItems" :popup="true" />
+            </div>
           </template>
           <template v-else>
-            <Button
-              :label="t('nav.signIn')"
-              text
-              severity="secondary"
-              size="small"
-              class="hidden sm:flex"
-              @click="router.push({ name: ROUTE_NAMES.LOGIN })"
-            />
-            <Button
-              :label="t('landing.hero.getStarted')"
-              size="small"
-              class="hidden sm:flex"
-              @click="router.push({ name: ROUTE_NAMES.REGISTER })"
-            />
+            <div class="hidden md:flex md:items-center md:gap-2">
+              <Button
+                :label="t('nav.signIn')"
+                text
+                severity="secondary"
+                size="small"
+                @click="router.push({ name: ROUTE_NAMES.LOGIN })"
+              />
+              <Button
+                :label="t('landing.hero.getStarted')"
+                size="small"
+                @click="router.push({ name: ROUTE_NAMES.REGISTER })"
+              />
+            </div>
           </template>
 
           <!-- Mobile hamburger -->

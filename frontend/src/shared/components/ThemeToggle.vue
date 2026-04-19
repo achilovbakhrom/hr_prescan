@@ -5,17 +5,10 @@ import { useThemeStore } from '@/shared/stores/theme.store'
 
 const themeStore = useThemeStore()
 
-const icon = computed(() => {
-  if (themeStore.colorScheme === 'light') return 'pi pi-sun'
-  if (themeStore.colorScheme === 'dark') return 'pi pi-moon'
-  return 'pi pi-desktop'
-})
-
-const label = computed(() => {
-  if (themeStore.colorScheme === 'light') return 'Light theme (click for dark)'
-  if (themeStore.colorScheme === 'dark') return 'Dark theme (click for system)'
-  return 'System theme (click for light)'
-})
+const icon = computed(() => (themeStore.resolvedDark ? 'pi pi-sun' : 'pi pi-moon'))
+const label = computed(() =>
+  themeStore.resolvedDark ? 'Switch to light theme' : 'Switch to dark theme',
+)
 </script>
 
 <template>

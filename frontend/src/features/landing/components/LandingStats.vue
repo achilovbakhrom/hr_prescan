@@ -46,9 +46,9 @@ onMounted(() => {
 
 <template>
   <section class="scroll-animate px-4 pb-12 pt-4 sm:px-6 sm:pb-20 sm:pt-6">
-    <div class="mx-auto max-w-5xl">
+    <div class="mx-auto max-w-7xl">
       <div
-        class="bg-glass-1 border-glass shadow-glass-float flex flex-col items-stretch justify-between gap-6 rounded-[--radius-lg] px-6 py-8 text-center sm:flex-row sm:items-center sm:gap-0 sm:divide-x sm:divide-[color:var(--color-border-soft)] sm:px-10 sm:py-10"
+        class="bg-glass-1 border-glass shadow-glass-float grid grid-cols-2 items-stretch justify-between gap-y-8 rounded-[32px] px-4 py-8 text-center sm:px-6 md:flex md:flex-row md:items-center md:gap-0 md:divide-x md:divide-[color:var(--color-border-soft)] md:px-12 md:py-12"
       >
         <!-- Metric 1: live candidates screened -->
         <div class="metric-item live-metric flex-1 px-4">
@@ -85,6 +85,18 @@ onMounted(() => {
             class="mt-3 text-xs font-semibold uppercase tracking-[0.08em] text-[color:var(--color-text-muted)] sm:text-sm"
           >
             HR satisfaction
+          </div>
+        </div>
+
+        <!-- Metric 4: customer rating -->
+        <div class="flex-1 px-4">
+          <div class="metric-number font-mono font-semibold text-[color:var(--color-success)]">
+            4.9★
+          </div>
+          <div
+            class="mt-3 text-xs font-semibold uppercase tracking-[0.08em] text-[color:var(--color-text-muted)] sm:text-sm"
+          >
+            customer rating
           </div>
         </div>
       </div>
@@ -133,7 +145,7 @@ onMounted(() => {
     opacity: 1;
   }
 }
-@media (min-width: 640px) {
+@media (min-width: 768px) {
   .live-metric::before {
     top: 10px;
     left: 18px;

@@ -1,0 +1,264 @@
+/* ============================================================
+   Dark mode — concrete overrides, no CSS-variable indirection.
+
+   Strategy: when `html` has `.dark`, force known selectors to
+   specific, solid colors with `!important`. This sidesteps the
+   previous implementation's reliance on `@theme` custom properties
+   that rendered washed-out.
+
+   Palette (slate-based, high contrast):
+     bg base      : #0f172a  (slate-900)
+     bg raised    : #1e293b  (slate-800)
+     bg elevated  : #273549  (slate-750)
+     border       : #334155  (slate-700)
+     text primary : #f8fafc  (slate-50)
+     text body    : #e2e8f0  (slate-200)
+     text muted   : #cbd5e1  (slate-300)
+     accent       : #60a5fa  (blue-400)
+   ============================================================ */
+
+html.dark {
+  color-scheme: dark;
+  background-color: #0f172a !important;
+
+  /* Dark values for the design tokens consumed by scoped Vue styles.
+     (These mirror the `@theme` block in main.css.) */
+  --color-surface-base: #0f172a;
+  --color-surface-raised: #1e293b;
+  --color-surface-sunken: #0a0f1d;
+
+  --color-surface-glass-1: #1e293b;
+  --color-surface-glass-2: #19223a;
+  --color-surface-glass-float: #273549;
+
+  --color-border-soft: #334155;
+  --color-border-glass: #334155;
+  --color-border-ring: rgba(96, 165, 250, 0.55);
+
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #e2e8f0;
+  --color-text-muted: #94a3b8;
+  --color-text-on-accent: #ffffff;
+
+  /* Brighter accent hues in dark so text like "Powered by GPT-4 & Voice AI"
+     reads clearly against dark glass panels. */
+  --color-accent: #60a5fa;
+  --color-accent-ai: #c4b5fd;
+  --color-accent-celebrate: #fdba74;
+  --color-accent-soft: rgba(96, 165, 250, 0.22);
+  --color-accent-ai-soft: rgba(196, 181, 253, 0.22);
+  --color-accent-celebrate-soft: rgba(253, 186, 116, 0.2);
+
+  --shadow-glass-1: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-glass-float: 0 2px 4px rgba(0, 0, 0, 0.5), 0 24px 48px rgba(0, 0, 0, 0.6);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+/* Body MUST be transparent in dark — the AnimatedBackground is a
+   `fixed -z-10` layer that paints between the html background and the
+   body background. A solid body bg covers it and the page looks dead. */
+html.dark body {
+  background-color: transparent !important;
+  background-image: none !important;
+  color: #e2e8f0 !important;
+}
+
+/* ---- Headings always pop ---- */
+html.dark h1,
+html.dark h2,
+html.dark h3 {
+  color: #ffffff !important;
+}
+html.dark h4,
+html.dark h5,
+html.dark h6 {
+  color: #f8fafc !important;
+}
+
+/* ---- Body copy ---- */
+html.dark p,
+html.dark li,
+html.dark label,
+html.dark span:not([class*='text-']):not([class*='color-']) {
+  color: inherit;
+}
+
+/* ---- Links ---- */
+html.dark a:not(.p-button):not([class*='p-button']) {
+  color: #93c5fd !important;
+}
+html.dark a:not(.p-button):not([class*='p-button']):hover {
+  color: #dbeafe !important;
+}
+
+/* ---- Muted utility text (Tailwind slate/gray 400/500/600) ---- */
+html.dark .text-gray-400,
+html.dark .text-gray-500,
+html.dark .text-gray-600,
+html.dark .text-slate-400,
+html.dark .text-slate-500,
+html.dark .text-slate-600,
+html.dark [class*='text-[color:var(--color-text-muted)]'] {
+  color: #cbd5e1 !important;
+}
+html.dark .text-gray-700,
+html.dark .text-gray-800,
+html.dark .text-gray-900,
+html.dark .text-slate-700,
+html.dark .text-slate-800,
+html.dark .text-slate-900,
+html.dark [class*='text-[color:var(--color-text-primary)]'] {
+  color: #f8fafc !important;
+}
+html.dark [class*='text-[color:var(--color-text-secondary)]'] {
+  color: #e2e8f0 !important;
+}
+
+/* ---- Glass surfaces: real translucent + blur in dark.
+        Translucency is tight enough (0.72 alpha) that text stays readable
+        even against the animated background orbs. ---- */
+html.dark .glass-card,
+html.dark .glass-surface,
+html.dark [class*='bg-glass-'],
+html.dark .bg-glass-1,
+html.dark .bg-glass-2,
+html.dark .bg-glass-float {
+  background: rgba(30, 41, 59, 0.72) !important;
+  background-color: rgba(30, 41, 59, 0.72) !important;
+  backdrop-filter: blur(18px) saturate(1.4) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.4) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.35),
+    0 8px 24px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* ---- PrimeVue surfaces — translucent blurry glass, same recipe as the
+        .glass-card / .glass-surface rule above. ---- */
+html.dark .p-card,
+html.dark .p-panel,
+html.dark .p-dialog,
+html.dark .p-dropdown-panel,
+html.dark .p-multiselect-panel,
+html.dark .p-overlaypanel,
+html.dark .p-menu,
+html.dark .surface {
+  background: rgba(30, 41, 59, 0.72) !important;
+  background-color: rgba(30, 41, 59, 0.72) !important;
+  color: #e2e8f0 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(18px) saturate(1.4) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.4) !important;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.35),
+    0 8px 24px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* ---- Inputs ---- */
+html.dark .p-inputtext,
+html.dark .p-textarea,
+html.dark .p-password-input,
+html.dark .p-inputnumber-input,
+html.dark .p-select,
+html.dark .p-multiselect,
+html.dark input:not([type='checkbox']):not([type='radio']),
+html.dark textarea,
+html.dark select {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}
+html.dark .p-inputtext::placeholder,
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* ---- Buttons: keep primary vivid; secondary = elevated slate ---- */
+html.dark .p-button {
+  color: #ffffff !important;
+}
+html.dark .p-button.p-button-secondary {
+  background-color: #273549 !important;
+  color: #f1f5f9 !important;
+  border-color: #475569 !important;
+}
+html.dark .p-button.p-button-secondary:hover:not(:disabled) {
+  background-color: #334155 !important;
+}
+html.dark .p-button.p-button-text {
+  background: transparent !important;
+  color: #93c5fd !important;
+}
+html.dark .p-button.p-button-text:hover:not(:disabled) {
+  background-color: rgba(147, 197, 253, 0.12) !important;
+}
+html.dark .p-button.p-button-outlined {
+  background: transparent !important;
+  border-color: #60a5fa !important;
+  color: #60a5fa !important;
+}
+
+/* ---- Generic border utilities (cover common Tailwind border colors) ---- */
+html.dark .border-gray-100,
+html.dark .border-gray-200,
+html.dark .border-gray-300,
+html.dark .border-slate-100,
+html.dark .border-slate-200,
+html.dark .border-slate-300,
+html.dark .border-glass,
+html.dark [class*='border-[color:var(--color-border-soft)]'] {
+  border-color: #334155 !important;
+}
+
+/* ---- Horizontal dividers ---- */
+html.dark hr {
+  border-color: #334155 !important;
+}
+
+/* ---- Animated backgrounds stay active in dark. Each variant has its
+   own dark-tuned internal opacity — no outer dimming needed. ---- */
+html.dark [class*='bg-animal'] {
+  display: none !important;
+}
+
+/* ---- Shadows: soften for dark ---- */
+html.dark .shadow-sm,
+html.dark .shadow,
+html.dark .shadow-md,
+html.dark .shadow-lg,
+html.dark .shadow-xl,
+html.dark .shadow-2xl {
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.35),
+    0 8px 24px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* ---- Nav & sticky bars: solid dark strip, no transparency ---- */
+html.dark nav,
+html.dark header,
+html.dark .sticky {
+  background-color: #0f172a !important;
+  border-bottom-color: #334155 !important;
+  backdrop-filter: none !important;
+}
+
+/* ---- Tables (dashboards) ---- */
+html.dark table,
+html.dark thead,
+html.dark tbody,
+html.dark tr {
+  background-color: transparent !important;
+  color: inherit !important;
+  border-color: #334155 !important;
+}
+html.dark th {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+}
+html.dark td {
+  border-color: #334155 !important;
+}
+html.dark tr:hover td {
+  background-color: #273549 !important;
+}

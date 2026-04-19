@@ -2,20 +2,13 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
 
-/* Class-based dark mode (so we can toggle manually, not just via OS pref). */
+/* Class-based dark mode (manual toggle, not OS-driven).
+   NOTE: dark styles live in `dark-mode.css` (imported below). They're
+   concrete `html.dark …` selectors with `!important` overrides — no
+   reliance on the CSS custom-property token system. */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Global base — body bg is DEEPER than surface bg so cards stand out. */
-html.dark body {
-  background-color: #060a12; /* near-black navy */
-  color: #e5e7eb;
-  background-image:
-    radial-gradient(ellipse 60% 40% at 20% 0%, rgba(59, 130, 246, 0.08), transparent 70%),
-    radial-gradient(ellipse 60% 40% at 80% 100%, rgba(168, 85, 247, 0.06), transparent 70%);
-  background-attachment: fixed;
-}
-
-/* Light theme also gets a soft ambient wash */
+/* Light theme ambient wash */
 html:not(.dark) body {
   background-image:
     radial-gradient(ellipse 60% 40% at 20% 0%, rgba(59, 130, 246, 0.05), transparent 70%),
@@ -23,20 +16,6 @@ html:not(.dark) body {
   background-attachment: fixed;
 }
 
-/* Default text colors — tighter contrast than Tailwind's /400 defaults. */
-html.dark {
-  color-scheme: dark;
-}
-html.dark body,
-html.dark .text-gray-700 {
-  color: #e5e7eb;
-}
-html.dark .text-gray-600 {
-  color: #d1d5db;
-}
-html.dark .text-gray-500 {
-  color: #9ca3af;
-}
 
 /* Fade-slide-in for any element tagged `.page-fade` (applied to route views). */
 .page-fade {
@@ -146,33 +125,7 @@ body,
   --radius-xl: 28px;
 }
 
-/* Dark-mode overrides — scoped by .dark class */
-.dark {
-  --color-surface-base: #0b0f17;
-  --color-surface-raised: #121826;
-  --color-surface-sunken: #0e131c;
-
-  --color-surface-glass-1: rgba(18, 24, 38, 0.64);
-  --color-surface-glass-2: rgba(18, 24, 38, 0.48);
-  --color-surface-glass-float: rgba(22, 28, 42, 0.76);
-
-  --color-border-soft: #1f2633;
-  --color-border-glass: rgba(255, 255, 255, 0.08);
-  --color-border-ring: rgba(124, 92, 255, 0.55);
-
-  --color-text-primary: #e5e7eb;
-  --color-text-secondary: #cbd1dc;
-  --color-text-muted: #8b93a3;
-  --color-text-on-accent: #ffffff;
-
-  --color-accent-soft: rgba(37, 99, 235, 0.18);
-  --color-accent-ai-soft: rgba(124, 92, 255, 0.2);
-  --color-accent-celebrate-soft: rgba(255, 155, 115, 0.18);
-
-  --shadow-glass-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.4);
-  --shadow-glass-float: 0 2px 4px rgba(0, 0, 0, 0.4), 0 24px 48px rgba(0, 0, 0, 0.55);
-  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(0, 0, 0, 0.3);
-}
+/* Dark-mode CSS lives entirely in dark-mode.css (below). */
 
 /* ============================================
    Utility layer (glass, motion, focus ring)
@@ -194,6 +147,23 @@ body,
     background-color: var(--color-surface-glass-float);
     backdrop-filter: blur(var(--blur-lg)) saturate(1.5);
     -webkit-backdrop-filter: blur(var(--blur-lg)) saturate(1.5);
+  }
+
+  /* PrimeVue cards/panels adopt the same glass recipe as our glass-* utilities
+     so every panel in the app reads as blurry glass, not a flat card. The
+     dark-mode counterpart lives in dark-mode.css. */
+  .p-card,
+  .p-panel,
+  .p-dialog,
+  .p-dropdown-panel,
+  .p-multiselect-panel,
+  .p-overlaypanel,
+  .p-menu {
+    background-color: var(--color-surface-glass-1) !important;
+    backdrop-filter: blur(var(--blur-md)) saturate(1.4) !important;
+    -webkit-backdrop-filter: blur(var(--blur-md)) saturate(1.4) !important;
+    border: 1px solid var(--color-border-glass) !important;
+    box-shadow: var(--shadow-glass-1) !important;
   }
 
   .border-glass {

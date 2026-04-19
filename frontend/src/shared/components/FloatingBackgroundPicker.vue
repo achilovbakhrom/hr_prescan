@@ -1,8 +1,8 @@
 <script setup lang="ts">
 /**
  * FloatingBackgroundPicker — fixed bottom-right control that lets users pick
- * one of 4 backgrounds (Aurora / Mesh / Constellation / Vellum) and cycle
- * the color scheme (light / dark / system).
+ * one of 3 backgrounds (Mesh / Constellation / Vellum).
+ * Dark mode was removed — theme-cycle button is gone.
  *
  * Replaces the legacy BackgroundModeSwitcher.vue popover.
  * Spec: docs/design/spec.md §5, §10.
@@ -13,7 +13,7 @@
  *   - Arrow keys navigate thumbs when open
  *   - `Enter` / `Space` on a thumb selects it
  */
-import { computed, nextTick, ref } from 'vue'
+import { nextTick, ref } from 'vue'
 import { useThemeStore, type BackgroundMode } from '@/shared/stores/theme.store'
 import { useBackgroundPickerKeys } from '@/shared/composables/useBackgroundPickerKeys'
 import GlassSurface from './GlassSurface.vue'
@@ -26,28 +26,18 @@ interface ThumbDef {
 }
 
 const THUMBS: readonly ThumbDef[] = [
-  { code: 'aurora', label: 'Aurora' },
   { code: 'mesh', label: 'Mesh' },
   { code: 'constellation', label: 'Constellation' },
   { code: 'vellum', label: 'Vellum' },
+  { code: 'aurora', label: 'Aurora' },
+  { code: 'waves', label: 'Waves' },
+  { code: 'rays', label: 'Rays' },
 ]
 
 const themeStore = useThemeStore()
 const open = ref(false)
 const rootRef = ref<HTMLElement | null>(null)
 const thumbRefs = ref<HTMLButtonElement[]>([])
-
-const themeIcon = computed(() => {
-  if (themeStore.colorScheme === 'light') return 'pi pi-sun'
-  if (themeStore.colorScheme === 'dark') return 'pi pi-moon'
-  return 'pi pi-desktop'
-})
-
-const themeLabel = computed(() => {
-  if (themeStore.colorScheme === 'light') return 'Light theme (click for dark)'
-  if (themeStore.colorScheme === 'dark') return 'Dark theme (click for system)'
-  return 'System theme (click for light)'
-})
 
 function setThumbRef(el: Element | null, index: number): void {
   if (el instanceof HTMLButtonElement) thumbRefs.value[index] = el
@@ -95,7 +85,7 @@ useBackgroundPickerKeys({ rootRef, isOpen: open, toggle: toggleOpen, close })
     ref="rootRef"
     class="fixed bottom-4 right-4 z-50 flex items-center gap-2"
     role="toolbar"
-    aria-label="Background and theme"
+    aria-label="Background picker"
   >
     <Transition name="picker">
       <GlassSurface
@@ -126,17 +116,6 @@ useBackgroundPickerKeys({ rootRef, isOpen: open, toggle: toggleOpen, close })
           </button>
         </div>
 
-        <div class="mx-0.5 h-6 w-px bg-[color:var(--color-border-soft)]" aria-hidden="true" />
-
-        <button
-          type="button"
-          class="fbp-theme-btn"
-          :aria-label="themeLabel"
-          :title="themeLabel"
-          @click="themeStore.cycleColorScheme()"
-        >
-          <i :class="themeIcon" />
-        </button>
       </GlassSurface>
     </Transition>
 
@@ -145,8 +124,8 @@ useBackgroundPickerKeys({ rootRef, isOpen: open, toggle: toggleOpen, close })
       class="fbp-trigger bg-glass-float border-glass shadow-glass-float"
       :aria-expanded="open"
       aria-haspopup="true"
-      aria-label="Background and theme picker"
-      title="Background and theme (? or Alt+B)"
+      aria-label="Background picker"
+      title="Background (? or Alt+B)"
       @click="toggleOpen"
     >
       <i class="pi pi-palette" />

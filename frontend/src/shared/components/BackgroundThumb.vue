@@ -27,11 +27,6 @@ defineProps<Props>()
   border-radius: inherit;
 }
 
-.bg-thumb[data-kind='aurora'] {
-  background: conic-gradient(from 200deg at 30% 40%, #cfd9ff, #e4d4ff, #ffe0cf, #dbeafe, #cfd9ff);
-  filter: blur(2px) saturate(1.2);
-}
-
 .bg-thumb[data-kind='mesh'] {
   background:
     radial-gradient(circle at 25% 30%, #7c5cff 0%, transparent 55%),
@@ -55,5 +50,40 @@ defineProps<Props>()
   background:
     radial-gradient(ellipse at 50% 40%, var(--color-surface-raised), transparent 70%),
     linear-gradient(135deg, var(--color-surface-base), var(--color-surface-sunken));
+}
+
+.bg-thumb[data-kind='aurora'] {
+  background:
+    radial-gradient(ellipse at 30% 20%, #60a5fa 0%, transparent 55%),
+    radial-gradient(ellipse at 70% 35%, #c4b5fd 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 55%, #fdba74 0%, transparent 55%),
+    var(--color-surface-raised);
+  filter: blur(2px) saturate(1.3);
+}
+
+.bg-thumb[data-kind='waves'] {
+  background:
+    linear-gradient(180deg, transparent 50%, rgba(96, 165, 250, 0.35) 55%, transparent 60%),
+    linear-gradient(180deg, transparent 65%, rgba(196, 181, 253, 0.35) 72%, transparent 78%),
+    linear-gradient(180deg, transparent 80%, rgba(253, 186, 116, 0.35) 88%, transparent 94%),
+    var(--color-surface-raised);
+  filter: blur(1.5px);
+}
+
+.bg-thumb[data-kind='rays'] {
+  background:
+    conic-gradient(
+      from 210deg at 25% 25%,
+      transparent 0deg,
+      rgba(96, 165, 250, 0.35) 25deg,
+      transparent 55deg,
+      rgba(196, 181, 253, 0.3) 95deg,
+      transparent 135deg,
+      rgba(253, 186, 116, 0.25) 180deg,
+      transparent 220deg,
+      transparent 360deg
+    ),
+    var(--color-surface-raised);
+  filter: blur(2px);
 }
 </style>

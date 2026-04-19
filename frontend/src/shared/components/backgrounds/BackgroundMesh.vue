@@ -31,8 +31,8 @@
   mix-blend-mode: multiply;
 }
 
-:global(.dark) .mesh-blob {
-  opacity: 0.55;
+:global(.dark .mesh-blob) {
+  opacity: 0.1;
   mix-blend-mode: screen;
 }
 
@@ -44,7 +44,7 @@
   height: 65vmin;
   transform: translate(-50%, -50%);
   background: #2563eb;
-  animation: mesh-drift-a 28s ease-in-out infinite alternate;
+  animation: mesh-drift-a 14s ease-in-out infinite alternate;
 }
 
 /* -------- Blob B (ai-violet) — 75%, 30% -------- */
@@ -55,7 +55,7 @@
   height: 70vmin;
   transform: translate(-50%, -50%);
   background: #7c5cff;
-  animation: mesh-drift-b 33s ease-in-out infinite alternate;
+  animation: mesh-drift-b 17s ease-in-out infinite alternate;
 }
 
 /* -------- Blob C (celebrate-peach) — 50%, 55% -------- */
@@ -66,7 +66,7 @@
   height: 80vmin;
   transform: translate(-50%, -50%);
   background: #ff9b73;
-  animation: mesh-drift-c 37s ease-in-out infinite alternate;
+  animation: mesh-drift-c 19s ease-in-out infinite alternate;
 }
 
 /* -------- Blob D (soft-teal) — 20%, 80% -------- */
@@ -77,7 +77,7 @@
   height: 55vmin;
   transform: translate(-50%, -50%);
   background: #06b6d4;
-  animation: mesh-drift-d 41s ease-in-out infinite alternate;
+  animation: mesh-drift-d 21s ease-in-out infinite alternate;
 }
 
 /* -------- Blob E (soft-pink) — 85%, 75% -------- */
@@ -88,7 +88,7 @@
   height: 50vmin;
   transform: translate(-50%, -50%);
   background: #f472b6;
-  animation: mesh-drift-e 44s ease-in-out infinite alternate;
+  animation: mesh-drift-e 23s ease-in-out infinite alternate;
 }
 
 /* Each blob drifts −6% → +6% of viewport on both axes, no rotation. */

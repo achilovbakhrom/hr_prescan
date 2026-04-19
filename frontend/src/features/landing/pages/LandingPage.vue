@@ -5,13 +5,11 @@
  * The landing route is registered outside of PublicLayout (see
  * `frontend/src/app/router.ts`), so this page provides its own PageShell
  * wrapper to get AnimatedBackground + FloatingBackgroundPicker. It also
- * pins the background to Aurora (the signature mood for marketing) unless
+ * pins the background to Vellum (the signature mood for marketing) unless
  * the user has explicitly picked a different variant via the picker.
  */
-import { onMounted } from 'vue'
 import AnimatedBackground from '@/shared/components/AnimatedBackground.vue'
 import FloatingBackgroundPicker from '@/shared/components/FloatingBackgroundPicker.vue'
-import { useThemeStore } from '@/shared/stores/theme.store'
 import { useScrollAnimation } from '../composables/useScrollAnimation'
 import LandingNav from '../components/LandingNav.vue'
 import LandingHero from '../components/LandingHero.vue'
@@ -23,23 +21,16 @@ import LandingFooter from '../components/LandingFooter.vue'
 // LandingJobs is temporarily unmounted — see docs/design/spec.md §9. Restore
 // once a public /api/public/vacancies endpoint is wired up with real data.
 
-const themeStore = useThemeStore()
 useScrollAnimation()
 
-// Aurora is the marketing signature — always force it on landing mount.
-// The FloatingBackgroundPicker still lets the visitor try other variants
-// live on the page; if they do, that choice persists for the rest of the
-// session across other pages. This keeps the landing impression consistent
-// without building a separate "explicit vs auto-random" flag.
-onMounted(() => {
-  if (themeStore.backgroundMode !== 'aurora') {
-    themeStore.setBackgroundMode('aurora')
-  }
-})
+// The user's background choice from the FloatingBackgroundPicker is honored —
+// we no longer force the landing page to a specific variant on mount. The
+// global default lives in `theme.store.readBackground()` for first-time
+// visitors.
 </script>
 
 <template>
-  <!-- Page root is transparent so the Aurora (fixed, behind `main`) bleeds
+  <!-- Page root is transparent so the Vellum (fixed, behind `main`) bleeds
        through every scroll section. Each section is also bg-transparent and
        stacks its content inside GlassCard / GlassSurface — the "floating
        islands on atmosphere" pattern from spec §9. -->

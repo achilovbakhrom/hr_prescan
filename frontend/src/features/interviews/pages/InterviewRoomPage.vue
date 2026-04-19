@@ -2,7 +2,7 @@
 /**
  * InterviewRoomPage — candidate video interview (LiveKit).
  *
- * T13 redesign: cinematic dark base with a subtle Aurora bleed behind
+ * T13 redesign: cinematic dark base with a subtle ambient glow behind
  * glass chrome (top strip, control pill, side cards). Video tiles stay
  * pitch black for contrast. Standalone route — no PublicLayout. We
  * mount AnimatedBackground at very low opacity so the ambient mood is

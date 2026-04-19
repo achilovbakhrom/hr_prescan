@@ -28,8 +28,8 @@ const sizeMap = {
 
 const dims = computed(() => sizeMap[props.size])
 
-// Unique gradient id so multiple logos on one page don't collide.
-const gradId = `prismGrad-${useId()}`
+// Unique id so multiple logos on one page don't collide.
+const gradId = `sparkGrad-${useId()}`
 
 const showGlyph = computed(() => props.variant !== 'wordmark')
 const showWordmark = computed(() => props.variant !== 'glyph')
@@ -53,71 +53,37 @@ const showWordmark = computed(() => props.variant !== 'glyph')
       aria-hidden="true"
     >
       <defs>
-        <linearGradient :id="gradId" x1="14" y1="50" x2="48" y2="14" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stop-color="#3b5bff" />
-          <stop offset="1" stop-color="#7c5cff" />
+        <!-- Tile gradient: blue → indigo → violet, kept tighter than the reference -->
+        <linearGradient :id="gradId" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#4f8bff" />
+          <stop offset="0.55" stop-color="#6d5cff" />
+          <stop offset="1" stop-color="#a855f7" />
         </linearGradient>
       </defs>
 
-      <!-- Prism pentagon -->
-      <polygon
-        class="app-logo__prism"
-        points="10,16 32,10 50,16 50,48 32,54 10,48"
-        :fill="`url(#${gradId})`"
-        stroke-width="1"
+      <!-- Flat rounded-square tile -->
+      <rect x="4" y="4" width="56" height="56" rx="14" :fill="`url(#${gradId})`" />
+
+      <!-- Scan-pulse glyph: a focal dot with three concentric arcs emanating
+           outward — evokes sonar / signal / pre-screening scan. All line-drawn. -->
+      <g
+        fill="none"
+        stroke="#ffffff"
+        stroke-linecap="round"
         stroke-linejoin="round"
-      />
-
-      <!-- Incoming beam (exits left edge) -->
-      <line
-        class="app-logo__incoming"
-        x1="-2"
-        y1="32"
-        x2="10"
-        y2="32"
-        stroke="var(--color-text-primary)"
-        stroke-opacity="0.7"
-        stroke-width="2"
-        stroke-linecap="round"
-      />
-
-      <!-- Outgoing beams: --beam-final drives the hover-pulse end opacity. -->
-      <line
-        class="app-logo__beam app-logo__beam--top"
-        x1="50"
-        y1="22"
-        x2="62"
-        y2="16"
-        stroke="var(--color-accent-celebrate)"
-        stroke-width="2.5"
-        stroke-linecap="round"
-        opacity="1"
-        style="--beam-final: 1"
-      />
-      <line
-        class="app-logo__beam app-logo__beam--mid"
-        x1="50"
-        y1="32"
-        x2="62"
-        y2="32"
-        stroke="var(--color-accent-ai)"
-        stroke-width="2"
-        stroke-linecap="round"
-        opacity="0.7"
-        style="--beam-final: 0.7"
-      />
-      <line
-        class="app-logo__beam app-logo__beam--bot"
-        x1="50"
-        y1="42"
-        x2="62"
-        y2="48"
-        stroke="var(--color-accent)"
-        stroke-width="2"
-        stroke-linecap="round"
-        opacity="0.45"
-        style="--beam-final: 0.45"
-      />
+      >
+        <!-- Focal point -->
+        <circle cx="20" cy="44" r="3.2" fill="#ffffff" stroke="none" />
+        <!-- Innermost pulse -->
+        <path class="app-logo__arc app-logo__arc--1" stroke-width="3.4"
+          d="M20 34 A10 10 0 0 1 30 44" />
+        <!-- Middle pulse -->
+        <path class="app-logo__arc app-logo__arc--2" stroke-width="3.4"
+          d="M20 26 A18 18 0 0 1 38 44" opacity="0.75" />
+        <!-- Outer pulse -->
+        <path class="app-logo__arc app-logo__arc--3" stroke-width="3.4"
+          d="M20 18 A26 26 0 0 1 46 44" opacity="0.5" />
+      </g>
     </svg>
 
     <span
@@ -139,34 +105,11 @@ const showWordmark = computed(() => props.variant !== 'glyph')
   color: var(--color-text-primary);
   line-height: 1;
 }
-.app-logo__prism {
-  stroke: rgba(255, 255, 255, 0.25);
-  transform-origin: 32px 32px;
-  transform-box: fill-box;
-}
-/* Dark mode: brighter prism highlight + brighter incoming beam. */
-:global(.dark) .app-logo__prism {
-  stroke: rgba(255, 255, 255, 0.35);
-}
-:global(.dark) .app-logo__incoming {
-  stroke: rgba(229, 231, 235, 0.8);
-  stroke-opacity: 1;
-}
-
 /* prettier-ignore */
 @media (prefers-reduced-motion: no-preference) {
-  .app-logo__glyph { perspective: 400px; }
-  .app-logo:hover .app-logo__prism { animation: app-logo-prism-rotate 2s ease-in-out infinite alternate; }
-  .app-logo:hover .app-logo__beam { animation: app-logo-beam-pulse 600ms cubic-bezier(0.22, 1, 0.36, 1) both; }
-  .app-logo:hover .app-logo__beam--mid { animation-delay: 80ms; }
-  .app-logo:hover .app-logo__beam--bot { animation-delay: 160ms; }
-  @keyframes app-logo-prism-rotate { from { transform: rotateY(0deg); } to { transform: rotateY(8deg); } }
-  @keyframes app-logo-beam-pulse { from { opacity: 0; } to { opacity: var(--beam-final, 1); } }
-}
-
-/* prettier-ignore */
-@media (prefers-reduced-motion: reduce) {
-  .app-logo:hover .app-logo__beam--top { animation: app-logo-beam-flash 300ms ease-out both; }
-  @keyframes app-logo-beam-flash { 0% { opacity: 0.4; } 50%, 100% { opacity: 1; } }
+  .app-logo__arc { transition: opacity 220ms ease-out, transform 420ms cubic-bezier(0.22, 1, 0.36, 1); transform-origin: 20px 44px; transform-box: view-box; }
+  .app-logo:hover .app-logo__arc--1 { opacity: 1; }
+  .app-logo:hover .app-logo__arc--2 { opacity: 1; transition-delay: 60ms; }
+  .app-logo:hover .app-logo__arc--3 { opacity: 1; transition-delay: 120ms; }
 }
 </style>
