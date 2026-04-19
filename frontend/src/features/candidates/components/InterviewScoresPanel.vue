@@ -72,7 +72,10 @@ onMounted(async () => {
     </div>
 
     <template v-else>
-      <div v-if="data.overallScore !== null" class="mb-4 rounded-lg bg-blue-50 dark:bg-blue-950 p-4 text-center">
+      <div
+        v-if="data.overallScore !== null"
+        class="mb-4 rounded-lg bg-blue-50 dark:bg-blue-950 p-4 text-center"
+      >
         <p class="text-xs font-medium text-blue-600">{{ t('interviews.overallScore') }}</p>
         <p class="text-3xl font-bold" :class="scoreColor(data.overallScore)">
           {{ data.overallScore }}/100

@@ -51,7 +51,9 @@ onMounted(() => {
     <h1 class="text-2xl font-bold text-gray-900">{{ t('interviews.preCheck.prepareTitle') }}</h1>
 
     <!-- Interview Info -->
-    <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
+    <div
+      class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6"
+    >
       <dl class="space-y-3 text-sm">
         <div class="flex justify-between">
           <dt class="text-gray-500">{{ t('interviews.preCheck.position') }}</dt>
@@ -71,7 +73,9 @@ onMounted(() => {
     </div>
 
     <!-- Camera Preview + Device Selection -->
-    <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
+    <div
+      class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6"
+    >
       <h2 class="mb-4 text-lg font-semibold text-gray-800">
         {{ t('interviews.preCheck.title') }}
       </h2>
@@ -116,7 +120,9 @@ onMounted(() => {
     </div>
 
     <!-- Instructions -->
-    <div class="rounded-lg border border-blue-100 dark:border-blue-900 bg-blue-50 dark:bg-blue-950 p-6">
+    <div
+      class="rounded-lg border border-blue-100 dark:border-blue-900 bg-blue-50 dark:bg-blue-950 p-6"
+    >
       <h3 class="mb-3 text-sm font-semibold text-blue-800">
         {{ t('interviews.preCheck.beforeYouJoin') }}
       </h3>

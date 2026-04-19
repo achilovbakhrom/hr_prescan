@@ -14,7 +14,9 @@ withDefaults(defineProps<Props>(), {
   <div
     :class="[
       'flex flex-col items-center justify-center gap-4',
-      overlay ? 'fixed inset-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm' : 'min-h-64 w-full',
+      overlay
+        ? 'fixed inset-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm'
+        : 'min-h-64 w-full',
     ]"
     role="status"
     :aria-label="message"

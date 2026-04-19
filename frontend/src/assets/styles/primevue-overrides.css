@@ -164,14 +164,27 @@
   border-color: var(--color-border-glass);
 }
 @keyframes dialog-enter {
-  from { opacity: 0; transform: scale(0.98); }
-  to   { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
-  .p-dialog { animation-duration: var(--dur-micro); animation-name: dialog-enter-rm; }
+  .p-dialog {
+    animation-duration: var(--dur-micro);
+    animation-name: dialog-enter-rm;
+  }
   @keyframes dialog-enter-rm {
-    from { opacity: 0; }
-    to   { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 }
 
@@ -261,19 +274,40 @@
   color: var(--color-text-primary);
   animation: toast-slide 320ms var(--ease-ios) both;
 }
-.p-toast-message.p-toast-message-success { border-left: 4px solid var(--color-success); }
-.p-toast-message.p-toast-message-info    { border-left: 4px solid var(--color-info); }
-.p-toast-message.p-toast-message-warn    { border-left: 4px solid var(--color-warning); }
-.p-toast-message.p-toast-message-error   { border-left: 4px solid var(--color-danger); }
+.p-toast-message.p-toast-message-success {
+  border-left: 4px solid var(--color-success);
+}
+.p-toast-message.p-toast-message-info {
+  border-left: 4px solid var(--color-info);
+}
+.p-toast-message.p-toast-message-warn {
+  border-left: 4px solid var(--color-warning);
+}
+.p-toast-message.p-toast-message-error {
+  border-left: 4px solid var(--color-danger);
+}
 @keyframes toast-slide {
-  from { opacity: 0; transform: translateY(-20px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
-  .p-toast-message { animation-name: toast-fade-rm; animation-duration: var(--dur-micro); }
+  .p-toast-message {
+    animation-name: toast-fade-rm;
+    animation-duration: var(--dur-micro);
+  }
   @keyframes toast-fade-rm {
-    from { opacity: 0; }
-    to   { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 }
 

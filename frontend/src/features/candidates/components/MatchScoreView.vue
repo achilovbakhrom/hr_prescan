@@ -128,7 +128,9 @@ const scoreBreakdownLabel = computed(() => {
     <!-- Score Comparison -->
     <div class="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-4">
       <!-- CV Match -->
-      <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 text-center sm:p-5">
+      <div
+        class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 text-center sm:p-5"
+      >
         <p
           class="mb-1 text-[9px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide sm:mb-2 sm:text-xs"
         >
@@ -146,7 +148,9 @@ const scoreBreakdownLabel = computed(() => {
       </div>
 
       <!-- Prescanning Score -->
-      <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 text-center sm:p-5">
+      <div
+        class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 text-center sm:p-5"
+      >
         <p
           class="mb-1 text-[9px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide sm:mb-2 sm:text-xs"
         >
@@ -164,7 +168,9 @@ const scoreBreakdownLabel = computed(() => {
       </div>
 
       <!-- Interview Score -->
-      <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 text-center sm:p-5">
+      <div
+        class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 text-center sm:p-5"
+      >
         <p
           class="mb-1 text-[9px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide sm:mb-2 sm:text-xs"
         >
@@ -204,7 +210,10 @@ const scoreBreakdownLabel = computed(() => {
     </div>
 
     <!-- Score Bar -->
-    <div v-if="combinedScore !== null" class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+    <div
+      v-if="combinedScore !== null"
+      class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4"
+    >
       <div class="mb-2 flex items-center justify-between">
         <span class="text-sm font-medium text-gray-700">{{
           t('candidates.matchScoreView.combinedAssessment')
@@ -232,8 +241,13 @@ const scoreBreakdownLabel = computed(() => {
     </div>
 
     <!-- AI Match Notes -->
-    <div v-if="props.matchDetails?.notes" class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-      <p class="mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+    <div
+      v-if="props.matchDetails?.notes"
+      class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4"
+    >
+      <p
+        class="mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide"
+      >
         {{ t('candidates.matchScoreView.aiNotes') }}
       </p>
       <TranslatableText
@@ -248,7 +262,9 @@ const scoreBreakdownLabel = computed(() => {
           <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{{ text }}</p>
         </template>
       </TranslatableText>
-      <p v-else class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{{ props.matchDetails.notes }}</p>
+      <p v-else class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+        {{ props.matchDetails.notes }}
+      </p>
     </div>
   </div>
 </template>

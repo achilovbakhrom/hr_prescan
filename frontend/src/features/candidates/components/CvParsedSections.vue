@@ -62,7 +62,9 @@ function contactHref(label: string, value: string): string | undefined {
   <div class="space-y-6">
     <div v-if="summary">
       <h3 class="mb-2 text-sm font-semibold text-gray-600">{{ t('candidates.cvData.summary') }}</h3>
-      <div class="rounded-lg border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 p-3 text-sm text-gray-700">
+      <div
+        class="rounded-lg border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 p-3 text-sm text-gray-700"
+      >
         <TranslatableText
           v-if="applicationId"
           :text="summary"
@@ -99,7 +101,9 @@ function contactHref(label: string, value: string): string | undefined {
         >
           <i class="pi text-gray-400" :class="c.icon"></i>
           <div class="min-w-0 flex-1">
-            <p class="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase">{{ c.label }}</p>
+            <p class="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase">
+              {{ c.label }}
+            </p>
             <p class="truncate text-sm text-gray-700">{{ c.value }}</p>
           </div>
         </a>

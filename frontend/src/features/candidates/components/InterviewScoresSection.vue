@@ -77,7 +77,10 @@ function scoreBg(score: number): string {
       </div>
     </div>
 
-    <div v-if="aiSummary" class="mb-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-4">
+    <div
+      v-if="aiSummary"
+      class="mb-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-4"
+    >
       <p class="mb-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
         {{ t('interviews.aiAssessment') }}
       </p>
@@ -99,7 +102,11 @@ function scoreBg(score: number): string {
       <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
         {{ t('interviews.criteriaBreakdown') }}
       </p>
-      <div v-for="score in scores" :key="score.id" class="rounded-lg border border-gray-200 dark:border-gray-700 p-3">
+      <div
+        v-for="score in scores"
+        :key="score.id"
+        class="rounded-lg border border-gray-200 dark:border-gray-700 p-3"
+      >
         <div class="mb-1.5 flex items-center justify-between">
           <span class="text-sm font-medium text-gray-700">{{
             getLocalizedCriteriaName(score)

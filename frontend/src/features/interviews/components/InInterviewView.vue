@@ -58,7 +58,9 @@ async function confirmLeave(): Promise<void> {
 <template>
   <div class="space-y-4">
     <!-- Top Bar -->
-    <div class="flex items-center justify-between rounded-lg bg-white dark:bg-gray-800 p-4 shadow-sm">
+    <div
+      class="flex items-center justify-between rounded-lg bg-white dark:bg-gray-800 p-4 shadow-sm"
+    >
       <div class="flex items-center gap-4">
         <ConnectionStatus :state="connectionState" />
         <InterviewTimer :duration-minutes="interview.durationMinutes" />
