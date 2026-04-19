@@ -79,6 +79,8 @@ function onChange(value: Industry[]): void {
     :optionLabel="translatedLabel"
     :placeholder="t('auth.chooseRole.industry')"
     :invalid="invalid"
+    class="w-full"
+    input-class="w-full"
     multiple
     @complete="search"
     @update:modelValue="onChange"
