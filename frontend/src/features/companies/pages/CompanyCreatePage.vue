@@ -3,7 +3,7 @@
  * CompanyCreatePage — centered GlassCard form.
  * Spec: docs/design/spec.md §9 Companies block.
  */
-import { ref } from 'vue'
+import { ref, computed, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import InputText from 'primevue/inputtext'
