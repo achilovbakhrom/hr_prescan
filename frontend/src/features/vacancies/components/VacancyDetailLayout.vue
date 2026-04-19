@@ -79,7 +79,7 @@ function selectMobile(e: { value: string }): void {
       <aside class="hidden w-56 shrink-0 lg:block">
         <div class="sticky top-4 space-y-4">
           <!-- At a glance card -->
-          <div class="rounded-xl border border-gray-100 bg-white p-4">
+          <div class="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-4">
             <p class="mb-2 text-[10px] font-semibold uppercase tracking-widest text-gray-400">
               {{ t('vacancies.atAGlance') }}
             </p>
@@ -100,7 +100,7 @@ function selectMobile(e: { value: string }): void {
           </div>
 
           <!-- Section nav -->
-          <nav class="rounded-xl border border-gray-100 bg-white p-2">
+          <nav class="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-2">
             <button
               v-for="item in items"
               :key="item.key"
@@ -109,7 +109,7 @@ function selectMobile(e: { value: string }): void {
               :class="
                 active === item.key
                   ? 'bg-blue-50 text-blue-700'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  : 'text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900'
               "
               @click="emit('navigate', item.key)"
             >
@@ -121,7 +121,7 @@ function selectMobile(e: { value: string }): void {
               <span class="flex-1 truncate">{{ item.label }}</span>
               <span
                 v-if="item.count != null"
-                class="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-semibold text-gray-600"
+                class="rounded-full bg-gray-100 dark:bg-gray-800 px-2 py-0.5 text-[10px] font-semibold text-gray-600"
                 >{{ item.count }}</span
               >
             </button>

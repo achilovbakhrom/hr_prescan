@@ -17,7 +17,7 @@ function goBack(): void {
 </script>
 
 <template>
-  <div class="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-6 py-24">
+  <div class="flex min-h-screen flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 px-6 py-24">
     <div class="text-center">
       <p class="text-8xl font-extrabold text-amber-500">403</p>
       <h1 class="mt-4 text-3xl font-bold tracking-tight text-gray-900">
@@ -40,7 +40,7 @@ function goBack(): void {
     <div class="mt-16 text-center">
       <p class="text-sm text-gray-400">
         {{ t('errors.needAccess') }}
-        <a href="mailto:support@hrprescan.com" class="text-blue-600 hover:underline"
+        <a href="mailto:support@hrprescan.com" class="text-blue-600 dark:text-blue-400 hover:underline"
           >support@hrprescan.com</a
         >
       </p>

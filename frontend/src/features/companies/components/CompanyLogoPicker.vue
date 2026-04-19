@@ -3,8 +3,6 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CompanyLogo from '@/shared/components/CompanyLogo.vue'
 
-const MAX_LOGO_BYTES = 2 * 1024 * 1024
-
 const props = defineProps<{
   logo: string | null
   name: string
@@ -15,6 +13,8 @@ const emit = defineEmits<{
   pick: [file: File]
   reject: [reason: string]
 }>()
+
+const MAX_LOGO_BYTES = 2 * 1024 * 1024
 
 const { t } = useI18n()
 const inputRef = ref<HTMLInputElement | null>(null)

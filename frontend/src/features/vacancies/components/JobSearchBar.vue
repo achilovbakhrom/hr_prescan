@@ -22,10 +22,10 @@ const { t } = useI18n()
 </script>
 
 <template>
-  <div class="border-b border-gray-100 bg-white">
+  <div class="border-b border-gray-100 dark:border-gray-800 bg-white">
     <div class="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
-      <h1 class="mb-1 text-xl font-bold text-gray-900 sm:text-2xl">{{ t('jobBoard.title') }}</h1>
-      <p class="mb-4 text-sm text-gray-500 sm:mb-5">
+      <h1 class="mb-1 text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">{{ t('jobBoard.title') }}</h1>
+      <p class="mb-4 text-sm text-gray-500 dark:text-gray-400 sm:mb-5">
         {{ t('jobBoard.openPositions', { count: jobCount }) }}
       </p>
 

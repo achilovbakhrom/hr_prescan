@@ -71,7 +71,7 @@ function proficiencyLabel(value: string): string {
             :href="profile.linkedinUrl"
             target="_blank"
             rel="noopener"
-            class="text-blue-600 hover:underline"
+            class="text-blue-600 dark:text-blue-400 hover:underline"
           >
             <i class="pi pi-linkedin mr-1 text-xs"></i>LinkedIn
           </a>
@@ -80,7 +80,7 @@ function proficiencyLabel(value: string): string {
             :href="profile.githubUrl"
             target="_blank"
             rel="noopener"
-            class="text-gray-700 hover:underline"
+            class="text-gray-700 dark:text-gray-300 hover:underline"
           >
             <i class="pi pi-github mr-1 text-xs"></i>GitHub
           </a>
@@ -89,7 +89,7 @@ function proficiencyLabel(value: string): string {
             :href="profile.websiteUrl"
             target="_blank"
             rel="noopener"
-            class="text-blue-600 hover:underline"
+            class="text-blue-600 dark:text-blue-400 hover:underline"
           >
             <i class="pi pi-globe mr-1 text-xs"></i>Website
           </a>
@@ -113,7 +113,7 @@ function proficiencyLabel(value: string): string {
         <h2 class="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-400">
           {{ t('publicCv.experience') }}
         </h2>
-        <div class="space-y-4 border-l-2 border-blue-200 pl-4">
+        <div class="space-y-4 border-l-2 border-blue-200 dark:border-blue-800 pl-4">
           <div v-for="exp in profile.workExperiences" :key="exp.id" class="relative">
             <div
               class="absolute -left-[1.35rem] top-1.5 h-2.5 w-2.5 rounded-full bg-blue-500"
@@ -143,7 +143,7 @@ function proficiencyLabel(value: string): string {
           <div
             v-for="edu in profile.educations"
             :key="edu.id"
-            class="rounded-lg border border-gray-100 bg-gray-50 p-3"
+            class="rounded-lg border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 p-3"
           >
             <p class="font-semibold text-gray-900">{{ edu.degree || edu.institution }}</p>
             <p v-if="edu.degree" class="text-sm text-gray-600">{{ edu.institution }}</p>
@@ -180,7 +180,7 @@ function proficiencyLabel(value: string): string {
           <span
             v-for="lang in profile.languages"
             :key="lang.id"
-            class="rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm"
+            class="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 px-3 py-1.5 text-sm"
           >
             {{ lang.language.name }}
             <span class="ml-1 text-gray-400">&mdash; {{ proficiencyLabel(lang.proficiency) }}</span>
@@ -209,7 +209,7 @@ function proficiencyLabel(value: string): string {
               :href="cert.credentialUrl"
               target="_blank"
               rel="noopener"
-              class="text-blue-600 hover:underline"
+              class="text-blue-600 dark:text-blue-400 hover:underline"
             >
               <i class="pi pi-external-link text-xs"></i>
             </a>

@@ -91,8 +91,8 @@ async function handleSubmit(): Promise<void> {
 
 <template>
   <div class="flex flex-1 items-center justify-center py-12">
-    <div class="w-full max-w-lg rounded-lg bg-white p-6 shadow-md sm:p-8">
-      <h1 class="mb-2 text-center text-xl font-bold text-gray-900 sm:text-2xl">
+    <div class="w-full max-w-lg rounded-lg bg-white dark:bg-gray-800 p-6 shadow-md sm:p-8">
+      <h1 class="mb-2 text-center text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">
         {{ t('auth.companySetup.title') }}
       </h1>
       <p class="mb-6 text-center text-sm text-gray-500">

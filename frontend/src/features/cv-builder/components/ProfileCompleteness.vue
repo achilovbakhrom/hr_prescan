@@ -33,9 +33,9 @@ const progressColor = computed(() => {
 </script>
 
 <template>
-  <div class="rounded-lg bg-white p-4 shadow-sm sm:p-6">
+  <div class="rounded-lg bg-white dark:bg-gray-800 p-4 shadow-sm sm:p-6">
     <div class="mb-3 flex items-center justify-between">
-      <h2 class="text-base font-semibold text-gray-900 sm:text-lg">
+      <h2 class="text-base font-semibold text-gray-900 dark:text-white sm:text-lg">
         {{ t('cvBuilder.completeness.title') }}
       </h2>
       <span

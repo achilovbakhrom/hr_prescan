@@ -43,7 +43,7 @@ function getProficiencySeverity(value: string): 'success' | 'info' | 'warn' | 's
 </script>
 
 <template>
-  <div class="flex items-center justify-between rounded-lg border border-gray-200 px-4 py-3">
+  <div class="flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 px-4 py-3">
     <div class="flex items-center gap-3">
       <span class="font-medium text-gray-900">{{ getLocalizedName(entry.language) }}</span>
       <Tag

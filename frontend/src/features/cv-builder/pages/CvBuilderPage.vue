@@ -84,7 +84,7 @@ function handleSave(): void {
         {{ store.error }}
       </Message>
 
-      <div class="rounded-lg bg-white shadow-sm">
+      <div class="rounded-lg bg-white dark:bg-gray-800 shadow-sm">
         <Tabs :value="activeTab" @update:value="(v: string | number) => (activeTab = String(v))">
           <TabList>
             <Tab value="0">

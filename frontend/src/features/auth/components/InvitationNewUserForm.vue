@@ -58,7 +58,7 @@ function handleSubmit(): void {
     <Message v-if="errorMessage" severity="error" class="mb-4">{{ errorMessage }}</Message>
 
     <form class="flex flex-col gap-4" @submit.prevent="handleSubmit">
-      <div class="rounded-md bg-gray-50 px-3 py-2 text-sm text-gray-600">
+      <div class="rounded-md bg-gray-50 dark:bg-gray-900 px-3 py-2 text-sm text-gray-600">
         <i class="pi pi-envelope mr-1"></i> {{ invitationEmail }}
       </div>
 
@@ -144,7 +144,7 @@ function handleSubmit(): void {
       {{ t('auth.register.hasAccount') }}
       <RouterLink
         :to="{ name: ROUTE_NAMES.LOGIN }"
-        class="font-medium text-blue-600 hover:text-blue-500"
+        class="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500"
         >{{ t('auth.register.signIn') }}</RouterLink
       >
     </p>

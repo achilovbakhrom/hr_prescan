@@ -12,7 +12,7 @@ withDefaults(defineProps<Props>(), {
 
 <template>
   <div
-    class="rounded-xl border border-gray-100 bg-white p-6 shadow-sm"
+    class="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-6 shadow-sm"
     role="status"
     aria-label="Loading content"
     aria-busy="true"

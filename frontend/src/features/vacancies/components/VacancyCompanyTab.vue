@@ -48,7 +48,7 @@ const { t } = useI18n()
       </div>
     </div>
 
-    <div v-if="selectedCompany" class="rounded-xl border border-gray-200 bg-gray-50 p-4">
+    <div v-if="selectedCompany" class="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-4">
       <div class="flex items-center gap-3">
         <CompanyLogo :logo="selectedCompany.logo" :name="selectedCompany.name" size="md" />
         <div class="min-w-0 flex-1">
@@ -68,7 +68,7 @@ const { t } = useI18n()
             v-if="selectedCompany.website"
             :href="selectedCompany.website"
             target="_blank"
-            class="text-xs text-blue-500 hover:underline"
+            class="text-xs text-blue-500 dark:text-blue-400 hover:underline"
           >
             {{ selectedCompany.website }}
           </a>
@@ -86,7 +86,7 @@ const { t } = useI18n()
       </p>
     </div>
 
-    <div v-else class="rounded-xl border border-dashed border-gray-200 py-10 text-center">
+    <div v-else class="rounded-xl border border-dashed border-gray-200 dark:border-gray-700 py-10 text-center">
       <i class="pi pi-building mb-2 text-3xl text-gray-300"></i>
       <p class="text-sm text-gray-500">{{ t('companies.selectCompany') }}</p>
       <p class="mt-1 text-xs text-gray-400">{{ t('companies.orCreateNew') }}</p>

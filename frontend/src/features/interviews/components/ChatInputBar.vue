@@ -39,7 +39,7 @@ function onInput(event: Event) {
 
 <template>
   <!-- Completed overlay -->
-  <div v-if="isCompleted" class="border-t border-gray-200 bg-white px-4 py-6">
+  <div v-if="isCompleted" class="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-6">
     <div class="mx-auto max-w-3xl text-center">
       <div
         class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-green-100"
@@ -57,13 +57,13 @@ function onInput(event: Event) {
       <div v-else class="flex justify-center gap-3">
         <RouterLink
           to="/register"
-          class="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+          class="rounded-xl bg-blue-600 dark:bg-blue-700 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
         >
           {{ t('interviews.chatPage.createAccount') }}
         </RouterLink>
         <RouterLink
           to="/jobs"
-          class="rounded-xl border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+          class="rounded-xl border border-gray-300 dark:border-gray-600 px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors hover:bg-gray-50"
         >
           {{ t('interviews.chatPage.browseJobs') }}
         </RouterLink>
@@ -72,13 +72,13 @@ function onInput(event: Event) {
   </div>
 
   <!-- Input area -->
-  <div v-else class="border-t border-gray-200 bg-white px-4 py-3">
+  <div v-else class="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3">
     <div class="mx-auto flex max-w-3xl items-end gap-3">
       <div class="relative flex-1">
         <textarea
           :value="modelValue"
           rows="1"
-          class="w-full resize-none rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 pr-4 text-sm transition-colors placeholder:text-gray-400 focus:border-blue-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100"
+          class="w-full resize-none rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 px-4 py-3 pr-4 text-sm transition-colors placeholder:text-gray-400 focus:border-blue-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100"
           :placeholder="t('interviews.chat.placeholder')"
           :disabled="props.sending || props.sendingVoice"
           @input="onInput"

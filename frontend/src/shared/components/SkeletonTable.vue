@@ -14,13 +14,13 @@ withDefaults(defineProps<Props>(), {
 
 <template>
   <div
-    class="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm"
+    class="overflow-hidden rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 shadow-sm"
     role="status"
     aria-label="Loading table"
     aria-busy="true"
   >
     <!-- Table header -->
-    <div v-if="showHeader" class="flex gap-4 border-b border-gray-100 bg-gray-50 px-6 py-3">
+    <div v-if="showHeader" class="flex gap-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 px-6 py-3">
       <div
         v-for="col in columns"
         :key="col"

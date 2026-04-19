@@ -61,7 +61,7 @@ async function handleCompanySwitch(value: string): Promise<void> {
   </div>
   <div
     v-else-if="authStore.user?.company"
-    class="hidden items-center gap-2 rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600 sm:inline-flex"
+    class="hidden items-center gap-2 rounded-md bg-gray-100 dark:bg-gray-800 px-2 py-1 text-xs font-medium text-gray-600 dark:text-gray-400 sm:inline-flex"
   >
     <CompanyLogo
       :logo="authStore.user.company.logo"

@@ -19,31 +19,31 @@ onMounted(() => adminStore.fetchAnalytics())
 
     <template v-else-if="adminStore.analytics">
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        <div class="rounded-lg border border-gray-200 bg-white p-4">
+        <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
           <p class="text-sm text-gray-500">{{ t('admin.dashboard.totalCompanies') }}</p>
           <p class="mt-1 text-2xl font-bold">
             {{ adminStore.analytics.totalCompanies }}
           </p>
         </div>
-        <div class="rounded-lg border border-gray-200 bg-white p-4">
+        <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
           <p class="text-sm text-gray-500">{{ t('admin.dashboard.totalUsers') }}</p>
           <p class="mt-1 text-2xl font-bold">
             {{ adminStore.analytics.totalUsers }}
           </p>
         </div>
-        <div class="rounded-lg border border-gray-200 bg-white p-4">
+        <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
           <p class="text-sm text-gray-500">{{ t('admin.dashboard.totalInterviews') }}</p>
           <p class="mt-1 text-2xl font-bold">
             {{ adminStore.analytics.totalInterviews }}
           </p>
         </div>
-        <div class="rounded-lg border border-gray-200 bg-white p-4">
+        <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
           <p class="text-sm text-gray-500">{{ t('admin.analytics.activeSubscriptions') }}</p>
           <p class="mt-1 text-2xl font-bold">
             {{ adminStore.analytics.activeSubscriptions }}
           </p>
         </div>
-        <div class="rounded-lg border border-gray-200 bg-white p-4">
+        <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
           <p class="text-sm text-gray-500">{{ t('admin.dashboard.monthlyRevenue') }}</p>
           <p class="mt-1 text-2xl font-bold">
             ${{ adminStore.analytics.monthlyRevenue.toLocaleString() }}
@@ -54,12 +54,12 @@ onMounted(() => adminStore.fetchAnalytics())
       <!-- Charts Placeholder -->
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div
-          class="flex h-64 items-center justify-center rounded-lg border border-gray-200 bg-white"
+          class="flex h-64 items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 bg-white"
         >
           <p class="text-gray-400">{{ t('admin.analytics.revenueChartSoon') }}</p>
         </div>
         <div
-          class="flex h-64 items-center justify-center rounded-lg border border-gray-200 bg-white"
+          class="flex h-64 items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 bg-white"
         >
           <p class="text-gray-400">{{ t('admin.analytics.userGrowthChartSoon') }}</p>
         </div>

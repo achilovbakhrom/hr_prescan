@@ -63,7 +63,7 @@ async function handleWatchLive(): Promise<void> {
 <template>
   <div class="space-y-4">
     <div class="flex items-center gap-3">
-      <button class="text-gray-500 hover:text-gray-700" @click="router.back()">
+      <button class="text-gray-500 dark:text-gray-400 hover:text-gray-700" @click="router.back()">
         <i class="pi pi-arrow-left text-lg"></i>
       </button>
       <h1 class="text-lg font-bold md:text-2xl">{{ t('interviews.detailPage.title') }}</h1>
@@ -78,14 +78,14 @@ async function handleWatchLive(): Promise<void> {
     </div>
 
     <template v-else-if="interview">
-      <div class="rounded-lg border border-gray-200 bg-white p-4 md:p-6">
+      <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 md:p-6">
         <div
           class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-4"
         >
           <div class="space-y-1">
             <p class="text-base font-semibold md:text-lg">{{ interview.candidateName }}</p>
             <p class="text-sm text-gray-600">{{ interview.vacancyTitle }}</p>
-            <p class="text-xs text-gray-500 sm:text-sm">
+            <p class="text-xs text-gray-500 dark:text-gray-400 sm:text-sm">
               {{ formatDate(interview.createdAt) }} &middot; {{ interview.durationMinutes }} min
             </p>
           </div>
@@ -127,7 +127,7 @@ async function handleWatchLive(): Promise<void> {
         </div>
         <div
           v-if="isScheduled || isInProgress"
-          class="mt-4 rounded border border-blue-100 bg-blue-50 p-3"
+          class="mt-4 rounded border border-blue-100 dark:border-blue-900 bg-blue-50 dark:bg-blue-950 p-3"
         >
           <p class="text-sm font-medium text-blue-800">{{ t('interviews.detailPage.roomLink') }}</p>
           <p class="mt-1 text-sm text-blue-600">
@@ -149,7 +149,7 @@ async function handleWatchLive(): Promise<void> {
           "
         >
           <template #default="{ text }">
-            <p class="mt-4 rounded bg-gray-50 p-3 text-sm text-gray-700">
+            <p class="mt-4 rounded bg-gray-50 dark:bg-gray-900 p-3 text-sm text-gray-700">
               {{ text }}
             </p>
           </template>
@@ -174,7 +174,7 @@ async function handleWatchLive(): Promise<void> {
         </TabPanel>
         <TabPanel value="3" :header="t('interviews.detailPage.tabRecording')">
           <div class="py-4">
-            <div v-if="interview.recordingPath" class="rounded-lg border border-gray-200 p-6">
+            <div v-if="interview.recordingPath" class="rounded-lg border border-gray-200 dark:border-gray-700 p-6">
               <p class="mb-2 text-sm font-medium text-gray-700">
                 {{ t('interviews.detailPage.recordingPath') }}
               </p>

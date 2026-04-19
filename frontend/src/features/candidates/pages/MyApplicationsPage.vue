@@ -73,7 +73,7 @@ function formatDate(dateStr: string): string {
         <div class="py-8 text-center text-gray-500">
           <i class="pi pi-inbox mb-2 text-3xl"></i>
           <p>No applications yet</p>
-          <RouterLink to="/jobs" class="mt-2 inline-block text-blue-600 hover:underline">
+          <RouterLink to="/jobs" class="mt-2 inline-block text-blue-600 dark:text-blue-400 hover:underline">
             Browse available jobs
           </RouterLink>
         </div>

@@ -62,7 +62,7 @@ function contactHref(label: string, value: string): string | undefined {
   <div class="space-y-6">
     <div v-if="summary">
       <h3 class="mb-2 text-sm font-semibold text-gray-600">{{ t('candidates.cvData.summary') }}</h3>
-      <div class="rounded-lg border border-gray-100 bg-gray-50 p-3 text-sm text-gray-700">
+      <div class="rounded-lg border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 p-3 text-sm text-gray-700">
         <TranslatableText
           v-if="applicationId"
           :text="summary"
@@ -94,12 +94,12 @@ function contactHref(label: string, value: string): string | undefined {
           :href="contactHref(c.label, c.value)"
           target="_blank"
           rel="noopener"
-          class="flex items-center gap-2.5 rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 text-sm transition-colors hover:bg-gray-100"
+          class="flex items-center gap-2.5 rounded-lg border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 px-3 py-2 text-sm transition-colors hover:bg-gray-100"
           :class="contactHref(c.label, c.value) ? 'cursor-pointer' : 'cursor-default'"
         >
           <i class="pi text-gray-400" :class="c.icon"></i>
           <div class="min-w-0 flex-1">
-            <p class="text-[10px] font-medium text-gray-400 uppercase">{{ c.label }}</p>
+            <p class="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase">{{ c.label }}</p>
             <p class="truncate text-sm text-gray-700">{{ c.value }}</p>
           </div>
         </a>
@@ -117,7 +117,7 @@ function contactHref(label: string, value: string): string | undefined {
       <h3 class="mb-2 text-sm font-semibold text-gray-600">
         {{ t('candidates.cvData.experience') }}
       </h3>
-      <div class="space-y-3 border-l-2 border-blue-200 pl-4">
+      <div class="space-y-3 border-l-2 border-blue-200 dark:border-blue-800 pl-4">
         <div v-for="(entry, idx) in experience" :key="idx" class="relative">
           <div class="absolute -left-[1.35rem] top-1 h-2.5 w-2.5 rounded-full bg-blue-500"></div>
           <p class="font-medium">{{ entry.position || entry.role }}</p>
@@ -140,7 +140,7 @@ function contactHref(label: string, value: string): string | undefined {
         <div
           v-for="(entry, idx) in education"
           :key="idx"
-          class="rounded border border-gray-100 bg-gray-50 p-3"
+          class="rounded border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 p-3"
         >
           <p class="font-medium">
             {{ entry.degree
@@ -164,7 +164,7 @@ function contactHref(label: string, value: string): string | undefined {
         <span
           v-for="(lang, idx) in languages"
           :key="idx"
-          class="rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm"
+          class="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 px-3 py-1.5 text-sm"
         >
           {{ lang.language
           }}<span v-if="lang.level" class="ml-1 text-gray-400">-- {{ lang.level }}</span>

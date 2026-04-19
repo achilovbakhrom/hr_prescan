@@ -43,7 +43,7 @@ const {
     <div v-if="loading" class="flex flex-1 items-center justify-center">
       <div class="text-center">
         <div
-          class="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600"
+          class="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-blue-200 dark:border-blue-800 border-t-blue-600"
         ></div>
         <p class="text-sm text-gray-500">{{ t('interviews.chatPage.preparing') }}</p>
       </div>
@@ -61,7 +61,7 @@ const {
       <!-- Minimized bar -->
       <div
         v-if="isMinimized && !isClosed"
-        class="fixed bottom-0 left-0 right-0 z-50 cursor-pointer border-t border-gray-200 bg-white px-4 py-3 shadow-lg transition-all hover:bg-gray-50"
+        class="fixed bottom-0 left-0 right-0 z-50 cursor-pointer border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 shadow-lg transition-all hover:bg-gray-50"
         @click="isMinimized = false"
       >
         <div class="mx-auto flex max-w-3xl items-center justify-between">
@@ -80,7 +80,7 @@ const {
           <div class="flex items-center gap-2">
             <span
               v-if="messages.length"
-              class="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white"
+              class="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 dark:bg-blue-700 text-[10px] font-bold text-white"
             >
               {{ messages.length }}
             </span>
@@ -101,7 +101,7 @@ const {
       <!-- Full chat view -->
       <template v-if="!isMinimized">
         <!-- Header -->
-        <header class="border-b border-gray-200 bg-white px-4 py-3 shadow-sm">
+        <header class="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 shadow-sm">
           <div class="mx-auto flex max-w-3xl items-center justify-between">
             <div class="flex items-center gap-3">
               <div
@@ -129,14 +129,14 @@ const {
             </div>
             <div class="flex items-center gap-1">
               <button
-                class="flex h-9 w-9 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+                class="flex h-9 w-9 items-center justify-center rounded-lg text-gray-400 dark:text-gray-500 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-600"
                 title="Minimize"
                 @click="isMinimized = true"
               >
                 <i class="pi pi-minus text-sm"></i>
               </button>
               <button
-                class="flex h-9 w-9 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500"
+                class="flex h-9 w-9 items-center justify-center rounded-lg text-gray-400 dark:text-gray-500 transition-colors hover:bg-red-50 hover:text-red-500"
                 title="Close"
                 @click="handleClose"
               >
@@ -151,7 +151,7 @@ const {
           v-if="showLeaveConfirm"
           class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
         >
-          <div class="mx-4 w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl">
+          <div class="mx-4 w-full max-w-sm rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-2xl">
             <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-yellow-100">
               <i class="pi pi-exclamation-triangle text-xl text-yellow-600"></i>
             </div>

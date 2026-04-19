@@ -74,7 +74,7 @@ async function handleStatusChange(_event: Event, id: string, status: VacancyStat
   <div>
     <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h1 class="text-lg font-bold text-gray-900 md:text-xl">{{ t('vacancies.title') }}</h1>
+        <h1 class="text-lg font-bold text-gray-900 dark:text-white md:text-xl">{{ t('vacancies.title') }}</h1>
         <p class="mt-0.5 text-sm text-gray-500">
           {{ t('vacancies.shown', { count: filteredVacancies.length }) }}
         </p>
@@ -88,12 +88,12 @@ async function handleStatusChange(_event: Event, id: string, status: VacancyStat
     </div>
 
     <div class="mb-4 flex items-center gap-2">
-      <div class="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-0.5">
+      <div class="inline-flex rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-0.5">
         <button
           class="rounded-md px-4 py-1.5 text-sm font-medium transition-colors"
           :class="
             activeTab === 'active'
-              ? 'bg-white text-gray-900 shadow-sm'
+              ? 'bg-white text-gray-900 dark:text-white shadow-sm'
               : 'text-gray-500 hover:text-gray-700'
           "
           @click="activeTab = 'active'"
@@ -105,7 +105,7 @@ async function handleStatusChange(_event: Event, id: string, status: VacancyStat
           class="rounded-md px-4 py-1.5 text-sm font-medium transition-colors"
           :class="
             activeTab === 'archived'
-              ? 'bg-white text-gray-900 shadow-sm'
+              ? 'bg-white text-gray-900 dark:text-white shadow-sm'
               : 'text-gray-500 hover:text-gray-700'
           "
           @click="activeTab = 'archived'"
@@ -126,7 +126,7 @@ async function handleStatusChange(_event: Event, id: string, status: VacancyStat
       />
     </div>
 
-    <p v-if="vacancyStore.error" class="mb-3 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700">
+    <p v-if="vacancyStore.error" class="mb-3 rounded-lg bg-red-50 dark:bg-red-950 px-4 py-2 text-sm text-red-700">
       {{ vacancyStore.error }}
     </p>
 
@@ -147,7 +147,7 @@ async function handleStatusChange(_event: Event, id: string, status: VacancyStat
 
     <div
       v-else
-      class="flex flex-col items-center rounded-xl border border-dashed border-gray-200 px-4 py-12 text-center md:py-16"
+      class="flex flex-col items-center rounded-xl border border-dashed border-gray-200 dark:border-gray-700 px-4 py-12 text-center md:py-16"
     >
       <div class="flex h-14 w-14 items-center justify-center rounded-full bg-gray-100">
         <i class="pi pi-briefcase text-2xl text-gray-400"></i>

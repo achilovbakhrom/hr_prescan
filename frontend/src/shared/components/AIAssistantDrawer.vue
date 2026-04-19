@@ -76,9 +76,9 @@ onUnmounted(() => {
   <Transition name="slide-right">
     <div
       v-if="isOpen"
-      class="fixed right-0 top-0 z-50 flex h-full w-full flex-col border-l border-gray-200 bg-white shadow-2xl sm:max-w-[400px]"
+      class="fixed right-0 top-0 z-50 flex h-full w-full flex-col border-l border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-2xl sm:max-w-[400px]"
     >
-      <div class="flex items-center justify-between border-b border-gray-100 px-4 py-3">
+      <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 px-4 py-3">
         <div class="flex items-center gap-2">
           <div
             class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600"
@@ -129,7 +129,7 @@ onUnmounted(() => {
             <button
               v-for="hint in quickHints"
               :key="hint"
-              class="rounded-full border border-gray-200 px-3 py-1.5 text-xs text-gray-600 transition-colors hover:border-violet-300 hover:bg-violet-50 hover:text-violet-700"
+              class="rounded-full border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 transition-colors hover:border-violet-300 hover:bg-violet-50 hover:text-violet-700"
               @click="sendMessage(hint)"
             >
               {{ hint }}
@@ -140,7 +140,7 @@ onUnmounted(() => {
         <AIMessageList v-else :messages="messages" :sending="sending" />
       </div>
 
-      <div class="border-t border-gray-100 p-3">
+      <div class="border-t border-gray-100 dark:border-gray-800 p-3">
         <div class="flex gap-2">
           <Textarea
             v-model="inputText"

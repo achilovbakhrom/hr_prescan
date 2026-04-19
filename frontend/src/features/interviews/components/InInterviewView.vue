@@ -58,7 +58,7 @@ async function confirmLeave(): Promise<void> {
 <template>
   <div class="space-y-4">
     <!-- Top Bar -->
-    <div class="flex items-center justify-between rounded-lg bg-white p-4 shadow-sm">
+    <div class="flex items-center justify-between rounded-lg bg-white dark:bg-gray-800 p-4 shadow-sm">
       <div class="flex items-center gap-4">
         <ConnectionStatus :state="connectionState" />
         <InterviewTimer :duration-minutes="interview.durationMinutes" />
@@ -98,7 +98,7 @@ async function confirmLeave(): Promise<void> {
     </div>
 
     <!-- Controls -->
-    <div class="rounded-lg bg-white p-4 shadow-sm">
+    <div class="rounded-lg bg-white dark:bg-gray-800 p-4 shadow-sm">
       <MediaControls
         :is-mic-enabled="isMicEnabled"
         :is-camera-enabled="isCameraEnabled"
@@ -113,7 +113,7 @@ async function confirmLeave(): Promise<void> {
       v-if="showLeaveDialog"
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
     >
-      <div class="mx-4 w-full max-w-sm rounded-lg bg-white p-6 shadow-xl">
+      <div class="mx-4 w-full max-w-sm rounded-lg bg-white dark:bg-gray-800 p-6 shadow-xl">
         <h3 class="mb-2 text-lg font-semibold text-gray-900">
           {{ t('interviews.inInterview.leaveTitle') }}
         </h3>
@@ -122,7 +122,7 @@ async function confirmLeave(): Promise<void> {
         </p>
         <div class="flex justify-end gap-3">
           <button
-            class="rounded-md px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+            class="rounded-md px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100"
             @click="cancelLeave"
           >
             {{ t('common.cancel') }}

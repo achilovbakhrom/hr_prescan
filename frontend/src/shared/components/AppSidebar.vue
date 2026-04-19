@@ -168,7 +168,7 @@ function isActive(path: string): boolean {
               :class="
                 isActive(item.to)
                   ? 'bg-blue-50 text-blue-700'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  : 'text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900'
               "
               :title="collapsed ? item.label : undefined"
               :aria-current="isActive(item.to) ? 'page' : undefined"
@@ -187,7 +187,7 @@ function isActive(path: string): boolean {
     </nav>
 
     <!-- AI Assistant button -->
-    <div class="border-t border-gray-100 px-2 py-3">
+    <div class="border-t border-gray-100 dark:border-gray-800 px-2 py-3">
       <button
         type="button"
         class="flex w-full items-center gap-3 rounded-xl bg-gradient-to-r from-violet-500 to-indigo-600 px-3 py-2.5 text-[13px] font-medium text-white shadow-sm transition-all hover:shadow-md hover:brightness-110 active:scale-[0.98]"

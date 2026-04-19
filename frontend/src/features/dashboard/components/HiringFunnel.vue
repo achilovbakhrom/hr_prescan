@@ -36,7 +36,7 @@ const funnelSteps = computed(() => {
 </script>
 
 <template>
-  <div class="rounded-xl border border-gray-100 bg-white p-6">
+  <div class="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-6">
     <h2 class="mb-5 text-sm font-semibold uppercase tracking-wider text-gray-400">
       {{ t('analytics.hiringFunnel') }}
     </h2>

@@ -127,21 +127,21 @@ function navigateToDetail(id: string): void {
           <!-- Mobile filter bar -->
           <div class="mb-3 flex items-center gap-2 lg:hidden">
             <button
-              class="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
+              class="flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 transition-colors hover:bg-gray-50"
               @click="showMobileFilters = !showMobileFilters"
             >
               <i class="pi pi-filter text-xs"></i>
               {{ t('common.filters') }}
               <span
                 v-if="activeFilterCount > 0"
-                class="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white"
+                class="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 dark:bg-blue-700 text-[10px] font-bold text-white"
               >
                 {{ activeFilterCount }}
               </span>
             </button>
             <button
               v-if="activeFilterCount > 0"
-              class="text-xs text-blue-600 hover:underline"
+              class="text-xs text-blue-600 dark:text-blue-400 hover:underline"
               @click="clearFilters"
             >
               {{ t('jobBoard.clearAll') }}

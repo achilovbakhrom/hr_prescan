@@ -90,7 +90,7 @@ function handleTelegramError(msg: string): void {
 
 <template>
   <div class="flex flex-1 items-center justify-center py-12">
-    <div class="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
+    <div class="w-full max-w-md rounded-lg bg-white dark:bg-gray-800 p-8 shadow-md">
       <h1 class="mb-6 text-center text-2xl font-bold text-gray-900">
         {{ t('auth.login.title') }}
       </h1>
@@ -158,7 +158,7 @@ function handleTelegramError(msg: string): void {
         {{ t('auth.login.noAccount') }}
         <RouterLink
           :to="{ name: ROUTE_NAMES.REGISTER }"
-          class="font-medium text-blue-600 hover:text-blue-500"
+          class="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500"
         >
           {{ t('auth.login.register') }}
         </RouterLink>

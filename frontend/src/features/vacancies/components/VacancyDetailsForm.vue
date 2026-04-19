@@ -95,7 +95,7 @@ async function handleSave(): Promise<void> {
       {{ vacancyStore.error }}
     </Message>
 
-    <section class="rounded-xl border border-gray-100 bg-white p-5">
+    <section class="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-5">
       <h3 class="mb-4 text-sm font-semibold text-gray-900">{{ t('vacancies.details.jobInfo') }}</h3>
       <VacancyBasicInfoTab
         v-model:title="form.title.value"
@@ -116,7 +116,7 @@ async function handleSave(): Promise<void> {
       />
     </section>
 
-    <section class="rounded-xl border border-gray-100 bg-white p-5">
+    <section class="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-5">
       <h3 class="mb-4 text-sm font-semibold text-gray-900">{{ t('vacancies.details.company') }}</h3>
       <VacancyCompanyTab
         v-model:company-id="form.companyId.value"
@@ -128,7 +128,7 @@ async function handleSave(): Promise<void> {
     </section>
 
     <div
-      class="sticky bottom-0 -mx-3 flex justify-end border-t border-gray-100 bg-white/95 px-3 py-3 backdrop-blur sm:-mx-5 sm:px-5"
+      class="sticky bottom-0 -mx-3 flex justify-end border-t border-gray-100 dark:border-gray-800 bg-white/95 dark:bg-gray-900/95 px-3 py-3 backdrop-blur sm:-mx-5 sm:px-5"
     >
       <Button
         type="submit"

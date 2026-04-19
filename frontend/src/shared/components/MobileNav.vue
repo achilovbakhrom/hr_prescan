@@ -53,19 +53,19 @@ watch(
     >
       <div
         v-if="open"
-        class="fixed inset-y-0 left-0 z-50 flex w-[80vw] max-w-72 flex-col bg-white shadow-xl lg:hidden"
+        class="fixed inset-y-0 left-0 z-50 flex w-[80vw] max-w-72 flex-col bg-white dark:bg-gray-800 shadow-xl lg:hidden"
         role="dialog"
         aria-modal="true"
         aria-label="Mobile navigation"
       >
-        <div class="flex h-16 items-center justify-between border-b border-gray-200 px-4">
+        <div class="flex h-16 items-center justify-between border-b border-gray-200 dark:border-gray-700 px-4">
           <div class="flex items-center gap-2">
             <AppLogo size="sm" />
             <span class="text-lg font-bold text-gray-900">PreScreen AI</span>
           </div>
           <button
             type="button"
-            class="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+            class="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-700"
             aria-label="Close navigation menu"
             @click="emit('close')"
           >
@@ -75,12 +75,12 @@ watch(
 
         <MobileNavItems />
 
-        <div class="border-t border-gray-200 px-4 py-3"><LanguageSwitcher /></div>
+        <div class="border-t border-gray-200 dark:border-gray-700 px-4 py-3"><LanguageSwitcher /></div>
 
-        <div v-if="authStore.user" class="border-t border-gray-200 px-4 py-3">
+        <div v-if="authStore.user" class="border-t border-gray-200 dark:border-gray-700 px-4 py-3">
           <div class="flex items-center gap-3">
             <div
-              class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-medium text-blue-700"
+              class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-950 text-sm font-medium text-blue-700"
             >
               {{ authStore.user.firstName?.charAt(0) ?? ''
               }}{{ authStore.user.lastName?.charAt(0) ?? '' }}

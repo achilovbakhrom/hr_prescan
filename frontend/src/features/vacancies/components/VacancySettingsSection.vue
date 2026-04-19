@@ -90,7 +90,7 @@ function confirmDelete(): void {
 <template>
   <div class="space-y-6">
     <!-- Visibility & CV -->
-    <section class="rounded-xl border border-gray-100 bg-white p-5">
+    <section class="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-5">
       <h3 class="mb-4 text-sm font-semibold text-gray-900">
         {{ t('vacancies.settings.visibility') }}
       </h3>
@@ -120,7 +120,7 @@ function confirmDelete(): void {
     </section>
 
     <!-- Interview enable -->
-    <section class="rounded-xl border border-gray-100 bg-white p-5">
+    <section class="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-5">
       <h3 class="mb-4 text-sm font-semibold text-gray-900">
         {{ t('vacancies.settings.interviewStep') }}
       </h3>
@@ -138,7 +138,7 @@ function confirmDelete(): void {
     </div>
 
     <!-- Danger zone -->
-    <section class="rounded-xl border border-red-200 bg-red-50/40 p-5">
+    <section class="rounded-xl border border-red-200 dark:border-red-800 bg-red-50/40 p-5">
       <h3 class="mb-2 text-sm font-semibold text-red-700">
         {{ t('vacancies.settings.dangerZone') }}
       </h3>

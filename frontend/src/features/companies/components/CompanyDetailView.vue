@@ -8,7 +8,7 @@ const { t } = useI18n()
 </script>
 
 <template>
-  <div class="space-y-4 rounded-xl border border-gray-200 bg-white p-6">
+  <div class="space-y-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
     <div v-if="company.customIndustry">
       <p class="text-sm text-gray-500">{{ t('companies.industry') }}</p>
       <p class="font-medium">{{ company.customIndustry }}</p>
@@ -23,7 +23,7 @@ const { t } = useI18n()
         :href="company.website"
         target="_blank"
         rel="noopener noreferrer"
-        class="font-medium text-blue-600 hover:underline"
+        class="font-medium text-blue-600 dark:text-blue-400 hover:underline"
       >
         {{ company.website }}
       </a>

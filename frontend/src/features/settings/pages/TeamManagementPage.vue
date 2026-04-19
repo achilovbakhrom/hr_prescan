@@ -94,7 +94,7 @@ async function handleToggleActive(userId: string): Promise<void> {
     </div>
 
     <template v-else>
-      <div v-if="settingsStore.invitations.length" class="mb-8 rounded-lg bg-white p-6 shadow-sm">
+      <div v-if="settingsStore.invitations.length" class="mb-8 rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
         <h2 class="mb-4 text-lg font-semibold text-gray-900">
           {{ t('settings.team.invitations') }}
         </h2>
@@ -104,7 +104,7 @@ async function handleToggleActive(userId: string): Promise<void> {
         />
       </div>
 
-      <div class="rounded-lg bg-white p-6 shadow-sm">
+      <div class="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
         <h2 class="mb-4 text-lg font-semibold text-gray-900">{{ t('settings.team.members') }}</h2>
         <TeamMembersTable
           :members="settingsStore.team"

@@ -59,7 +59,7 @@ function goToInterview(interview: Interview): void {
   <!-- Stats Cards -->
   <div class="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
     <div
-      class="cursor-pointer rounded-xl border border-gray-100 bg-white p-5 transition-all hover:shadow-md"
+      class="cursor-pointer rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-5 transition-all hover:shadow-md"
       @click="router.push({ name: ROUTE_NAMES.VACANCY_LIST })"
     >
       <div class="flex items-center justify-between">
@@ -76,7 +76,7 @@ function goToInterview(interview: Interview): void {
     </div>
 
     <div
-      class="cursor-pointer rounded-xl border border-gray-100 bg-white p-5 transition-all hover:shadow-md"
+      class="cursor-pointer rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-5 transition-all hover:shadow-md"
       @click="router.push({ name: ROUTE_NAMES.INTERVIEW_LIST })"
     >
       <div class="flex items-center justify-between">
@@ -91,7 +91,7 @@ function goToInterview(interview: Interview): void {
       </p>
     </div>
 
-    <div class="rounded-xl border border-gray-100 bg-white p-5">
+    <div class="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-5">
       <div class="flex items-center justify-between">
         <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50">
           <i class="pi pi-check-circle text-lg text-emerald-600"></i>
@@ -102,7 +102,7 @@ function goToInterview(interview: Interview): void {
       <p class="mt-0.5 text-xs text-emerald-600">{{ t('dashboard.stats.aiInterviewsDone') }}</p>
     </div>
 
-    <div class="rounded-xl border border-gray-100 bg-white p-5">
+    <div class="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-5">
       <div class="flex items-center justify-between">
         <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-50">
           <i class="pi pi-users text-lg text-violet-600"></i>
@@ -116,13 +116,13 @@ function goToInterview(interview: Interview): void {
 
   <div class="grid gap-6 lg:grid-cols-3">
     <!-- Quick Actions -->
-    <div class="rounded-xl border border-gray-100 bg-white p-6">
+    <div class="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-6">
       <h2 class="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-400">
         {{ t('dashboard.quickActions') }}
       </h2>
       <div class="space-y-2">
         <button
-          class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+          class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors hover:bg-gray-50"
           @click="router.push({ name: ROUTE_NAMES.VACANCY_CREATE })"
         >
           <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50">
@@ -131,7 +131,7 @@ function goToInterview(interview: Interview): void {
           {{ t('dashboard.createVacancy') }}
         </button>
         <button
-          class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+          class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors hover:bg-gray-50"
           @click="router.push({ name: ROUTE_NAMES.VACANCY_LIST })"
         >
           <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50">
@@ -140,7 +140,7 @@ function goToInterview(interview: Interview): void {
           {{ t('nav.vacancies') }}
         </button>
         <button
-          class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+          class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors hover:bg-gray-50"
           @click="router.push({ name: ROUTE_NAMES.INTERVIEW_LIST })"
         >
           <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50">
@@ -150,7 +150,7 @@ function goToInterview(interview: Interview): void {
         </button>
         <button
           v-if="role === 'admin'"
-          class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+          class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors hover:bg-gray-50"
           @click="router.push({ name: ROUTE_NAMES.TEAM_MANAGEMENT })"
         >
           <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-50">
@@ -162,7 +162,7 @@ function goToInterview(interview: Interview): void {
     </div>
 
     <!-- Upcoming Interviews -->
-    <div class="lg:col-span-2 rounded-xl border border-gray-100 bg-white p-6">
+    <div class="lg:col-span-2 rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-6">
       <div class="mb-4 flex items-center justify-between">
         <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400">
           {{ t('dashboard.upcomingInterviews') }}
@@ -180,12 +180,12 @@ function goToInterview(interview: Interview): void {
         <div
           v-for="iv in upcomingInterviews"
           :key="iv.id"
-          class="flex cursor-pointer items-center justify-between rounded-lg border border-gray-50 px-4 py-3 transition-colors hover:bg-gray-50"
+          class="flex cursor-pointer items-center justify-between rounded-lg border border-gray-50 dark:border-gray-900 px-4 py-3 transition-colors hover:bg-gray-50"
           @click="goToInterview(iv)"
         >
           <div class="flex items-center gap-3">
             <div
-              class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700"
+              class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-950 text-xs font-semibold text-blue-700"
             >
               {{ iv.candidateName?.charAt(0) ?? '?' }}
             </div>

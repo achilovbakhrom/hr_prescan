@@ -70,7 +70,7 @@ const hasResults = () => results.value.vacancies.length + results.value.candidat
     :style="{ width: '90%', maxWidth: '600px' }"
     :pt="{ root: { class: 'overflow-hidden' }, content: { class: 'p-0' } }"
   >
-    <div class="flex items-center gap-2 border-b border-gray-100 px-4 py-3">
+    <div class="flex items-center gap-2 border-b border-gray-100 dark:border-gray-800 px-4 py-3">
       <i class="pi pi-search text-gray-400"></i>
       <InputText
         ref="inputRef"
@@ -84,7 +84,7 @@ const hasResults = () => results.value.vacancies.length + results.value.candidat
         @keyup.escape="visible = false"
       />
       <kbd
-        class="hidden rounded border border-gray-200 bg-gray-50 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 sm:inline"
+        class="hidden rounded border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 dark:text-gray-400 sm:inline"
         >ESC</kbd
       >
     </div>

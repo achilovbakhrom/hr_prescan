@@ -161,7 +161,7 @@ function handleDelete(cv: CvFile): void {
 
       <div
         v-if="!hasProfileData && cvs.length === 0"
-        class="rounded-xl border border-dashed border-gray-200 py-16 text-center"
+        class="rounded-xl border border-dashed border-gray-200 dark:border-gray-700 py-16 text-center"
       >
         <i class="pi pi-file-pdf mb-3 text-4xl text-gray-300"></i>
         <p class="font-medium text-gray-600">{{ t('myCvs.empty') }}</p>

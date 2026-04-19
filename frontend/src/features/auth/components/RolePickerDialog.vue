@@ -44,11 +44,11 @@ function pick(role: GoogleAuthRole): void {
       <button
         type="button"
         :disabled="loading"
-        class="flex flex-col items-start gap-2 rounded-lg border border-gray-200 bg-white p-5 text-left transition-colors hover:border-blue-500 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+        class="flex flex-col items-start gap-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 text-left transition-colors hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
         @click="pick('candidate')"
       >
         <div
-          class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-blue-600"
+          class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-950 text-blue-600"
         >
           <i class="pi pi-briefcase text-xl"></i>
         </div>
@@ -63,11 +63,11 @@ function pick(role: GoogleAuthRole): void {
       <button
         type="button"
         :disabled="loading"
-        class="flex flex-col items-start gap-2 rounded-lg border border-gray-200 bg-white p-5 text-left transition-colors hover:border-blue-500 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+        class="flex flex-col items-start gap-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 text-left transition-colors hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
         @click="pick('hr')"
       >
         <div
-          class="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 text-green-600"
+          class="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-950 text-green-600"
         >
           <i class="pi pi-building text-xl"></i>
         </div>

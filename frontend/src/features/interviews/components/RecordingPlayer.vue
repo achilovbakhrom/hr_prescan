@@ -16,7 +16,7 @@ const isVideo = computed(() => {
 </script>
 
 <template>
-  <div class="rounded-lg border border-gray-200 p-6">
+  <div class="rounded-lg border border-gray-200 dark:border-gray-700 p-6">
     <template v-if="recordingUrl">
       <p class="mb-3 text-sm font-medium text-gray-700">
         {{ t('interviews.recordingPlayer.title') }}

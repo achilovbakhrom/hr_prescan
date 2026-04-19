@@ -37,7 +37,7 @@ const { t } = useI18n()
         ></video>
         <div v-if="isCameraOff" class="flex h-full w-full items-center justify-center">
           <div
-            class="flex h-24 w-24 items-center justify-center rounded-full bg-blue-600 text-3xl font-medium text-white"
+            class="flex h-24 w-24 items-center justify-center rounded-full bg-blue-600 dark:bg-blue-700 text-3xl font-medium text-white"
           >
             {{ interview.candidateName ? getInitials(interview.candidateName) : '?' }}
           </div>
@@ -78,7 +78,7 @@ const { t } = useI18n()
         size="large"
         @click="emit('joinRoom')"
       />
-      <button class="mt-3 text-sm text-gray-400 hover:text-white" @click="emit('cancel')">
+      <button class="mt-3 text-sm text-gray-400 dark:text-gray-500 hover:text-white" @click="emit('cancel')">
         {{ t('interviews.roomPage.goBack') }}
       </button>
     </div>

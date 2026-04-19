@@ -41,7 +41,7 @@ const hasData = computed(() => {
 <template>
   <div
     v-if="props.cvFile"
-    class="mb-4 flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3"
+    class="mb-4 flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-3"
   >
     <i class="pi pi-file-pdf text-2xl text-red-500"></i>
     <div class="min-w-0 flex-1">
@@ -61,7 +61,7 @@ const hasData = computed(() => {
 
   <div
     v-if="props.cvFile && (props.matchScore === null || props.matchScore === undefined) && !hasData"
-    class="mb-4 flex items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4"
+    class="mb-4 flex items-center gap-3 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950 p-4"
   >
     <i class="pi pi-spinner pi-spin text-lg text-blue-500"></i>
     <div>

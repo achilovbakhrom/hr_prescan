@@ -33,7 +33,7 @@ function stepIndex(status: string): number {
   <div class="space-y-6">
     <div class="flex items-center gap-3">
       <button
-        class="text-gray-500 hover:text-gray-700"
+        class="text-gray-500 dark:text-gray-400 hover:text-gray-700"
         @click="router.push({ name: ROUTE_NAMES.MY_APPLICATIONS })"
       >
         <i class="pi pi-arrow-left text-lg"></i>
@@ -51,7 +51,7 @@ function stepIndex(status: string): number {
 
     <template v-if="application">
       <!-- Status Timeline -->
-      <div class="rounded-lg border border-gray-200 bg-white p-4">
+      <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
         <h2 class="mb-3 text-sm font-semibold text-gray-600">
           {{ t('candidates.myApplication.progress') }}
         </h2>
@@ -83,7 +83,7 @@ function stepIndex(status: string): number {
       </div>
 
       <!-- Vacancy Info -->
-      <div class="rounded-lg border border-gray-200 bg-white p-4">
+      <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
         <h2 class="mb-2 text-sm font-semibold text-gray-600">{{ t('nav.vacancies') }}</h2>
         <p class="text-lg font-medium">{{ application.vacancyTitle }}</p>
         <p class="text-sm text-gray-500">
@@ -92,7 +92,7 @@ function stepIndex(status: string): number {
       </div>
 
       <!-- Match Score -->
-      <div class="rounded-lg border border-gray-200 bg-white p-4">
+      <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
         <h2 class="mb-2 text-sm font-semibold text-gray-600">{{ t('candidates.matchScore') }}</h2>
         <p v-if="application.matchScore !== null" class="text-3xl font-bold text-blue-600">
           {{ application.matchScore }}%
@@ -103,7 +103,7 @@ function stepIndex(status: string): number {
       </div>
 
       <!-- CV Download -->
-      <div class="rounded-lg border border-gray-200 bg-white p-4">
+      <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
         <h2 class="mb-2 text-sm font-semibold text-gray-600">
           {{ t('candidates.cv') }}
         </h2>

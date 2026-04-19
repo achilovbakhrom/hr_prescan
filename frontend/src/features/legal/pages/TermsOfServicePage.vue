@@ -12,7 +12,7 @@ function goBack(): void {
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- Header -->
-    <div class="border-b border-gray-200 bg-white">
+    <div class="border-b border-gray-200 dark:border-gray-700 bg-white">
       <div class="mx-auto max-w-4xl px-6 py-6">
         <Button
           label="Back"
@@ -29,7 +29,7 @@ function goBack(): void {
 
     <!-- Content -->
     <div class="mx-auto max-w-4xl px-6 py-12">
-      <div class="space-y-10 rounded-2xl bg-white p-10 shadow-sm">
+      <div class="space-y-10 rounded-2xl bg-white dark:bg-gray-800 p-10 shadow-sm">
         <section>
           <h2 class="mb-4 text-xl font-semibold text-gray-900">1. Acceptance of Terms</h2>
           <p class="leading-relaxed text-gray-600">
@@ -57,7 +57,7 @@ function goBack(): void {
             current information. You are responsible for maintaining the confidentiality of your
             account credentials and for all activities that occur under your account. Notify us
             immediately of any unauthorized use of your account at
-            <a href="mailto:security@hrprescan.com" class="text-blue-600 hover:underline"
+            <a href="mailto:security@hrprescan.com" class="text-blue-600 dark:text-blue-400 hover:underline"
               >security@hrprescan.com</a
             >.
           </p>
@@ -147,7 +147,7 @@ function goBack(): void {
             <p>PreScreen AI</p>
             <p>
               Email:
-              <a href="mailto:legal@hrprescan.com" class="text-blue-600 hover:underline"
+              <a href="mailto:legal@hrprescan.com" class="text-blue-600 dark:text-blue-400 hover:underline"
                 >legal@hrprescan.com</a
               >
             </p>

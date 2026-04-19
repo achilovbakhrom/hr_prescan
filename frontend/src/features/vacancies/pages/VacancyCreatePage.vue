@@ -26,7 +26,7 @@ async function handleSave(data: CreateVacancyRequest): Promise<void> {
 <template>
   <div class="space-y-4">
     <div class="flex items-center gap-3">
-      <button class="text-gray-500 hover:text-gray-700" @click="router.back()">
+      <button class="text-gray-500 dark:text-gray-400 hover:text-gray-700" @click="router.back()">
         <i class="pi pi-arrow-left text-lg"></i>
       </button>
       <h1 class="text-2xl font-bold">{{ t('vacancies.createTitle') }}</h1>

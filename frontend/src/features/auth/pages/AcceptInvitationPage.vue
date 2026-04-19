@@ -82,7 +82,7 @@ async function handleAcceptAsLoggedIn(): Promise<void> {
 
 <template>
   <div class="flex flex-1 items-center justify-center py-12">
-    <div class="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
+    <div class="w-full max-w-md rounded-lg bg-white dark:bg-gray-800 p-8 shadow-md">
       <div v-if="loading" class="py-8 text-center">
         <i class="pi pi-spinner pi-spin text-3xl text-gray-400"></i>
       </div>

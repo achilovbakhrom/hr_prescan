@@ -88,7 +88,7 @@ onUnmounted(() => {
   <div v-if="botUsername" class="mb-4">
     <button
       type="button"
-      class="flex w-full items-center justify-center gap-3 rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
+      class="flex w-full items-center justify-center gap-3 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 shadow-sm transition-colors hover:bg-gray-50"
       :disabled="loading"
       :class="loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'"
       @click="openTelegramAuth"

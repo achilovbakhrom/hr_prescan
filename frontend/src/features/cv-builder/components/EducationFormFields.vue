@@ -37,7 +37,7 @@ const { t } = useI18n()
 
 <template>
   <form
-    class="mt-4 flex flex-col gap-4 rounded-lg border border-gray-200 p-4"
+    class="mt-4 flex flex-col gap-4 rounded-lg border border-gray-200 dark:border-gray-700 p-4"
     @submit.prevent="emit('save')"
   >
     <h3 class="font-semibold text-gray-900">

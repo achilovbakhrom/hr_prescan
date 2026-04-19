@@ -40,7 +40,7 @@ function templateLabel(template: string): string {
 
 <template>
   <div
-    class="rounded-xl border bg-white p-4 transition-all"
+    class="rounded-xl border bg-white dark:bg-gray-800 p-4 transition-all"
     :class="cv.isActive ? 'border-green-200 bg-green-50/20' : 'border-gray-200'"
   >
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

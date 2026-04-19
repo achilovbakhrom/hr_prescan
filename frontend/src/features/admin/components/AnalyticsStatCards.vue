@@ -11,7 +11,7 @@ const { t } = useI18n()
 
 <template>
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-    <div class="rounded-lg border border-gray-200 bg-white p-6">
+    <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
       <div class="flex items-center gap-3">
         <i class="pi pi-building text-2xl text-blue-500"></i>
         <div>
@@ -21,7 +21,7 @@ const { t } = useI18n()
       </div>
     </div>
 
-    <div class="rounded-lg border border-gray-200 bg-white p-6">
+    <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
       <div class="flex items-center gap-3">
         <i class="pi pi-users text-2xl text-green-500"></i>
         <div>
@@ -31,7 +31,7 @@ const { t } = useI18n()
       </div>
     </div>
 
-    <div class="rounded-lg border border-gray-200 bg-white p-6">
+    <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
       <div class="flex items-center gap-3">
         <i class="pi pi-video text-2xl text-purple-500"></i>
         <div>
@@ -41,7 +41,7 @@ const { t } = useI18n()
       </div>
     </div>
 
-    <div class="rounded-lg border border-gray-200 bg-white p-6">
+    <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
       <div class="flex items-center gap-3">
         <i class="pi pi-credit-card text-2xl text-yellow-500"></i>
         <div>
@@ -51,7 +51,7 @@ const { t } = useI18n()
       </div>
     </div>
 
-    <div class="rounded-lg border border-gray-200 bg-white p-6">
+    <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
       <div class="flex items-center gap-3">
         <i class="pi pi-dollar text-2xl text-emerald-500"></i>
         <div>

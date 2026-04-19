@@ -52,7 +52,7 @@ const experienceOptions = computed(() => [
         <span class="text-xs font-medium text-gray-500"
           >{{ activeFilterCount }} {{ t('jobBoard.activeFilters') }}</span
         >
-        <button class="text-xs text-blue-600 hover:underline" @click="emit('clearFilters')">
+        <button class="text-xs text-blue-600 dark:text-blue-400 hover:underline" @click="emit('clearFilters')">
           {{ t('jobBoard.clearAll') }}
         </button>
       </div>
@@ -142,7 +142,7 @@ const experienceOptions = computed(() => [
   </aside>
 
   <!-- Mobile filter drawer -->
-  <div v-else class="mb-4 space-y-4 rounded-xl border border-gray-200 bg-white p-4 lg:hidden">
+  <div v-else class="mb-4 space-y-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 lg:hidden">
     <button
       class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors"
       :class="remoteOnly ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100'"
@@ -163,7 +163,7 @@ const experienceOptions = computed(() => [
           class="rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
           :class="
             employmentType === opt.value
-              ? 'border-blue-200 bg-blue-50 text-blue-700'
+              ? 'border-blue-200 bg-blue-50 dark:bg-blue-950 text-blue-700'
               : 'border-gray-200 text-gray-600'
           "
           @click="emit('toggleEmployment', opt.value)"
@@ -184,7 +184,7 @@ const experienceOptions = computed(() => [
           class="rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
           :class="
             experienceLevel === opt.value
-              ? 'border-blue-200 bg-blue-50 text-blue-700'
+              ? 'border-blue-200 bg-blue-50 dark:bg-blue-950 text-blue-700'
               : 'border-gray-200 text-gray-600'
           "
           @click="emit('toggleExperience', opt.value)"
