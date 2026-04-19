@@ -63,8 +63,8 @@ const features = computed<Feature[]>(() => [
           >
             <i :class="feature.icon" class="text-xl"></i>
           </div>
-          <h3 class="mb-2 text-lg font-semibold text-gray-900">{{ feature.title }}</h3>
-          <p class="text-sm leading-relaxed text-gray-500">{{ feature.description }}</p>
+          <h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">{{ feature.title }}</h3>
+          <p class="text-sm leading-relaxed text-gray-500 dark:text-gray-300">{{ feature.description }}</p>
         </div>
       </div>
     </div>

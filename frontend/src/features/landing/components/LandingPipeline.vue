@@ -74,8 +74,8 @@ const pipelineSteps = computed<PipelineStep[]>(() => [
               >
                 <i :class="step.icon" class="text-2xl"></i>
               </div>
-              <h3 class="mb-1.5 text-sm font-semibold text-gray-900">{{ step.title }}</h3>
-              <p class="max-w-[160px] text-xs leading-relaxed text-gray-500">
+              <h3 class="mb-1.5 text-sm font-semibold text-gray-900 dark:text-white">{{ step.title }}</h3>
+              <p class="max-w-[160px] text-xs leading-relaxed text-gray-500 dark:text-gray-300">
                 {{ step.description }}
               </p>
             </div>
@@ -100,8 +100,8 @@ const pipelineSteps = computed<PipelineStep[]>(() => [
               <i :class="step.icon" class="text-lg"></i>
             </div>
             <div class="pt-0.5">
-              <h3 class="mb-1 text-base font-semibold text-gray-900">{{ step.title }}</h3>
-              <p class="text-sm leading-relaxed text-gray-500">{{ step.description }}</p>
+              <h3 class="mb-1 text-base font-semibold text-gray-900 dark:text-white">{{ step.title }}</h3>
+              <p class="text-sm leading-relaxed text-gray-500 dark:text-gray-300">{{ step.description }}</p>
             </div>
           </div>
         </div>
