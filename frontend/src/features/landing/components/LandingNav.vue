@@ -64,7 +64,7 @@ const navLinks = [
 </script>
 
 <template>
-  <nav class="sticky top-0 z-50 border-b border-gray-100 bg-white/80 backdrop-blur-xl">
+  <nav class="sticky top-0 z-50 border-b border-gray-100 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl">
     <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
       <!-- Logo -->
       <RouterLink to="/" class="flex items-center gap-2.5">
@@ -78,7 +78,7 @@ const navLinks = [
           v-for="link in navLinks"
           :key="link.id"
           type="button"
-          class="text-sm font-medium text-gray-500 transition-colors hover:text-gray-900"
+          class="text-sm font-medium text-gray-500 dark:text-gray-400 transition-colors hover:text-gray-900"
           @click="scrollTo(link.id)"
         >
           {{ t(link.labelKey) }}
@@ -106,14 +106,14 @@ const navLinks = [
             @click="toggleUserMenu"
           >
             <div
-              class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-medium text-blue-700"
+              class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-950 text-sm font-medium text-blue-700"
             >
               {{ authStore.user?.firstName?.charAt(0) }}{{ authStore.user?.lastName?.charAt(0) }}
             </div>
-            <span class="hidden text-sm font-medium text-gray-700 sm:inline">
+            <span class="hidden text-sm font-medium text-gray-700 dark:text-gray-300 sm:inline">
               {{ authStore.user?.firstName }}
             </span>
-            <i class="pi pi-chevron-down hidden text-xs text-gray-400 sm:inline"></i>
+            <i class="pi pi-chevron-down hidden text-xs text-gray-400 dark:text-gray-500 sm:inline"></i>
           </button>
           <Menu ref="userMenu" :model="menuItems" :popup="true" />
         </template>
@@ -134,7 +134,7 @@ const navLinks = [
         <!-- Mobile hamburger -->
         <button
           type="button"
-          class="flex h-9 w-9 items-center justify-center rounded-lg text-gray-600 transition-colors hover:bg-gray-100 md:hidden"
+          class="flex h-9 w-9 items-center justify-center rounded-lg text-gray-600 dark:text-gray-400 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 md:hidden"
           aria-label="Open menu"
           @click="mobileOpen = !mobileOpen"
         >
@@ -152,13 +152,13 @@ const navLinks = [
       leave-from-class="max-h-96 opacity-100"
       leave-to-class="max-h-0 opacity-0"
     >
-      <div v-if="mobileOpen" class="overflow-hidden border-t border-gray-100 bg-white md:hidden">
+      <div v-if="mobileOpen" class="overflow-hidden border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 md:hidden">
         <div class="flex flex-col gap-1 px-6 py-4">
           <button
             v-for="link in navLinks"
             :key="link.id"
             type="button"
-            class="rounded-lg px-3 py-2.5 text-left text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900"
+            class="rounded-lg px-3 py-2.5 text-left text-sm font-medium text-gray-600 dark:text-gray-400 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900"
             @click="scrollTo(link.id)"
           >
             {{ t(link.labelKey) }}
