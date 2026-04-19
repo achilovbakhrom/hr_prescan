@@ -14,9 +14,16 @@ from apps.vacancies.models import Vacancy
 def get_all_companies(
     *,
     search: str | None = None,
-    status: str | None = None,  # noqa: ARG001  kept for API compat; subscription now lives on User
+    status: str | None = None,
 ) -> QuerySet[Company]:
-    """Return all companies with optional search filter."""
+    """Return all companies with optional search filter.
+
+    The ``status`` argument is accepted for API compatibility with the pre-refactor
+    admin endpoint (which filtered by Company.subscription_status). Subscription now
+    lives on User, so the filter is a no-op here; callers that need the old behavior
+    should query User-level subscription state instead.
+    """
+    del status
     qs = Company.objects.annotate(
         user_count=Count("users"),
         vacancy_count=Count("vacancies"),
@@ -109,7 +116,11 @@ def get_monthly_interview_volume(months: int = 6) -> list[dict]:
     """Count interviews per month for the last N months."""
     now = timezone.now()
     start_date = (now - timedelta(days=months * 30)).replace(
-        day=1, hour=0, minute=0, second=0, microsecond=0,
+        day=1,
+        hour=0,
+        minute=0,
+        second=0,
+        microsecond=0,
     )
 
     data = (
@@ -132,17 +143,18 @@ def get_subscription_distribution() -> list[dict]:
         .order_by("plan__tier")
     )
 
-    return [
-        {"tier": entry["plan__tier"], "name": entry["plan__name"], "count": entry["count"]}
-        for entry in data
-    ]
+    return [{"tier": entry["plan__tier"], "name": entry["plan__name"], "count": entry["count"]} for entry in data]
 
 
 def get_monthly_registrations(months: int = 6) -> list[dict]:
     """Count users registered per month, grouped by role."""
     now = timezone.now()
     start_date = (now - timedelta(days=months * 30)).replace(
-        day=1, hour=0, minute=0, second=0, microsecond=0,
+        day=1,
+        hour=0,
+        minute=0,
+        second=0,
+        microsecond=0,
     )
 
     data = (
@@ -154,6 +166,5 @@ def get_monthly_registrations(months: int = 6) -> list[dict]:
     )
 
     return [
-        {"month": entry["month"].strftime("%Y-%m"), "role": entry["role"], "count": entry["count"]}
-        for entry in data
+        {"month": entry["month"].strftime("%Y-%m"), "role": entry["role"], "count": entry["count"]} for entry in data
     ]
