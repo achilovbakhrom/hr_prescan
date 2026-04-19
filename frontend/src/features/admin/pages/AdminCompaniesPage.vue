@@ -88,6 +88,8 @@ onMounted(() => adminStore.fetchCompanies())
             :severity="(data as AdminCompany).isActive ? 'danger' : 'success'"
             size="small"
             outlined
+            :loading="adminStore.isMutating((data as AdminCompany).id)"
+            :disabled="adminStore.isMutating((data as AdminCompany).id)"
             @click="handleToggleStatus(data as AdminCompany)"
           />
         </template>
