@@ -5,6 +5,8 @@ import { useI18n } from 'vue-i18n'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
 import Button from 'primevue/button'
+import CompanyDetailView from '../components/CompanyDetailView.vue'
+import CompanyLogoPicker from '../components/CompanyLogoPicker.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import { useCompanyStore } from '../stores/company.store'
 
@@ -14,6 +16,8 @@ const router = useRouter()
 const companyStore = useCompanyStore()
 const editing = ref(false)
 const saving = ref(false)
+const logoUploading = ref(false)
+const logoError = ref<string | null>(null)
 
 const name = ref('')
 const customIndustry = ref('')
@@ -49,6 +53,22 @@ function startEdit(): void {
 function cancelEdit(): void {
   syncFormFromStore()
   editing.value = false
+}
+
+function onLogoReject(reason: string): void {
+  logoError.value = reason
+}
+
+async function onLogoPick(file: File): Promise<void> {
+  logoError.value = null
+  logoUploading.value = true
+  try {
+    await companyStore.uploadCompanyLogo(route.params.id as string, file)
+  } catch {
+    logoError.value = companyStore.error
+  } finally {
+    logoUploading.value = false
+  }
 }
 
 async function handleSave(): Promise<void> {
@@ -96,22 +116,13 @@ async function handleSave(): Promise<void> {
     <template v-else-if="companyStore.currentCompany">
       <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div class="flex items-center gap-3">
-          <div
-            v-if="companyStore.currentCompany.logo"
-            class="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gray-100"
-          >
-            <img
-              :src="companyStore.currentCompany.logo"
-              :alt="companyStore.currentCompany.name"
-              class="h-full w-full object-contain"
-            />
-          </div>
-          <div
-            v-else
-            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600"
-          >
-            <i class="pi pi-building text-xl"></i>
-          </div>
+          <CompanyLogoPicker
+            :logo="companyStore.currentCompany.logo"
+            :name="companyStore.currentCompany.name"
+            :uploading="logoUploading"
+            @pick="onLogoPick"
+            @reject="onLogoReject"
+          />
           <h1 v-if="!editing" class="text-2xl font-bold text-gray-900">
             {{ companyStore.currentCompany.name }}
           </h1>
@@ -125,6 +136,8 @@ async function handleSave(): Promise<void> {
         />
       </div>
 
+      <p v-if="logoError" class="mb-3 text-sm text-red-600">{{ logoError }}</p>
+
       <div
         v-if="companyStore.error"
         class="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600"
@@ -132,31 +145,7 @@ async function handleSave(): Promise<void> {
         {{ companyStore.error }}
       </div>
 
-      <div v-if="!editing" class="space-y-4 rounded-xl border border-gray-200 bg-white p-6">
-        <div v-if="companyStore.currentCompany.customIndustry">
-          <p class="text-sm text-gray-500">{{ t('companies.industry') }}</p>
-          <p class="font-medium">{{ companyStore.currentCompany.customIndustry }}</p>
-        </div>
-        <div>
-          <p class="text-sm text-gray-500">{{ t('companies.country') }}</p>
-          <p class="font-medium">{{ companyStore.currentCompany.country }}</p>
-        </div>
-        <div v-if="companyStore.currentCompany.website">
-          <p class="text-sm text-gray-500">{{ t('companies.website') }}</p>
-          <a
-            :href="companyStore.currentCompany.website"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="font-medium text-blue-600 hover:underline"
-          >
-            {{ companyStore.currentCompany.website }}
-          </a>
-        </div>
-        <div v-if="companyStore.currentCompany.description">
-          <p class="text-sm text-gray-500">{{ t('companies.description') }}</p>
-          <p class="whitespace-pre-line text-gray-700">{{ companyStore.currentCompany.description }}</p>
-        </div>
-      </div>
+      <CompanyDetailView v-if="!editing" :company="companyStore.currentCompany" />
 
       <form
         v-else

@@ -92,6 +92,23 @@ export const useCompanyStore = defineStore('company', () => {
     }
   }
 
+  async function uploadCompanyLogo(id: string, file: File): Promise<void> {
+    loading.value = true
+    error.value = null
+    try {
+      const updated = await companyService.uploadLogo(id, file)
+      if (currentCompany.value?.id === id) currentCompany.value = updated
+      const index = companies.value.findIndex((c) => c.id === id)
+      if (index !== -1) companies.value[index] = { ...companies.value[index], ...updated }
+    } catch (err: unknown) {
+      const message = extractErrorMessage(err)
+      error.value = message
+      throw new Error(message)
+    } finally {
+      loading.value = false
+    }
+  }
+
   async function setDefaultCompany(id: string): Promise<void> {
     try {
       await companyService.setDefault(id)
@@ -116,5 +133,6 @@ export const useCompanyStore = defineStore('company', () => {
     updateCompany,
     softDeleteCompany,
     setDefaultCompany,
+    uploadCompanyLogo,
   }
 })
