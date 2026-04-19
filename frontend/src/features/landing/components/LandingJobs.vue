@@ -82,8 +82,10 @@ function getCompanyName(job: Vacancy): string | undefined {
               size="md"
             />
             <div class="min-w-0 flex-1">
-              <h3 class="text-base font-semibold text-gray-900">{{ job.title }}</h3>
-              <p v-if="getCompanyName(job)" class="mt-0.5 text-sm text-gray-500">
+              <h3 class="text-base font-semibold text-gray-900 dark:text-white">
+                {{ job.title }}
+              </h3>
+              <p v-if="getCompanyName(job)" class="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
                 {{ getCompanyName(job) }}
               </p>
               <div
@@ -118,7 +120,10 @@ function getCompanyName(job: Vacancy): string | undefined {
       </div>
 
       <!-- Empty state -->
-      <div v-else class="rounded-2xl border border-dashed border-gray-200 dark:border-gray-700 py-16 text-center">
+      <div
+        v-else
+        class="rounded-2xl border border-dashed border-gray-200 dark:border-gray-700 py-16 text-center"
+      >
         <i class="pi pi-briefcase mb-3 text-4xl text-gray-300"></i>
         <p class="text-gray-500">{{ t('landing.noJobsYet') }}</p>
         <p class="mt-1 text-sm text-gray-400">{{ t('landing.noJobsCheckBack') }}</p>
