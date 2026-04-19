@@ -23,8 +23,6 @@ export interface Application {
   status: ApplicationStatus
   createdAt: string
   updatedAt: string
-  /** Employer company name returned by some API endpoints */
-  employerName?: string | null
   /** Company name returned by some API endpoints */
   companyName?: string | null
 }

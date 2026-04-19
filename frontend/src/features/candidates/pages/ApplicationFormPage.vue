@@ -14,10 +14,10 @@ import ApplicationReadyStep from '../components/ApplicationReadyStep.vue'
 import PrescanChatOverlay from '../components/PrescanChatOverlay.vue'
 import CvSelectionSection from '../components/CvSelectionSection.vue'
 import type { Vacancy } from '@/shared/types/vacancy.types'
-import type { EmployerCompany } from '@/features/employers/types/employer.types'
+import type { Company } from '@/features/companies/types/company.types'
 
-interface VacancyWithEmployer extends Vacancy {
-  employer?: EmployerCompany
+interface VacancyWithCompany extends Vacancy {
+  company?: Company
 }
 
 const { t } = useI18n()
@@ -27,7 +27,7 @@ const candidateStore = useCandidateStore()
 const authStore = useAuthStore()
 const vacancyId = route.params.vacancyId as string
 
-const vacancy = ref<VacancyWithEmployer | null>(null)
+const vacancy = ref<VacancyWithCompany | null>(null)
 const vacancyLoading = ref(false)
 const name = ref('')
 const email = ref('')
@@ -174,10 +174,10 @@ async function copyLink(): Promise<void> {
         <h1 class="mb-1 text-xl font-bold sm:text-2xl">{{ t('candidates.application.title') }}</h1>
         <p v-if="vacancy" class="mb-1 text-sm text-gray-600 sm:text-base">{{ vacancy.title }}</p>
         <p
-          v-if="vacancy && (vacancy.employer?.name || vacancy.companyName)"
+          v-if="vacancy && (vacancy.company?.name || vacancy.companyName)"
           class="mb-4 text-xs text-gray-500 sm:mb-6 sm:text-sm"
         >
-          <i class="pi pi-building mr-1"></i>{{ vacancy.employer?.name || vacancy.companyName }}
+          <i class="pi pi-building mr-1"></i>{{ vacancy.company?.name || vacancy.companyName }}
         </p>
         <div v-else class="mb-4 sm:mb-6"></div>
 

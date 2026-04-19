@@ -62,9 +62,9 @@ const navItems = computed<NavItem[]>(() => [
     permission: 'view_analytics',
   },
   {
-    label: t('employers.title'),
+    label: t('companies.title'),
     icon: 'pi pi-building',
-    to: '/employers',
+    to: '/companies',
     roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
     permission: 'manage_vacancies',
   },
@@ -74,13 +74,6 @@ const navItems = computed<NavItem[]>(() => [
     to: '/settings/team',
     roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
     permission: 'manage_team',
-  },
-  {
-    label: t('settings.company.title'),
-    icon: 'pi pi-cog',
-    to: '/settings/company',
-    roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
-    permission: 'manage_settings',
   },
   {
     label: t('nav.subscription'),

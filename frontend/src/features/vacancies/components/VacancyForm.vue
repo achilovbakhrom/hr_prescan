@@ -6,7 +6,7 @@ import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
 import Message from 'primevue/message'
 import type { FieldErrors } from '@/shared/api/errors'
-import type { EmployerCompany } from '@/features/employers/types/employer.types'
+import type { Company } from '@/features/companies/types/company.types'
 import type { CreateVacancyRequest } from '../types/vacancy.types'
 import { useVacancyForm } from '../composables/useVacancyForm'
 import VacancyBasicInfoTab from './VacancyBasicInfoTab.vue'
@@ -14,7 +14,7 @@ import VacancyCompanyTab from './VacancyCompanyTab.vue'
 import VacancyPrescanningTab from './VacancyPrescanningTab.vue'
 import VacancyInterviewTab from './VacancyInterviewTab.vue'
 import VacancySettingsTab from './VacancySettingsTab.vue'
-import CreateEmployerDialog from './CreateEmployerDialog.vue'
+import CreateCompanyDialog from './CreateCompanyDialog.vue'
 
 const props = defineProps<{
   initialData?: Partial<CreateVacancyRequest>
@@ -41,9 +41,13 @@ watch(
 
 const showCreateDialog = ref(false)
 
-function handleEmployerCreated(employer: EmployerCompany): void {
-  form.employersList.value.push(employer)
-  form.employerId.value = employer.id
+async function handleCompanyCreated(company: Company): Promise<void> {
+  // Re-fetch memberships so the new company is in the dropdown with correct is_default state.
+  form.companiesList.value = [
+    ...form.companiesList.value,
+    { ...company, isDefault: form.companiesList.value.length === 0, role: 'admin' },
+  ]
+  form.companyId.value = company.id
 }
 
 function handleSave(): void {
@@ -80,10 +84,10 @@ function handleSave(): void {
 
       <TabPanel value="1" :header="t('vacancies.form.companyInfo')">
         <VacancyCompanyTab
-          v-model:employer-id="form.employerId.value"
-          :employers-list="form.employersList.value"
-          :loading-employers="form.loadingEmployers.value"
-          :selected-employer="form.selectedEmployer.value"
+          v-model:company-id="form.companyId.value"
+          :companies-list="form.companiesList.value"
+          :loading-companies="form.loadingCompanies.value"
+          :selected-company="form.selectedCompany.value"
           @open-create-dialog="showCreateDialog = true"
         />
       </TabPanel>
@@ -129,5 +133,5 @@ function handleSave(): void {
     </div>
   </form>
 
-  <CreateEmployerDialog v-model:visible="showCreateDialog" @created="handleEmployerCreated" />
+  <CreateCompanyDialog v-model:visible="showCreateDialog" @created="handleCompanyCreated" />
 </template>

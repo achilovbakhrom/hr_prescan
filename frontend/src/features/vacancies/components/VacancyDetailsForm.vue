@@ -6,11 +6,11 @@ import Button from 'primevue/button'
 import Message from 'primevue/message'
 import VacancyBasicInfoTab from './VacancyBasicInfoTab.vue'
 import VacancyCompanyTab from './VacancyCompanyTab.vue'
-import CreateEmployerDialog from './CreateEmployerDialog.vue'
+import CreateCompanyDialog from './CreateCompanyDialog.vue'
 import { useVacancyForm } from '../composables/useVacancyForm'
 import { useVacancyStore } from '../stores/vacancy.store'
 import type { CreateVacancyRequest, VacancyDetail } from '../types/vacancy.types'
-import type { EmployerCompany } from '@/features/employers/types/employer.types'
+import type { Company } from '@/features/companies/types/company.types'
 
 const props = defineProps<{
   vacancy: VacancyDetail
@@ -34,7 +34,7 @@ const initialData = (): Partial<CreateVacancyRequest> => ({
   employmentType: props.vacancy.employmentType,
   experienceLevel: props.vacancy.experienceLevel,
   deadline: props.vacancy.deadline,
-  employerId: props.vacancy.employer?.id ?? undefined,
+  companyId: props.vacancy.company?.id ?? undefined,
 })
 
 const form = useVacancyForm(initialData, () => vacancyStore.fieldErrors)
@@ -50,16 +50,18 @@ watch(
 const showCreateDialog = ref(false)
 const saving = ref(false)
 
-function handleEmployerCreated(employer: EmployerCompany): void {
-  form.employersList.value.push(employer)
-  form.employerId.value = employer.id
+function handleCompanyCreated(company: Company): void {
+  form.companiesList.value = [
+    ...form.companiesList.value,
+    { ...company, isDefault: form.companiesList.value.length === 0, role: 'admin' },
+  ]
+  form.companyId.value = company.id
 }
 
 async function handleSave(): Promise<void> {
   saving.value = true
   try {
     const payload = form.buildPayload()
-    // Only send the fields this section owns
     await vacancyStore.updateVacancy(props.vacancy.id, {
       title: payload.title,
       description: payload.description,
@@ -74,7 +76,6 @@ async function handleSave(): Promise<void> {
       employmentType: payload.employmentType,
       experienceLevel: payload.experienceLevel,
       deadline: payload.deadline,
-      employerId: payload.employerId,
     })
     toast.add({ severity: 'success', summary: t('common.saved'), life: 2500 })
   } catch {
@@ -94,7 +95,6 @@ async function handleSave(): Promise<void> {
       {{ vacancyStore.error }}
     </Message>
 
-    <!-- Job info -->
     <section class="rounded-xl border border-gray-100 bg-white p-5">
       <h3 class="mb-4 text-sm font-semibold text-gray-900">{{ t('vacancies.details.jobInfo') }}</h3>
       <VacancyBasicInfoTab
@@ -116,14 +116,13 @@ async function handleSave(): Promise<void> {
       />
     </section>
 
-    <!-- Company / Employer -->
     <section class="rounded-xl border border-gray-100 bg-white p-5">
       <h3 class="mb-4 text-sm font-semibold text-gray-900">{{ t('vacancies.details.company') }}</h3>
       <VacancyCompanyTab
-        v-model:employer-id="form.employerId.value"
-        :employers-list="form.employersList.value"
-        :loading-employers="form.loadingEmployers.value"
-        :selected-employer="form.selectedEmployer.value"
+        v-model:company-id="form.companyId.value"
+        :companies-list="form.companiesList.value"
+        :loading-companies="form.loadingCompanies.value"
+        :selected-company="form.selectedCompany.value"
         @open-create-dialog="showCreateDialog = true"
       />
     </section>
@@ -140,6 +139,6 @@ async function handleSave(): Promise<void> {
       />
     </div>
 
-    <CreateEmployerDialog v-model:visible="showCreateDialog" @created="handleEmployerCreated" />
+    <CreateCompanyDialog v-model:visible="showCreateDialog" @created="handleCompanyCreated" />
   </form>
 </template>

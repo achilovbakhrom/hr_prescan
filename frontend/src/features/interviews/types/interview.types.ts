@@ -30,8 +30,6 @@ export interface Interview {
   overallScore: number | null
   language: string
   createdAt: string
-  /** Employer company name returned by some API endpoints */
-  employerName?: string | null
   /** Company name returned by some API endpoints */
   companyName?: string | null
 }
