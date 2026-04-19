@@ -30,7 +30,7 @@ def handle_cancel_interview(*, user, params):
     from apps.interviews.services import cancel_interview
 
     interview = resolve_interview_for_candidate(
-        company=user.company,
+        user=user,
         candidate_email_or_name=params.get("candidate_email_or_name", ""),
     )
     interview = cancel_interview(interview=interview)
@@ -46,7 +46,7 @@ def handle_reset_interview(*, user, params):
     from apps.interviews.services import reset_interview
 
     interview = resolve_interview_for_candidate(
-        company=user.company,
+        user=user,
         candidate_email_or_name=params.get("candidate_email_or_name", ""),
     )
     new_interview = reset_interview(interview=interview)

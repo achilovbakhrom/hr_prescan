@@ -13,13 +13,6 @@ from .criteria_questions import (
     update_interview_question,
     update_vacancy_criteria,
 )
-from .employer import (
-    create_employer,
-    create_employer_from_file,
-    create_employer_from_url,
-    delete_employer,
-    update_employer,
-)
 from .vacancy_ai import (
     generate_interview_questions,
     generate_vacancy_keywords,
@@ -35,24 +28,15 @@ from .vacancy_crud import (
 )
 
 __all__ = [
-    # criteria_questions
     "DEFAULT_CRITERIA",
     "add_interview_question",
     "add_vacancy_criteria",
-    # vacancy_crud
     "archive_vacancy",
     "create_default_criteria",
-    # employer
-    "create_employer",
-    "create_employer_from_file",
-    "create_employer_from_url",
     "create_vacancy",
-    "delete_employer",
     "delete_interview_question",
     "delete_vacancy_criteria",
-    # company_info
     "detect_language",
-    # vacancy_ai
     "generate_interview_questions",
     "generate_vacancy_keywords",
     "parse_company_info_from_file",
@@ -60,7 +44,6 @@ __all__ = [
     "pause_vacancy",
     "publish_vacancy",
     "soft_delete_vacancy",
-    "update_employer",
     "update_interview_question",
     "update_vacancy",
     "update_vacancy_criteria",

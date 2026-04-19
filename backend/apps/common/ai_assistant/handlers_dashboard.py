@@ -19,7 +19,7 @@ def handle_get_vacancy_summary(*, user, params):
     from apps.applications.models import Application
     from apps.interviews.models import Interview
 
-    vacancy = resolve_vacancy(company=user.company, title=params.get("vacancy_title", ""))
+    vacancy = resolve_vacancy(user=user, title=params.get("vacancy_title", ""))
 
     total_candidates = Application.objects.filter(
         vacancy=vacancy,

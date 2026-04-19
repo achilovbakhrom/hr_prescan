@@ -1,13 +1,9 @@
 from django.urls import path
 
 from apps.vacancies.apis import (
-    EmployerCompanyDetailApi,
-    EmployerCompanyListCreateApi,
     GenerateQuestionsApi,
     ParseCompanyFileApi,
     ParseCompanyUrlApi,
-    ParseEmployerFileApi,
-    ParseEmployerUrlApi,
     PublicVacancyDetailApi,
     PublicVacancyListApi,
     VacancyCriteriaDetailApi,
@@ -53,14 +49,6 @@ hr_urlpatterns = [
         VacancyRegenerateKeywordsApi.as_view(),
         name="vacancy-regenerate-keywords",
     ),
-]
-
-# Employer URLs — mounted at /api/hr/employers/
-employer_urlpatterns = [
-    path("", EmployerCompanyListCreateApi.as_view(), name="employer-list-create"),
-    path("<uuid:employer_id>/", EmployerCompanyDetailApi.as_view(), name="employer-detail"),
-    path("parse-file/", ParseEmployerFileApi.as_view(), name="employer-parse-file"),
-    path("parse-url/", ParseEmployerUrlApi.as_view(), name="employer-parse-url"),
 ]
 
 # Public URLs — mounted at /api/public/vacancies/

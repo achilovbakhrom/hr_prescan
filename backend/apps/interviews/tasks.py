@@ -15,7 +15,6 @@ def evaluate_telegram_interview(interview_id: str) -> None:
     try:
         interview = Interview.objects.select_related(
             "application__vacancy__company",
-            "application__vacancy__employer",
         ).get(id=interview_id)
     except Interview.DoesNotExist:
         logger.error("evaluate_telegram_interview: session %s not found", interview_id)

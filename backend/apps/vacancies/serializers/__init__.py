@@ -1,4 +1,3 @@
-from apps.vacancies.serializers.employer import EmployerCompanyOutputSerializer
 from apps.vacancies.serializers.vacancy import (
     InterviewQuestionOutputSerializer,
     PublicVacancyDetailOutputSerializer,
@@ -9,7 +8,6 @@ from apps.vacancies.serializers.vacancy import (
 )
 
 __all__ = [
-    "EmployerCompanyOutputSerializer",
     "InterviewQuestionOutputSerializer",
     "PublicVacancyDetailOutputSerializer",
     "PublicVacancyListOutputSerializer",

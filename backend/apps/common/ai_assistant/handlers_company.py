@@ -74,7 +74,7 @@ def handle_help(*, user, params):
         "I can help you with:\n"
         "- **Vacancies**: list, create, update, publish, pause, archive, delete, "
         "generate questions, regenerate keywords\n"
-        "- **Employers**: list, create (manual or from URL), update, delete\n"
+        "- **Companies**: list, create, update, delete, set default\n"
         "- **Candidates**: list by vacancy, update status, bulk move, add notes\n"
         "- **Interviews**: list, cancel, reset\n"
         "- **Dashboard**: view stats, vacancy summaries\n"
@@ -127,13 +127,12 @@ PAGE_ROUTES = {
     "dashboard": "/dashboard",
     "vacancies": "/vacancies",
     "vacancy-detail": "/vacancies/{id}",
-    "employers": "/employers",
-    "employer-create": "/employers/create",
+    "companies": "/companies",
+    "company-create": "/companies/create",
     "candidates": "/candidates",
     "interviews": "/interviews",
     "settings": "/settings",
     "profile": "/settings/profile",
-    "company-profile": "/settings/company",
     "team": "/settings/team",
     "pricing": "/pricing",
     "subscription": "/subscription",

@@ -14,7 +14,6 @@ from apps.accounts.apis import (
     CertificationDetailApi,
     CertificationListCreateApi,
     CheckInvitationApi,
-    CompanyProfileApi,
     CompleteCompanySetupApi,
     CompleteOnboardingApi,
     CvAiChatApi,
@@ -40,6 +39,9 @@ from apps.accounts.apis import (
     TeamMemberDetailApi,
     TelegramAuthApi,
     TokenRefreshApi,
+    UserCompanyDetailApi,
+    UserCompanyListCreateApi,
+    UserCompanySetDefaultApi,
     VerifyEmailApi,
     WorkExperienceDetailApi,
     WorkExperienceListCreateApi,
@@ -73,10 +75,16 @@ auth_urlpatterns = [
 
 # HR URLs — mounted at /api/hr/company/
 hr_urlpatterns = [
-    path("profile/", CompanyProfileApi.as_view(), name="company-profile"),
     path("invite/", InviteHRApi.as_view(), name="invite-hr"),
     path("team/", TeamListApi.as_view(), name="team-list"),
     path("team/<uuid:user_id>/", TeamMemberDetailApi.as_view(), name="team-member-detail"),
+]
+
+# User-owned company URLs — mounted at /api/hr/companies/
+user_companies_urlpatterns = [
+    path("", UserCompanyListCreateApi.as_view(), name="user-company-list-create"),
+    path("<uuid:pk>/", UserCompanyDetailApi.as_view(), name="user-company-detail"),
+    path("<uuid:pk>/set-default/", UserCompanySetDefaultApi.as_view(), name="user-company-set-default"),
 ]
 
 # Candidate profile URLs — mounted at /api/candidate/profile/

@@ -6,7 +6,7 @@ def _handle_list_my_applications(*, user, params):
 
     applications = (
         Application.objects.filter(candidate=user, is_deleted=False)
-        .select_related("vacancy", "vacancy__company", "vacancy__employer")
+        .select_related("vacancy", "vacancy__company")
         .order_by("-created_at")
     )
 
@@ -16,7 +16,6 @@ def _handle_list_my_applications(*, user, params):
             "id": str(a.id),
             "vacancy_title": a.vacancy.title,
             "company": a.vacancy.company.name if a.vacancy.company else "",
-            "employer": a.vacancy.employer.name if a.vacancy.employer else "",
             "status": a.status,
             "match_score": float(a.match_score) if a.match_score is not None else None,
             "applied_at": a.created_at.isoformat(),
@@ -43,7 +42,7 @@ def _handle_get_application_details(*, user, params):
 
     application_id = params.get("application_id", "")
     try:
-        application = Application.objects.select_related("vacancy", "vacancy__company", "vacancy__employer").get(
+        application = Application.objects.select_related("vacancy", "vacancy__company").get(
             id=application_id, candidate=user, is_deleted=False
         )
     except (Application.DoesNotExist, ValueError):
@@ -53,7 +52,6 @@ def _handle_get_application_details(*, user, params):
         "id": str(application.id),
         "vacancy_title": application.vacancy.title,
         "company": application.vacancy.company.name if application.vacancy.company else "",
-        "employer": application.vacancy.employer.name if application.vacancy.employer else "",
         "status": application.status,
         "match_score": float(application.match_score) if application.match_score is not None else None,
         "applied_at": application.created_at.isoformat(),

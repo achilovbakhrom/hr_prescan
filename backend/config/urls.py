@@ -8,7 +8,7 @@ from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 from apps.accounts.apis import PublicCvViewApi
-from apps.accounts.urls import candidate_profile_urlpatterns, hr_urlpatterns
+from apps.accounts.urls import candidate_profile_urlpatterns, hr_urlpatterns, user_companies_urlpatterns
 from apps.applications.urls import (
     candidate_urlpatterns as application_candidate_urlpatterns,
 )
@@ -68,7 +68,6 @@ from apps.subscriptions.urls import (
 from apps.subscriptions.urls import (
     public_urlpatterns as subscription_public_urlpatterns,
 )
-from apps.vacancies.urls import employer_urlpatterns as employer_hr_urlpatterns
 from apps.vacancies.urls import hr_urlpatterns as vacancy_hr_urlpatterns
 from apps.vacancies.urls import public_urlpatterns as vacancy_public_urlpatterns
 
@@ -83,7 +82,7 @@ urlpatterns = [
     path("api/health/", health_check, name="health-check"),
     path("api/auth/", include("apps.accounts.urls")),
     path("api/hr/company/", include((hr_urlpatterns, "hr"))),
-    path("api/hr/employers/", include((employer_hr_urlpatterns, "hr-employers"))),
+    path("api/hr/companies/", include((user_companies_urlpatterns, "hr-companies"))),
     path("api/hr/vacancies/", include((vacancy_hr_urlpatterns, "hr-vacancies"))),
     path("api/hr/vacancies/", include((application_hr_vacancy_urlpatterns, "hr-applications"))),
     path("api/hr/candidates/", include((application_hr_candidate_urlpatterns, "hr-candidates"))),
