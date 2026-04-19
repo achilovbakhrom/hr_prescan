@@ -1,7 +1,7 @@
 import factory
 from factory.django import DjangoModelFactory
 
-from apps.accounts.models import Company, User
+from apps.accounts.models import Company, CompanyMembership, User
 from apps.applications.models import Application
 from apps.interviews.models import Interview
 from apps.vacancies.models import Vacancy
@@ -12,7 +12,7 @@ class CompanyFactory(DjangoModelFactory):
         model = Company
 
     name = factory.Faker("company")
-    industry = factory.Faker("bs")
+    custom_industry = factory.Faker("bs")
     size = Company.Size.SMALL
     country = factory.Faker("country")
 
@@ -29,6 +29,16 @@ class UserFactory(DjangoModelFactory):
     company = factory.SubFactory(CompanyFactory)
     is_active = True
     email_verified = True
+
+
+class CompanyMembershipFactory(DjangoModelFactory):
+    class Meta:
+        model = CompanyMembership
+
+    user = factory.SubFactory(UserFactory)
+    company = factory.SelfAttribute("user.company")
+    role = factory.SelfAttribute("user.role")
+    is_default = True
 
 
 class VacancyFactory(DjangoModelFactory):

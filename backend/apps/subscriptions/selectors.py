@@ -1,7 +1,7 @@
 from django.db.models import QuerySet
 
-from apps.accounts.models import Company
-from apps.subscriptions.models import CompanySubscription, SubscriptionPlan
+from apps.accounts.models import User
+from apps.subscriptions.models import SubscriptionPlan, UserSubscription
 
 
 def get_all_plans(*, active_only: bool = True) -> QuerySet[SubscriptionPlan]:
@@ -12,14 +12,14 @@ def get_all_plans(*, active_only: bool = True) -> QuerySet[SubscriptionPlan]:
     return qs
 
 
-def get_company_subscription(*, company: Company) -> CompanySubscription | None:
-    """Return the active subscription for a company, or None."""
+def get_user_subscription(*, user: User) -> UserSubscription | None:
+    """Return the active subscription for a user, or None."""
     try:
-        return CompanySubscription.objects.select_related("plan").get(
-            company=company,
+        return UserSubscription.objects.select_related("plan").get(
+            user=user,
             is_active=True,
         )
-    except CompanySubscription.DoesNotExist:
+    except UserSubscription.DoesNotExist:
         return None
 
 

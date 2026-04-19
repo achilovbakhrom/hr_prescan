@@ -23,8 +23,7 @@ class CompanyOutputSerializer(serializers.ModelSerializer):
             "website",
             "description",
             "custom_industry",
-            "subscription_status",
-            "trial_ends_at",
+            "is_deleted",
             "created_at",
             "updated_at",
         ]
@@ -50,6 +49,8 @@ class UserOutputSerializer(serializers.ModelSerializer):
             "is_active",
             "email_verified",
             "onboarding_completed",
+            "subscription_status",
+            "trial_ends_at",
             "language",
             "created_at",
             "updated_at",
