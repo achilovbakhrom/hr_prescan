@@ -1140,7 +1140,9 @@
     "deleteConfirm": "Delete '{name}'? All members will lose access; historical vacancies keep the name.",
     "changeLogo": "Change logo",
     "logoInvalidType": "Please choose an image file.",
-    "logoTooLarge": "Logo must be 2 MB or smaller."
+    "logoTooLarge": "Logo must be 2 MB or smaller.",
+    "logo": "Logo",
+    "logoHint": "Optional. PNG or JPG, up to 2 MB."
   },
   "jobBoard": {
     "title": "Browse Jobs",

@@ -2,6 +2,7 @@
 import { useI18n } from 'vue-i18n'
 import Tag from 'primevue/tag'
 import Button from 'primevue/button'
+import CompanyLogo from '@/shared/components/CompanyLogo.vue'
 import {
   EMPLOYMENT_LABELS,
   EXPERIENCE_LABELS,
@@ -61,13 +62,21 @@ function formatRelativeDate(dateStr: string): string {
     >
       <!-- Top row -->
       <div class="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-        <div class="min-w-0 flex-1">
-          <h2 class="text-base font-semibold text-gray-900 group-hover:text-blue-600">
-            {{ job.title }}
-          </h2>
-          <p v-if="getCompanyName(job)" class="mt-0.5 text-sm text-gray-500">
-            <i class="pi pi-building mr-1 text-xs"></i>{{ getCompanyName(job) }}
-          </p>
+        <div class="flex min-w-0 flex-1 items-start gap-3">
+          <CompanyLogo
+            v-if="getCompanyName(job)"
+            :logo="job.companyLogo"
+            :name="getCompanyName(job)"
+            size="md"
+          />
+          <div class="min-w-0 flex-1">
+            <h2 class="text-base font-semibold text-gray-900 group-hover:text-blue-600">
+              {{ job.title }}
+            </h2>
+            <p v-if="getCompanyName(job)" class="mt-0.5 text-sm text-gray-500">
+              {{ getCompanyName(job) }}
+            </p>
+          </div>
         </div>
         <span
           v-if="formatSalaryRange(job, t) !== t('vacancies.overview.salaryNotSpecified')"

@@ -609,7 +609,7 @@ Archived → Applied (restore)
 2. HR can add more companies at any time from the Companies page. Each additional company starts as non-default.
 3. **Set as default** toggles which company is used implicitly (vacancy creation pre-selects it; AI assistant uses it when asked to "use default").
 4. **Delete** is a soft delete with a confirm dialog. Cannot delete the user's last non-deleted company. When a company is deleted, every affected user's default is transferred to their next non-deleted company by creation date. Historical vacancies keep the company name for display.
-5. Each company can still have its own logo, description, website, size, country, and custom industry.
+5. Each company can still have its own logo, description, website, size, country, and custom industry. A logo can be uploaded during creation or at any time from the company detail page (PNG/JPG, up to 2 MB). The logo is shown everywhere a company appears — company list, company switcher, vacancy cards, and the public job board. A neutral building-icon placeholder is used when no logo is set.
 
 ### 14.4 Inviting HR Users
 

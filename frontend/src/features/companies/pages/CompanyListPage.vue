@@ -7,6 +7,7 @@ import Tag from 'primevue/tag'
 import { useConfirm } from 'primevue/useconfirm'
 import ConfirmDialog from 'primevue/confirmdialog'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
+import CompanyLogo from '@/shared/components/CompanyLogo.vue'
 import { useCompanyStore } from '../stores/company.store'
 import type { UserCompanyMembership } from '../types/company.types'
 
@@ -93,18 +94,7 @@ async function handleSetDefault(company: UserCompanyMembership): Promise<void> {
         @click="router.push({ name: ROUTE_NAMES.COMPANY_DETAIL, params: { id: company.id } })"
       >
         <div class="mb-3 flex items-start gap-3">
-          <div
-            v-if="company.logo"
-            class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-gray-100"
-          >
-            <img :src="company.logo" :alt="company.name" class="h-full w-full object-contain" />
-          </div>
-          <div
-            v-else
-            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600"
-          >
-            <i class="pi pi-building text-lg"></i>
-          </div>
+          <CompanyLogo :logo="company.logo" :name="company.name" size="md" />
           <div class="min-w-0 flex-1">
             <h3 class="truncate text-base font-semibold text-gray-900">{{ company.name }}</h3>
             <p v-if="company.customIndustry" class="truncate text-sm text-gray-500">
