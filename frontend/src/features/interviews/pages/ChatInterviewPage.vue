@@ -71,12 +71,8 @@ const {
             </div>
             <div>
               <p class="text-sm font-medium text-gray-900">{{ interview.vacancyTitle }}</p>
-              <p
-                v-if="interview.employerName || interview.companyName"
-                class="text-xs text-gray-500"
-              >
-                <i class="pi pi-building mr-0.5"></i
-                >{{ interview.employerName || interview.companyName }}
+              <p v-if="interview.companyName" class="text-xs text-gray-500">
+                <i class="pi pi-building mr-0.5"></i>{{ interview.companyName }}
               </p>
               <p class="text-xs text-gray-500">{{ t('interviews.chatPage.inProgress') }}</p>
             </div>
@@ -115,12 +111,8 @@ const {
               </div>
               <div>
                 <h1 class="text-base font-semibold text-gray-900">{{ interview.vacancyTitle }}</h1>
-                <p
-                  v-if="interview.employerName || interview.companyName"
-                  class="text-xs text-gray-500"
-                >
-                  <i class="pi pi-building mr-1"></i
-                  >{{ interview.employerName || interview.companyName }}
+                <p v-if="interview.companyName" class="text-xs text-gray-500">
+                  <i class="pi pi-building mr-1"></i>{{ interview.companyName }}
                 </p>
                 <div class="flex items-center gap-1.5">
                   <span

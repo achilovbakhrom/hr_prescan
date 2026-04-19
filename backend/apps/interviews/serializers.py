@@ -126,7 +126,6 @@ class CandidateInterviewOutputSerializer(serializers.ModelSerializer):
 
     vacancy_title = serializers.SerializerMethodField()
     company_name = serializers.SerializerMethodField()
-    employer_name = serializers.SerializerMethodField()
 
     class Meta:
         model = Interview
@@ -134,7 +133,6 @@ class CandidateInterviewOutputSerializer(serializers.ModelSerializer):
             "id",
             "vacancy_title",
             "company_name",
-            "employer_name",
             "interview_token",
             "session_type",
             "screening_mode",
@@ -154,18 +152,12 @@ class CandidateInterviewOutputSerializer(serializers.ModelSerializer):
     def get_company_name(self, obj: Interview) -> str:
         return obj.application.vacancy.company.name
 
-    def get_employer_name(self, obj: Interview) -> str | None:
-        # Compatibility shim: returns the company name. The 'employer' concept was removed;
-        # the frontend will drop this field in PR 3 and switch to company_name.
-        return obj.application.vacancy.company.name
-
 
 class PublicInterviewOutputSerializer(serializers.ModelSerializer):
     """Public view for session accessed by token — minimal info."""
 
     vacancy_title = serializers.SerializerMethodField()
     company_name = serializers.SerializerMethodField()
-    employer_name = serializers.SerializerMethodField()
 
     class Meta:
         model = Interview
@@ -173,7 +165,6 @@ class PublicInterviewOutputSerializer(serializers.ModelSerializer):
             "id",
             "vacancy_title",
             "company_name",
-            "employer_name",
             "interview_token",
             "session_type",
             "screening_mode",
@@ -188,8 +179,4 @@ class PublicInterviewOutputSerializer(serializers.ModelSerializer):
         return obj.application.vacancy.title
 
     def get_company_name(self, obj: Interview) -> str:
-        return obj.application.vacancy.company.name
-
-    def get_employer_name(self, obj: Interview) -> str | None:
-        # Compatibility shim (see CandidateInterviewOutputSerializer).
         return obj.application.vacancy.company.name

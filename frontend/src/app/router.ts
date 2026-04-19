@@ -17,7 +17,7 @@ import { notificationRoutes } from '@/features/notifications/routes'
 import { settingsRoutes } from '@/features/settings/routes'
 import { subscriptionRoutes, publicSubscriptionRoutes } from '@/features/subscriptions/routes'
 import { cvBuilderRoutes, publicCvRoutes } from '@/features/cv-builder/routes'
-import { employerRoutes } from '@/features/employers/routes'
+import { companyRoutes } from '@/features/companies/routes'
 import { landingRoutes } from '@/features/landing/routes'
 import { legalRoutes } from '@/features/legal/routes'
 import { errorRoutes } from '@/features/errors/routes'
@@ -60,7 +60,7 @@ const routes: RouteRecordRaw[] = [
     children: [
       ...dashboardRoutes,
       ...vacancyRoutes,
-      ...employerRoutes,
+      ...companyRoutes,
       ...candidateRoutes,
       ...cvBuilderRoutes,
       ...hrCandidateRoutes,

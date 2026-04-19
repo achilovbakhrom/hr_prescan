@@ -10,11 +10,11 @@ const router = useRouter()
 const { t } = useI18n()
 const authStore = useAuthStore()
 
-const company = computed(() => authStore.user?.company)
-const isTrial = computed(() => company.value?.subscriptionStatus === 'trial')
+const user = computed(() => authStore.user)
+const isTrial = computed(() => user.value?.subscriptionStatus === 'trial')
 const daysRemaining = computed(() => {
-  if (!company.value?.trialEndsAt) return null
-  const diff = new Date(company.value.trialEndsAt).getTime() - Date.now()
+  if (!user.value?.trialEndsAt) return null
+  const diff = new Date(user.value.trialEndsAt).getTime() - Date.now()
   return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)))
 })
 

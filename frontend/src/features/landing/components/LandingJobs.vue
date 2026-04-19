@@ -33,9 +33,8 @@ function goToJobDetail(id: string): void {
   router.push({ name: ROUTE_NAMES.JOB_DETAIL, params: { id } })
 }
 
-function getEmployerName(job: Vacancy): string | undefined {
-  const j = job as unknown as Record<string, unknown>
-  return (j.employerName as string) || (j.companyName as string) || undefined
+function getCompanyName(job: Vacancy): string | undefined {
+  return job.companyName ?? undefined
 }
 </script>
 
@@ -76,8 +75,8 @@ function getEmployerName(job: Vacancy): string | undefined {
         >
           <div class="min-w-0 flex-1">
             <h3 class="text-base font-semibold text-gray-900">{{ job.title }}</h3>
-            <p v-if="getEmployerName(job)" class="mt-0.5 text-sm text-gray-500">
-              <i class="pi pi-building mr-1 text-xs"></i>{{ getEmployerName(job) }}
+            <p v-if="getCompanyName(job)" class="mt-0.5 text-sm text-gray-500">
+              <i class="pi pi-building mr-1 text-xs"></i>{{ getCompanyName(job) }}
             </p>
             <div class="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">
               <span v-if="job.location"

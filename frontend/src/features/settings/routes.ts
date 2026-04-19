@@ -10,12 +10,6 @@ export const settingsRoutes: RouteRecordRaw[] = [
     meta: { requiresAuth: true },
   },
   {
-    path: '/settings/company',
-    name: ROUTE_NAMES.COMPANY_PROFILE,
-    component: () => import('./pages/CompanyProfilePage.vue'),
-    meta: { requiresAuth: true, roles: [USER_ROLES.ADMIN, USER_ROLES.HR] },
-  },
-  {
     path: '/settings/team',
     name: ROUTE_NAMES.TEAM_MANAGEMENT,
     component: () => import('./pages/TeamManagementPage.vue'),

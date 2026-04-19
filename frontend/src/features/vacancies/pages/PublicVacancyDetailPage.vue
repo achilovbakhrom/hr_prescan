@@ -13,19 +13,19 @@ import {
 } from '../composables/useVacancyLabels'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { Vacancy } from '../types/vacancy.types'
-import type { EmployerCompany } from '@/features/employers/types/employer.types'
+import type { Company } from '@/features/companies/types/company.types'
 import { sanitizeHtml } from '@/shared/utils/sanitize'
 import TranslatableText from '@/shared/components/TranslatableText.vue'
 
-interface VacancyWithEmployer extends Vacancy {
-  employer?: EmployerCompany
+interface VacancyWithCompany extends Vacancy {
+  company?: Company
   companyName?: string | null
 }
 
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
-const vacancy = ref<VacancyWithEmployer | null>(null)
+const vacancy = ref<VacancyWithCompany | null>(null)
 const loading = ref(false)
 const error = ref<string | null>(null)
 const isShareRoute = computed(() => route.name === 'job-share')
@@ -69,10 +69,10 @@ onMounted(async () => {
         <div class="mb-5 sm:mb-6">
           <h1 class="text-2xl font-bold sm:text-3xl">{{ vacancy.title }}</h1>
           <p
-            v-if="vacancy.employer?.name || vacancy.companyName"
+            v-if="vacancy.company?.name || vacancy.companyName"
             class="mt-1 text-sm text-gray-500 sm:text-base"
           >
-            <i class="pi pi-building mr-1"></i>{{ vacancy.employer?.name || vacancy.companyName }}
+            <i class="pi pi-building mr-1"></i>{{ vacancy.company?.name || vacancy.companyName }}
           </p>
           <div
             class="mt-2 flex flex-wrap items-center gap-2 text-xs text-gray-500 sm:gap-3 sm:text-sm"
@@ -130,19 +130,18 @@ onMounted(async () => {
           </div>
         </div>
 
-        <!-- Employer profile card -->
         <div
-          v-if="vacancy.employer"
+          v-if="vacancy.company"
           class="mb-5 rounded-xl border border-gray-200 bg-gray-50 p-4 sm:mb-6 sm:p-5"
         >
           <div class="flex items-center gap-3 sm:gap-4">
             <div
-              v-if="vacancy.employer.logo"
+              v-if="vacancy.company.logo"
               class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white sm:h-14 sm:w-14"
             >
               <img
-                :src="vacancy.employer.logo"
-                :alt="vacancy.employer.name"
+                :src="vacancy.company.logo"
+                :alt="vacancy.company.name"
                 class="h-full w-full object-contain"
               />
             </div>
@@ -154,27 +153,27 @@ onMounted(async () => {
             </div>
             <div class="min-w-0">
               <h3 class="text-base font-semibold text-gray-900 sm:text-lg">
-                {{ vacancy.employer.name }}
+                {{ vacancy.company.name }}
               </h3>
-              <p v-if="vacancy.employer.industry" class="text-xs text-gray-500 sm:text-sm">
-                {{ vacancy.employer.industry }}
+              <p v-if="vacancy.company.customIndustry" class="text-xs text-gray-500 sm:text-sm">
+                {{ vacancy.company.customIndustry }}
               </p>
               <a
-                v-if="vacancy.employer.website"
-                :href="vacancy.employer.website"
+                v-if="vacancy.company.website"
+                :href="vacancy.company.website"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="text-xs text-blue-600 hover:underline sm:text-sm"
               >
-                {{ vacancy.employer.website }}
+                {{ vacancy.company.website }}
               </a>
             </div>
           </div>
           <p
-            v-if="vacancy.employer.description"
+            v-if="vacancy.company.description"
             class="mt-3 whitespace-pre-line text-xs text-gray-600 sm:text-sm"
           >
-            {{ vacancy.employer.description }}
+            {{ vacancy.company.description }}
           </p>
         </div>
 

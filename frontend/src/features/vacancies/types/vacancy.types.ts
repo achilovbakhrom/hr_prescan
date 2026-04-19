@@ -16,7 +16,7 @@ import type {
   VacancyVisibility,
   InterviewMode,
 } from '@/shared/types/vacancy.types'
-import type { EmployerCompany } from '@/features/employers/types/employer.types'
+import type { Company } from '@/features/companies/types/company.types'
 
 export type QuestionSource = 'ai_generated' | 'hr_added'
 export type StepType = 'prescanning' | 'interview'
@@ -28,7 +28,7 @@ export interface VacancyDetail extends Vacancy {
   criteria: VacancyCriteria[]
   questions: InterviewQuestion[]
   createdByEmail: string
-  employer?: EmployerCompany
+  company?: Company
 }
 
 export interface VacancyCriteria {
@@ -73,7 +73,7 @@ export interface CreateVacancyRequest {
   cvRequired?: boolean
   interviewDuration?: number
   companyInfo?: string
-  employerId?: string
+  companyId?: string
   prescanningPrompt?: string
   interviewPrompt?: string
   prescanningLanguage?: string

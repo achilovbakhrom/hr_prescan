@@ -41,8 +41,8 @@ function onStatusClick(event: Event, id: string, status: VacancyStatus): void {
           <h3 class="text-sm font-semibold text-gray-900">{{ vacancy.title }}</h3>
           <VacancyStatusBadge :status="vacancy.status" />
         </div>
-        <p v-if="vacancy.employerName" class="mt-0.5 text-xs text-gray-500">
-          <i class="pi pi-building mr-1"></i>{{ vacancy.employerName }}
+        <p v-if="vacancy.companyName" class="mt-0.5 text-xs text-gray-500">
+          <i class="pi pi-building mr-1"></i>{{ vacancy.companyName }}
         </p>
         <div class="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500">
           <span v-if="vacancy.location"

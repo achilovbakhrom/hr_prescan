@@ -1,14 +1,4 @@
-import type { CompanySize, HRPermission, UserRole, User } from '@/shared/types/auth.types'
-
-export interface CompanyProfileUpdate {
-  name: string
-  industries: string[]
-  size: CompanySize
-  country: string
-  website: string | null
-  description: string | null
-  customIndustry?: string | null
-}
+import type { HRPermission, User, UserRole } from '@/shared/types/auth.types'
 
 export interface Invitation {
   id: string
