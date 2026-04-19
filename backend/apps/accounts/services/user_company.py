@@ -32,6 +32,7 @@ def create_user_company(
     from apps.common.models import Industry
 
     company = Company.objects.create(
+        account_owner=user.effective_account_owner,
         name=name,
         size=size,
         country=country,

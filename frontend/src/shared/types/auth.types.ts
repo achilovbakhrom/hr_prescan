@@ -28,6 +28,8 @@ export interface User {
   role: UserRole
   hrPermissions: HRPermission[]
   company: Company | null
+  accountOwnerName: string
+  isAccountOwner: boolean
   emailVerified: boolean
   onboardingCompleted: boolean
   subscriptionStatus?: SubscriptionStatus
@@ -53,8 +55,9 @@ export type CompanySize = 'small' | 'medium' | 'large' | 'enterprise'
 
 export interface PendingInvitation {
   id: string
-  company: Company
+  companies: Company[]
   invitedByName: string
+  accountOwnerName: string
   token: string
   expiresAt: string
   createdAt: string

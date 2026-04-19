@@ -51,13 +51,16 @@ The AI agent evaluates candidates at each step and decides whether to advance th
 
 ---
 
-## 3. Multi-Company Model (per user)
+## 3. Multi-Company Model (per account)
 
-- **Subscription and billing live on the User**, not on a company. One HR user pays once; their plan limits (vacancies, interviews, HR seats) aggregate across every company they manage.
-- A user can **own or be a member of multiple Companies**. Memberships are tracked in `CompanyMembership` and each member picks one company as their personal default (`is_default`) — used implicitly for new vacancies and pre-selected in forms.
-- **Registration creates the user's first Company** (with `is_default=True`) and their 14-day trial. Additional companies are added from the **Companies** page.
+- **The Account is the tenant.** The account is identified by its owner user (`User.account_owner IS NULL ⇒ the user is the owner`). Subscription and billing live on the account owner; plan limits aggregate across every Company in the account.
+- **Companies are scoping objects inside the account** (`Company.account_owner`). They group vacancies, applications, and interviews, and double as labels on the public job page.
+- **Invitations target the account, not a single company.** When an HR invites a teammate, they pick which companies the invitee gets access to (default: all non-deleted companies at the time of invite). On accept, one `CompanyMembership` is created per selected company and the invitee's `User.account_owner` is set to the inviter's account owner.
+- **A user belongs to at most one account.** Accepting an invitation is blocked if the user already owns companies or already belongs to another account — they have to leave the current account first.
+- **Default membership per user.** Each user picks one of their memberships as `is_default` — used implicitly for new vacancies and pre-selected in forms.
+- **Registration creates the user's own account**: one Company (with the user as `account_owner` and `is_default=True` membership) plus a 14-day trial. Additional companies are added from the **Companies** page.
 - **Soft delete** marks `Company.is_deleted=True`: affects every member of that company, transfers each affected user's default to their next non-deleted membership, and historical vacancies keep the company name for display. The acting user cannot delete their last non-deleted company.
-- Data isolation is enforced per company on reads: vacancy/application/interview endpoints scope to companies the caller is a member of.
+- Data isolation: vacancy/application/interview queries scope to the caller's memberships (for invitees) or to all companies on the caller's account (for the owner).
 
 ---
 
@@ -610,11 +613,12 @@ Archived → Applied (restore)
 
 ### 14.4 Inviting HR Users
 
-1. Company admin goes to "Team" section
-2. Invites HR managers by email (invitation scopes to the admin's currently active company)
-3. Invited HR receives an email with a sign-up link
-4. HR creates their account and is automatically added to the company as a member
-5. Company admin can manage HR permissions (activate/deactivate)
+1. Account admin goes to the "Team" section.
+2. Invites HR managers by email and picks which of their companies the invitee should have access to (default: all non-deleted companies at the time of invite).
+3. Invitation is scoped to the inviter's account, not to a single company. Only one pending invitation per email per account is allowed at a time.
+4. Invitee receives an email listing the account name and the granted companies, with a sign-up / sign-in link.
+5. On accept, a `CompanyMembership` is created for each granted company, `User.account_owner` is set to the inviter's account owner, and the invitee lands in the default company. A user who already owns companies (or belongs to another account) cannot accept — they must leave the current account first.
+6. Account admin can manage HR permissions (activate/deactivate) and invitation scope for future invites.
 
 ### 14.5 Creating First Vacancy
 

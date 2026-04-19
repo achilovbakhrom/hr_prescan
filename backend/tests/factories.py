@@ -11,6 +11,11 @@ class CompanyFactory(DjangoModelFactory):
     class Meta:
         model = Company
 
+    account_owner = factory.SubFactory(
+        "tests.factories.UserFactory",
+        company=None,
+        role=User.Role.ADMIN,
+    )
     name = factory.Faker("company")
     custom_industry = factory.Faker("bs")
     size = Company.Size.SMALL

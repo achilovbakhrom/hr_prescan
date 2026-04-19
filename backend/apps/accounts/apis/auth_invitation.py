@@ -29,7 +29,9 @@ class CheckInvitationApi(APIView):
         from apps.accounts.models import Invitation
 
         try:
-            invitation = Invitation.objects.select_related("company").get(token=token)
+            invitation = (
+                Invitation.objects.select_related("account_owner").prefetch_related("companies").get(token=token)
+            )
         except (Invitation.DoesNotExist, ValueError):
             return Response({"detail": "Invalid invitation."}, status=status.HTTP_404_NOT_FOUND)
 
@@ -40,11 +42,13 @@ class CheckInvitationApi(APIView):
             return Response({"detail": "Invitation expired."}, status=status.HTTP_400_BAD_REQUEST)
 
         existing_user = User.objects.filter(email=invitation.email).exists()
+        companies = list(invitation.companies.all())
 
         return Response(
             {
                 "email": invitation.email,
-                "company_name": invitation.company.name,
+                "account_owner_name": invitation.account_owner.full_name or invitation.account_owner.email,
+                "company_names": [c.name for c in companies],
                 "existing_user": existing_user,
             }
         )
