@@ -3,6 +3,7 @@ import { useI18n } from 'vue-i18n'
 import Dropdown from 'primevue/dropdown'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
+import CompanyLogo from '@/shared/components/CompanyLogo.vue'
 import type { UserCompanyMembership } from '@/features/companies/types/company.types'
 
 defineProps<{
@@ -49,22 +50,7 @@ const { t } = useI18n()
 
     <div v-if="selectedCompany" class="rounded-xl border border-gray-200 bg-gray-50 p-4">
       <div class="flex items-center gap-3">
-        <div
-          v-if="selectedCompany.logo"
-          class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white ring-1 ring-gray-200"
-        >
-          <img
-            :src="selectedCompany.logo"
-            :alt="selectedCompany.name"
-            class="h-full w-full object-contain"
-          />
-        </div>
-        <div
-          v-else
-          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600"
-        >
-          <i class="pi pi-building"></i>
-        </div>
+        <CompanyLogo :logo="selectedCompany.logo" :name="selectedCompany.name" size="md" />
         <div class="min-w-0 flex-1">
           <p class="font-semibold text-gray-900">
             {{ selectedCompany.name }}

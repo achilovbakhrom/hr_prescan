@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import CompanyLogo from '@/shared/components/CompanyLogo.vue'
 
 const MAX_LOGO_BYTES = 2 * 1024 * 1024
 
@@ -42,18 +43,12 @@ function handleChange(event: Event): void {
 <template>
   <button
     type="button"
-    class="group relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gray-100 transition hover:ring-2 hover:ring-blue-400 disabled:cursor-not-allowed disabled:opacity-60"
+    class="group relative h-12 w-12 shrink-0 overflow-hidden rounded-xl transition hover:ring-2 hover:ring-blue-400 disabled:cursor-not-allowed disabled:opacity-60"
     :title="t('companies.changeLogo')"
     :disabled="uploading"
     @click="open"
   >
-    <img
-      v-if="props.logo"
-      :src="props.logo"
-      :alt="props.name"
-      class="h-full w-full object-contain"
-    />
-    <i v-else class="pi pi-building text-xl text-blue-600"></i>
+    <CompanyLogo :logo="props.logo" :name="props.name" size="lg" rounded="xl" />
     <span
       class="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/40 text-white opacity-0 transition-opacity group-hover:opacity-100"
     >

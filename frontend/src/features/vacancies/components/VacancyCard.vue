@@ -2,6 +2,7 @@
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import VacancyStatusBadge from './VacancyStatusBadge.vue'
+import CompanyLogo from '@/shared/components/CompanyLogo.vue'
 import type { Vacancy, VacancyStatus } from '../types/vacancy.types'
 
 defineProps<{
@@ -36,13 +37,20 @@ function onStatusClick(event: Event, id: string, status: VacancyStatus): void {
     @click="emit('click', vacancy.id)"
   >
     <div class="flex items-start justify-between gap-3">
+      <CompanyLogo
+        v-if="vacancy.companyName"
+        :logo="vacancy.companyLogo"
+        :name="vacancy.companyName"
+        size="sm"
+        rounded="md"
+      />
       <div class="min-w-0 flex-1">
         <div class="flex flex-wrap items-center gap-2">
           <h3 class="text-sm font-semibold text-gray-900">{{ vacancy.title }}</h3>
           <VacancyStatusBadge :status="vacancy.status" />
         </div>
         <p v-if="vacancy.companyName" class="mt-0.5 text-xs text-gray-500">
-          <i class="pi pi-building mr-1"></i>{{ vacancy.companyName }}
+          {{ vacancy.companyName }}
         </p>
         <div class="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500">
           <span v-if="vacancy.location"

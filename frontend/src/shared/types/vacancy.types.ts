@@ -48,4 +48,6 @@ export interface Vacancy {
   companyId?: string | null
   /** Company name returned by some API endpoints */
   companyName?: string | null
+  /** Company logo URL returned by list endpoints (may be absent on detail) */
+  companyLogo?: string | null
 }

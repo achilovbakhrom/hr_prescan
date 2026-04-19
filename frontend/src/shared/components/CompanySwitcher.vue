@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Select from 'primevue/select'
+import CompanyLogo from '@/shared/components/CompanyLogo.vue'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 
@@ -40,20 +41,34 @@ async function handleCompanySwitch(value: string): Promise<void> {
 </script>
 
 <template>
-  <Select
-    v-if="showSwitcher"
-    :model-value="activeCompanyId"
-    :options="companyOptions"
-    option-label="label"
-    option-value="value"
-    class="hidden !text-xs sm:inline-flex"
-    :pt="{ root: { class: '!py-1 !px-2 !min-w-0 max-w-48' }, label: { class: '!text-xs !py-0' } }"
-    @update:model-value="handleCompanySwitch"
-  />
-  <span
+  <div v-if="showSwitcher" class="hidden items-center gap-2 sm:inline-flex">
+    <CompanyLogo
+      v-if="authStore.user?.company"
+      :logo="authStore.user.company.logo"
+      :name="authStore.user.company.name"
+      size="xs"
+      rounded="md"
+    />
+    <Select
+      :model-value="activeCompanyId"
+      :options="companyOptions"
+      option-label="label"
+      option-value="value"
+      class="!text-xs"
+      :pt="{ root: { class: '!py-1 !px-2 !min-w-0 max-w-48' }, label: { class: '!text-xs !py-0' } }"
+      @update:model-value="handleCompanySwitch"
+    />
+  </div>
+  <div
     v-else-if="authStore.user?.company"
-    class="hidden rounded-md bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600 sm:inline"
+    class="hidden items-center gap-2 rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600 sm:inline-flex"
   >
+    <CompanyLogo
+      :logo="authStore.user.company.logo"
+      :name="authStore.user.company.name"
+      size="xs"
+      rounded="md"
+    />
     {{ authStore.user.company.name }}
-  </span>
+  </div>
 </template>

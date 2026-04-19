@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
+import CompanyLogo from '@/shared/components/CompanyLogo.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import { vacancyService } from '@/features/vacancies/services/vacancy.service'
 import {
@@ -73,25 +74,33 @@ function getCompanyName(job: Vacancy): string | undefined {
           class="flex cursor-pointer items-center justify-between rounded-xl border border-gray-100 bg-white p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-gray-200 hover:shadow-lg hover:shadow-gray-100/50"
           @click="goToJobDetail(job.id)"
         >
-          <div class="min-w-0 flex-1">
-            <h3 class="text-base font-semibold text-gray-900">{{ job.title }}</h3>
-            <p v-if="getCompanyName(job)" class="mt-0.5 text-sm text-gray-500">
-              <i class="pi pi-building mr-1 text-xs"></i>{{ getCompanyName(job) }}
-            </p>
-            <div class="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">
-              <span v-if="job.location"
-                ><i class="pi pi-map-marker mr-1 text-xs"></i>{{ job.location }}</span
-              >
-              <span
-                ><i class="pi pi-briefcase mr-1 text-xs"></i
-                >{{ EMPLOYMENT_LABELS[job.employmentType] }}</span
-              >
-              <Tag
-                v-if="job.isRemote"
-                :value="t('landing.remote')"
-                severity="info"
-                class="text-xs"
-              />
+          <div class="flex min-w-0 flex-1 items-start gap-3">
+            <CompanyLogo
+              v-if="getCompanyName(job)"
+              :logo="job.companyLogo"
+              :name="getCompanyName(job) ?? ''"
+              size="md"
+            />
+            <div class="min-w-0 flex-1">
+              <h3 class="text-base font-semibold text-gray-900">{{ job.title }}</h3>
+              <p v-if="getCompanyName(job)" class="mt-0.5 text-sm text-gray-500">
+                {{ getCompanyName(job) }}
+              </p>
+              <div class="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">
+                <span v-if="job.location"
+                  ><i class="pi pi-map-marker mr-1 text-xs"></i>{{ job.location }}</span
+                >
+                <span
+                  ><i class="pi pi-briefcase mr-1 text-xs"></i
+                  >{{ EMPLOYMENT_LABELS[job.employmentType] }}</span
+                >
+                <Tag
+                  v-if="job.isRemote"
+                  :value="t('landing.remote')"
+                  severity="info"
+                  class="text-xs"
+                />
+              </div>
             </div>
           </div>
           <div class="ml-4 flex flex-col items-end gap-1">
