@@ -12,7 +12,6 @@ import ConfirmDialog from 'primevue/confirmdialog'
 import GlassCard from '@/shared/components/GlassCard.vue'
 import CompanyCardItem from '../components/CompanyCardItem.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
-import CompanyLogo from '@/shared/components/CompanyLogo.vue'
 import { useCompanyStore } from '../stores/company.store'
 import type { UserCompanyMembership } from '../types/company.types'
 
