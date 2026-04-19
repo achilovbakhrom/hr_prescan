@@ -325,6 +325,14 @@
     "scheduledInterviewsHint": "Rejalashtirilgan intervyular bu yerda ko'rinadi",
     "trackApplications": "Ariza holatingizni kuzating",
     "viewEditProfile": "Profilingizni ko'ring va tahrirlang",
+    "recentActivity": "So'nggi faollik",
+    "pipelineOverview": "Quvur nazorati",
+    "applicants": "nomzodlar",
+    "ai": {
+      "title": "Nomzodlar haqida so'rang",
+      "subtitle": "Tezkor xulosalar oling, finalchilarni solishtiring yoki javob tayyorlang — tabiiy til bilan.",
+      "placeholder": "Nomzodlar haqida so'rang…"
+    },
     "candidate": {
       "profileCompleteness": "Profil to'liqligi",
       "completeProfileHint": "Ish moslashuvini yaxshilash uchun profilingizni to'ldiring",

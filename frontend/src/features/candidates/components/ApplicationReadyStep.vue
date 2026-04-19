@@ -16,7 +16,8 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
-const telegramBotUsername = (import.meta.env.VITE_TELEGRAM_CANDIDATE_BOT_USERNAME as string | undefined) ?? ''
+const telegramBotUsername =
+  (import.meta.env.VITE_TELEGRAM_CANDIDATE_BOT_USERNAME as string | undefined) ?? ''
 
 const telegramDeepLink = computed(() => {
   if (!telegramBotUsername || !props.telegramCode) return ''
@@ -123,7 +124,9 @@ async function copyTelegramLink(): Promise<void> {
             class="w-full sm:w-auto"
           />
           <Button
-            :label="telegramCopied ? t('common.copied') : t('candidates.application.copyTelegramLink')"
+            :label="
+              telegramCopied ? t('common.copied') : t('candidates.application.copyTelegramLink')
+            "
             :icon="telegramCopied ? 'pi pi-check' : 'pi pi-copy'"
             :severity="telegramCopied ? 'success' : 'secondary'"
             size="small"

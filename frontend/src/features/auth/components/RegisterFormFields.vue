@@ -30,10 +30,13 @@ const { t } = useI18n()
 <template>
   <form class="flex flex-col gap-4" @submit.prevent="emit('submit')">
     <div class="grid grid-cols-2 gap-4">
-      <div class="flex flex-col gap-1">
-        <label for="firstName" class="text-sm font-medium text-gray-700">{{
-          t('auth.register.firstName')
-        }}</label>
+      <div class="flex flex-col gap-1.5">
+        <label
+          for="firstName"
+          class="text-xs font-medium uppercase tracking-wider text-[color:var(--color-text-muted)]"
+        >
+          {{ t('auth.register.firstName') }}
+        </label>
         <InputText
           id="firstName"
           :model-value="firstName"
@@ -42,14 +45,17 @@ const { t } = useI18n()
           class="w-full"
           @update:model-value="emit('update:firstName', $event as string)"
         />
-        <small v-if="submitted && errors.firstName" class="text-red-500">{{
-          t('auth.register.firstNameRequired')
-        }}</small>
+        <small v-if="submitted && errors.firstName" class="text-[color:var(--color-danger)]">
+          {{ t('auth.register.firstNameRequired') }}
+        </small>
       </div>
-      <div class="flex flex-col gap-1">
-        <label for="lastName" class="text-sm font-medium text-gray-700">{{
-          t('auth.register.lastName')
-        }}</label>
+      <div class="flex flex-col gap-1.5">
+        <label
+          for="lastName"
+          class="text-xs font-medium uppercase tracking-wider text-[color:var(--color-text-muted)]"
+        >
+          {{ t('auth.register.lastName') }}
+        </label>
         <InputText
           id="lastName"
           :model-value="lastName"
@@ -58,16 +64,19 @@ const { t } = useI18n()
           class="w-full"
           @update:model-value="emit('update:lastName', $event as string)"
         />
-        <small v-if="submitted && errors.lastName" class="text-red-500">{{
-          t('auth.register.lastNameRequired')
-        }}</small>
+        <small v-if="submitted && errors.lastName" class="text-[color:var(--color-danger)]">
+          {{ t('auth.register.lastNameRequired') }}
+        </small>
       </div>
     </div>
 
-    <div class="flex flex-col gap-1">
-      <label for="email" class="text-sm font-medium text-gray-700">{{
-        t('auth.register.email')
-      }}</label>
+    <div class="flex flex-col gap-1.5">
+      <label
+        for="email"
+        class="text-xs font-medium uppercase tracking-wider text-[color:var(--color-text-muted)]"
+      >
+        {{ t('auth.register.email') }}
+      </label>
       <InputText
         id="email"
         :model-value="email"
@@ -77,15 +86,18 @@ const { t } = useI18n()
         class="w-full"
         @update:model-value="emit('update:email', $event as string)"
       />
-      <small v-if="submitted && errors.email" class="text-red-500">{{
-        t('auth.register.emailInvalid')
-      }}</small>
+      <small v-if="submitted && errors.email" class="text-[color:var(--color-danger)]">
+        {{ t('auth.register.emailInvalid') }}
+      </small>
     </div>
 
-    <div class="flex flex-col gap-1">
-      <label for="password" class="text-sm font-medium text-gray-700">{{
-        t('auth.register.password')
-      }}</label>
+    <div class="flex flex-col gap-1.5">
+      <label
+        for="password"
+        class="text-xs font-medium uppercase tracking-wider text-[color:var(--color-text-muted)]"
+      >
+        {{ t('auth.register.password') }}
+      </label>
       <Password
         :model-value="password"
         input-id="password"
@@ -96,15 +108,18 @@ const { t } = useI18n()
         input-class="w-full"
         @update:model-value="emit('update:password', $event)"
       />
-      <small v-if="submitted && errors.password" class="text-red-500">{{
-        t('auth.register.passwordTooShort')
-      }}</small>
+      <small v-if="submitted && errors.password" class="text-[color:var(--color-danger)]">
+        {{ t('auth.register.passwordTooShort') }}
+      </small>
     </div>
 
-    <div class="flex flex-col gap-1">
-      <label for="confirmPassword" class="text-sm font-medium text-gray-700">{{
-        t('auth.register.confirmPassword')
-      }}</label>
+    <div class="flex flex-col gap-1.5">
+      <label
+        for="confirmPassword"
+        class="text-xs font-medium uppercase tracking-wider text-[color:var(--color-text-muted)]"
+      >
+        {{ t('auth.register.confirmPassword') }}
+      </label>
       <Password
         :model-value="confirmPassword"
         input-id="confirmPassword"
@@ -116,9 +131,9 @@ const { t } = useI18n()
         input-class="w-full"
         @update:model-value="emit('update:confirmPassword', $event)"
       />
-      <small v-if="submitted && errors.confirmPassword" class="text-red-500">{{
-        t('auth.register.passwordMismatch')
-      }}</small>
+      <small v-if="submitted && errors.confirmPassword" class="text-[color:var(--color-danger)]">
+        {{ t('auth.register.passwordMismatch') }}
+      </small>
     </div>
 
     <Button

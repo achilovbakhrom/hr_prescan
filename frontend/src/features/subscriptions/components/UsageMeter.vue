@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * UsageMeter — labeled progress meter for a subscription quota.
+ * Uses design tokens for colors. Severity shifts at 70% / 90%.
+ */
 import { computed } from 'vue'
 import ProgressBar from 'primevue/progressbar'
 
@@ -14,44 +18,63 @@ const percentage = computed(() => {
   return Math.min(Math.round((props.used / props.limit) * 100), 100)
 })
 
-const severity = computed(() => {
+const severity = computed<'info' | 'warning' | 'danger'>(() => {
   if (percentage.value >= 90) return 'danger'
   if (percentage.value >= 70) return 'warning'
   return 'info'
 })
 
-const colorClass = computed(() => {
-  if (severity.value === 'danger') return 'text-red-600'
-  if (severity.value === 'warning') return 'text-yellow-600'
-  return 'text-blue-600'
+const valueColor = computed(() => {
+  if (severity.value === 'danger') return 'text-[color:var(--color-danger)]'
+  if (severity.value === 'warning') return 'text-[color:var(--color-warning)]'
+  return 'text-[color:var(--color-accent)]'
 })
 
-const displayUsed = computed(() => {
-  return props.unit ? `${props.used} ${props.unit}` : String(props.used)
+const barColorClass = computed(() => {
+  if (severity.value === 'danger') return 'usage-meter--danger'
+  if (severity.value === 'warning') return 'usage-meter--warning'
+  return 'usage-meter--info'
 })
 
-const displayLimit = computed(() => {
-  return props.unit ? `${props.limit} ${props.unit}` : String(props.limit)
-})
+const displayUsed = computed(() =>
+  props.unit ? `${props.used} ${props.unit}` : String(props.used),
+)
+
+const displayLimit = computed(() =>
+  props.unit ? `${props.limit} ${props.unit}` : String(props.limit),
+)
 </script>
 
 <template>
-  <div class="space-y-1">
+  <div class="space-y-2">
     <div class="flex items-center justify-between text-sm">
-      <span class="font-medium text-gray-700">{{ label }}</span>
-      <span :class="colorClass"> {{ displayUsed }} / {{ displayLimit }} </span>
+      <span class="font-medium text-[color:var(--color-text-secondary)]">{{ label }}</span>
+      <span class="font-mono text-xs font-semibold" :class="valueColor">
+        {{ displayUsed }} / {{ displayLimit }}
+      </span>
     </div>
     <ProgressBar
       :value="percentage"
       :show-value="false"
+      :class="['usage-meter', barColorClass]"
       style="height: 8px"
-      :class="
-        severity === 'danger'
-          ? '[&_.p-progressbar-value]:!bg-red-500'
-          : severity === 'warning'
-            ? '[&_.p-progressbar-value]:!bg-yellow-500'
-            : ''
-      "
     />
   </div>
 </template>
+
+<style scoped>
+.usage-meter :deep(.p-progressbar-value) {
+  transition:
+    width 480ms var(--ease-ios),
+    background-color 240ms var(--ease-ios);
+}
+.usage-meter--info :deep(.p-progressbar-value) {
+  background: var(--color-accent) !important;
+}
+.usage-meter--warning :deep(.p-progressbar-value) {
+  background: var(--color-warning) !important;
+}
+.usage-meter--danger :deep(.p-progressbar-value) {
+  background: var(--color-danger) !important;
+}
+</style>

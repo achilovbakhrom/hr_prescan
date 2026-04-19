@@ -1,8 +1,14 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+/**
+ * TeamManagementPage — team roster + pending invitations.
+ * Glass toolbar + GlassCard chrome around solid data tables.
+ * Spec: docs/design/spec.md §9.
+ */
+import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import Message from 'primevue/message'
+import GlassCard from '@/shared/components/GlassCard.vue'
 import InviteHRDialog from '../components/InviteHRDialog.vue'
 import InvitationsTable from '../components/InvitationsTable.vue'
 import TeamMembersTable from '../components/TeamMembersTable.vue'
@@ -15,6 +21,11 @@ const settingsStore = useSettingsStore()
 const showInviteDialog = ref(false)
 const successMessage = ref<string | null>(null)
 const errorMessage = ref<string | null>(null)
+
+const pendingInvitationsCount = computed(
+  () => settingsStore.invitations.filter((i) => !i.isAccepted).length,
+)
+const activeMembersCount = computed(() => settingsStore.team.filter((m) => m.isActive).length)
 
 onMounted(async () => {
   await Promise.all([settingsStore.fetchTeam(), settingsStore.fetchInvitations()])
@@ -68,50 +79,70 @@ async function handleToggleActive(userId: string): Promise<void> {
 </script>
 
 <template>
-  <div class="mx-auto max-w-5xl p-6">
-    <div class="mb-6 flex items-center justify-between">
-      <h1 class="text-2xl font-bold text-gray-900">{{ t('settings.team.title') }}</h1>
-      <Button
-        :label="t('settings.team.invite')"
-        icon="pi pi-plus"
-        @click="showInviteDialog = true"
-      />
-    </div>
+  <div class="mx-auto max-w-6xl space-y-6">
+    <!-- Header / glass toolbar -->
+    <GlassCard class="!p-4">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 class="text-2xl font-semibold tracking-tight text-[color:var(--color-text-primary)]">
+            {{ t('settings.team.title') }}
+          </h1>
+          <p
+            class="mt-0.5 flex flex-wrap gap-x-3 gap-y-1 text-xs text-[color:var(--color-text-muted)]"
+          >
+            <span class="inline-flex items-center gap-1">
+              <span
+                class="h-1.5 w-1.5 rounded-full bg-[color:var(--color-success)]"
+                aria-hidden="true"
+              ></span>
+              <span class="font-mono">{{ activeMembersCount }}</span>
+              {{ t('settings.team.activeMembers') || 'active members' }}
+            </span>
+            <span class="inline-flex items-center gap-1">
+              <span
+                class="h-1.5 w-1.5 rounded-full bg-[color:var(--color-warning)]"
+                aria-hidden="true"
+              ></span>
+              <span class="font-mono">{{ pendingInvitationsCount }}</span>
+              {{ t('settings.team.pendingInvitations') || 'pending invitations' }}
+            </span>
+          </p>
+        </div>
+        <Button
+          :label="t('settings.team.invite')"
+          icon="pi pi-plus"
+          @click="showInviteDialog = true"
+        />
+      </div>
+    </GlassCard>
 
-    <Message v-if="successMessage" severity="success" class="mb-4">
+    <Message v-if="successMessage" severity="success">
       {{ successMessage }}
     </Message>
 
-    <Message v-if="errorMessage" severity="error" class="mb-4">
+    <Message v-if="errorMessage" severity="error">
       {{ errorMessage }}
     </Message>
 
-    <div
-      v-if="settingsStore.loading && !settingsStore.team.length"
-      class="py-12 text-center text-gray-500"
-    >
-      Loading team data...
+    <div v-if="settingsStore.loading && !settingsStore.team.length" class="py-16 text-center">
+      <i class="pi pi-spinner pi-spin text-3xl text-[color:var(--color-text-muted)]"></i>
     </div>
 
     <template v-else>
-      <div v-if="settingsStore.invitations.length" class="mb-8 rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
-        <h2 class="mb-4 text-lg font-semibold text-gray-900">
-          {{ t('settings.team.invitations') }}
-        </h2>
+      <GlassCard v-if="settingsStore.invitations.length" :title="t('settings.team.invitations')">
         <InvitationsTable
           :invitations="settingsStore.invitations"
           @cancel="handleCancelInvitation"
         />
-      </div>
+      </GlassCard>
 
-      <div class="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
-        <h2 class="mb-4 text-lg font-semibold text-gray-900">{{ t('settings.team.members') }}</h2>
+      <GlassCard :title="t('settings.team.members')">
         <TeamMembersTable
           :members="settingsStore.team"
           @toggle-active="handleToggleActive"
           @update-permissions="handleUpdatePermissions"
         />
-      </div>
+      </GlassCard>
     </template>
 
     <InviteHRDialog

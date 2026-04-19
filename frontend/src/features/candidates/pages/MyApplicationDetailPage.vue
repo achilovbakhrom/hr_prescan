@@ -1,10 +1,17 @@
 <script setup lang="ts">
+/**
+ * MyApplicationDetailPage — full detail of a candidate's application.
+ * Timeline (ApplicationTimeline) + vacancy card + score card + CV card.
+ * Spec: docs/design/spec.md §9 — timeline events as glass chips, mono timestamps.
+ */
 import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
-import { useCandidateStore } from '../stores/candidate.store'
+import GlassCard from '@/shared/components/GlassCard.vue'
 import ApplicationStatusBadge from '../components/ApplicationStatusBadge.vue'
+import ApplicationTimeline from '../components/ApplicationTimeline.vue'
+import { useCandidateStore } from '../stores/candidate.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 
 const { t } = useI18n()
@@ -18,106 +25,109 @@ const application = computed(() => candidateStore.currentApplication)
 onMounted(() => candidateStore.fetchMyApplicationDetail(applicationId.value))
 
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString()
+  return new Date(dateStr).toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
 }
 
-const statusSteps = ['applied', 'prescanned', 'interviewed', 'shortlisted'] as const
-
-function stepIndex(status: string): number {
-  const idx = statusSteps.indexOf(status as (typeof statusSteps)[number])
-  return idx === -1 ? -1 : idx
+function goBack(): void {
+  router.push({ name: ROUTE_NAMES.MY_APPLICATIONS })
 }
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="mx-auto max-w-5xl space-y-6">
     <div class="flex items-center gap-3">
-      <button
-        class="text-gray-500 dark:text-gray-400 hover:text-gray-700"
-        @click="router.push({ name: ROUTE_NAMES.MY_APPLICATIONS })"
-      >
-        <i class="pi pi-arrow-left text-lg"></i>
-      </button>
-      <h1 class="text-2xl font-bold">{{ t('candidates.overview') }}</h1>
+      <Button
+        icon="pi pi-arrow-left"
+        severity="secondary"
+        text
+        rounded
+        aria-label="Back"
+        @click="goBack"
+      />
+      <h1 class="text-2xl font-semibold tracking-tight text-[color:var(--color-text-primary)]">
+        {{ t('candidates.overview') }}
+      </h1>
     </div>
 
     <div v-if="candidateStore.loading" class="py-12 text-center">
-      <i class="pi pi-spinner pi-spin text-3xl text-gray-400"></i>
+      <i class="pi pi-spinner pi-spin text-3xl text-[color:var(--color-text-muted)]"></i>
     </div>
 
-    <p v-if="candidateStore.error" class="text-sm text-red-600">
+    <p v-if="candidateStore.error" class="text-sm text-[color:var(--color-danger)]">
       {{ candidateStore.error }}
     </p>
 
     <template v-if="application">
-      <!-- Status Timeline -->
-      <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-        <h2 class="mb-3 text-sm font-semibold text-gray-600">
-          {{ t('candidates.myApplication.progress') }}
-        </h2>
-        <div
-          v-if="application.status !== 'rejected'"
-          class="flex items-center gap-1 overflow-x-auto"
-        >
-          <div v-for="(step, idx) in statusSteps" :key="step" class="flex items-center">
-            <div
-              class="flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold"
-              :class="
-                idx <= stepIndex(application.status)
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-200 text-gray-500'
-              "
-            >
-              {{ idx + 1 }}
+      <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <!-- Left: timeline + status -->
+        <div class="lg:col-span-1">
+          <GlassCard class="h-full">
+            <ApplicationTimeline :application="application" />
+            <div class="mt-5 flex justify-center">
+              <ApplicationStatusBadge :status="application.status" />
             </div>
-            <div
-              v-if="idx < statusSteps.length - 1"
-              class="mx-1 h-0.5 w-6"
-              :class="idx < stepIndex(application.status) ? 'bg-blue-500' : 'bg-gray-200'"
-            ></div>
-          </div>
+          </GlassCard>
         </div>
-        <div class="mt-2">
-          <ApplicationStatusBadge :status="application.status" />
+
+        <!-- Right: meta + score + cv -->
+        <div class="space-y-6 lg:col-span-2">
+          <GlassCard>
+            <span
+              class="text-xs font-semibold uppercase tracking-wider text-[color:var(--color-text-muted)]"
+            >
+              {{ t('nav.vacancies') }}
+            </span>
+            <p class="mt-1 text-xl font-semibold text-[color:var(--color-text-primary)]">
+              {{ application.vacancyTitle }}
+            </p>
+            <p
+              class="mt-2 flex items-center gap-1.5 text-sm text-[color:var(--color-text-secondary)]"
+            >
+              <i class="pi pi-calendar text-xs"></i>
+              {{ t('candidates.myApplication.appliedOn') }}
+              <span class="font-mono">{{ formatDate(application.createdAt) }}</span>
+            </p>
+          </GlassCard>
+
+          <GlassCard accent="ai">
+            <span
+              class="text-xs font-semibold uppercase tracking-wider text-[color:var(--color-text-muted)]"
+            >
+              {{ t('candidates.matchScore') }}
+            </span>
+            <p
+              v-if="application.matchScore !== null"
+              class="mt-2 font-mono text-5xl font-semibold leading-none tracking-tight text-[color:var(--color-accent-ai)]"
+            >
+              {{ application.matchScore }}%
+            </p>
+            <p v-else class="mt-2 text-sm text-[color:var(--color-text-muted)]">
+              <i class="pi pi-spin pi-spinner mr-1.5"></i>
+              {{ t('candidates.myApplication.cvBeingAnalyzed') }}
+            </p>
+          </GlassCard>
+
+          <GlassCard :title="t('candidates.cv')">
+            <Button
+              v-if="application.cvFile"
+              :label="application.cvOriginalFilename || t('candidates.myApplication.downloadCv')"
+              icon="pi pi-download"
+              size="small"
+              severity="secondary"
+              outlined
+              :href="application.cvFile"
+              as="a"
+              target="_blank"
+            />
+            <p v-else class="text-sm text-[color:var(--color-text-muted)]">
+              {{ t('candidates.myApplication.noCvUploaded') }}
+            </p>
+          </GlassCard>
         </div>
-      </div>
-
-      <!-- Vacancy Info -->
-      <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-        <h2 class="mb-2 text-sm font-semibold text-gray-600">{{ t('nav.vacancies') }}</h2>
-        <p class="text-lg font-medium">{{ application.vacancyTitle }}</p>
-        <p class="text-sm text-gray-500">
-          {{ t('candidates.myApplication.appliedOn') }} {{ formatDate(application.createdAt) }}
-        </p>
-      </div>
-
-      <!-- Match Score -->
-      <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-        <h2 class="mb-2 text-sm font-semibold text-gray-600">{{ t('candidates.matchScore') }}</h2>
-        <p v-if="application.matchScore !== null" class="text-3xl font-bold text-blue-600">
-          {{ application.matchScore }}%
-        </p>
-        <p v-else class="text-gray-400">
-          {{ t('candidates.myApplication.cvBeingAnalyzed') }}
-        </p>
-      </div>
-
-      <!-- CV Download -->
-      <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-        <h2 class="mb-2 text-sm font-semibold text-gray-600">
-          {{ t('candidates.cv') }}
-        </h2>
-        <Button
-          v-if="application.cvFile"
-          :label="application.cvOriginalFilename || t('candidates.myApplication.downloadCv')"
-          icon="pi pi-download"
-          size="small"
-          outlined
-          :href="application.cvFile"
-          as="a"
-          target="_blank"
-        />
-        <p v-else class="text-sm text-gray-400">{{ t('candidates.myApplication.noCvUploaded') }}</p>
       </div>
     </template>
   </div>

@@ -1,111 +1,191 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+/**
+ * LandingPipeline — animated 3-step horizontal flow: Apply → Prescreen → Interview.
+ * Connector lines use a gradient in --color-accent-ai that draws on scroll-in
+ * via CSS `stroke-dashoffset`. Mobile stacks vertically with short connectors.
+ * Reduced-motion: lines fade in, no drawing animation.
+ */
+import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import LandingPipelineNode from './LandingPipelineNode.vue'
 
 const { t } = useI18n()
 
-interface PipelineStep {
+interface Step {
   icon: string
   title: string
   description: string
-  color: string
-  bg: string
 }
 
-const pipelineSteps = computed<PipelineStep[]>(() => [
+const steps = computed<Step[]>(() => [
   {
     icon: 'pi pi-send',
     title: t('landing.pipeline.step1'),
     description: t('landing.pipeline.step1Desc'),
-    color: 'text-blue-600',
-    bg: 'bg-blue-50',
   },
   {
-    icon: 'pi pi-comments',
+    icon: 'pi pi-sparkles',
     title: t('landing.pipeline.step2'),
     description: t('landing.pipeline.step2Desc'),
-    color: 'text-indigo-600',
-    bg: 'bg-indigo-50',
   },
   {
     icon: 'pi pi-video',
     title: t('landing.pipeline.step3'),
     description: t('landing.pipeline.step3Desc'),
-    color: 'text-violet-600',
-    bg: 'bg-violet-50',
-  },
-  {
-    icon: 'pi pi-chart-bar',
-    title: t('landing.pipeline.step4'),
-    description: t('landing.pipeline.step4Desc'),
-    color: 'text-emerald-600',
-    bg: 'bg-emerald-50',
-  },
-  {
-    icon: 'pi pi-check-circle',
-    title: t('landing.pipeline.step5'),
-    description: t('landing.pipeline.step5Desc'),
-    color: 'text-green-600',
-    bg: 'bg-green-50',
   },
 ])
+
+// Draw the line on mount (with a small tick so the initial CSS state still
+// renders and the transition plays). Default-true ensures the line is always
+// visible under static/screenshot/reduced-motion paths.
+const inView = ref(true)
+onMounted(() => {
+  inView.value = false
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      inView.value = true
+    })
+  })
+})
 </script>
 
 <template>
-  <section id="how-it-works" class="bg-gray-50/80 dark:bg-gray-900/40 px-6 py-24">
+  <section id="how-it-works" class="px-4 py-24 sm:px-6 md:py-32">
     <div class="mx-auto max-w-6xl">
-      <div class="scroll-animate mb-16 text-center">
-        <h2 class="mb-3 text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
-          {{ t('landing.pipeline.title') }}
+      <div class="scroll-animate mb-16 text-center sm:mb-20">
+        <h2
+          class="mb-4 text-4xl font-semibold tracking-tight text-[color:var(--color-text-primary)] md:text-5xl"
+        >
+          {{ t('landing.howItWorks.title') }}
         </h2>
-        <p class="mx-auto max-w-xl text-gray-500">
+        <p
+          class="mx-auto max-w-xl text-base leading-relaxed text-[color:var(--color-text-secondary)] md:text-lg"
+        >
           {{ t('landing.pipeline.subtitle') }}
         </p>
       </div>
 
-      <!-- Desktop: horizontal flow -->
-      <div class="scroll-animate hidden lg:block">
-        <div class="flex items-start">
-          <template v-for="(step, idx) in pipelineSteps" :key="step.title">
-            <div class="flex flex-1 flex-col items-center text-center">
-              <div
-                class="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl transition-transform duration-300 hover:scale-110"
-                :class="[step.bg, step.color]"
-              >
-                <i :class="step.icon" class="text-2xl"></i>
-              </div>
-              <h3 class="mb-1.5 text-sm font-semibold text-gray-900 dark:text-white">{{ step.title }}</h3>
-              <p class="max-w-[160px] text-xs leading-relaxed text-gray-500 dark:text-gray-300">
-                {{ step.description }}
-              </p>
-            </div>
-            <!-- Connector arrow -->
-            <div v-if="idx < pipelineSteps.length - 1" class="mt-6 flex shrink-0 items-center px-1">
-              <div class="h-px w-8 bg-gray-300"></div>
-              <i class="pi pi-angle-right text-xs text-gray-400"></i>
-            </div>
-          </template>
+      <!-- Desktop: 3 nodes in a row, connector lines between.
+           Connector sits at top = 56px (center of the 112px chip). -->
+      <div class="hidden lg:block">
+        <div class="relative flex items-start justify-between gap-8">
+          <!-- Connector layer (absolute, behind nodes) -->
+          <div
+            class="pointer-events-none absolute inset-x-0 top-[54px] flex items-center px-[160px]"
+          >
+            <svg
+              class="pipeline-svg w-full"
+              :class="{ 'is-drawn': inView }"
+              height="6"
+              viewBox="0 0 1000 6"
+              preserveAspectRatio="none"
+              aria-hidden="true"
+            >
+              <defs>
+                <linearGradient id="pipelineGrad" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stop-color="var(--color-accent-ai)" stop-opacity="0" />
+                  <stop offset="0.08" stop-color="var(--color-accent-ai)" stop-opacity="0.95" />
+                  <stop offset="0.92" stop-color="var(--color-accent-ai)" stop-opacity="0.95" />
+                  <stop offset="1" stop-color="var(--color-accent-ai)" stop-opacity="0" />
+                </linearGradient>
+              </defs>
+              <line
+                x1="0"
+                y1="3"
+                x2="1000"
+                y2="3"
+                stroke="url(#pipelineGrad)"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-dasharray="1000"
+                stroke-dashoffset="1000"
+                class="pipeline-line"
+              />
+            </svg>
+          </div>
+
+          <div v-for="(step, i) in steps" :key="step.title" class="relative flex-1">
+            <LandingPipelineNode
+              :icon="step.icon"
+              :title="step.title"
+              :description="step.description"
+              :index="i"
+            />
+          </div>
         </div>
       </div>
 
-      <!-- Mobile: vertical flow -->
-      <div class="scroll-animate lg:hidden">
-        <div class="relative ml-6 border-l-2 border-gray-200 dark:border-gray-700 pl-8">
-          <div v-for="step in pipelineSteps" :key="step.title" class="relative pb-10 last:pb-0">
-            <!-- Dot on the timeline -->
+      <!-- Mobile: vertical stack with tall vertical connectors -->
+      <div class="lg:hidden">
+        <div class="flex flex-col items-center gap-8">
+          <template v-for="(step, i) in steps" :key="step.title">
+            <LandingPipelineNode
+              :icon="step.icon"
+              :title="step.title"
+              :description="step.description"
+              :index="i"
+            />
             <div
-              class="absolute -left-[41px] flex h-10 w-10 items-center justify-center rounded-xl"
-              :class="[step.bg, step.color]"
-            >
-              <i :class="step.icon" class="text-lg"></i>
-            </div>
-            <div class="pt-0.5">
-              <h3 class="mb-1 text-base font-semibold text-gray-900 dark:text-white">{{ step.title }}</h3>
-              <p class="text-sm leading-relaxed text-gray-500 dark:text-gray-300">{{ step.description }}</p>
-            </div>
-          </div>
+              v-if="i < steps.length - 1"
+              class="pipeline-v-connector"
+              :class="{ 'is-drawn': inView }"
+              aria-hidden="true"
+            ></div>
+          </template>
         </div>
       </div>
     </div>
   </section>
 </template>
+
+<style scoped>
+/* Line draws once when section enters viewport. Uses stroke-dashoffset so
+   it truly feels drawn rather than simply fading. */
+.pipeline-svg .pipeline-line {
+  transition: stroke-dashoffset 1200ms var(--ease-ios);
+}
+.pipeline-svg.is-drawn .pipeline-line {
+  stroke-dashoffset: 0;
+}
+
+/* Mobile vertical connector — tall enough to read as a real pipeline step,
+   not a visual afterthought. Same draw-in feel via scaleY. */
+.pipeline-v-connector {
+  height: 80px;
+  width: 3px;
+  border-radius: 2px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--color-accent-ai) 18%,
+    var(--color-accent-ai) 82%,
+    transparent
+  );
+  opacity: 0.85;
+  transform-origin: top center;
+  transform: scaleY(0);
+  transition: transform 720ms var(--ease-ios);
+}
+.pipeline-v-connector.is-drawn {
+  transform: scaleY(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pipeline-svg .pipeline-line {
+    transition: opacity 200ms linear;
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+  .pipeline-svg.is-drawn .pipeline-line {
+    opacity: 1;
+  }
+  .pipeline-v-connector {
+    transform: none;
+    transition: opacity 200ms linear;
+    opacity: 0;
+  }
+  .pipeline-v-connector.is-drawn {
+    opacity: 0.7;
+  }
+}
+</style>

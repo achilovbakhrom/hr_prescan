@@ -1,3 +1,10 @@
+import '@fontsource/geist-sans/400.css'
+import '@fontsource/geist-sans/500.css'
+import '@fontsource/geist-sans/600.css'
+import '@fontsource/geist-sans/700.css'
+import '@fontsource/geist-mono/400.css'
+import '@fontsource/geist-mono/500.css'
+
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import PrimeVue from 'primevue/config'
@@ -10,6 +17,7 @@ import { router } from './router'
 import { i18n, detectAndApplyLocale } from '@/shared/i18n'
 
 import '@/assets/styles/main.css'
+import '@/assets/styles/primevue-overrides.css'
 
 const app = createApp(App)
 

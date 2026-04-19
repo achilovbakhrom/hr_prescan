@@ -39,34 +39,47 @@ function validate(): boolean {
 function handleSubmit(): void {
   submitted.value = true
   if (!validate()) return
-  emit('submit', { firstName: firstName.value, lastName: lastName.value, password: password.value })
+  emit('submit', {
+    firstName: firstName.value,
+    lastName: lastName.value,
+    password: password.value,
+  })
 }
+
+const labelClass =
+  'text-xs font-medium uppercase tracking-wider text-[color:var(--color-text-muted)]'
 </script>
 
 <template>
   <div>
-    <h1 class="mb-2 text-center text-2xl font-bold text-gray-900">
-      {{ t('auth.acceptInvitation.title') }}
-    </h1>
-    <p class="mb-6 text-center text-sm text-gray-600">
-      Join <strong>{{ accountOwnerName }}</strong> as an HR team member<template
-        v-if="companyNames.length"
-      >
-        with access to <strong>{{ companyNames.join(', ') }}</strong></template>.
-    </p>
+    <div class="mb-6 text-center">
+      <h1 class="mb-2 text-xl font-semibold text-[color:var(--color-text-primary)] sm:text-2xl">
+        {{ t('auth.acceptInvitation.title') }}
+      </h1>
+      <p class="text-sm text-[color:var(--color-text-secondary)]">
+        Join <strong>{{ accountOwnerName }}</strong> as an HR team member<template
+          v-if="companyNames.length"
+        >
+          with access to <strong>{{ companyNames.join(', ') }}</strong></template
+        >.
+      </p>
+    </div>
 
     <Message v-if="errorMessage" severity="error" class="mb-4">{{ errorMessage }}</Message>
 
     <form class="flex flex-col gap-4" @submit.prevent="handleSubmit">
-      <div class="rounded-md bg-gray-50 dark:bg-gray-900 px-3 py-2 text-sm text-gray-600">
-        <i class="pi pi-envelope mr-1"></i> {{ invitationEmail }}
+      <div
+        class="flex items-center gap-2 rounded-md bg-[color:var(--color-surface-sunken)] px-3 py-2 text-sm text-[color:var(--color-text-secondary)]"
+      >
+        <i class="pi pi-envelope text-[color:var(--color-text-muted)]"></i>
+        <span>{{ invitationEmail }}</span>
       </div>
 
       <div class="grid grid-cols-2 gap-4">
-        <div class="flex flex-col gap-1">
-          <label for="firstName" class="text-sm font-medium text-gray-700">{{
-            t('auth.acceptInvitation.firstName')
-          }}</label>
+        <div class="flex flex-col gap-1.5">
+          <label for="firstName" :class="labelClass">
+            {{ t('auth.acceptInvitation.firstName') }}
+          </label>
           <InputText
             id="firstName"
             v-model="firstName"
@@ -74,14 +87,14 @@ function handleSubmit(): void {
             :invalid="submitted && errors.firstName"
             class="w-full"
           />
-          <small v-if="submitted && errors.firstName" class="text-red-500"
-            >First name is required.</small
-          >
+          <small v-if="submitted && errors.firstName" class="text-[color:var(--color-danger)]">
+            First name is required.
+          </small>
         </div>
-        <div class="flex flex-col gap-1">
-          <label for="lastName" class="text-sm font-medium text-gray-700">{{
-            t('auth.acceptInvitation.lastName')
-          }}</label>
+        <div class="flex flex-col gap-1.5">
+          <label for="lastName" :class="labelClass">
+            {{ t('auth.acceptInvitation.lastName') }}
+          </label>
           <InputText
             id="lastName"
             v-model="lastName"
@@ -89,16 +102,16 @@ function handleSubmit(): void {
             :invalid="submitted && errors.lastName"
             class="w-full"
           />
-          <small v-if="submitted && errors.lastName" class="text-red-500"
-            >Last name is required.</small
-          >
+          <small v-if="submitted && errors.lastName" class="text-[color:var(--color-danger)]">
+            Last name is required.
+          </small>
         </div>
       </div>
 
-      <div class="flex flex-col gap-1">
-        <label for="password" class="text-sm font-medium text-gray-700">{{
-          t('auth.acceptInvitation.password')
-        }}</label>
+      <div class="flex flex-col gap-1.5">
+        <label for="password" :class="labelClass">
+          {{ t('auth.acceptInvitation.password') }}
+        </label>
         <Password
           v-model="password"
           input-id="password"
@@ -108,15 +121,15 @@ function handleSubmit(): void {
           class="w-full"
           input-class="w-full"
         />
-        <small v-if="submitted && errors.password" class="text-red-500">{{
-          t('auth.register.passwordTooShort')
-        }}</small>
+        <small v-if="submitted && errors.password" class="text-[color:var(--color-danger)]">
+          {{ t('auth.register.passwordTooShort') }}
+        </small>
       </div>
 
-      <div class="flex flex-col gap-1">
-        <label for="confirmPassword" class="text-sm font-medium text-gray-700">{{
-          t('auth.register.confirmPassword')
-        }}</label>
+      <div class="flex flex-col gap-1.5">
+        <label for="confirmPassword" :class="labelClass">
+          {{ t('auth.register.confirmPassword') }}
+        </label>
         <Password
           v-model="confirmPassword"
           input-id="confirmPassword"
@@ -127,9 +140,9 @@ function handleSubmit(): void {
           class="w-full"
           input-class="w-full"
         />
-        <small v-if="submitted && errors.confirmPassword" class="text-red-500">{{
-          t('auth.register.passwordMismatch')
-        }}</small>
+        <small v-if="submitted && errors.confirmPassword" class="text-[color:var(--color-danger)]">
+          {{ t('auth.register.passwordMismatch') }}
+        </small>
       </div>
 
       <Button
@@ -140,13 +153,14 @@ function handleSubmit(): void {
       />
     </form>
 
-    <p class="mt-4 text-center text-sm text-gray-600">
+    <p class="mt-4 text-center text-sm text-[color:var(--color-text-secondary)]">
       {{ t('auth.register.hasAccount') }}
       <RouterLink
         :to="{ name: ROUTE_NAMES.LOGIN }"
-        class="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500"
-        >{{ t('auth.register.signIn') }}</RouterLink
+        class="font-medium text-[color:var(--color-accent)] hover:underline"
       >
+        {{ t('auth.register.signIn') }}
+      </RouterLink>
     </p>
   </div>
 </template>

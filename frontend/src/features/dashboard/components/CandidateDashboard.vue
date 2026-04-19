@@ -1,12 +1,19 @@
 <script setup lang="ts">
+/**
+ * CandidateDashboard — single-column glass layout for candidate role.
+ * Profile completeness + stat grid + quick actions + recommended jobs.
+ * All values preserved from previous implementation.
+ */
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import Button from 'primevue/button'
 import ProgressBar from 'primevue/progressbar'
 import { useCandidateStore } from '@/features/candidates/stores/candidate.store'
 import { useDashboardStore } from '@/features/dashboard/stores/dashboard.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
+import GlassCard from '@/shared/components/GlassCard.vue'
+import DashboardStatsCard from './DashboardStatsCard.vue'
+import RecommendedVacancies from './RecommendedVacancies.vue'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -33,211 +40,103 @@ const hiredApplications = computed(() => candidateDash.value?.hired ?? 0)
 const profileCompleteness = computed(() => candidateDash.value?.profileCompleteness ?? 0)
 const recommendedVacancies = computed(() => candidateDash.value?.recommendedVacancies ?? [])
 
-function formatEmploymentType(type: string): string {
-  const map: Record<string, string> = {
-    full_time: t('vacancies.employment.fullTime'),
-    part_time: t('vacancies.employment.partTime'),
-    contract: t('vacancies.employment.contract'),
-    internship: t('vacancies.employment.internship'),
-  }
-  return map[type] || type
-}
+const profileColor = computed(() => {
+  if (profileCompleteness.value >= 80) return 'var(--color-success)'
+  if (profileCompleteness.value >= 50) return 'var(--color-warning)'
+  return 'var(--color-danger)'
+})
+
+const quickActions = [
+  { route: ROUTE_NAMES.JOB_BOARD, icon: 'pi pi-search', key: 'nav.browseJobs' },
+  { route: ROUTE_NAMES.MY_APPLICATIONS, icon: 'pi pi-list', key: 'nav.myApplications' },
+  { route: ROUTE_NAMES.CV_BUILDER, icon: 'pi pi-file-edit', key: 'dashboard.candidate.editCv' },
+  { route: ROUTE_NAMES.PROFILE, icon: 'pi pi-user', key: 'nav.profile' },
+]
 </script>
 
 <template>
-  <!-- Profile Completeness -->
-  <div class="mb-6 rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-5">
+  <!-- Profile completeness -->
+  <GlassCard class="mb-6">
     <div class="mb-2 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50">
-          <i class="pi pi-user text-lg text-blue-600"></i>
+        <div
+          class="flex h-10 w-10 items-center justify-center rounded-[--radius-sm] bg-[color:var(--color-accent-soft)] text-[color:var(--color-accent)]"
+        >
+          <i class="pi pi-user text-lg"></i>
         </div>
         <div>
-          <h3 class="text-sm font-semibold text-gray-900">
+          <h3 class="text-sm font-semibold text-[color:var(--color-text-primary)]">
             {{ t('dashboard.candidate.profileCompleteness') }}
           </h3>
-          <p class="text-xs text-gray-500">{{ t('dashboard.candidate.completeProfileHint') }}</p>
+          <p class="text-xs text-[color:var(--color-text-muted)]">
+            {{ t('dashboard.candidate.completeProfileHint') }}
+          </p>
         </div>
       </div>
-      <span
-        class="text-lg font-bold"
-        :class="
-          profileCompleteness >= 80
-            ? 'text-emerald-600'
-            : profileCompleteness >= 50
-              ? 'text-amber-600'
-              : 'text-red-500'
-        "
+      <span class="font-mono text-xl font-semibold" :style="{ color: profileColor }"
+        >{{ profileCompleteness }}%</span
       >
-        {{ profileCompleteness }}%
-      </span>
     </div>
-    <ProgressBar
-      :value="profileCompleteness"
-      :showValue="false"
-      style="height: 8px"
-      :class="
-        profileCompleteness >= 80
-          ? '[&_.p-progressbar-value]:!bg-emerald-500'
-          : profileCompleteness >= 50
-            ? '[&_.p-progressbar-value]:!bg-amber-500'
-            : '[&_.p-progressbar-value]:!bg-red-500'
-      "
+    <ProgressBar :value="profileCompleteness" :showValue="false" style="height: 8px" />
+  </GlassCard>
+
+  <!-- Stats grid -->
+  <div class="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-5">
+    <DashboardStatsCard
+      icon="pi pi-file"
+      icon-accent="default"
+      :label="t('dashboard.candidate.total')"
+      :value="totalApplications"
     />
-  </div>
-
-  <!-- Stats Cards -->
-  <div class="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-5">
-    <div class="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-5">
-      <div class="flex items-center justify-between">
-        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50">
-          <i class="pi pi-file text-lg text-blue-600"></i>
-        </div>
-        <span class="text-2xl font-bold text-gray-900">{{ totalApplications }}</span>
-      </div>
-      <p class="mt-3 text-sm font-medium text-gray-500">{{ t('dashboard.candidate.total') }}</p>
-    </div>
-
-    <div class="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-5">
-      <div class="flex items-center justify-between">
-        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-50">
-          <i class="pi pi-clock text-lg text-amber-600"></i>
-        </div>
-        <span class="text-2xl font-bold text-gray-900">{{ appliedApplications }}</span>
-      </div>
-      <p class="mt-3 text-sm font-medium text-gray-500">{{ t('dashboard.candidate.applied') }}</p>
-    </div>
-
-    <div class="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-5">
-      <div class="flex items-center justify-between">
-        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-50">
-          <i class="pi pi-video text-lg text-violet-600"></i>
-        </div>
-        <span class="text-2xl font-bold text-gray-900">{{ inProgressApplications }}</span>
-      </div>
-      <p class="mt-3 text-sm font-medium text-gray-500">
-        {{ t('dashboard.candidate.inProgress') }}
-      </p>
-    </div>
-
-    <div class="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-5">
-      <div class="flex items-center justify-between">
-        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50">
-          <i class="pi pi-star text-lg text-emerald-600"></i>
-        </div>
-        <span class="text-2xl font-bold text-gray-900">{{ shortlistedApplications }}</span>
-      </div>
-      <p class="mt-3 text-sm font-medium text-gray-500">
-        {{ t('dashboard.candidate.shortlisted') }}
-      </p>
-    </div>
-
-    <div class="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-5">
-      <div class="flex items-center justify-between">
-        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-green-50">
-          <i class="pi pi-check-circle text-lg text-green-600"></i>
-        </div>
-        <span class="text-2xl font-bold text-gray-900">{{ hiredApplications }}</span>
-      </div>
-      <p class="mt-3 text-sm font-medium text-gray-500">{{ t('dashboard.candidate.hired') }}</p>
-    </div>
+    <DashboardStatsCard
+      icon="pi pi-clock"
+      icon-accent="warning"
+      :label="t('dashboard.candidate.applied')"
+      :value="appliedApplications"
+    />
+    <DashboardStatsCard
+      icon="pi pi-video"
+      icon-accent="ai"
+      :label="t('dashboard.candidate.inProgress')"
+      :value="inProgressApplications"
+    />
+    <DashboardStatsCard
+      icon="pi pi-star"
+      icon-accent="success"
+      :label="t('dashboard.candidate.shortlisted')"
+      :value="shortlistedApplications"
+    />
+    <DashboardStatsCard
+      icon="pi pi-check-circle"
+      icon-accent="celebrate"
+      :label="t('dashboard.candidate.hired')"
+      :value="hiredApplications"
+    />
   </div>
 
   <div class="grid gap-6 lg:grid-cols-3">
     <!-- Quick Actions -->
-    <div class="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-6">
-      <h2 class="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-400">
-        {{ t('dashboard.quickActions') }}
-      </h2>
-      <div class="space-y-2">
-        <button
-          class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors hover:bg-gray-50"
-          @click="router.push({ name: ROUTE_NAMES.JOB_BOARD })"
+    <GlassCard>
+      <template #header>
+        <h2
+          class="text-xs font-semibold uppercase tracking-wider text-[color:var(--color-text-muted)]"
         >
-          <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50">
-            <i class="pi pi-search text-sm text-blue-600"></i>
-          </div>
-          {{ t('nav.browseJobs') }}
-        </button>
-        <button
-          class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors hover:bg-gray-50"
-          @click="router.push({ name: ROUTE_NAMES.MY_APPLICATIONS })"
-        >
-          <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50">
-            <i class="pi pi-list text-sm text-emerald-600"></i>
-          </div>
-          {{ t('nav.myApplications') }}
-        </button>
-        <button
-          class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors hover:bg-gray-50"
-          @click="router.push({ name: ROUTE_NAMES.CV_BUILDER })"
-        >
-          <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-50">
-            <i class="pi pi-file-edit text-sm text-violet-600"></i>
-          </div>
-          {{ t('dashboard.candidate.editCv') }}
-        </button>
-        <button
-          class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors hover:bg-gray-50"
-          @click="router.push({ name: ROUTE_NAMES.PROFILE })"
-        >
-          <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50">
-            <i class="pi pi-user text-sm text-amber-600"></i>
-          </div>
-          {{ t('nav.profile') }}
-        </button>
-      </div>
-    </div>
-
-    <!-- Recommended Jobs -->
-    <div class="lg:col-span-2 rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-6">
-      <div class="mb-4 flex items-center justify-between">
-        <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400">
-          {{ t('dashboard.candidate.recommendedJobs') }}
+          {{ t('dashboard.quickActions') }}
         </h2>
-        <Button
-          :label="t('common.viewAll')"
-          text
-          size="small"
-          severity="secondary"
-          @click="router.push({ name: ROUTE_NAMES.JOB_BOARD })"
-        />
-      </div>
-
-      <div v-if="recommendedVacancies.length > 0" class="space-y-3">
-        <div
-          v-for="vacancy in recommendedVacancies"
-          :key="vacancy.id"
-          class="flex cursor-pointer items-center justify-between rounded-lg border border-gray-50 dark:border-gray-900 px-4 py-3 transition-colors hover:bg-gray-50"
-          @click="router.push({ name: ROUTE_NAMES.JOB_DETAIL, params: { id: vacancy.id } })"
+      </template>
+      <div class="flex flex-col gap-1">
+        <button
+          v-for="action in quickActions"
+          :key="action.route"
+          class="flex w-full items-center gap-3 rounded-[--radius-sm] px-3 py-2.5 text-left text-sm font-medium text-[color:var(--color-text-secondary)] transition-colors hover:bg-[color:var(--color-surface-sunken)] hover:text-[color:var(--color-text-primary)]"
+          @click="router.push({ name: action.route })"
         >
-          <div class="flex items-center gap-3">
-            <div
-              class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-950 text-xs font-semibold text-blue-700"
-            >
-              {{ vacancy.companyName?.charAt(0) ?? '?' }}
-            </div>
-            <div>
-              <p class="text-sm font-medium text-gray-900">{{ vacancy.title }}</p>
-              <p class="text-xs text-gray-500">{{ vacancy.companyName }}</p>
-            </div>
-          </div>
-          <div class="text-right">
-            <p class="text-sm font-medium text-gray-700">
-              {{ vacancy.isRemote ? t('vacancies.overview.remote') : vacancy.location }}
-            </p>
-            <p class="text-xs text-gray-400">{{ formatEmploymentType(vacancy.employmentType) }}</p>
-          </div>
-        </div>
+          <i :class="action.icon" class="text-sm text-[color:var(--color-accent)]"></i>
+          {{ t(action.key) }}
+        </button>
       </div>
+    </GlassCard>
 
-      <div v-else class="flex flex-col items-center py-8 text-center">
-        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-          <i class="pi pi-briefcase text-xl text-gray-400"></i>
-        </div>
-        <p class="mt-3 text-sm text-gray-500">{{ t('dashboard.candidate.noRecommendations') }}</p>
-        <p class="text-xs text-gray-400">{{ t('dashboard.candidate.noRecommendationsHint') }}</p>
-      </div>
-    </div>
+    <RecommendedVacancies :vacancies="recommendedVacancies" />
   </div>
 </template>

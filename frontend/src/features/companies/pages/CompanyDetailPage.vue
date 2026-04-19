@@ -1,12 +1,18 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+/**
+ * CompanyDetailPage — company header + tabs (Info / Members / Vacancies).
+ * Current backend only supports Info editing; Members/Vacancies placeholders
+ * show but do not hit APIs that don't exist. Spec §9 Companies block.
+ */
+import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import InputText from 'primevue/inputtext'
-import Textarea from 'primevue/textarea'
-import Button from 'primevue/button'
-import CompanyDetailView from '../components/CompanyDetailView.vue'
-import CompanyLogoPicker from '../components/CompanyLogoPicker.vue'
+import TabView from 'primevue/tabview'
+import TabPanel from 'primevue/tabpanel'
+import GlassCard from '@/shared/components/GlassCard.vue'
+import CompanyDetailHeader from '../components/CompanyDetailHeader.vue'
+import CompanyInfoView from '../components/CompanyInfoView.vue'
+import CompanyInfoEditForm from '../components/CompanyInfoEditForm.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import { useCompanyStore } from '../stores/company.store'
 
@@ -19,72 +25,20 @@ const saving = ref(false)
 const logoUploading = ref(false)
 const logoError = ref<string | null>(null)
 
-const name = ref('')
-const customIndustry = ref('')
-const website = ref('')
-const description = ref('')
+onMounted(() => companyStore.fetchCompanyDetail(route.params.id as string))
 
-function syncFormFromStore(): void {
-  const c = companyStore.currentCompany
-  if (!c) return
-  name.value = c.name
-  customIndustry.value = c.customIndustry
-  website.value = c.website ?? ''
-  description.value = c.description ?? ''
-}
-
-onMounted(async () => {
-  await companyStore.fetchCompanyDetail(route.params.id as string)
-  syncFormFromStore()
-})
-
-watch(
-  () => companyStore.currentCompany,
-  () => {
-    if (!editing.value) syncFormFromStore()
-  },
-)
-
-function startEdit(): void {
-  syncFormFromStore()
-  editing.value = true
-}
-
-function cancelEdit(): void {
-  syncFormFromStore()
-  editing.value = false
-}
-
-function onLogoReject(reason: string): void {
-  logoError.value = reason
-}
-
-async function onLogoPick(file: File): Promise<void> {
-  logoError.value = null
-  logoUploading.value = true
-  try {
-    await companyStore.uploadCompanyLogo(route.params.id as string, file)
-  } catch {
-    logoError.value = companyStore.error
-  } finally {
-    logoUploading.value = false
-  }
-}
-
-async function handleSave(): Promise<void> {
-  const id = route.params.id as string
-  if (!name.value) return
+async function handleSave(payload: {
+  name: string
+  customIndustry: string
+  website: string
+  description: string
+}): Promise<void> {
   saving.value = true
   try {
-    await companyStore.updateCompany(id, {
-      name: name.value,
-      customIndustry: customIndustry.value,
-      website: website.value,
-      description: description.value,
-    })
+    await companyStore.updateCompany(route.params.id as string, payload)
     editing.value = false
   } catch {
-    // error surfaced via store
+    /* error surfaced via store */
   } finally {
     saving.value = false
   }
@@ -92,9 +46,9 @@ async function handleSave(): Promise<void> {
 </script>
 
 <template>
-  <div class="mx-auto max-w-2xl px-4 py-6">
+  <div class="mx-auto max-w-3xl space-y-4">
     <button
-      class="mb-4 flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 transition-colors hover:text-gray-900"
+      class="flex items-center gap-1.5 text-sm text-[color:var(--color-text-muted)] transition-colors hover:text-[color:var(--color-text-primary)]"
       @click="router.push({ name: ROUTE_NAMES.COMPANY_LIST })"
     >
       <i class="pi pi-arrow-left text-xs"></i>
@@ -102,90 +56,67 @@ async function handleSave(): Promise<void> {
     </button>
 
     <div v-if="companyStore.loading && !companyStore.currentCompany" class="py-12 text-center">
-      <i class="pi pi-spinner pi-spin text-3xl text-gray-400"></i>
+      <i class="pi pi-spinner pi-spin text-3xl text-[color:var(--color-text-muted)]"></i>
     </div>
 
-    <div
-      v-else-if="companyStore.error && !companyStore.currentCompany"
-      class="py-12 text-center text-red-600"
-    >
-      <i class="pi pi-exclamation-circle mb-3 text-4xl"></i>
-      <p>{{ companyStore.error }}</p>
-    </div>
+    <GlassCard v-else-if="companyStore.error && !companyStore.currentCompany" class="text-center">
+      <i class="pi pi-exclamation-circle mb-3 text-4xl text-[color:var(--color-danger)]"></i>
+      <p class="text-[color:var(--color-danger)]">{{ companyStore.error }}</p>
+    </GlassCard>
 
     <template v-else-if="companyStore.currentCompany">
-      <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div class="flex items-center gap-3">
-          <CompanyLogoPicker
-            :logo="companyStore.currentCompany.logo"
-            :name="companyStore.currentCompany.name"
-            :uploading="logoUploading"
-            @pick="onLogoPick"
-            @reject="onLogoReject"
-          />
-          <h1 v-if="!editing" class="text-2xl font-bold text-gray-900">
-            {{ companyStore.currentCompany.name }}
-          </h1>
-        </div>
-        <Button
-          v-if="!editing"
-          :label="t('common.edit')"
-          icon="pi pi-pencil"
-          severity="secondary"
-          @click="startEdit"
-        />
-      </div>
+      <CompanyDetailHeader
+        :company="companyStore.currentCompany"
+        :editing="editing"
+        @edit="editing = true"
+      />
 
-      <p v-if="logoError" class="mb-3 text-sm text-red-600">{{ logoError }}</p>
-
-      <div
+      <p
         v-if="companyStore.error"
-        class="mb-4 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950 p-3 text-sm text-red-600"
+        class="rounded-lg border border-[color:var(--color-danger)] bg-[color:var(--color-danger)]/10 p-3 text-sm text-[color:var(--color-danger)]"
       >
         {{ companyStore.error }}
-      </div>
+      </p>
 
-      <CompanyDetailView v-if="!editing" :company="companyStore.currentCompany" />
-
-      <form
-        v-else
-        class="space-y-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6"
-        @submit.prevent="handleSave"
-      >
-        <div>
-          <label class="mb-1 block text-sm font-medium"
-            >{{ t('companies.name') }} <span class="text-red-500">*</span></label
-          >
-          <InputText v-model="name" class="w-full" />
-        </div>
-        <div>
-          <label class="mb-1 block text-sm font-medium">{{ t('companies.industry') }}</label>
-          <InputText v-model="customIndustry" class="w-full" />
-        </div>
-        <div>
-          <label class="mb-1 block text-sm font-medium">{{ t('companies.website') }}</label>
-          <InputText v-model="website" class="w-full" placeholder="https://..." />
-        </div>
-        <div>
-          <label class="mb-1 block text-sm font-medium">{{ t('companies.description') }}</label>
-          <Textarea v-model="description" class="w-full" rows="6" />
-        </div>
-        <div class="flex justify-end gap-2">
-          <Button
-            :label="t('common.cancel')"
-            severity="secondary"
-            type="button"
-            @click="cancelEdit"
-          />
-          <Button
-            :label="t('common.save')"
-            icon="pi pi-check"
-            type="submit"
-            :loading="saving"
-            :disabled="!name"
-          />
-        </div>
-      </form>
+      <TabView>
+        <TabPanel value="info" :header="t('common.info', 'Info')">
+          <div class="py-3">
+            <GlassCard>
+              <CompanyInfoView v-if="!editing" :company="companyStore.currentCompany" />
+              <CompanyInfoEditForm
+                v-else
+                :company="companyStore.currentCompany"
+                :saving="saving"
+                @save="handleSave"
+                @cancel="editing = false"
+              />
+            </GlassCard>
+          </div>
+        </TabPanel>
+        <TabPanel value="members" :header="t('settings.team.title', 'Members')">
+          <div class="py-3">
+            <GlassCard>
+              <p class="text-sm text-[color:var(--color-text-muted)]">
+                {{ t('settings.team.manageHint', 'Manage team members in Settings → Team.') }}
+              </p>
+            </GlassCard>
+          </div>
+        </TabPanel>
+        <TabPanel value="vacancies" :header="t('nav.vacancies')">
+          <div class="py-3">
+            <GlassCard>
+              <p class="text-sm text-[color:var(--color-text-muted)]">
+                {{
+                  t(
+                    'vacancies.companyVacanciesHint',
+                    'Vacancies scoped to this company appear on the main Vacancies list when it is active.',
+                  )
+                }}
+              </p>
+            </GlassCard>
+          </div>
+        </TabPanel>
+      </TabView>
     </template>
   </div>
 </template>

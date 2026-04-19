@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Dropdown from 'primevue/dropdown'
+import GlassCard from '@/shared/components/GlassCard.vue'
 import VacancyStatusBadge from './VacancyStatusBadge.vue'
 import type { VacancyDetail } from '../types/vacancy.types'
 
@@ -79,53 +80,69 @@ function selectMobile(e: { value: string }): void {
       <aside class="hidden w-56 shrink-0 lg:block">
         <div class="sticky top-4 space-y-4">
           <!-- At a glance card -->
-          <div class="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-4">
-            <p class="mb-2 text-[10px] font-semibold uppercase tracking-widest text-gray-400">
+          <GlassCard class="!p-4">
+            <p
+              class="mb-2 text-[10px] font-semibold uppercase tracking-widest text-[color:var(--color-text-muted)]"
+            >
               {{ t('vacancies.atAGlance') }}
             </p>
             <div class="space-y-2">
               <div class="flex items-center justify-between">
-                <span class="text-xs text-gray-500">{{ t('common.status') }}</span>
+                <span class="text-xs text-[color:var(--color-text-muted)]">{{
+                  t('common.status')
+                }}</span>
                 <VacancyStatusBadge :status="vacancy.status" />
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-xs text-gray-500">{{ t('vacancies.applied') }}</span>
-                <span class="text-sm font-semibold text-gray-900">{{ candidatesTotal }}</span>
+                <span class="text-xs text-[color:var(--color-text-muted)]">{{
+                  t('vacancies.applied')
+                }}</span>
+                <span
+                  class="font-mono text-sm font-semibold text-[color:var(--color-text-primary)]"
+                  >{{ candidatesTotal }}</span
+                >
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-xs text-gray-500">{{ t('vacancies.shortlisted') }}</span>
-                <span class="text-sm font-semibold text-gray-900">{{ candidatesShortlisted }}</span>
+                <span class="text-xs text-[color:var(--color-text-muted)]">{{
+                  t('vacancies.shortlisted')
+                }}</span>
+                <span
+                  class="font-mono text-sm font-semibold text-[color:var(--color-text-primary)]"
+                  >{{ candidatesShortlisted }}</span
+                >
               </div>
             </div>
-          </div>
+          </GlassCard>
 
           <!-- Section nav -->
-          <nav class="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-2">
-            <button
-              v-for="item in items"
-              :key="item.key"
-              type="button"
-              class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors"
-              :class="
-                active === item.key
-                  ? 'bg-blue-50 text-blue-700'
-                  : 'text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900'
-              "
-              @click="emit('navigate', item.key)"
-            >
-              <i
-                :class="item.icon"
-                class="text-sm"
-                :style="{ width: '16px', textAlign: 'center' }"
-              ></i>
-              <span class="flex-1 truncate">{{ item.label }}</span>
-              <span
-                v-if="item.count != null"
-                class="rounded-full bg-gray-100 dark:bg-gray-800 px-2 py-0.5 text-[10px] font-semibold text-gray-600"
-                >{{ item.count }}</span
+          <GlassCard class="!p-2">
+            <nav>
+              <button
+                v-for="item in items"
+                :key="item.key"
+                type="button"
+                class="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm font-medium transition-colors"
+                :class="
+                  active === item.key
+                    ? 'bg-[color:var(--color-accent-soft)] text-[color:var(--color-accent)]'
+                    : 'text-[color:var(--color-text-secondary)] hover:bg-[color:var(--color-surface-sunken)] hover:text-[color:var(--color-text-primary)]'
+                "
+                @click="emit('navigate', item.key)"
               >
-            </button>
-          </nav>
+                <i
+                  :class="item.icon"
+                  class="text-sm"
+                  :style="{ width: '16px', textAlign: 'center' }"
+                ></i>
+                <span class="flex-1 truncate">{{ item.label }}</span>
+                <span
+                  v-if="item.count != null"
+                  class="rounded-full bg-[color:var(--color-surface-sunken)] px-2 py-0.5 text-[10px] font-semibold text-[color:var(--color-text-muted)]"
+                  >{{ item.count }}</span
+                >
+              </button>
+            </nav>
+          </GlassCard>
         </div>
       </aside>
 

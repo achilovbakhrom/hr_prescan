@@ -1,8 +1,21 @@
 <script setup lang="ts">
+/**
+ * InterviewGatewayPage — candidate lands here via email link and is
+ * routed to the right screening mode (chat or room).
+ *
+ * T13 redesign: full-bleed ambient background + centered glass card with
+ * the Prism glyph as a glow. The page is standalone (no PublicLayout)
+ * so we mount AnimatedBackground directly. The picker is suppressed to
+ * avoid distracting the candidate right before their interview.
+ */
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
+import AnimatedBackground from '@/shared/components/AnimatedBackground.vue'
+import GlassCard from '@/shared/components/GlassCard.vue'
+import AppLogo from '@/shared/components/AppLogo.vue'
+import { useThemeStore } from '@/shared/stores/theme.store'
 import { interviewService } from '../services/interview.service'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { InterviewDetail } from '../types/interview.types'
@@ -11,6 +24,7 @@ const { t } = useI18n()
 
 const route = useRoute()
 const router = useRouter()
+const themeStore = useThemeStore()
 
 const token = route.params.token as string
 const loading = ref(true)
@@ -19,6 +33,11 @@ const errorMessage = ref('')
 const interview = ref<InterviewDetail | null>(null)
 
 onMounted(async () => {
+  // Aurora sets a calm but expressive stage for the gateway moment.
+  if (themeStore.backgroundMode === 'off') {
+    themeStore.setBackgroundMode('aurora')
+  }
+
   try {
     const data = await interviewService.getInterviewByToken(token)
     interview.value = data
@@ -41,7 +60,6 @@ onMounted(async () => {
       return
     }
 
-    // Redirect based on screening mode
     if (data.screeningMode === 'chat') {
       router.replace({ name: ROUTE_NAMES.CHAT_INTERVIEW, params: { token } })
     } else {
@@ -73,74 +91,92 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex min-h-[60vh] items-center justify-center px-4 py-12">
-    <!-- Loading spinner -->
-    <div v-if="loading" class="text-center">
-      <i class="pi pi-spinner pi-spin mb-4 text-4xl text-blue-500"></i>
-      <p class="text-gray-600">{{ t('interviews.gatewayPage.loading') }}</p>
+  <div class="relative flex min-h-screen items-center justify-center px-4 py-12">
+    <AnimatedBackground />
+
+    <!-- Loading — only the Prism glyph pulses; no chrome -->
+    <div v-if="loading" class="animate-in relative z-0 text-center">
+      <div class="mx-auto mb-6 flex justify-center">
+        <AppLogo variant="glyph" size="lg" :linked="false" />
+      </div>
+      <p class="text-sm text-[color:var(--color-text-secondary)]">
+        {{ t('interviews.gatewayPage.loading') }}
+      </p>
     </div>
 
-    <!-- Error states -->
-    <div v-else class="w-full max-w-md text-center">
-      <!-- Completed -->
+    <!-- Error / terminal states -->
+    <GlassCard
+      v-else
+      class="animate-in relative z-0 w-full max-w-md text-center"
+      :accent="errorState === 'completed' ? 'celebrate' : 'default'"
+    >
+      <div class="mb-4 flex justify-center">
+        <AppLogo variant="glyph" size="lg" :linked="false" />
+      </div>
+
       <template v-if="errorState === 'completed'">
-        <div class="rounded-lg border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950 p-8">
-          <i class="pi pi-check-circle mb-4 text-5xl text-green-500"></i>
-          <h1 class="mb-2 text-2xl font-bold text-gray-900">
-            {{ t('interviews.gatewayPage.interviewCompleted') }}
-          </h1>
-          <p class="mb-4 text-gray-600">
-            {{ t('interviews.gatewayPage.completedMessage') }}
-          </p>
-          <RouterLink to="/jobs" class="text-blue-600 dark:text-blue-400 hover:underline">
-            {{ t('interviews.gatewayPage.browseMoreJobs') }}
-          </RouterLink>
+        <div
+          class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[color:var(--color-accent-celebrate-soft)]"
+        >
+          <i class="pi pi-check-circle text-3xl text-[color:var(--color-accent-celebrate)]"></i>
         </div>
+        <h1 class="mb-2 text-2xl font-semibold text-[color:var(--color-text-primary)]">
+          {{ t('interviews.gatewayPage.interviewCompleted') }}
+        </h1>
+        <p class="mb-5 text-sm text-[color:var(--color-text-secondary)]">
+          {{ t('interviews.gatewayPage.completedMessage') }}
+        </p>
+        <RouterLink to="/jobs" class="text-sm text-[color:var(--color-accent)] hover:underline">
+          {{ t('interviews.gatewayPage.browseMoreJobs') }}
+        </RouterLink>
       </template>
 
-      <!-- Expired -->
       <template v-else-if="errorState === 'expired'">
-        <div class="rounded-lg border border-yellow-200 bg-yellow-50 dark:bg-yellow-950 p-8">
-          <i class="pi pi-clock mb-4 text-5xl text-yellow-500"></i>
-          <h1 class="mb-2 text-2xl font-bold text-gray-900">
-            {{ t('interviews.gatewayPage.linkExpired') }}
-          </h1>
-          <p class="mb-4 text-gray-600">
-            {{ errorMessage || t('interviews.states.expired') }}
-          </p>
-          <RouterLink to="/jobs" class="text-blue-600 dark:text-blue-400 hover:underline">
-            {{ t('interviews.gatewayPage.browseMoreJobs') }}
-          </RouterLink>
+        <div
+          class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[color:var(--color-warning)]/15"
+        >
+          <i class="pi pi-clock text-3xl text-[color:var(--color-warning)]"></i>
         </div>
+        <h1 class="mb-2 text-2xl font-semibold text-[color:var(--color-text-primary)]">
+          {{ t('interviews.gatewayPage.linkExpired') }}
+        </h1>
+        <p class="mb-5 text-sm text-[color:var(--color-text-secondary)]">
+          {{ errorMessage || t('interviews.states.expired') }}
+        </p>
+        <RouterLink to="/jobs" class="text-sm text-[color:var(--color-accent)] hover:underline">
+          {{ t('interviews.gatewayPage.browseMoreJobs') }}
+        </RouterLink>
       </template>
 
-      <!-- Vacancy closed -->
       <template v-else-if="errorState === 'closed'">
-        <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-8">
-          <i class="pi pi-ban mb-4 text-5xl text-gray-400"></i>
-          <h1 class="mb-2 text-2xl font-bold text-gray-900">
-            {{ t('interviews.gatewayPage.vacancyClosed') }}
-          </h1>
-          <p class="mb-4 text-gray-600">
-            {{ errorMessage || t('interviews.states.closed') }}
-          </p>
-          <RouterLink to="/jobs" class="text-blue-600 dark:text-blue-400 hover:underline">
-            {{ t('interviews.gatewayPage.browseMoreJobs') }}
-          </RouterLink>
+        <div
+          class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[color:var(--color-surface-sunken)]"
+        >
+          <i class="pi pi-ban text-3xl text-[color:var(--color-text-muted)]"></i>
         </div>
+        <h1 class="mb-2 text-2xl font-semibold text-[color:var(--color-text-primary)]">
+          {{ t('interviews.gatewayPage.vacancyClosed') }}
+        </h1>
+        <p class="mb-5 text-sm text-[color:var(--color-text-secondary)]">
+          {{ errorMessage || t('interviews.states.closed') }}
+        </p>
+        <RouterLink to="/jobs" class="text-sm text-[color:var(--color-accent)] hover:underline">
+          {{ t('interviews.gatewayPage.browseMoreJobs') }}
+        </RouterLink>
       </template>
 
-      <!-- Generic error -->
       <template v-else>
-        <div class="rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950 p-8">
-          <i class="pi pi-exclamation-triangle mb-4 text-5xl text-red-400"></i>
-          <h1 class="mb-2 text-2xl font-bold text-gray-900">
-            {{ t('interviews.gatewayPage.somethingWentWrong') }}
-          </h1>
-          <p class="mb-4 text-gray-600">{{ errorMessage }}</p>
-          <Button :label="t('errors.tryAgain')" icon="pi pi-refresh" @click="$router.go(0)" />
+        <div
+          class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[color:var(--color-danger)]/15"
+        >
+          <i class="pi pi-exclamation-triangle text-3xl text-[color:var(--color-danger)]"></i>
         </div>
+        <h1 class="mb-2 text-2xl font-semibold text-[color:var(--color-text-primary)]">
+          {{ t('interviews.gatewayPage.somethingWentWrong') }}
+        </h1>
+        <p class="mb-5 text-sm text-[color:var(--color-text-secondary)]">{{ errorMessage }}</p>
+        <Button :label="t('errors.tryAgain')" icon="pi pi-refresh" @click="$router.go(0)" />
       </template>
-    </div>
+    </GlassCard>
   </div>
 </template>

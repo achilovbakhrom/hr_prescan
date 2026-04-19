@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * CompanyCreatePage — centered GlassCard form.
+ * Spec: docs/design/spec.md §9 Companies block.
+ */
 import { ref, computed, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
@@ -6,6 +10,7 @@ import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
 import Select from 'primevue/select'
 import Button from 'primevue/button'
+import GlassCard from '@/shared/components/GlassCard.vue'
 import CountryAutocomplete from '@/shared/components/CountryAutocomplete.vue'
 import IndustryAutocomplete from '@/shared/components/IndustryAutocomplete.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
@@ -86,7 +91,7 @@ async function handleSave(): Promise<void> {
     }
     router.push({ name: ROUTE_NAMES.COMPANY_DETAIL, params: { id: company.id } })
   } catch {
-    // store surfaces error
+    /* store surfaces error */
   } finally {
     saving.value = false
   }
@@ -94,94 +99,85 @@ async function handleSave(): Promise<void> {
 </script>
 
 <template>
-  <div class="mx-auto max-w-2xl px-4 py-6">
+  <div class="mx-auto max-w-2xl space-y-4">
     <button
-      class="mb-4 flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 transition-colors hover:text-gray-900"
+      class="flex items-center gap-1.5 text-sm text-[color:var(--color-text-muted)] transition-colors hover:text-[color:var(--color-text-primary)]"
       @click="router.push({ name: ROUTE_NAMES.COMPANY_LIST })"
     >
       <i class="pi pi-arrow-left text-xs"></i>
       {{ t('common.back') }}
     </button>
 
-    <h1 class="mb-6 text-2xl font-bold text-gray-900">{{ t('companies.create') }}</h1>
+    <h1 class="text-xl font-bold text-[color:var(--color-text-primary)] md:text-2xl">
+      {{ t('companies.create') }}
+    </h1>
 
-    <div class="mb-6 flex items-center gap-3">
-      <CompanyLogoPicker
-        :logo="pendingLogoUrl"
-        :name="previewName"
-        :uploading="false"
-        @pick="onLogoPick"
-        @reject="onLogoReject"
-      />
-      <div class="min-w-0">
-        <p class="text-sm font-medium text-gray-900">{{ t('companies.logo') }}</p>
-        <p class="text-xs text-gray-500">{{ t('companies.logoHint') }}</p>
-      </div>
-    </div>
-
-    <p v-if="logoError" class="mb-3 text-sm text-red-600">{{ logoError }}</p>
-
-    <div
+    <p
       v-if="companyStore.error"
-      class="mb-4 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950 p-3 text-sm text-red-600"
+      class="rounded-lg border border-[color:var(--color-danger)] bg-[color:var(--color-danger)]/10 p-3 text-sm text-[color:var(--color-danger)]"
     >
       {{ companyStore.error }}
-    </div>
+    </p>
 
-    <div class="mb-4">
-      <label class="mb-1 block text-sm font-medium">
-        {{ t('companies.name') }} <span class="text-red-500">*</span>
-      </label>
-      <InputText
-        v-model="name"
-        class="w-full"
-        :placeholder="t('companies.namePlaceholder')"
-        :invalid="submitted && errors.name"
-      />
-    </div>
+    <GlassCard>
+      <form class="space-y-4" @submit.prevent="handleSave">
+        <div>
+          <label class="mb-1 block text-sm font-medium text-[color:var(--color-text-secondary)]">
+            {{ t('companies.name') }} <span class="text-[color:var(--color-danger)]">*</span>
+          </label>
+          <InputText
+            v-model="name"
+            class="w-full"
+            :placeholder="t('companies.namePlaceholder')"
+            :invalid="submitted && errors.name"
+          />
+        </div>
 
-    <div class="mb-4">
-      <label class="mb-1 block text-sm font-medium">
-        {{ t('companies.country') }} <span class="text-red-500">*</span>
-      </label>
-      <CountryAutocomplete v-model="country" :invalid="submitted && errors.country" />
-    </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium text-[color:var(--color-text-secondary)]">
+            {{ t('companies.country') }} <span class="text-[color:var(--color-danger)]">*</span>
+          </label>
+          <CountryAutocomplete v-model="country" :invalid="submitted && errors.country" />
+        </div>
 
-    <div class="mb-4">
-      <label class="mb-1 block text-sm font-medium">{{ t('companies.size') }}</label>
-      <Select
-        v-model="size"
-        :options="sizeOptions"
-        option-label="label"
-        option-value="value"
-        class="w-full"
-      />
-    </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium text-[color:var(--color-text-secondary)]">
+            {{ t('companies.size') }}
+          </label>
+          <Select
+            v-model="size"
+            :options="sizeOptions"
+            option-label="label"
+            option-value="value"
+            class="w-full"
+          />
+        </div>
 
-    <div class="mb-4">
-      <label class="mb-1 block text-sm font-medium">
-        {{ t('companies.industry') }} <span class="text-red-500">*</span>
-      </label>
-      <IndustryAutocomplete v-model="industries" :invalid="submitted && errors.industries" />
-    </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium text-[color:var(--color-text-secondary)]">
+            {{ t('companies.industry') }} <span class="text-[color:var(--color-danger)]">*</span>
+          </label>
+          <IndustryAutocomplete v-model="industries" :invalid="submitted && errors.industries" />
+        </div>
 
-    <div class="mb-4">
-      <label class="mb-1 block text-sm font-medium">{{ t('companies.website') }}</label>
-      <InputText v-model="website" class="w-full" placeholder="https://..." />
-    </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium text-[color:var(--color-text-secondary)]">
+            {{ t('companies.website') }}
+          </label>
+          <InputText v-model="website" class="w-full" placeholder="https://..." />
+        </div>
 
-    <div class="mb-6">
-      <label class="mb-1 block text-sm font-medium">{{ t('companies.description') }}</label>
-      <Textarea v-model="description" class="w-full" rows="6" />
-    </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium text-[color:var(--color-text-secondary)]">
+            {{ t('companies.description') }}
+          </label>
+          <Textarea v-model="description" class="w-full" rows="6" />
+        </div>
 
-    <div class="flex justify-end">
-      <Button
-        :label="t('common.save')"
-        icon="pi pi-check"
-        :loading="saving"
-        @click="handleSave"
-      />
-    </div>
+        <div class="flex justify-end pt-2">
+          <Button :label="t('common.save')" icon="pi pi-check" :loading="saving" type="submit" />
+        </div>
+      </form>
+    </GlassCard>
   </div>
 </template>

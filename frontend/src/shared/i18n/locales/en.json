@@ -332,6 +332,14 @@
     "scheduledInterviewsHint": "Scheduled interviews will appear here",
     "trackApplications": "Track your application status",
     "viewEditProfile": "View and edit your profile",
+    "recentActivity": "Recent activity",
+    "pipelineOverview": "Pipeline overview",
+    "applicants": "applicants",
+    "ai": {
+      "title": "Ask about candidates",
+      "subtitle": "Get instant summaries, compare finalists, or draft a follow-up — in natural language.",
+      "placeholder": "Ask about candidates…"
+    },
     "candidate": {
       "profileCompleteness": "Profile Completeness",
       "completeProfileHint": "Complete your profile to improve job matches",

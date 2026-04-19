@@ -87,3 +87,7 @@ static_collected/
 # Claude Code local state
 .claude/
 .claude-task-state/
+
+# UI redesign screenshot scratch (local only)
+docs/design/baseline/
+docs/design/after-*/

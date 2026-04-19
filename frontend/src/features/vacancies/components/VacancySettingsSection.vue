@@ -7,6 +7,7 @@ import { useRouter } from 'vue-router'
 import Button from 'primevue/button'
 import Dropdown from 'primevue/dropdown'
 import ToggleSwitch from 'primevue/toggleswitch'
+import GlassCard from '@/shared/components/GlassCard.vue'
 import { getVisibilityOptions } from '../constants/formOptions'
 import { useVacancyStore } from '../stores/vacancy.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
@@ -66,6 +67,9 @@ const canDelete = computed(
   () => props.vacancy.status === 'draft' || props.vacancy.status === 'archived',
 )
 
+/** Lock the interview-step toggle once active applications exist. */
+const interviewLocked = computed(() => (props.vacancy.candidatesTotal ?? 0) > 0)
+
 function confirmDelete(): void {
   confirm.require({
     message: t('vacancies.deleteConfirmMessage', { title: props.vacancy.title }),
@@ -88,16 +92,12 @@ function confirmDelete(): void {
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="space-y-4">
     <!-- Visibility & CV -->
-    <section class="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-5">
-      <h3 class="mb-4 text-sm font-semibold text-gray-900">
-        {{ t('vacancies.settings.visibility') }}
-      </h3>
-
+    <GlassCard :title="t('vacancies.settings.visibility')">
       <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
         <div>
-          <label class="mb-1 block text-xs font-medium text-gray-600">{{
+          <label class="mb-1 block text-xs font-medium text-[color:var(--color-text-secondary)]">{{
             t('vacancies.form.visibility')
           }}</label>
           <Dropdown
@@ -107,42 +107,64 @@ function confirmDelete(): void {
             option-value="value"
             class="w-full"
           />
-          <p class="mt-1 text-xs text-gray-400">{{ t('vacancies.form.visibilityPublicHint') }}</p>
+          <p class="mt-1 text-xs text-[color:var(--color-text-muted)]">
+            {{ t('vacancies.form.visibilityPublicHint') }}
+          </p>
         </div>
         <div class="flex items-start gap-3 pt-5">
           <ToggleSwitch v-model="cvRequired" />
           <div>
-            <label class="text-sm font-medium">{{ t('vacancies.form.cvRequired') }}</label>
-            <p class="text-xs text-gray-400">{{ t('vacancies.form.cvRequiredHint') }}</p>
+            <label class="text-sm font-medium text-[color:var(--color-text-primary)]">{{
+              t('vacancies.form.cvRequired')
+            }}</label>
+            <p class="text-xs text-[color:var(--color-text-muted)]">
+              {{ t('vacancies.form.cvRequiredHint') }}
+            </p>
           </div>
         </div>
       </div>
-    </section>
+    </GlassCard>
 
-    <!-- Interview enable -->
-    <section class="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-5">
-      <h3 class="mb-4 text-sm font-semibold text-gray-900">
-        {{ t('vacancies.settings.interviewStep') }}
-      </h3>
+    <!-- Interview enable — locked once active applications exist -->
+    <GlassCard :title="t('vacancies.settings.interviewStep')">
       <div class="flex items-start gap-3">
-        <ToggleSwitch v-model="interviewEnabled" />
+        <ToggleSwitch v-model="interviewEnabled" :disabled="interviewLocked" />
         <div>
-          <label class="text-sm font-medium">{{ t('vacancies.form.interviewOptional') }}</label>
-          <p class="text-xs text-gray-400">{{ t('vacancies.form.interviewHint') }}</p>
+          <label class="text-sm font-medium text-[color:var(--color-text-primary)]">{{
+            t('vacancies.form.interviewOptional')
+          }}</label>
+          <p class="text-xs text-[color:var(--color-text-muted)]">
+            {{ t('vacancies.form.interviewHint') }}
+          </p>
+          <p
+            v-if="interviewLocked"
+            class="mt-2 flex items-center gap-1 text-xs text-[color:var(--color-warning)]"
+            :title="
+              t(
+                'vacancies.settings.interviewLockedTooltip',
+                'Interview step cannot be changed once candidates have applied.',
+              )
+            "
+          >
+            <i class="pi pi-lock"></i>
+            {{ t('vacancies.settings.interviewLocked', 'Locked — applications already received') }}
+          </p>
         </div>
       </div>
-    </section>
+    </GlassCard>
 
     <div v-if="dirty" class="flex justify-end">
       <Button :label="t('common.save')" icon="pi pi-check" :loading="saving" @click="save" />
     </div>
 
     <!-- Danger zone -->
-    <section class="rounded-xl border border-red-200 dark:border-red-800 bg-red-50/40 p-5">
-      <h3 class="mb-2 text-sm font-semibold text-red-700">
+    <GlassCard>
+      <h3 class="mb-2 text-sm font-semibold text-[color:var(--color-danger)]">
         {{ t('vacancies.settings.dangerZone') }}
       </h3>
-      <p class="mb-3 text-xs text-red-600">{{ t('vacancies.settings.dangerZoneHint') }}</p>
+      <p class="mb-3 text-xs text-[color:var(--color-text-muted)]">
+        {{ t('vacancies.settings.dangerZoneHint') }}
+      </p>
       <Button
         :label="t('vacancies.settings.deleteVacancy')"
         icon="pi pi-trash"
@@ -151,9 +173,9 @@ function confirmDelete(): void {
         :disabled="!canDelete"
         @click="confirmDelete"
       />
-      <p v-if="!canDelete" class="mt-2 text-xs text-gray-500">
+      <p v-if="!canDelete" class="mt-2 text-xs text-[color:var(--color-text-muted)]">
         {{ t('vacancies.settings.deleteOnlyDraftArchived') }}
       </p>
-    </section>
+    </GlassCard>
   </div>
 </template>

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="prismGrad" x1="14" y1="50" x2="48" y2="14" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3b5bff"/>
+      <stop offset="1" stop-color="#7c5cff"/>
+    </linearGradient>
+  </defs>
+  <polygon
+    points="10,16 32,10 50,16 50,48 32,54 10,48"
+    fill="url(#prismGrad)"
+    stroke="rgba(255,255,255,0.25)"
+    stroke-width="1"
+    stroke-linejoin="round"/>
+  <line x1="-2" y1="32" x2="10" y2="32"
+    stroke="#0b0f17" stroke-opacity="0.7" stroke-width="2" stroke-linecap="round"/>
+  <line x1="50" y1="22" x2="62" y2="16"
+    stroke="#ff9b73" stroke-width="2.5" stroke-linecap="round" opacity="1"/>
+  <line x1="50" y1="32" x2="62" y2="32"
+    stroke="#7c5cff" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+  <line x1="50" y1="42" x2="62" y2="48"
+    stroke="#2563eb" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+</svg>
