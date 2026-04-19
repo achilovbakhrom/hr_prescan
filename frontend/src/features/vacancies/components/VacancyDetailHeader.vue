@@ -37,7 +37,7 @@ function copyShareLink(): void {
   <div class="space-y-3 sm:space-y-4">
     <div class="flex items-center gap-2 sm:gap-3">
       <button
-        class="shrink-0 rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+        class="shrink-0 rounded-lg p-1.5 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-700"
         @click="router.push({ name: ROUTE_NAMES.VACANCY_LIST })"
       >
         <i class="pi pi-arrow-left"></i>

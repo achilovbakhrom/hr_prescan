@@ -90,7 +90,7 @@ function formatDate(dateStr: string): string {
       >{{ errorMessage }}</Message
     >
 
-    <div v-if="invitations.length > 0" class="rounded-lg border-2 border-blue-200 bg-blue-50 p-5">
+    <div v-if="invitations.length > 0" class="rounded-lg border-2 border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950 p-5">
       <div class="mb-3 flex items-center gap-2">
         <i class="pi pi-envelope text-blue-600"></i>
         <h2 class="text-base font-semibold text-blue-900">
@@ -101,7 +101,7 @@ function formatDate(dateStr: string): string {
         <div
           v-for="inv in invitations"
           :key="inv.id"
-          class="flex items-center justify-between rounded-lg bg-white p-4 shadow-sm"
+          class="flex items-center justify-between rounded-lg bg-white dark:bg-gray-800 p-4 shadow-sm"
         >
           <div>
             <p class="font-medium text-gray-900">{{ inv.accountOwnerName }}</p>
@@ -126,10 +126,10 @@ function formatDate(dateStr: string): string {
       <p class="mt-3 text-xs text-blue-700">{{ t('settings.profile.acceptInvitationHint') }}</p>
     </div>
 
-    <div class="rounded-lg border border-gray-200 bg-white p-6">
+    <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
       <div class="mb-6 flex items-center gap-4">
         <div
-          class="flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 text-2xl font-bold text-blue-700"
+          class="flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-950 text-2xl font-bold text-blue-700"
         >
           {{ authStore.user?.firstName?.charAt(0) ?? ''
           }}{{ authStore.user?.lastName?.charAt(0) ?? '' }}
@@ -172,7 +172,7 @@ function formatDate(dateStr: string): string {
           ><InputText id="phone" v-model="phone" class="w-full" disabled />
         </div>
       </form>
-      <div class="mt-6 border-t border-gray-200 pt-4">
+      <div class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-4">
         <h3 class="mb-2 text-sm font-medium text-gray-700">
           {{ t('settings.profile.accountInfo') }}
         </h3>

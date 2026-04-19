@@ -40,7 +40,7 @@ const isHighlighted = computed(() => props.plan.tier === 'professional')
     :class="isHighlighted ? 'border-blue-500 shadow-md' : 'border-gray-200'"
   >
     <div v-if="isHighlighted" class="mb-2 text-center">
-      <span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">
+      <span class="rounded-full bg-blue-100 dark:bg-blue-950 px-3 py-1 text-xs font-semibold text-blue-700">
         Most Popular
       </span>
     </div>

@@ -43,7 +43,7 @@ function decline(): void {
   >
     <div
       v-if="visible"
-      class="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-200 bg-white shadow-2xl"
+      class="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-2xl"
       role="dialog"
       aria-modal="false"
       aria-label="Cookie consent"
@@ -57,7 +57,7 @@ function decline(): void {
             {{ t('cookies.message') }}
             <RouterLink
               to="/privacy"
-              class="ml-1 font-medium text-blue-600 hover:underline"
+              class="ml-1 font-medium text-blue-600 dark:text-blue-400 hover:underline"
               @click="visible = false"
             >
               {{ t('cookies.learnMore') }}

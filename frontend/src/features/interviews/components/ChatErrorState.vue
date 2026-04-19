@@ -15,7 +15,7 @@ const { t } = useI18n()
   <div class="flex flex-1 items-center justify-center px-4">
     <div class="w-full max-w-md text-center">
       <template v-if="errorState === 'completed'">
-        <div class="rounded-2xl bg-white p-8 shadow-lg">
+        <div class="rounded-2xl bg-white dark:bg-gray-800 p-8 shadow-lg">
           <div
             class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100"
           >
@@ -27,7 +27,7 @@ const { t } = useI18n()
           <p class="mb-6 text-sm text-gray-500">{{ t('interviews.states.completed') }}</p>
           <RouterLink
             to="/jobs"
-            class="inline-block rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+            class="inline-block rounded-xl bg-blue-600 dark:bg-blue-700 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
           >
             {{ t('interviews.chatPage.browseMoreJobs') }}
           </RouterLink>
@@ -35,7 +35,7 @@ const { t } = useI18n()
       </template>
 
       <template v-else-if="errorState === 'expired'">
-        <div class="rounded-2xl bg-white p-8 shadow-lg">
+        <div class="rounded-2xl bg-white dark:bg-gray-800 p-8 shadow-lg">
           <div
             class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-yellow-100"
           >
@@ -47,14 +47,14 @@ const { t } = useI18n()
           <p class="mb-6 text-sm text-gray-500">
             {{ errorMessage || t('interviews.states.expired') }}
           </p>
-          <RouterLink to="/jobs" class="text-sm font-medium text-blue-600 hover:underline">{{
+          <RouterLink to="/jobs" class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline">{{
             t('interviews.chatPage.browseMoreJobs')
           }}</RouterLink>
         </div>
       </template>
 
       <template v-else-if="errorState === 'closed'">
-        <div class="rounded-2xl bg-white p-8 shadow-lg">
+        <div class="rounded-2xl bg-white dark:bg-gray-800 p-8 shadow-lg">
           <div
             class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100"
           >
@@ -66,14 +66,14 @@ const { t } = useI18n()
           <p class="mb-6 text-sm text-gray-500">
             {{ errorMessage || t('interviews.states.closed') }}
           </p>
-          <RouterLink to="/jobs" class="text-sm font-medium text-blue-600 hover:underline">{{
+          <RouterLink to="/jobs" class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline">{{
             t('interviews.chatPage.browseMoreJobs')
           }}</RouterLink>
         </div>
       </template>
 
       <template v-else>
-        <div class="rounded-2xl bg-white p-8 shadow-lg">
+        <div class="rounded-2xl bg-white dark:bg-gray-800 p-8 shadow-lg">
           <div
             class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100"
           >

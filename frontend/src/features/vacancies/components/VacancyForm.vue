@@ -122,7 +122,7 @@ function handleSave(): void {
       </TabPanel>
     </TabView>
 
-    <div class="mt-4 flex justify-end border-t border-gray-100 pt-4">
+    <div class="mt-4 flex justify-end border-t border-gray-100 dark:border-gray-800 pt-4">
       <Button
         type="submit"
         :label="t('common.save')"

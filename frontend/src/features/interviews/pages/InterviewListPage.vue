@@ -88,7 +88,7 @@ function sessionTypeSeverity(type: string): string {
       <div
         v-for="interview in interviews"
         :key="interview.id"
-        class="cursor-pointer rounded-xl border border-gray-100 bg-white p-4 transition-all hover:shadow-sm"
+        class="cursor-pointer rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-4 transition-all hover:shadow-sm"
         @click="router.push({ name: ROUTE_NAMES.INTERVIEW_DETAIL, params: { id: interview.id } })"
       >
         <div class="flex items-start justify-between gap-2">

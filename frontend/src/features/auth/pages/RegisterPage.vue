@@ -95,7 +95,7 @@ async function handleTelegramSuccess(
 
 <template>
   <div class="flex flex-1 items-center justify-center py-12">
-    <div class="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
+    <div class="w-full max-w-md rounded-lg bg-white dark:bg-gray-800 p-8 shadow-md">
       <RegisterSuccess v-if="registered" :email="email" />
 
       <template v-else>
@@ -135,7 +135,7 @@ async function handleTelegramSuccess(
           {{ t('auth.register.hasAccount') }}
           <RouterLink
             :to="{ name: ROUTE_NAMES.LOGIN }"
-            class="font-medium text-blue-600 hover:text-blue-500"
+            class="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500"
             >{{ t('auth.register.signIn') }}</RouterLink
           >
         </p>

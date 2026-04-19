@@ -129,13 +129,13 @@ function handleKanbanStatusChange(candidateId: string, status: ApplicationStatus
       <div class="flex items-center gap-3">
         <button
           v-if="!isAllCandidates"
-          class="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+          class="rounded-lg p-1.5 text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-600"
           @click="router.back()"
         >
           <i class="pi pi-arrow-left"></i>
         </button>
         <div>
-          <h1 class="text-lg font-bold text-gray-900 md:text-xl">
+          <h1 class="text-lg font-bold text-gray-900 dark:text-white md:text-xl">
             {{ isAllCandidates ? t('nav.allCandidates') : t('candidates.pipeline') }}
           </h1>
           <p class="text-sm text-gray-500">
@@ -143,7 +143,7 @@ function handleKanbanStatusChange(candidateId: string, status: ApplicationStatus
           </p>
         </div>
       </div>
-      <div class="flex items-center gap-2 rounded-lg border border-gray-200 p-0.5">
+      <div class="flex items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 p-0.5">
         <button
           class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
           :class="
@@ -165,7 +165,7 @@ function handleKanbanStatusChange(candidateId: string, status: ApplicationStatus
       </div>
     </div>
 
-    <p v-if="candidateStore.error" class="rounded-lg bg-red-50 px-4 py-2 text-sm text-red-600">
+    <p v-if="candidateStore.error" class="rounded-lg bg-red-50 dark:bg-red-950 px-4 py-2 text-sm text-red-600">
       {{ candidateStore.error }}
     </p>
 

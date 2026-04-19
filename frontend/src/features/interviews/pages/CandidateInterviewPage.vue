@@ -45,7 +45,7 @@ function handleJoinInterview(): void {
       <!-- Completed state -->
       <div
         v-if="isCompleted"
-        class="rounded-lg border border-green-200 bg-green-50 p-8 text-center"
+        class="rounded-lg border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950 p-8 text-center"
       >
         <i class="pi pi-check-circle mb-4 text-5xl text-green-500"></i>
         <h1 class="mb-2 text-2xl font-bold text-gray-900">
@@ -57,13 +57,13 @@ function handleJoinInterview(): void {
       </div>
 
       <!-- Pre-interview state -->
-      <div v-else class="rounded-lg border border-gray-200 bg-white p-8">
+      <div v-else class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-8">
         <h1 class="mb-6 text-2xl font-bold text-gray-900">
           {{ t('interviews.candidatePage.yourInterview') }}
         </h1>
 
         <div class="space-y-4">
-          <div class="rounded-lg bg-gray-50 p-4">
+          <div class="rounded-lg bg-gray-50 dark:bg-gray-900 p-4">
             <dl class="space-y-2 text-sm">
               <div class="flex justify-between">
                 <dt class="text-gray-500">{{ t('interviews.preCheck.position') }}</dt>
@@ -92,7 +92,7 @@ function handleJoinInterview(): void {
             </dl>
           </div>
 
-          <div class="rounded-lg border border-blue-100 bg-blue-50 p-4">
+          <div class="rounded-lg border border-blue-100 dark:border-blue-900 bg-blue-50 dark:bg-blue-950 p-4">
             <h3 class="mb-2 text-sm font-semibold text-blue-800">
               {{ t('interviews.candidatePage.instructions') }}
             </h3>
@@ -104,7 +104,7 @@ function handleJoinInterview(): void {
             </ul>
           </div>
 
-          <div class="rounded-lg border border-gray-200 p-4">
+          <div class="rounded-lg border border-gray-200 dark:border-gray-700 p-4">
             <h3 class="mb-2 text-sm font-semibold text-gray-700">
               {{ t('interviews.candidatePage.cameraMicTest') }}
             </h3>

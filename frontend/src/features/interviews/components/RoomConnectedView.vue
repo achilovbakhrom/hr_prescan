@@ -88,7 +88,7 @@ const { t } = useI18n()
         ></video>
         <div v-if="isCameraOff" class="flex h-full w-full items-center justify-center">
           <div
-            class="flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-lg font-medium text-white"
+            class="flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 dark:bg-blue-700 text-lg font-medium text-white"
           >
             {{ interview.candidateName ? getInitials(interview.candidateName) : 'Y' }}
           </div>

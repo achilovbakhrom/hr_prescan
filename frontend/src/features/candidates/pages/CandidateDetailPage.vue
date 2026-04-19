@@ -81,7 +81,7 @@ function formatScore(score: number | null | undefined): string {
   <div class="space-y-3 sm:space-y-4">
     <div class="flex items-center gap-2 sm:gap-3">
       <button
-        class="shrink-0 rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+        class="shrink-0 rounded-lg p-1.5 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-700"
         @click="router.back()"
       >
         <i class="pi pi-arrow-left"></i>
@@ -90,7 +90,7 @@ function formatScore(score: number | null | undefined): string {
         <h1 class="truncate text-base font-bold sm:text-lg md:text-2xl">
           {{ candidate?.candidateName ?? t('common.loading') }}
         </h1>
-        <p v-if="candidate" class="truncate text-xs text-gray-500 sm:text-sm">
+        <p v-if="candidate" class="truncate text-xs text-gray-500 dark:text-gray-400 sm:text-sm">
           {{ candidate.vacancyTitle }}
         </p>
       </div>

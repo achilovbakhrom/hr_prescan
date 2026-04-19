@@ -84,7 +84,7 @@ onMounted(async () => {
     <div v-else class="w-full max-w-md text-center">
       <!-- Completed -->
       <template v-if="errorState === 'completed'">
-        <div class="rounded-lg border border-green-200 bg-green-50 p-8">
+        <div class="rounded-lg border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950 p-8">
           <i class="pi pi-check-circle mb-4 text-5xl text-green-500"></i>
           <h1 class="mb-2 text-2xl font-bold text-gray-900">
             {{ t('interviews.gatewayPage.interviewCompleted') }}
@@ -92,7 +92,7 @@ onMounted(async () => {
           <p class="mb-4 text-gray-600">
             {{ t('interviews.gatewayPage.completedMessage') }}
           </p>
-          <RouterLink to="/jobs" class="text-blue-600 hover:underline">
+          <RouterLink to="/jobs" class="text-blue-600 dark:text-blue-400 hover:underline">
             {{ t('interviews.gatewayPage.browseMoreJobs') }}
           </RouterLink>
         </div>
@@ -100,7 +100,7 @@ onMounted(async () => {
 
       <!-- Expired -->
       <template v-else-if="errorState === 'expired'">
-        <div class="rounded-lg border border-yellow-200 bg-yellow-50 p-8">
+        <div class="rounded-lg border border-yellow-200 bg-yellow-50 dark:bg-yellow-950 p-8">
           <i class="pi pi-clock mb-4 text-5xl text-yellow-500"></i>
           <h1 class="mb-2 text-2xl font-bold text-gray-900">
             {{ t('interviews.gatewayPage.linkExpired') }}
@@ -108,7 +108,7 @@ onMounted(async () => {
           <p class="mb-4 text-gray-600">
             {{ errorMessage || t('interviews.states.expired') }}
           </p>
-          <RouterLink to="/jobs" class="text-blue-600 hover:underline">
+          <RouterLink to="/jobs" class="text-blue-600 dark:text-blue-400 hover:underline">
             {{ t('interviews.gatewayPage.browseMoreJobs') }}
           </RouterLink>
         </div>
@@ -116,7 +116,7 @@ onMounted(async () => {
 
       <!-- Vacancy closed -->
       <template v-else-if="errorState === 'closed'">
-        <div class="rounded-lg border border-gray-200 bg-gray-50 p-8">
+        <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-8">
           <i class="pi pi-ban mb-4 text-5xl text-gray-400"></i>
           <h1 class="mb-2 text-2xl font-bold text-gray-900">
             {{ t('interviews.gatewayPage.vacancyClosed') }}
@@ -124,7 +124,7 @@ onMounted(async () => {
           <p class="mb-4 text-gray-600">
             {{ errorMessage || t('interviews.states.closed') }}
           </p>
-          <RouterLink to="/jobs" class="text-blue-600 hover:underline">
+          <RouterLink to="/jobs" class="text-blue-600 dark:text-blue-400 hover:underline">
             {{ t('interviews.gatewayPage.browseMoreJobs') }}
           </RouterLink>
         </div>
@@ -132,7 +132,7 @@ onMounted(async () => {
 
       <!-- Generic error -->
       <template v-else>
-        <div class="rounded-lg border border-red-200 bg-red-50 p-8">
+        <div class="rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950 p-8">
           <i class="pi pi-exclamation-triangle mb-4 text-5xl text-red-400"></i>
           <h1 class="mb-2 text-2xl font-bold text-gray-900">
             {{ t('interviews.gatewayPage.somethingWentWrong') }}

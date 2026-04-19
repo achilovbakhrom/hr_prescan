@@ -33,7 +33,7 @@ function scoreBg(score: number): string {
 </script>
 
 <template>
-  <div class="mb-4 rounded-xl border border-gray-200 bg-white p-4">
+  <div class="mb-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
     <div class="flex items-center gap-4">
       <div
         class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full"
@@ -65,7 +65,7 @@ function scoreBg(score: number): string {
       <div
         v-for="(score, name) in matchDetails.criteria_scores"
         :key="name"
-        class="rounded-lg bg-gray-50 p-2 text-center"
+        class="rounded-lg bg-gray-50 dark:bg-gray-900 p-2 text-center"
       >
         <p class="text-xs text-gray-500">{{ formatCriteriaName(String(name)) }}</p>
         <p

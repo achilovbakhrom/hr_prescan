@@ -27,8 +27,8 @@ function formatDate(dateStr: string): string {
 </script>
 
 <template>
-  <div class="rounded-lg border border-gray-200 bg-white">
-    <div class="border-b border-gray-200 px-5 py-3">
+  <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white">
+    <div class="border-b border-gray-200 dark:border-gray-700 px-5 py-3">
       <h3 class="text-sm font-semibold text-gray-700">{{ t('dashboard.recentApplications') }}</h3>
     </div>
     <DataTable

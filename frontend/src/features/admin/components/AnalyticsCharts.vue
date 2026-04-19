@@ -176,13 +176,13 @@ const stackOpts = {
 
 <template>
   <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-    <div class="rounded-lg border border-gray-200 bg-white p-6">
+    <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
       <h2 class="mb-4 text-lg font-semibold">{{ t('admin.analytics.revenueTrend') }}</h2>
       <div class="h-64">
         <Chart type="line" :data="revenueTrendData" :options="lineOpts" class="h-full w-full" />
       </div>
     </div>
-    <div class="rounded-lg border border-gray-200 bg-white p-6">
+    <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
       <h2 class="mb-4 text-lg font-semibold">{{ t('admin.analytics.interviewVolume') }}</h2>
       <div class="h-64">
         <Chart
@@ -197,7 +197,7 @@ const stackOpts = {
         </div>
       </div>
     </div>
-    <div class="rounded-lg border border-gray-200 bg-white p-6">
+    <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
       <h2 class="mb-4 text-lg font-semibold">
         {{ t('admin.analytics.subscriptionDistribution') }}
       </h2>
@@ -214,7 +214,7 @@ const stackOpts = {
         </div>
       </div>
     </div>
-    <div class="rounded-lg border border-gray-200 bg-white p-6">
+    <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
       <h2 class="mb-4 text-lg font-semibold">{{ t('admin.analytics.userRegistrations') }}</h2>
       <div class="h-64">
         <Chart

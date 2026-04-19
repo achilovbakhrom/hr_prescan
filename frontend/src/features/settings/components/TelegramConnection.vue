@@ -52,7 +52,7 @@ async function handleUnlink(): Promise<void> {
 </script>
 
 <template>
-  <div class="rounded-xl border border-gray-200 bg-white p-5">
+  <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5">
     <div class="mb-4 flex items-center gap-3">
       <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50">
         <i class="pi pi-send text-lg text-blue-500"></i>

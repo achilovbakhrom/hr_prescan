@@ -37,7 +37,7 @@ function formatScore(score: number | null): string {
     </div>
     <div
       v-else-if="analyticsStore.error"
-      class="rounded-xl border border-red-200 bg-red-50 p-6 text-center"
+      class="rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950 p-6 text-center"
     >
       <i class="pi pi-exclamation-triangle mb-2 text-2xl text-red-400"></i>
       <p class="text-sm text-red-600">{{ analyticsStore.error }}</p>
@@ -54,7 +54,7 @@ function formatScore(score: number | null): string {
       <div class="grid gap-6 lg:grid-cols-2">
         <HiringFunnel :funnel="funnel ?? null" />
 
-        <div class="rounded-xl border border-gray-100 bg-white p-6">
+        <div class="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-6">
           <h2 class="mb-5 text-sm font-semibold uppercase tracking-wider text-gray-400">
             {{ t('analytics.vacancyPerformance') }}
           </h2>

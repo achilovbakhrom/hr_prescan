@@ -57,7 +57,7 @@ function formatRelativeDate(dateStr: string): string {
     <div
       v-for="job in jobs"
       :key="job.id"
-      class="group cursor-pointer rounded-xl border border-gray-100 bg-white p-4 transition-all hover:border-blue-200 hover:shadow-md sm:p-5"
+      class="group cursor-pointer rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-4 transition-all hover:border-blue-200 hover:shadow-md sm:p-5"
       @click="emit('select', job.id)"
     >
       <!-- Top row -->
@@ -70,7 +70,7 @@ function formatRelativeDate(dateStr: string): string {
             size="md"
           />
           <div class="min-w-0 flex-1">
-            <h2 class="text-base font-semibold text-gray-900 group-hover:text-blue-600">
+            <h2 class="text-base font-semibold text-gray-900 dark:text-white group-hover:text-blue-600">
               {{ job.title }}
             </h2>
             <p v-if="getCompanyName(job)" class="mt-0.5 text-sm text-gray-500">
@@ -80,7 +80,7 @@ function formatRelativeDate(dateStr: string): string {
         </div>
         <span
           v-if="formatSalaryRange(job, t) !== t('vacancies.overview.salaryNotSpecified')"
-          class="self-start rounded-lg bg-emerald-50 px-2.5 py-0.5 text-sm font-semibold text-emerald-700 sm:shrink-0 sm:px-3 sm:py-1"
+          class="self-start rounded-lg bg-emerald-50 dark:bg-emerald-950 px-2.5 py-0.5 text-sm font-semibold text-emerald-700 sm:shrink-0 sm:px-3 sm:py-1"
         >
           {{ formatSalaryRange(job, t) }}
         </span>
@@ -88,7 +88,7 @@ function formatRelativeDate(dateStr: string): string {
 
       <!-- Tags row -->
       <div class="mt-2 flex flex-wrap items-center gap-1.5 sm:mt-3 sm:gap-2">
-        <span v-if="job.location" class="flex items-center gap-1 text-xs text-gray-500 sm:text-sm">
+        <span v-if="job.location" class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 sm:text-sm">
           <i class="pi pi-map-marker text-[10px] sm:text-xs"></i>{{ job.location }}
         </span>
         <Tag
@@ -98,19 +98,19 @@ function formatRelativeDate(dateStr: string): string {
           class="!text-[10px] sm:!text-xs"
         />
         <span
-          class="rounded-md bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-600 sm:px-2 sm:text-xs"
+          class="rounded-md bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 text-[10px] font-medium text-gray-600 dark:text-gray-400 sm:px-2 sm:text-xs"
         >
           {{ EMPLOYMENT_LABELS[job.employmentType] || job.employmentType }}
         </span>
         <span
-          class="rounded-md bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-600 sm:px-2 sm:text-xs"
+          class="rounded-md bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 text-[10px] font-medium text-gray-600 dark:text-gray-400 sm:px-2 sm:text-xs"
         >
           {{ EXPERIENCE_LABELS[job.experienceLevel] || job.experienceLevel }}
         </span>
       </div>
 
       <!-- Description -->
-      <p class="mt-2 line-clamp-2 text-xs leading-relaxed text-gray-500 sm:mt-2.5 sm:text-sm">
+      <p class="mt-2 line-clamp-2 text-xs leading-relaxed text-gray-500 dark:text-gray-400 sm:mt-2.5 sm:text-sm">
         {{ stripHtml(job.description) }}
       </p>
 
@@ -120,18 +120,18 @@ function formatRelativeDate(dateStr: string): string {
           <span
             v-for="skill in job.skills.slice(0, 3)"
             :key="skill"
-            class="rounded-md bg-blue-50 px-1.5 py-0.5 text-[10px] font-medium text-blue-600 sm:px-2 sm:text-xs"
+            class="rounded-md bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 text-[10px] font-medium text-blue-600 dark:text-blue-400 sm:px-2 sm:text-xs"
           >
             {{ skill }}
           </span>
           <span
             v-if="job.skills.length > 3"
-            class="rounded-md bg-gray-50 px-1.5 py-0.5 text-[10px] text-gray-400 sm:px-2 sm:text-xs"
+            class="rounded-md bg-gray-50 dark:bg-gray-900 px-1.5 py-0.5 text-[10px] text-gray-400 dark:text-gray-500 sm:px-2 sm:text-xs"
           >
             +{{ job.skills.length - 3 }}
           </span>
         </div>
-        <span class="shrink-0 text-[10px] text-gray-400 sm:text-xs">{{
+        <span class="shrink-0 text-[10px] text-gray-400 dark:text-gray-500 sm:text-xs">{{
           formatRelativeDate(job.createdAt)
         }}</span>
       </div>
@@ -141,15 +141,15 @@ function formatRelativeDate(dateStr: string): string {
   <!-- Empty -->
   <div
     v-else
-    class="flex flex-col items-center rounded-xl border border-dashed border-gray-200 bg-white py-12 text-center sm:py-20"
+    class="flex flex-col items-center rounded-xl border border-dashed border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 py-12 text-center sm:py-20"
   >
     <div
-      class="flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 sm:h-16 sm:w-16"
+      class="flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 sm:h-16 sm:w-16"
     >
-      <i class="pi pi-search text-xl text-gray-400 sm:text-2xl"></i>
+      <i class="pi pi-search text-xl text-gray-400 dark:text-gray-500 sm:text-2xl"></i>
     </div>
-    <p class="mt-3 text-sm font-medium text-gray-600 sm:mt-4">{{ t('jobBoard.noJobs') }}</p>
-    <p class="mt-1 text-xs text-gray-400 sm:text-sm">{{ t('jobBoard.noJobsHint') }}</p>
+    <p class="mt-3 text-sm font-medium text-gray-600 dark:text-gray-400 sm:mt-4">{{ t('jobBoard.noJobs') }}</p>
+    <p class="mt-1 text-xs text-gray-400 dark:text-gray-500 sm:text-sm">{{ t('jobBoard.noJobsHint') }}</p>
     <Button
       v-if="activeFilterCount > 0"
       :label="t('common.clearFilters')"

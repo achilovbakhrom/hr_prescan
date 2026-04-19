@@ -36,7 +36,7 @@ const { t } = useI18n()
           <i class="pi pi-comments text-xs text-white"></i>
         </div>
         <div class="min-w-0">
-          <div class="rounded-2xl rounded-tl-sm bg-white px-4 py-3 shadow-sm ring-1 ring-gray-100">
+          <div class="rounded-2xl rounded-tl-sm bg-white dark:bg-gray-800 px-4 py-3 shadow-sm ring-1 ring-gray-100">
             <p class="whitespace-pre-wrap text-[13px] leading-relaxed text-gray-800">
               {{ msg.text }}
             </p>
@@ -49,7 +49,7 @@ const { t } = useI18n()
 
       <!-- Candidate voice message -->
       <div v-else-if="msg.messageType === 'voice'" class="max-w-[80%]">
-        <div class="rounded-2xl rounded-tr-sm bg-blue-600 px-4 py-3 shadow-sm">
+        <div class="rounded-2xl rounded-tr-sm bg-blue-600 dark:bg-blue-700 px-4 py-3 shadow-sm">
           <div v-if="msg.text === 'Transcribing...'" class="flex items-center gap-2 text-white/80">
             <i class="pi pi-spinner pi-spin text-xs"></i>
             <span class="text-[13px]">{{ t('interviews.chat.transcribing') }}</span>
@@ -69,7 +69,7 @@ const { t } = useI18n()
 
       <!-- Candidate text message -->
       <div v-else class="max-w-[80%]">
-        <div class="rounded-2xl rounded-tr-sm bg-blue-600 px-4 py-3 shadow-sm">
+        <div class="rounded-2xl rounded-tr-sm bg-blue-600 dark:bg-blue-700 px-4 py-3 shadow-sm">
           <p class="whitespace-pre-wrap text-[13px] leading-relaxed text-white">{{ msg.text }}</p>
         </div>
         <span class="mt-1 block pr-1 text-right text-[10px] text-gray-400">
@@ -87,7 +87,7 @@ const { t } = useI18n()
         >
           <i class="pi pi-comments text-xs text-white"></i>
         </div>
-        <div class="rounded-2xl rounded-tl-sm bg-white px-5 py-3.5 shadow-sm ring-1 ring-gray-100">
+        <div class="rounded-2xl rounded-tl-sm bg-white dark:bg-gray-800 px-5 py-3.5 shadow-sm ring-1 ring-gray-100">
           <div class="flex items-center gap-1.5">
             <span class="typing-dot h-2 w-2 rounded-full bg-gray-400"></span>
             <span

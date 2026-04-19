@@ -102,7 +102,7 @@ onBeforeUnmount(() => {
           :class="
             activeSection === 'scores'
               ? 'bg-blue-600 text-white'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              : 'bg-gray-100 text-gray-600 dark:text-gray-400 hover:bg-gray-200'
           "
           @click="activeSection = 'scores'"
         >
@@ -113,7 +113,7 @@ onBeforeUnmount(() => {
           :class="
             activeSection === 'conversation'
               ? 'bg-blue-600 text-white'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              : 'bg-gray-100 text-gray-600 dark:text-gray-400 hover:bg-gray-200'
           "
           @click="activeSection = 'conversation'"
         >
@@ -156,8 +156,8 @@ onBeforeUnmount(() => {
             class="max-w-[75%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed"
             :class="
               msg.role === 'ai'
-                ? 'rounded-tl-md border border-gray-200 bg-white text-gray-800'
-                : 'rounded-tr-md bg-blue-600 text-white'
+                ? 'rounded-tl-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800'
+                : 'rounded-tr-md bg-blue-600 dark:bg-blue-700 text-white'
             "
           >
             <template v-if="msg.messageType === 'voice'">

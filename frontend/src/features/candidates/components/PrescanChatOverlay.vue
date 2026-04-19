@@ -37,7 +37,7 @@ onUnmounted(() => window.removeEventListener('message', onMessage))
     class="fixed inset-0 z-50 flex flex-col bg-black/30 backdrop-blur-sm sm:items-center sm:justify-center sm:p-4"
   >
     <div
-      class="flex h-full w-full flex-col overflow-hidden bg-white sm:h-[85vh] sm:max-h-[700px] sm:max-w-3xl sm:rounded-2xl sm:shadow-2xl"
+      class="flex h-full w-full flex-col overflow-hidden bg-white dark:bg-gray-800 sm:h-[85vh] sm:max-h-[700px] sm:max-w-3xl sm:rounded-2xl sm:shadow-2xl"
     >
       <div
         class="flex items-center justify-between bg-gradient-to-r from-blue-600 to-blue-700 px-3 py-2.5 sm:px-4 sm:py-3"
@@ -85,27 +85,27 @@ onUnmounted(() => window.removeEventListener('message', onMessage))
   <!-- Minimized chat bar -->
   <div
     v-if="showMinimized"
-    class="fixed bottom-0 left-0 right-0 z-40 cursor-pointer border-t border-gray-200 bg-white px-3 py-2.5 shadow-lg transition-all hover:bg-gray-50 sm:px-4 sm:py-3"
+    class="fixed bottom-0 left-0 right-0 z-40 cursor-pointer border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2.5 shadow-lg transition-all hover:bg-gray-50 dark:hover:bg-gray-800 sm:px-4 sm:py-3"
     @click="emit('restore')"
   >
     <div class="mx-auto flex max-w-3xl items-center justify-between">
       <div class="flex items-center gap-2 sm:gap-3">
         <div
-          class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 sm:h-10 sm:w-10"
+          class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 dark:bg-blue-700 sm:h-10 sm:w-10"
         >
           <i class="pi pi-comments text-xs text-white sm:text-sm"></i>
         </div>
         <div class="min-w-0">
-          <p class="truncate text-xs font-medium text-gray-900 sm:text-sm">
+          <p class="truncate text-xs font-medium text-gray-900 dark:text-white sm:text-sm">
             {{ t('interviews.chat.aiPrescanning') }}
           </p>
-          <p class="hidden text-xs text-gray-500 sm:block">
+          <p class="hidden text-xs text-gray-500 dark:text-gray-400 sm:block">
             {{ t('candidates.application.clickToOpenChat') }}
           </p>
         </div>
       </div>
       <div class="flex items-center gap-1 sm:gap-2">
-        <i class="pi pi-chevron-up text-xs text-gray-400 sm:text-sm"></i>
+        <i class="pi pi-chevron-up text-xs text-gray-400 dark:text-gray-500 sm:text-sm"></i>
         <Button
           icon="pi pi-times"
           severity="secondary"

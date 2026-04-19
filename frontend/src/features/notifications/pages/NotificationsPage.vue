@@ -106,7 +106,7 @@ onMounted(() => notificationStore.fetchNotifications())
       <div
         v-for="notification in filteredNotifications"
         :key="notification.id"
-        class="flex cursor-pointer items-start gap-3 rounded-lg border border-gray-200 p-4 transition hover:bg-gray-50"
+        class="flex cursor-pointer items-start gap-3 rounded-lg border border-gray-200 dark:border-gray-700 p-4 transition hover:bg-gray-50"
         :class="{ 'border-blue-200 bg-blue-50': !notification.isRead }"
         @click="handleClick(notification)"
       >

@@ -94,7 +94,7 @@ async function handleSave(): Promise<void> {
 <template>
   <div class="mx-auto max-w-2xl px-4 py-6">
     <button
-      class="mb-4 flex items-center gap-1.5 text-sm text-gray-500 transition-colors hover:text-gray-900"
+      class="mb-4 flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 transition-colors hover:text-gray-900"
       @click="router.push({ name: ROUTE_NAMES.COMPANY_LIST })"
     >
       <i class="pi pi-arrow-left text-xs"></i>
@@ -140,7 +140,7 @@ async function handleSave(): Promise<void> {
 
       <div
         v-if="companyStore.error"
-        class="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600"
+        class="mb-4 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950 p-3 text-sm text-red-600"
       >
         {{ companyStore.error }}
       </div>
@@ -149,7 +149,7 @@ async function handleSave(): Promise<void> {
 
       <form
         v-else
-        class="space-y-4 rounded-xl border border-gray-200 bg-white p-6"
+        class="space-y-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6"
         @submit.prevent="handleSave"
       >
         <div>

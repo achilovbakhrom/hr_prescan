@@ -101,7 +101,7 @@ const recommendation = computed(() => {
     <!-- CV Processing indicator -->
     <div
       v-if="props.candidate.cvFile && props.candidate.matchScore === null"
-      class="flex items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 p-3"
+      class="flex items-center gap-3 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950 p-3"
     >
       <i class="pi pi-spinner pi-spin text-blue-500"></i>
       <div>
@@ -112,8 +112,8 @@ const recommendation = computed(() => {
 
     <!-- Scores -->
     <div class="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
-      <div class="rounded-lg border border-gray-200 bg-gray-50 p-2 text-center sm:p-3">
-        <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide sm:text-[10px]">
+      <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-2 text-center sm:p-3">
+        <p class="text-[9px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide sm:text-[10px]">
           {{ t('candidates.matchScore') }}
         </p>
         <p
@@ -126,10 +126,10 @@ const recommendation = computed(() => {
         <div v-else-if="props.candidate.cvFile" class="mt-1">
           <i class="pi pi-spinner pi-spin text-sm text-blue-400"></i>
         </div>
-        <p v-else class="mt-0.5 text-base text-gray-300 sm:mt-1 sm:text-lg">—</p>
+        <p v-else class="mt-0.5 text-base text-gray-300 dark:text-gray-600 sm:mt-1 sm:text-lg">—</p>
       </div>
-      <div class="rounded-lg border border-gray-200 bg-gray-50 p-2 text-center sm:p-3">
-        <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide sm:text-[10px]">
+      <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-2 text-center sm:p-3">
+        <p class="text-[9px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide sm:text-[10px]">
           {{ t('candidates.prescanning') }}
         </p>
         <p
@@ -139,10 +139,10 @@ const recommendation = computed(() => {
         >
           {{ props.prescanningScore }}/10
         </p>
-        <p v-else class="mt-0.5 text-base text-gray-300 sm:mt-1 sm:text-lg">—</p>
+        <p v-else class="mt-0.5 text-base text-gray-300 dark:text-gray-600 sm:mt-1 sm:text-lg">—</p>
       </div>
-      <div class="rounded-lg border border-gray-200 bg-gray-50 p-2 text-center sm:p-3">
-        <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide sm:text-[10px]">
+      <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-2 text-center sm:p-3">
+        <p class="text-[9px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide sm:text-[10px]">
           {{ t('candidates.interview') }}
         </p>
         <p
@@ -152,13 +152,13 @@ const recommendation = computed(() => {
         >
           {{ props.interviewScore }}/10
         </p>
-        <p v-else class="mt-0.5 text-base text-gray-300 sm:mt-1 sm:text-lg">—</p>
+        <p v-else class="mt-0.5 text-base text-gray-300 dark:text-gray-600 sm:mt-1 sm:text-lg">—</p>
       </div>
       <div
         class="rounded-lg border-2 p-2 text-center sm:p-3"
         :class="overallScore !== null ? 'border-blue-200 bg-blue-50' : 'border-gray-200 bg-gray-50'"
       >
-        <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide sm:text-[10px]">
+        <p class="text-[9px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide sm:text-[10px]">
           {{ t('candidates.overallScore') }}
         </p>
         <p
@@ -168,8 +168,8 @@ const recommendation = computed(() => {
         >
           {{ overallScore }}%
         </p>
-        <p v-else class="mt-0.5 text-base text-gray-300 sm:mt-1 sm:text-lg">—</p>
-        <p v-if="overallScore !== null" class="mt-0.5 hidden text-[10px] text-gray-400 sm:block">
+        <p v-else class="mt-0.5 text-base text-gray-300 dark:text-gray-600 sm:mt-1 sm:text-lg">—</p>
+        <p v-if="overallScore !== null" class="mt-0.5 hidden text-[10px] text-gray-400 dark:text-gray-500 sm:block">
           {{ t('candidates.overviewDetails.combinedScore') }}
         </p>
       </div>

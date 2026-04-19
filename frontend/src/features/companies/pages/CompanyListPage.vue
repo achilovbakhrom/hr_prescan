@@ -73,7 +73,7 @@ async function handleSetDefault(company: UserCompanyMembership): Promise<void> {
 
     <div
       v-else-if="companyStore.companies.length === 0"
-      class="rounded-xl border-2 border-dashed border-gray-200 px-6 py-16 text-center"
+      class="rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700 px-6 py-16 text-center"
     >
       <i class="pi pi-building mb-4 text-5xl text-gray-300"></i>
       <h3 class="text-lg font-semibold text-gray-700">{{ t('companies.empty') }}</h3>
@@ -90,7 +90,7 @@ async function handleSetDefault(company: UserCompanyMembership): Promise<void> {
       <div
         v-for="company in companyStore.companies"
         :key="company.id"
-        class="group relative cursor-pointer rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
+        class="group relative cursor-pointer rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 shadow-sm transition-shadow hover:shadow-md"
         @click="router.push({ name: ROUTE_NAMES.COMPANY_DETAIL, params: { id: company.id } })"
       >
         <div class="mb-3 flex items-start gap-3">
@@ -107,7 +107,7 @@ async function handleSetDefault(company: UserCompanyMembership): Promise<void> {
           <i class="pi pi-globe mr-1 text-xs"></i>{{ company.website }}
         </p>
 
-        <div class="mt-3 flex items-center justify-between border-t border-gray-100 pt-3">
+        <div class="mt-3 flex items-center justify-between border-t border-gray-100 dark:border-gray-800 pt-3">
           <Tag
             v-if="company.isDefault"
             :value="t('companies.default')"

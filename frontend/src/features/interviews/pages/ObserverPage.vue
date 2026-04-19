@@ -50,7 +50,7 @@ async function handleLeave(): Promise<void> {
 <template>
   <div class="space-y-4">
     <div class="flex items-center gap-3">
-      <button class="text-gray-500 hover:text-gray-700" @click="router.back()">
+      <button class="text-gray-500 dark:text-gray-400 hover:text-gray-700" @click="router.back()">
         <i class="pi pi-arrow-left text-lg"></i>
       </button>
       <h1 class="text-2xl font-bold">{{ t('interviews.observerPage.title') }}</h1>
@@ -71,7 +71,7 @@ async function handleLeave(): Promise<void> {
       <!-- Interview not in progress -->
       <div
         v-if="interview.status !== 'in_progress' && !isJoined"
-        class="rounded-lg border border-yellow-200 bg-yellow-50 p-6 text-center"
+        class="rounded-lg border border-yellow-200 bg-yellow-50 dark:bg-yellow-950 p-6 text-center"
       >
         <i class="pi pi-info-circle mb-3 text-3xl text-yellow-500"></i>
         <p class="text-gray-700">
@@ -83,10 +83,10 @@ async function handleLeave(): Promise<void> {
 
       <!-- Observer View -->
       <template v-if="isJoined">
-        <div class="flex items-center justify-between rounded-lg bg-white p-4 shadow-sm">
+        <div class="flex items-center justify-between rounded-lg bg-white dark:bg-gray-800 p-4 shadow-sm">
           <div class="flex items-center gap-4">
             <ConnectionStatus :state="connectionState" />
-            <span class="rounded bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700">
+            <span class="rounded bg-blue-100 dark:bg-blue-950 px-2 py-1 text-xs font-medium text-blue-700">
               {{ t('interviews.observerPage.observerMode') }}
             </span>
           </div>

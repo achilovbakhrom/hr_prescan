@@ -156,7 +156,7 @@ async function copyLink(): Promise<void> {
         <p class="mb-7 text-sm text-gray-500">{{ t('candidates.application.prescanCompleteHint') }}</p>
         <RouterLink
           to="/jobs"
-          class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+          class="inline-flex items-center gap-2 rounded-xl bg-blue-600 dark:bg-blue-700 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700"
         >
           <i class="pi pi-briefcase"></i>
           {{ t('candidates.application.browseVacancies') }}
@@ -166,16 +166,16 @@ async function copyLink(): Promise<void> {
       <template v-else>
         <RouterLink
           :to="`/jobs/${vacancyId}`"
-          class="mb-4 inline-flex items-center text-sm text-gray-500 hover:text-gray-700"
+          class="mb-4 inline-flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700"
         >
           <i class="pi pi-arrow-left mr-1"></i> {{ t('candidates.application.backToJob') }}
         </RouterLink>
 
         <h1 class="mb-1 text-xl font-bold sm:text-2xl">{{ t('candidates.application.title') }}</h1>
-        <p v-if="vacancy" class="mb-1 text-sm text-gray-600 sm:text-base">{{ vacancy.title }}</p>
+        <p v-if="vacancy" class="mb-1 text-sm text-gray-600 dark:text-gray-400 sm:text-base">{{ vacancy.title }}</p>
         <p
           v-if="vacancy && (vacancy.company?.name || vacancy.companyName)"
-          class="mb-4 text-xs text-gray-500 sm:mb-6 sm:text-sm"
+          class="mb-4 text-xs text-gray-500 dark:text-gray-400 sm:mb-6 sm:text-sm"
         >
           <i class="pi pi-building mr-1"></i>{{ vacancy.company?.name || vacancy.companyName }}
         </p>
@@ -184,7 +184,7 @@ async function copyLink(): Promise<void> {
         <!-- Logged-in banner -->
         <div
           v-if="isLoggedIn"
-          class="mb-4 flex items-center gap-2 rounded-lg bg-blue-50 px-4 py-3 text-sm text-blue-700"
+          class="mb-4 flex items-center gap-2 rounded-lg bg-blue-50 dark:bg-blue-950 px-4 py-3 text-sm text-blue-700"
         >
           <i class="pi pi-user"></i>
           {{ t('candidates.application.loggedInAs', { name: fullName }) }}
@@ -198,7 +198,7 @@ async function copyLink(): Promise<void> {
           <!-- Name & Email: editable if guest, read-only if logged in -->
           <template v-if="isLoggedIn">
             <div
-              class="grid grid-cols-1 gap-4 rounded-lg border border-gray-100 bg-gray-50 p-4 sm:grid-cols-2"
+              class="grid grid-cols-1 gap-4 rounded-lg border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 p-4 sm:grid-cols-2"
             >
               <div>
                 <label class="block text-xs font-medium text-gray-500">{{

@@ -80,14 +80,14 @@ onBeforeUnmount(() => {
   <div class="space-y-1.5">
     <div
       v-if="loadError"
-      class="flex items-center gap-2 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-500"
+      class="flex items-center gap-2 rounded-lg bg-red-50 dark:bg-red-950 px-3 py-2 text-xs text-red-500"
     >
       <i class="pi pi-exclamation-circle"></i> {{ t('interviews.chat.audioUnavailable') }}
     </div>
-    <div v-else class="flex items-center gap-2 rounded-lg bg-gray-100 px-3 py-2">
+    <div v-else class="flex items-center gap-2 rounded-lg bg-gray-100 dark:bg-gray-800 px-3 py-2">
       <button
         type="button"
-        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-blue-500 shadow-sm transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
+        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white dark:bg-gray-800 text-blue-500 dark:text-blue-400 shadow-sm transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
         :disabled="!audioUrl"
         @click="togglePlay"
       >
@@ -107,7 +107,7 @@ onBeforeUnmount(() => {
       </span>
     </div>
     <button
-      class="flex items-center gap-1 text-xs text-blue-500 transition-colors hover:text-blue-700"
+      class="flex items-center gap-1 text-xs text-blue-500 dark:text-blue-400 transition-colors hover:text-blue-700"
       @click="showTranscript = !showTranscript"
     >
       <i

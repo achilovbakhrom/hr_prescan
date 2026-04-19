@@ -51,7 +51,7 @@ onMounted(async () => {
     <div class="mx-auto max-w-3xl px-4 py-6 sm:py-8">
       <!-- Back button -->
       <button
-        class="mb-4 flex items-center gap-1.5 text-sm text-gray-500 transition-colors hover:text-gray-900"
+        class="mb-4 flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 transition-colors hover:text-gray-900"
         @click="router.push({ name: ROUTE_NAMES.JOB_BOARD })"
       >
         <i class="pi pi-arrow-left text-xs"></i>
@@ -70,12 +70,12 @@ onMounted(async () => {
           <h1 class="text-2xl font-bold sm:text-3xl">{{ vacancy.title }}</h1>
           <p
             v-if="vacancy.company?.name || vacancy.companyName"
-            class="mt-1 text-sm text-gray-500 sm:text-base"
+            class="mt-1 text-sm text-gray-500 dark:text-gray-400 sm:text-base"
           >
             <i class="pi pi-building mr-1"></i>{{ vacancy.company?.name || vacancy.companyName }}
           </p>
           <div
-            class="mt-2 flex flex-wrap items-center gap-2 text-xs text-gray-500 sm:gap-3 sm:text-sm"
+            class="mt-2 flex flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-gray-400 sm:gap-3 sm:text-sm"
           >
             <span v-if="vacancy.location"
               ><i class="pi pi-map-marker mr-1"></i>{{ vacancy.location }}</span
@@ -98,7 +98,7 @@ onMounted(async () => {
               {{ formatDate(vacancy.createdAt) }}</span
             >
           </div>
-          <p class="mt-1 text-xs text-gray-400 sm:hidden">
+          <p class="mt-1 text-xs text-gray-400 dark:text-gray-500 sm:hidden">
             <i class="pi pi-calendar mr-1"></i>{{ t('jobBoard.postedOn') }}
             {{ formatDate(vacancy.createdAt) }}
           </p>
@@ -106,7 +106,7 @@ onMounted(async () => {
 
         <p
           v-if="formatSalaryRange(vacancy, t) !== t('vacancies.overview.salaryNotSpecified')"
-          class="mb-5 text-lg font-semibold text-green-700 sm:mb-6 sm:text-xl"
+          class="mb-5 text-lg font-semibold text-green-700 dark:text-green-300 sm:mb-6 sm:text-xl"
         >
           {{ formatSalaryRange(vacancy, t) }}
         </p>
@@ -132,12 +132,12 @@ onMounted(async () => {
 
         <div
           v-if="vacancy.company"
-          class="mb-5 rounded-xl border border-gray-200 bg-gray-50 p-4 sm:mb-6 sm:p-5"
+          class="mb-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-4 sm:mb-6 sm:p-5"
         >
           <div class="flex items-center gap-3 sm:gap-4">
             <div
               v-if="vacancy.company.logo"
-              class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white sm:h-14 sm:w-14"
+              class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white dark:bg-gray-800 sm:h-14 sm:w-14"
             >
               <img
                 :src="vacancy.company.logo"
@@ -147,15 +147,15 @@ onMounted(async () => {
             </div>
             <div
               v-else
-              class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 sm:h-14 sm:w-14"
+              class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 sm:h-14 sm:w-14"
             >
               <i class="pi pi-building text-lg sm:text-2xl"></i>
             </div>
             <div class="min-w-0">
-              <h3 class="text-base font-semibold text-gray-900 sm:text-lg">
+              <h3 class="text-base font-semibold text-gray-900 dark:text-white sm:text-lg">
                 {{ vacancy.company.name }}
               </h3>
-              <p v-if="vacancy.company.customIndustry" class="text-xs text-gray-500 sm:text-sm">
+              <p v-if="vacancy.company.customIndustry" class="text-xs text-gray-500 dark:text-gray-400 sm:text-sm">
                 {{ vacancy.company.customIndustry }}
               </p>
               <a
@@ -163,7 +163,7 @@ onMounted(async () => {
                 :href="vacancy.company.website"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-xs text-blue-600 hover:underline sm:text-sm"
+                class="text-xs text-blue-600 dark:text-blue-400 hover:underline sm:text-sm"
               >
                 {{ vacancy.company.website }}
               </a>
@@ -171,7 +171,7 @@ onMounted(async () => {
           </div>
           <p
             v-if="vacancy.company.description"
-            class="mt-3 whitespace-pre-line text-xs text-gray-600 sm:text-sm"
+            class="mt-3 whitespace-pre-line text-xs text-gray-600 dark:text-gray-400 sm:text-sm"
           >
             {{ vacancy.company.description }}
           </p>
@@ -235,7 +235,7 @@ onMounted(async () => {
             </template>
           </TranslatableText>
         </div>
-        <div v-if="vacancy.deadline" class="text-xs text-gray-500 sm:text-sm">
+        <div v-if="vacancy.deadline" class="text-xs text-gray-500 dark:text-gray-400 sm:text-sm">
           <i class="pi pi-clock mr-1"></i>{{ t('vacancies.form.deadline') }}:
           {{ formatDate(vacancy.deadline) }}
         </div>

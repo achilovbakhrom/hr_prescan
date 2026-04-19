@@ -34,8 +34,8 @@ async function handleRoleSelect(role: 'candidate' | 'hr'): Promise<void> {
 
 <template>
   <div class="flex flex-1 items-center justify-center py-12">
-    <div class="w-full max-w-lg rounded-lg bg-white p-6 shadow-md sm:p-8">
-      <h1 class="mb-8 text-center text-xl font-bold text-gray-900 sm:text-2xl">
+    <div class="w-full max-w-lg rounded-lg bg-white dark:bg-gray-800 p-6 shadow-md sm:p-8">
+      <h1 class="mb-8 text-center text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">
         {{ t('auth.chooseRole.title') }}
       </h1>
 
@@ -43,17 +43,17 @@ async function handleRoleSelect(role: 'candidate' | 'hr'): Promise<void> {
 
       <div class="flex flex-col gap-4">
         <button
-          class="flex w-full cursor-pointer items-center gap-4 rounded-lg border-2 border-gray-200 p-4 text-left transition-colors hover:border-blue-500 hover:bg-blue-50 sm:p-6"
+          class="flex w-full cursor-pointer items-center gap-4 rounded-lg border-2 border-gray-200 dark:border-gray-700 p-4 text-left transition-colors hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900 sm:p-6"
           :disabled="loading"
           @click="handleRoleSelect('candidate')"
         >
           <div
-            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-green-100 sm:h-14 sm:w-14"
+            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-green-100 dark:bg-green-950 sm:h-14 sm:w-14"
           >
-            <i class="pi pi-user text-xl text-green-600 sm:text-2xl" />
+            <i class="pi pi-user text-xl text-green-600 dark:text-green-400 sm:text-2xl" />
           </div>
           <div>
-            <p class="text-base font-semibold text-gray-900 sm:text-lg">
+            <p class="text-base font-semibold text-gray-900 dark:text-white sm:text-lg">
               {{ t('auth.chooseRole.candidate') }}
             </p>
             <p class="mt-1 text-sm text-gray-500">
@@ -63,17 +63,17 @@ async function handleRoleSelect(role: 'candidate' | 'hr'): Promise<void> {
         </button>
 
         <button
-          class="flex w-full cursor-pointer items-center gap-4 rounded-lg border-2 border-gray-200 p-4 text-left transition-colors hover:border-blue-500 hover:bg-blue-50 sm:p-6"
+          class="flex w-full cursor-pointer items-center gap-4 rounded-lg border-2 border-gray-200 dark:border-gray-700 p-4 text-left transition-colors hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900 sm:p-6"
           :disabled="loading"
           @click="handleRoleSelect('hr')"
         >
           <div
-            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-100 sm:h-14 sm:w-14"
+            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-950 sm:h-14 sm:w-14"
           >
-            <i class="pi pi-building text-xl text-blue-600 sm:text-2xl" />
+            <i class="pi pi-building text-xl text-blue-600 dark:text-blue-400 sm:text-2xl" />
           </div>
           <div>
-            <p class="text-base font-semibold text-gray-900 sm:text-lg">
+            <p class="text-base font-semibold text-gray-900 dark:text-white sm:text-lg">
               {{ t('auth.chooseRole.company') }}
             </p>
             <p class="mt-1 text-sm text-gray-500">{{ t('auth.chooseRole.companyDescription') }}</p>

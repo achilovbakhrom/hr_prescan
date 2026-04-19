@@ -21,7 +21,7 @@ function formatDisplayDate(dateStr: string | null): string {
 </script>
 
 <template>
-  <div class="rounded-lg border border-gray-200 p-4">
+  <div class="rounded-lg border border-gray-200 dark:border-gray-700 p-4">
     <div class="flex items-start justify-between">
       <div class="min-w-0 flex-1">
         <h3 class="font-semibold text-gray-900">{{ certification.name }}</h3>
@@ -41,7 +41,7 @@ function formatDisplayDate(dateStr: string | null): string {
           :href="certification.credentialUrl"
           target="_blank"
           rel="noopener noreferrer"
-          class="mt-1 inline-flex items-center gap-1 text-xs text-blue-600 hover:underline"
+          class="mt-1 inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:underline"
         >
           <i class="pi pi-external-link text-xs"></i
           >{{ t('cvBuilder.certifications.viewCredential') }}

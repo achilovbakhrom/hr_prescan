@@ -119,7 +119,7 @@ function formatTimestamp(seconds: number | null): string {
         <p class="mt-1 line-clamp-1 text-sm text-gray-600">{{ flag.description }}</p>
       </div>
       <span
-        class="mt-1 shrink-0 text-gray-400 transition-transform"
+        class="mt-1 shrink-0 text-gray-400 dark:text-gray-500 transition-transform"
         :class="expanded ? 'rotate-180' : ''"
         >&#x25BE;</span
       >

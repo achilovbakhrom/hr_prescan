@@ -36,7 +36,7 @@ onMounted(async () => {
 
 <template>
   <div class="flex flex-1 items-center justify-center py-12">
-    <div class="w-full max-w-md rounded-lg bg-white p-8 text-center shadow-md">
+    <div class="w-full max-w-md rounded-lg bg-white dark:bg-gray-800 p-8 text-center shadow-md">
       <div v-if="loading" class="flex flex-col items-center gap-4">
         <i class="pi pi-spin pi-spinner text-4xl text-blue-600"></i>
         <p class="text-gray-600">{{ t('auth.verifyEmail.verifying') }}</p>

@@ -128,9 +128,9 @@ const scoreBreakdownLabel = computed(() => {
     <!-- Score Comparison -->
     <div class="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-4">
       <!-- CV Match -->
-      <div class="rounded-xl border border-gray-200 bg-white p-3 text-center sm:p-5">
+      <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 text-center sm:p-5">
         <p
-          class="mb-1 text-[9px] font-semibold text-gray-500 uppercase tracking-wide sm:mb-2 sm:text-xs"
+          class="mb-1 text-[9px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide sm:mb-2 sm:text-xs"
         >
           {{ t('candidates.matchScore') }}
         </p>
@@ -138,17 +138,17 @@ const scoreBreakdownLabel = computed(() => {
           <p class="text-xl font-bold sm:text-3xl" :class="scoreTextColor(cvScore)">
             {{ cvScore }}%
           </p>
-          <p class="mt-1 hidden text-xs text-gray-400 sm:block">
+          <p class="mt-1 hidden text-xs text-gray-400 dark:text-gray-500 sm:block">
             {{ t('candidates.matchScoreView.basedOnResume') }}
           </p>
         </div>
-        <p v-else class="text-xl text-gray-300 sm:text-2xl">—</p>
+        <p v-else class="text-xl text-gray-300 dark:text-gray-600 sm:text-2xl">—</p>
       </div>
 
       <!-- Prescanning Score -->
-      <div class="rounded-xl border border-gray-200 bg-white p-3 text-center sm:p-5">
+      <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 text-center sm:p-5">
         <p
-          class="mb-1 text-[9px] font-semibold text-gray-500 uppercase tracking-wide sm:mb-2 sm:text-xs"
+          class="mb-1 text-[9px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide sm:mb-2 sm:text-xs"
         >
           {{ t('candidates.prescanning') }}
         </p>
@@ -156,17 +156,17 @@ const scoreBreakdownLabel = computed(() => {
           <p class="text-xl font-bold sm:text-3xl" :class="scoreTextColor(prescanningScoreNorm!)">
             {{ props.prescanningScore }}/10
           </p>
-          <p class="mt-1 hidden text-xs text-gray-400 sm:block">
+          <p class="mt-1 hidden text-xs text-gray-400 dark:text-gray-500 sm:block">
             {{ t('candidates.matchScoreView.aiPrescanResult') }}
           </p>
         </div>
-        <p v-else class="text-xl text-gray-300 sm:text-2xl">—</p>
+        <p v-else class="text-xl text-gray-300 dark:text-gray-600 sm:text-2xl">—</p>
       </div>
 
       <!-- Interview Score -->
-      <div class="rounded-xl border border-gray-200 bg-white p-3 text-center sm:p-5">
+      <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 text-center sm:p-5">
         <p
-          class="mb-1 text-[9px] font-semibold text-gray-500 uppercase tracking-wide sm:mb-2 sm:text-xs"
+          class="mb-1 text-[9px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide sm:mb-2 sm:text-xs"
         >
           {{ t('candidates.interview') }}
         </p>
@@ -174,20 +174,20 @@ const scoreBreakdownLabel = computed(() => {
           <p class="text-xl font-bold sm:text-3xl" :class="scoreTextColor(interviewScoreNorm!)">
             {{ props.interviewScore }}/10
           </p>
-          <p class="mt-1 hidden text-xs text-gray-400 sm:block">
+          <p class="mt-1 hidden text-xs text-gray-400 dark:text-gray-500 sm:block">
             {{ t('candidates.matchScoreView.aiInterviewResult') }}
           </p>
         </div>
-        <p v-else class="text-xl text-gray-300 sm:text-2xl">—</p>
+        <p v-else class="text-xl text-gray-300 dark:text-gray-600 sm:text-2xl">—</p>
       </div>
 
       <!-- Combined -->
       <div
-        class="rounded-xl border-2 bg-white p-3 text-center sm:p-5"
+        class="rounded-xl border-2 bg-white dark:bg-gray-800 p-3 text-center sm:p-5"
         :class="combinedScore !== null ? 'border-blue-200' : 'border-gray-200'"
       >
         <p
-          class="mb-1 text-[9px] font-semibold text-gray-500 uppercase tracking-wide sm:mb-2 sm:text-xs"
+          class="mb-1 text-[9px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide sm:mb-2 sm:text-xs"
         >
           {{ t('candidates.overallScore') }}
         </p>
@@ -195,16 +195,16 @@ const scoreBreakdownLabel = computed(() => {
           <p class="text-xl font-bold sm:text-3xl" :class="scoreTextColor(combinedScore)">
             {{ combinedScore }}%
           </p>
-          <p class="mt-1 hidden text-xs text-gray-400 sm:block">
+          <p class="mt-1 hidden text-xs text-gray-400 dark:text-gray-500 sm:block">
             {{ t('candidates.overviewDetails.combinedScore') }}
           </p>
         </div>
-        <p v-else class="text-xl text-gray-300 sm:text-2xl">—</p>
+        <p v-else class="text-xl text-gray-300 dark:text-gray-600 sm:text-2xl">—</p>
       </div>
     </div>
 
     <!-- Score Bar -->
-    <div v-if="combinedScore !== null" class="rounded-lg border border-gray-200 bg-white p-4">
+    <div v-if="combinedScore !== null" class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
       <div class="mb-2 flex items-center justify-between">
         <span class="text-sm font-medium text-gray-700">{{
           t('candidates.matchScoreView.combinedAssessment')
@@ -232,8 +232,8 @@ const scoreBreakdownLabel = computed(() => {
     </div>
 
     <!-- AI Match Notes -->
-    <div v-if="props.matchDetails?.notes" class="rounded-lg border border-gray-200 bg-white p-4">
-      <p class="mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+    <div v-if="props.matchDetails?.notes" class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+      <p class="mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
         {{ t('candidates.matchScoreView.aiNotes') }}
       </p>
       <TranslatableText
@@ -245,10 +245,10 @@ const scoreBreakdownLabel = computed(() => {
         field="match_notes"
       >
         <template #default="{ text }">
-          <p class="text-sm text-gray-700 leading-relaxed">{{ text }}</p>
+          <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{{ text }}</p>
         </template>
       </TranslatableText>
-      <p v-else class="text-sm text-gray-700 leading-relaxed">{{ props.matchDetails.notes }}</p>
+      <p v-else class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{{ props.matchDetails.notes }}</p>
     </div>
   </div>
 </template>

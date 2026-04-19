@@ -69,7 +69,7 @@ function toggleRowMenu(event: Event, id: string) {
           @click="viewDetail(data as Application)"
         >
           <div
-            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-50 text-xs font-semibold text-blue-700"
+            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-950 text-xs font-semibold text-blue-700"
           >
             {{
               (data as Application).candidateName
@@ -118,7 +118,7 @@ function toggleRowMenu(event: Event, id: string) {
       <template #body="{ data }">
         <span
           v-if="(data as Application).matchScore !== null"
-          class="rounded px-1.5 py-0.5 text-xs font-medium bg-blue-50 text-blue-700"
+          class="rounded px-1.5 py-0.5 text-xs font-medium bg-blue-50 dark:bg-blue-950 text-blue-700"
           >{{ (data as Application).matchScore }}%</span
         >
         <span v-else class="text-xs text-gray-400">---</span>
@@ -176,7 +176,7 @@ function toggleRowMenu(event: Event, id: string) {
               (data as Application).status !== 'archived'
             "
             v-tooltip.top="t('candidates.actions.shortlist')"
-            class="rounded p-1.5 text-gray-400 hover:bg-emerald-50 hover:text-emerald-600"
+            class="rounded p-1.5 text-gray-400 dark:text-gray-500 hover:bg-emerald-50 hover:text-emerald-600"
             @click="confirmRowStatus(data as Application, 'shortlisted')"
           >
             <i class="pi pi-star text-sm"></i>
@@ -188,13 +188,13 @@ function toggleRowMenu(event: Event, id: string) {
               (data as Application).status !== 'archived'
             "
             v-tooltip.top="t('candidates.actions.reject')"
-            class="rounded p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600"
+            class="rounded p-1.5 text-gray-400 dark:text-gray-500 hover:bg-red-50 hover:text-red-600"
             @click="confirmRowStatus(data as Application, 'rejected')"
           >
             <i class="pi pi-times text-sm"></i>
           </button>
           <button
-            class="rounded p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+            class="rounded p-1.5 text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-600"
             @click="toggleRowMenu($event, (data as Application).id)"
           >
             <i class="pi pi-ellipsis-v text-sm"></i>

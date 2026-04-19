@@ -43,7 +43,7 @@ onMounted(async () => {
       <!-- Current Plan -->
       <div
         v-if="subscriptionStore.currentSubscription"
-        class="rounded-lg border border-gray-200 bg-white p-6"
+        class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6"
       >
         <div class="flex items-start justify-between">
           <div>
@@ -118,7 +118,7 @@ onMounted(async () => {
       </div>
 
       <!-- Usage -->
-      <div v-if="subscriptionStore.usage" class="rounded-lg border border-gray-200 bg-white p-6">
+      <div v-if="subscriptionStore.usage" class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
         <h2 class="mb-4 text-lg font-semibold">{{ t('subscriptions.usage') }}</h2>
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <UsageMeter
@@ -146,7 +146,7 @@ onMounted(async () => {
       </div>
 
       <!-- Upgrade -->
-      <div class="rounded-lg border border-gray-200 bg-white p-6">
+      <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
         <h2 class="mb-4 text-lg font-semibold">{{ t('subscriptions.availablePlans') }}</h2>
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
           <PlanCard
@@ -161,7 +161,7 @@ onMounted(async () => {
       </div>
 
       <!-- Billing History Placeholder -->
-      <div class="rounded-lg border border-gray-200 bg-white p-6">
+      <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
         <h2 class="mb-4 text-lg font-semibold">{{ t('subscriptions.billingHistory') }}</h2>
         <p class="text-sm text-gray-500">
           {{ t('subscriptions.billingHistoryComingSoon') }}

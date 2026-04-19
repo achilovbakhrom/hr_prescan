@@ -23,7 +23,7 @@ function toggleExpand(id: string): void {
 <template>
   <div class="space-y-4">
     <div
-      class="flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-5 py-4"
+      class="flex items-center justify-between rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 px-5 py-4"
     >
       <div>
         <p class="text-sm font-medium text-gray-500">

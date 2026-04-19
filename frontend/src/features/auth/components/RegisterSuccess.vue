@@ -15,7 +15,7 @@ defineProps<{
     </p>
     <RouterLink
       :to="{ name: ROUTE_NAMES.LOGIN }"
-      class="font-medium text-blue-600 hover:text-blue-500"
+      class="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500"
       >Back to Login</RouterLink
     >
   </div>

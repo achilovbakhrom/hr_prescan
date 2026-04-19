@@ -123,7 +123,7 @@ function formatSalary(): string {
       </div>
     </div>
 
-    <div v-if="vacancy.company" class="rounded-lg border border-gray-200 bg-gray-50 p-4">
+    <div v-if="vacancy.company" class="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-4">
       <p class="mb-2 text-sm text-gray-500">{{ t('vacancies.form.companyInfo') }}</p>
       <div class="flex items-center gap-3">
         <div
@@ -138,7 +138,7 @@ function formatSalary(): string {
         </div>
         <div
           v-else
-          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600"
+          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-950 text-blue-600"
         >
           <i class="pi pi-building text-lg"></i>
         </div>
@@ -152,7 +152,7 @@ function formatSalary(): string {
             :href="vacancy.company.website"
             target="_blank"
             rel="noopener noreferrer"
-            class="text-sm text-blue-600 hover:underline"
+            class="text-sm text-blue-600 dark:text-blue-400 hover:underline"
           >
             {{ vacancy.company.website }}
           </a>

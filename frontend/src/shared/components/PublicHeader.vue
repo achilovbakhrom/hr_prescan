@@ -84,14 +84,14 @@ function initials(): string {
             @click="toggleUserMenu"
           >
             <div
-              class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-medium text-blue-700"
+              class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-950 text-sm font-medium text-blue-700"
             >
               {{ initials() }}
             </div>
-            <span class="hidden text-sm font-medium text-gray-700 sm:inline">
+            <span class="hidden text-sm font-medium text-gray-700 dark:text-gray-300 sm:inline">
               {{ authStore.user?.firstName }}
             </span>
-            <i class="pi pi-chevron-down hidden text-xs text-gray-400 sm:inline"></i>
+            <i class="pi pi-chevron-down hidden text-xs text-gray-400 dark:text-gray-500 sm:inline"></i>
           </button>
           <Menu ref="userMenu" :model="menuItems" :popup="true" />
         </template>
@@ -100,7 +100,7 @@ function initials(): string {
         <template v-else>
           <RouterLink
             :to="{ name: ROUTE_NAMES.LOGIN }"
-            class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            class="rounded-lg bg-blue-600 dark:bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
           >
             {{ t('nav.signIn') }}
           </RouterLink>
