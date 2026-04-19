@@ -2,6 +2,34 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
 
+/* Class-based dark mode (so we can toggle manually, not just via OS pref). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Global base — ensures background/text follow the theme everywhere even on
+   pages that don't yet have explicit `dark:` utilities. */
+html.dark body {
+  background-color: #0b0f17;
+  color: #e5e7eb;
+}
+
+/* Smooth theme transitions */
+html,
+body,
+.p-panel,
+.p-card {
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease;
+}
+
+/* Respect OS-level motion preference — kill background animations. */
+@media (prefers-reduced-motion: reduce) {
+  .bg-animal {
+    animation: none !important;
+  }
+}
+
 /* ============================================
    Global modern tab styling (PrimeVue TabView)
    ============================================ */

@@ -8,6 +8,8 @@ import type { MenuItem } from 'primevue/menuitem'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import LanguageSwitcher from '@/shared/components/LanguageSwitcher.vue'
+import ThemeToggle from '@/shared/components/ThemeToggle.vue'
+import BackgroundModeSwitcher from '@/shared/components/BackgroundModeSwitcher.vue'
 import AppLogo from '@/shared/components/AppLogo.vue'
 
 const router = useRouter()
@@ -85,6 +87,8 @@ const navLinks = [
 
       <!-- Right side -->
       <div class="flex items-center gap-2">
+        <BackgroundModeSwitcher />
+        <ThemeToggle />
         <LanguageSwitcher />
         <template v-if="authStore.isAuthenticated">
           <Button

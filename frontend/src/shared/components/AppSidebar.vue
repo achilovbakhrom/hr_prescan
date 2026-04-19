@@ -145,7 +145,7 @@ function isActive(path: string): boolean {
 
 <template>
   <aside
-    class="flex h-full shrink-0 flex-col border-r border-gray-100 bg-white transition-all duration-200"
+    class="flex h-full shrink-0 flex-col border-r border-gray-100 bg-white transition-all duration-200 dark:border-gray-800 dark:bg-gray-950"
     :class="collapsed ? 'w-16' : 'w-60'"
     role="navigation"
     aria-label="Main navigation"

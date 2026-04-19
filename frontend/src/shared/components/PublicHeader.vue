@@ -7,6 +7,8 @@ import { ref, computed } from 'vue'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import LanguageSwitcher from '@/shared/components/LanguageSwitcher.vue'
+import ThemeToggle from '@/shared/components/ThemeToggle.vue'
+import BackgroundModeSwitcher from '@/shared/components/BackgroundModeSwitcher.vue'
 import AppLogo from '@/shared/components/AppLogo.vue'
 import type { MenuItem } from 'primevue/menuitem'
 
@@ -49,7 +51,9 @@ function initials(): string {
 </script>
 
 <template>
-  <header class="sticky top-0 z-50 border-b border-gray-100 bg-white/95 backdrop-blur-md">
+  <header
+    class="sticky top-0 z-50 border-b border-gray-100 bg-white/95 backdrop-blur-md dark:border-gray-800 dark:bg-gray-950/95"
+  >
     <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
       <RouterLink to="/" class="flex items-center gap-2.5">
         <AppLogo size="sm" />
@@ -59,6 +63,8 @@ function initials(): string {
       <slot name="center" />
 
       <div class="flex items-center gap-3">
+        <BackgroundModeSwitcher />
+        <ThemeToggle />
         <LanguageSwitcher />
 
         <!-- Authenticated: show user menu -->
