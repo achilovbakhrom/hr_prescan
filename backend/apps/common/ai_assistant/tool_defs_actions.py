@@ -46,8 +46,8 @@ FRONTEND_ACTION_TOOL_DEFINITIONS = [
             "description": (
                 "Navigate the user to a specific page in the app. Use after creating/updating resources "
                 "or when user asks to go somewhere. Available pages: dashboard, vacancies, vacancy-detail "
-                "(needs vacancy_id), employers, employer-create, candidates, interviews, settings, profile, "
-                "company-profile, team, pricing, subscription, notifications, jobs (public job board)"
+                "(needs vacancy_id), companies, company-create, candidates, interviews, settings, profile, "
+                "team, pricing, subscription, notifications, jobs (public job board)"
             ),
             "parameters": {
                 "type": "object",
@@ -55,9 +55,9 @@ FRONTEND_ACTION_TOOL_DEFINITIONS = [
                     "page": {
                         "type": "string",
                         "description": (
-                            "Page name: dashboard, vacancies, vacancy-detail, employers, employer-create, "
-                            "candidates, interviews, settings, profile, company-profile, team, pricing, "
-                            "subscription, notifications, jobs"
+                            "Page name: dashboard, vacancies, vacancy-detail, companies, company-create, "
+                            "candidates, interviews, settings, profile, team, pricing, subscription, "
+                            "notifications, jobs"
                         ),
                     },
                     "params": {

@@ -2,14 +2,6 @@ from apps.vacancies.apis.criteria import (
     VacancyCriteriaDetailApi,
     VacancyCriteriaListCreateApi,
 )
-from apps.vacancies.apis.employer_crud import (
-    EmployerCompanyDetailApi,
-    EmployerCompanyListCreateApi,
-)
-from apps.vacancies.apis.employer_parse import (
-    ParseEmployerFileApi,
-    ParseEmployerUrlApi,
-)
 from apps.vacancies.apis.public import (
     PublicVacancyDetailApi,
     PublicVacancyListApi,
@@ -33,13 +25,9 @@ from apps.vacancies.apis.vacancy_detail import (
 )
 
 __all__ = [
-    "EmployerCompanyDetailApi",
-    "EmployerCompanyListCreateApi",
     "GenerateQuestionsApi",
     "ParseCompanyFileApi",
     "ParseCompanyUrlApi",
-    "ParseEmployerFileApi",
-    "ParseEmployerUrlApi",
     "PublicVacancyDetailApi",
     "PublicVacancyListApi",
     "VacancyCriteriaDetailApi",

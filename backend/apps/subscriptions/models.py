@@ -30,15 +30,15 @@ class SubscriptionPlan(BaseModel):
         return f"{self.name} ({self.tier})"
 
 
-class CompanySubscription(BaseModel):
-    """Active subscription linking a company to a plan."""
+class UserSubscription(BaseModel):
+    """Active subscription linking a user to a plan. Limits aggregate across the user's companies."""
 
     class BillingPeriod(models.TextChoices):
         MONTHLY = "monthly", "Monthly"
         YEARLY = "yearly", "Yearly"
 
-    company = models.OneToOneField(
-        "accounts.Company",
+    user = models.OneToOneField(
+        "accounts.User",
         on_delete=models.CASCADE,
         related_name="subscription",
     )
@@ -62,4 +62,4 @@ class CompanySubscription(BaseModel):
         ordering = ["-created_at"]
 
     def __str__(self) -> str:
-        return f"{self.company.name} — {self.plan.name} ({self.billing_period})"
+        return f"{self.user.email} — {self.plan.name} ({self.billing_period})"

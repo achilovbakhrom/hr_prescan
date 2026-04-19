@@ -49,12 +49,6 @@ TRANSLATABLE_FIELDS = {
         "public": False,
     },
     # Publicly visible content — translatable by any authenticated user
-    ("employer", "description"): {
-        "model": "vacancies.EmployerCompany",
-        "source_field": "description",
-        "translations_field": "description_translations",
-        "public": True,
-    },
     ("vacancy", "title"): {
         "model": "vacancies.Vacancy",
         "source_field": "title",

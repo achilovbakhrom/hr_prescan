@@ -32,7 +32,6 @@ export const ROUTE_NAMES = {
   CHAT_INTERVIEW: 'chat-interview',
   INTERVIEW_ROOM: 'interview-room',
   NOTIFICATIONS: 'notifications',
-  COMPANY_PROFILE: 'company-profile',
   TEAM_MANAGEMENT: 'team-management',
   PRICING: 'pricing',
   SUBSCRIPTION: 'subscription',
@@ -50,10 +49,10 @@ export const ROUTE_NAMES = {
   MY_CVS: 'my-cvs',
   PUBLIC_CV: 'public-cv',
 
-  // Employers
-  EMPLOYER_LIST: 'employer-list',
-  EMPLOYER_CREATE: 'employer-create',
-  EMPLOYER_DETAIL: 'employer-detail',
+  // Companies (user-owned companies a user is a member of)
+  COMPANY_LIST: 'company-list',
+  COMPANY_CREATE: 'company-create',
+  COMPANY_DETAIL: 'company-detail',
 
   // Legal
   PRIVACY_POLICY: 'privacy-policy',

@@ -28,9 +28,8 @@ function stripHtml(html: string): string {
   return div.textContent || div.innerText || ''
 }
 
-function getEmployerName(job: Vacancy): string {
-  const record = job as unknown as Record<string, unknown>
-  return (record.employerName as string) || (record.companyName as string) || ''
+function getCompanyName(job: Vacancy): string {
+  return job.companyName ?? ''
 }
 
 function formatRelativeDate(dateStr: string): string {
@@ -66,8 +65,8 @@ function formatRelativeDate(dateStr: string): string {
           <h2 class="text-base font-semibold text-gray-900 group-hover:text-blue-600">
             {{ job.title }}
           </h2>
-          <p v-if="getEmployerName(job)" class="mt-0.5 text-sm text-gray-500">
-            <i class="pi pi-building mr-1 text-xs"></i>{{ getEmployerName(job) }}
+          <p v-if="getCompanyName(job)" class="mt-0.5 text-sm text-gray-500">
+            <i class="pi pi-building mr-1 text-xs"></i>{{ getCompanyName(job) }}
           </p>
         </div>
         <span

@@ -3,7 +3,7 @@ from apps.subscriptions.services.plan import (
     check_and_expire_trials,
     create_default_plans,
     expire_trial,
-    subscribe_company,
+    subscribe_user,
 )
 from apps.subscriptions.services.usage import (
     check_hr_user_quota,
@@ -21,5 +21,5 @@ __all__ = [
     "create_default_plans",
     "expire_trial",
     "get_subscription_usage",
-    "subscribe_company",
+    "subscribe_user",
 ]

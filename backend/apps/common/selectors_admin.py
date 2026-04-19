@@ -7,7 +7,7 @@ from django.utils import timezone
 from apps.accounts.models import Company, User
 from apps.applications.models import Application
 from apps.interviews.models import Interview
-from apps.subscriptions.models import CompanySubscription
+from apps.subscriptions.models import UserSubscription
 from apps.vacancies.models import Vacancy
 
 
@@ -16,17 +16,21 @@ def get_all_companies(
     search: str | None = None,
     status: str | None = None,
 ) -> QuerySet[Company]:
-    """Return all companies with optional search and status filter."""
+    """Return all companies with optional search filter.
+
+    The ``status`` argument is accepted for API compatibility with the pre-refactor
+    admin endpoint (which filtered by Company.subscription_status). Subscription now
+    lives on User, so the filter is a no-op here; callers that need the old behavior
+    should query User-level subscription state instead.
+    """
+    del status
     qs = Company.objects.annotate(
         user_count=Count("users"),
         vacancy_count=Count("vacancies"),
     )
 
     if search:
-        qs = qs.filter(Q(name__icontains=search) | Q(industry__icontains=search))
-
-    if status:
-        qs = qs.filter(subscription_status=status)
+        qs = qs.filter(Q(name__icontains=search) | Q(custom_industry__icontains=search))
 
     return qs.order_by("-created_at")
 
@@ -59,48 +63,32 @@ def get_platform_analytics() -> dict:
     total_interviews = Interview.objects.count()
     total_applications = Application.objects.count()
 
-    active_subscriptions = CompanySubscription.objects.filter(is_active=True).count()
+    active_subscriptions = UserSubscription.objects.filter(is_active=True).count()
 
-    # Monthly revenue estimate (from active subscriptions)
     monthly_revenue = (
-        CompanySubscription.objects.filter(
+        UserSubscription.objects.filter(
             is_active=True,
-            billing_period=CompanySubscription.BillingPeriod.MONTHLY,
-        ).aggregate(
-            total=Sum("plan__price_monthly"),
-        )["total"]
+            billing_period=UserSubscription.BillingPeriod.MONTHLY,
+        ).aggregate(total=Sum("plan__price_monthly"))["total"]
         or 0
     )
 
     yearly_revenue_monthly = (
-        CompanySubscription.objects.filter(
+        UserSubscription.objects.filter(
             is_active=True,
-            billing_period=CompanySubscription.BillingPeriod.YEARLY,
-        ).aggregate(
-            total=Sum("plan__price_yearly"),
-        )["total"]
+            billing_period=UserSubscription.BillingPeriod.YEARLY,
+        ).aggregate(total=Sum("plan__price_yearly"))["total"]
         or 0
     )
 
-    # Convert yearly to monthly equivalent
     monthly_revenue = float(monthly_revenue) + float(yearly_revenue_monthly) / 12
 
-    # New this month
-    new_companies_this_month = Company.objects.filter(
-        created_at__gte=month_start,
-    ).count()
+    new_companies_this_month = Company.objects.filter(created_at__gte=month_start).count()
+    new_users_this_month = User.objects.filter(created_at__gte=month_start).count()
+    interviews_this_month = Interview.objects.filter(created_at__gte=month_start).count()
 
-    new_users_this_month = User.objects.filter(
-        created_at__gte=month_start,
-    ).count()
-
-    interviews_this_month = Interview.objects.filter(
-        created_at__gte=month_start,
-    ).count()
-
-    # Subscription tier breakdown
     tier_breakdown = (
-        CompanySubscription.objects.filter(is_active=True)
+        UserSubscription.objects.filter(is_active=True)
         .values("plan__tier", "plan__name")
         .annotate(count=Count("id"))
         .order_by("plan__tier")
@@ -143,32 +131,19 @@ def get_monthly_interview_volume(months: int = 6) -> list[dict]:
         .order_by("month")
     )
 
-    return [
-        {
-            "month": entry["month"].strftime("%Y-%m"),
-            "count": entry["count"],
-        }
-        for entry in data
-    ]
+    return [{"month": entry["month"].strftime("%Y-%m"), "count": entry["count"]} for entry in data]
 
 
 def get_subscription_distribution() -> list[dict]:
-    """Count companies by subscription tier."""
+    """Count users by subscription tier."""
     data = (
-        CompanySubscription.objects.filter(is_active=True)
+        UserSubscription.objects.filter(is_active=True)
         .values("plan__tier", "plan__name")
         .annotate(count=Count("id"))
         .order_by("plan__tier")
     )
 
-    return [
-        {
-            "tier": entry["plan__tier"],
-            "name": entry["plan__name"],
-            "count": entry["count"],
-        }
-        for entry in data
-    ]
+    return [{"tier": entry["plan__tier"], "name": entry["plan__name"], "count": entry["count"]} for entry in data]
 
 
 def get_monthly_registrations(months: int = 6) -> list[dict]:
@@ -191,10 +166,5 @@ def get_monthly_registrations(months: int = 6) -> list[dict]:
     )
 
     return [
-        {
-            "month": entry["month"].strftime("%Y-%m"),
-            "role": entry["role"],
-            "count": entry["count"],
-        }
-        for entry in data
+        {"month": entry["month"].strftime("%Y-%m"), "role": entry["role"], "count": entry["count"]} for entry in data
     ]

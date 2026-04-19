@@ -122,12 +122,6 @@ class CandidateApplicationListOutputSerializer(serializers.ModelSerializer):
         source="vacancy.company.name",
         read_only=True,
     )
-    employer_name = serializers.CharField(
-        source="vacancy.employer.name",
-        read_only=True,
-        default=None,
-        allow_null=True,
-    )
 
     class Meta:
         model = Application
@@ -135,7 +129,6 @@ class CandidateApplicationListOutputSerializer(serializers.ModelSerializer):
             "id",
             "vacancy_title",
             "company_name",
-            "employer_name",
             "status",
             "created_at",
         ]

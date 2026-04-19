@@ -51,16 +51,13 @@ The AI agent evaluates candidates at each step and decides whether to advance th
 
 ---
 
-## 3. Multi-Tenancy (Company Model)
+## 3. Multi-Company Model (per user)
 
-- Multiple companies can register and use the platform independently
-- Each company has its own:
-  - HR managers
-  - Vacancies
-  - Candidate pools
-  - Subscription plan
-- Data is isolated between companies
-- Companies sign up and choose a subscription plan
+- **Subscription and billing live on the User**, not on a company. One HR user pays once; their plan limits (vacancies, interviews, HR seats) aggregate across every company they manage.
+- A user can **own or be a member of multiple Companies**. Memberships are tracked in `CompanyMembership` and each member picks one company as their personal default (`is_default`) — used implicitly for new vacancies and pre-selected in forms.
+- **Registration creates the user's first Company** (with `is_default=True`) and their 14-day trial. Additional companies are added from the **Companies** page.
+- **Soft delete** marks `Company.is_deleted=True`: affects every member of that company, transfers each affected user's default to their next non-deleted membership, and historical vacancies keep the company name for display. The acting user cannot delete their last non-deleted company.
+- Data isolation is enforced per company on reads: vacancy/application/interview endpoints scope to companies the caller is a member of.
 
 ---
 
@@ -69,7 +66,8 @@ The AI agent evaluates candidates at each step and decides whether to advance th
 ### 4.1 Billing Model
 - Subscription-based (monthly/yearly, yearly = 2 months free)
 - Payment integration (Stripe or similar)
-- 14-day free trial on Pro plan for new companies (no credit card required)
+- **Subscription is per-User, not per-Company.** One HR user pays once; plan limits aggregate across every company they own or are a member of.
+- 14-day free trial on Pro plan for every new HR user (no credit card required)
 - Automatic downgrade to Free when trial expires without payment
 
 ### 4.2 Plans
@@ -119,6 +117,7 @@ The AI agent evaluates candidates at each step and decides whether to advance th
 
 ### 5.1 Creating a Vacancy
 HR provides the following information:
+- **Company** — required. Dropdown lists all companies the user is a member of; pre-selected to their default. The AI vacancy assistant uses the default implicitly if the user has one company, otherwise it asks.
 - **Title** — job position name
 - **Description** — detailed job description and responsibilities
 - **Required Skills** — key skills and qualifications needed
@@ -601,23 +600,20 @@ Archived → Applied (restore)
 3. Enters payment details (credit card via Stripe or similar)
 4. Subscription activated — company dashboard becomes accessible
 
-### 14.3 Company Profile Setup
+### 14.3 Managing Companies
 
-1. Upload company logo
-2. Write company description (shown on public job board)
-3. Add company website URL
-4. Configure default settings:
-   - Preferred language (EN/RU)
-   - Default interview mode (Chat or Meet) — applies to the interview step when enabled
-   - Default interview duration (Meet mode)
-   - Notification preferences
+1. The initial company from signup lands in **Settings → Companies** with `is_default=True`.
+2. HR can add more companies at any time from the Companies page. Each additional company starts as non-default.
+3. **Set as default** toggles which company is used implicitly (vacancy creation pre-selects it; AI assistant uses it when asked to "use default").
+4. **Delete** is a soft delete with a confirm dialog. Cannot delete the user's last non-deleted company. When a company is deleted, every affected user's default is transferred to their next non-deleted company by creation date. Historical vacancies keep the company name for display.
+5. Each company can still have its own logo, description, website, size, country, and custom industry.
 
 ### 14.4 Inviting HR Users
 
 1. Company admin goes to "Team" section
-2. Invites HR managers by email
+2. Invites HR managers by email (invitation scopes to the admin's currently active company)
 3. Invited HR receives an email with a sign-up link
-4. HR creates their account and is automatically linked to the company
+4. HR creates their account and is automatically added to the company as a member
 5. Company admin can manage HR permissions (activate/deactivate)
 
 ### 14.5 Creating First Vacancy

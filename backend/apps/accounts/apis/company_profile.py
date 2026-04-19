@@ -10,60 +10,17 @@ from apps.accounts.selectors import get_company_invitations
 from apps.accounts.serializers import (
     AcceptInvitationInputSerializer,
     CompanyOutputSerializer,
-    CompanyProfileInputSerializer,
     InvitationOutputSerializer,
     InviteHRInputSerializer,
     UserOutputSerializer,
 )
-from apps.accounts.services import (
-    accept_invitation,
-    invite_hr,
-    update_company_profile,
-)
+from apps.accounts.services import accept_invitation, invite_hr
 from apps.common.exceptions import ApplicationError
-from apps.common.messages import (
-    MSG_INVITATION_ACCEPTED,
-    MSG_INVITATION_SENT,
-    MSG_NOT_IN_COMPANY,
-)
-
-
-class CompanyProfileApi(APIView):
-    """
-    GET  /api/hr/company/profile/ — get company profile
-    PUT  /api/hr/company/profile/ — update company profile
-    """
-
-    permission_classes = [HasHRPermission]
-    hr_permission = HRPermissions.MANAGE_SETTINGS
-
-    def get(self, request: Request) -> Response:
-        company = request.user.company
-        if company is None:
-            return Response(
-                {"detail": str(MSG_NOT_IN_COMPANY)},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-        return Response(CompanyOutputSerializer(company).data, status=status.HTTP_200_OK)
-
-    def put(self, request: Request) -> Response:
-        company = request.user.company
-        if company is None:
-            return Response(
-                {"detail": str(MSG_NOT_IN_COMPANY)},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-        serializer = CompanyProfileInputSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        company = update_company_profile(company=company, data=serializer.validated_data)
-
-        return Response(CompanyOutputSerializer(company).data, status=status.HTTP_200_OK)
+from apps.common.messages import MSG_INVITATION_ACCEPTED, MSG_INVITATION_SENT
 
 
 class InviteHRApi(APIView):
-    """POST /api/hr/company/invite/ — invite an HR manager."""
+    """POST /api/hr/company/invite/ — invite an HR manager to the user's active company."""
 
     permission_classes = [HasHRPermission]
     hr_permission = HRPermissions.MANAGE_TEAM
@@ -91,7 +48,6 @@ class InviteHRApi(APIView):
         )
 
     def delete(self, request: Request) -> Response:
-        """DELETE /api/hr/company/invite/ — cancel a pending invitation."""
         invitation_id = request.data.get("invitation_id")
         if not invitation_id:
             return Response(
@@ -115,7 +71,6 @@ class InviteHRApi(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def get(self, request: Request) -> Response:
-        """List all invitations for the company."""
         invitations = get_company_invitations(company=request.user.company)
         return Response(
             InvitationOutputSerializer(invitations, many=True).data,
@@ -156,11 +111,15 @@ class MyCompaniesApi(APIView):
 
         class Meta:
             model = CompanyMembership
-            fields = ["company", "role", "hr_permissions", "created_at"]
+            fields = ["company", "role", "hr_permissions", "is_default", "created_at"]
             read_only_fields = fields
 
     def get(self, request: Request) -> Response:
-        memberships = CompanyMembership.objects.filter(user=request.user).select_related("company")
+        memberships = (
+            CompanyMembership.objects.filter(user=request.user, company__is_deleted=False)
+            .select_related("company")
+            .order_by("-is_default", "company__created_at")
+        )
         return Response(
             self.OutputSerializer(memberships, many=True).data,
             status=status.HTTP_200_OK,

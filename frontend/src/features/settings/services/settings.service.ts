@@ -1,23 +1,7 @@
 import { apiClient } from '@/shared/api/client'
-import type { Company } from '@/shared/types/auth.types'
-import type {
-  CompanyProfileUpdate,
-  Invitation,
-  TeamMember,
-  InviteHRRequest,
-} from '../types/settings.types'
+import type { Invitation, InviteHRRequest, TeamMember } from '../types/settings.types'
 
 export const settingsService = {
-  async getCompanyProfile(): Promise<Company> {
-    const response = await apiClient.get<Company>('/hr/company/profile')
-    return response.data
-  },
-
-  async updateCompanyProfile(data: CompanyProfileUpdate): Promise<Company> {
-    const response = await apiClient.put<Company>('/hr/company/profile', data)
-    return response.data
-  },
-
   async inviteHR(data: InviteHRRequest): Promise<Invitation> {
     const response = await apiClient.post<{ invitation: Invitation }>('/hr/company/invite', data)
     return response.data.invitation

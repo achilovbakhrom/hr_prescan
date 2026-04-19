@@ -14,9 +14,9 @@ logger = logging.getLogger(__name__)
 TRIAL_DURATION_DAYS = 14
 
 
-def _create_company_with_trial(
+def _create_company(
     *,
-    company_name: str,
+    name: str,
     industries: list[str] | None = None,
     custom_industry: str = "",
     size: str,
@@ -24,14 +24,11 @@ def _create_company_with_trial(
     website: str | None = None,
     description: str | None = None,
 ) -> Company:
-    """Create a Company with a 14-day Professional trial."""
+    """Create a Company row. No subscription/trial side-effects."""
     from apps.common.models import Industry
-    from apps.subscriptions.models import CompanySubscription, SubscriptionPlan
-
-    now = timezone.now()
 
     company = Company.objects.create(
-        name=company_name,
+        name=name,
         size=size,
         country=country,
         custom_industry=custom_industry,
@@ -43,34 +40,42 @@ def _create_company_with_trial(
         industry_objs = Industry.objects.filter(slug__in=industries)
         company.industries.set(industry_objs)
 
-    # Activate 14-day trial
-    company.trial_ends_at = now + timedelta(days=TRIAL_DURATION_DAYS)
-    company.subscription_status = Company.SubscriptionStatus.TRIAL
-    company.save(update_fields=["trial_ends_at", "subscription_status", "updated_at"])
+    return company
 
-    # Grant Professional-tier limits during trial
+
+def _grant_trial_to_user(user: User) -> None:
+    """Start a 14-day Professional trial on the user. Idempotent — no-op if already subscribed."""
+    from apps.subscriptions.models import SubscriptionPlan, UserSubscription
+
+    now = timezone.now()
+
     pro_plan = SubscriptionPlan.objects.filter(
         tier=SubscriptionPlan.Tier.PROFESSIONAL,
         is_active=True,
     ).first()
 
+    user.subscription_plan = pro_plan
+    user.subscription_status = User.SubscriptionStatus.TRIAL
+    user.trial_ends_at = now + timedelta(days=TRIAL_DURATION_DAYS)
+    user.save(update_fields=["subscription_plan", "subscription_status", "trial_ends_at", "updated_at"])
+
     if pro_plan is not None:
-        CompanySubscription.objects.create(
-            company=company,
-            plan=pro_plan,
-            billing_period=CompanySubscription.BillingPeriod.MONTHLY,
-            current_period_start=now,
-            current_period_end=now + timedelta(days=TRIAL_DURATION_DAYS),
-            is_active=True,
+        UserSubscription.objects.update_or_create(
+            user=user,
+            defaults={
+                "plan": pro_plan,
+                "billing_period": UserSubscription.BillingPeriod.MONTHLY,
+                "current_period_start": now,
+                "current_period_end": now + timedelta(days=TRIAL_DURATION_DAYS),
+                "is_active": True,
+            },
         )
     else:
         logger.warning(
-            "Professional plan not found — company %s (%s) created without trial subscription.",
-            company.name,
-            company.id,
+            "Professional plan not found — user %s (%s) created without trial subscription.",
+            user.email,
+            user.id,
         )
-
-    return company
 
 
 @transaction.atomic
@@ -87,12 +92,9 @@ def create_company_with_admin(
     website: str | None = None,
     description: str | None = None,
 ) -> tuple[Company, User]:
-    """Create a company and its admin user in a single transaction.
-
-    The company starts on a 14-day free trial with Professional-tier limits.
-    """
-    company = _create_company_with_trial(
-        company_name=company_name,
+    """Create a company and its admin user in one transaction, starting a 14-day user trial."""
+    company = _create_company(
+        name=company_name,
         industries=industries,
         size=size,
         country=country,
@@ -109,7 +111,14 @@ def create_company_with_admin(
         company=company,
     )
 
-    CompanyMembership.objects.create(user=user, company=company, role=User.Role.ADMIN)
+    _grant_trial_to_user(user)
+
+    CompanyMembership.objects.create(
+        user=user,
+        company=company,
+        role=User.Role.ADMIN,
+        is_default=True,
+    )
 
     send_verification_email.delay(user_id=str(user.id))
 
@@ -126,14 +135,14 @@ def complete_company_setup(
     country: str,
     email: str | None = None,
 ) -> Company:
-    """Upgrade a social-auth candidate to company admin."""
+    """Upgrade a social-auth candidate to company admin, granting them a trial."""
     if email:
         if User.objects.filter(email=email).exclude(id=user.id).exists():
             raise ApplicationError("A user with this email already exists.")
         user.email = email
 
-    company = _create_company_with_trial(
-        company_name=company_name,
+    company = _create_company(
+        name=company_name,
         industries=industries,
         size=size,
         country=country,
@@ -144,32 +153,13 @@ def complete_company_setup(
     user.onboarding_completed = True
     user.save(update_fields=["email", "role", "company", "onboarding_completed", "updated_at"])
 
-    CompanyMembership.objects.create(user=user, company=company, role=User.Role.ADMIN)
+    _grant_trial_to_user(user)
 
-    return company
+    CompanyMembership.objects.create(
+        user=user,
+        company=company,
+        role=User.Role.ADMIN,
+        is_default=True,
+    )
 
-
-def update_company_profile(*, company: Company, data: dict) -> Company:
-    """Update company fields (name, industries, size, country, website, description, logo)."""
-    from apps.common.models import Industry
-
-    allowed_fields = {"name", "size", "country", "website", "description", "logo", "custom_industry"}
-    update_fields = []
-
-    # Handle M2M industries separately
-    if "industries" in data:
-        industry_slugs = data.pop("industries")
-        industry_objs = Industry.objects.filter(slug__in=industry_slugs)
-        company.industries.set(industry_objs)
-
-    for field, value in data.items():
-        if field in allowed_fields:
-            setattr(company, field, value)
-            update_fields.append(field)
-
-    if not update_fields:
-        return company
-
-    update_fields.append("updated_at")
-    company.save(update_fields=update_fields)
     return company

@@ -131,7 +131,7 @@ function permissionCount(member: TeamMember): string {
     <template #footer>
       <div class="flex justify-end gap-2">
         <Button :label="t('common.cancel')" severity="secondary" @click="editingMember = null" />
-        <Button :label="t('settings.company.save')" @click="savePermissions" />
+        <Button :label="t('common.save')" @click="savePermissions" />
       </div>
     </template>
   </Dialog>

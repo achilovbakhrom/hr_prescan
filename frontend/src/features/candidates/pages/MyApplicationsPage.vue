@@ -44,12 +44,8 @@ function formatDate(dateStr: string): string {
       <Column field="vacancyTitle" :header="t('nav.vacancies')" sortable />
       <Column :header="t('vacancies.form.companyInfo')">
         <template #body="{ data }">
-          <span
-            v-if="(data as Application).employerName || (data as Application).companyName"
-            class="text-sm text-gray-600"
-          >
-            <i class="pi pi-building mr-1 text-xs"></i
-            >{{ (data as Application).employerName || (data as Application).companyName }}
+          <span v-if="(data as Application).companyName" class="text-sm text-gray-600">
+            <i class="pi pi-building mr-1 text-xs"></i>{{ (data as Application).companyName }}
           </span>
           <span v-else class="text-sm text-gray-400">-</span>
         </template>

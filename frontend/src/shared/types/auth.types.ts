@@ -17,6 +17,8 @@ export const HR_PERMISSIONS = {
 
 export const ALL_HR_PERMISSIONS: HRPermission[] = Object.values(HR_PERMISSIONS)
 
+export type SubscriptionStatus = 'trial' | 'active' | 'past_due' | 'cancelled'
+
 export interface User {
   id: string
   email: string
@@ -28,6 +30,8 @@ export interface User {
   company: Company | null
   emailVerified: boolean
   onboardingCompleted: boolean
+  subscriptionStatus?: SubscriptionStatus
+  trialEndsAt?: string | null
   language: 'en' | 'ru' | 'uz'
 }
 
@@ -42,8 +46,7 @@ export interface Company {
   logo: string | null
   website: string | null
   customIndustry?: string | null
-  subscriptionStatus?: 'trial' | 'active' | 'past_due' | 'cancelled'
-  trialEndsAt?: string | null
+  isDeleted?: boolean
 }
 
 export type CompanySize = 'small' | 'medium' | 'large' | 'enterprise'
@@ -61,5 +64,6 @@ export interface CompanyMembership {
   company: Company
   role: UserRole
   hrPermissions: HRPermission[]
+  isDefault?: boolean
   createdAt: string
 }

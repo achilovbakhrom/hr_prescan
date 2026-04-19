@@ -19,7 +19,7 @@ def handle_get_vacancy_summary(*, user, params):
     from apps.applications.models import Application
     from apps.interviews.models import Interview
 
-    vacancy = resolve_vacancy(company=user.company, title=params.get("vacancy_title", ""))
+    vacancy = resolve_vacancy(user=user, title=params.get("vacancy_title", ""))
 
     total_candidates = Application.objects.filter(
         vacancy=vacancy,
@@ -62,9 +62,9 @@ def handle_get_vacancy_summary(*, user, params):
 
 
 def handle_get_subscription_info(*, user, params):
-    from apps.subscriptions.selectors import get_company_subscription
+    from apps.subscriptions.selectors import get_user_subscription
 
-    subscription = get_company_subscription(company=user.company)
+    subscription = get_user_subscription(user=user)
     if subscription is None:
         return {
             "success": True,
@@ -91,7 +91,7 @@ def handle_get_subscription_info(*, user, params):
 def handle_get_usage(*, user, params):
     from apps.subscriptions.services import get_subscription_usage
 
-    usage = get_subscription_usage(company=user.company)
+    usage = get_subscription_usage(user=user)
     return {
         "success": True,
         "message": "Here is your current usage.",

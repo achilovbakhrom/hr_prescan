@@ -19,12 +19,18 @@ class CompanyMembership(models.Model):
     )
     role = models.CharField(max_length=20, choices=User.Role.choices, default=User.Role.HR)
     hr_permissions = models.JSONField(default=list, blank=True)
+    is_default = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         app_label = "accounts"
         constraints = [
             models.UniqueConstraint(fields=["user", "company"], name="unique_user_company"),
+            models.UniqueConstraint(
+                fields=["user"],
+                condition=models.Q(is_default=True),
+                name="unique_user_default_membership",
+            ),
         ]
         ordering = ["-created_at"]
 

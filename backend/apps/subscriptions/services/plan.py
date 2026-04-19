@@ -5,8 +5,8 @@ from decimal import Decimal
 from django.db import transaction
 from django.utils import timezone
 
-from apps.accounts.models import Company
-from apps.subscriptions.models import CompanySubscription, SubscriptionPlan
+from apps.accounts.models import User
+from apps.subscriptions.models import SubscriptionPlan, UserSubscription
 
 logger = logging.getLogger(__name__)
 
@@ -53,9 +53,9 @@ def create_default_plans() -> list[SubscriptionPlan]:
             "description": "Unlimited access for large organisations",
             "price_monthly": Decimal("399.00"),
             "price_yearly": Decimal("3830.00"),
-            "max_vacancies": 0,  # unlimited
-            "max_interviews_per_month": 0,  # unlimited
-            "max_hr_users": 0,  # unlimited
+            "max_vacancies": 0,
+            "max_interviews_per_month": 0,
+            "max_hr_users": 0,
             "max_storage_gb": 500,
         },
     ]
@@ -71,22 +71,22 @@ def create_default_plans() -> list[SubscriptionPlan]:
     return plans
 
 
-def subscribe_company(
+def subscribe_user(
     *,
-    company: Company,
+    user: User,
     plan: SubscriptionPlan,
     billing_period: str,
-) -> CompanySubscription:
-    """Create or update a company's subscription."""
+) -> UserSubscription:
+    """Create or update a user's subscription."""
     now = timezone.now()
 
-    if billing_period == CompanySubscription.BillingPeriod.YEARLY:
+    if billing_period == UserSubscription.BillingPeriod.YEARLY:
         period_end = now + timedelta(days=365)
     else:
         period_end = now + timedelta(days=30)
 
-    subscription, _created = CompanySubscription.objects.update_or_create(
-        company=company,
+    subscription, _created = UserSubscription.objects.update_or_create(
+        user=user,
         defaults={
             "plan": plan,
             "billing_period": billing_period,
@@ -96,27 +96,27 @@ def subscribe_company(
         },
     )
 
-    # Update company status
-    company.subscription_status = Company.SubscriptionStatus.ACTIVE
-    company.save(update_fields=["subscription_status", "updated_at"])
+    user.subscription_plan = plan
+    user.subscription_status = User.SubscriptionStatus.ACTIVE
+    user.save(update_fields=["subscription_plan", "subscription_status", "updated_at"])
 
     return subscription
 
 
-def cancel_subscription(*, subscription: CompanySubscription) -> CompanySubscription:
+def cancel_subscription(*, subscription: UserSubscription) -> UserSubscription:
     """Cancel an active subscription (remains active until period end)."""
     subscription.is_active = False
     subscription.save(update_fields=["is_active", "updated_at"])
 
-    subscription.company.subscription_status = Company.SubscriptionStatus.CANCELLED
-    subscription.company.save(update_fields=["subscription_status", "updated_at"])
+    subscription.user.subscription_status = User.SubscriptionStatus.CANCELLED
+    subscription.user.save(update_fields=["subscription_status", "updated_at"])
 
     return subscription
 
 
 @transaction.atomic
-def expire_trial(*, company: Company) -> None:
-    """Downgrade a company from trial to the Free plan."""
+def expire_trial(*, user: User) -> None:
+    """Downgrade a user from trial to the Free plan."""
     free_plan = SubscriptionPlan.objects.filter(
         tier=SubscriptionPlan.Tier.FREE,
         is_active=True,
@@ -124,47 +124,47 @@ def expire_trial(*, company: Company) -> None:
 
     if free_plan is None:
         logger.error(
-            "Free plan not found — cannot downgrade company %s (%s) from trial.",
-            company.name,
-            company.id,
+            "Free plan not found — cannot downgrade user %s (%s) from trial.",
+            user.email,
+            user.id,
         )
         return
 
     now = timezone.now()
 
-    # Update or create subscription with the free plan
-    CompanySubscription.objects.update_or_create(
-        company=company,
+    UserSubscription.objects.update_or_create(
+        user=user,
         defaults={
             "plan": free_plan,
-            "billing_period": CompanySubscription.BillingPeriod.MONTHLY,
+            "billing_period": UserSubscription.BillingPeriod.MONTHLY,
             "current_period_start": now,
             "current_period_end": now + timedelta(days=30),
             "is_active": True,
         },
     )
 
-    company.subscription_status = Company.SubscriptionStatus.ACTIVE
-    company.save(update_fields=["subscription_status", "updated_at"])
+    user.subscription_plan = free_plan
+    user.subscription_status = User.SubscriptionStatus.ACTIVE
+    user.save(update_fields=["subscription_plan", "subscription_status", "updated_at"])
 
     logger.info(
-        "Trial expired for company %s (%s) — downgraded to Free plan.",
-        company.name,
-        company.id,
+        "Trial expired for user %s (%s) — downgraded to Free plan.",
+        user.email,
+        user.id,
     )
 
 
 def check_and_expire_trials() -> int:
-    """Check all trial companies and downgrade expired ones. Returns count of expired trials."""
+    """Check all trial users and downgrade expired ones. Returns count of expired trials."""
     now = timezone.now()
-    expired_companies = Company.objects.filter(
-        subscription_status=Company.SubscriptionStatus.TRIAL,
+    expired_users = User.objects.filter(
+        subscription_status=User.SubscriptionStatus.TRIAL,
         trial_ends_at__lte=now,
     )
 
     count = 0
-    for company in expired_companies:
-        expire_trial(company=company)
+    for user in expired_users:
+        expire_trial(user=user)
         count += 1
 
     if count:

@@ -1,8 +1,8 @@
-import { ref, computed, watch, onMounted, nextTick } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import type { FieldErrors } from '@/shared/api/errors'
 import { getLocale } from '@/shared/i18n'
-import { employerService } from '@/features/employers/services/employer.service'
-import type { EmployerCompany } from '@/features/employers/types/employer.types'
+import { companyService } from '@/features/companies/services/company.service'
+import type { UserCompanyMembership } from '@/features/companies/types/company.types'
 import type {
   CreateVacancyRequest,
   EmploymentType,
@@ -39,13 +39,13 @@ export function useVacancyForm(
   const interviewDuration = ref(initialData()?.interviewDuration ?? 30)
   const interviewPrompt = ref(initialData()?.interviewPrompt ?? '')
   const companyInfo = ref(initialData()?.companyInfo ?? '')
-  const employerId = ref<string | null>(initialData()?.employerId ?? null)
-  const employersList = ref<EmployerCompany[]>([])
-  const loadingEmployers = ref(false)
+  const companyId = ref<string | null>(initialData()?.companyId ?? null)
+  const companiesList = ref<UserCompanyMembership[]>([])
+  const loadingCompanies = ref(false)
   const activeTab = ref(0)
 
-  const selectedEmployer = computed(
-    () => employersList.value.find((e) => e.id === employerId.value) ?? null,
+  const selectedCompany = computed(
+    () => companiesList.value.find((c) => c.id === companyId.value) ?? null,
   )
 
   const errors = computed<FieldErrors>(() => fieldErrors() ?? {})
@@ -72,7 +72,7 @@ export function useVacancyForm(
     employmentType: 0,
     experienceLevel: 0,
     deadline: 0,
-    employerId: 1,
+    companyId: 1,
     companyInfo: 1,
     prescanningPrompt: 2,
     interviewEnabled: 3,
@@ -99,13 +99,18 @@ export function useVacancyForm(
   })
 
   onMounted(async () => {
-    loadingEmployers.value = true
+    loadingCompanies.value = true
     try {
-      employersList.value = await employerService.list()
+      companiesList.value = await companyService.list()
+      // Pre-select the user's default company if the form wasn't seeded with one.
+      if (!companyId.value) {
+        const def = companiesList.value.find((c) => c.isDefault)
+        if (def) companyId.value = def.id
+      }
     } catch {
-      // silent
+      // silent; loading state ends in finally
     } finally {
-      loadingEmployers.value = false
+      loadingCompanies.value = false
     }
   })
 
@@ -137,7 +142,7 @@ export function useVacancyForm(
     interviewDuration.value = d.interviewDuration ?? 30
     interviewPrompt.value = d.interviewPrompt ?? ''
     companyInfo.value = d.companyInfo ?? ''
-    employerId.value = d.employerId ?? null
+    companyId.value = d.companyId ?? null
   }
 
   function buildPayload(): CreateVacancyRequest {
@@ -164,7 +169,7 @@ export function useVacancyForm(
       interviewDuration: interviewDuration.value,
       interviewPrompt: interviewPrompt.value || undefined,
       companyInfo: companyInfo.value || undefined,
-      employerId: employerId.value || undefined,
+      companyId: companyId.value || undefined,
     }
   }
 
@@ -191,10 +196,10 @@ export function useVacancyForm(
     interviewDuration,
     interviewPrompt,
     companyInfo,
-    employerId,
-    employersList,
-    loadingEmployers,
-    selectedEmployer,
+    companyId,
+    companiesList,
+    loadingCompanies,
+    selectedCompany,
     activeTab,
     canSave,
     hasError,

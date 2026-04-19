@@ -1,16 +1,22 @@
-"""Resolvers: fuzzy-match helpers for vacancies, employers, applications, interviews."""
+"""Resolvers: fuzzy-match helpers for vacancies, companies, applications, interviews."""
 
 from apps.common.exceptions import ApplicationError
 
 
-def resolve_vacancy(*, company, title):
-    """Find a vacancy by fuzzy title match. Raises if ambiguous or not found."""
+def _user_live_company_ids(user):
+    return list(user.memberships.filter(company__is_deleted=False).values_list("company_id", flat=True))
+
+
+def resolve_vacancy(*, user, title):
+    """Find a vacancy by fuzzy title match across every company the user belongs to."""
     from apps.vacancies.models import Vacancy
 
     matches = list(
-        Vacancy.objects.filter(company=company, is_deleted=False, title__icontains=title).values_list("id", "title")[
-            :10
-        ]
+        Vacancy.objects.filter(
+            company_id__in=_user_live_company_ids(user),
+            is_deleted=False,
+            title__icontains=title,
+        ).values_list("id", "title")[:10]
     )
     if not matches:
         raise ApplicationError(f"Vacancy matching '{title}' not found.")
@@ -20,25 +26,30 @@ def resolve_vacancy(*, company, title):
     return Vacancy.objects.get(id=matches[0][0])
 
 
-def resolve_employer(*, company, name):
-    """Find an employer by fuzzy name match. Raises if ambiguous or not found."""
-    from apps.vacancies.models import EmployerCompany
+def resolve_company(*, user, name):
+    """Find one of the user's non-deleted companies by fuzzy name match."""
+    from apps.accounts.models import Company
 
-    matches = list(EmployerCompany.objects.filter(company=company, name__icontains=name).values_list("id", "name")[:10])
+    matches = list(
+        Company.objects.filter(
+            id__in=_user_live_company_ids(user),
+            name__icontains=name,
+        ).values_list("id", "name")[:10]
+    )
     if not matches:
-        raise ApplicationError(f"Employer matching '{name}' not found.")
+        raise ApplicationError(f"Company matching '{name}' not found.")
     if len(matches) > 1:
         names = ", ".join(f'"{m[1]}"' for m in matches)
-        raise ApplicationError(f"Multiple employers match '{name}': {names}. Please be more specific.")
-    return EmployerCompany.objects.get(id=matches[0][0])
+        raise ApplicationError(f"Multiple companies match '{name}': {names}. Please be more specific.")
+    return Company.objects.get(id=matches[0][0])
 
 
-def resolve_application(*, company, candidate_email_or_name, vacancy_title=None):
-    """Find an application by candidate email or name. Raises if ambiguous."""
+def resolve_application(*, user, candidate_email_or_name, vacancy_title=None):
+    """Find an application by candidate email or name across the user's companies."""
     from apps.applications.models import Application
 
     qs = Application.objects.filter(
-        vacancy__company=company,
+        vacancy__company_id__in=_user_live_company_ids(user),
         is_deleted=False,
     ).select_related("vacancy")
 
@@ -67,15 +78,15 @@ def resolve_application(*, company, candidate_email_or_name, vacancy_title=None)
     return Application.objects.select_related("vacancy").get(id=matches[0][0])
 
 
-def resolve_interview_for_candidate(*, company, candidate_email_or_name):
-    """Find the most recent active interview for a candidate."""
+def resolve_interview_for_candidate(*, user, candidate_email_or_name):
+    """Find the most recent active interview for a candidate, across the user's companies."""
     from django.db.models import Q
 
     from apps.interviews.models import Interview
 
     qs = (
         Interview.objects.filter(
-            application__vacancy__company=company,
+            application__vacancy__company_id__in=_user_live_company_ids(user),
             application__is_deleted=False,
         )
         .select_related("application", "application__vacancy")

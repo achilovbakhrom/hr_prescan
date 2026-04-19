@@ -102,18 +102,11 @@ const sections = computed<NavSection[]>(() => [
     title: t('nav.settings'),
     items: [
       {
-        label: t('employers.title'),
+        label: t('companies.title'),
         icon: 'pi pi-building',
-        to: '/employers',
+        to: '/companies',
         roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
         permission: 'manage_vacancies',
-      },
-      {
-        label: t('settings.company.title'),
-        icon: 'pi pi-cog',
-        to: '/settings/company',
-        roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
-        permission: 'manage_settings',
       },
       {
         label: t('nav.team'),

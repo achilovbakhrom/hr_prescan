@@ -123,17 +123,16 @@ function formatSalary(): string {
       </div>
     </div>
 
-    <!-- Employer card -->
-    <div v-if="vacancy.employer" class="rounded-lg border border-gray-200 bg-gray-50 p-4">
+    <div v-if="vacancy.company" class="rounded-lg border border-gray-200 bg-gray-50 p-4">
       <p class="mb-2 text-sm text-gray-500">{{ t('vacancies.form.companyInfo') }}</p>
       <div class="flex items-center gap-3">
         <div
-          v-if="vacancy.employer.logo"
+          v-if="vacancy.company.logo"
           class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white"
         >
           <img
-            :src="vacancy.employer.logo"
-            :alt="vacancy.employer.name"
+            :src="vacancy.company.logo"
+            :alt="vacancy.company.name"
             class="h-full w-full object-contain"
           />
         </div>
@@ -144,18 +143,18 @@ function formatSalary(): string {
           <i class="pi pi-building text-lg"></i>
         </div>
         <div class="min-w-0">
-          <p class="font-semibold text-gray-900">{{ vacancy.employer.name }}</p>
-          <p v-if="vacancy.employer.industry" class="text-sm text-gray-500">
-            {{ vacancy.employer.industry }}
+          <p class="font-semibold text-gray-900">{{ vacancy.company.name }}</p>
+          <p v-if="vacancy.company.customIndustry" class="text-sm text-gray-500">
+            {{ vacancy.company.customIndustry }}
           </p>
           <a
-            v-if="vacancy.employer.website"
-            :href="vacancy.employer.website"
+            v-if="vacancy.company.website"
+            :href="vacancy.company.website"
             target="_blank"
             rel="noopener noreferrer"
             class="text-sm text-blue-600 hover:underline"
           >
-            {{ vacancy.employer.website }}
+            {{ vacancy.company.website }}
           </a>
         </div>
       </div>
