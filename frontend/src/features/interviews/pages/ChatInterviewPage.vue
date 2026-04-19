@@ -1,15 +1,31 @@
 <script setup lang="ts">
+/**
+ * ChatInterviewPage — candidate chat interview (standalone route).
+ *
+ * T13 redesign (the "crown jewel"): full-screen chat. AnimatedBackground
+ * is mounted directly (no PublicLayout). Vellum is forced on mount to
+ * keep the chrome calm while the conversation takes focus. AI avatar ring
+ * pulses via `accentPulse` while `isTyping`. No FloatingBackgroundPicker
+ * to avoid distracting the candidate.
+ */
+import { onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
+import AnimatedBackground from '@/shared/components/AnimatedBackground.vue'
+import GlassSurface from '@/shared/components/GlassSurface.vue'
+import { useThemeStore } from '@/shared/stores/theme.store'
 import { useChatInterview } from '../composables/useChatInterview'
 import ChatErrorState from '../components/ChatErrorState.vue'
 import ChatMessageList from '../components/ChatMessageList.vue'
 import ChatInputBar from '../components/ChatInputBar.vue'
+import ChatInterviewHeader from '../components/ChatInterviewHeader.vue'
+import ChatMinimizedBar from '../components/ChatMinimizedBar.vue'
 
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
+const themeStore = useThemeStore()
 const token = route.params.token as string
 
 const {
@@ -35,130 +51,74 @@ const {
   formatTime,
   getAudioUrl,
 } = useChatInterview(token)
+
+onMounted(() => {
+  if (themeStore.backgroundMode !== 'vellum') {
+    themeStore.setBackgroundMode('vellum')
+  }
+})
 </script>
 
 <template>
-  <div class="flex h-screen flex-col bg-gray-100">
-    <!-- Loading -->
-    <div v-if="loading" class="flex flex-1 items-center justify-center">
+  <div class="relative flex h-screen flex-col">
+    <AnimatedBackground />
+
+    <div v-if="loading" class="relative z-0 flex flex-1 items-center justify-center">
       <div class="text-center">
         <div
-          class="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600"
+          class="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-[color:var(--color-accent-ai-soft)] border-t-[color:var(--color-accent-ai)]"
         ></div>
-        <p class="text-sm text-gray-500">{{ t('interviews.chatPage.preparing') }}</p>
+        <p class="text-sm text-[color:var(--color-text-secondary)]">
+          {{ t('interviews.chatPage.preparing') }}
+        </p>
       </div>
     </div>
 
-    <!-- Error states -->
     <ChatErrorState
       v-else-if="errorState"
+      class="relative z-0"
       :error-state="errorState"
       :error-message="errorMessage"
     />
 
-    <!-- Chat interface -->
     <template v-else-if="interview">
-      <!-- Minimized bar -->
-      <div
+      <ChatMinimizedBar
         v-if="isMinimized && !isClosed"
-        class="fixed bottom-0 left-0 right-0 z-50 cursor-pointer border-t border-gray-200 bg-white px-4 py-3 shadow-lg transition-all hover:bg-gray-50"
-        @click="isMinimized = false"
-      >
-        <div class="mx-auto flex max-w-3xl items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600">
-              <i class="pi pi-comments text-sm text-white"></i>
-            </div>
-            <div>
-              <p class="text-sm font-medium text-gray-900">{{ interview.vacancyTitle }}</p>
-              <p v-if="interview.companyName" class="text-xs text-gray-500">
-                <i class="pi pi-building mr-0.5"></i>{{ interview.companyName }}
-              </p>
-              <p class="text-xs text-gray-500">{{ t('interviews.chatPage.inProgress') }}</p>
-            </div>
-          </div>
-          <div class="flex items-center gap-2">
-            <span
-              v-if="messages.length"
-              class="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white"
-            >
-              {{ messages.length }}
-            </span>
-            <i class="pi pi-chevron-up text-gray-400"></i>
-            <Button
-              icon="pi pi-times"
-              severity="secondary"
-              text
-              rounded
-              size="small"
-              title="Close"
-              @click.stop="isClosed = true"
-            />
-          </div>
-        </div>
-      </div>
+        :vacancy-title="interview.vacancyTitle"
+        :company-name="interview.companyName"
+        :message-count="messages.length"
+        @restore="isMinimized = false"
+        @close="isClosed = true"
+      />
 
-      <!-- Full chat view -->
       <template v-if="!isMinimized">
-        <!-- Header -->
-        <header class="border-b border-gray-200 bg-white px-4 py-3 shadow-sm">
-          <div class="mx-auto flex max-w-3xl items-center justify-between">
-            <div class="flex items-center gap-3">
-              <div
-                class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-700"
-              >
-                <i class="pi pi-comments text-white"></i>
-              </div>
-              <div>
-                <h1 class="text-base font-semibold text-gray-900">{{ interview.vacancyTitle }}</h1>
-                <p v-if="interview.companyName" class="text-xs text-gray-500">
-                  <i class="pi pi-building mr-1"></i>{{ interview.companyName }}
-                </p>
-                <div class="flex items-center gap-1.5">
-                  <span
-                    class="h-2 w-2 rounded-full"
-                    :class="isCompleted ? 'bg-gray-400' : 'bg-green-500 animate-pulse'"
-                  ></span>
-                  <span class="text-xs text-gray-500">{{
-                    isCompleted
-                      ? t('interviews.status.completed')
-                      : t('interviews.chat.aiInterview')
-                  }}</span>
-                </div>
-              </div>
-            </div>
-            <div class="flex items-center gap-1">
-              <button
-                class="flex h-9 w-9 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
-                title="Minimize"
-                @click="isMinimized = true"
-              >
-                <i class="pi pi-minus text-sm"></i>
-              </button>
-              <button
-                class="flex h-9 w-9 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500"
-                title="Close"
-                @click="handleClose"
-              >
-                <i class="pi pi-times text-sm"></i>
-              </button>
-            </div>
-          </div>
-        </header>
+        <ChatInterviewHeader
+          class="relative z-10"
+          :vacancy-title="interview.vacancyTitle"
+          :company-name="interview.companyName"
+          :is-completed="isCompleted"
+          :is-speaking="isTyping"
+          @minimize="isMinimized = true"
+          @close="handleClose"
+        />
 
         <!-- Leave confirmation dialog -->
         <div
           v-if="showLeaveConfirm"
-          class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          class="fixed inset-0 z-50 flex items-center justify-center bg-[color:var(--color-surface-base)]/60 backdrop-blur-sm"
         >
-          <div class="mx-4 w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl">
-            <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-yellow-100">
-              <i class="pi pi-exclamation-triangle text-xl text-yellow-600"></i>
+          <GlassSurface level="float" class="mx-4 w-full max-w-sm p-6">
+            <div
+              class="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[color:var(--color-warning)]/15"
+            >
+              <i class="pi pi-exclamation-triangle text-xl text-[color:var(--color-warning)]"></i>
             </div>
-            <h2 class="mb-2 text-lg font-semibold text-gray-900">
+            <h2 class="mb-2 text-lg font-semibold text-[color:var(--color-text-primary)]">
               {{ t('interviews.chatPage.leaveTitle') }}
             </h2>
-            <p class="mb-5 text-sm text-gray-500">{{ t('interviews.chatPage.leaveMessage') }}</p>
+            <p class="mb-5 text-sm text-[color:var(--color-text-secondary)]">
+              {{ t('interviews.chatPage.leaveMessage') }}
+            </p>
             <div class="flex gap-3">
               <Button
                 :label="t('interviews.chatPage.stayButton')"
@@ -173,11 +133,10 @@ const {
                 @click="router.push('/jobs')"
               />
             </div>
-          </div>
+          </GlassSurface>
         </div>
 
-        <!-- Messages -->
-        <div ref="messagesContainer" class="flex-1 overflow-y-auto px-4 py-6">
+        <div ref="messagesContainer" class="relative z-0 flex-1 overflow-y-auto px-4 py-6">
           <ChatMessageList
             :messages="messages"
             :is-typing="isTyping"
@@ -186,17 +145,18 @@ const {
           />
         </div>
 
-        <!-- Input / Completed -->
-        <ChatInputBar
-          v-model="inputMessage"
-          :sending="sending"
-          :sending-voice="sendingVoice"
-          :can-send="canSend"
-          :is-completed="isCompleted"
-          @send="sendMessage"
-          @keydown="handleKeyDown"
-          @voice-recorded="handleVoiceRecorded"
-        />
+        <div class="relative z-10">
+          <ChatInputBar
+            v-model="inputMessage"
+            :sending="sending"
+            :sending-voice="sendingVoice"
+            :can-send="canSend"
+            :is-completed="isCompleted"
+            @send="sendMessage"
+            @keydown="handleKeyDown"
+            @voice-recorded="handleVoiceRecorded"
+          />
+        </div>
       </template>
     </template>
   </div>

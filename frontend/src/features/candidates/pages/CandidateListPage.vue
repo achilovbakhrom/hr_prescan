@@ -1,16 +1,20 @@
 <script setup lang="ts">
+/**
+ * CandidateListPage — HR-facing list, redesigned with glass primitives.
+ * Preserves tenant scoping (store already filters by active company via
+ * CompanySwitcher) and the kanban/table toggle.
+ * Spec: docs/design/spec.md §9 Candidates.
+ */
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import Dropdown from 'primevue/dropdown'
-import InputText from 'primevue/inputtext'
-import IconField from 'primevue/iconfield'
-import InputIcon from 'primevue/inputicon'
 import ConfirmDialog from 'primevue/confirmdialog'
 import { useConfirm } from 'primevue/useconfirm'
+import GlassCard from '@/shared/components/GlassCard.vue'
 import { useCandidateStore } from '../stores/candidate.store'
 import CandidateKanban from '../components/CandidateKanban.vue'
-import CandidateTableView from '../components/CandidateTableView.vue'
+import CandidateListTable from '../components/CandidateListTable.vue'
+import CandidateListToolbar from '../components/CandidateListToolbar.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { Application, ApplicationStatus } from '../types/candidate.types'
 
@@ -27,7 +31,6 @@ const statusFilter = ref<string | undefined>(undefined)
 const orderingFilter = ref<string>('-created_at')
 const searchQuery = ref('')
 const selectedCandidates = ref<Application[]>([])
-
 let searchTimeout: ReturnType<typeof setTimeout> | null = null
 
 const statusOptions = computed(() => [
@@ -47,22 +50,14 @@ const orderingOptions = computed(() => [
   { label: t('candidates.ordering.lowestScore'), value: 'match_score' },
 ])
 
-const bulkActionOptions = computed(() => [
-  { label: t('candidates.actions.shortlist'), value: 'shortlisted' as ApplicationStatus },
-  { label: t('candidates.actions.reject'), value: 'rejected' as ApplicationStatus },
-])
-
 function fetchCandidates(): void {
   const params = {
     status: statusFilter.value,
     ordering: orderingFilter.value,
     search: searchQuery.value || undefined,
   }
-  if (isAllCandidates.value) {
-    candidateStore.fetchAllCandidates(params)
-  } else {
-    candidateStore.fetchVacancyCandidates(vacancyId.value, params)
-  }
+  if (isAllCandidates.value) candidateStore.fetchAllCandidates(params)
+  else candidateStore.fetchVacancyCandidates(vacancyId.value, params)
 }
 
 onMounted(fetchCandidates)
@@ -72,31 +67,9 @@ function onSearchInput(): void {
   if (searchTimeout) clearTimeout(searchTimeout)
   searchTimeout = setTimeout(fetchCandidates, 300)
 }
+
 function viewDetail(candidate: Application): void {
   router.push({ name: ROUTE_NAMES.CANDIDATE_DETAIL, params: { id: candidate.id } })
-}
-
-function handleBulkAction(event: { value: ApplicationStatus }): void {
-  const status = event.value
-  const count = selectedCandidates.value.length
-  confirm.require({
-    message: t('candidates.dialogs.bulkConfirmMessage', {
-      action: status === 'shortlisted' ? 'shortlist' : 'reject',
-      count,
-    }),
-    header: t('candidates.dialogs.bulkConfirmHeader'),
-    icon: 'pi pi-exclamation-triangle',
-    acceptClass: status === 'rejected' ? 'p-button-danger' : 'p-button-success',
-    accept: async () => {
-      await candidateStore
-        .bulkUpdateStatus(
-          selectedCandidates.value.map((c) => c.id),
-          status,
-        )
-        .catch(() => {})
-      selectedCandidates.value = []
-    },
-  })
 }
 
 function handleKanbanStatusChange(candidateId: string, status: ApplicationStatus): void {
@@ -129,25 +102,30 @@ function handleKanbanStatusChange(candidateId: string, status: ApplicationStatus
       <div class="flex items-center gap-3">
         <button
           v-if="!isAllCandidates"
-          class="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+          class="rounded-lg p-1.5 text-[color:var(--color-text-muted)] transition-colors hover:bg-[color:var(--color-surface-sunken)] hover:text-[color:var(--color-text-primary)]"
           @click="router.back()"
         >
           <i class="pi pi-arrow-left"></i>
         </button>
         <div>
-          <h1 class="text-lg font-bold text-gray-900 md:text-xl">
+          <h1 class="text-xl font-bold text-[color:var(--color-text-primary)] md:text-2xl">
             {{ isAllCandidates ? t('nav.allCandidates') : t('candidates.pipeline') }}
           </h1>
-          <p class="text-sm text-gray-500">
+          <p class="mt-0.5 text-sm text-[color:var(--color-text-muted)]">
             {{ candidateStore.candidates.length }} {{ t('nav.candidates').toLowerCase() }}
           </p>
         </div>
       </div>
-      <div class="flex items-center gap-2 rounded-lg border border-gray-200 p-0.5">
+      <div
+        class="inline-flex rounded-md bg-[color:var(--color-surface-sunken)] p-0.5"
+        role="tablist"
+      >
         <button
           class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
           :class="
-            viewMode === 'kanban' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:text-gray-700'
+            viewMode === 'kanban'
+              ? 'bg-[color:var(--color-surface-raised)] text-[color:var(--color-text-primary)] shadow-sm'
+              : 'text-[color:var(--color-text-muted)] hover:text-[color:var(--color-text-primary)]'
           "
           @click="viewMode = 'kanban'"
         >
@@ -156,7 +134,9 @@ function handleKanbanStatusChange(candidateId: string, status: ApplicationStatus
         <button
           class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
           :class="
-            viewMode === 'table' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:text-gray-700'
+            viewMode === 'table'
+              ? 'bg-[color:var(--color-surface-raised)] text-[color:var(--color-text-primary)] shadow-sm'
+              : 'text-[color:var(--color-text-muted)] hover:text-[color:var(--color-text-primary)]'
           "
           @click="viewMode = 'table'"
         >
@@ -165,64 +145,39 @@ function handleKanbanStatusChange(candidateId: string, status: ApplicationStatus
       </div>
     </div>
 
-    <p v-if="candidateStore.error" class="rounded-lg bg-red-50 px-4 py-2 text-sm text-red-600">
+    <p
+      v-if="candidateStore.error"
+      class="rounded-lg border border-[color:var(--color-danger)] bg-[color:var(--color-danger)]/10 px-4 py-2 text-sm text-[color:var(--color-danger)]"
+    >
       {{ candidateStore.error }}
     </p>
 
-    <div class="flex flex-wrap items-center gap-3">
-      <IconField class="w-full sm:w-64"
-        ><InputIcon class="pi pi-search" /><InputText
-          v-model="searchQuery"
-          :placeholder="t('candidates.search')"
-          class="w-full"
-          @input="onSearchInput"
-      /></IconField>
-      <template v-if="viewMode === 'table'">
-        <Dropdown
-          v-model="statusFilter"
-          :options="statusOptions"
-          option-label="label"
-          option-value="value"
-          placeholder="Filter by status"
-          class="w-full sm:w-48"
-        />
-        <Dropdown
-          v-model="orderingFilter"
-          :options="orderingOptions"
-          option-label="label"
-          option-value="value"
-          placeholder="Sort by"
-          class="w-full sm:w-48"
-        />
-      </template>
-      <div v-if="selectedCandidates.length > 0" class="flex items-center gap-2">
-        <span class="text-sm text-gray-600">{{ selectedCandidates.length }} selected</span>
-        <Dropdown
-          :model-value="null"
-          :options="bulkActionOptions"
-          option-label="label"
-          option-value="value"
-          placeholder="Bulk Actions"
-          class="w-full sm:w-40"
-          @change="handleBulkAction"
-        />
-      </div>
-    </div>
+    <CandidateListToolbar
+      v-model:search="searchQuery"
+      v-model:status-filter="statusFilter"
+      v-model:ordering-filter="orderingFilter"
+      :status-options="statusOptions"
+      :ordering-options="orderingOptions"
+      :show-filters="viewMode === 'table'"
+      @search-input="onSearchInput"
+    />
+
+    <GlassCard v-if="viewMode === 'table'" class="!p-0 overflow-hidden">
+      <CandidateListTable
+        v-model:selected-candidates="selectedCandidates"
+        :candidates="candidateStore.candidates"
+        :loading="candidateStore.loading"
+        :search-query="searchQuery"
+        :show-vacancy-column="isAllCandidates"
+        @view-detail="viewDetail"
+      />
+    </GlassCard>
 
     <CandidateKanban
-      v-if="viewMode === 'kanban'"
+      v-else
       :candidates="candidateStore.candidates"
       :loading="candidateStore.loading"
       @status-change="handleKanbanStatusChange"
-    />
-    <CandidateTableView
-      v-if="viewMode === 'table'"
-      :candidates="candidateStore.candidates"
-      :loading="candidateStore.loading"
-      v-model:selected-candidates="selectedCandidates"
-      :search-query="searchQuery"
-      :show-vacancy-column="isAllCandidates"
-      @view-detail="viewDetail"
     />
 
     <ConfirmDialog />

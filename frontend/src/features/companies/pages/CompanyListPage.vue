@@ -1,11 +1,16 @@
 <script setup lang="ts">
+/**
+ * CompanyListPage — grid of company cards (GlassCard each).
+ * Spec: docs/design/spec.md §9 Companies block.
+ */
 import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
-import Tag from 'primevue/tag'
 import { useConfirm } from 'primevue/useconfirm'
 import ConfirmDialog from 'primevue/confirmdialog'
+import GlassCard from '@/shared/components/GlassCard.vue'
+import CompanyCardItem from '../components/CompanyCardItem.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import { useCompanyStore } from '../stores/company.store'
 import type { UserCompanyMembership } from '../types/company.types'
@@ -15,9 +20,7 @@ const router = useRouter()
 const confirm = useConfirm()
 const companyStore = useCompanyStore()
 
-onMounted(() => {
-  companyStore.fetchCompanies()
-})
+onMounted(() => companyStore.fetchCompanies())
 
 const canDelete = computed(() => companyStore.liveCount > 1)
 
@@ -32,7 +35,7 @@ function handleDelete(company: UserCompanyMembership): void {
       try {
         await companyStore.softDeleteCompany(company.id)
       } catch {
-        // error surfaced via store.error
+        /* error surfaced via store */
       }
     },
   })
@@ -43,17 +46,28 @@ async function handleSetDefault(company: UserCompanyMembership): Promise<void> {
   try {
     await companyStore.setDefaultCompany(company.id)
   } catch {
-    // error surfaced via store.error
+    /* error surfaced via store */
   }
+}
+
+function openDetail(company: UserCompanyMembership): void {
+  router.push({ name: ROUTE_NAMES.COMPANY_DETAIL, params: { id: company.id } })
 }
 </script>
 
 <template>
-  <div class="mx-auto max-w-5xl px-4 py-6">
+  <div class="space-y-5">
     <ConfirmDialog />
 
-    <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <h1 class="text-2xl font-bold text-gray-900">{{ t('companies.title') }}</h1>
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <h1 class="text-xl font-bold text-[color:var(--color-text-primary)] md:text-2xl">
+          {{ t('companies.title') }}
+        </h1>
+        <p class="mt-0.5 text-sm text-[color:var(--color-text-muted)]">
+          {{ companyStore.companies.length }} {{ t('companies.title').toLowerCase() }}
+        </p>
+      </div>
       <Button
         :label="t('companies.create')"
         icon="pi pi-plus"
@@ -62,88 +76,40 @@ async function handleSetDefault(company: UserCompanyMembership): Promise<void> {
     </div>
 
     <div v-if="companyStore.loading" class="py-12 text-center">
-      <i class="pi pi-spinner pi-spin text-3xl text-gray-400"></i>
+      <i class="pi pi-spinner pi-spin text-3xl text-[color:var(--color-text-muted)]"></i>
     </div>
 
-    <div v-else-if="companyStore.error" class="py-12 text-center text-red-600">
-      <i class="pi pi-exclamation-circle mb-3 text-4xl"></i>
-      <p>{{ companyStore.error }}</p>
-    </div>
+    <GlassCard v-else-if="companyStore.error" class="text-center">
+      <i class="pi pi-exclamation-circle mb-3 text-4xl text-[color:var(--color-danger)]"></i>
+      <p class="text-[color:var(--color-danger)]">{{ companyStore.error }}</p>
+    </GlassCard>
 
-    <div
-      v-else-if="companyStore.companies.length === 0"
-      class="rounded-xl border-2 border-dashed border-gray-200 px-6 py-16 text-center"
-    >
-      <i class="pi pi-building mb-4 text-5xl text-gray-300"></i>
-      <h3 class="text-lg font-semibold text-gray-700">{{ t('companies.empty') }}</h3>
-      <p class="mt-1 text-sm text-gray-500">{{ t('companies.emptyHint') }}</p>
+    <GlassCard v-else-if="companyStore.companies.length === 0" class="text-center">
+      <i class="pi pi-building mb-4 text-5xl text-[color:var(--color-text-muted)]"></i>
+      <h3 class="text-lg font-semibold text-[color:var(--color-text-primary)]">
+        {{ t('companies.empty') }}
+      </h3>
+      <p class="mt-1 text-sm text-[color:var(--color-text-muted)]">
+        {{ t('companies.emptyHint') }}
+      </p>
       <Button
         :label="t('companies.create')"
         icon="pi pi-plus"
         class="mt-4"
         @click="router.push({ name: ROUTE_NAMES.COMPANY_CREATE })"
       />
-    </div>
+    </GlassCard>
 
     <div v-else class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-      <div
+      <CompanyCardItem
         v-for="company in companyStore.companies"
         :key="company.id"
-        class="group relative cursor-pointer rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
-        @click="router.push({ name: ROUTE_NAMES.COMPANY_DETAIL, params: { id: company.id } })"
-      >
-        <div class="mb-3 flex items-start gap-3">
-          <div
-            v-if="company.logo"
-            class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-gray-100"
-          >
-            <img :src="company.logo" :alt="company.name" class="h-full w-full object-contain" />
-          </div>
-          <div
-            v-else
-            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600"
-          >
-            <i class="pi pi-building text-lg"></i>
-          </div>
-          <div class="min-w-0 flex-1">
-            <h3 class="truncate text-base font-semibold text-gray-900">{{ company.name }}</h3>
-            <p v-if="company.customIndustry" class="truncate text-sm text-gray-500">
-              {{ company.customIndustry }}
-            </p>
-          </div>
-        </div>
-
-        <p v-if="company.website" class="mb-2 truncate text-sm text-blue-600">
-          <i class="pi pi-globe mr-1 text-xs"></i>{{ company.website }}
-        </p>
-
-        <div class="mt-3 flex items-center justify-between border-t border-gray-100 pt-3">
-          <Tag
-            v-if="company.isDefault"
-            :value="t('companies.default')"
-            severity="success"
-            icon="pi pi-check"
-          />
-          <Button
-            v-else
-            :label="t('companies.setAsDefault')"
-            icon="pi pi-star"
-            text
-            size="small"
-            @click.stop="handleSetDefault(company)"
-          />
-          <Button
-            icon="pi pi-trash"
-            severity="danger"
-            text
-            size="small"
-            :disabled="!canDelete"
-            :title="canDelete ? '' : t('companies.cannotDeleteLast')"
-            class="opacity-0 transition-opacity group-hover:opacity-100"
-            @click.stop="handleDelete(company)"
-          />
-        </div>
-      </div>
+        :company="company"
+        :can-delete="canDelete"
+        @open="openDetail(company)"
+        @set-default="handleSetDefault(company)"
+        @delete="handleDelete(company)"
+      />
     </div>
   </div>
 </template>

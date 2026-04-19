@@ -1,6 +1,11 @@
 <script setup lang="ts">
+/**
+ * HiringFunnel — glass card with stacked stage bars.
+ * Uses theme tokens for colors. Data rows sit on solid surface inside card.
+ */
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import GlassCard from '@/shared/components/GlassCard.vue'
 
 const props = defineProps<{
   funnel: {
@@ -20,12 +25,12 @@ const funnelSteps = computed(() => {
   if (!props.funnel) return []
   const total = props.funnel.total || 1
   const steps = [
-    { key: 'applied', count: props.funnel.applied, color: 'bg-blue-500' },
-    { key: 'prescanned', count: props.funnel.prescanned, color: 'bg-cyan-500' },
-    { key: 'interviewed', count: props.funnel.interviewed, color: 'bg-violet-500' },
-    { key: 'shortlisted', count: props.funnel.shortlisted, color: 'bg-amber-500' },
-    { key: 'hired', count: props.funnel.hired, color: 'bg-emerald-500' },
-    { key: 'rejected', count: props.funnel.rejected, color: 'bg-red-500' },
+    { key: 'applied', count: props.funnel.applied, color: 'var(--color-accent)' },
+    { key: 'prescanned', count: props.funnel.prescanned, color: 'var(--color-info)' },
+    { key: 'interviewed', count: props.funnel.interviewed, color: 'var(--color-accent-ai)' },
+    { key: 'shortlisted', count: props.funnel.shortlisted, color: 'var(--color-warning)' },
+    { key: 'hired', count: props.funnel.hired, color: 'var(--color-accent-celebrate)' },
+    { key: 'rejected', count: props.funnel.rejected, color: 'var(--color-danger)' },
   ]
   return steps.map((s) => ({
     ...s,
@@ -36,33 +41,45 @@ const funnelSteps = computed(() => {
 </script>
 
 <template>
-  <div class="rounded-xl border border-gray-100 bg-white p-6">
-    <h2 class="mb-5 text-sm font-semibold uppercase tracking-wider text-gray-400">
-      {{ t('analytics.hiringFunnel') }}
-    </h2>
-    <div v-if="funnel && funnel.total > 0" class="space-y-4">
-      <div v-for="step in funnelSteps" :key="step.key" class="space-y-1.5">
+  <GlassCard>
+    <template #header>
+      <h2
+        class="text-xs font-semibold uppercase tracking-wider text-[color:var(--color-text-muted)]"
+      >
+        {{ t('analytics.hiringFunnel') }}
+      </h2>
+    </template>
+
+    <div v-if="funnel && funnel.total > 0" class="flex flex-col gap-4">
+      <div v-for="step in funnelSteps" :key="step.key" class="flex flex-col gap-1.5">
         <div class="flex items-center justify-between">
-          <span class="text-sm font-medium text-gray-700">{{ step.label }}</span>
+          <span class="text-sm font-medium text-[color:var(--color-text-secondary)]">{{
+            step.label
+          }}</span>
           <div class="flex items-center gap-2">
-            <span class="text-sm font-semibold text-gray-900">{{ step.count }}</span>
-            <span class="text-xs text-gray-400">({{ step.pct }}%)</span>
+            <span
+              class="font-mono text-sm font-semibold tabular-nums text-[color:var(--color-text-primary)]"
+              >{{ step.count }}</span
+            >
+            <span class="font-mono text-xs text-[color:var(--color-text-muted)]"
+              >({{ step.pct }}%)</span
+            >
           </div>
         </div>
-        <div class="h-2.5 w-full overflow-hidden rounded-full bg-gray-100">
+        <div class="h-2.5 w-full overflow-hidden rounded-full bg-[color:var(--color-border-soft)]">
           <div
-            class="h-full rounded-full transition-all duration-500"
-            :class="step.color"
-            :style="{ width: `${Math.max(step.pct, 2)}%` }"
+            class="h-full rounded-full transition-all duration-500 ease-ios"
+            :style="{ width: `${Math.max(step.pct, 2)}%`, backgroundColor: step.color }"
           ></div>
         </div>
       </div>
     </div>
-    <div v-else class="flex flex-col items-center py-8 text-center">
-      <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-        <i class="pi pi-chart-bar text-xl text-gray-400"></i>
-      </div>
-      <p class="mt-3 text-sm text-gray-500">{{ t('analytics.noData') }}</p>
+    <div
+      v-else
+      class="flex flex-col items-center py-8 text-center text-[color:var(--color-text-muted)]"
+    >
+      <i class="pi pi-chart-bar mb-2 text-2xl"></i>
+      <p class="text-sm">{{ t('analytics.noData') }}</p>
     </div>
-  </div>
+  </GlassCard>
 </template>

@@ -2,10 +2,18 @@ import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 
 export type ColorScheme = 'light' | 'dark' | 'system'
-export type BackgroundMode = 'off' | 'forest' | 'ocean'
+export type BackgroundMode = 'off' | 'aurora' | 'mesh' | 'constellation' | 'vellum'
 
 const SCHEME_KEY = 'hr_prescan_color_scheme'
 const BG_KEY = 'hr_prescan_bg_mode'
+
+const VALID_BG_MODES: readonly BackgroundMode[] = [
+  'off',
+  'aurora',
+  'mesh',
+  'constellation',
+  'vellum',
+]
 
 function readScheme(): ColorScheme {
   const v = localStorage.getItem(SCHEME_KEY)
@@ -14,7 +22,12 @@ function readScheme(): ColorScheme {
 
 function readBackground(): BackgroundMode {
   const v = localStorage.getItem(BG_KEY)
-  return v === 'forest' || v === 'ocean' || v === 'off' ? v : 'forest'
+  if (v === null) return 'aurora'
+  if ((VALID_BG_MODES as readonly string[]).includes(v)) return v as BackgroundMode
+  // Legacy value (e.g. 'forest', 'ocean') or garbage — migrate to 'aurora'
+  // and persist so the next read is clean.
+  localStorage.setItem(BG_KEY, 'aurora')
+  return 'aurora'
 }
 
 function systemPrefersDark(): boolean {
@@ -25,8 +38,8 @@ export const useThemeStore = defineStore('theme', () => {
   const colorScheme = ref<ColorScheme>(readScheme())
   const backgroundMode = ref<BackgroundMode>(readBackground())
 
-  const resolvedDark = computed(() =>
-    colorScheme.value === 'dark' || (colorScheme.value === 'system' && systemPrefersDark()),
+  const resolvedDark = computed(
+    () => colorScheme.value === 'dark' || (colorScheme.value === 'system' && systemPrefersDark()),
   )
 
   function applyDarkClass(): void {

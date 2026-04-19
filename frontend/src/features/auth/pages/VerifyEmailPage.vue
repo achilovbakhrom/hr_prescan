@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import Message from 'primevue/message'
+import AuthShell from '../components/AuthShell.vue'
 import { authService } from '../services/auth.service'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 
@@ -35,36 +36,43 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex flex-1 items-center justify-center py-12">
-    <div class="w-full max-w-md rounded-lg bg-white p-8 text-center shadow-md">
-      <div v-if="loading" class="flex flex-col items-center gap-4">
-        <i class="pi pi-spin pi-spinner text-4xl text-blue-600"></i>
-        <p class="text-gray-600">{{ t('auth.verifyEmail.verifying') }}</p>
-      </div>
-
-      <template v-else-if="success">
-        <h1 class="mb-4 text-2xl font-bold text-green-700">
-          {{ t('auth.verifyEmail.success') }}
-        </h1>
-        <p class="mb-6 text-gray-600">
-          {{ t('auth.verifyEmail.success') }}
-        </p>
-        <RouterLink :to="{ name: ROUTE_NAMES.LOGIN }">
-          <Button :label="t('auth.verifyEmail.goToLogin')" class="w-full" />
-        </RouterLink>
-      </template>
-
-      <template v-else>
-        <h1 class="mb-4 text-2xl font-bold text-red-700">
-          {{ t('auth.verifyEmail.error') }}
-        </h1>
-        <Message v-if="errorMessage" severity="error" class="mb-4">
-          {{ errorMessage }}
-        </Message>
-        <RouterLink :to="{ name: ROUTE_NAMES.LOGIN }">
-          <Button :label="t('auth.verifyEmail.goToLogin')" severity="secondary" class="w-full" />
-        </RouterLink>
-      </template>
+  <AuthShell>
+    <div v-if="loading" class="flex flex-col items-center gap-4 py-6 text-center">
+      <i class="pi pi-spin pi-spinner text-3xl text-[color:var(--color-accent)]"></i>
+      <p class="text-sm text-[color:var(--color-text-secondary)]">
+        {{ t('auth.verifyEmail.verifying') }}
+      </p>
     </div>
-  </div>
+
+    <div v-else-if="success" class="text-center">
+      <div
+        class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[color:var(--color-accent-celebrate-soft)]"
+      >
+        <i class="pi pi-check text-2xl text-[color:var(--color-accent-celebrate)]"></i>
+      </div>
+      <h1 class="mb-3 text-xl font-semibold text-[color:var(--color-text-primary)] sm:text-2xl">
+        {{ t('auth.verifyEmail.success') }}
+      </h1>
+      <RouterLink :to="{ name: ROUTE_NAMES.LOGIN }">
+        <Button :label="t('auth.verifyEmail.goToLogin')" class="mt-2 w-full" />
+      </RouterLink>
+    </div>
+
+    <div v-else class="text-center">
+      <div
+        class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[color:var(--color-surface-sunken)]"
+      >
+        <i class="pi pi-times text-2xl text-[color:var(--color-danger)]"></i>
+      </div>
+      <h1 class="mb-3 text-xl font-semibold text-[color:var(--color-text-primary)] sm:text-2xl">
+        {{ t('auth.verifyEmail.error') }}
+      </h1>
+      <Message v-if="errorMessage" severity="error" class="mb-4">
+        {{ errorMessage }}
+      </Message>
+      <RouterLink :to="{ name: ROUTE_NAMES.LOGIN }">
+        <Button :label="t('auth.verifyEmail.goToLogin')" severity="secondary" class="mt-2 w-full" />
+      </RouterLink>
+    </div>
+  </AuthShell>
 </template>

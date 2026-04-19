@@ -33,12 +33,36 @@ const liveCompanies = computed(() =>
 )
 
 const permissionOptions: { value: HRPermission; labelKey: string; descKey: string }[] = [
-  { value: 'manage_vacancies', labelKey: 'permissions.manageVacancies', descKey: 'permissions.manageVacanciesDesc' },
-  { value: 'manage_candidates', labelKey: 'permissions.manageCandidates', descKey: 'permissions.manageCandidatesDesc' },
-  { value: 'manage_interviews', labelKey: 'permissions.manageInterviews', descKey: 'permissions.manageInterviewsDesc' },
-  { value: 'manage_team', labelKey: 'permissions.manageTeam', descKey: 'permissions.manageTeamDesc' },
-  { value: 'view_analytics', labelKey: 'permissions.viewAnalytics', descKey: 'permissions.viewAnalyticsDesc' },
-  { value: 'manage_settings', labelKey: 'permissions.manageSettings', descKey: 'permissions.manageSettingsDesc' },
+  {
+    value: 'manage_vacancies',
+    labelKey: 'permissions.manageVacancies',
+    descKey: 'permissions.manageVacanciesDesc',
+  },
+  {
+    value: 'manage_candidates',
+    labelKey: 'permissions.manageCandidates',
+    descKey: 'permissions.manageCandidatesDesc',
+  },
+  {
+    value: 'manage_interviews',
+    labelKey: 'permissions.manageInterviews',
+    descKey: 'permissions.manageInterviewsDesc',
+  },
+  {
+    value: 'manage_team',
+    labelKey: 'permissions.manageTeam',
+    descKey: 'permissions.manageTeamDesc',
+  },
+  {
+    value: 'view_analytics',
+    labelKey: 'permissions.viewAnalytics',
+    descKey: 'permissions.viewAnalyticsDesc',
+  },
+  {
+    value: 'manage_settings',
+    labelKey: 'permissions.manageSettings',
+    descKey: 'permissions.manageSettingsDesc',
+  },
 ]
 
 watch(
@@ -104,7 +128,9 @@ function handleSubmit(): void {
           {{ t('settings.team.companies') }}
         </label>
         <p class="text-xs text-gray-500">{{ t('settings.team.companiesHelp') }}</p>
-        <div class="flex flex-col gap-2 rounded-lg border border-gray-200 bg-gray-50 p-3 max-h-48 overflow-auto">
+        <div
+          class="flex flex-col gap-2 rounded-lg border border-gray-200 bg-gray-50 p-3 max-h-48 overflow-auto"
+        >
           <label
             v-for="c in liveCompanies"
             :key="c.id"

@@ -1,0 +1,98 @@
+/**
+ * FloatingBackgroundPicker styles — split out of the .vue file to keep the
+ * component under the 200-line limit per CLAUDE.md. Not scoped (Vue SFC
+ * `<style scoped>` applies a data-attr selector which we can't get from a
+ * plain .css import), so selectors are namespaced with `.fbp-` to avoid
+ * collisions.
+ */
+
+.fbp-trigger,
+.fbp-thumb,
+.fbp-theme-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  padding: 0;
+  transition:
+    transform 240ms var(--ease-ios),
+    background-color 240ms var(--ease-ios),
+    box-shadow 240ms var(--ease-ios);
+}
+
+.fbp-trigger:focus-visible,
+.fbp-thumb:focus-visible,
+.fbp-theme-btn:focus-visible {
+  outline: 2px solid var(--color-border-ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fbp-trigger:hover,
+  .fbp-thumb:hover,
+  .fbp-theme-btn:hover {
+    transform: translateY(-1px);
+  }
+}
+
+.fbp-trigger {
+  width: 44px;
+  height: 44px;
+  border-radius: 9999px;
+  font-size: 1.125rem;
+}
+
+.fbp-thumb {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-glass);
+  background-color: var(--color-surface-glass-1);
+  backdrop-filter: blur(var(--blur-md)) saturate(1.4);
+  -webkit-backdrop-filter: blur(var(--blur-md)) saturate(1.4);
+  overflow: hidden;
+  position: relative;
+}
+
+.fbp-thumb--selected {
+  box-shadow: 0 0 0 2px var(--color-accent);
+}
+
+.fbp-theme-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+}
+
+.fbp-theme-btn:hover {
+  background-color: var(--color-surface-sunken);
+}
+
+/* Open/close transition: scale + fade. Reduced-motion → opacity only. */
+.picker-enter-active,
+.picker-leave-active {
+  transition:
+    opacity 320ms var(--ease-ios),
+    transform 320ms var(--ease-ios);
+  transform-origin: right center;
+}
+
+.picker-enter-from,
+.picker-leave-to {
+  opacity: 0;
+  transform: scale(0.92);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .picker-enter-active,
+  .picker-leave-active {
+    transition: opacity 180ms linear;
+  }
+  .picker-enter-from,
+  .picker-leave-to {
+    transform: none;
+  }
+}

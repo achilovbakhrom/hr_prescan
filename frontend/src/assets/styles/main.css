@@ -12,6 +12,11 @@ html.dark body {
   color: #e5e7eb;
 }
 
+body {
+  font-family: var(--font-sans);
+  font-feature-settings: 'cv11', 'ss01', 'ss03';
+}
+
 /* Smooth theme transitions */
 html,
 body,
@@ -31,13 +36,197 @@ body,
 }
 
 /* ============================================
+   Design tokens (Tailwind v4 CSS-first config)
+   ============================================ */
+
+@theme {
+  /* ---- Typography ---- */
+  --font-sans: 'Geist Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
+
+  /* ---- Surfaces (solid) ---- */
+  --color-surface-base: #ffffff;
+  --color-surface-raised: #f7f8fa;
+  --color-surface-sunken: #eef0f3;
+
+  /* ---- Surfaces (glass / translucent) ---- */
+  --color-surface-glass-1: rgba(255, 255, 255, 0.64);
+  --color-surface-glass-2: rgba(255, 255, 255, 0.48);
+  --color-surface-glass-float: rgba(255, 255, 255, 0.76);
+
+  /* ---- Borders ---- */
+  --color-border-soft: #e5e7eb;
+  --color-border-glass: rgba(255, 255, 255, 0.72);
+  --color-border-ring: rgba(37, 99, 235, 0.45);
+
+  /* ---- Text ---- */
+  --color-text-primary: #0b0f17;
+  --color-text-secondary: #374151;
+  --color-text-muted: #6b7280;
+  --color-text-on-accent: #ffffff;
+
+  /* ---- Accents ---- */
+  --color-accent: #2563eb;
+  --color-accent-soft: #dbeafe;
+  --color-accent-ai: #7c5cff;
+  --color-accent-ai-soft: #ede9fe;
+  --color-accent-celebrate: #ff9b73;
+  --color-accent-celebrate-soft: #ffe9de;
+
+  /* ---- Semantic (state) ---- */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-info: #0ea5e9;
+
+  /* ---- Blur scale ---- */
+  --blur-sm: 8px;
+  --blur-md: 16px;
+  --blur-lg: 24px;
+  --blur-xl: 40px;
+
+  /* ---- Shadows ---- */
+  --shadow-glass-1: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.06);
+  --shadow-glass-float: 0 2px 4px rgba(15, 23, 42, 0.06), 0 24px 48px rgba(15, 23, 42, 0.12);
+  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.05), 0 2px 6px rgba(15, 23, 42, 0.04);
+
+  /* ---- Motion ---- */
+  --ease-ios: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-soft: cubic-bezier(0.33, 1, 0.68, 1);
+  --dur-micro: 240ms;
+  --dur-card: 420ms;
+  --dur-page: 720ms;
+
+  /* ---- Radii ---- */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+}
+
+/* Dark-mode overrides — scoped by .dark class */
+.dark {
+  --color-surface-base: #0b0f17;
+  --color-surface-raised: #121826;
+  --color-surface-sunken: #0e131c;
+
+  --color-surface-glass-1: rgba(18, 24, 38, 0.64);
+  --color-surface-glass-2: rgba(18, 24, 38, 0.48);
+  --color-surface-glass-float: rgba(22, 28, 42, 0.76);
+
+  --color-border-soft: #1f2633;
+  --color-border-glass: rgba(255, 255, 255, 0.08);
+  --color-border-ring: rgba(124, 92, 255, 0.55);
+
+  --color-text-primary: #e5e7eb;
+  --color-text-secondary: #cbd1dc;
+  --color-text-muted: #8b93a3;
+  --color-text-on-accent: #ffffff;
+
+  --color-accent-soft: rgba(37, 99, 235, 0.18);
+  --color-accent-ai-soft: rgba(124, 92, 255, 0.20);
+  --color-accent-celebrate-soft: rgba(255, 155, 115, 0.18);
+
+  --shadow-glass-1: 0 1px 2px rgba(0, 0, 0, 0.30), 0 8px 24px rgba(0, 0, 0, 0.40);
+  --shadow-glass-float: 0 2px 4px rgba(0, 0, 0, 0.40), 0 24px 48px rgba(0, 0, 0, 0.55);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(0, 0, 0, 0.30);
+}
+
+/* ============================================
+   Utility layer (glass, motion, focus ring)
+   ============================================ */
+
+@layer utilities {
+  /* Glass composite utilities — always pair bg-glass-* with backdrop-blur-* */
+  .bg-glass-1 {
+    background-color: var(--color-surface-glass-1);
+    backdrop-filter: blur(var(--blur-md)) saturate(1.4);
+    -webkit-backdrop-filter: blur(var(--blur-md)) saturate(1.4);
+  }
+  .bg-glass-2 {
+    background-color: var(--color-surface-glass-2);
+    backdrop-filter: blur(var(--blur-md)) saturate(1.3);
+    -webkit-backdrop-filter: blur(var(--blur-md)) saturate(1.3);
+  }
+  .bg-glass-float {
+    background-color: var(--color-surface-glass-float);
+    backdrop-filter: blur(var(--blur-lg)) saturate(1.5);
+    -webkit-backdrop-filter: blur(var(--blur-lg)) saturate(1.5);
+  }
+
+  .border-glass {
+    border: 1px solid var(--color-border-glass);
+  }
+  .shadow-glass {
+    box-shadow: var(--shadow-glass-1);
+  }
+  .shadow-glass-float {
+    box-shadow: var(--shadow-glass-float);
+  }
+
+  /* Focus ring (applied via :focus-visible in components) */
+  .focus-ring-glass {
+    outline: 2px solid var(--color-border-ring);
+    outline-offset: 2px;
+  }
+
+  /* Motion convenience */
+  .ease-ios {
+    transition-timing-function: var(--ease-ios);
+  }
+  .dur-card {
+    transition-duration: var(--dur-card);
+  }
+  .dur-page {
+    transition-duration: var(--dur-page);
+  }
+
+  /* Entrance animation — used everywhere opt-in */
+  .animate-in {
+    animation: animate-in var(--dur-card) var(--ease-ios) both;
+  }
+  @keyframes animate-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .animate-in {
+      animation: animate-in-rm var(--dur-micro) linear both;
+    }
+    @keyframes animate-in-rm {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+  }
+
+  /* Display type step (Geist-tuned) */
+  .text-display {
+    font-size: clamp(2.75rem, 5.5vw, 4.5rem);
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    font-weight: 600;
+  }
+}
+
+/* ============================================
    Global modern tab styling (PrimeVue TabView)
    ============================================ */
 
 /* Tab list — underline container */
 .p-tabview-tablist,
 .p-tablist {
-  border-bottom: 2px solid #e5e7eb;
+  border-bottom: 2px solid var(--color-border-soft);
   gap: 0;
   background: transparent;
 }
@@ -49,7 +238,7 @@ body,
   padding: 0.75rem 1.25rem;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #6b7280;
+  color: var(--color-text-muted);
   border: none;
   border-bottom: 2px solid transparent;
   margin-bottom: -2px;
@@ -64,9 +253,9 @@ body,
 /* Hover state */
 .p-tabview-tab-header:hover,
 .p-tab:hover {
-  color: #374151;
-  background-color: #f9fafb;
-  border-bottom-color: #d1d5db;
+  color: var(--color-text-secondary);
+  background-color: var(--color-surface-raised);
+  border-bottom-color: var(--color-border-soft);
 }
 
 /* Active tab */
@@ -75,10 +264,29 @@ body,
 .p-tabview-tab-header.p-highlight,
 .p-tab[data-p-active='true'],
 .p-tab.p-tab-active {
-  color: #2563eb;
+  color: var(--color-accent);
   font-weight: 600;
-  border-bottom-color: #2563eb;
-  background-color: #eff6ff;
+  border-bottom-color: var(--color-accent);
+  background-color: var(--color-accent-soft);
+}
+
+/* Dark-mode tab overrides — tokens already swap via .dark selector, but the
+   hover background needs a subtler tint in dark to avoid washing out. */
+.dark .p-tabview-tab-header:hover,
+.dark .p-tab:hover {
+  color: var(--color-text-secondary);
+  background-color: var(--color-surface-raised);
+  border-bottom-color: var(--color-border-soft);
+}
+
+.dark .p-tabview-tab-header[data-p-active='true'],
+.dark .p-tabview-tab-header.p-tabview-active-tab-header,
+.dark .p-tabview-tab-header.p-highlight,
+.dark .p-tab[data-p-active='true'],
+.dark .p-tab.p-tab-active {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+  background-color: var(--color-accent-soft);
 }
 
 /* Tab panels container */

@@ -1,8 +1,16 @@
 <script setup lang="ts">
+/**
+ * InterviewConfirmationPage — post-scheduling "you're booked" page.
+ *
+ * T13 redesign: celebrate-accented GlassCard with the Prism glyph. Uses
+ * the peach celebrate tint. Route lives under PublicLayout.
+ */
 import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
+import GlassCard from '@/shared/components/GlassCard.vue'
+import AppLogo from '@/shared/components/AppLogo.vue'
 import { useInterviewStore } from '../stores/interview.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 
@@ -46,41 +54,64 @@ function handleGoToInterview(): void {
 </script>
 
 <template>
-  <div class="mx-auto max-w-lg py-12">
+  <div class="mx-auto max-w-lg py-10">
     <div v-if="!interview && interviewStore.loading" class="py-12 text-center">
-      <i class="pi pi-spinner pi-spin text-3xl text-gray-400"></i>
+      <i class="pi pi-spinner pi-spin text-3xl text-[color:var(--color-text-muted)]"></i>
     </div>
 
-    <div v-else-if="interview" class="rounded-lg border border-green-200 bg-white p-8 text-center">
-      <i class="pi pi-check-circle mb-4 text-5xl text-green-500"></i>
-      <h1 class="mb-2 text-2xl font-bold text-gray-900">{{ t('interviews.status.scheduled') }}!</h1>
-      <p class="mb-6 text-gray-600">
+    <GlassCard v-else-if="interview" accent="celebrate" class="text-center">
+      <!-- Prism + celebrate glow -->
+      <div class="relative mx-auto mb-4 flex items-center justify-center">
+        <div
+          class="absolute inset-0 mx-auto h-20 w-20 animate-[celebrate-pulse_2s_ease-in-out_infinite] rounded-full bg-[color:var(--color-accent-celebrate-soft)] blur-xl"
+        ></div>
+        <div class="relative">
+          <AppLogo variant="glyph" size="lg" :linked="false" />
+        </div>
+      </div>
+
+      <h1 class="mb-2 text-2xl font-semibold text-[color:var(--color-text-primary)]">
+        {{ t('interviews.status.scheduled') }}!
+      </h1>
+      <p class="mb-6 text-sm text-[color:var(--color-text-secondary)]">
         {{ t('interviews.confirmationPage.confirmed') }}
       </p>
 
-      <div class="mb-6 rounded-lg bg-gray-50 p-4 text-left">
+      <div
+        class="bg-glass-2 mb-6 rounded-md border border-[color:var(--color-border-soft)] p-4 text-left"
+      >
         <dl class="space-y-2 text-sm">
           <div class="flex justify-between">
-            <dt class="text-gray-500">{{ t('interviews.confirmationPage.date') }}</dt>
-            <dd class="font-medium">
+            <dt class="text-[color:var(--color-text-muted)]">
+              {{ t('interviews.confirmationPage.date') }}
+            </dt>
+            <dd class="font-medium text-[color:var(--color-text-primary)]">
               {{ formatDate(interview.createdAt) }}
             </dd>
           </div>
           <div class="flex justify-between">
-            <dt class="text-gray-500">{{ t('interviews.confirmationPage.time') }}</dt>
-            <dd class="font-medium">
+            <dt class="text-[color:var(--color-text-muted)]">
+              {{ t('interviews.confirmationPage.time') }}
+            </dt>
+            <dd class="font-mono text-xs text-[color:var(--color-text-primary)]">
               {{ formatTime(interview.createdAt) }}
             </dd>
           </div>
           <div class="flex justify-between">
-            <dt class="text-gray-500">{{ t('interviews.preCheck.duration') }}</dt>
-            <dd class="font-medium">
+            <dt class="text-[color:var(--color-text-muted)]">
+              {{ t('interviews.preCheck.duration') }}
+            </dt>
+            <dd class="font-mono text-xs text-[color:var(--color-text-primary)]">
               {{ t('interviews.preCheck.durationMinutes', { minutes: interview.durationMinutes }) }}
             </dd>
           </div>
           <div class="flex justify-between">
-            <dt class="text-gray-500">{{ t('interviews.preCheck.position') }}</dt>
-            <dd class="font-medium">{{ interview.vacancyTitle }}</dd>
+            <dt class="text-[color:var(--color-text-muted)]">
+              {{ t('interviews.preCheck.position') }}
+            </dt>
+            <dd class="font-medium text-[color:var(--color-text-primary)]">
+              {{ interview.vacancyTitle }}
+            </dd>
           </div>
         </dl>
       </div>
@@ -99,6 +130,27 @@ function handleGoToInterview(): void {
           @click="handleGoToInterview"
         />
       </div>
-    </div>
+    </GlassCard>
   </div>
 </template>
+
+<style scoped>
+@keyframes celebrate-pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [class*='celebrate-pulse'] {
+    animation: none !important;
+    opacity: 0.8;
+  }
+}
+</style>

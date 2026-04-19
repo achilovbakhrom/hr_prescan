@@ -1,8 +1,23 @@
 <script setup lang="ts">
+/**
+ * CandidateInterviewPage — the `/my-interview/:id` pre-interview briefing.
+ *
+ * Distinction from InterviewGatewayPage:
+ * - Gateway (`/interview/:token`) is the token-based entry from the email
+ *   link; it's a redirect hub that sends the candidate to chat or room.
+ * - CandidateInterviewPage is the authenticated candidate's interview
+ *   landing inside the app (PublicLayout via candidateInterviewRoutes);
+ *   it shows a scheduled interview and a "Join" CTA.
+ *
+ * T13 redesign: glass card on ambient background; prescan-style pre-check
+ * and device-test hints.
+ */
 import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
+import GlassCard from '@/shared/components/GlassCard.vue'
+import AppLogo from '@/shared/components/AppLogo.vue'
 import { useInterviewStore } from '../stores/interview.store'
 import InterviewStatusBadge from '../components/InterviewStatusBadge.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
@@ -32,59 +47,75 @@ function handleJoinInterview(): void {
 </script>
 
 <template>
-  <div class="mx-auto max-w-lg py-12">
+  <div class="mx-auto max-w-lg py-10">
     <div v-if="!interview && interviewStore.loading" class="py-12 text-center">
-      <i class="pi pi-spinner pi-spin text-3xl text-gray-400"></i>
+      <i class="pi pi-spinner pi-spin text-3xl text-[color:var(--color-text-muted)]"></i>
     </div>
 
-    <p v-if="interviewStore.error" class="mb-4 text-sm text-red-600">
+    <p v-if="interviewStore.error" class="mb-4 text-sm text-[color:var(--color-danger)]">
       {{ interviewStore.error }}
     </p>
 
     <template v-if="interview">
-      <!-- Completed state -->
-      <div
-        v-if="isCompleted"
-        class="rounded-lg border border-green-200 bg-green-50 p-8 text-center"
-      >
-        <i class="pi pi-check-circle mb-4 text-5xl text-green-500"></i>
-        <h1 class="mb-2 text-2xl font-bold text-gray-900">
+      <!-- Completed -->
+      <GlassCard v-if="isCompleted" accent="celebrate" class="text-center">
+        <div
+          class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[color:var(--color-accent-celebrate-soft)]"
+        >
+          <i class="pi pi-check-circle text-3xl text-[color:var(--color-accent-celebrate)]"></i>
+        </div>
+        <h1 class="mb-2 text-2xl font-semibold text-[color:var(--color-text-primary)]">
           {{ t('interviews.candidatePage.thankYou') }}
         </h1>
-        <p class="text-gray-600">
+        <p class="text-sm text-[color:var(--color-text-secondary)]">
           {{ t('interviews.candidatePage.completedMessage') }}
         </p>
-      </div>
+      </GlassCard>
 
-      <!-- Pre-interview state -->
-      <div v-else class="rounded-lg border border-gray-200 bg-white p-8">
-        <h1 class="mb-6 text-2xl font-bold text-gray-900">
-          {{ t('interviews.candidatePage.yourInterview') }}
-        </h1>
+      <!-- Pre-interview briefing -->
+      <GlassCard v-else>
+        <div class="mb-6 flex items-center gap-3">
+          <AppLogo variant="glyph" size="md" :linked="false" />
+          <h1 class="text-2xl font-semibold text-[color:var(--color-text-primary)]">
+            {{ t('interviews.candidatePage.yourInterview') }}
+          </h1>
+        </div>
 
         <div class="space-y-4">
-          <div class="rounded-lg bg-gray-50 p-4">
+          <div class="bg-glass-2 rounded-md border border-[color:var(--color-border-soft)] p-4">
             <dl class="space-y-2 text-sm">
               <div class="flex justify-between">
-                <dt class="text-gray-500">{{ t('interviews.preCheck.position') }}</dt>
-                <dd class="font-medium">{{ interview.vacancyTitle }}</dd>
+                <dt class="text-[color:var(--color-text-muted)]">
+                  {{ t('interviews.preCheck.position') }}
+                </dt>
+                <dd class="font-medium text-[color:var(--color-text-primary)]">
+                  {{ interview.vacancyTitle }}
+                </dd>
               </div>
               <div class="flex justify-between">
-                <dt class="text-gray-500">{{ t('interviews.preCheck.scheduled') }}</dt>
-                <dd class="font-medium">
+                <dt class="text-[color:var(--color-text-muted)]">
+                  {{ t('interviews.preCheck.scheduled') }}
+                </dt>
+                <dd class="font-mono text-xs text-[color:var(--color-text-primary)]">
                   {{ formatDate(interview.createdAt) }}
                 </dd>
               </div>
               <div class="flex justify-between">
-                <dt class="text-gray-500">{{ t('interviews.preCheck.duration') }}</dt>
-                <dd class="font-medium">
+                <dt class="text-[color:var(--color-text-muted)]">
+                  {{ t('interviews.preCheck.duration') }}
+                </dt>
+                <dd class="font-mono text-xs text-[color:var(--color-text-primary)]">
                   {{
-                    t('interviews.preCheck.durationMinutes', { minutes: interview.durationMinutes })
+                    t('interviews.preCheck.durationMinutes', {
+                      minutes: interview.durationMinutes,
+                    })
                   }}
                 </dd>
               </div>
-              <div class="flex justify-between">
-                <dt class="text-gray-500">{{ t('common.status') }}</dt>
+              <div class="flex items-center justify-between">
+                <dt class="text-[color:var(--color-text-muted)]">
+                  {{ t('common.status') }}
+                </dt>
                 <dd>
                   <InterviewStatusBadge :status="interview.status" />
                 </dd>
@@ -92,11 +123,15 @@ function handleJoinInterview(): void {
             </dl>
           </div>
 
-          <div class="rounded-lg border border-blue-100 bg-blue-50 p-4">
-            <h3 class="mb-2 text-sm font-semibold text-blue-800">
+          <div
+            class="rounded-md border border-[color:var(--color-accent-ai)]/30 bg-[color:var(--color-accent-ai-soft)] p-4"
+          >
+            <h3 class="mb-2 text-sm font-semibold text-[color:var(--color-accent-ai)]">
               {{ t('interviews.candidatePage.instructions') }}
             </h3>
-            <ul class="list-inside list-disc space-y-1 text-sm text-blue-700">
+            <ul
+              class="list-inside list-disc space-y-1 text-sm text-[color:var(--color-text-secondary)]"
+            >
               <li>{{ t('interviews.preCheck.stableConnection') }}</li>
               <li>{{ t('interviews.preCheck.quietRoom') }}</li>
               <li>{{ t('interviews.preCheck.allowCameraMicAccess') }}</li>
@@ -104,11 +139,11 @@ function handleJoinInterview(): void {
             </ul>
           </div>
 
-          <div class="rounded-lg border border-gray-200 p-4">
-            <h3 class="mb-2 text-sm font-semibold text-gray-700">
+          <div class="rounded-md border border-[color:var(--color-border-soft)] p-4">
+            <h3 class="mb-2 text-sm font-semibold text-[color:var(--color-text-secondary)]">
               {{ t('interviews.candidatePage.cameraMicTest') }}
             </h3>
-            <p class="text-xs text-gray-500">
+            <p class="text-xs text-[color:var(--color-text-muted)]">
               {{ t('interviews.candidatePage.deviceTestNote') }}
             </p>
           </div>
@@ -118,10 +153,11 @@ function handleJoinInterview(): void {
             :label="t('interviews.candidatePage.joinInterview')"
             icon="pi pi-video"
             class="w-full"
+            size="large"
             @click="handleJoinInterview"
           />
         </div>
-      </div>
+      </GlassCard>
     </template>
   </div>
 </template>

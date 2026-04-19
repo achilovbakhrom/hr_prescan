@@ -1,4 +1,9 @@
 <script setup lang="ts">
+/**
+ * DashboardPage — main landing after login.
+ * Per spec §9: glass greeting header + role-specific dashboard
+ * (HrDashboard = 2-col glass, CandidateDashboard = 1-col).
+ */
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
@@ -25,6 +30,14 @@ const greeting = computed(() => {
   return t('dashboard.greeting.evening')
 })
 
+const today = computed(() =>
+  new Date().toLocaleDateString(undefined, {
+    weekday: 'long',
+    month: 'short',
+    day: 'numeric',
+  }),
+)
+
 const loadingStats = ref(true)
 
 onMounted(async () => {
@@ -47,27 +60,31 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div>
-    <!-- Header -->
-    <div class="mb-8">
-      <h1 class="text-2xl font-bold text-gray-900">
+  <div class="mx-auto w-full max-w-7xl">
+    <!-- Greeting header -->
+    <header class="mb-6 flex flex-col gap-1 sm:mb-8">
+      <p
+        class="font-mono text-[11px] uppercase tracking-[0.18em] text-[color:var(--color-text-muted)]"
+      >
+        {{ today }}
+      </p>
+      <h1
+        class="text-3xl font-semibold tracking-tight text-[color:var(--color-text-primary)] sm:text-4xl"
+      >
         {{ greeting }}, {{ authStore.user?.firstName ?? 'User' }}
       </h1>
-      <p class="mt-1 text-sm text-gray-500">{{ t('dashboard.subtitle') }}</p>
-    </div>
+      <p class="text-sm text-[color:var(--color-text-secondary)] sm:text-base">
+        {{ t('dashboard.subtitle') }}
+      </p>
+    </header>
 
-    <!-- Trial Banner -->
     <TrialBanner class="mb-6" />
 
-    <!-- Loading -->
     <div v-if="loadingStats" class="flex items-center justify-center py-20">
-      <i class="pi pi-spinner pi-spin text-3xl text-gray-300"></i>
+      <i class="pi pi-spinner pi-spin text-3xl text-[color:var(--color-text-muted)]"></i>
     </div>
 
-    <!-- HR / Admin Dashboard -->
     <HrDashboard v-else-if="role === 'hr' || role === 'admin'" />
-
-    <!-- Candidate Dashboard -->
     <CandidateDashboard v-else-if="role === 'candidate'" />
   </div>
 </template>

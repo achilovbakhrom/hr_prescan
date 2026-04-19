@@ -1,70 +1,105 @@
 <script setup lang="ts">
+/**
+ * LandingPage — composes the 8 redesigned marketing sections.
+ *
+ * The landing route is registered outside of PublicLayout (see
+ * `frontend/src/app/router.ts`), so this page provides its own PageShell
+ * wrapper to get AnimatedBackground + FloatingBackgroundPicker. It also
+ * pins the background to Aurora (the signature mood for marketing) unless
+ * the user has explicitly picked a different variant via the picker.
+ */
+import { onMounted } from 'vue'
+import AnimatedBackground from '@/shared/components/AnimatedBackground.vue'
+import FloatingBackgroundPicker from '@/shared/components/FloatingBackgroundPicker.vue'
+import { useThemeStore } from '@/shared/stores/theme.store'
 import { useScrollAnimation } from '../composables/useScrollAnimation'
 import LandingNav from '../components/LandingNav.vue'
 import LandingHero from '../components/LandingHero.vue'
 import LandingStats from '../components/LandingStats.vue'
 import LandingFeatures from '../components/LandingFeatures.vue'
 import LandingPipeline from '../components/LandingPipeline.vue'
-import LandingJobs from '../components/LandingJobs.vue'
 import LandingCta from '../components/LandingCta.vue'
 import LandingFooter from '../components/LandingFooter.vue'
+// LandingJobs is temporarily unmounted — see docs/design/spec.md §9. Restore
+// once a public /api/public/vacancies endpoint is wired up with real data.
 
+const themeStore = useThemeStore()
 useScrollAnimation()
+
+// Aurora is the marketing signature — always force it on landing mount.
+// The FloatingBackgroundPicker still lets the visitor try other variants
+// live on the page; if they do, that choice persists for the rest of the
+// session across other pages. This keeps the landing impression consistent
+// without building a separate "explicit vs auto-random" flag.
+onMounted(() => {
+  if (themeStore.backgroundMode !== 'aurora') {
+    themeStore.setBackgroundMode('aurora')
+  }
+})
 </script>
 
 <template>
-  <div class="min-h-screen bg-white">
+  <!-- Page root is transparent so the Aurora (fixed, behind `main`) bleeds
+       through every scroll section. Each section is also bg-transparent and
+       stacks its content inside GlassCard / GlassSurface — the "floating
+       islands on atmosphere" pattern from spec §9. -->
+  <div class="landing-page relative min-h-screen bg-transparent">
+    <!-- Background layer (fixed, full-bleed) -->
+    <AnimatedBackground />
+
+    <!-- Sticky translucent header -->
     <LandingNav />
-    <LandingHero />
-    <LandingStats />
-    <LandingFeatures />
-    <LandingPipeline />
-    <LandingJobs />
-    <LandingCta />
-    <LandingFooter />
+
+    <!-- Main scroll column -->
+    <main class="relative z-0 bg-transparent pb-24 md:pb-12">
+      <LandingHero />
+      <LandingStats />
+      <LandingFeatures />
+      <LandingPipeline />
+      <LandingCta />
+      <LandingFooter />
+    </main>
+
+    <!-- Floating chrome — background + theme picker -->
+    <FloatingBackgroundPicker />
   </div>
 </template>
 
 <style>
-/* Scroll animation base */
+/* Entrance + scroll reveal shared classes. Kept global so child sections can
+   reference them without <style scoped> barriers. */
+/* Default = fully visible. The first-mount opacity/translate was invisible
+   under static screenshot/slow-load paths when IntersectionObserver hadn't
+   fired yet. Entrance animation now only plays if we explicitly start it
+   from a below-fold mount. */
 .scroll-animate {
-  opacity: 0;
-  transform: translateY(20px);
+  opacity: 1;
+  transform: none;
   transition:
-    opacity 0.6s ease,
-    transform 0.6s ease;
+    opacity 520ms var(--ease-ios),
+    transform 520ms var(--ease-ios);
 }
 .scroll-animate.animate-in {
   opacity: 1;
   transform: translateY(0);
 }
 .scroll-animate-delay-1 {
-  transition-delay: 0.1s;
+  transition-delay: 80ms;
 }
 .scroll-animate-delay-2 {
-  transition-delay: 0.2s;
+  transition-delay: 160ms;
 }
 .scroll-animate-delay-3 {
-  transition-delay: 0.3s;
+  transition-delay: 240ms;
 }
 .scroll-animate-delay-4 {
-  transition-delay: 0.4s;
+  transition-delay: 320ms;
 }
 
-/* Floating animation for hero background blobs */
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0) rotate(0deg);
+@media (prefers-reduced-motion: reduce) {
+  .scroll-animate {
+    transform: none;
+    transition: opacity 180ms linear;
   }
-  50% {
-    transform: translateY(-20px) rotate(3deg);
-  }
-}
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-.animate-float-delayed {
-  animation: float 8s ease-in-out 2s infinite;
 }
 </style>

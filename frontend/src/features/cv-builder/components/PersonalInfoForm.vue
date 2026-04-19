@@ -130,10 +130,7 @@ defineExpose({ save: handleSave })
     <Message v-if="errorMessage" severity="error" class="mb-4">{{ errorMessage }}</Message>
 
     <form class="flex flex-col gap-5" @submit.prevent="handleSave">
-      <PersonalInfoPhoto
-        @success="successMessage = $event"
-        @error="errorMessage = $event"
-      />
+      <PersonalInfoPhoto @success="successMessage = $event" @error="errorMessage = $event" />
 
       <PersonalInfoBasics
         v-model:headline="headline"

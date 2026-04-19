@@ -6,6 +6,8 @@ import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
 import Button from 'primevue/button'
 import Message from 'primevue/message'
+import AuthShell from '../components/AuthShell.vue'
+import AuthDivider from '../components/AuthDivider.vue'
 import GoogleSignInButton from '../components/GoogleSignInButton.vue'
 import TelegramSignInButton from '../components/TelegramSignInButton.vue'
 import { useAuthStore } from '../stores/auth.store'
@@ -89,80 +91,75 @@ function handleTelegramError(msg: string): void {
 </script>
 
 <template>
-  <div class="flex flex-1 items-center justify-center py-12">
-    <div class="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
-      <h1 class="mb-6 text-center text-2xl font-bold text-gray-900">
-        {{ t('auth.login.title') }}
-      </h1>
+  <AuthShell :title="t('auth.login.title')">
+    <Message v-if="errorMessage" severity="error" class="mb-4">
+      {{ errorMessage }}
+    </Message>
 
-      <Message v-if="errorMessage" severity="error" class="mb-4">
-        {{ errorMessage }}
-      </Message>
+    <GoogleSignInButton @success="handleGoogleSuccess" @error="handleGoogleError" />
+    <TelegramSignInButton @success="handleTelegramSuccess" @error="handleTelegramError" />
 
-      <GoogleSignInButton @success="handleGoogleSuccess" @error="handleGoogleError" />
+    <AuthDivider :label="t('auth.login.orSignInWithEmail')" />
 
-      <TelegramSignInButton @success="handleTelegramSuccess" @error="handleTelegramError" />
-
-      <div class="mb-4 flex items-center gap-3">
-        <div class="h-px flex-1 bg-gray-200"></div>
-        <span class="text-xs text-gray-400">{{ t('auth.login.orSignInWithEmail') }}</span>
-        <div class="h-px flex-1 bg-gray-200"></div>
+    <form class="flex flex-col gap-4" @submit.prevent="handleLogin">
+      <div class="flex flex-col gap-1.5">
+        <label
+          for="email"
+          class="text-xs font-medium uppercase tracking-wider text-[color:var(--color-text-muted)]"
+        >
+          {{ t('auth.login.email') }}
+        </label>
+        <InputText
+          id="email"
+          v-model="email"
+          type="email"
+          :placeholder="t('auth.login.emailPlaceholder')"
+          :invalid="submitted && emailInvalid"
+          class="w-full"
+        />
+        <small v-if="submitted && emailInvalid" class="text-[color:var(--color-danger)]">
+          {{ t('auth.login.emailInvalid') }}
+        </small>
       </div>
 
-      <form class="flex flex-col gap-4" @submit.prevent="handleLogin">
-        <div class="flex flex-col gap-1">
-          <label for="email" class="text-sm font-medium text-gray-700">
-            {{ t('auth.login.email') }}
-          </label>
-          <InputText
-            id="email"
-            v-model="email"
-            type="email"
-            :placeholder="t('auth.login.emailPlaceholder')"
-            :invalid="submitted && emailInvalid"
-            class="w-full"
-          />
-          <small v-if="submitted && emailInvalid" class="text-red-500">
-            {{ t('auth.login.emailInvalid') }}
-          </small>
-        </div>
-
-        <div class="flex flex-col gap-1">
-          <label for="password" class="text-sm font-medium text-gray-700">
-            {{ t('auth.login.password') }}
-          </label>
-          <Password
-            v-model="password"
-            input-id="password"
-            :placeholder="t('auth.login.passwordPlaceholder')"
-            :feedback="false"
-            toggle-mask
-            :invalid="submitted && passwordInvalid"
-            class="w-full"
-            input-class="w-full"
-          />
-          <small v-if="submitted && passwordInvalid" class="text-red-500">
-            {{ t('auth.login.passwordRequired') }}
-          </small>
-        </div>
-
-        <Button
-          type="submit"
-          :label="t('auth.login.submit')"
-          :loading="authStore.loading"
-          class="mt-2 w-full"
-        />
-      </form>
-
-      <p class="mt-4 text-center text-sm text-gray-600">
-        {{ t('auth.login.noAccount') }}
-        <RouterLink
-          :to="{ name: ROUTE_NAMES.REGISTER }"
-          class="font-medium text-blue-600 hover:text-blue-500"
+      <div class="flex flex-col gap-1.5">
+        <label
+          for="password"
+          class="text-xs font-medium uppercase tracking-wider text-[color:var(--color-text-muted)]"
         >
-          {{ t('auth.login.register') }}
-        </RouterLink>
-      </p>
-    </div>
-  </div>
+          {{ t('auth.login.password') }}
+        </label>
+        <Password
+          v-model="password"
+          input-id="password"
+          :placeholder="t('auth.login.passwordPlaceholder')"
+          :feedback="false"
+          toggle-mask
+          :invalid="submitted && passwordInvalid"
+          class="w-full"
+          input-class="w-full"
+        />
+        <small v-if="submitted && passwordInvalid" class="text-[color:var(--color-danger)]">
+          {{ t('auth.login.passwordRequired') }}
+        </small>
+      </div>
+
+      <Button
+        type="submit"
+        :label="t('auth.login.submit')"
+        :loading="authStore.loading"
+        class="mt-2 w-full"
+      />
+    </form>
+
+    <template #footer>
+      {{ t('auth.login.noAccount') }}
+      <RouterLink
+        :to="{ name: ROUTE_NAMES.REGISTER }"
+        class="font-medium text-[color:var(--color-accent)] hover:underline"
+      >
+        {{ t('auth.login.register') }}
+      </RouterLink>
+    </template>
+  </AuthShell>
 </template>

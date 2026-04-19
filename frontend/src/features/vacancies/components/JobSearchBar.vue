@@ -1,4 +1,10 @@
 <script setup lang="ts">
+/**
+ * JobSearchBar — glass hero for the public job board.
+ *
+ * T13: sits on top of the ambient background, using glass tokens so the
+ * Aurora/Mesh/Constellation bleeds through.
+ */
 import { useI18n } from 'vue-i18n'
 import InputText from 'primevue/inputtext'
 import IconField from 'primevue/iconfield'
@@ -22,14 +28,27 @@ const { t } = useI18n()
 </script>
 
 <template>
-  <div class="border-b border-gray-100 bg-white">
-    <div class="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
-      <h1 class="mb-1 text-xl font-bold text-gray-900 sm:text-2xl">{{ t('jobBoard.title') }}</h1>
-      <p class="mb-4 text-sm text-gray-500 sm:mb-5">
+  <div class="relative border-b border-[color:var(--color-border-soft)]">
+    <div class="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
+      <div class="mb-5 flex items-center gap-2">
+        <span
+          class="bg-glass-1 border-glass shadow-glass inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-medium text-[color:var(--color-accent-ai)]"
+        >
+          <i class="pi pi-briefcase text-[10px]"></i>
+          {{ t('jobBoard.openPositions', { count: jobCount }) }}
+        </span>
+      </div>
+
+      <h1 class="mb-1 text-2xl font-semibold text-[color:var(--color-text-primary)] sm:text-3xl">
+        {{ t('jobBoard.title') }}
+      </h1>
+      <p class="mb-5 text-sm text-[color:var(--color-text-secondary)]">
         {{ t('jobBoard.openPositions', { count: jobCount }) }}
       </p>
 
-      <div class="flex flex-col gap-2 sm:flex-row sm:gap-3">
+      <div
+        class="bg-glass-1 border-glass shadow-glass flex flex-col gap-2 rounded-lg p-2 sm:flex-row sm:gap-3 sm:p-3"
+      >
         <IconField class="flex-1">
           <InputIcon class="pi pi-search" />
           <InputText

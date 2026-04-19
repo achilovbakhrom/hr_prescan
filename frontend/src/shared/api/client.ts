@@ -174,10 +174,9 @@ apiClient.interceptors.response.use(
 
     try {
       const tokens = JSON.parse(raw) as { access: string; refresh: string }
-      const response = await axios.post<{ access: string }>(
-        `${baseURL}/auth/token/refresh/`,
-        { refresh: tokens.refresh },
-      )
+      const response = await axios.post<{ access: string }>(`${baseURL}/auth/token/refresh/`, {
+        refresh: tokens.refresh,
+      })
 
       const newAccess = response.data.access
       const updatedTokens = { ...tokens, access: newAccess }

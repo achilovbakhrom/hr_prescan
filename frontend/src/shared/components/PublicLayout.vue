@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import PublicHeader from './PublicHeader.vue'
+import PageShell from './PageShell.vue'
 </script>
 
 <template>
-  <div class="flex min-h-screen flex-col bg-gray-50">
-    <PublicHeader />
+  <PageShell variant="public">
+    <template #nav>
+      <PublicHeader />
+    </template>
     <RouterView />
-  </div>
+  </PageShell>
 </template>

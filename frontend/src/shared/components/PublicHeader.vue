@@ -8,7 +8,6 @@ import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import LanguageSwitcher from '@/shared/components/LanguageSwitcher.vue'
 import ThemeToggle from '@/shared/components/ThemeToggle.vue'
-import BackgroundModeSwitcher from '@/shared/components/BackgroundModeSwitcher.vue'
 import AppLogo from '@/shared/components/AppLogo.vue'
 import type { MenuItem } from 'primevue/menuitem'
 
@@ -63,7 +62,6 @@ function initials(): string {
       <slot name="center" />
 
       <div class="flex items-center gap-3">
-        <BackgroundModeSwitcher />
         <ThemeToggle />
         <LanguageSwitcher />
 

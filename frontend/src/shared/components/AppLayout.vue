@@ -4,6 +4,7 @@ import Toast from 'primevue/toast'
 import AppNavbar from './AppNavbar.vue'
 import AppSidebar from './AppSidebar.vue'
 import MobileNav from './MobileNav.vue'
+import PageShell from './PageShell.vue'
 
 const sidebarCollapsed = ref(localStorage.getItem('sidebar_collapsed') === 'true')
 const mobileNavOpen = ref(false)
@@ -24,14 +25,16 @@ function closeMobileNav(): void {
 </script>
 
 <template>
-  <div class="flex h-screen flex-col">
-    <AppNavbar
-      :sidebar-collapsed="sidebarCollapsed"
-      @toggle-sidebar="toggleDesktopSidebar"
-      @toggle-mobile-nav="toggleMobileNav"
-    />
+  <PageShell variant="app">
+    <template #nav>
+      <AppNavbar
+        :sidebar-collapsed="sidebarCollapsed"
+        @toggle-sidebar="toggleDesktopSidebar"
+        @toggle-mobile-nav="toggleMobileNav"
+      />
+    </template>
 
-    <div class="flex flex-1 overflow-hidden">
+    <div class="flex flex-1 gap-0">
       <!-- Desktop Sidebar (always rendered, collapsible) -->
       <AppSidebar
         :collapsed="sidebarCollapsed"
@@ -40,12 +43,9 @@ function closeMobileNav(): void {
       />
 
       <!-- Main content -->
-      <main
-        class="flex-1 overflow-y-auto bg-gray-50 p-3 sm:p-5 lg:p-8 dark:bg-gray-900"
-        id="main-content"
-      >
+      <div class="min-w-0 flex-1" id="main-content">
         <RouterView />
-      </main>
+      </div>
     </div>
 
     <!-- Mobile slide-out navigation (teleported, only on small screens) -->
@@ -53,5 +53,5 @@ function closeMobileNav(): void {
 
     <!-- Global toast outlet -->
     <Toast position="bottom-right" />
-  </div>
+  </PageShell>
 </template>

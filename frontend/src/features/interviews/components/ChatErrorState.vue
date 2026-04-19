@@ -1,6 +1,14 @@
 <script setup lang="ts">
+/**
+ * ChatErrorState — terminal states for the chat interview flow.
+ *
+ * T13 redesign: composes GlassCard on top of the ambient background
+ * (parent page provides AnimatedBackground).
+ */
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
+import GlassCard from '@/shared/components/GlassCard.vue'
+import AppLogo from '@/shared/components/AppLogo.vue'
 import type { ChatErrorState } from '../composables/useChatInterview'
 
 defineProps<{
@@ -12,85 +20,83 @@ const { t } = useI18n()
 </script>
 
 <template>
-  <div class="flex flex-1 items-center justify-center px-4">
-    <div class="w-full max-w-md text-center">
-      <template v-if="errorState === 'completed'">
-        <div class="rounded-2xl bg-white p-8 shadow-lg">
+  <div class="flex flex-1 items-center justify-center px-4 py-8">
+    <div class="w-full max-w-md">
+      <GlassCard :accent="errorState === 'completed' ? 'celebrate' : 'default'" class="text-center">
+        <div class="mb-3 flex justify-center">
+          <AppLogo variant="glyph" size="md" :linked="false" />
+        </div>
+
+        <template v-if="errorState === 'completed'">
           <div
-            class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100"
+            class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[color:var(--color-accent-celebrate-soft)]"
           >
-            <i class="pi pi-check text-3xl text-green-600"></i>
+            <i class="pi pi-check text-3xl text-[color:var(--color-accent-celebrate)]"></i>
           </div>
-          <h1 class="mb-2 text-xl font-bold text-gray-900">
+          <h1 class="mb-2 text-xl font-semibold text-[color:var(--color-text-primary)]">
             {{ t('interviews.chatPage.interviewCompleted') }}
           </h1>
-          <p class="mb-6 text-sm text-gray-500">{{ t('interviews.states.completed') }}</p>
+          <p class="mb-5 text-sm text-[color:var(--color-text-secondary)]">
+            {{ t('interviews.states.completed') }}
+          </p>
+          <RouterLink to="/jobs">
+            <Button :label="t('interviews.chatPage.browseMoreJobs')" />
+          </RouterLink>
+        </template>
+
+        <template v-else-if="errorState === 'expired'">
+          <div
+            class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[color:var(--color-warning)]/15"
+          >
+            <i class="pi pi-clock text-3xl text-[color:var(--color-warning)]"></i>
+          </div>
+          <h1 class="mb-2 text-xl font-semibold text-[color:var(--color-text-primary)]">
+            {{ t('interviews.chatPage.linkExpired') }}
+          </h1>
+          <p class="mb-5 text-sm text-[color:var(--color-text-secondary)]">
+            {{ errorMessage || t('interviews.states.expired') }}
+          </p>
           <RouterLink
             to="/jobs"
-            class="inline-block rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+            class="text-sm font-medium text-[color:var(--color-accent)] hover:underline"
           >
             {{ t('interviews.chatPage.browseMoreJobs') }}
           </RouterLink>
-        </div>
-      </template>
+        </template>
 
-      <template v-else-if="errorState === 'expired'">
-        <div class="rounded-2xl bg-white p-8 shadow-lg">
+        <template v-else-if="errorState === 'closed'">
           <div
-            class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-yellow-100"
+            class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[color:var(--color-surface-sunken)]"
           >
-            <i class="pi pi-clock text-3xl text-yellow-600"></i>
+            <i class="pi pi-ban text-3xl text-[color:var(--color-text-muted)]"></i>
           </div>
-          <h1 class="mb-2 text-xl font-bold text-gray-900">
-            {{ t('interviews.chatPage.linkExpired') }}
-          </h1>
-          <p class="mb-6 text-sm text-gray-500">
-            {{ errorMessage || t('interviews.states.expired') }}
-          </p>
-          <RouterLink to="/jobs" class="text-sm font-medium text-blue-600 hover:underline">{{
-            t('interviews.chatPage.browseMoreJobs')
-          }}</RouterLink>
-        </div>
-      </template>
-
-      <template v-else-if="errorState === 'closed'">
-        <div class="rounded-2xl bg-white p-8 shadow-lg">
-          <div
-            class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100"
-          >
-            <i class="pi pi-ban text-3xl text-gray-400"></i>
-          </div>
-          <h1 class="mb-2 text-xl font-bold text-gray-900">
+          <h1 class="mb-2 text-xl font-semibold text-[color:var(--color-text-primary)]">
             {{ t('interviews.chatPage.vacancyClosed') }}
           </h1>
-          <p class="mb-6 text-sm text-gray-500">
+          <p class="mb-5 text-sm text-[color:var(--color-text-secondary)]">
             {{ errorMessage || t('interviews.states.closed') }}
           </p>
-          <RouterLink to="/jobs" class="text-sm font-medium text-blue-600 hover:underline">{{
-            t('interviews.chatPage.browseMoreJobs')
-          }}</RouterLink>
-        </div>
-      </template>
-
-      <template v-else>
-        <div class="rounded-2xl bg-white p-8 shadow-lg">
-          <div
-            class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100"
+          <RouterLink
+            to="/jobs"
+            class="text-sm font-medium text-[color:var(--color-accent)] hover:underline"
           >
-            <i class="pi pi-exclamation-triangle text-3xl text-red-400"></i>
+            {{ t('interviews.chatPage.browseMoreJobs') }}
+          </RouterLink>
+        </template>
+
+        <template v-else>
+          <div
+            class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[color:var(--color-danger)]/15"
+          >
+            <i class="pi pi-exclamation-triangle text-3xl text-[color:var(--color-danger)]"></i>
           </div>
-          <h1 class="mb-2 text-xl font-bold text-gray-900">
+          <h1 class="mb-2 text-xl font-semibold text-[color:var(--color-text-primary)]">
             {{ t('interviews.chatPage.somethingWentWrong') }}
           </h1>
-          <p class="mb-6 text-sm text-gray-500">{{ errorMessage }}</p>
-          <Button
-            :label="t('errors.tryAgain')"
-            icon="pi pi-refresh"
-            rounded
-            @click="$router.go(0)"
-          />
-        </div>
-      </template>
+          <p class="mb-5 text-sm text-[color:var(--color-text-secondary)]">{{ errorMessage }}</p>
+          <Button :label="t('errors.tryAgain')" icon="pi pi-refresh" @click="$router.go(0)" />
+        </template>
+      </GlassCard>
     </div>
   </div>
 </template>

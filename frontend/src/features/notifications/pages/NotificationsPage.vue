@@ -1,11 +1,18 @@
 <script setup lang="ts">
+/**
+ * NotificationsPage — HR notifications inbox.
+ * Glass list container wrapping solid rows (data legibility rule).
+ * Spec: docs/design/spec.md §9 Settings+Notifications block.
+ */
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import Button from 'primevue/button'
 import { useRouter } from 'vue-router'
+import Button from 'primevue/button'
+import GlassCard from '@/shared/components/GlassCard.vue'
+import NotificationRow from '../components/NotificationRow.vue'
 import { useNotificationStore } from '../stores/notification.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
-import type { Notification, NotificationType } from '../types/notification.types'
+import type { Notification } from '../types/notification.types'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -19,35 +26,16 @@ const filteredNotifications = computed(() => {
   return notificationStore.notifications
 })
 
-const typeIcons: Record<NotificationType, string> = {
-  application_received: 'pi pi-user-plus',
-  interview_scheduled: 'pi pi-calendar',
-  interview_completed: 'pi pi-check-circle',
-  interview_reminder: 'pi pi-clock',
-  status_changed: 'pi pi-sync',
-  invitation_received: 'pi pi-envelope',
-  system: 'pi pi-info-circle',
-}
-
-function getIcon(type: NotificationType): string {
-  return typeIcons[type] ?? 'pi pi-bell'
-}
-
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleString()
+async function handleMarkAllAsRead(): Promise<void> {
+  await notificationStore.markAllAsRead()
 }
 
 async function handleMarkAsRead(notification: Notification): Promise<void> {
   await notificationStore.markAsRead(notification.id)
 }
 
-async function handleMarkAllAsRead(): Promise<void> {
-  await notificationStore.markAllAsRead()
-}
-
 async function handleClick(notification: Notification): Promise<void> {
   await notificationStore.markAsRead(notification.id)
-
   if (notification.type === 'application_received' && notification.data.candidateId) {
     await router.push({
       name: ROUTE_NAMES.CANDIDATE_DETAIL,
@@ -66,8 +54,15 @@ onMounted(() => notificationStore.fetchNotifications())
 
 <template>
   <div class="space-y-4">
-    <div class="flex items-center justify-between">
-      <h1 class="text-2xl font-bold">{{ t('notifications.title') }}</h1>
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <h1 class="text-xl font-bold text-[color:var(--color-text-primary)] md:text-2xl">
+          {{ t('notifications.title') }}
+        </h1>
+        <p class="mt-0.5 text-sm text-[color:var(--color-text-muted)]">
+          {{ notificationStore.unreadCount }} {{ t('common.unread', 'unread') }}
+        </p>
+      </div>
       <Button
         v-if="notificationStore.unreadCount > 0"
         :label="t('notifications.markAllRead')"
@@ -93,45 +88,26 @@ onMounted(() => notificationStore.fetchNotifications())
       />
     </div>
 
-    <div v-if="notificationStore.loading" class="py-12 text-center">
-      <i class="pi pi-spinner pi-spin text-3xl text-gray-400"></i>
-    </div>
-
-    <div v-else-if="filteredNotifications.length === 0" class="py-12 text-center text-gray-500">
-      <i class="pi pi-bell-slash mb-2 text-3xl"></i>
-      <p>{{ t('notifications.noNotifications') }}</p>
-    </div>
-
-    <div v-else class="space-y-2">
-      <div
-        v-for="notification in filteredNotifications"
-        :key="notification.id"
-        class="flex cursor-pointer items-start gap-3 rounded-lg border border-gray-200 p-4 transition hover:bg-gray-50"
-        :class="{ 'border-blue-200 bg-blue-50': !notification.isRead }"
-        @click="handleClick(notification)"
-      >
-        <i :class="getIcon(notification.type)" class="mt-0.5 text-lg text-gray-400"></i>
-        <div class="min-w-0 flex-1">
-          <p class="text-sm font-medium text-gray-900">
-            {{ notification.title }}
-          </p>
-          <p class="mt-1 text-sm text-gray-600">
-            {{ notification.message }}
-          </p>
-          <p class="mt-1 text-xs text-gray-400">
-            {{ formatDate(notification.createdAt) }}
-          </p>
-        </div>
-        <Button
-          v-if="!notification.isRead"
-          icon="pi pi-check"
-          text
-          rounded
-          size="small"
-          aria-label="Mark as read"
-          @click.stop="handleMarkAsRead(notification)"
-        />
+    <GlassCard class="!p-0">
+      <div v-if="notificationStore.loading" class="py-12 text-center">
+        <i class="pi pi-spinner pi-spin text-3xl text-[color:var(--color-text-muted)]"></i>
       </div>
-    </div>
+      <div
+        v-else-if="filteredNotifications.length === 0"
+        class="py-12 text-center text-[color:var(--color-text-muted)]"
+      >
+        <i class="pi pi-bell-slash mb-2 text-3xl"></i>
+        <p>{{ t('notifications.noNotifications') }}</p>
+      </div>
+      <ul v-else class="divide-y divide-[color:var(--color-border-soft)]">
+        <NotificationRow
+          v-for="notification in filteredNotifications"
+          :key="notification.id"
+          :notification="notification"
+          @click="handleClick(notification)"
+          @mark-read="handleMarkAsRead(notification)"
+        />
+      </ul>
+    </GlassCard>
   </div>
 </template>

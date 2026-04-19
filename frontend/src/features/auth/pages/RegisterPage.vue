@@ -3,6 +3,8 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Message from 'primevue/message'
+import AuthShell from '../components/AuthShell.vue'
+import AuthDivider from '../components/AuthDivider.vue'
 import GoogleSignInButton from '../components/GoogleSignInButton.vue'
 import TelegramSignInButton from '../components/TelegramSignInButton.vue'
 import RegisterFormFields from '../components/RegisterFormFields.vue'
@@ -94,52 +96,44 @@ async function handleTelegramSuccess(
 </script>
 
 <template>
-  <div class="flex flex-1 items-center justify-center py-12">
-    <div class="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
-      <RegisterSuccess v-if="registered" :email="email" />
+  <AuthShell :title="registered ? '' : t('auth.register.title')">
+    <RegisterSuccess v-if="registered" :email="email" />
 
-      <template v-else>
-        <h1 class="mb-6 text-center text-2xl font-bold text-gray-900">
-          {{ t('auth.register.title') }}
-        </h1>
-        <Message v-if="errorMessage" severity="error" class="mb-4">{{ errorMessage }}</Message>
+    <template v-else>
+      <Message v-if="errorMessage" severity="error" class="mb-4">{{ errorMessage }}</Message>
 
-        <GoogleSignInButton
-          @success="handleGoogleSuccess"
-          @error="(msg: string) => (errorMessage = msg)"
-        />
-        <TelegramSignInButton
-          @success="handleTelegramSuccess"
-          @error="(msg: string) => (errorMessage = msg)"
-        />
+      <GoogleSignInButton
+        @success="handleGoogleSuccess"
+        @error="(msg: string) => (errorMessage = msg)"
+      />
+      <TelegramSignInButton
+        @success="handleTelegramSuccess"
+        @error="(msg: string) => (errorMessage = msg)"
+      />
 
-        <div class="mb-4 flex items-center gap-3">
-          <div class="h-px flex-1 bg-gray-200"></div>
-          <span class="text-xs text-gray-400">{{ t('auth.register.orRegisterWithEmail') }}</span>
-          <div class="h-px flex-1 bg-gray-200"></div>
-        </div>
+      <AuthDivider :label="t('auth.register.orRegisterWithEmail')" />
 
-        <RegisterFormFields
-          v-model:first-name="firstName"
-          v-model:last-name="lastName"
-          v-model:email="email"
-          v-model:password="password"
-          v-model:confirm-password="confirmPassword"
-          :submitted="submitted"
-          :errors="errors"
-          :loading="authStore.loading"
-          @submit="handleRegister"
-        />
+      <RegisterFormFields
+        v-model:first-name="firstName"
+        v-model:last-name="lastName"
+        v-model:email="email"
+        v-model:password="password"
+        v-model:confirm-password="confirmPassword"
+        :submitted="submitted"
+        :errors="errors"
+        :loading="authStore.loading"
+        @submit="handleRegister"
+      />
+    </template>
 
-        <p class="mt-4 text-center text-sm text-gray-600">
-          {{ t('auth.register.hasAccount') }}
-          <RouterLink
-            :to="{ name: ROUTE_NAMES.LOGIN }"
-            class="font-medium text-blue-600 hover:text-blue-500"
-            >{{ t('auth.register.signIn') }}</RouterLink
-          >
-        </p>
-      </template>
-    </div>
-  </div>
+    <template v-if="!registered" #footer>
+      {{ t('auth.register.hasAccount') }}
+      <RouterLink
+        :to="{ name: ROUTE_NAMES.LOGIN }"
+        class="font-medium text-[color:var(--color-accent)] hover:underline"
+      >
+        {{ t('auth.register.signIn') }}
+      </RouterLink>
+    </template>
+  </AuthShell>
 </template>

@@ -1,0 +1,319 @@
+/* ============================================
+   PrimeVue Overrides — HR PreScan design system
+   Scoped by .dark via @custom-variant in main.css.
+   Uses tokens defined in main.css @theme block.
+   ============================================ */
+
+/* ---- Button ---- */
+.p-button {
+  background: var(--color-accent);
+  color: var(--color-text-on-accent);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.95rem;
+  font-weight: 500;
+  box-shadow: var(--shadow-card);
+  transition:
+    transform 240ms var(--ease-ios),
+    background-color 240ms var(--ease-ios),
+    box-shadow 240ms var(--ease-ios);
+}
+.p-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: color-mix(in srgb, var(--color-accent) 92%, black);
+  border-color: color-mix(in srgb, var(--color-accent) 92%, black);
+}
+.p-button:active:not(:disabled) {
+  transform: translateY(0);
+  filter: brightness(0.95);
+}
+.p-button:focus-visible {
+  outline: 2px solid var(--color-border-ring);
+  outline-offset: 2px;
+}
+.p-button:disabled {
+  opacity: 0.5;
+  transform: none;
+  cursor: not-allowed;
+}
+
+/* Secondary — glass ghost */
+.p-button.p-button-secondary {
+  background-color: var(--color-surface-glass-1);
+  backdrop-filter: blur(var(--blur-md)) saturate(1.4);
+  -webkit-backdrop-filter: blur(var(--blur-md)) saturate(1.4);
+  border: 1px solid var(--color-border-glass);
+  color: var(--color-text-primary);
+}
+.p-button.p-button-secondary:hover:not(:disabled) {
+  background-color: var(--color-surface-glass-float);
+}
+
+/* Danger */
+.p-button.p-button-danger {
+  background: var(--color-danger);
+  border-color: var(--color-danger);
+  color: var(--color-text-on-accent);
+}
+.p-button.p-button-danger:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-danger) 92%, black);
+  border-color: color-mix(in srgb, var(--color-danger) 92%, black);
+}
+
+/* Text — transparent with accent color */
+.p-button.p-button-text {
+  background: transparent;
+  border-color: transparent;
+  color: var(--color-accent);
+  box-shadow: none;
+}
+.p-button.p-button-text:hover:not(:disabled) {
+  background: var(--color-accent-soft);
+  border-color: transparent;
+}
+
+/* Outlined — transparent with accent border */
+.p-button.p-button-outlined {
+  background: transparent;
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+  box-shadow: none;
+}
+.p-button.p-button-outlined:hover:not(:disabled) {
+  background: var(--color-accent-soft);
+}
+
+/* ---- Inputs — InputText, Textarea, Select, MultiSelect, Password, InputNumber ---- */
+.p-inputtext,
+.p-textarea,
+.p-select,
+.p-multiselect,
+.p-password-input,
+.p-inputnumber-input {
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.8rem;
+  color: var(--color-text-primary);
+  transition:
+    border-color 160ms var(--ease-ios),
+    box-shadow 160ms var(--ease-ios),
+    background-color 160ms var(--ease-ios);
+}
+.p-inputtext:focus,
+.p-inputtext:focus-visible,
+.p-textarea:focus,
+.p-textarea:focus-visible,
+.p-select:not(.p-disabled).p-focus,
+.p-multiselect:not(.p-disabled).p-focus,
+.p-password-input:focus,
+.p-inputnumber-input:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-soft);
+  outline: none;
+}
+.p-inputtext.p-invalid,
+.p-textarea.p-invalid,
+.p-select.p-invalid,
+.p-multiselect.p-invalid,
+.p-password.p-invalid > .p-password-input,
+.p-inputnumber.p-invalid > .p-inputnumber-input {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-danger) 25%, transparent);
+}
+.p-inputtext:disabled,
+.p-textarea:disabled,
+.p-select.p-disabled,
+.p-multiselect.p-disabled,
+.p-password-input:disabled,
+.p-inputnumber-input:disabled {
+  background: var(--color-surface-sunken);
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Dark inputs stay on solid surface-sunken for legibility (never glass). */
+.dark .p-inputtext,
+.dark .p-textarea,
+.dark .p-select,
+.dark .p-multiselect,
+.dark .p-password-input,
+.dark .p-inputnumber-input {
+  background: var(--color-surface-sunken);
+}
+
+/* ---- Dialog ---- */
+.p-dialog {
+  background: var(--color-surface-glass-float);
+  backdrop-filter: blur(var(--blur-lg)) saturate(1.5);
+  -webkit-backdrop-filter: blur(var(--blur-lg)) saturate(1.5);
+  border: 1px solid var(--color-border-glass);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-glass-float);
+  color: var(--color-text-primary);
+  animation: dialog-enter var(--dur-card) var(--ease-ios) both;
+}
+.p-dialog-mask {
+  background: rgba(10, 14, 24, 0.45);
+  backdrop-filter: blur(var(--blur-sm));
+  -webkit-backdrop-filter: blur(var(--blur-sm));
+}
+.p-dialog-header,
+.p-dialog-footer {
+  background: transparent;
+  border-color: var(--color-border-glass);
+}
+@keyframes dialog-enter {
+  from { opacity: 0; transform: scale(0.98); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .p-dialog { animation-duration: var(--dur-micro); animation-name: dialog-enter-rm; }
+  @keyframes dialog-enter-rm {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+}
+
+/* ---- DataTable ---- */
+.p-datatable {
+  background: transparent;
+  color: var(--color-text-primary);
+}
+.p-datatable .p-datatable-thead > tr > th {
+  background: var(--color-surface-sunken);
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  border-bottom: 1px solid var(--color-border-soft);
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+.p-datatable .p-datatable-tbody > tr {
+  background: var(--color-surface-base);
+  color: var(--color-text-primary);
+  transition: background-color 120ms var(--ease-ios);
+}
+.p-datatable.p-datatable-striped .p-datatable-tbody > tr:nth-child(even) {
+  background: var(--color-surface-raised);
+}
+.p-datatable .p-datatable-tbody > tr:hover,
+.p-datatable.p-datatable-hoverable .p-datatable-tbody > tr:not(.p-datatable-row-selected):hover {
+  background: var(--color-accent-soft);
+}
+.p-datatable .p-datatable-tbody > tr.p-datatable-row-selected {
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  border-left: 2px solid var(--color-accent);
+}
+.p-datatable .p-datatable-tbody > tr > td {
+  border-bottom: 1px solid var(--color-border-soft);
+}
+
+/* Pagination container — chrome can be glass */
+.p-paginator {
+  background-color: var(--color-surface-glass-1);
+  backdrop-filter: blur(var(--blur-md)) saturate(1.4);
+  -webkit-backdrop-filter: blur(var(--blur-md)) saturate(1.4);
+  border: 1px solid var(--color-border-glass);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+}
+
+/* ---- Card ---- */
+.p-card {
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  color: var(--color-text-primary);
+}
+
+/* ---- Menu / Menubar / Toolbar (chrome = glass) ---- */
+.p-menu,
+.p-menubar,
+.p-toolbar,
+.p-tieredmenu,
+.p-contextmenu,
+.p-megamenu {
+  background-color: var(--color-surface-glass-1);
+  backdrop-filter: blur(var(--blur-md)) saturate(1.4);
+  -webkit-backdrop-filter: blur(var(--blur-md)) saturate(1.4);
+  border: 1px solid var(--color-border-glass);
+  box-shadow: var(--shadow-glass-1);
+  color: var(--color-text-primary);
+}
+.p-menu .p-menuitem.p-menuitem-active > .p-menuitem-content,
+.p-menubar .p-menuitem.p-menuitem-active > .p-menuitem-content,
+.p-menu .p-menuitem-link:hover,
+.p-menubar .p-menuitem-link:hover {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+/* ---- Toast ---- */
+.p-toast-message {
+  background-color: var(--color-surface-glass-float);
+  backdrop-filter: blur(var(--blur-lg)) saturate(1.5);
+  -webkit-backdrop-filter: blur(var(--blur-lg)) saturate(1.5);
+  border: 1px solid var(--color-border-glass);
+  box-shadow: var(--shadow-glass-float);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  animation: toast-slide 320ms var(--ease-ios) both;
+}
+.p-toast-message.p-toast-message-success { border-left: 4px solid var(--color-success); }
+.p-toast-message.p-toast-message-info    { border-left: 4px solid var(--color-info); }
+.p-toast-message.p-toast-message-warn    { border-left: 4px solid var(--color-warning); }
+.p-toast-message.p-toast-message-error   { border-left: 4px solid var(--color-danger); }
+@keyframes toast-slide {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .p-toast-message { animation-name: toast-fade-rm; animation-duration: var(--dur-micro); }
+  @keyframes toast-fade-rm {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+}
+
+/* ---- Tag / Chip / Badge — preserved vacancy states (Draft/Published/Paused/Archived) ---- */
+.p-tag,
+.p-chip,
+.p-badge {
+  border-radius: var(--radius-xs);
+  font-weight: 500;
+  padding: 0.2rem 0.55rem;
+}
+.p-tag.p-tag-draft,
+.p-chip.p-chip-draft {
+  background: var(--color-surface-sunken);
+  color: var(--color-text-muted);
+}
+.p-tag.p-tag-published,
+.p-tag.p-tag-success,
+.p-chip.p-chip-published {
+  background: color-mix(in srgb, var(--color-success) 15%, transparent);
+  color: var(--color-success);
+}
+.p-tag.p-tag-paused,
+.p-tag.p-tag-warn,
+.p-chip.p-chip-paused {
+  background: color-mix(in srgb, var(--color-warning) 15%, transparent);
+  color: var(--color-warning);
+}
+.p-tag.p-tag-archived,
+.p-chip.p-chip-archived {
+  background: var(--color-surface-sunken);
+  color: var(--color-text-muted);
+  opacity: 0.75;
+  text-decoration: line-through;
+}
+.p-tag.p-tag-info {
+  background: color-mix(in srgb, var(--color-info) 15%, transparent);
+  color: var(--color-info);
+}
+.p-tag.p-tag-danger {
+  background: color-mix(in srgb, var(--color-danger) 15%, transparent);
+  color: var(--color-danger);
+}

@@ -1,4 +1,11 @@
 <script setup lang="ts">
+/**
+ * PublicJobBoardPage — public list of published vacancies.
+ *
+ * T13 redesign: content sits on glass primitives on top of the ambient
+ * AnimatedBackground supplied by PublicLayout. Header becomes a glass
+ * block (`GlassSurface level="float"`), cards compose `GlassCard`.
+ */
 import { ref, computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -95,7 +102,7 @@ function navigateToDetail(id: string): void {
 </script>
 
 <template>
-  <div>
+  <div class="public-job-board relative">
     <JobSearchBar
       :search="search"
       :location="locationFilter"
@@ -106,7 +113,7 @@ function navigateToDetail(id: string): void {
       @submit="fetchJobs"
     />
 
-    <div class="mx-auto max-w-6xl px-4 py-4 sm:px-6 sm:py-6">
+    <div class="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
       <div class="flex gap-6">
         <JobFilterSidebar
           :employment-type="employmentType"
@@ -127,21 +134,21 @@ function navigateToDetail(id: string): void {
           <!-- Mobile filter bar -->
           <div class="mb-3 flex items-center gap-2 lg:hidden">
             <button
-              class="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
+              class="bg-glass-1 border-glass shadow-glass flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium text-[color:var(--color-text-secondary)] ease-ios transition-colors hover:text-[color:var(--color-text-primary)]"
               @click="showMobileFilters = !showMobileFilters"
             >
               <i class="pi pi-filter text-xs"></i>
               {{ t('common.filters') }}
               <span
                 v-if="activeFilterCount > 0"
-                class="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white"
+                class="flex h-5 w-5 items-center justify-center rounded-full bg-[color:var(--color-accent)] font-mono text-[10px] font-bold text-[color:var(--color-text-on-accent)]"
               >
                 {{ activeFilterCount }}
               </span>
             </button>
             <button
               v-if="activeFilterCount > 0"
-              class="text-xs text-blue-600 hover:underline"
+              class="text-xs text-[color:var(--color-accent)] hover:underline"
               @click="clearFilters"
             >
               {{ t('jobBoard.clearAll') }}

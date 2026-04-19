@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
+import GlassSurface from '@/shared/components/GlassSurface.vue'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -19,15 +20,14 @@ const daysRemaining = computed(() => {
 })
 
 const bannerClass = computed(() => {
-  if (!daysRemaining.value || daysRemaining.value > 3)
-    return 'bg-blue-50 border-blue-200 text-blue-800'
-  if (daysRemaining.value > 0) return 'bg-amber-50 border-amber-200 text-amber-800'
-  return 'bg-red-50 border-red-200 text-red-800'
+  if (!daysRemaining.value || daysRemaining.value > 3) return ''
+  if (daysRemaining.value > 0) return 'urgent'
+  return 'critical'
 })
 </script>
 
 <template>
-  <div v-if="isTrial" class="rounded-xl border p-4" :class="bannerClass">
+  <GlassSurface v-if="isTrial" level="1" class="trial-banner p-4" :class="bannerClass">
     <div class="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
       <div class="flex items-center gap-3">
         <i class="pi pi-clock text-lg"></i>
@@ -39,7 +39,7 @@ const bannerClass = computed(() => {
                 : t('trial.expired')
             }}
           </p>
-          <p class="text-xs opacity-75">{{ t('trial.banner') }}</p>
+          <p class="text-xs opacity-80">{{ t('trial.banner') }}</p>
         </div>
       </div>
       <Button
@@ -50,5 +50,18 @@ const bannerClass = computed(() => {
         @click="router.push({ name: ROUTE_NAMES.PRICING })"
       />
     </div>
-  </div>
+  </GlassSurface>
 </template>
+
+<style scoped>
+.trial-banner.urgent {
+  border-color: color-mix(in srgb, var(--color-warning) 50%, transparent);
+  background: color-mix(in srgb, var(--color-warning) 12%, var(--color-surface-glass-1));
+  color: var(--color-text-primary);
+}
+.trial-banner.critical {
+  border-color: color-mix(in srgb, var(--color-danger) 50%, transparent);
+  background: color-mix(in srgb, var(--color-danger) 12%, var(--color-surface-glass-1));
+  color: var(--color-text-primary);
+}
+</style>

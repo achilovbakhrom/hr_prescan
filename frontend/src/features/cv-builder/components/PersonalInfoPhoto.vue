@@ -85,7 +85,9 @@ async function removePhoto(): Promise<void> {
       <div class="flex flex-col gap-2">
         <div class="flex flex-wrap items-center gap-2">
           <Button
-            :label="hasPhoto ? t('cvBuilder.personal.changePhoto') : t('cvBuilder.personal.uploadPhoto')"
+            :label="
+              hasPhoto ? t('cvBuilder.personal.changePhoto') : t('cvBuilder.personal.uploadPhoto')
+            "
             icon="pi pi-upload"
             size="small"
             :loading="uploading"

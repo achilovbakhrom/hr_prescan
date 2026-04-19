@@ -6,6 +6,7 @@ import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
 import Button from 'primevue/button'
 import Message from 'primevue/message'
+import AuthShell from '../components/AuthShell.vue'
 import CountryAutocomplete from '@/shared/components/CountryAutocomplete.vue'
 import IndustryAutocomplete from '@/shared/components/IndustryAutocomplete.vue'
 import { useAuthStore } from '../stores/auth.store'
@@ -87,49 +88,49 @@ async function handleSubmit(): Promise<void> {
     loading.value = false
   }
 }
+
+const labelClass =
+  'text-xs font-medium uppercase tracking-wider text-[color:var(--color-text-muted)]'
 </script>
 
 <template>
-  <div class="flex flex-1 items-center justify-center py-12">
-    <div class="w-full max-w-lg rounded-lg bg-white p-6 shadow-md sm:p-8">
-      <h1 class="mb-2 text-center text-xl font-bold text-gray-900 sm:text-2xl">
-        {{ t('auth.companySetup.title') }}
-      </h1>
-      <p class="mb-6 text-center text-sm text-gray-500">
-        {{ t('auth.companySetup.subtitle') }}
-      </p>
+  <AuthShell
+    :title="t('auth.companySetup.title')"
+    :subtitle="t('auth.companySetup.subtitle')"
+    width="2xl"
+  >
+    <Message v-if="errorMessage" severity="error" class="mb-4">{{ errorMessage }}</Message>
 
-      <Message v-if="errorMessage" severity="error" class="mb-4">{{ errorMessage }}</Message>
+    <form class="flex flex-col gap-5" @submit.prevent="handleSubmit">
+      <div class="flex flex-col gap-1.5">
+        <label for="company-name" :class="labelClass">
+          {{ t('auth.companySetup.companyName') }}
+        </label>
+        <InputText
+          id="company-name"
+          v-model="companyName"
+          :placeholder="t('auth.companySetup.companyNamePlaceholder')"
+          :invalid="submitted && errors.companyName"
+          class="w-full"
+        />
+        <small v-if="submitted && errors.companyName" class="text-[color:var(--color-danger)]">
+          {{ t('auth.companySetup.companyNameRequired') }}
+        </small>
+      </div>
 
-      <form class="flex flex-col gap-5" @submit.prevent="handleSubmit">
-        <div class="flex flex-col gap-1">
-          <label for="company-name" class="text-sm font-medium text-gray-700">
-            {{ t('auth.companySetup.companyName') }}
-          </label>
-          <InputText
-            id="company-name"
-            v-model="companyName"
-            :placeholder="t('auth.companySetup.companyNamePlaceholder')"
-            :invalid="submitted && errors.companyName"
-            class="w-full"
-          />
-          <small v-if="submitted && errors.companyName" class="text-red-500">
-            {{ t('auth.companySetup.companyNameRequired') }}
-          </small>
-        </div>
+      <div class="flex flex-col gap-1.5">
+        <label for="industries" :class="labelClass">
+          {{ t('auth.companySetup.industries') }}
+        </label>
+        <IndustryAutocomplete v-model="industries" :invalid="submitted && errors.industries" />
+        <small v-if="submitted && errors.industries" class="text-[color:var(--color-danger)]">
+          {{ t('auth.companySetup.industriesRequired') }}
+        </small>
+      </div>
 
-        <div class="flex flex-col gap-1">
-          <label for="industries" class="text-sm font-medium text-gray-700">
-            {{ t('auth.companySetup.industries') }}
-          </label>
-          <IndustryAutocomplete v-model="industries" :invalid="submitted && errors.industries" />
-          <small v-if="submitted && errors.industries" class="text-red-500">
-            {{ t('auth.companySetup.industriesRequired') }}
-          </small>
-        </div>
-
-        <div class="flex flex-col gap-1">
-          <label for="size" class="text-sm font-medium text-gray-700">
+      <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <div class="flex flex-col gap-1.5">
+          <label for="size" :class="labelClass">
             {{ t('auth.companySetup.size') }}
           </label>
           <Select
@@ -142,47 +143,47 @@ async function handleSubmit(): Promise<void> {
             :invalid="submitted && errors.size"
             class="w-full"
           />
-          <small v-if="submitted && errors.size" class="text-red-500">
+          <small v-if="submitted && errors.size" class="text-[color:var(--color-danger)]">
             {{ t('auth.companySetup.sizeRequired') }}
           </small>
         </div>
 
-        <div class="flex flex-col gap-1">
-          <label for="country" class="text-sm font-medium text-gray-700">
+        <div class="flex flex-col gap-1.5">
+          <label for="country" :class="labelClass">
             {{ t('auth.companySetup.country') }}
           </label>
           <CountryAutocomplete v-model="country" :invalid="submitted && errors.country" />
-          <small v-if="submitted && errors.country" class="text-red-500">
+          <small v-if="submitted && errors.country" class="text-[color:var(--color-danger)]">
             {{ t('auth.companySetup.countryRequired') }}
           </small>
         </div>
+      </div>
 
-        <div v-if="requiresEmail" class="flex flex-col gap-1">
-          <label for="email" class="text-sm font-medium text-gray-700">
-            {{ t('auth.companySetup.email') }}
-          </label>
-          <InputText
-            id="email"
-            v-model="email"
-            type="email"
-            :placeholder="t('auth.companySetup.emailPlaceholder')"
-            :invalid="submitted && errors.email"
-            class="w-full"
-          />
-          <small v-if="submitted && errors.email" class="text-red-500">
-            {{ t('auth.companySetup.emailRequired') }}
-          </small>
-        </div>
+      <div v-if="requiresEmail" class="flex flex-col gap-1.5">
+        <label for="email" :class="labelClass">
+          {{ t('auth.companySetup.email') }}
+        </label>
+        <InputText
+          id="email"
+          v-model="email"
+          type="email"
+          :placeholder="t('auth.companySetup.emailPlaceholder')"
+          :invalid="submitted && errors.email"
+          class="w-full"
+        />
+        <small v-if="submitted && errors.email" class="text-[color:var(--color-danger)]">
+          {{ t('auth.companySetup.emailRequired') }}
+        </small>
+      </div>
 
-        <div class="pt-2">
-          <Button
-            type="submit"
-            :label="t('auth.companySetup.submit')"
-            :loading="loading"
-            class="w-full"
-          />
-        </div>
-      </form>
-    </div>
-  </div>
+      <div class="pt-2">
+        <Button
+          type="submit"
+          :label="t('auth.companySetup.submit')"
+          :loading="loading"
+          class="w-full"
+        />
+      </div>
+    </form>
+  </AuthShell>
 </template>

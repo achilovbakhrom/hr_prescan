@@ -11,7 +11,6 @@ import { ROUTE_NAMES } from '@/shared/constants/routes'
 import NotificationBell from '@/features/notifications/components/NotificationBell.vue'
 import LanguageSwitcher from '@/shared/components/LanguageSwitcher.vue'
 import ThemeToggle from '@/shared/components/ThemeToggle.vue'
-import BackgroundModeSwitcher from '@/shared/components/BackgroundModeSwitcher.vue'
 import CompanySwitcher from './CompanySwitcher.vue'
 import GlobalSearchDialog from './GlobalSearchDialog.vue'
 import { useNotificationPolling } from '@/features/notifications/composables/useNotificationPolling'
@@ -158,7 +157,6 @@ function handleMenuToggle(): void {
         <i class="pi pi-sparkles text-[10px]"></i><span class="hidden sm:inline">AI</span>
       </button>
 
-      <BackgroundModeSwitcher />
       <ThemeToggle />
       <LanguageSwitcher />
       <NotificationBell />
