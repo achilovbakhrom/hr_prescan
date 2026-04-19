@@ -54,7 +54,7 @@ const features = computed<Feature[]>(() => [
         <div
           v-for="(feature, idx) in features"
           :key="feature.title"
-          class="scroll-animate group rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-7 transition-all duration-300 hover:-translate-y-1 hover:border-gray-200 dark:hover:border-gray-700 hover:shadow-xl hover:shadow-gray-100"
+          class="scroll-animate group glass-card rounded-2xl p-7 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-blue-500/10"
           :class="`scroll-animate-delay-${idx + 1}`"
         >
           <div

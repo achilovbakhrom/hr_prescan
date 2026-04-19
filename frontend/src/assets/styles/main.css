@@ -31,6 +31,57 @@ body,
 }
 
 /* ============================================
+   Glass / blur / glow utilities (design refresh)
+   ============================================ */
+
+/* Frosted-glass card: translucent background + backdrop blur + subtle
+   cool-tinted shadow. Works in light and dark mode. */
+.glass-card {
+  background-color: rgb(255 255 255 / 0.7);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgb(255 255 255 / 0.3);
+  box-shadow:
+    0 10px 15px -3px rgb(59 130 246 / 0.05),
+    0 4px 6px -4px rgb(59 130 246 / 0.05);
+}
+
+:where(.dark) .glass-card {
+  background-color: rgb(17 24 39 / 0.6);
+  border-color: rgb(255 255 255 / 0.1);
+}
+
+/* Glow-on-hover: subtle blue ring + soft shadow + slight brightness
+   lift. Scoped to :hover so it only appears on interaction. */
+.glow-on-hover {
+  transition:
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
+}
+
+.glow-on-hover:hover {
+  box-shadow:
+    0 0 0 1px rgb(59 130 246 / 0.2),
+    0 8px 24px -8px rgb(59 130 246 / 0.3);
+  filter: brightness(1.05);
+}
+
+/* Primary PrimeVue button — pick up the same glow on hover so primary CTAs
+   feel more alive without having to add a class to every button. Only the
+   default (primary) variant is targeted; text/outlined/secondary/etc. are
+   explicitly excluded. */
+.p-button:not(.p-button-text):not(.p-button-outlined):not(.p-button-secondary):not(
+    .p-button-success
+  ):not(.p-button-info):not(.p-button-warn):not(.p-button-help):not(.p-button-danger):not(
+    .p-button-contrast
+  ):not(:disabled):hover {
+  box-shadow:
+    0 0 0 1px rgb(59 130 246 / 0.2),
+    0 8px 24px -8px rgb(59 130 246 / 0.3);
+  filter: brightness(1.05);
+}
+
+/* ============================================
    Global modern tab styling (PrimeVue TabView)
    ============================================ */
 

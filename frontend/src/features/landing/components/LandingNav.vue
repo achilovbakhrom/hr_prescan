@@ -64,7 +64,7 @@ const navLinks = [
 </script>
 
 <template>
-  <nav class="sticky top-0 z-50 border-b border-gray-100 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl">
+  <nav class="sticky top-0 z-50 border-b border-gray-100 bg-white/60 shadow-sm shadow-black/5 backdrop-blur-2xl dark:border-gray-800 dark:bg-gray-900/60 dark:shadow-black/20">
     <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
       <!-- Logo -->
       <RouterLink to="/" class="flex items-center gap-2.5">
