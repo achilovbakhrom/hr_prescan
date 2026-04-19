@@ -55,7 +55,9 @@ def create_user_company(
 def update_user_company(*, user: User, company: Company, data: dict) -> Company:
     """Update company fields. Raises if user isn't an admin of this company."""
     if not CompanyMembership.objects.filter(
-        user=user, company=company, role=User.Role.ADMIN,
+        user=user,
+        company=company,
+        role=User.Role.ADMIN,
     ).exists():
         raise ApplicationError("Only company admins can update company details.")
 

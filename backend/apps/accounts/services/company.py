@@ -163,5 +163,3 @@ def complete_company_setup(
     )
 
     return company
-
-

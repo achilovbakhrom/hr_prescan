@@ -40,7 +40,10 @@ def handle_create_vacancy(*, user, params):
 
     title = params.get("title", "Untitled").strip()
     existing = Vacancy.objects.filter(
-        company=company, title__iexact=title, status=Vacancy.Status.DRAFT, is_deleted=False,
+        company=company,
+        title__iexact=title,
+        status=Vacancy.Status.DRAFT,
+        is_deleted=False,
     ).first()
     if existing:
         return {

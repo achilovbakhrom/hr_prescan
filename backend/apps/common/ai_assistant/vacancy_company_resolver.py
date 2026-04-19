@@ -39,18 +39,13 @@ def resolve_company_for_create(*, user, params):
         return None, {
             "success": False,
             "message": (
-                f"I couldn't find a company matching '{company_name}'. "
-                f"Your companies are: {names}. Which one?"
+                f"I couldn't find a company matching '{company_name}'. Your companies are: {names}. Which one?"
             ),
             "action": "clarify",
         }
 
     if params.get("use_default"):
-        default = (
-            user.memberships.filter(is_default=True, company__is_deleted=False)
-            .select_related("company")
-            .first()
-        )
+        default = user.memberships.filter(is_default=True, company__is_deleted=False).select_related("company").first()
         if default is not None:
             return default.company, None
 

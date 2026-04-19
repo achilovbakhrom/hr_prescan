@@ -7,11 +7,7 @@ def forwards(apps, schema_editor):
     db_alias = schema_editor.connection.alias
 
     # 1. Copy subscription state from Company to User for every HR/admin user tied to a company.
-    users_with_company = (
-        User.objects.using(db_alias)
-        .filter(company__isnull=False)
-        .select_related("company")
-    )
+    users_with_company = User.objects.using(db_alias).filter(company__isnull=False).select_related("company")
     for user in users_with_company.iterator():
         company = user.company
         user.subscription_plan_id = company.subscription_plan_id
@@ -22,11 +18,7 @@ def forwards(apps, schema_editor):
     # 2. Mark the user's membership for their active company as default.
     #    Users without an active company (candidates) get no default — correct by construction.
     for user in users_with_company.iterator():
-        (
-            CompanyMembership.objects.using(db_alias)
-            .filter(user=user, company=user.company)
-            .update(is_default=True)
-        )
+        (CompanyMembership.objects.using(db_alias).filter(user=user, company=user.company).update(is_default=True))
 
 
 def backwards(apps, schema_editor):

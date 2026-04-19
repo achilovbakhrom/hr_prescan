@@ -4,9 +4,7 @@ from apps.common.exceptions import ApplicationError
 
 
 def _user_live_company_ids(user):
-    return list(
-        user.memberships.filter(company__is_deleted=False).values_list("company_id", flat=True)
-    )
+    return list(user.memberships.filter(company__is_deleted=False).values_list("company_id", flat=True))
 
 
 def resolve_vacancy(*, user, title):

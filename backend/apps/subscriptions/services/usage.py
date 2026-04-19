@@ -8,9 +8,7 @@ from apps.vacancies.models import Vacancy
 
 def _live_company_ids(user: User) -> list:
     """Company IDs the user belongs to, excluding soft-deleted ones."""
-    return list(
-        user.memberships.filter(company__is_deleted=False).values_list("company_id", flat=True)
-    )
+    return list(user.memberships.filter(company__is_deleted=False).values_list("company_id", flat=True))
 
 
 def check_vacancy_quota(*, user: User) -> bool:

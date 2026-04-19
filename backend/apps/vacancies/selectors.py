@@ -9,9 +9,7 @@ from apps.vacancies.models import InterviewQuestion, Vacancy, VacancyCriteria
 
 
 def _user_live_company_ids(user: User) -> list:
-    return list(
-        user.memberships.filter(company__is_deleted=False).values_list("company_id", flat=True)
-    )
+    return list(user.memberships.filter(company__is_deleted=False).values_list("company_id", flat=True))
 
 
 _VACANCY_COUNTERS = {
@@ -51,16 +49,24 @@ def _apply_vacancy_filters(qs: QuerySet[Vacancy], *, status: str | None, include
 
 
 def get_company_vacancies(
-    *, company: Company, status: str | None = None, include_deleted: bool = False,
+    *,
+    company: Company,
+    status: str | None = None,
+    include_deleted: bool = False,
 ) -> QuerySet[Vacancy]:
     """Return vacancies for a single company, optionally filtered by status."""
     return _apply_vacancy_filters(
-        Vacancy.objects.filter(company=company), status=status, include_deleted=include_deleted,
+        Vacancy.objects.filter(company=company),
+        status=status,
+        include_deleted=include_deleted,
     )
 
 
 def get_user_vacancies(
-    *, user: User, status: str | None = None, include_deleted: bool = False,
+    *,
+    user: User,
+    status: str | None = None,
+    include_deleted: bool = False,
 ) -> QuerySet[Vacancy]:
     """Return vacancies across every non-deleted company the user belongs to."""
     return _apply_vacancy_filters(
@@ -147,7 +153,10 @@ def get_vacancy_criteria(*, vacancy: Vacancy, step: str | None = None) -> QueryS
 
 
 def get_vacancy_questions(
-    *, vacancy: Vacancy, active_only: bool = True, step: str | None = None,
+    *,
+    vacancy: Vacancy,
+    active_only: bool = True,
+    step: str | None = None,
 ) -> QuerySet[InterviewQuestion]:
     """Return questions for a vacancy, optionally filtered by step and active status."""
     qs = InterviewQuestion.objects.filter(vacancy=vacancy)

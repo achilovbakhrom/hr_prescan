@@ -19,9 +19,7 @@ def forwards(apps, schema_editor):
     Vacancy = apps.get_model("vacancies", "Vacancy")
     db_alias = schema_editor.connection.alias
 
-    for employer in (
-        EmployerCompany.objects.using(db_alias).select_related("company").iterator()
-    ):
+    for employer in EmployerCompany.objects.using(db_alias).select_related("company").iterator():
         parent = employer.company
 
         admin_membership = (
@@ -32,10 +30,7 @@ def forwards(apps, schema_editor):
         )
         if admin_membership is None:
             admin_membership = (
-                CompanyMembership.objects.using(db_alias)
-                .filter(company=parent)
-                .order_by("created_at")
-                .first()
+                CompanyMembership.objects.using(db_alias).filter(company=parent).order_by("created_at").first()
             )
         if admin_membership is None:
             # Parent has no memberships at all — skip. The underlying vacancies still
