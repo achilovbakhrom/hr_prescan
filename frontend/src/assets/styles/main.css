@@ -70,7 +70,11 @@ body,
    feel more alive without having to add a class to every button. Only the
    default (primary) variant is targeted; text/outlined/secondary/etc. are
    explicitly excluded. */
-.p-button:not(.p-button-text):not(.p-button-outlined):not(.p-button-secondary):not(.p-button-success):not(.p-button-info):not(.p-button-warn):not(.p-button-help):not(.p-button-danger):not(.p-button-contrast):not(:disabled):hover {
+.p-button:not(.p-button-text):not(.p-button-outlined):not(.p-button-secondary):not(
+    .p-button-success
+  ):not(.p-button-info):not(.p-button-warn):not(.p-button-help):not(.p-button-danger):not(
+    .p-button-contrast
+  ):not(:disabled):hover {
   box-shadow:
     0 0 0 1px rgb(59 130 246 / 0.2),
     0 8px 24px -8px rgb(59 130 246 / 0.3);
