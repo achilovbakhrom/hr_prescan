@@ -69,7 +69,7 @@ const navLinks = [
       <!-- Logo -->
       <RouterLink to="/" class="flex items-center gap-2.5">
         <AppLogo size="sm" />
-        <span class="text-xl font-bold tracking-tight text-gray-900">PreScreen AI</span>
+        <span class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">PreScreen AI</span>
       </RouterLink>
 
       <!-- Desktop nav links -->

@@ -18,8 +18,29 @@ useThemeStore()
 <template>
   <AnimatedBackground />
   <div class="relative z-10">
-    <RouterView />
+    <RouterView v-slot="{ Component, route }">
+      <Transition name="page" mode="out-in">
+        <component :is="Component" :key="route.fullPath" />
+      </Transition>
+    </RouterView>
   </div>
   <CookieConsent />
   <AIAssistantDrawer />
 </template>
+
+<style>
+.page-enter-active,
+.page-leave-active {
+  transition:
+    opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.page-enter-from {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.page-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+</style>

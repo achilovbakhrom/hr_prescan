@@ -46,10 +46,10 @@ function getCompanyName(job: Vacancy): string | undefined {
         class="scroll-animate mb-10 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end"
       >
         <div>
-          <h2 class="mb-2 text-3xl font-bold tracking-tight text-gray-900">
+          <h2 class="mb-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
             {{ t('landing.latestJobs') }}
           </h2>
-          <p class="text-gray-500">{{ t('landing.latestJobsSubtitle') }}</p>
+          <p class="text-gray-500 dark:text-gray-300">{{ t('landing.latestJobsSubtitle') }}</p>
         </div>
         <Button
           :label="t('landing.viewAllJobs')"

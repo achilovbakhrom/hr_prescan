@@ -2,39 +2,51 @@
 import { computed } from 'vue'
 import { useThemeStore } from '@/shared/stores/theme.store'
 import { ANIMAL_MAP, type AnimalArt } from '@/shared/components/animals/animals'
+import './animated-background.css'
 
 const themeStore = useThemeStore()
+
+type Motion = 'walk-right' | 'walk-left' | 'swim-right' | 'swim-left' | 'fly' | 'float-up' | 'float-up-slow'
 
 interface Placement {
   art: AnimalArt
   size: number
+  /** Top position as % of viewport (0–100) */
   top: number
-  left: number
   durationSec: number
   delaySec: number
-  driftX: number
-  driftY: number
-  rotate: number
+  /** Tailwind text-* classes for currentColor */
   tone: string
-  anim: 'drift-a' | 'drift-b' | 'drift-c'
+  motion: Motion
+  /** Flip horizontally (for left-walking animals that face right by default) */
+  flip?: boolean
 }
 
 const FOREST: Placement[] = [
-  { art: ANIMAL_MAP.fox, size: 110, top: 14, left: 6, durationSec: 28, delaySec: 0, driftX: 80, driftY: -20, rotate: 4, tone: 'text-amber-700/30 dark:text-amber-300/25', anim: 'drift-a' },
-  { art: ANIMAL_MAP.owl, size: 96, top: 28, left: 78, durationSec: 34, delaySec: 3, driftX: -70, driftY: 30, rotate: -3, tone: 'text-slate-500/25 dark:text-slate-300/25', anim: 'drift-b' },
-  { art: ANIMAL_MAP.deer, size: 140, top: 62, left: 44, durationSec: 38, delaySec: 2, driftX: 60, driftY: -40, rotate: 2, tone: 'text-stone-600/25 dark:text-stone-300/20', anim: 'drift-c' },
-  { art: ANIMAL_MAP.leaf, size: 70, top: 18, left: 42, durationSec: 22, delaySec: 1, driftX: 140, driftY: 40, rotate: 12, tone: 'text-emerald-700/25 dark:text-emerald-400/25', anim: 'drift-b' },
-  { art: ANIMAL_MAP.leaf, size: 58, top: 74, left: 86, durationSec: 26, delaySec: 4, driftX: -110, driftY: -30, rotate: -15, tone: 'text-green-700/25 dark:text-green-400/20', anim: 'drift-a' },
-  { art: ANIMAL_MAP.owl, size: 72, top: 70, left: 14, durationSec: 30, delaySec: 5, driftX: 50, driftY: 20, rotate: 6, tone: 'text-slate-600/20 dark:text-slate-300/20', anim: 'drift-c' },
+  // Ground-dwellers walking across
+  { art: ANIMAL_MAP.fox, size: 120, top: 72, durationSec: 55, delaySec: 0, tone: 'text-amber-700/55 dark:text-amber-300/80', motion: 'walk-right' },
+  { art: ANIMAL_MAP.deer, size: 150, top: 68, durationSec: 80, delaySec: 20, tone: 'text-stone-600/50 dark:text-stone-300/70', motion: 'walk-right' },
+  { art: ANIMAL_MAP.fox, size: 100, top: 78, durationSec: 65, delaySec: 40, tone: 'text-amber-800/45 dark:text-amber-400/70', motion: 'walk-left', flip: true },
+  // Flying owls diagonal
+  { art: ANIMAL_MAP.owl, size: 80, top: 18, durationSec: 48, delaySec: 5, tone: 'text-slate-500/50 dark:text-slate-300/75', motion: 'fly' },
+  { art: ANIMAL_MAP.owl, size: 64, top: 32, durationSec: 40, delaySec: 25, tone: 'text-slate-600/45 dark:text-slate-400/70', motion: 'fly' },
+  // Floating leaves
+  { art: ANIMAL_MAP.leaf, size: 50, top: 85, durationSec: 28, delaySec: 0, tone: 'text-emerald-700/55 dark:text-emerald-400/80', motion: 'float-up' },
+  { art: ANIMAL_MAP.leaf, size: 38, top: 90, durationSec: 34, delaySec: 8, tone: 'text-green-700/50 dark:text-green-400/70', motion: 'float-up-slow' },
+  { art: ANIMAL_MAP.leaf, size: 44, top: 95, durationSec: 30, delaySec: 16, tone: 'text-emerald-800/50 dark:text-emerald-500/70', motion: 'float-up' },
 ]
 
 const OCEAN: Placement[] = [
-  { art: ANIMAL_MAP.whale, size: 170, top: 20, left: 8, durationSec: 40, delaySec: 0, driftX: 160, driftY: 20, rotate: 3, tone: 'text-sky-700/25 dark:text-sky-300/25', anim: 'drift-a' },
-  { art: ANIMAL_MAP.jellyfish, size: 90, top: 46, left: 72, durationSec: 24, delaySec: 2, driftX: -40, driftY: -80, rotate: -4, tone: 'text-cyan-600/30 dark:text-cyan-300/25', anim: 'drift-b' },
-  { art: ANIMAL_MAP.turtle, size: 120, top: 72, left: 36, durationSec: 34, delaySec: 3, driftX: 90, driftY: -20, rotate: 2, tone: 'text-teal-700/25 dark:text-teal-300/20', anim: 'drift-c' },
-  { art: ANIMAL_MAP.bubble, size: 40, top: 30, left: 54, durationSec: 20, delaySec: 1, driftX: 20, driftY: -120, rotate: 0, tone: 'text-sky-500/30 dark:text-sky-200/25', anim: 'drift-b' },
-  { art: ANIMAL_MAP.bubble, size: 28, top: 62, left: 18, durationSec: 26, delaySec: 4, driftX: -15, driftY: -140, rotate: 0, tone: 'text-sky-500/25 dark:text-sky-200/20', anim: 'drift-b' },
-  { art: ANIMAL_MAP.jellyfish, size: 70, top: 10, left: 86, durationSec: 28, delaySec: 5, driftX: -60, driftY: 50, rotate: 5, tone: 'text-indigo-500/25 dark:text-indigo-300/20', anim: 'drift-a' },
+  // Whales + fish swim full-width
+  { art: ANIMAL_MAP.whale, size: 180, top: 30, durationSec: 90, delaySec: 0, tone: 'text-sky-700/50 dark:text-sky-300/75', motion: 'swim-right' },
+  { art: ANIMAL_MAP.whale, size: 130, top: 60, durationSec: 70, delaySec: 35, tone: 'text-indigo-600/45 dark:text-indigo-300/70', motion: 'swim-left', flip: true },
+  { art: ANIMAL_MAP.turtle, size: 110, top: 72, durationSec: 60, delaySec: 15, tone: 'text-teal-700/50 dark:text-teal-300/70', motion: 'swim-right' },
+  { art: ANIMAL_MAP.jellyfish, size: 85, top: 45, durationSec: 32, delaySec: 0, tone: 'text-cyan-600/55 dark:text-cyan-300/80', motion: 'float-up-slow' },
+  { art: ANIMAL_MAP.jellyfish, size: 60, top: 55, durationSec: 28, delaySec: 10, tone: 'text-indigo-500/50 dark:text-indigo-300/75', motion: 'float-up' },
+  // Bubbles drift up
+  { art: ANIMAL_MAP.bubble, size: 32, top: 95, durationSec: 18, delaySec: 0, tone: 'text-sky-500/55 dark:text-sky-200/80', motion: 'float-up' },
+  { art: ANIMAL_MAP.bubble, size: 24, top: 98, durationSec: 22, delaySec: 5, tone: 'text-sky-500/50 dark:text-sky-200/70', motion: 'float-up-slow' },
+  { art: ANIMAL_MAP.bubble, size: 40, top: 92, durationSec: 20, delaySec: 12, tone: 'text-cyan-500/55 dark:text-cyan-200/80', motion: 'float-up' },
 ]
 
 const placements = computed<Placement[]>(() => {
@@ -53,18 +65,14 @@ const placements = computed<Placement[]>(() => {
     <svg
       v-for="(p, i) in placements"
       :key="`${themeStore.backgroundMode}-${i}`"
-      :class="['bg-animal absolute', p.tone, `anim-${p.anim}`]"
+      :class="['bg-animal absolute', p.tone, `motion-${p.motion}`, { 'flip-x': p.flip }]"
       :viewBox="p.art.viewBox"
       :style="{
         top: p.top + '%',
-        left: p.left + '%',
         width: p.size + 'px',
         height: p.size + 'px',
         animationDuration: p.durationSec + 's',
         animationDelay: p.delaySec + 's',
-        '--dx': p.driftX + 'px',
-        '--dy': p.driftY + 'px',
-        '--rot': p.rotate + 'deg',
       }"
       fill="none"
       stroke="currentColor"
@@ -76,69 +84,3 @@ const placements = computed<Placement[]>(() => {
     </svg>
   </div>
 </template>
-
-<style scoped>
-.bg-animal {
-  animation-iteration-count: infinite;
-  animation-timing-function: ease-in-out;
-  animation-direction: alternate;
-  will-change: transform;
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.08));
-}
-
-.anim-drift-a {
-  animation-name: drift-a;
-}
-.anim-drift-b {
-  animation-name: drift-b;
-}
-.anim-drift-c {
-  animation-name: drift-c;
-}
-
-@keyframes drift-a {
-  0% {
-    transform: translate(0, 0) rotate(calc(var(--rot) * -1));
-  }
-  40% {
-    transform: translate(calc(var(--dx) * 0.4), calc(var(--dy) * 0.7)) rotate(calc(var(--rot) * 0.5));
-  }
-  100% {
-    transform: translate(var(--dx), var(--dy)) rotate(var(--rot));
-  }
-}
-
-@keyframes drift-b {
-  0% {
-    transform: translate(0, 0) rotate(0deg);
-  }
-  30% {
-    transform: translate(calc(var(--dx) * 0.3), calc(var(--dy) * 0.5)) rotate(calc(var(--rot) * 1.2));
-  }
-  70% {
-    transform: translate(calc(var(--dx) * 0.8), calc(var(--dy) * 0.9)) rotate(calc(var(--rot) * -0.8));
-  }
-  100% {
-    transform: translate(var(--dx), var(--dy)) rotate(var(--rot));
-  }
-}
-
-@keyframes drift-c {
-  0% {
-    transform: translate(0, 0) rotate(calc(var(--rot) * 0.3));
-  }
-  50% {
-    transform: translate(calc(var(--dx) * 0.6), calc(var(--dy) * 0.4)) rotate(calc(var(--rot) * -1));
-  }
-  100% {
-    transform: translate(var(--dx), var(--dy)) rotate(var(--rot));
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .bg-animal {
-    animation: none !important;
-    transform: none !important;
-  }
-}
-</style>

@@ -51,7 +51,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <section ref="statsRef" class="border-y border-gray-100 dark:border-gray-800 bg-gray-50/50">
+  <section ref="statsRef" class="border-y border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-slate-900/40">
     <div
       class="mx-auto grid max-w-5xl grid-cols-1 divide-y divide-gray-200 dark:divide-gray-800 py-10 sm:grid-cols-3 sm:divide-x sm:divide-y-0"
     >
