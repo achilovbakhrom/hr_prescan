@@ -1137,7 +1137,10 @@
     "setAsDefault": "Set as default",
     "cannotDeleteLast": "You can't delete your last remaining company.",
     "deleteConfirmHeader": "Delete Company",
-    "deleteConfirm": "Delete '{name}'? All members will lose access; historical vacancies keep the name."
+    "deleteConfirm": "Delete '{name}'? All members will lose access; historical vacancies keep the name.",
+    "changeLogo": "Change logo",
+    "logoInvalidType": "Please choose an image file.",
+    "logoTooLarge": "Logo must be 2 MB or smaller."
   },
   "jobBoard": {
     "title": "Browse Jobs",
