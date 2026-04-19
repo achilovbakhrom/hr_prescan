@@ -50,7 +50,7 @@ async function acceptInvitation(inv: PendingInvitation): Promise<void> {
   try {
     const result = await authService.acceptCompanyInvitation(inv.token)
     authStore.user = result.user
-    successMessage.value = `You are now part of ${inv.company.name}`
+    successMessage.value = `You are now part of ${inv.accountOwnerName}`
     invitations.value = invitations.value.filter((i) => i.id !== inv.id)
   } catch (err: unknown) {
     const axiosErr = err as { response?: { data?: { detail?: string } } }
@@ -104,9 +104,9 @@ function formatDate(dateStr: string): string {
           class="flex items-center justify-between rounded-lg bg-white p-4 shadow-sm"
         >
           <div>
-            <p class="font-medium text-gray-900">{{ inv.company.name }}</p>
-            <p class="text-sm text-gray-500">
-              {{ inv.company.industries?.join(', ') }} &middot; {{ inv.company.country }}
+            <p class="font-medium text-gray-900">{{ inv.accountOwnerName }}</p>
+            <p v-if="inv.companies?.length" class="text-sm text-gray-500">
+              {{ inv.companies.map((c) => c.name).join(', ') }}
             </p>
             <p class="mt-1 text-xs text-gray-400">
               {{ t('settings.profile.invitedBy', { name: inv.invitedByName }) }} &middot;

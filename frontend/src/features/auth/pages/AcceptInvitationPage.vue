@@ -19,7 +19,8 @@ const errorMessage = ref<string | null>(null)
 const loading = ref(true)
 const existingUser = ref(false)
 const invitationEmail = ref('')
-const companyName = ref('')
+const accountOwnerName = ref('')
+const companyNames = ref<string[]>([])
 const invitationError = ref<string | null>(null)
 
 onMounted(async () => {
@@ -33,7 +34,8 @@ onMounted(async () => {
     })
     existingUser.value = response.data.existingUser
     invitationEmail.value = response.data.email
-    companyName.value = response.data.companyName
+    accountOwnerName.value = response.data.accountOwnerName || ''
+    companyNames.value = response.data.companyNames || []
     if (authStore.isAuthenticated && authStore.user?.email === invitationEmail.value) {
       await handleAcceptAsLoggedIn()
       return
@@ -105,7 +107,9 @@ async function handleAcceptAsLoggedIn(): Promise<void> {
             {{ t('auth.acceptInvitation.title') }}
           </h1>
           <p class="mb-6 text-sm text-gray-600">
-            You've been invited to join <strong>{{ companyName }}</strong> as an HR team member.
+            You've been invited to join <strong>{{ accountOwnerName }}</strong> as an HR team member
+            <template v-if="companyNames.length">
+              with access to <strong>{{ companyNames.join(', ') }}</strong></template>.
             Please sign in to your existing account to accept.
           </p>
           <Message v-if="errorMessage" severity="error" class="mb-4">{{ errorMessage }}</Message>
@@ -124,7 +128,8 @@ async function handleAcceptAsLoggedIn(): Promise<void> {
       <InvitationNewUserForm
         v-else-if="!existingUser"
         :invitation-email="invitationEmail"
-        :company-name="companyName"
+        :account-owner-name="accountOwnerName"
+        :company-names="companyNames"
         :error-message="errorMessage"
         :loading="authStore.loading"
         @submit="handleSubmit"

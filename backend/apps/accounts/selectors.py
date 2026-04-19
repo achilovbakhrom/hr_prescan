@@ -25,9 +25,14 @@ def get_company_by_id(*, company_id: UUID) -> Company | None:
     return Company.objects.filter(id=company_id).first()
 
 
-def get_company_invitations(*, company: Company) -> QuerySet[Invitation]:
-    """Return all invitations for a company."""
-    return Invitation.objects.filter(company=company).select_related("invited_by").order_by("-created_at")
+def get_account_invitations(*, account_owner: User) -> QuerySet[Invitation]:
+    """Return all invitations for an account (across all its companies)."""
+    return (
+        Invitation.objects.filter(account_owner=account_owner)
+        .select_related("invited_by")
+        .prefetch_related("companies")
+        .order_by("-created_at")
+    )
 
 
 def get_pending_invitations_for_email(*, email: str) -> QuerySet[Invitation]:
@@ -40,11 +45,17 @@ def get_pending_invitations_for_email(*, email: str) -> QuerySet[Invitation]:
             is_accepted=False,
             expires_at__gt=timezone.now(),
         )
-        .select_related("company", "invited_by")
+        .select_related("account_owner", "invited_by")
+        .prefetch_related("companies")
         .order_by("-created_at")
     )
 
 
 def get_invitation_by_token(*, token: UUID) -> Invitation | None:
-    """Retrieve an invitation by its token, with company pre-loaded."""
-    return Invitation.objects.select_related("company", "invited_by").filter(token=token).first()
+    """Retrieve an invitation by its token, with account and companies pre-loaded."""
+    return (
+        Invitation.objects.select_related("account_owner", "invited_by")
+        .prefetch_related("companies")
+        .filter(token=token)
+        .first()
+    )

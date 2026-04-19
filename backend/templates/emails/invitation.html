@@ -1,8 +1,14 @@
 {% extends "emails/base.html" %}
 {% block content %}
-<h1>You're invited to join {{ company_name }}</h1>
+<h1>You're invited to join {{ account_name }}</h1>
 <p>Hi,</p>
-<p><strong>{{ invited_by }}</strong> has invited you to join <strong>{{ company_name }}</strong> as an HR team member on PreScreen AI.</p>
+<p><strong>{{ invited_by }}</strong> has invited you to join <strong>{{ account_name }}</strong> as an HR team member on PreScreen AI.</p>
+{% if company_names %}
+<p>You'll have access to the following {{ company_names|length|pluralize:"company,companies" }}:</p>
+<ul>
+  {% for name in company_names %}<li>{{ name }}</li>{% endfor %}
+</ul>
+{% endif %}
 {% if existing_user %}
 <p>Since you already have an account, just click below to sign in and accept the invitation.</p>
 {% else %}

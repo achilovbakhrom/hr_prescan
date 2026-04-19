@@ -6,10 +6,11 @@ from apps.accounts.models import Company, CompanyMembership, Invitation, User
 
 @admin.register(Company)
 class CompanyAdmin(admin.ModelAdmin):
-    list_display = ["name", "size", "country", "is_deleted", "created_at"]
+    list_display = ["name", "account_owner", "size", "country", "is_deleted", "created_at"]
     list_filter = ["size", "is_deleted"]
-    search_fields = ["name", "country"]
+    search_fields = ["name", "country", "account_owner__email"]
     filter_horizontal = ["industries"]
+    raw_id_fields = ["account_owner"]
     readonly_fields = ["id", "created_at", "updated_at", "deleted_at"]
 
 
@@ -23,10 +24,11 @@ class CompanyMembershipAdmin(admin.ModelAdmin):
 
 @admin.register(Invitation)
 class InvitationAdmin(admin.ModelAdmin):
-    list_display = ["email", "company", "is_accepted", "expires_at", "created_at"]
+    list_display = ["email", "account_owner", "is_accepted", "expires_at", "created_at"]
     list_filter = ["is_accepted"]
-    search_fields = ["email", "company__name"]
-    raw_id_fields = ["company", "invited_by"]
+    search_fields = ["email", "account_owner__email"]
+    filter_horizontal = ["companies"]
+    raw_id_fields = ["account_owner", "invited_by"]
 
 
 @admin.register(User)
@@ -49,7 +51,7 @@ class UserAdmin(BaseUserAdmin):
     fieldsets = (
         (None, {"fields": ("id", "email", "password")}),
         ("Personal info", {"fields": ("first_name", "last_name", "phone")}),
-        ("Role & Company", {"fields": ("role", "company")}),
+        ("Role & Company", {"fields": ("role", "company", "account_owner")}),
         (
             "Subscription",
             {"fields": ("subscription_plan", "subscription_status", "trial_ends_at")},

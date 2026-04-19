@@ -13,10 +13,11 @@ def get_all_plans(*, active_only: bool = True) -> QuerySet[SubscriptionPlan]:
 
 
 def get_user_subscription(*, user: User) -> UserSubscription | None:
-    """Return the active subscription for a user, or None."""
+    """Return the active subscription for a user's account (resolved via account owner)."""
+    owner = user.effective_account_owner
     try:
         return UserSubscription.objects.select_related("plan").get(
-            user=user,
+            user=owner,
             is_active=True,
         )
     except UserSubscription.DoesNotExist:

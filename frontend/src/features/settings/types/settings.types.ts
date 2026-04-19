@@ -1,8 +1,9 @@
-import type { HRPermission, User, UserRole } from '@/shared/types/auth.types'
+import type { Company, HRPermission, User, UserRole } from '@/shared/types/auth.types'
 
 export interface Invitation {
   id: string
   email: string
+  companies: Company[]
   permissions: HRPermission[]
   invitedBy: User
   isAccepted: boolean
@@ -24,4 +25,6 @@ export interface TeamMember {
 export interface InviteHRRequest {
   email: string
   permissions: HRPermission[]
+  // Omit or empty ⇒ grant access to all companies on the inviter's account.
+  companyIds?: string[]
 }

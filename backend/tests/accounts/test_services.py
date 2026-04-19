@@ -4,7 +4,7 @@ from unittest.mock import patch
 import pytest
 from django.utils import timezone
 
-from apps.accounts.models import Company, User
+from apps.accounts.models import Company, CompanyMembership, User
 from apps.accounts.services import (
     accept_invitation,
     accept_invitation_existing_user,
@@ -171,21 +171,28 @@ class TestCreateCompanyWithAdmin:
 # ---------------------------------------------------------------------------
 
 
+def _make_admin_with_company():
+    admin = UserFactory(company=None, role=User.Role.ADMIN)
+    company = CompanyFactory(account_owner=admin)
+    admin.company = company
+    admin.save(update_fields=["company", "updated_at"])
+    return admin, company
+
+
 @pytest.mark.django_db
 class TestInviteHR:
     @patch("apps.accounts.services.membership.send_invitation_email")
     def test_invite_creates_invitation(self, mock_send):
-        """Creates an Invitation with correct fields."""
-        company = CompanyFactory()
-        admin = UserFactory(company=company, role=User.Role.ADMIN)
+        """Creates an Invitation scoped to the inviter's account."""
+        admin, company = _make_admin_with_company()
 
         invitation = invite_hr(
-            company=company,
-            email="newhire@example.com",
             invited_by=admin,
+            email="newhire@example.com",
         )
 
-        assert invitation.company == company
+        assert invitation.account_owner == admin
+        assert list(invitation.companies.all()) == [company]
         assert invitation.email == "newhire@example.com"
         assert invitation.invited_by == admin
         assert invitation.is_accepted is False
@@ -194,26 +201,23 @@ class TestInviteHR:
 
     @patch("apps.accounts.services.membership.send_invitation_email")
     def test_invite_duplicate_pending_fails(self, mock_send):
-        """Cannot invite the same email twice to the same company while pending."""
-        company = CompanyFactory()
-        admin = UserFactory(company=company, role=User.Role.ADMIN)
+        """Cannot invite the same email twice to the same account while pending."""
+        admin, _ = _make_admin_with_company()
 
-        invite_hr(company=company, email="hr@example.com", invited_by=admin)
+        invite_hr(invited_by=admin, email="hr@example.com")
 
         with pytest.raises(ApplicationError, match="already been sent"):
-            invite_hr(company=company, email="hr@example.com", invited_by=admin)
+            invite_hr(invited_by=admin, email="hr@example.com")
 
     @patch("apps.accounts.services.membership.send_invitation_email")
     def test_invitation_has_expiry(self, mock_send):
         """Invitation expires_at is set to approximately 7 days from now."""
-        company = CompanyFactory()
-        admin = UserFactory(company=company, role=User.Role.ADMIN)
+        admin, _ = _make_admin_with_company()
 
         before = timezone.now()
         invitation = invite_hr(
-            company=company,
-            email="future@example.com",
             invited_by=admin,
+            email="future@example.com",
         )
         after = timezone.now()
 
@@ -222,14 +226,14 @@ class TestInviteHR:
         assert expected_min <= invitation.expires_at <= expected_max
 
     @patch("apps.accounts.services.membership.send_invitation_email")
-    def test_invite_existing_user_email_fails(self, mock_send):
-        """Cannot invite an email that already belongs to a registered user."""
-        company = CompanyFactory()
-        admin = UserFactory(company=company, role=User.Role.ADMIN)
-        UserFactory(email="existing@example.com")
+    def test_invite_existing_user_already_member_fails(self, mock_send):
+        """Cannot invite an email that is already a member of every selected company."""
+        admin, company = _make_admin_with_company()
+        existing = UserFactory(email="existing@example.com", company=None)
+        CompanyMembership.objects.create(user=existing, company=company, role=User.Role.HR)
 
-        with pytest.raises(ApplicationError, match="already exists"):
-            invite_hr(company=company, email="existing@example.com", invited_by=admin)
+        with pytest.raises(ApplicationError, match="already a member"):
+            invite_hr(invited_by=admin, email="existing@example.com")
 
 
 # ---------------------------------------------------------------------------
@@ -241,10 +245,9 @@ class TestInviteHR:
 class TestAcceptInvitation:
     @patch("apps.accounts.services.membership.send_invitation_email")
     def test_accept_creates_hr_user(self, mock_send):
-        """Accepting an invitation creates a user with role=hr linked to the company."""
-        company = CompanyFactory()
-        admin = UserFactory(company=company, role=User.Role.ADMIN)
-        invitation = invite_hr(company=company, email="newhr@example.com", invited_by=admin)
+        """Accepting an invitation creates a user with role=hr linked to the inviter's account."""
+        admin, company = _make_admin_with_company()
+        invitation = invite_hr(invited_by=admin, email="newhr@example.com")
 
         user = accept_invitation(
             token=invitation.token,
@@ -255,14 +258,14 @@ class TestAcceptInvitation:
 
         assert user.role == User.Role.HR
         assert user.company_id == company.id
+        assert user.account_owner_id == admin.id
         assert user.email == "newhr@example.com"
 
     @patch("apps.accounts.services.membership.send_invitation_email")
     def test_accept_marks_invitation_accepted(self, mock_send):
         """After acceptance, invitation.is_accepted becomes True."""
-        company = CompanyFactory()
-        admin = UserFactory(company=company, role=User.Role.ADMIN)
-        invitation = invite_hr(company=company, email="accept@example.com", invited_by=admin)
+        admin, _ = _make_admin_with_company()
+        invitation = invite_hr(invited_by=admin, email="accept@example.com")
 
         accept_invitation(
             token=invitation.token,
@@ -277,11 +280,9 @@ class TestAcceptInvitation:
     @patch("apps.accounts.services.membership.send_invitation_email")
     def test_accept_expired_invitation_fails(self, mock_send):
         """Accepting an expired invitation raises ApplicationError."""
-        company = CompanyFactory()
-        admin = UserFactory(company=company, role=User.Role.ADMIN)
-        invitation = invite_hr(company=company, email="expired@example.com", invited_by=admin)
+        admin, _ = _make_admin_with_company()
+        invitation = invite_hr(invited_by=admin, email="expired@example.com")
 
-        # Force the invitation to be expired
         invitation.expires_at = timezone.now() - timedelta(days=1)
         invitation.save(update_fields=["expires_at"])
 
@@ -296,11 +297,9 @@ class TestAcceptInvitation:
     @patch("apps.accounts.services.membership.send_invitation_email")
     def test_accept_already_accepted_fails(self, mock_send):
         """Accepting an already accepted invitation raises ApplicationError."""
-        company = CompanyFactory()
-        admin = UserFactory(company=company, role=User.Role.ADMIN)
-        invitation = invite_hr(company=company, email="double@example.com", invited_by=admin)
+        admin, _ = _make_admin_with_company()
+        invitation = invite_hr(invited_by=admin, email="double@example.com")
 
-        # Accept first time
         accept_invitation(
             token=invitation.token,
             password="HrPass123!",
@@ -326,44 +325,32 @@ class TestAcceptInvitation:
 class TestAcceptInvitationExistingUser:
     @patch("apps.accounts.services.membership.send_invitation_email")
     def test_switches_company_and_role(self, mock_send):
-        """Existing user gets the invitation's company and role=hr."""
-        company = CompanyFactory()
-        admin = UserFactory(company=company, role=User.Role.ADMIN)
+        """Existing user joins the inviter's account and gets role=hr."""
+        admin, company = _make_admin_with_company()
         existing_user = UserFactory(
             email="switchable@example.com",
             role=User.Role.CANDIDATE,
             company=None,
         )
-        invitation = invite_hr(
-            company=company,
-            email="switchable@example.com",
-            invited_by=admin,
-        )
+        invitation = invite_hr(invited_by=admin, email="switchable@example.com")
 
-        result = accept_invitation_existing_user(
-            user=existing_user,
-            token=invitation.token,
-        )
+        result = accept_invitation_existing_user(user=existing_user, token=invitation.token)
 
         result.refresh_from_db()
         assert result.company_id == company.id
+        assert result.account_owner_id == admin.id
         assert result.role == User.Role.HR
 
     @patch("apps.accounts.services.membership.send_invitation_email")
     def test_accept_existing_marks_invitation_accepted(self, mock_send):
         """Invitation is marked as accepted after existing user accepts."""
-        company = CompanyFactory()
-        admin = UserFactory(company=company, role=User.Role.ADMIN)
+        admin, _ = _make_admin_with_company()
         existing_user = UserFactory(
             email="mark@example.com",
             role=User.Role.CANDIDATE,
             company=None,
         )
-        invitation = invite_hr(
-            company=company,
-            email="mark@example.com",
-            invited_by=admin,
-        )
+        invitation = invite_hr(invited_by=admin, email="mark@example.com")
 
         accept_invitation_existing_user(user=existing_user, token=invitation.token)
 
@@ -373,18 +360,13 @@ class TestAcceptInvitationExistingUser:
     @patch("apps.accounts.services.membership.send_invitation_email")
     def test_accept_existing_wrong_email_fails(self, mock_send):
         """Fails if the user's email does not match the invitation email."""
-        company = CompanyFactory()
-        admin = UserFactory(company=company, role=User.Role.ADMIN)
+        admin, _ = _make_admin_with_company()
         wrong_user = UserFactory(
             email="wrong@example.com",
             role=User.Role.CANDIDATE,
             company=None,
         )
-        invitation = invite_hr(
-            company=company,
-            email="correct@example.com",
-            invited_by=admin,
-        )
+        invitation = invite_hr(invited_by=admin, email="correct@example.com")
 
         with pytest.raises(ApplicationError, match="different email"):
             accept_invitation_existing_user(user=wrong_user, token=invitation.token)

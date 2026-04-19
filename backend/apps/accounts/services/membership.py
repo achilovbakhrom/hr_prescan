@@ -17,29 +17,51 @@ from apps.common.messages import (
 
 def invite_hr(
     *,
-    company: Company,
-    email: str,
     invited_by: User,
+    email: str,
+    companies: list[Company] | None = None,
     permissions: list[str] | None = None,
 ) -> Invitation:
-    """Create an HR invitation and send the invitation email.
+    """Create an HR invitation scoped to the inviter's account and one or more companies.
 
-    Works for both new and existing users. If the user already belongs
-    to this company, the invitation is rejected.
+    If ``companies`` is None/empty, the invitation grants access to every non-deleted
+    company currently owned by the inviter's account. If the target email already has
+    a membership covering every requested company, the invitation is rejected.
     """
-    existing_user = User.objects.filter(email=email).first()
-    if existing_user and CompanyMembership.objects.filter(user=existing_user, company=company).exists():
-        raise ApplicationError("User is already a member of this company.")
+    account_owner = invited_by.effective_account_owner
+    owned_qs = Company.objects.filter(account_owner=account_owner, is_deleted=False)
 
-    if Invitation.objects.filter(company=company, email=email, is_accepted=False).exists():
+    if companies:
+        selected = list(owned_qs.filter(id__in=[c.id for c in companies]))
+        if len(selected) != len({c.id for c in companies}):
+            raise ApplicationError("One or more selected companies do not belong to your account.")
+    else:
+        selected = list(owned_qs)
+
+    if not selected:
+        raise ApplicationError("No companies available to invite into.")
+
+    existing_user = User.objects.filter(email=email).first()
+    if existing_user:
+        existing_company_ids = set(
+            CompanyMembership.objects.filter(
+                user=existing_user,
+                company_id__in=[c.id for c in selected],
+            ).values_list("company_id", flat=True),
+        )
+        if existing_company_ids == {c.id for c in selected}:
+            raise ApplicationError("User is already a member of the selected companies.")
+
+    if Invitation.objects.filter(account_owner=account_owner, email=email, is_accepted=False).exists():
         raise ApplicationError(str(MSG_INVITATION_EXISTS))
 
     invitation = Invitation.objects.create(
-        company=company,
+        account_owner=account_owner,
         email=email,
         invited_by=invited_by,
         permissions=permissions or [],
     )
+    invitation.companies.set(selected)
 
     send_invitation_email.delay(invitation_id=str(invitation.id))
 
@@ -47,31 +69,46 @@ def invite_hr(
 
 
 def _create_membership_from_invitation(user: User, invitation: Invitation) -> None:
-    """Create (or update) a membership for the user and switch their active company.
+    """Grant the user memberships to every company in the invitation and link them to the account.
 
-    If this is the user's first membership, it becomes their default. Otherwise the
-    existing default is preserved — re-accepting an invite must not silently demote it.
+    Existing default membership is preserved — re-accepting never demotes the current default.
     """
     perms = invitation.permissions or []
+    companies = list(invitation.companies.filter(is_deleted=False))
+    if not companies:
+        raise ApplicationError(str(MSG_INVALID_INVITATION))
 
-    membership, created = CompanyMembership.objects.get_or_create(
-        user=user,
-        company=invitation.company,
-        defaults={
-            "role": User.Role.HR,
-            "hr_permissions": perms,
-            "is_default": not CompanyMembership.objects.filter(user=user, is_default=True).exists(),
-        },
-    )
-    if not created:
-        membership.role = User.Role.HR
-        membership.hr_permissions = perms
-        membership.save(update_fields=["role", "hr_permissions"])
+    # If the user already operates under a different account (either as owner of
+    # their own companies or as an invited member elsewhere), reject — we don't
+    # support belonging to two accounts simultaneously.
+    if user.owned_companies.exists():
+        raise ApplicationError("You already own companies. Transfer or delete them before accepting this invitation.")
+    if user.account_owner_id and user.account_owner_id != invitation.account_owner_id:
+        raise ApplicationError("You already belong to another account. Leave it before accepting this invitation.")
 
-    user.company = invitation.company
+    user.account_owner = invitation.account_owner
+    has_default = CompanyMembership.objects.filter(user=user, is_default=True).exists()
+    for company in companies:
+        membership, created = CompanyMembership.objects.get_or_create(
+            user=user,
+            company=company,
+            defaults={
+                "role": User.Role.HR,
+                "hr_permissions": perms,
+                "is_default": not has_default,
+            },
+        )
+        if membership.is_default:
+            has_default = True
+        if not created:
+            membership.role = User.Role.HR
+            membership.hr_permissions = perms
+            membership.save(update_fields=["role", "hr_permissions"])
+
+    user.company = companies[0]
     user.role = User.Role.HR
     user.hr_permissions = perms
-    user.save(update_fields=["company", "role", "hr_permissions", "updated_at"])
+    user.save(update_fields=["account_owner", "company", "role", "hr_permissions", "updated_at"])
 
 
 @transaction.atomic
@@ -84,7 +121,7 @@ def accept_invitation(
 ) -> User:
     """Accept an invitation: validate token, create HR user, mark invitation accepted."""
     try:
-        invitation = Invitation.objects.select_related("company").get(token=token)
+        invitation = Invitation.objects.select_related("account_owner").get(token=token)
     except Invitation.DoesNotExist as exc:
         raise ApplicationError(str(MSG_INVALID_INVITATION)) from exc
 
@@ -94,13 +131,14 @@ def accept_invitation(
     if invitation.is_expired:
         raise ApplicationError(str(MSG_INVITATION_EXPIRED))
 
+    first_company = invitation.companies.filter(is_deleted=False).first()
     user = create_user(
         email=invitation.email,
         password=password,
         first_name=first_name,
         last_name=last_name,
         role=User.Role.HR,
-        company=invitation.company,
+        company=first_company,
     )
     _create_membership_from_invitation(user, invitation)
 
@@ -114,7 +152,7 @@ def accept_invitation(
 def accept_invitation_existing_user(*, user: User, token: UUID) -> User:
     """Accept an invitation for an existing user -- adds membership and switches."""
     try:
-        invitation = Invitation.objects.select_related("company").get(token=token)
+        invitation = Invitation.objects.select_related("account_owner").get(token=token)
     except Invitation.DoesNotExist as exc:
         raise ApplicationError(str(MSG_INVALID_INVITATION)) from exc
 
@@ -133,50 +171,3 @@ def accept_invitation_existing_user(*, user: User, token: UUID) -> User:
     invitation.save(update_fields=["is_accepted", "updated_at"])
 
     return user
-
-
-@transaction.atomic
-def switch_company(*, user: User, company_id: UUID) -> User:
-    """Switch the user's active company. Must have a membership."""
-    try:
-        membership = CompanyMembership.objects.select_related("company").get(
-            user=user,
-            company_id=company_id,
-        )
-    except CompanyMembership.DoesNotExist as exc:
-        raise ApplicationError("You are not a member of this company.") from exc
-
-    user.company = membership.company
-    user.role = membership.role
-    user.hr_permissions = membership.hr_permissions
-    user.save(update_fields=["company", "role", "hr_permissions", "updated_at"])
-    return user
-
-
-def switch_to_personal(*, user: User) -> User:
-    """Switch user back to personal/candidate context (no company)."""
-    user.company = None
-    user.role = User.Role.CANDIDATE
-    user.hr_permissions = []
-    user.save(update_fields=["company", "role", "hr_permissions", "updated_at"])
-    return user
-
-
-@transaction.atomic
-def set_default_company(*, user: User, company_id: UUID) -> CompanyMembership:
-    """Toggle the user's default flag onto one of their memberships.
-
-    Unsets any previous default for the user in the same transaction.
-    """
-    try:
-        target = CompanyMembership.objects.get(user=user, company_id=company_id)
-    except CompanyMembership.DoesNotExist as exc:
-        raise ApplicationError("You are not a member of this company.") from exc
-
-    if target.is_default:
-        return target
-
-    CompanyMembership.objects.filter(user=user, is_default=True).update(is_default=False)
-    target.is_default = True
-    target.save(update_fields=["is_default"])
-    return target
