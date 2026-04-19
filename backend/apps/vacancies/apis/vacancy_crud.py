@@ -102,9 +102,15 @@ class VacancyListCreateApi(APIView):
 
         company_id = data.pop("company_id", None)
         if company_id is not None:
-            membership = CompanyMembership.objects.filter(
-                user=request.user, company_id=company_id, company__is_deleted=False,
-            ).select_related("company").first()
+            membership = (
+                CompanyMembership.objects.filter(
+                    user=request.user,
+                    company_id=company_id,
+                    company__is_deleted=False,
+                )
+                .select_related("company")
+                .first()
+            )
             if membership is None:
                 return Response(
                     {"detail": MSG_COMPANY_NOT_FOUND_OR_NOT_MEMBER},
@@ -112,9 +118,15 @@ class VacancyListCreateApi(APIView):
                 )
             company = membership.company
         else:
-            default_membership = CompanyMembership.objects.filter(
-                user=request.user, is_default=True, company__is_deleted=False,
-            ).select_related("company").first()
+            default_membership = (
+                CompanyMembership.objects.filter(
+                    user=request.user,
+                    is_default=True,
+                    company__is_deleted=False,
+                )
+                .select_related("company")
+                .first()
+            )
             if default_membership is None:
                 return Response(
                     {"detail": str(MSG_NOT_IN_COMPANY)},

@@ -3,7 +3,7 @@
 from apps.common.ai_assistant.resolvers import resolve_company
 
 
-def handle_list_companies(*, user, params):  # noqa: ARG001
+def handle_list_companies(*, user, params):
     memberships = (
         user.memberships.filter(company__is_deleted=False)
         .select_related("company")

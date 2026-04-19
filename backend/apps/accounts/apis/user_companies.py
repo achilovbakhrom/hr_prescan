@@ -19,7 +19,10 @@ class UserCompanyListOutputSerializer(serializers.Serializer):
     id = serializers.UUIDField(source="company.id")
     name = serializers.CharField(source="company.name")
     industries = serializers.SlugRelatedField(
-        source="company.industries", many=True, read_only=True, slug_field="slug",
+        source="company.industries",
+        many=True,
+        read_only=True,
+        slug_field="slug",
     )
     custom_industry = serializers.CharField(source="company.custom_industry")
     size = serializers.CharField(source="company.size")
@@ -102,7 +105,9 @@ class UserCompanyDetailApi(APIView):
     def _get_membership(self, request: Request, pk: str) -> CompanyMembership | None:
         return (
             CompanyMembership.objects.filter(
-                user=request.user, company_id=pk, company__is_deleted=False,
+                user=request.user,
+                company_id=pk,
+                company__is_deleted=False,
             )
             .select_related("company")
             .first()
@@ -123,7 +128,9 @@ class UserCompanyDetailApi(APIView):
         serializer.is_valid(raise_exception=True)
         try:
             company = update_user_company(
-                user=request.user, company=membership.company, data=dict(serializer.validated_data),
+                user=request.user,
+                company=membership.company,
+                data=dict(serializer.validated_data),
             )
         except ApplicationError as exc:
             return Response({"detail": exc.message}, status=status.HTTP_403_FORBIDDEN)
