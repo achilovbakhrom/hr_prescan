@@ -109,10 +109,7 @@ export const TURTLE: AnimalArt = {
 export const BUBBLE: AnimalArt = {
   id: 'bubble',
   viewBox: '0 0 100 100',
-  paths: [
-    'M50 50 A38 38 0 1 0 50 49.99',
-    'M34 34 Q42 28 50 32',
-  ],
+  paths: ['M50 50 A38 38 0 1 0 50 49.99', 'M34 34 Q42 28 50 32'],
 }
 
 export const LEAF: AnimalArt = {

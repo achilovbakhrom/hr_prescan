@@ -26,7 +26,9 @@ function progressColor(score: number): string {
 </script>
 
 <template>
-  <div class="mb-6 rounded-xl border border-blue-200 dark:border-blue-800 bg-gradient-to-r from-blue-50/50 to-white p-5">
+  <div
+    class="mb-6 rounded-xl border border-blue-200 dark:border-blue-800 bg-gradient-to-r from-blue-50/50 to-white p-5"
+  >
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div class="flex items-center gap-4">
         <div

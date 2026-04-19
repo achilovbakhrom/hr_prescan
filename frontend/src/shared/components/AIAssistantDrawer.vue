@@ -78,7 +78,9 @@ onUnmounted(() => {
       v-if="isOpen"
       class="fixed right-0 top-0 z-50 flex h-full w-full flex-col border-l border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-2xl sm:max-w-[400px]"
     >
-      <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 px-4 py-3">
+      <div
+        class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 px-4 py-3"
+      >
         <div class="flex items-center gap-2">
           <div
             class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600"

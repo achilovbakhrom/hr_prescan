@@ -37,7 +37,9 @@ function formatMessage(text: string): string {
         <p class="whitespace-pre-wrap text-sm text-white">{{ msg.content }}</p>
       </div>
       <div v-else class="max-w-[85%]">
-        <div class="rounded-2xl rounded-tl-sm border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 px-3.5 py-2.5">
+        <div
+          class="rounded-2xl rounded-tl-sm border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 px-3.5 py-2.5"
+        >
           <!-- eslint-disable-next-line vue/no-v-html -->
           <p
             class="whitespace-pre-wrap text-sm text-gray-700"

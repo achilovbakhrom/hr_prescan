@@ -123,7 +123,10 @@ function formatSalary(): string {
       </div>
     </div>
 
-    <div v-if="vacancy.company" class="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-4">
+    <div
+      v-if="vacancy.company"
+      class="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-4"
+    >
       <p class="mb-2 text-sm text-gray-500">{{ t('vacancies.form.companyInfo') }}</p>
       <div class="flex items-center gap-3">
         <div

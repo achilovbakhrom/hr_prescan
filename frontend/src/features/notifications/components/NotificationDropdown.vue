@@ -98,7 +98,9 @@ onUnmounted(() => {
     ref="dropdownEl"
     class="absolute right-0 top-full z-50 mt-2 w-80 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg"
   >
-    <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 px-4 py-3">
+    <div
+      class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 px-4 py-3"
+    >
       <span class="text-sm font-semibold text-gray-900">{{ t('notifications.title') }}</span>
       <button
         v-if="notificationStore.unreadCount > 0"

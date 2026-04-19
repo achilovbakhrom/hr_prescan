@@ -54,7 +54,9 @@ const bulkActionOptions = computed(() => [
 <template>
   <div class="flex items-center gap-2">
     <!-- View toggle -->
-    <div class="flex shrink-0 items-center rounded-lg border border-gray-200 dark:border-gray-700 p-0.5">
+    <div
+      class="flex shrink-0 items-center rounded-lg border border-gray-200 dark:border-gray-700 p-0.5"
+    >
       <button
         class="rounded-md px-2.5 py-1 text-xs font-medium transition-colors sm:px-3 sm:py-1.5 sm:text-sm"
         :class="

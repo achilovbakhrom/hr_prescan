@@ -89,7 +89,9 @@ function initials(): string {
             <span class="hidden text-sm font-medium text-gray-700 dark:text-gray-300 sm:inline">
               {{ authStore.user?.firstName }}
             </span>
-            <i class="pi pi-chevron-down hidden text-xs text-gray-400 dark:text-gray-500 sm:inline"></i>
+            <i
+              class="pi pi-chevron-down hidden text-xs text-gray-400 dark:text-gray-500 sm:inline"
+            ></i>
           </button>
           <Menu ref="userMenu" :model="menuItems" :popup="true" />
         </template>

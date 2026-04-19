@@ -55,12 +55,6 @@ function handleChange(event: Event): void {
       <i v-if="!uploading" class="pi pi-camera text-sm"></i>
       <i v-else class="pi pi-spinner pi-spin text-sm"></i>
     </span>
-    <input
-      ref="inputRef"
-      type="file"
-      accept="image/*"
-      class="hidden"
-      @change="handleChange"
-    />
+    <input ref="inputRef" type="file" accept="image/*" class="hidden" @change="handleChange" />
   </button>
 </template>

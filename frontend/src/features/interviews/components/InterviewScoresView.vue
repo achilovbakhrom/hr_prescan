@@ -19,7 +19,11 @@ function scoreColor(score: number): string {
   <div class="space-y-4">
     <p v-if="scores.length === 0" class="text-sm text-gray-500">No scores available yet.</p>
 
-    <div v-for="score in scores" :key="score.id" class="rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+    <div
+      v-for="score in scores"
+      :key="score.id"
+      class="rounded-lg border border-gray-200 dark:border-gray-700 p-4"
+    >
       <div class="mb-2 flex items-center justify-between">
         <span class="text-sm font-medium text-gray-700">
           {{ score.criteriaName }}

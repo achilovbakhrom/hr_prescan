@@ -8,7 +8,9 @@ const { t } = useI18n()
 </script>
 
 <template>
-  <div class="space-y-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
+  <div
+    class="space-y-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6"
+  >
     <div v-if="company.customIndustry">
       <p class="text-sm text-gray-500">{{ t('companies.industry') }}</p>
       <p class="font-medium">{{ company.customIndustry }}</p>

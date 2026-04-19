@@ -33,7 +33,9 @@ function scoreBg(score: number): string {
 </script>
 
 <template>
-  <div class="mb-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+  <div
+    class="mb-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4"
+  >
     <div class="flex items-center gap-4">
       <div
         class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full"

@@ -58,7 +58,9 @@ watch(
         aria-modal="true"
         aria-label="Mobile navigation"
       >
-        <div class="flex h-16 items-center justify-between border-b border-gray-200 dark:border-gray-700 px-4">
+        <div
+          class="flex h-16 items-center justify-between border-b border-gray-200 dark:border-gray-700 px-4"
+        >
           <div class="flex items-center gap-2">
             <AppLogo size="sm" />
             <span class="text-lg font-bold text-gray-900">PreScreen AI</span>
@@ -75,7 +77,9 @@ watch(
 
         <MobileNavItems />
 
-        <div class="border-t border-gray-200 dark:border-gray-700 px-4 py-3"><LanguageSwitcher /></div>
+        <div class="border-t border-gray-200 dark:border-gray-700 px-4 py-3">
+          <LanguageSwitcher />
+        </div>
 
         <div v-if="authStore.user" class="border-t border-gray-200 dark:border-gray-700 px-4 py-3">
           <div class="flex items-center gap-3">

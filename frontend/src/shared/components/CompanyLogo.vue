@@ -42,10 +42,7 @@ const iconClass = computed(
 <template>
   <div
     v-if="resolvedLogo"
-    :class="[
-      boxClass,
-      'flex shrink-0 items-center justify-center overflow-hidden bg-gray-100',
-    ]"
+    :class="[boxClass, 'flex shrink-0 items-center justify-center overflow-hidden bg-gray-100']"
   >
     <img :src="resolvedLogo" :alt="resolvedName" class="h-full w-full object-contain" />
   </div>
