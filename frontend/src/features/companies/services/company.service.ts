@@ -26,9 +26,7 @@ export const companyService = {
   async uploadLogo(id: string, file: File): Promise<Company> {
     const form = new FormData()
     form.append('logo', file)
-    const response = await apiClient.patch(`/hr/companies/${id}/`, form, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    })
+    const response = await apiClient.patch(`/hr/companies/${id}/`, form)
     return response.data
   },
   async softDelete(id: string): Promise<void> {
