@@ -13,7 +13,7 @@ useScrollAnimation()
 </script>
 
 <template>
-  <div class="min-h-screen bg-white">
+  <div class="relative min-h-screen">
     <LandingNav />
     <LandingHero />
     <LandingStats />

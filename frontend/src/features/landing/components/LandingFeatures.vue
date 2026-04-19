@@ -43,7 +43,7 @@ const features = computed<Feature[]>(() => [
   <section id="features" class="px-6 py-24">
     <div class="mx-auto max-w-7xl">
       <div class="scroll-animate mb-16 text-center">
-        <h2 class="mb-3 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+        <h2 class="mb-3 text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
           {{ t('landing.features.title') }}
         </h2>
         <p class="mx-auto max-w-xl text-gray-500">
@@ -54,7 +54,7 @@ const features = computed<Feature[]>(() => [
         <div
           v-for="(feature, idx) in features"
           :key="feature.title"
-          class="scroll-animate group rounded-2xl border border-gray-100 bg-white p-7 transition-all duration-300 hover:-translate-y-1 hover:border-gray-200 hover:shadow-xl hover:shadow-gray-100"
+          class="scroll-animate group rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-7 transition-all duration-300 hover:-translate-y-1 hover:border-gray-200 dark:hover:border-gray-700 hover:shadow-xl hover:shadow-gray-100"
           :class="`scroll-animate-delay-${idx + 1}`"
         >
           <div

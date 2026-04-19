@@ -52,10 +52,10 @@ const pipelineSteps = computed<PipelineStep[]>(() => [
 </script>
 
 <template>
-  <section id="how-it-works" class="bg-gray-50/80 px-6 py-24">
+  <section id="how-it-works" class="bg-gray-50/80 dark:bg-gray-900/40 px-6 py-24">
     <div class="mx-auto max-w-6xl">
       <div class="scroll-animate mb-16 text-center">
-        <h2 class="mb-3 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+        <h2 class="mb-3 text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
           {{ t('landing.pipeline.title') }}
         </h2>
         <p class="mx-auto max-w-xl text-gray-500">
@@ -90,7 +90,7 @@ const pipelineSteps = computed<PipelineStep[]>(() => [
 
       <!-- Mobile: vertical flow -->
       <div class="scroll-animate lg:hidden">
-        <div class="relative ml-6 border-l-2 border-gray-200 pl-8">
+        <div class="relative ml-6 border-l-2 border-gray-200 dark:border-gray-700 pl-8">
           <div v-for="step in pipelineSteps" :key="step.title" class="relative pb-10 last:pb-0">
             <!-- Dot on the timeline -->
             <div

@@ -52,7 +52,7 @@ onMounted(() => {
   <section class="relative overflow-hidden px-6 py-20 sm:py-28 lg:py-36">
     <!-- Background gradient -->
     <div
-      class="absolute inset-0 bg-gradient-to-br from-slate-50 via-blue-50/40 to-indigo-50/60"
+      class="absolute inset-0 bg-gradient-to-br from-slate-50 via-blue-50/40 to-indigo-50/60 dark:from-gray-950 dark:via-blue-950/30 dark:to-indigo-950/30"
     ></div>
     <!-- Animated floating shapes -->
     <div
@@ -68,21 +68,21 @@ onMounted(() => {
         <div class="text-center lg:text-left">
           <!-- Badge -->
           <div
-            class="scroll-animate mb-6 inline-flex items-center gap-2 rounded-full border border-blue-200/60 bg-blue-50/80 px-4 py-1.5 text-sm font-medium text-blue-700 backdrop-blur-sm"
+            class="scroll-animate mb-6 inline-flex items-center gap-2 rounded-full border border-blue-200/60 bg-blue-50/80 px-4 py-1.5 text-sm font-medium text-blue-700 dark:text-blue-300 backdrop-blur-sm"
           >
             <i class="pi pi-sparkles text-xs"></i> {{ t('landing.badge.poweredBy') }}
           </div>
 
           <!-- Headline -->
           <h1
-            class="scroll-animate mb-5 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl lg:text-5xl xl:text-6xl"
+            class="scroll-animate mb-5 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl lg:text-5xl xl:text-6xl"
           >
             {{ t('landing.hero.title') }}
           </h1>
 
           <!-- Subtitle -->
           <p
-            class="scroll-animate mb-8 max-w-lg text-base leading-relaxed text-gray-500 sm:text-lg lg:mx-0 mx-auto"
+            class="scroll-animate mb-8 max-w-lg text-base leading-relaxed text-gray-500 dark:text-gray-400 sm:text-lg lg:mx-0 mx-auto"
           >
             {{ t('landing.hero.subtitle') }}
           </p>
@@ -119,11 +119,11 @@ onMounted(() => {
         <!-- Right: Animated chat demo -->
         <div class="scroll-animate scroll-animate-delay-2 hidden sm:block">
           <div
-            class="relative rounded-2xl border border-gray-200/60 bg-white/90 shadow-2xl shadow-blue-900/10 backdrop-blur-sm"
+            class="relative rounded-2xl border border-gray-200/60 bg-white/90 dark:bg-gray-900/90 shadow-2xl shadow-blue-900/10 backdrop-blur-sm"
           >
             <!-- Chat header -->
             <div
-              class="flex items-center gap-3 rounded-t-2xl border-b border-gray-100 bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3.5"
+              class="flex items-center gap-3 rounded-t-2xl border-b border-gray-100 dark:border-gray-800 bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3.5"
             >
               <div class="flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
                 <i class="pi pi-comments text-sm text-white"></i>
@@ -155,14 +155,14 @@ onMounted(() => {
                     >
                       <i class="pi pi-sparkles text-[10px] text-blue-600"></i>
                     </div>
-                    <div class="rounded-2xl rounded-tl-sm bg-gray-100 px-4 py-2.5">
+                    <div class="rounded-2xl rounded-tl-sm bg-gray-100 dark:bg-gray-800 px-4 py-2.5">
                       <p class="text-sm text-gray-700">{{ msg.text }}</p>
                     </div>
                   </div>
 
                   <!-- Candidate message -->
                   <div v-else class="max-w-[75%]">
-                    <div class="rounded-2xl rounded-tr-sm bg-blue-600 px-4 py-2.5">
+                    <div class="rounded-2xl rounded-tr-sm bg-blue-600 dark:bg-blue-700 px-4 py-2.5">
                       <p class="text-sm text-white">{{ msg.text }}</p>
                     </div>
                   </div>
@@ -179,7 +179,7 @@ onMounted(() => {
                 >
                   <i class="pi pi-sparkles text-[10px] text-blue-600"></i>
                 </div>
-                <div class="flex gap-1 rounded-2xl bg-gray-100 px-4 py-3">
+                <div class="flex gap-1 rounded-2xl bg-gray-100 dark:bg-gray-800 px-4 py-3">
                   <span
                     class="h-1.5 w-1.5 animate-bounce rounded-full bg-gray-400"
                     style="animation-delay: 0ms"
@@ -197,8 +197,8 @@ onMounted(() => {
             </div>
 
             <!-- Chat input mockup -->
-            <div class="flex items-center gap-2 border-t border-gray-100 px-5 py-3">
-              <div class="flex-1 rounded-full bg-gray-50 px-4 py-2.5">
+            <div class="flex items-center gap-2 border-t border-gray-100 dark:border-gray-800 px-5 py-3">
+              <div class="flex-1 rounded-full bg-gray-50 dark:bg-gray-900 px-4 py-2.5">
                 <span class="text-sm text-gray-400">{{ t('interviews.chat.typeYourAnswer') }}</span>
               </div>
               <div class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-600">

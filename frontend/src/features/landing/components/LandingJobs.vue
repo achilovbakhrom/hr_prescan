@@ -71,7 +71,7 @@ function getCompanyName(job: Vacancy): string | undefined {
         <div
           v-for="job in jobs.slice(0, 10)"
           :key="job.id"
-          class="flex cursor-pointer items-center justify-between rounded-xl border border-gray-100 bg-white p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-gray-200 hover:shadow-lg hover:shadow-gray-100/50"
+          class="flex cursor-pointer items-center justify-between rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-gray-200 dark:hover:border-gray-700 hover:shadow-lg hover:shadow-gray-100/50"
           @click="goToJobDetail(job.id)"
         >
           <div class="flex min-w-0 flex-1 items-start gap-3">
@@ -82,11 +82,15 @@ function getCompanyName(job: Vacancy): string | undefined {
               size="md"
             />
             <div class="min-w-0 flex-1">
-              <h3 class="text-base font-semibold text-gray-900">{{ job.title }}</h3>
-              <p v-if="getCompanyName(job)" class="mt-0.5 text-sm text-gray-500">
+              <h3 class="text-base font-semibold text-gray-900 dark:text-white">
+                {{ job.title }}
+              </h3>
+              <p v-if="getCompanyName(job)" class="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
                 {{ getCompanyName(job) }}
               </p>
-              <div class="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">
+              <div
+                class="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500 dark:text-gray-400"
+              >
                 <span v-if="job.location"
                   ><i class="pi pi-map-marker mr-1 text-xs"></i>{{ job.location }}</span
                 >
@@ -116,7 +120,10 @@ function getCompanyName(job: Vacancy): string | undefined {
       </div>
 
       <!-- Empty state -->
-      <div v-else class="rounded-2xl border border-dashed border-gray-200 py-16 text-center">
+      <div
+        v-else
+        class="rounded-2xl border border-dashed border-gray-200 dark:border-gray-700 py-16 text-center"
+      >
         <i class="pi pi-briefcase mb-3 text-4xl text-gray-300"></i>
         <p class="text-gray-500">{{ t('landing.noJobsYet') }}</p>
         <p class="mt-1 text-sm text-gray-400">{{ t('landing.noJobsCheckBack') }}</p>
