@@ -72,6 +72,8 @@ function onClear(): void {
     :optionLabel="translatedLabel"
     :placeholder="t('auth.chooseRole.country')"
     :invalid="invalid"
+    class="w-full"
+    input-class="w-full"
     @complete="search"
     @item-select="onSelect"
     @clear="onClear"
