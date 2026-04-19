@@ -60,7 +60,7 @@ function handleBulkAction(event: { value: ApplicationStatus }): void {
       @bulk-action="handleBulkAction"
     />
 
-    <p v-if="candidateStore.error" class="rounded-lg bg-red-50 px-4 py-2 text-sm text-red-600">
+    <p v-if="candidateStore.error" class="rounded-lg bg-red-50 dark:bg-red-950 px-4 py-2 text-sm text-red-600">
       {{ candidateStore.error }}
     </p>
 

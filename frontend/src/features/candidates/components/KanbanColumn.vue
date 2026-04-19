@@ -42,7 +42,7 @@ function onDragOver(event: DragEvent): void {
 
 <template>
   <div
-    class="flex w-56 shrink-0 flex-col rounded-xl border border-gray-100 bg-gray-50/50 sm:w-64"
+    class="flex w-56 shrink-0 flex-col rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/30 sm:w-64"
     @drop="emit('drop', $event)"
     @dragover="onDragOver"
   >
@@ -59,7 +59,7 @@ function onDragOver(event: DragEvent): void {
         </span>
       </div>
       <button
-        class="rounded p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-600"
+        class="rounded p-1 text-gray-400 dark:text-gray-500 hover:bg-gray-200 hover:text-gray-600"
         @click="toggleMenu($event)"
       >
         <i class="pi pi-ellipsis-v text-xs"></i>
@@ -81,7 +81,7 @@ function onDragOver(event: DragEvent): void {
       <!-- Empty state -->
       <div
         v-if="candidates.length === 0"
-        class="flex flex-1 items-center justify-center rounded-lg border border-dashed border-gray-200 py-6"
+        class="flex flex-1 items-center justify-center rounded-lg border border-dashed border-gray-200 dark:border-gray-700 py-6"
       >
         <p class="text-xs text-gray-400">{{ t('candidates.noCandidates') }}</p>
       </div>

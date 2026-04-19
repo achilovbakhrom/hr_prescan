@@ -14,6 +14,7 @@ import GlassCard from '@/shared/components/GlassCard.vue'
 import CountryAutocomplete from '@/shared/components/CountryAutocomplete.vue'
 import IndustryAutocomplete from '@/shared/components/IndustryAutocomplete.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
+import CompanyLogoPicker from '../components/CompanyLogoPicker.vue'
 import { useCompanyStore } from '../stores/company.store'
 import type { Company } from '../types/company.types'
 
@@ -29,6 +30,27 @@ const description = ref('')
 const size = ref<Company['size']>('small')
 const saving = ref(false)
 const submitted = ref(false)
+
+const pendingLogo = ref<File | null>(null)
+const pendingLogoUrl = ref<string | null>(null)
+const logoError = ref<string | null>(null)
+
+function onLogoPick(file: File): void {
+  logoError.value = null
+  if (pendingLogoUrl.value) URL.revokeObjectURL(pendingLogoUrl.value)
+  pendingLogo.value = file
+  pendingLogoUrl.value = URL.createObjectURL(file)
+}
+
+function onLogoReject(reason: string): void {
+  logoError.value = reason
+}
+
+onBeforeUnmount(() => {
+  if (pendingLogoUrl.value) URL.revokeObjectURL(pendingLogoUrl.value)
+})
+
+const previewName = computed(() => name.value || t('companies.namePlaceholder'))
 
 const sizeOptions: { label: string; value: Company['size'] }[] = [
   { label: t('companies.sizeSmall'), value: 'small' },
@@ -59,6 +81,14 @@ async function handleSave(): Promise<void> {
       website: website.value || undefined,
       description: description.value || undefined,
     })
+    if (pendingLogo.value) {
+      try {
+        await companyStore.uploadCompanyLogo(company.id, pendingLogo.value)
+      } catch {
+        // Company already created — don't block navigation on a logo failure.
+        // Store surfaces the error; user can retry from the detail page.
+      }
+    }
     router.push({ name: ROUTE_NAMES.COMPANY_DETAIL, params: { id: company.id } })
   } catch {
     /* store surfaces error */

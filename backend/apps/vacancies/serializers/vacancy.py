@@ -53,6 +53,7 @@ class VacancyListOutputSerializer(serializers.ModelSerializer):
     created_by_email = serializers.EmailField(source="created_by.email", read_only=True)
     company_name = serializers.CharField(source="company.name", read_only=True)
     company_id = serializers.UUIDField(source="company.id", read_only=True)
+    company_logo = serializers.ImageField(source="company.logo", read_only=True, allow_null=True)
 
     class Meta:
         model = Vacancy
@@ -80,6 +81,7 @@ class VacancyListOutputSerializer(serializers.ModelSerializer):
             "created_by_email",
             "company_id",
             "company_name",
+            "company_logo",
             "created_at",
             "updated_at",
         ]
@@ -147,6 +149,7 @@ class PublicVacancyListOutputSerializer(serializers.ModelSerializer):
     """Public vacancy list -- includes salary and skills for job seekers."""
 
     company_name = serializers.CharField(source="company.name", read_only=True)
+    company_logo = serializers.ImageField(source="company.logo", read_only=True, allow_null=True)
 
     class Meta:
         model = Vacancy
@@ -159,6 +162,7 @@ class PublicVacancyListOutputSerializer(serializers.ModelSerializer):
             "employment_type",
             "experience_level",
             "company_name",
+            "company_logo",
             "cv_required",
             "skills",
             "salary_min",

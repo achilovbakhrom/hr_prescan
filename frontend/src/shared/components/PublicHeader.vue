@@ -51,7 +51,7 @@ function initials(): string {
 
 <template>
   <header
-    class="sticky top-0 z-50 border-b border-gray-100 bg-white/95 backdrop-blur-md dark:border-gray-800 dark:bg-gray-950/95"
+    class="sticky top-0 z-50 border-b border-gray-100 bg-white/60 shadow-sm shadow-black/5 backdrop-blur-2xl dark:border-gray-800 dark:bg-gray-950/60 dark:shadow-black/20"
   >
     <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
       <RouterLink to="/" class="flex items-center gap-2.5">
@@ -82,14 +82,14 @@ function initials(): string {
             @click="toggleUserMenu"
           >
             <div
-              class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-medium text-blue-700"
+              class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-950 text-sm font-medium text-blue-700"
             >
               {{ initials() }}
             </div>
-            <span class="hidden text-sm font-medium text-gray-700 sm:inline">
+            <span class="hidden text-sm font-medium text-gray-700 dark:text-gray-300 sm:inline">
               {{ authStore.user?.firstName }}
             </span>
-            <i class="pi pi-chevron-down hidden text-xs text-gray-400 sm:inline"></i>
+            <i class="pi pi-chevron-down hidden text-xs text-gray-400 dark:text-gray-500 sm:inline"></i>
           </button>
           <Menu ref="userMenu" :model="menuItems" :popup="true" />
         </template>
@@ -98,7 +98,7 @@ function initials(): string {
         <template v-else>
           <RouterLink
             :to="{ name: ROUTE_NAMES.LOGIN }"
-            class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            class="rounded-lg bg-blue-600 dark:bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
           >
             {{ t('nav.signIn') }}
           </RouterLink>

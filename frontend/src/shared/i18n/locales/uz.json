@@ -1138,7 +1138,12 @@
     "setAsDefault": "Asosiy qilish",
     "cannotDeleteLast": "Oxirgi kompaniyangizni o'chira olmaysiz.",
     "deleteConfirmHeader": "Kompaniyani o'chirish",
-    "deleteConfirm": "'{name}' ni o'chirasizmi? Barcha a'zolar kirish huquqini yo'qotadi; eski vakansiyalar nomni saqlab qoladi."
+    "deleteConfirm": "'{name}' ni o'chirasizmi? Barcha a'zolar kirish huquqini yo'qotadi; eski vakansiyalar nomni saqlab qoladi.",
+    "changeLogo": "Logotipni o'zgartirish",
+    "logoInvalidType": "Iltimos, rasm faylini tanlang.",
+    "logoTooLarge": "Logotip 2 MB dan katta bo'lmasligi kerak.",
+    "logo": "Logotip",
+    "logoHint": "Ixtiyoriy. PNG yoki JPG, 2 MB gacha."
   },
   "jobBoard": {
     "title": "Ishlarni ko'rish",

@@ -1,4 +1,5 @@
 from rest_framework import serializers, status
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -88,6 +89,7 @@ class UserCompanyDetailApi(APIView):
     """
 
     permission_classes = [IsAuthenticated]
+    parser_classes = [JSONParser, MultiPartParser, FormParser]
 
     class InputSerializer(serializers.Serializer):
         name = serializers.CharField(max_length=255, required=False)
@@ -100,7 +102,7 @@ class UserCompanyDetailApi(APIView):
         country = serializers.CharField(max_length=100, required=False)
         website = serializers.URLField(max_length=500, required=False, allow_blank=True)
         description = serializers.CharField(required=False, allow_blank=True)
-        logo = serializers.CharField(max_length=500, required=False, allow_blank=True)
+        logo = serializers.ImageField(required=False, allow_null=True)
 
     def _get_membership(self, request: Request, pk: str) -> CompanyMembership | None:
         return (

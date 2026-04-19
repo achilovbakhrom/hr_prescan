@@ -15,6 +15,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
+import CompanyLogo from '@/shared/components/CompanyLogo.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import { vacancyService } from '@/features/vacancies/services/vacancy.service'
 import {

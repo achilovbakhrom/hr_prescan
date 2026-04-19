@@ -153,7 +153,7 @@ function handleSubmit(): void {
           {{ t('permissions.title') }}
         </label>
         <p class="text-xs text-gray-500">{{ t('permissions.selectPermissions') }}</p>
-        <div class="flex flex-col gap-2 rounded-lg border border-gray-200 bg-gray-50 p-3">
+        <div class="flex flex-col gap-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-3">
           <label
             v-for="opt in permissionOptions"
             :key="opt.value"

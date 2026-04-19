@@ -14,7 +14,7 @@ withDefaults(defineProps<Props>(), {
   <div
     :class="[
       'flex flex-col items-center justify-center gap-4',
-      overlay ? 'fixed inset-0 z-50 bg-white/80 backdrop-blur-sm' : 'min-h-64 w-full',
+      overlay ? 'fixed inset-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm' : 'min-h-64 w-full',
     ]"
     role="status"
     :aria-label="message"
@@ -24,10 +24,10 @@ withDefaults(defineProps<Props>(), {
     <!-- Spinner -->
     <div class="relative">
       <div
-        class="h-12 w-12 animate-spin rounded-full border-4 border-blue-100 border-t-blue-600"
+        class="h-12 w-12 animate-spin rounded-full border-4 border-blue-100 dark:border-blue-900 border-t-blue-600"
       ></div>
       <div
-        class="absolute inset-0 h-12 w-12 animate-ping rounded-full border-2 border-blue-200 opacity-20"
+        class="absolute inset-0 h-12 w-12 animate-ping rounded-full border-2 border-blue-200 dark:border-blue-800 opacity-20"
       ></div>
     </div>
 

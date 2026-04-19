@@ -72,7 +72,7 @@ async function removePhoto(): Promise<void> {
     </label>
     <div class="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
       <div
-        class="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-full border border-gray-200 bg-gray-50"
+        class="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-full border border-gray-200 dark:border-gray-700 bg-gray-50"
       >
         <img
           v-if="hasPhoto"

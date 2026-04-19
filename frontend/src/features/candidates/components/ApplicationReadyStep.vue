@@ -42,7 +42,7 @@ async function copyTelegramLink(): Promise<void> {
 
 <template>
   <div class="space-y-4 sm:space-y-6">
-    <div class="rounded-lg border border-green-200 bg-green-50 p-3 sm:p-4">
+    <div class="rounded-lg border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950 p-3 sm:p-4">
       <div class="flex items-center gap-2">
         <i class="pi pi-check-circle text-green-600"></i>
         <p class="text-sm font-medium text-green-800 sm:text-base">
@@ -51,16 +51,16 @@ async function copyTelegramLink(): Promise<void> {
       </div>
     </div>
 
-    <div class="rounded-lg border border-gray-200 bg-white p-5 text-center sm:p-8">
+    <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 text-center sm:p-8">
       <div
-        class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 sm:mb-4 sm:h-16 sm:w-16"
+        class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-950 sm:mb-4 sm:h-16 sm:w-16"
       >
-        <i class="pi pi-comments text-2xl text-blue-600 sm:text-3xl"></i>
+        <i class="pi pi-comments text-2xl text-blue-600 dark:text-blue-400 sm:text-3xl"></i>
       </div>
-      <h2 class="mb-2 text-lg font-bold text-gray-900 sm:text-xl">
+      <h2 class="mb-2 text-lg font-bold text-gray-900 dark:text-white sm:text-xl">
         {{ t('candidates.application.prescanReady') }}
       </h2>
-      <p class="mb-4 text-xs text-gray-500 sm:mb-6 sm:text-sm">
+      <p class="mb-4 text-xs text-gray-500 dark:text-gray-400 sm:mb-6 sm:text-sm">
         {{ t('candidates.application.prescanReadyHint') }}
       </p>
 
@@ -72,7 +72,7 @@ async function copyTelegramLink(): Promise<void> {
         @click="emit('startPrescanning')"
       />
 
-      <div class="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-3 sm:mb-6">
+      <div class="mb-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-3 sm:mb-6">
         <label class="mb-1 block text-xs font-medium text-gray-500">{{
           t('candidates.application.prescanLink')
         }}</label>
@@ -81,7 +81,7 @@ async function copyTelegramLink(): Promise<void> {
             type="text"
             readonly
             :value="prescanUrl"
-            class="w-full rounded border border-gray-200 bg-white px-3 py-2 text-xs text-gray-700 sm:flex-1 sm:text-sm"
+            class="w-full rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-xs text-gray-700 dark:text-gray-300 sm:flex-1 sm:text-sm"
             @focus="($event.target as HTMLInputElement).select()"
           />
           <Button
@@ -95,7 +95,7 @@ async function copyTelegramLink(): Promise<void> {
         </div>
       </div>
 
-      <p class="mb-3 text-xs text-gray-500 sm:mb-4 sm:text-sm">
+      <p class="mb-3 text-xs text-gray-500 dark:text-gray-400 sm:mb-4 sm:text-sm">
         <i class="pi pi-envelope mr-1"></i>{{ t('candidates.application.linkSentToEmail') }}
       </p>
 
@@ -136,15 +136,15 @@ async function copyTelegramLink(): Promise<void> {
         </div>
       </div>
 
-      <div class="rounded-lg border border-blue-100 bg-blue-50 p-3 text-left sm:p-4">
-        <p class="text-xs text-blue-800 sm:text-sm">
+      <div class="rounded-lg border border-blue-100 dark:border-blue-900 bg-blue-50 dark:bg-blue-950 p-3 text-left sm:p-4">
+        <p class="text-xs text-blue-800 dark:text-blue-200 sm:text-sm">
           <i class="pi pi-user-plus mr-1"></i>
           <strong>{{ t('candidates.application.tip') }}:</strong>
           {{ t('candidates.application.tipText') }}
         </p>
         <RouterLink
           to="/register"
-          class="mt-2 inline-block text-xs font-medium text-blue-600 hover:underline sm:text-sm"
+          class="mt-2 inline-block text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline sm:text-sm"
         >
           {{ t('candidates.application.createAccount') }}
         </RouterLink>
@@ -152,7 +152,7 @@ async function copyTelegramLink(): Promise<void> {
     </div>
 
     <div class="text-center">
-      <RouterLink to="/jobs" class="text-xs text-gray-500 hover:text-gray-700 sm:text-sm">
+      <RouterLink to="/jobs" class="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 sm:text-sm">
         {{ t('candidates.application.browseMoreJobs') }}
       </RouterLink>
     </div>

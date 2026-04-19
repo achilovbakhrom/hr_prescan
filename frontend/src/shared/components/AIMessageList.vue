@@ -32,12 +32,12 @@ function formatMessage(text: string): string {
     >
       <div
         v-if="msg.role === 'user'"
-        class="max-w-[85%] rounded-2xl rounded-tr-sm bg-blue-600 px-3.5 py-2.5"
+        class="max-w-[85%] rounded-2xl rounded-tr-sm bg-blue-600 dark:bg-blue-700 px-3.5 py-2.5"
       >
         <p class="whitespace-pre-wrap text-sm text-white">{{ msg.content }}</p>
       </div>
       <div v-else class="max-w-[85%]">
-        <div class="rounded-2xl rounded-tl-sm border border-gray-100 bg-gray-50 px-3.5 py-2.5">
+        <div class="rounded-2xl rounded-tl-sm border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 px-3.5 py-2.5">
           <!-- eslint-disable-next-line vue/no-v-html -->
           <p
             class="whitespace-pre-wrap text-sm text-gray-700"
@@ -48,7 +48,7 @@ function formatMessage(text: string): string {
           <span
             v-for="(action, aidx) in msg.actions"
             :key="aidx"
-            class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700"
+            class="inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 text-[10px] font-medium text-emerald-700"
           >
             <i class="pi pi-check text-[8px]"></i>{{ action.tool.replace(/_/g, ' ') }}
           </span>
@@ -57,7 +57,7 @@ function formatMessage(text: string): string {
     </div>
 
     <div v-if="sending" class="flex justify-start">
-      <div class="flex gap-1 rounded-2xl bg-gray-100 px-4 py-3">
+      <div class="flex gap-1 rounded-2xl bg-gray-100 dark:bg-gray-800 px-4 py-3">
         <span
           class="h-1.5 w-1.5 animate-bounce rounded-full bg-gray-400"
           style="animation-delay: 0ms"

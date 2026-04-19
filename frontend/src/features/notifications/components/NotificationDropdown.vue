@@ -96,13 +96,13 @@ onUnmounted(() => {
 <template>
   <div
     ref="dropdownEl"
-    class="absolute right-0 top-full z-50 mt-2 w-80 rounded-lg border border-gray-200 bg-white shadow-lg"
+    class="absolute right-0 top-full z-50 mt-2 w-80 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg"
   >
-    <div class="flex items-center justify-between border-b border-gray-100 px-4 py-3">
+    <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 px-4 py-3">
       <span class="text-sm font-semibold text-gray-900">{{ t('notifications.title') }}</span>
       <button
         v-if="notificationStore.unreadCount > 0"
-        class="text-xs text-blue-600 hover:text-blue-800"
+        class="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800"
         @click="handleMarkAllAsRead"
       >
         {{ t('notifications.markAllRead') }}
@@ -143,7 +143,7 @@ onUnmounted(() => {
       </button>
     </div>
 
-    <div class="border-t border-gray-100 px-4 py-2">
+    <div class="border-t border-gray-100 dark:border-gray-800 px-4 py-2">
       <Button
         :label="t('common.viewAll')"
         text

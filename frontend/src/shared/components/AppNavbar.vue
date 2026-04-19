@@ -81,7 +81,7 @@ function handleMenuToggle(): void {
 
 <template>
   <header
-    class="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4 dark:border-gray-800 dark:bg-gray-950"
+    class="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-gray-200 bg-white/60 px-4 shadow-sm shadow-black/5 backdrop-blur-2xl dark:border-gray-800 dark:bg-gray-950/60 dark:shadow-black/20"
   >
     <div class="flex items-center gap-3">
       <Button
@@ -91,14 +91,14 @@ function handleMenuToggle(): void {
         aria-label="Toggle menu"
         @click="handleMenuToggle"
       />
-      <RouterLink to="/" class="text-xl font-bold text-gray-900 hover:text-blue-600"
+      <RouterLink to="/" class="text-xl font-bold text-gray-900 dark:text-white hover:text-blue-600"
         >PreScreen AI</RouterLink
       >
       <a
         href="/jobs"
         target="_blank"
         rel="noopener"
-        class="ml-1 flex items-center gap-1.5 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 transition-colors hover:border-blue-200 hover:bg-blue-100 sm:ml-2"
+        class="ml-1 flex items-center gap-1.5 rounded-full border border-blue-100 dark:border-blue-900 bg-blue-50 dark:bg-blue-950 px-3 py-1 text-xs font-medium text-blue-700 dark:text-blue-300 transition-colors hover:border-blue-200 hover:bg-blue-100 dark:hover:bg-blue-900 sm:ml-2"
       >
         <i class="pi pi-search text-[10px]"></i>
         <span class="hidden sm:inline">{{ t('nav.browseJobs') }}</span>
@@ -110,20 +110,20 @@ function handleMenuToggle(): void {
     <div class="flex items-center gap-3">
       <button
         type="button"
-        class="hidden items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs text-gray-500 transition-colors hover:bg-gray-100 sm:flex"
+        class="hidden items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 px-3 py-1.5 text-xs text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 sm:flex"
         :title="t('common.searchPlaceholder')"
         @click="showSearch = true"
       >
         <i class="pi pi-search text-[10px]"></i>
         <span class="hidden md:inline">{{ t('common.searchPlaceholder') }}</span>
         <kbd
-          class="hidden rounded border border-gray-200 bg-white px-1 py-0.5 text-[9px] font-medium md:inline"
+          class="hidden rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-1 py-0.5 text-[9px] font-medium md:inline"
           >⌘K</kbd
         >
       </button>
       <button
         type="button"
-        class="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700 sm:hidden"
+        class="rounded-lg p-1.5 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200 sm:hidden"
         :aria-label="t('common.searchPlaceholder')"
         @click="showSearch = true"
       >
@@ -169,15 +169,15 @@ function handleMenuToggle(): void {
         @click="toggleUserMenu"
       >
         <div
-          class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-medium text-blue-700"
+          class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-950 text-sm font-medium text-blue-700"
         >
           {{ authStore.user?.firstName?.charAt(0) ?? ''
           }}{{ authStore.user?.lastName?.charAt(0) ?? '' }}
         </div>
-        <span class="hidden text-sm font-medium text-gray-700 sm:inline"
+        <span class="hidden text-sm font-medium text-gray-700 dark:text-gray-300 sm:inline"
           >{{ authStore.user?.firstName }} {{ authStore.user?.lastName }}</span
         >
-        <i class="pi pi-chevron-down hidden text-xs text-gray-400 sm:inline"></i>
+        <i class="pi pi-chevron-down hidden text-xs text-gray-400 dark:text-gray-500 sm:inline"></i>
       </button>
 
       <Menu ref="userMenu" :model="menuItems" :popup="true" />

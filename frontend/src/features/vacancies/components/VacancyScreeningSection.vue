@@ -112,7 +112,7 @@ async function save(): Promise<void> {
 <template>
   <div class="space-y-6">
     <!-- Block 1: Language & Instructions -->
-    <section class="rounded-xl border border-gray-100 bg-white p-5">
+    <section class="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-5">
       <h3 class="mb-1 text-sm font-semibold text-gray-900">
         {{ t('vacancies.screening.languageAndInstructions') }}
       </h3>
@@ -192,7 +192,7 @@ async function save(): Promise<void> {
     </section>
 
     <!-- Block 2: Questions -->
-    <section class="rounded-xl border border-gray-100 bg-white p-5">
+    <section class="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-5">
       <QuestionList
         :questions="questions"
         :loading="loading"
@@ -205,7 +205,7 @@ async function save(): Promise<void> {
     </section>
 
     <!-- Block 3: Criteria -->
-    <section class="rounded-xl border border-gray-100 bg-white p-5">
+    <section class="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-5">
       <CriteriaList
         :criteria="criteria"
         :loading="loading"

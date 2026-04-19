@@ -22,6 +22,8 @@ const router = useRouter()
 const companyStore = useCompanyStore()
 const editing = ref(false)
 const saving = ref(false)
+const logoUploading = ref(false)
+const logoError = ref<string | null>(null)
 
 onMounted(() => companyStore.fetchCompanyDetail(route.params.id as string))
 

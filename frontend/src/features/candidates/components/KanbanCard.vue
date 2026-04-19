@@ -61,7 +61,7 @@ function onDragStart(event: DragEvent): void {
 <template>
   <div
     draggable="true"
-    class="cursor-pointer rounded-lg border border-gray-100 bg-white p-3 shadow-sm transition-all hover:shadow-md"
+    class="cursor-pointer rounded-lg border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-3 shadow-sm transition-all hover:shadow-md"
     @click="emit('click')"
     @dragstart="onDragStart"
   >
@@ -119,7 +119,7 @@ function onDragStart(event: DragEvent): void {
     >
       <span
         v-if="candidate.matchScore !== null"
-        class="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[10px] font-medium bg-blue-50 text-blue-700"
+        class="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[10px] font-medium bg-blue-50 dark:bg-blue-950 text-blue-700"
         title="CV match score"
       >
         CV {{ candidate.matchScore }}%

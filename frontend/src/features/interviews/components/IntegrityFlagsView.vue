@@ -34,7 +34,7 @@ function formatTimestamp(seconds: number | null): string {
     <div
       v-for="flag in flags"
       :key="flag.id"
-      class="flex items-start gap-3 rounded-lg border border-gray-200 p-4"
+      class="flex items-start gap-3 rounded-lg border border-gray-200 dark:border-gray-700 p-4"
     >
       <Tag
         :value="flag.severity.toUpperCase()"
