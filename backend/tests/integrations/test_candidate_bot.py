@@ -12,6 +12,7 @@ from apps.integrations.telegram_bot.bots import ROLE_CANDIDATE
 from apps.integrations.telegram_bot.candidate.auth import get_or_create_candidate_user
 from apps.integrations.telegram_bot.candidate.handlers import handle_update
 from apps.integrations.telegram_bot.sessions import clear_session, get_session
+from apps.interviews.models import Interview
 
 TG_USER = {
     "id": 12345678,
@@ -101,7 +102,7 @@ class TestStartCommand:
         # The welcome message was sent via sendMessage
         assert any("sendMessage" in str(c) for c in post_mock.call_args_list)
 
-    def test_start_with_vacancy_deep_link(self, vacancy):
+    def test_start_with_vacancy_uuid_deep_link(self, vacancy):
         with (
             patch(
                 "apps.integrations.telegram_bot.client.requests.post",
@@ -118,6 +119,52 @@ class TestStartCommand:
         # Vacancy card sent — payload contains the vacancy title
         sent_text = "".join(str(call.kwargs.get("json", {}).get("text", "")) for call in post_mock.call_args_list)
         assert vacancy.title in sent_text
+
+    def test_start_with_vacancy_telegram_code_deep_link(self, vacancy):
+        with (
+            patch(
+                "apps.integrations.telegram_bot.client.requests.post",
+            ) as post_mock,
+            patch(
+                "apps.integrations.telegram_bot.client.requests.get",
+            ),
+        ):
+            post_mock.return_value.json.return_value = {"ok": True, "result": {}}
+            handle_update(_make_message_update(f"/start vac_{vacancy.telegram_code}"))
+
+        sent_text = "".join(str(call.kwargs.get("json", {}).get("text", "")) for call in post_mock.call_args_list)
+        assert vacancy.title in sent_text
+
+    def test_start_with_prescan_token_resumes_same_session(self, vacancy):
+        application = Application.objects.create(
+            vacancy=vacancy,
+            candidate_name="Anon Candidate",
+            candidate_email="anon@example.com",
+        )
+        interview = Interview.objects.create(
+            application=application,
+            session_type=Interview.SessionType.PRESCANNING,
+            screening_mode=Interview.ScreeningMode.CHAT,
+            status=Interview.Status.PENDING,
+            language="en",
+        )
+
+        with (
+            patch(
+                "apps.integrations.telegram_bot.client.requests.post",
+            ) as post_mock,
+            patch(
+                "apps.integrations.telegram_bot.client.requests.get",
+            ),
+        ):
+            post_mock.return_value.json.return_value = {"ok": True, "result": {}}
+            handle_update(_make_message_update(f"/start ps_{interview.interview_token}"))
+
+        application.refresh_from_db()
+        interview.refresh_from_db()
+        tg_user = User.objects.get(telegram_id=TG_USER["id"])
+        assert application.candidate == tg_user
+        assert interview.status == Interview.Status.IN_PROGRESS
 
 
 class TestApplyFlow:

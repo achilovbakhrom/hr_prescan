@@ -95,6 +95,7 @@ function goBack(): void {
           </GlassCard>
 
           <CandidateTelegramShortcut
+            :prescan-token="application.prescanToken ?? null"
             :telegram-code="application.telegramCode ?? null"
             :title="t('candidates.myApplication.telegramVacancyTitle')"
             :hint="t('candidates.myApplication.telegramVacancyHint')"

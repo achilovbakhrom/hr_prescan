@@ -20,11 +20,13 @@ export function getHrTelegramBotUsername(override?: string): string {
 }
 
 export function buildCandidateTelegramBotUrl(
+  prescanToken?: string | null,
   telegramCode?: number | null,
   usernameOverride?: string,
 ): string {
   const username = getCandidateTelegramBotUsername(usernameOverride)
   if (!username) return ''
+  if (prescanToken) return `https://t.me/${username}?start=ps_${prescanToken}`
   if (telegramCode) return `https://t.me/${username}?start=vac_${telegramCode}`
   return `https://t.me/${username}`
 }

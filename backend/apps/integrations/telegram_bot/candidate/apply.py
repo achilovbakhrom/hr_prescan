@@ -1,7 +1,7 @@
-"""Candidate bot — deep-link vacancy apply flow.
+"""Candidate bot vacancy cards and apply actions.
 
 End-to-end:
-    1. /start vac_<uuid>           -> show_vacancy_card
+    1. /start vac_<uuid|code>      -> show_vacancy_card
     2. user uploads CV (document)  -> store cv_file_path on session
     3. user taps [Apply]           -> submit_application -> confirmation
 
@@ -13,7 +13,6 @@ sending the document.
 from __future__ import annotations
 
 import logging
-from uuid import UUID
 
 from apps.applications.services import submit_application
 from apps.common.exceptions import ApplicationError
@@ -31,25 +30,12 @@ from apps.vacancies.selectors import get_vacancy_by_id
 
 logger = logging.getLogger(__name__)
 
-DEEP_LINK_PREFIX = "vac_"
-
-
-def parse_deep_link_vacancy(*, payload: str) -> UUID | None:
-    """Extract a vacancy UUID from a /start payload like ``vac_<uuid>``."""
-    if not payload or not payload.startswith(DEEP_LINK_PREFIX):
-        return None
-    raw = payload[len(DEEP_LINK_PREFIX) :]
-    try:
-        return UUID(raw)
-    except (ValueError, TypeError):
-        return None
-
 
 def show_vacancy_card(
     *,
     client: TelegramClient,
     chat_id: int,
-    vacancy_id: UUID,
+    vacancy_id,
     lang: str,
 ) -> None:
     """Render a vacancy detail card with Apply / Back buttons."""
@@ -76,7 +62,7 @@ def confirm_apply(
     client: TelegramClient,
     chat_id: int,
     user,
-    vacancy_id: UUID,
+    vacancy_id,
     cv_file_path: str,
     cv_original_filename: str,
     lang: str,

@@ -10,6 +10,7 @@ from __future__ import annotations
 import logging
 
 from apps.integrations.telegram_bot.bots import ROLE_HR, get_client
+from apps.integrations.telegram_bot.hr.linking import get_hr_bot_user
 from apps.integrations.telegram_bot.voice import transcribe_voice
 
 logger = logging.getLogger(__name__)
@@ -63,9 +64,7 @@ def handle_update(update_data: dict) -> None:
         _handle_help(client=client, chat_id=chat_id)
         return
 
-    from apps.accounts.models import User
-
-    user = User.objects.filter(telegram_id=telegram_id, role=User.Role.HR).first()
+    user = get_hr_bot_user(telegram_id=telegram_id)
     if user is None:
         from apps.integrations.telegram_bot.hr.auth import try_link_code
 

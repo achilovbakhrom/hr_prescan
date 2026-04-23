@@ -6,6 +6,7 @@ import CandidateTelegramShortcut from '@/shared/components/CandidateTelegramShor
 const props = defineProps<{
   prescanUrl: string
   linkCopied: boolean
+  prescanToken?: string | null
   telegramCode?: number | null
 }>()
 
@@ -83,6 +84,7 @@ const { t } = useI18n()
       </p>
 
       <CandidateTelegramShortcut
+        :prescan-token="props.prescanToken ?? null"
         :telegram-code="props.telegramCode ?? null"
         :title="t('candidates.application.telegramOption')"
         :hint="t('candidates.application.telegramOptionHint')"

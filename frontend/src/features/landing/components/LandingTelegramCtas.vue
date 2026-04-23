@@ -21,6 +21,7 @@ const telegramLinks = computed(() =>
       key: 'candidate',
       href: buildCandidateTelegramBotUrl(
         undefined,
+        undefined,
         publicConfig.value?.telegramCandidateBotUsername,
       ),
       icon: 'pi pi-user',

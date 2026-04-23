@@ -8,6 +8,14 @@ matches it against an unused ``TelegramLinkCode`` and links the accounts.
 from __future__ import annotations
 
 from apps.integrations.telegram_bot.client import TelegramClient
+from apps.integrations.telegram_bot.hr.linking import (
+    get_hr_bot_user,
+    looks_like_code,
+    looks_like_email,
+    send_email_link_code,
+    verify_email_link_code,
+)
+from apps.integrations.telegram_bot.sessions import get_session
 
 
 def handle_start(
@@ -21,9 +29,7 @@ def handle_start(
     payload: str = "",
 ) -> None:
     """Handle ``/start`` for the HR bot, optionally auto-linking via deep-link payload."""
-    from apps.accounts.models import User
-
-    user = User.objects.filter(telegram_id=telegram_id, role=User.Role.HR).first()
+    user = get_hr_bot_user(telegram_id=telegram_id)
     if user:
         client.send_message(
             chat_id=chat_id,
@@ -45,9 +51,9 @@ def handle_start(
         chat_id=chat_id,
         text=(
             "Welcome to PreScreen AI!\n\n"
-            "To connect your account, go to Settings -> Telegram in the web app "
-            "and click the Connect button.\n\n"
-            "Don't have an account? Visit https://prescreenai.com to get started."
+            "If you already have an HR or admin account, send me your work email and I'll send a 6-digit code.\n\n"
+            "If you're new, create your company at "
+            f"{_public_site_url()} and come back here."
         ),
     )
 
@@ -60,13 +66,51 @@ def try_link_code(
     telegram_username: str,
     text: str,
 ) -> None:
-    """Handle messages from unlinked HR users (no auto-linking by free text)."""
+    """Handle messages from unlinked HR users via work-email verification."""
+    if looks_like_email(text=text):
+        success, result = send_email_link_code(telegram_id=telegram_id, email=text)
+        if success:
+            client.send_message(
+                chat_id=chat_id,
+                text=(
+                    f"I sent a 6-digit code to {result}.\n\n"
+                    "Reply here with that code to connect your Telegram account."
+                ),
+            )
+        else:
+            client.send_message(
+                chat_id=chat_id,
+                text=result + f"\n\nIf you don't have an account yet, start at {_public_site_url()}.",
+            )
+        return
+
+    session = get_session(role="hr", telegram_id=telegram_id)
+    if session.get("state") == "awaiting_email_code" and looks_like_code(text=text):
+        user, error = verify_email_link_code(
+            telegram_id=telegram_id,
+            telegram_username=telegram_username,
+            code=text,
+        )
+        if user is not None:
+            company_name = user.company.name if user.company else ""
+            client.send_message(
+                chat_id=chat_id,
+                text=(
+                    f"Connected as {user.email}"
+                    + (f" ({company_name})" if company_name else "")
+                    + "\n\nYou can now manage your HR tasks here. Type /help to see what I can do."
+                ),
+            )
+            return
+        client.send_message(chat_id=chat_id, text=error)
+        return
+
     client.send_message(
         chat_id=chat_id,
         text=(
             "Your Telegram account is not linked yet.\n\n"
-            "To connect, go to Settings -> Telegram in the web app "
-            "and click the Connect button."
+            "Send your HR/admin work email and I'll email you a 6-digit verification code.\n\n"
+            "You can still use the web Settings -> Telegram deep link if you prefer."
         ),
     )
 
@@ -134,3 +178,9 @@ def _try_deep_link(
             + "\n\nYou can now manage your HR tasks here. Type /help to see what I can do."
         ),
     )
+
+
+def _public_site_url() -> str:
+    from django.conf import settings
+
+    return settings.FRONTEND_URL.rstrip("/")

@@ -6,11 +6,8 @@ import logging
 from uuid import UUID
 
 from apps.integrations.telegram_bot.bots import ROLE_CANDIDATE, get_client
-from apps.integrations.telegram_bot.candidate.apply import (
-    confirm_apply,
-    parse_deep_link_vacancy,
-    show_vacancy_card,
-)
+from apps.integrations.telegram_bot.candidate.apply import confirm_apply
+from apps.integrations.telegram_bot.candidate.assistant import route_to_assistant
 from apps.integrations.telegram_bot.candidate.auth import get_or_create_candidate_user
 from apps.integrations.telegram_bot.candidate.menus import (
     CB_MENU,
@@ -18,6 +15,7 @@ from apps.integrations.telegram_bot.candidate.menus import (
     main_menu_keyboard,
     parse_callback,
 )
+from apps.integrations.telegram_bot.candidate.start import handle_start_command
 from apps.integrations.telegram_bot.candidate.states import STATE_PS_CV, STATE_PS_INTERVIEW
 from apps.integrations.telegram_bot.candidate.uploads import handle_document
 from apps.integrations.telegram_bot.i18n import normalize_language, t
@@ -72,19 +70,13 @@ def handle_update(update_data: dict) -> None:
 
 
 def _handle_text(*, client, chat_id: int, user, text: str, session: dict, lang: str) -> None:
-    if not user.phone:
-        from apps.integrations.telegram_bot.candidate.registration import (
-            handle_registration_text,
-            prompt_registration,
-        )
+    state = session.get("state", "")
+    if state in ("reg_name", "reg_phone"):
+        from apps.integrations.telegram_bot.candidate.registration import handle_registration_text
 
-        if session.get("state") in ("reg_name", "reg_phone"):
-            handle_registration_text(client=client, chat_id=chat_id, user=user, text=text, session=session, lang=lang)
-        else:
-            prompt_registration(client=client, chat_id=chat_id, user=user, lang=lang)
+        handle_registration_text(client=client, chat_id=chat_id, user=user, text=text, session=session, lang=lang)
         return
 
-    state = session.get("state", "")
     if state.startswith("ps_"):
         from apps.integrations.telegram_bot.candidate.prescreening import handle_prescreening_text
 
@@ -93,11 +85,8 @@ def _handle_text(*, client, chat_id: int, user, text: str, session: dict, lang: 
 
     if text == "/start" or text.startswith("/start "):
         payload = text[7:].strip() if text.startswith("/start ") else ""
-        if payload:
-            vacancy_id = parse_deep_link_vacancy(payload=payload)
-            if vacancy_id:
-                show_vacancy_card(client=client, chat_id=chat_id, vacancy_id=vacancy_id, lang=lang)
-                return
+        if handle_start_command(client=client, chat_id=chat_id, user=user, payload=payload, lang=lang):
+            return
         _send_main_menu(client=client, chat_id=chat_id, lang=lang)
         return
 
@@ -105,7 +94,13 @@ def _handle_text(*, client, chat_id: int, user, text: str, session: dict, lang: 
         _send_main_menu(client=client, chat_id=chat_id, lang=lang)
         return
 
-    client.send_message(chat_id=chat_id, text=t("common.unknown_command", lang=lang))
+    if text == "/register":
+        from apps.integrations.telegram_bot.candidate.registration import prompt_registration
+
+        prompt_registration(client=client, chat_id=chat_id, user=user, lang=lang)
+        return
+
+    route_to_assistant(client=client, chat_id=chat_id, user=user, text=text, lang=lang)
 
 
 def _handle_document(*, client, chat_id: int, user, document: dict, session: dict, lang: str) -> None:

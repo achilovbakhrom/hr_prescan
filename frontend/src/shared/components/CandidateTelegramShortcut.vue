@@ -6,6 +6,7 @@ import { buildCandidateTelegramBotUrl } from '@/shared/utils/telegram'
 
 const props = withDefaults(
   defineProps<{
+    prescanToken?: string | null
     telegramCode?: number | null
     title: string
     hint: string
@@ -14,6 +15,7 @@ const props = withDefaults(
     compact?: boolean
   }>(),
   {
+    prescanToken: null,
     telegramCode: null,
     compact: false,
   },
@@ -21,7 +23,9 @@ const props = withDefaults(
 
 const { t } = useI18n()
 
-const telegramUrl = computed(() => buildCandidateTelegramBotUrl(props.telegramCode))
+const telegramUrl = computed(() =>
+  buildCandidateTelegramBotUrl(props.prescanToken, props.telegramCode),
+)
 const copied = ref(false)
 
 async function copyTelegramLink(): Promise<void> {

@@ -47,9 +47,9 @@ _STRINGS_EXT: dict[str, dict[str, str]] = {
     },
     # ----- main menu -----
     "candidate.main_menu": {
-        "en": "What would you like to do?",
-        "ru": "Что хотите сделать?",
-        "uz": "Nima qilmoqchisiz?",
+        "en": "What would you like to do?\n\nYou can also ask me about jobs, your applications, or interview prep in plain text.",
+        "ru": "Что хотите сделать?\n\nВы также можете написать мне обычным текстом о вакансиях, откликах или подготовке к интервью.",
+        "uz": "Nima qilmoqchisiz?\n\nShuningdek, menga vakansiyalar, arizalar yoki suhbatga tayyorgarlik haqida oddiy matnda yozishingiz mumkin.",
     },
     "candidate.btn_prescreening": {
         "en": "🎯 Pass Prescreening",
@@ -165,5 +165,20 @@ _STRINGS_EXT: dict[str, dict[str, str]] = {
         "en": "This vacancy has no prescreening questions yet. Please check back later.",
         "ru": "У этой вакансии пока нет вопросов прескрининга. Попробуйте позже.",
         "uz": "Bu vakansiya uchun hali preskreeninz savollari yo'q. Keyinroq urinib ko'ring.",
+    },
+    "candidate.ps_resume": {
+        "en": "🔁 Resuming your Telegram prescreening for *{title}*.",
+        "ru": "🔁 Возобновляем ваш Telegram-прескрининг по вакансии *{title}*.",
+        "uz": "🔁 *{title}* uchun Telegram preskreening davom ettirilmoqda.",
+    },
+    "candidate.ps_not_available": {
+        "en": "This prescreening session is no longer available in Telegram.",
+        "ru": "Эта сессия прескрининга больше недоступна в Telegram.",
+        "uz": "Ushbu preskreening sessiyasi endi Telegram’da mavjud emas.",
+    },
+    "candidate.ps_continue_on_web": {
+        "en": "This prescreening session is already active on the web. Please continue it there or start a new Telegram session from a fresh link.",
+        "ru": "Эта сессия прескрининга уже активна в веб-версии. Пожалуйста, продолжите её там или начните новую Telegram-сессию по новой ссылке.",
+        "uz": "Ushbu preskreening sessiyasi allaqachon vebda davom etmoqda. Iltimos, uni o‘sha yerda davom ettiring yoki yangi havola orqali Telegram sessiyasini boshlang.",
     },
 }
