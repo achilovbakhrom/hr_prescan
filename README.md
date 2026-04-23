@@ -40,6 +40,12 @@ AI-powered candidate pre-screening platform. Companies post vacancies, candidate
 
 ## Local Development Setup
 
+## Agent Setup
+
+- Codex project instructions live in `AGENTS.md`.
+- Claude repo hooks live in `.claude/settings.json`.
+- Codex machine-local setup is documented in `docs/CODEX_SETUP.md`.
+
 ### Prerequisites
 
 - [Docker](https://docs.docker.com/get-docker/) and Docker Compose v2+
