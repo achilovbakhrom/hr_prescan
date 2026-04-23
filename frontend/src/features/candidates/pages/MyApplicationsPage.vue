@@ -9,6 +9,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import GlassCard from '@/shared/components/GlassCard.vue'
+import CandidateTelegramShortcut from '@/shared/components/CandidateTelegramShortcut.vue'
 import MyApplicationCard from '../components/MyApplicationCard.vue'
 import { useCandidateStore } from '../stores/candidate.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
@@ -55,6 +56,14 @@ function browseJobs(): void {
     <p v-if="candidateStore.error" class="text-sm text-[color:var(--color-danger)]">
       {{ candidateStore.error }}
     </p>
+
+    <CandidateTelegramShortcut
+      :title="t('candidates.myApplication.telegramTitle')"
+      :hint="t('candidates.myApplication.telegramHint')"
+      :open-label="t('candidates.application.openInTelegram')"
+      :copy-label="t('candidates.application.copyTelegramLink')"
+      compact
+    />
 
     <div v-if="candidateStore.loading" class="py-16 text-center">
       <i class="pi pi-spinner pi-spin text-3xl text-[color:var(--color-text-muted)]"></i>

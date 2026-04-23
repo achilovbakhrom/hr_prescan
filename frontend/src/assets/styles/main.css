@@ -16,7 +16,6 @@ html:not(.dark) body {
   background-attachment: fixed;
 }
 
-
 /* Fade-slide-in for any element tagged `.page-fade` (applied to route views). */
 .page-fade {
   animation: page-fade 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;

@@ -12,22 +12,13 @@
     class="waves-root pointer-events-none fixed inset-0 -z-10 overflow-hidden"
   >
     <svg class="waves-svg waves-svg--a" viewBox="0 0 1440 320" preserveAspectRatio="none">
-      <path
-        fill="#60a5fa"
-        d="M0,160 C320,260 720,60 1440,180 L1440,320 L0,320 Z"
-      />
+      <path fill="#60a5fa" d="M0,160 C320,260 720,60 1440,180 L1440,320 L0,320 Z" />
     </svg>
     <svg class="waves-svg waves-svg--b" viewBox="0 0 1440 320" preserveAspectRatio="none">
-      <path
-        fill="#c4b5fd"
-        d="M0,200 C360,100 820,260 1440,140 L1440,320 L0,320 Z"
-      />
+      <path fill="#c4b5fd" d="M0,200 C360,100 820,260 1440,140 L1440,320 L0,320 Z" />
     </svg>
     <svg class="waves-svg waves-svg--c" viewBox="0 0 1440 320" preserveAspectRatio="none">
-      <path
-        fill="#fdba74"
-        d="M0,240 C400,140 900,280 1440,200 L1440,320 L0,320 Z"
-      />
+      <path fill="#fdba74" d="M0,240 C400,140 900,280 1440,200 L1440,320 L0,320 Z" />
     </svg>
   </div>
 </template>

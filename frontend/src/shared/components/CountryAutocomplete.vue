@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
-import AutoComplete from 'primevue/autocomplete'
+import AutoComplete from '@/shared/components/AppAutocomplete.vue'
 import { fetchCountries, type Country } from '@/shared/services/country.service'
 import { getTranslatedName, matchesTranslatedName } from '@/shared/composables/useTranslatedName'
 import { useI18n } from 'vue-i18n'
@@ -9,6 +9,7 @@ const props = withDefaults(
   defineProps<{
     modelValue: string
     invalid?: boolean
+    size?: 'small' | 'large'
   }>(),
   {
     invalid: false,
@@ -72,6 +73,7 @@ function onClear(): void {
     :optionLabel="translatedLabel"
     :placeholder="t('auth.chooseRole.country')"
     :invalid="invalid"
+    :size="size"
     class="w-full"
     input-class="w-full"
     @complete="search"

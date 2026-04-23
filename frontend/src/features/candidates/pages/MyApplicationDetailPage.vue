@@ -9,6 +9,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import GlassCard from '@/shared/components/GlassCard.vue'
+import CandidateTelegramShortcut from '@/shared/components/CandidateTelegramShortcut.vue'
 import ApplicationStatusBadge from '../components/ApplicationStatusBadge.vue'
 import ApplicationTimeline from '../components/ApplicationTimeline.vue'
 import { useCandidateStore } from '../stores/candidate.store'
@@ -92,6 +93,14 @@ function goBack(): void {
               <span class="font-mono">{{ formatDate(application.createdAt) }}</span>
             </p>
           </GlassCard>
+
+          <CandidateTelegramShortcut
+            :telegram-code="application.telegramCode ?? null"
+            :title="t('candidates.myApplication.telegramVacancyTitle')"
+            :hint="t('candidates.myApplication.telegramVacancyHint')"
+            :open-label="t('candidates.application.openInTelegram')"
+            :copy-label="t('candidates.application.copyTelegramLink')"
+          />
 
           <GlassCard accent="ai">
             <span

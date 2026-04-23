@@ -118,6 +118,7 @@ class CandidateApplicationListOutputSerializer(serializers.ModelSerializer):
     """Application list for candidate view — no HR notes or parsed data."""
 
     vacancy_title = serializers.CharField(source="vacancy.title", read_only=True)
+    telegram_code = serializers.IntegerField(source="vacancy.telegram_code", read_only=True, allow_null=True)
     company_name = serializers.CharField(
         source="vacancy.company.name",
         read_only=True,
@@ -128,6 +129,7 @@ class CandidateApplicationListOutputSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "vacancy_title",
+            "telegram_code",
             "company_name",
             "status",
             "created_at",
@@ -139,6 +141,7 @@ class CandidateApplicationDetailOutputSerializer(serializers.ModelSerializer):
     """Application detail for candidate view — no HR notes or internal data."""
 
     vacancy_title = serializers.CharField(source="vacancy.title", read_only=True)
+    telegram_code = serializers.IntegerField(source="vacancy.telegram_code", read_only=True, allow_null=True)
     company_name = serializers.CharField(
         source="vacancy.company.name",
         read_only=True,
@@ -152,6 +155,7 @@ class CandidateApplicationDetailOutputSerializer(serializers.ModelSerializer):
             "id",
             "vacancy_id",
             "vacancy_title",
+            "telegram_code",
             "company_name",
             "candidate_name",
             "candidate_email",

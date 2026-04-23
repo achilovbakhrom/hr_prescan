@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import Select from 'primevue/select'
+import Select from '@/shared/components/AppSelect.vue'
 import {
   fetchEducationLevels,
   type EducationLevel,

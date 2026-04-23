@@ -8,7 +8,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
-import Select from 'primevue/select'
+import Select from '@/shared/components/AppSelect.vue'
 import Button from 'primevue/button'
 import GlassCard from '@/shared/components/GlassCard.vue'
 import CountryAutocomplete from '@/shared/components/CountryAutocomplete.vue'
@@ -90,58 +90,97 @@ async function handleSave(): Promise<void> {
     </p>
 
     <GlassCard>
-      <form class="space-y-4" @submit.prevent="handleSave">
-        <div>
-          <label class="mb-1 block text-sm font-medium text-[color:var(--color-text-secondary)]">
-            {{ t('companies.name') }} <span class="text-[color:var(--color-danger)]">*</span>
-          </label>
-          <InputText
-            v-model="name"
-            class="w-full"
-            :placeholder="t('companies.namePlaceholder')"
-            :invalid="submitted && errors.name"
-          />
+      <form class="space-y-5" @submit.prevent="handleSave">
+        <div class="rounded-xl bg-[color:var(--color-accent-soft)]/70 px-4 py-3">
+          <p class="text-sm font-medium text-[color:var(--color-text-primary)]">
+            {{ t('companies.createHint') }}
+          </p>
         </div>
 
-        <div>
-          <label class="mb-1 block text-sm font-medium text-[color:var(--color-text-secondary)]">
-            {{ t('companies.country') }} <span class="text-[color:var(--color-danger)]">*</span>
-          </label>
-          <CountryAutocomplete v-model="country" :invalid="submitted && errors.country" />
-        </div>
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <div class="sm:col-span-2">
+            <label
+              class="mb-1.5 block text-sm font-medium text-[color:var(--color-text-secondary)]"
+            >
+              {{ t('companies.name') }} <span class="text-[color:var(--color-danger)]">*</span>
+            </label>
+            <InputText
+              v-model="name"
+              class="w-full"
+              :placeholder="t('companies.namePlaceholder')"
+              :invalid="submitted && errors.name"
+            />
+            <small v-if="submitted && errors.name" class="text-[color:var(--color-danger)]">
+              {{ t('companies.nameRequired') }}
+            </small>
+          </div>
 
-        <div>
-          <label class="mb-1 block text-sm font-medium text-[color:var(--color-text-secondary)]">
-            {{ t('companies.size') }}
-          </label>
-          <Select
-            v-model="size"
-            :options="sizeOptions"
-            option-label="label"
-            option-value="value"
-            class="w-full"
-          />
-        </div>
+          <div>
+            <label
+              class="mb-1.5 block text-sm font-medium text-[color:var(--color-text-secondary)]"
+            >
+              {{ t('companies.country') }} <span class="text-[color:var(--color-danger)]">*</span>
+            </label>
+            <CountryAutocomplete v-model="country" :invalid="submitted && errors.country" />
+            <small v-if="submitted && errors.country" class="text-[color:var(--color-danger)]">
+              {{ t('companies.countryRequired') }}
+            </small>
+          </div>
 
-        <div>
-          <label class="mb-1 block text-sm font-medium text-[color:var(--color-text-secondary)]">
-            {{ t('companies.industry') }} <span class="text-[color:var(--color-danger)]">*</span>
-          </label>
-          <IndustryAutocomplete v-model="industries" :invalid="submitted && errors.industries" />
-        </div>
+          <div>
+            <label
+              class="mb-1.5 block text-sm font-medium text-[color:var(--color-text-secondary)]"
+            >
+              {{ t('companies.size') }}
+            </label>
+            <Select
+              v-model="size"
+              :options="sizeOptions"
+              option-label="label"
+              option-value="value"
+              :placeholder="t('companies.sizePlaceholder')"
+              class="w-full"
+            />
+          </div>
 
-        <div>
-          <label class="mb-1 block text-sm font-medium text-[color:var(--color-text-secondary)]">
-            {{ t('companies.website') }}
-          </label>
-          <InputText v-model="website" class="w-full" placeholder="https://..." />
-        </div>
+          <div class="sm:col-span-2">
+            <label
+              class="mb-1.5 block text-sm font-medium text-[color:var(--color-text-secondary)]"
+            >
+              {{ t('companies.industry') }} <span class="text-[color:var(--color-danger)]">*</span>
+            </label>
+            <IndustryAutocomplete v-model="industries" :invalid="submitted && errors.industries" />
+            <small v-if="submitted && errors.industries" class="text-[color:var(--color-danger)]">
+              {{ t('companies.industryRequired') }}
+            </small>
+          </div>
 
-        <div>
-          <label class="mb-1 block text-sm font-medium text-[color:var(--color-text-secondary)]">
-            {{ t('companies.description') }}
-          </label>
-          <Textarea v-model="description" class="w-full" rows="6" />
+          <div class="sm:col-span-2">
+            <label
+              class="mb-1.5 block text-sm font-medium text-[color:var(--color-text-secondary)]"
+            >
+              {{ t('companies.website') }}
+            </label>
+            <InputText
+              v-model="website"
+              class="w-full"
+              :placeholder="t('companies.websitePlaceholder')"
+            />
+          </div>
+
+          <div class="sm:col-span-2">
+            <label
+              class="mb-1.5 block text-sm font-medium text-[color:var(--color-text-secondary)]"
+            >
+              {{ t('companies.description') }}
+            </label>
+            <Textarea
+              v-model="description"
+              class="w-full"
+              rows="6"
+              :placeholder="t('companies.descriptionPlaceholder')"
+            />
+          </div>
         </div>
 
         <div class="flex justify-end pt-2">

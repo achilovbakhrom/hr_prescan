@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from 'vue'
-import AutoComplete from 'primevue/autocomplete'
+import AutoComplete from '@/shared/components/AppAutocomplete.vue'
 import { fetchIndustries, type Industry } from '@/shared/services/industry.service'
 import { getTranslatedName, matchesTranslatedName } from '@/shared/composables/useTranslatedName'
 import { useI18n } from 'vue-i18n'
@@ -9,6 +9,7 @@ const props = withDefaults(
   defineProps<{
     modelValue: string[]
     invalid?: boolean
+    size?: 'small' | 'large'
   }>(),
   {
     invalid: false,
@@ -79,6 +80,7 @@ function onChange(value: Industry[]): void {
     :optionLabel="translatedLabel"
     :placeholder="t('auth.chooseRole.industry')"
     :invalid="invalid"
+    :size="size"
     class="w-full"
     input-class="w-full"
     multiple

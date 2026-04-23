@@ -35,11 +35,7 @@ function formatDate(dateStr: string): string {
 
 <template>
   <!-- Loading skeletons -->
-  <div
-    v-if="loading"
-    class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3"
-    aria-busy="true"
-  >
+  <div v-if="loading" class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3" aria-busy="true">
     <div
       v-for="n in 6"
       :key="n"

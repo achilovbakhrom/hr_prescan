@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import InputText from 'primevue/inputtext'
-import Select from 'primevue/select'
+import Select from '@/shared/components/AppSelect.vue'
 import Button from 'primevue/button'
 import Message from 'primevue/message'
 import AuthShell from '../components/AuthShell.vue'
@@ -141,6 +141,7 @@ const labelClass =
             option-value="value"
             :placeholder="t('auth.companySetup.sizePlaceholder')"
             :invalid="submitted && errors.size"
+            size="small"
             class="w-full"
           />
           <small v-if="submitted && errors.size" class="text-[color:var(--color-danger)]">

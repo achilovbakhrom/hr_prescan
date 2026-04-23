@@ -157,13 +157,38 @@ pip install -r requirements.txt
 
 # Set env vars (database must be running — use Docker for Postgres/Redis/RabbitMQ)
 export DJANGO_SETTINGS_MODULE=config.settings.local
-export POSTGRES_HOST=localhost
-export REDIS_URL=redis://localhost:6379/0
-export RABBITMQ_URL=amqp://guest:guest@localhost:5672//
+export POSTGRES_HOST=127.0.0.1
+export POSTGRES_PORT=35432
+export REDIS_URL=redis://127.0.0.1:36379/0
+export RABBITMQ_URL=amqp://guest:guest@127.0.0.1:35672//
+export LIVEKIT_URL=ws://127.0.0.1:37880
 
 # Run migrations and server
 python manage.py migrate
-python manage.py runserver
+python manage.py runserver 0.0.0.0:8000
+```
+
+The Make-based native local flow uses Docker context `desktop-linux` and an isolated
+Compose project by default, with these host ports:
+
+- Frontend: `5173`
+- Backend: `8000`
+- Postgres: `35432`
+- Redis: `36379`
+- RabbitMQ AMQP: `35672`
+- RabbitMQ Management: `35673`
+- LiveKit: `37880`
+- MinIO API: `39000`
+- MinIO Console: `39001`
+
+If you want to change the context or ports, override the variables explicitly, for example:
+
+```bash
+make local-backend-all \
+  LOCAL_DOCKER_CONTEXT=desktop-linux \
+  LOCAL_DJANGO_PORT=48000 \
+  LOCAL_FRONTEND_PORT=45173 \
+  LOCAL_POSTGRES_PORT=45432
 ```
 
 ### Running Without Docker (Frontend)

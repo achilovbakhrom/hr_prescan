@@ -115,7 +115,6 @@ useBackgroundPickerKeys({ rootRef, isOpen: open, toggle: toggleOpen, close })
             <BackgroundThumb :kind="thumb.code" />
           </button>
         </div>
-
       </GlassSurface>
     </Transition>
 

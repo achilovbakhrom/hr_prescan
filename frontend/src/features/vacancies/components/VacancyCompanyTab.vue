@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import Dropdown from 'primevue/dropdown'
+import Dropdown from '@/shared/components/AppSelect.vue'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
 import CompanyLogo from '@/shared/components/CompanyLogo.vue'
@@ -36,7 +36,33 @@ const { t } = useI18n()
           show-clear
           filter
           class="flex-1"
-        />
+        >
+          <template #value="{ value, placeholder }">
+            <div v-if="value && selectedCompany" class="flex min-w-0 items-center gap-2 py-0.5">
+              <CompanyLogo :logo="selectedCompany.logo" :name="selectedCompany.name" size="xs" />
+              <span class="truncate text-sm font-medium">{{ selectedCompany.name }}</span>
+            </div>
+            <span v-else class="text-sm text-[color:var(--color-text-muted)]">{{
+              placeholder
+            }}</span>
+          </template>
+          <template #option="{ option }">
+            <div class="flex min-w-0 items-center gap-2 py-0.5">
+              <CompanyLogo :logo="option.logo" :name="option.name" size="xs" />
+              <div class="min-w-0">
+                <p class="truncate text-sm font-medium text-gray-900 dark:text-gray-50">
+                  {{ option.name }}
+                </p>
+                <p
+                  v-if="option.customIndustry"
+                  class="truncate text-xs text-gray-500 dark:text-gray-400"
+                >
+                  {{ option.customIndustry }}
+                </p>
+              </div>
+            </div>
+          </template>
+        </Dropdown>
         <Button
           type="button"
           icon="pi pi-plus"

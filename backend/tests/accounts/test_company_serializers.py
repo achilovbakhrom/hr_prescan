@@ -2,8 +2,8 @@ import pytest
 
 from apps.accounts.apis.user_companies import UserCompanyListOutputSerializer
 from apps.accounts.serializers import CompanyOutputSerializer
-from apps.common.serializers_admin import AdminCompanyDetailOutputSerializer
 from apps.common.models import Country
+from apps.common.serializers_admin import AdminCompanyDetailOutputSerializer
 from tests.factories import CompanyFactory, CompanyMembershipFactory
 
 

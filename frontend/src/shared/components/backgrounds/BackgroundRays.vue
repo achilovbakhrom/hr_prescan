@@ -6,10 +6,7 @@
 </script>
 
 <template>
-  <div
-    aria-hidden="true"
-    class="rays-root pointer-events-none fixed inset-0 -z-10 overflow-hidden"
-  >
+  <div aria-hidden="true" class="rays-root pointer-events-none fixed inset-0 -z-10 overflow-hidden">
     <div class="rays-sweep" />
   </div>
 </template>

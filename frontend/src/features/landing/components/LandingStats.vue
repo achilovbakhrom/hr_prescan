@@ -8,24 +8,45 @@
  * NOTE: metrics here are plausible placeholders — wire to real telemetry
  * if/when the backend exposes a `/api/public/metrics` endpoint.
  */
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
 const TARGET = 12481
-// Default to the final value so the number is always readable (incl. static
-// screenshot / reduced-motion / slow-load paths). Counter-up is delight, not
-// the content.
 const candidatesScreened = ref(TARGET)
+const metrics = computed(() => [
+  {
+    value: formatNumber(candidatesScreened.value),
+    label: t('landing.stats.interviews'),
+    tone: 'primary',
+    live: true,
+    featured: true,
+  },
+  { value: '3.2×', label: t('landing.stats.fasterScreening'), tone: 'ai' },
+  { value: '94%', label: t('landing.stats.satisfaction'), tone: 'celebrate' },
+  { value: '24/7', label: t('landing.stats.available'), tone: 'success' },
+])
 
 function formatNumber(n: number): string {
   return n.toLocaleString('en-US')
 }
 
+function numberClass(tone: string): string {
+  switch (tone) {
+    case 'ai':
+      return 'text-[color:var(--color-accent-ai)]'
+    case 'celebrate':
+      return 'text-[color:var(--color-accent-celebrate)]'
+    case 'success':
+      return 'text-[color:var(--color-success)]'
+    default:
+      return 'text-[color:var(--color-text-primary)]'
+  }
+}
+
 onMounted(() => {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-  // Animate from 0 → TARGET on mount as a delight pass.
   candidatesScreened.value = 0
   const duration = 1400
   const fps = 60
@@ -48,55 +69,21 @@ onMounted(() => {
   <section class="scroll-animate px-4 pb-12 pt-4 sm:px-6 sm:pb-20 sm:pt-6">
     <div class="mx-auto max-w-7xl">
       <div
-        class="bg-glass-1 border-glass shadow-glass-float grid grid-cols-2 items-stretch justify-between gap-y-8 rounded-[32px] px-4 py-8 text-center sm:px-6 md:flex md:flex-row md:items-center md:gap-0 md:divide-x md:divide-[color:var(--color-border-soft)] md:px-12 md:py-12"
+        class="bg-glass-1 border-glass shadow-glass-float grid gap-4 rounded-[32px] p-4 sm:p-6 xl:grid-cols-[minmax(0,1.5fr)_repeat(3,minmax(0,1fr))]"
       >
-        <!-- Metric 1: live candidates screened -->
-        <div class="metric-item live-metric flex-1 px-4">
-          <div class="metric-number font-mono font-semibold text-[color:var(--color-text-primary)]">
-            {{ formatNumber(candidatesScreened) }}
+        <div
+          v-for="metric in metrics"
+          :key="metric.label"
+          class="relative rounded-[26px] border border-[color:var(--color-border-glass)] bg-white/58 px-5 py-6 text-left shadow-[0_14px_40px_rgba(15,23,42,0.06)] backdrop-blur-xl dark:bg-white/5"
+          :class="metric.featured ? 'live-metric xl:row-span-1' : ''"
+        >
+          <div class="metric-number font-mono font-semibold" :class="numberClass(metric.tone)">
+            {{ metric.value }}
           </div>
           <div
             class="mt-3 text-xs font-semibold uppercase tracking-[0.08em] text-[color:var(--color-text-muted)] sm:text-sm"
           >
-            candidates screened this week
-          </div>
-        </div>
-
-        <!-- Metric 2: speed -->
-        <div class="flex-1 px-4">
-          <div class="metric-number font-mono font-semibold text-[color:var(--color-accent-ai)]">
-            3.2×
-          </div>
-          <div
-            class="mt-3 text-xs font-semibold uppercase tracking-[0.08em] text-[color:var(--color-text-muted)] sm:text-sm"
-          >
-            {{ t('landing.stats.fasterScreening') }}
-          </div>
-        </div>
-
-        <!-- Metric 3: satisfaction -->
-        <div class="flex-1 px-4">
-          <div
-            class="metric-number font-mono font-semibold text-[color:var(--color-accent-celebrate)]"
-          >
-            94%
-          </div>
-          <div
-            class="mt-3 text-xs font-semibold uppercase tracking-[0.08em] text-[color:var(--color-text-muted)] sm:text-sm"
-          >
-            HR satisfaction
-          </div>
-        </div>
-
-        <!-- Metric 4: customer rating -->
-        <div class="flex-1 px-4">
-          <div class="metric-number font-mono font-semibold text-[color:var(--color-success)]">
-            4.9★
-          </div>
-          <div
-            class="mt-3 text-xs font-semibold uppercase tracking-[0.08em] text-[color:var(--color-text-muted)] sm:text-sm"
-          >
-            customer rating
+            {{ metric.label }}
           </div>
         </div>
       </div>
@@ -105,25 +92,20 @@ onMounted(() => {
 </template>
 
 <style scoped>
-/* Metric number — use display type scale so the strip reads as confident,
-   not decorative. Mobile stays large (clamp lower bound ~44px). */
 .metric-number {
   font-size: clamp(2.5rem, 4.5vw, 3.75rem);
   line-height: 1;
   letter-spacing: -0.02em;
 }
 
-/* accentPulse ring on the leading "live" number — a bigger, more
-   prominent double-ring so the "live" feel actually lands. */
 .live-metric {
   position: relative;
 }
 .live-metric::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
+  top: 24px;
+  right: 24px;
   width: 12px;
   height: 12px;
   border-radius: 9999px;
@@ -137,30 +119,12 @@ onMounted(() => {
 @keyframes metric-pulse {
   0%,
   100% {
-    transform: translateX(-50%) scale(1);
+    transform: scale(1);
     opacity: 0.95;
   }
   50% {
-    transform: translateX(-50%) scale(1.25);
+    transform: scale(1.25);
     opacity: 1;
-  }
-}
-@media (min-width: 768px) {
-  .live-metric::before {
-    top: 10px;
-    left: 18px;
-    transform: none;
-  }
-  @keyframes metric-pulse {
-    0%,
-    100% {
-      transform: scale(1);
-      opacity: 0.95;
-    }
-    50% {
-      transform: scale(1.25);
-      opacity: 1;
-    }
   }
 }
 @media (prefers-reduced-motion: reduce) {

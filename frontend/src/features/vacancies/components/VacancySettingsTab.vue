@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import Dropdown from 'primevue/dropdown'
+import Dropdown from '@/shared/components/AppSelect.vue'
 import ToggleSwitch from 'primevue/toggleswitch'
 import { getVisibilityOptions } from '../constants/formOptions'
 import type { VacancyVisibility } from '../types/vacancy.types'

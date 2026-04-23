@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import Select from 'primevue/select'
+import Select from '@/shared/components/AppSelect.vue'
 import Button from 'primevue/button'
 import Message from 'primevue/message'
 import LanguageAutocomplete from '@/shared/components/LanguageAutocomplete.vue'

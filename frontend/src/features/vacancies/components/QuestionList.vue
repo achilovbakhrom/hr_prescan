@@ -7,7 +7,7 @@ import Button from 'primevue/button'
 import Textarea from 'primevue/textarea'
 import Dialog from 'primevue/dialog'
 import Tag from 'primevue/tag'
-import Select from 'primevue/select'
+import Select from '@/shared/components/AppSelect.vue'
 import { getLocale } from '@/shared/i18n'
 import type { InterviewQuestion } from '../types/vacancy.types'
 

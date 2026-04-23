@@ -34,24 +34,21 @@ function closeMobileNav(): void {
       />
     </template>
 
-    <div class="flex flex-1 gap-0">
-      <!-- Desktop Sidebar (always rendered, collapsible) -->
-      <AppSidebar
-        :collapsed="sidebarCollapsed"
-        class="hidden lg:flex"
-        @toggle="toggleDesktopSidebar"
-      />
+    <div class="flex flex-1">
+      <div class="mx-auto flex w-full max-w-[1600px] min-w-0 gap-0 xl:px-2">
+        <AppSidebar
+          :collapsed="sidebarCollapsed"
+          class="hidden lg:sticky lg:top-24 lg:flex lg:h-[calc(100vh-7rem)] lg:self-start"
+          @toggle="toggleDesktopSidebar"
+        />
 
-      <!-- Main content -->
-      <div class="min-w-0 flex-1" id="main-content">
-        <RouterView />
+        <div class="min-w-0 flex-1 lg:pl-5" id="main-content">
+          <RouterView />
+        </div>
       </div>
     </div>
 
-    <!-- Mobile slide-out navigation (teleported, only on small screens) -->
     <MobileNav :open="mobileNavOpen" @close="closeMobileNav" />
-
-    <!-- Global toast outlet -->
     <Toast position="bottom-right" />
   </PageShell>
 </template>

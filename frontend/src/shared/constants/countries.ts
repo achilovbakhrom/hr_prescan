@@ -225,5 +225,5 @@ export function resolveCountryDisplayName(
   if (!normalizedCode) return ''
 
   const country = COUNTRIES.find((item) => item.code === normalizedCode)
-  return country ? countryDisplayName(country, locale) : countryCode?.trim() ?? ''
+  return country ? countryDisplayName(country, locale) : (countryCode?.trim() ?? '')
 }

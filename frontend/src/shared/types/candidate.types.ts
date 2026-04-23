@@ -12,6 +12,7 @@ export interface Application {
   id: string
   vacancyId: string
   vacancyTitle: string
+  telegramCode?: number | null
   candidateName: string
   candidateEmail: string
   candidatePhone: string

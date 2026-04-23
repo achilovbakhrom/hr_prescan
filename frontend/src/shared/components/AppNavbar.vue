@@ -13,6 +13,7 @@ import LanguageSwitcher from '@/shared/components/LanguageSwitcher.vue'
 import ThemeToggle from '@/shared/components/ThemeToggle.vue'
 import CompanySwitcher from './CompanySwitcher.vue'
 import GlobalSearchDialog from './GlobalSearchDialog.vue'
+import AppLogo from './AppLogo.vue'
 import { useNotificationPolling } from '@/features/notifications/composables/useNotificationPolling'
 import { useAIAssistant } from '@/shared/composables/useAIAssistant'
 import type { MenuItem } from 'primevue/menuitem'
@@ -80,107 +81,116 @@ function handleMenuToggle(): void {
 </script>
 
 <template>
-  <header
-    class="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-gray-200 bg-white/60 px-4 shadow-sm shadow-black/5 backdrop-blur-2xl dark:border-gray-800 dark:bg-gray-950/60 dark:shadow-black/20"
-  >
-    <div class="flex items-center gap-3">
-      <Button
-        icon="pi pi-bars"
-        text
-        severity="secondary"
-        aria-label="Toggle menu"
-        @click="handleMenuToggle"
-      />
-      <RouterLink to="/" class="text-xl font-bold text-gray-900 dark:text-white hover:text-blue-600"
-        >PreScreen AI</RouterLink
-      >
-      <a
-        href="/jobs"
-        target="_blank"
-        rel="noopener"
-        class="ml-1 flex items-center gap-1.5 rounded-full border border-blue-100 dark:border-blue-900 bg-blue-50 dark:bg-blue-950 px-3 py-1 text-xs font-medium text-blue-700 dark:text-blue-300 transition-colors hover:border-blue-200 hover:bg-blue-100 dark:hover:bg-blue-900 sm:ml-2"
-      >
-        <i class="pi pi-search text-[10px]"></i>
-        <span class="hidden sm:inline">{{ t('nav.browseJobs') }}</span>
-        <span class="sm:hidden">{{ t('nav.jobs') }}</span>
-      </a>
-      <CompanySwitcher />
-    </div>
-
-    <div class="flex items-center gap-3">
-      <button
-        type="button"
-        class="hidden items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 px-3 py-1.5 text-xs text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 sm:flex"
-        :title="t('common.searchPlaceholder')"
-        @click="showSearch = true"
-      >
-        <i class="pi pi-search text-[10px]"></i>
-        <span class="hidden md:inline">{{ t('common.searchPlaceholder') }}</span>
-        <kbd
-          class="hidden rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-1 py-0.5 text-[9px] font-medium md:inline"
-          >⌘K</kbd
+  <header class="sticky top-0 z-40 px-3 pt-3 sm:px-4 lg:px-6">
+    <div
+      class="mx-auto flex h-16 max-w-[1600px] items-center justify-between rounded-[24px] border border-white/50 bg-white/72 px-4 shadow-[0_18px_48px_rgba(15,23,42,0.08)] backdrop-blur-2xl dark:border-white/10 dark:bg-gray-950/72 dark:shadow-black/25"
+    >
+      <div class="flex min-w-0 items-center gap-3">
+        <Button
+          icon="pi pi-bars"
+          text
+          severity="secondary"
+          aria-label="Toggle menu"
+          @click="handleMenuToggle"
+        />
+        <AppLogo size="sm" to="/" />
+        <a
+          href="/jobs"
+          target="_blank"
+          rel="noopener"
+          class="group hidden items-center gap-2 rounded-full border border-[color:var(--color-border-glass)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-surface-raised)_84%,white),color-mix(in_srgb,var(--color-surface-raised)_96%,white))] px-2.5 py-1.5 text-xs font-semibold text-[color:var(--color-text-primary)] shadow-[0_10px_24px_rgba(15,23,42,0.08)] transition-all hover:-translate-y-px hover:border-[color:color-mix(in_srgb,var(--color-accent)_28%,var(--color-border-glass))] hover:shadow-[0_14px_28px_rgba(15,23,42,0.12)] dark:bg-[rgba(15,23,42,0.55)] dark:hover:bg-[rgba(15,23,42,0.72)] sm:flex"
         >
-      </button>
-      <button
-        type="button"
-        class="rounded-lg p-1.5 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200 sm:hidden"
-        :aria-label="t('common.searchPlaceholder')"
-        @click="showSearch = true"
-      >
-        <i class="pi pi-search"></i>
-      </button>
+          <span
+            class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[color:var(--color-accent-soft)] text-[color:var(--color-accent)] transition-colors group-hover:bg-[color:var(--color-accent)] group-hover:text-white"
+          >
+            <i class="pi pi-briefcase text-[11px]"></i>
+          </span>
+          <span class="whitespace-nowrap">{{ t('nav.browseJobs') }}</span>
+          <i
+            class="pi pi-arrow-up-right text-[10px] text-[color:var(--color-text-muted)] transition-all group-hover:-translate-y-px group-hover:translate-x-px group-hover:text-[color:var(--color-text-primary)]"
+          ></i>
+        </a>
+        <CompanySwitcher class="min-w-0" />
+      </div>
 
-      <Button
-        v-if="pendingInvitationsCount > 0"
-        icon="pi pi-envelope"
-        text
-        severity="info"
-        size="small"
-        class="relative"
-        aria-label="Pending invitations"
-        @click="router.push({ name: ROUTE_NAMES.PROFILE })"
-      >
-        <template #icon
-          ><i class="pi pi-envelope"></i
-          ><Badge
-            :value="pendingInvitationsCount"
-            severity="danger"
-            class="absolute -right-1 -top-1"
-        /></template>
-      </Button>
-
-      <button
-        type="button"
-        class="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-violet-500 to-indigo-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-all hover:shadow-md hover:brightness-110 active:scale-95"
-        @click="aiAssistant.toggle()"
-      >
-        <i class="pi pi-sparkles text-[10px]"></i><span class="hidden sm:inline">AI</span>
-      </button>
-
-      <ThemeToggle />
-      <LanguageSwitcher />
-      <NotificationBell />
-
-      <button
-        type="button"
-        class="flex items-center gap-2 rounded-lg px-2 py-1 transition-colors hover:bg-gray-100"
-        aria-label="User menu"
-        aria-haspopup="true"
-        @click="toggleUserMenu"
-      >
-        <div
-          class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-950 text-sm font-medium text-blue-700"
+      <div class="flex items-center gap-2 sm:gap-3">
+        <button
+          type="button"
+          class="hidden items-center gap-2 rounded-2xl border border-white/70 bg-white/70 px-3 py-2 text-xs text-gray-500 transition-colors hover:bg-white dark:border-white/10 dark:bg-gray-900/70 dark:text-gray-400 dark:hover:bg-gray-900 sm:flex"
+          :title="t('common.searchPlaceholder')"
+          @click="showSearch = true"
         >
-          {{ authStore.user?.firstName?.charAt(0) ?? ''
-          }}{{ authStore.user?.lastName?.charAt(0) ?? '' }}
-        </div>
-        <span class="hidden text-sm font-medium text-gray-700 dark:text-gray-300 sm:inline"
-          >{{ authStore.user?.firstName }} {{ authStore.user?.lastName }}</span
+          <i class="pi pi-search text-[10px]"></i>
+          <span class="hidden md:inline">{{ t('common.searchPlaceholder') }}</span>
+          <kbd
+            class="hidden rounded border border-gray-200 bg-white px-1 py-0.5 text-[9px] font-medium dark:border-gray-700 dark:bg-gray-800 md:inline"
+            >⌘K</kbd
+          >
+        </button>
+        <button
+          type="button"
+          class="rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-white/80 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-900 dark:hover:text-gray-200 sm:hidden"
+          :aria-label="t('common.searchPlaceholder')"
+          @click="showSearch = true"
         >
-        <i class="pi pi-chevron-down hidden text-xs text-gray-400 dark:text-gray-500 sm:inline"></i>
-      </button>
+          <i class="pi pi-search"></i>
+        </button>
 
-      <Menu ref="userMenu" :model="menuItems" :popup="true" />
+        <Button
+          v-if="pendingInvitationsCount > 0"
+          icon="pi pi-envelope"
+          text
+          severity="info"
+          size="small"
+          class="relative"
+          aria-label="Pending invitations"
+          @click="router.push({ name: ROUTE_NAMES.PROFILE })"
+        >
+          <template #icon
+            ><i class="pi pi-envelope"></i
+            ><Badge
+              :value="pendingInvitationsCount"
+              severity="danger"
+              class="absolute -right-1 -top-1"
+          /></template>
+        </Button>
+
+        <button
+          type="button"
+          class="hidden items-center gap-2 rounded-full bg-gradient-to-r from-violet-500 to-indigo-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-all hover:shadow-md hover:brightness-110 active:scale-95 sm:flex"
+          @click="aiAssistant.toggle()"
+        >
+          <i class="pi pi-sparkles text-[10px]"></i>
+          <span>{{ t('aiAssistant.title') }}</span>
+        </button>
+
+        <ThemeToggle />
+        <LanguageSwitcher />
+        <NotificationBell />
+
+        <button
+          type="button"
+          class="flex items-center gap-2 rounded-xl px-2 py-1 transition-colors hover:bg-white/80 dark:hover:bg-gray-900"
+          aria-label="User menu"
+          aria-haspopup="true"
+          @click="toggleUserMenu"
+        >
+          <div
+            class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-medium text-blue-700 dark:bg-blue-950"
+          >
+            {{ authStore.user?.firstName?.charAt(0) ?? ''
+            }}{{ authStore.user?.lastName?.charAt(0) ?? '' }}
+          </div>
+          <span class="hidden text-sm font-medium text-gray-700 dark:text-gray-300 sm:inline"
+            >{{ authStore.user?.firstName }} {{ authStore.user?.lastName }}</span
+          >
+          <i
+            class="pi pi-chevron-down hidden text-xs text-gray-400 dark:text-gray-500 sm:inline"
+          ></i>
+        </button>
+
+        <Menu ref="userMenu" :model="menuItems" :popup="true" />
+      </div>
     </div>
 
     <GlobalSearchDialog v-model:visible="showSearch" />

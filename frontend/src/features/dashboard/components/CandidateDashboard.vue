@@ -81,7 +81,7 @@ const quickActions = [
   </GlassCard>
 
   <!-- Stats grid -->
-  <div class="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-5">
+  <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
     <DashboardStatsCard
       icon="pi pi-file"
       icon-accent="default"

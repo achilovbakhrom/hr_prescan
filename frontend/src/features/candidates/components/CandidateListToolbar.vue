@@ -4,7 +4,7 @@
  * Extracted from CandidateListPage to respect the 200-line file cap.
  */
 import { useI18n } from 'vue-i18n'
-import Dropdown from 'primevue/dropdown'
+import Dropdown from '@/shared/components/AppSelect.vue'
 import InputText from 'primevue/inputtext'
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'

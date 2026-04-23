@@ -17,14 +17,7 @@ import BackgroundRays from './backgrounds/BackgroundRays.vue'
  */
 
 const BG_KEY = 'hr_prescan_bg_mode'
-const RANDOM_POOL: BackgroundMode[] = [
-  'mesh',
-  'constellation',
-  'vellum',
-  'aurora',
-  'waves',
-  'rays',
-]
+const RANDOM_POOL: BackgroundMode[] = ['mesh', 'constellation', 'vellum', 'aurora', 'waves', 'rays']
 
 const themeStore = useThemeStore()
 

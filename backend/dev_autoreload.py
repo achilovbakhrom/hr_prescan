@@ -8,7 +8,6 @@ from pathlib import Path
 
 from django.utils.autoreload import run_with_reloader
 
-
 PROJECT_DIR = Path(__file__).resolve().parent
 child_process: subprocess.Popen[str] | None = None
 
@@ -40,7 +39,8 @@ def run_command() -> None:
     if len(sys.argv) < 2:
         raise SystemExit("Usage: python dev_autoreload.py <command> [args...]")
 
-    child_process = subprocess.Popen(sys.argv[1:], cwd=PROJECT_DIR)
+    # argv comes directly from the local developer invoking this helper.
+    child_process = subprocess.Popen(sys.argv[1:], cwd=PROJECT_DIR)  # noqa: S603
     exit_code = child_process.wait()
     raise SystemExit(exit_code)
 

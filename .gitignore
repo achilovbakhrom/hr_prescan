@@ -88,6 +88,10 @@ static_collected/
 .claude/
 .claude-task-state/
 
+# Codex local state
+.codex/
+.codex-task-state/
+
 # UI redesign screenshot scratch (local only)
 docs/design/baseline/
 docs/design/after-*/

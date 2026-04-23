@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
-import AutoComplete from 'primevue/autocomplete'
+import AutoComplete from '@/shared/components/AppAutocomplete.vue'
 import { fetchSkills, type Skill } from '@/shared/services/skill.service'
 import { useI18n } from 'vue-i18n'
 

@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
-import Dropdown from 'primevue/dropdown'
+import Dropdown from '@/shared/components/AppSelect.vue'
 import ConfirmDialog from 'primevue/confirmdialog'
 import { useConfirm } from 'primevue/useconfirm'
 import type { ApplicationStatus } from '../types/candidate.types'

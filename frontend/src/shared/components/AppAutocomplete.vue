@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, useAttrs } from 'vue'
-import PrimeSelect from 'primevue/select'
+import PrimeAutoComplete from 'primevue/autocomplete'
 
 defineOptions({ inheritAttrs: false })
 
 const attrs = useAttrs()
 
-const rootClass = computed(() => ['app-select', attrs.class])
+const rootClass = computed(() => ['app-autocomplete', attrs.class])
 const forwardedAttrs = computed(() => {
   const rest = { ...attrs }
   delete rest.class
@@ -19,10 +19,7 @@ const forwardedAttrs = computed(() => {
 </script>
 
 <template>
-  <PrimeSelect v-bind="forwardedAttrs" :class="rootClass">
-    <template v-if="$slots.value" #value="slotProps">
-      <slot name="value" v-bind="slotProps" />
-    </template>
+  <PrimeAutoComplete v-bind="forwardedAttrs" :class="rootClass">
     <template v-if="$slots.option" #option="slotProps">
       <slot name="option" v-bind="slotProps" />
     </template>
@@ -32,14 +29,17 @@ const forwardedAttrs = computed(() => {
     <template v-if="$slots.footer" #footer="slotProps">
       <slot name="footer" v-bind="slotProps" />
     </template>
+    <template v-if="$slots.chip" #chip="slotProps">
+      <slot name="chip" v-bind="slotProps" />
+    </template>
     <template v-if="$slots.empty" #empty>
       <slot name="empty" />
     </template>
-    <template v-if="$slots.emptyfilter" #emptyfilter>
-      <slot name="emptyfilter" />
+    <template v-if="$slots.loader" #loader="slotProps">
+      <slot name="loader" v-bind="slotProps" />
     </template>
     <template v-if="$slots.dropdownicon" #dropdownicon>
       <slot name="dropdownicon" />
     </template>
-  </PrimeSelect>
+  </PrimeAutoComplete>
 </template>

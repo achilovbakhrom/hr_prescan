@@ -9,7 +9,7 @@
   background: var(--color-accent);
   color: var(--color-text-on-accent);
   border: 1px solid var(--color-accent);
-  border-radius: var(--radius-sm);
+  border-radius: 9999px;
   padding: 0.55rem 0.95rem;
   font-weight: 500;
   box-shadow: var(--shadow-card);
@@ -83,11 +83,9 @@
   background: var(--color-accent-soft);
 }
 
-/* ---- Inputs — InputText, Textarea, Select, MultiSelect, Password, InputNumber ---- */
+/* ---- Inputs — InputText, Textarea, Password, InputNumber ---- */
 .p-inputtext,
 .p-textarea,
-.p-select,
-.p-multiselect,
 .p-password-input,
 .p-inputnumber-input {
   background: var(--color-surface-raised);
@@ -104,8 +102,6 @@
 .p-inputtext:focus-visible,
 .p-textarea:focus,
 .p-textarea:focus-visible,
-.p-select:not(.p-disabled).p-focus,
-.p-multiselect:not(.p-disabled).p-focus,
 .p-password-input:focus,
 .p-inputnumber-input:focus {
   border-color: var(--color-accent);
@@ -114,8 +110,6 @@
 }
 .p-inputtext.p-invalid,
 .p-textarea.p-invalid,
-.p-select.p-invalid,
-.p-multiselect.p-invalid,
 .p-password.p-invalid > .p-password-input,
 .p-inputnumber.p-invalid > .p-inputnumber-input {
   border-color: var(--color-danger);
@@ -123,8 +117,6 @@
 }
 .p-inputtext:disabled,
 .p-textarea:disabled,
-.p-select.p-disabled,
-.p-multiselect.p-disabled,
 .p-password-input:disabled,
 .p-inputnumber-input:disabled {
   background: var(--color-surface-sunken);
@@ -135,11 +127,377 @@
 /* Dark inputs stay on solid surface-sunken for legibility (never glass). */
 .dark .p-inputtext,
 .dark .p-textarea,
-.dark .p-select,
-.dark .p-multiselect,
 .dark .p-password-input,
 .dark .p-inputnumber-input {
   background: var(--color-surface-sunken);
+}
+
+/* ---- Select / MultiSelect / AutoComplete ---- */
+.p-select,
+.p-multiselect,
+.p-autocomplete {
+  position: relative;
+  overflow: hidden;
+  min-height: 2.5rem;
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-surface-raised) 92%, white),
+    var(--color-surface-raised)
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 1px 2px rgba(15, 23, 42, 0.05);
+  transition:
+    border-color 160ms var(--ease-ios),
+    box-shadow 160ms var(--ease-ios),
+    background-color 160ms var(--ease-ios);
+}
+
+.p-select:not(.p-disabled):hover,
+.p-multiselect:not(.p-disabled):hover,
+.p-autocomplete:hover {
+  border-color: color-mix(in srgb, var(--color-accent) 26%, var(--color-border-soft));
+  background: color-mix(in srgb, var(--color-surface-raised) 88%, white);
+}
+
+.p-select.p-inputwrapper-focus,
+.p-select.p-select-open,
+.p-multiselect.p-inputwrapper-focus,
+.p-multiselect.p-multiselect-open {
+  border-color: var(--color-accent);
+  box-shadow:
+    0 0 0 3px var(--color-accent-soft),
+    0 10px 24px rgba(37, 99, 235, 0.08);
+}
+
+.p-autocomplete.p-inputwrapper-focus,
+.p-autocomplete.p-autocomplete-open {
+  border-color: var(--color-accent);
+  box-shadow:
+    0 0 0 3px var(--color-accent-soft),
+    0 10px 24px rgba(37, 99, 235, 0.08);
+}
+
+.p-select.p-invalid,
+.p-multiselect.p-invalid,
+.p-autocomplete.p-invalid {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-danger) 25%, transparent);
+}
+
+.p-select-label,
+.p-multiselect-label,
+.p-autocomplete-input {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  min-height: 2.5rem;
+  padding-inline: 0.8rem;
+  font-size: 0.925rem;
+  line-height: 1.35;
+  color: var(--color-text-primary);
+}
+
+.p-select-label,
+.p-multiselect-label {
+  padding-block: 0;
+}
+
+.p-select-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.p-autocomplete-input {
+  width: 100%;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.p-autocomplete-input:focus,
+.p-autocomplete-input:focus-visible {
+  box-shadow: none;
+}
+
+.p-autocomplete-input::placeholder,
+.p-select-label.p-placeholder,
+.p-multiselect-label.p-placeholder {
+  color: var(--color-text-muted);
+}
+
+.p-select-dropdown,
+.p-multiselect-dropdown,
+.p-autocomplete-dropdown {
+  width: 2.5rem;
+  min-width: 2.5rem;
+  border-left: 1px solid color-mix(in srgb, var(--color-border-soft) 88%, transparent);
+  color: var(--color-text-muted);
+  border-radius: 0;
+  background: transparent;
+  transition:
+    color 160ms var(--ease-ios),
+    background-color 160ms var(--ease-ios);
+}
+
+.p-select:not(.p-disabled):hover .p-select-dropdown,
+.p-multiselect:not(.p-disabled):hover .p-multiselect-dropdown,
+.p-select.p-select-open .p-select-dropdown,
+.p-multiselect.p-multiselect-open .p-multiselect-dropdown,
+.p-autocomplete:hover .p-autocomplete-dropdown,
+.p-autocomplete.p-autocomplete-open .p-autocomplete-dropdown {
+  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent-soft) 55%, transparent);
+}
+
+.p-select-clear-icon,
+.p-multiselect-clear-icon,
+.p-select-dropdown-icon,
+.p-multiselect-dropdown-icon,
+.p-autocomplete-clear-icon,
+.p-autocomplete-dropdown-icon {
+  font-size: 0.85rem;
+}
+
+.p-select-sm,
+.p-multiselect-sm {
+  min-height: 2.15rem;
+}
+
+.p-select-sm .p-select-label,
+.p-multiselect-sm .p-multiselect-label {
+  min-height: 2.15rem;
+  padding-inline: 0.75rem;
+  font-size: 0.85rem;
+}
+
+.p-select-sm .p-select-dropdown,
+.p-multiselect-sm .p-multiselect-dropdown {
+  width: 2.15rem;
+  min-width: 2.15rem;
+}
+
+.p-autocomplete .p-autocomplete-input.p-inputtext-sm {
+  min-height: 2.15rem;
+  padding-inline: 0.75rem;
+  font-size: 0.85rem;
+}
+
+.p-autocomplete .p-autocomplete-input-multiple {
+  display: flex;
+  min-height: 2.5rem;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.5rem;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--color-text-primary);
+}
+
+.p-autocomplete .p-autocomplete-input-multiple input {
+  min-height: 1.4rem;
+  min-width: 6rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  color: var(--color-text-primary);
+  font-size: 0.925rem;
+}
+
+.p-autocomplete .p-autocomplete-input-multiple input:focus,
+.p-autocomplete .p-autocomplete-input-multiple input:focus-visible {
+  box-shadow: none;
+}
+
+.p-autocomplete .p-autocomplete-input-multiple input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.p-autocomplete-chip-item {
+  margin: 0;
+}
+
+.p-autocomplete-chip {
+  border: 1px solid color-mix(in srgb, var(--color-accent) 14%, var(--color-border-soft));
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-accent-soft) 48%, white),
+    color-mix(in srgb, var(--color-accent-soft) 24%, white)
+  );
+  color: color-mix(in srgb, var(--color-accent) 78%, var(--color-text-primary));
+  font-weight: 500;
+}
+
+.p-autocomplete-chip-icon {
+  color: currentColor;
+}
+
+.p-select-overlay,
+.p-multiselect-overlay,
+.p-autocomplete-overlay {
+  border: 1px solid color-mix(in srgb, var(--color-border-soft) 75%, white);
+  border-radius: calc(var(--radius-md) + 2px);
+  padding: 0.35rem;
+  box-shadow:
+    0 20px 40px rgba(15, 23, 42, 0.12),
+    0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+.p-select-list,
+.p-multiselect-list,
+.p-autocomplete-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.p-select-option,
+.p-multiselect-option,
+.p-autocomplete-option {
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 0.8rem;
+  color: var(--color-text-secondary);
+  transition:
+    background-color 160ms var(--ease-ios),
+    color 160ms var(--ease-ios),
+    transform 160ms var(--ease-ios);
+}
+
+.p-select-option:not(.p-disabled):hover,
+.p-select-option.p-focus,
+.p-multiselect-option:not(.p-disabled):hover,
+.p-multiselect-option.p-focus,
+.p-autocomplete-option:not(.p-disabled):hover,
+.p-autocomplete-option.p-focus {
+  background: color-mix(in srgb, var(--color-accent-soft) 85%, white);
+  color: var(--color-text-primary);
+}
+
+.p-select-option.p-select-option-selected,
+.p-multiselect-option.p-multiselect-option-selected,
+.p-autocomplete-option.p-autocomplete-option-selected {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-accent) 16%, white),
+    color-mix(in srgb, var(--color-accent-soft) 92%, white)
+  );
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+.p-select-option.p-select-option-selected.p-focus,
+.p-multiselect-option.p-multiselect-option-selected.p-focus,
+.p-autocomplete-option.p-autocomplete-option-selected.p-focus {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-accent) 20%, white),
+    color-mix(in srgb, var(--color-accent-soft) 96%, white)
+  );
+}
+
+.p-select-option-label,
+.p-multiselect-option-label {
+  line-height: 1.35;
+}
+
+.p-select-option-check-icon,
+.p-multiselect-option-check-icon {
+  color: var(--color-accent);
+}
+
+.p-select-empty-message,
+.p-multiselect-empty-message,
+.p-autocomplete-empty-message {
+  padding: 0.75rem 0.85rem;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.p-select-header,
+.p-multiselect-header {
+  padding: 0.25rem 0.25rem 0.45rem;
+}
+
+.p-select-filter,
+.p-multiselect-filter {
+  width: 100%;
+}
+
+.dark .p-select,
+.dark .p-multiselect,
+.dark .p-autocomplete {
+  background: var(--color-surface-sunken);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 1px 2px rgba(0, 0, 0, 0.28);
+}
+
+.dark .p-select:not(.p-disabled):hover,
+.dark .p-multiselect:not(.p-disabled):hover,
+.dark .p-autocomplete:hover {
+  background: color-mix(in srgb, var(--color-surface-sunken) 88%, #1e293b);
+}
+
+.dark .p-select-dropdown,
+.dark .p-multiselect-dropdown,
+.dark .p-autocomplete-dropdown {
+  border-left-color: rgba(148, 163, 184, 0.16);
+}
+
+.dark .p-select:not(.p-disabled):hover .p-select-dropdown,
+.dark .p-multiselect:not(.p-disabled):hover .p-multiselect-dropdown,
+.dark .p-select.p-select-open .p-select-dropdown,
+.dark .p-multiselect.p-multiselect-open .p-multiselect-dropdown,
+.dark .p-autocomplete:hover .p-autocomplete-dropdown,
+.dark .p-autocomplete.p-autocomplete-open .p-autocomplete-dropdown {
+  background: rgba(59, 130, 246, 0.12);
+}
+
+.dark .p-select-overlay,
+.dark .p-multiselect-overlay,
+.dark .p-autocomplete-overlay {
+  border-color: rgba(148, 163, 184, 0.16);
+  box-shadow:
+    0 22px 44px rgba(2, 6, 23, 0.45),
+    0 8px 20px rgba(2, 6, 23, 0.3);
+}
+
+.dark .p-select-option,
+.dark .p-multiselect-option,
+.dark .p-autocomplete-option {
+  color: #cbd5e1;
+}
+
+.dark .p-select-option:not(.p-disabled):hover,
+.dark .p-select-option.p-focus,
+.dark .p-multiselect-option:not(.p-disabled):hover,
+.dark .p-multiselect-option.p-focus,
+.dark .p-autocomplete-option:not(.p-disabled):hover,
+.dark .p-autocomplete-option.p-focus {
+  background: rgba(59, 130, 246, 0.14);
+  color: #f8fafc;
+}
+
+.dark .p-select-option.p-select-option-selected,
+.dark .p-multiselect-option.p-multiselect-option-selected,
+.dark .p-autocomplete-option.p-autocomplete-option-selected {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.22), rgba(59, 130, 246, 0.14));
+  color: #bfdbfe;
+}
+
+.dark .p-autocomplete-chip {
+  border-color: rgba(96, 165, 250, 0.22);
+  background: rgba(59, 130, 246, 0.12);
+  color: #bfdbfe;
 }
 
 /* ---- Dialog ---- */
@@ -192,34 +550,129 @@
 .p-datatable {
   background: transparent;
   color: var(--color-text-primary);
+  border: 1px solid var(--color-border-glass);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-glass-1);
+  overflow: hidden;
 }
+
+.p-datatable .p-datatable-table-container {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-surface-glass-float) 82%, var(--color-surface-base)),
+    color-mix(in srgb, var(--color-surface-glass-1) 88%, var(--color-surface-base))
+  );
+  padding: 0 0.55rem 0.6rem;
+}
+
+.p-datatable .p-datatable-table {
+  border-collapse: separate;
+  border-spacing: 0 0.45rem;
+  margin: 0;
+}
+
 .p-datatable .p-datatable-thead > tr > th {
-  background: var(--color-surface-sunken);
+  background: transparent;
   color: var(--color-text-secondary);
   font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   border-bottom: 1px solid var(--color-border-soft);
   border-top: none;
   border-left: none;
   border-right: none;
+  padding: 0.95rem 1rem 0.85rem;
+  white-space: nowrap;
 }
+
+.p-datatable .p-datatable-thead > tr > th .p-column-header-content {
+  gap: 0.45rem;
+}
+
+.p-datatable .p-sortable-column-icon,
+.p-datatable .p-column-filter-menu-button,
+.p-datatable .p-column-filter-clear-button {
+  color: var(--color-text-muted);
+}
+
 .p-datatable .p-datatable-tbody > tr {
-  background: var(--color-surface-base);
+  background: transparent;
   color: var(--color-text-primary);
-  transition: background-color 120ms var(--ease-ios);
+  transition: transform 180ms var(--ease-ios);
 }
-.p-datatable.p-datatable-striped .p-datatable-tbody > tr:nth-child(even) {
-  background: var(--color-surface-raised);
+
+.p-datatable .p-datatable-tbody > tr > td {
+  padding: 0.95rem 1rem;
+  vertical-align: middle;
+  background: color-mix(in srgb, var(--color-surface-base) 92%, var(--color-surface-raised));
+  border-top: 1px solid color-mix(in srgb, var(--color-border-soft) 88%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-border-soft) 88%, transparent);
+  border-left: none;
+  border-right: none;
 }
+
+.p-datatable .p-datatable-tbody > tr > td:first-child {
+  border-left: 1px solid color-mix(in srgb, var(--color-border-soft) 88%, transparent);
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+}
+
+.p-datatable .p-datatable-tbody > tr > td:last-child {
+  border-right: 1px solid color-mix(in srgb, var(--color-border-soft) 88%, transparent);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.p-datatable.p-datatable-striped .p-datatable-tbody > tr:nth-child(even) > td {
+  background: color-mix(in srgb, var(--color-surface-raised) 88%, var(--color-surface-base));
+}
+
 .p-datatable .p-datatable-tbody > tr:hover,
 .p-datatable.p-datatable-hoverable .p-datatable-tbody > tr:not(.p-datatable-row-selected):hover {
-  background: var(--color-accent-soft);
+  transform: translateY(-1px);
 }
+
+.p-datatable .p-datatable-tbody > tr:hover > td,
+.p-datatable.p-datatable-hoverable
+  .p-datatable-tbody
+  > tr:not(.p-datatable-row-selected):hover
+  > td {
+  background: color-mix(in srgb, var(--color-accent-soft) 52%, var(--color-surface-base));
+  border-top-color: color-mix(in srgb, var(--color-accent) 20%, var(--color-border-soft));
+  border-bottom-color: color-mix(in srgb, var(--color-accent) 20%, var(--color-border-soft));
+}
+
 .p-datatable .p-datatable-tbody > tr.p-datatable-row-selected {
-  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
-  border-left: 2px solid var(--color-accent);
+  transform: none;
 }
-.p-datatable .p-datatable-tbody > tr > td {
-  border-bottom: 1px solid var(--color-border-soft);
+
+.p-datatable .p-datatable-tbody > tr.p-datatable-row-selected > td {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-accent-soft) 78%, var(--color-surface-base)),
+    color-mix(in srgb, var(--color-accent-soft) 56%, var(--color-surface-raised))
+  );
+  border-top-color: color-mix(in srgb, var(--color-accent) 30%, var(--color-border-soft));
+  border-bottom-color: color-mix(in srgb, var(--color-accent) 30%, var(--color-border-soft));
+}
+
+.p-datatable .p-datatable-tbody > tr.p-datatable-row-selected > td:first-child {
+  box-shadow: inset 3px 0 0 var(--color-accent);
+}
+
+.p-datatable .p-datatable-tbody > tr.p-datatable-row-selected:hover > td {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-accent-soft) 82%, var(--color-surface-base)),
+    color-mix(in srgb, var(--color-accent-soft) 62%, var(--color-surface-raised))
+  );
+}
+
+.p-datatable .p-datatable-empty-message > td {
+  border-radius: var(--radius-md);
+  background: transparent;
+  border: none;
+  padding: 2rem 1rem;
+  text-align: center;
 }
 
 /* Pagination container — chrome can be glass */
@@ -228,8 +681,53 @@
   backdrop-filter: blur(var(--blur-md)) saturate(1.4);
   -webkit-backdrop-filter: blur(var(--blur-md)) saturate(1.4);
   border: 1px solid var(--color-border-glass);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-lg);
   color: var(--color-text-primary);
+  gap: 0.4rem;
+  padding: 0.7rem 0.85rem;
+}
+
+.p-paginator .p-paginator-page,
+.p-paginator .p-paginator-prev,
+.p-paginator .p-paginator-next,
+.p-paginator .p-paginator-first,
+.p-paginator .p-paginator-last,
+.p-paginator .p-paginator-rpp-dropdown {
+  min-width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid transparent;
+  border-radius: 9999px;
+  color: var(--color-text-secondary);
+  background: transparent;
+  transition:
+    background-color 180ms var(--ease-ios),
+    border-color 180ms var(--ease-ios),
+    color 180ms var(--ease-ios),
+    transform 180ms var(--ease-ios);
+}
+
+.p-paginator .p-paginator-page:hover,
+.p-paginator .p-paginator-prev:hover,
+.p-paginator .p-paginator-next:hover,
+.p-paginator .p-paginator-first:hover,
+.p-paginator .p-paginator-last:hover {
+  background: color-mix(in srgb, var(--color-surface-raised) 92%, var(--color-surface-base));
+  border-color: var(--color-border-soft);
+  color: var(--color-text-primary);
+  transform: translateY(-1px);
+}
+
+.p-paginator .p-paginator-page.p-highlight {
+  background: color-mix(in srgb, var(--color-accent-soft) 80%, var(--color-surface-base));
+  border-color: color-mix(in srgb, var(--color-accent) 28%, var(--color-border-soft));
+  color: var(--color-accent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 18%, transparent);
+}
+
+.p-paginator .p-paginator-current {
+  margin-left: auto;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
 }
 
 /* ---- Card ---- */

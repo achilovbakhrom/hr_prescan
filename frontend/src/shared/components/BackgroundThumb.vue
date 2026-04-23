@@ -56,8 +56,7 @@ defineProps<Props>()
   background:
     radial-gradient(ellipse at 30% 20%, #60a5fa 0%, transparent 55%),
     radial-gradient(ellipse at 70% 35%, #c4b5fd 0%, transparent 55%),
-    radial-gradient(ellipse at 50% 55%, #fdba74 0%, transparent 55%),
-    var(--color-surface-raised);
+    radial-gradient(ellipse at 50% 55%, #fdba74 0%, transparent 55%), var(--color-surface-raised);
   filter: blur(2px) saturate(1.3);
 }
 

@@ -23,6 +23,7 @@ from apps.applications.urls import (
 )
 from apps.common.apis import HRDashboardApi
 from apps.common.apis_ai import AIAssistantApi
+from apps.common.apis_app_config import PublicAppConfigApi
 from apps.common.apis_candidate_ai import CandidateAIAssistantApi
 from apps.common.apis_candidate_dashboard import CandidateDashboardApi
 from apps.common.apis_country import CountryListApi
@@ -103,6 +104,7 @@ urlpatterns = [
     path("api/public/industries/", IndustryListApi.as_view(), name="public-industries"),
     path("api/public/skills/", SkillListApi.as_view(), name="public-skills"),
     path("api/public/languages/", LanguageListApi.as_view(), name="public-languages"),
+    path("api/public/app-config/", PublicAppConfigApi.as_view(), name="public-app-config"),
     path("api/public/detect-language/", DetectLanguageApi.as_view(), name="public-detect-language"),
     path("api/public/education-levels/", EducationLevelListApi.as_view(), name="public-education-levels"),
     path("api/cv/<str:token>/", PublicCvViewApi.as_view(), name="public-cv-view"),

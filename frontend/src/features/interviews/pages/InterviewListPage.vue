@@ -7,7 +7,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import Dropdown from 'primevue/dropdown'
+import Dropdown from '@/shared/components/AppSelect.vue'
 import GlassSurface from '@/shared/components/GlassSurface.vue'
 import GlassCard from '@/shared/components/GlassCard.vue'
 import InterviewListTable from '../components/InterviewListTable.vue'

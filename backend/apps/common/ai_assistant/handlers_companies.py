@@ -1,7 +1,7 @@
 """AI assistant handlers for per-user Company CRUD operations."""
 
-from apps.common.country_display import resolve_country_display_name
 from apps.common.ai_assistant.resolvers import resolve_company
+from apps.common.country_display import resolve_country_display_name
 
 
 def handle_list_companies(*, user, params):

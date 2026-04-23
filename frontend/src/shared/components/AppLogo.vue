@@ -66,23 +66,29 @@ const showWordmark = computed(() => props.variant !== 'glyph')
 
       <!-- Scan-pulse glyph: a focal dot with three concentric arcs emanating
            outward — evokes sonar / signal / pre-screening scan. All line-drawn. -->
-      <g
-        fill="none"
-        stroke="#ffffff"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
+      <g fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round">
         <!-- Focal point -->
         <circle cx="20" cy="44" r="3.2" fill="#ffffff" stroke="none" />
         <!-- Innermost pulse -->
-        <path class="app-logo__arc app-logo__arc--1" stroke-width="3.4"
-          d="M20 34 A10 10 0 0 1 30 44" />
+        <path
+          class="app-logo__arc app-logo__arc--1"
+          stroke-width="3.4"
+          d="M20 34 A10 10 0 0 1 30 44"
+        />
         <!-- Middle pulse -->
-        <path class="app-logo__arc app-logo__arc--2" stroke-width="3.4"
-          d="M20 26 A18 18 0 0 1 38 44" opacity="0.75" />
+        <path
+          class="app-logo__arc app-logo__arc--2"
+          stroke-width="3.4"
+          d="M20 26 A18 18 0 0 1 38 44"
+          opacity="0.75"
+        />
         <!-- Outer pulse -->
-        <path class="app-logo__arc app-logo__arc--3" stroke-width="3.4"
-          d="M20 18 A26 26 0 0 1 46 44" opacity="0.5" />
+        <path
+          class="app-logo__arc app-logo__arc--3"
+          stroke-width="3.4"
+          d="M20 18 A26 26 0 0 1 46 44"
+          opacity="0.5"
+        />
       </g>
     </svg>
 

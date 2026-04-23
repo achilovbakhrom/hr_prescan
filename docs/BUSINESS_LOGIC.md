@@ -215,6 +215,7 @@ Candidates can apply via two surfaces: the **web app** (public job board) and th
 5. Candidate sees a post-apply screen with two options:
    - **"Start Prescanning Now"** — opens the prescanning chat immediately
    - **"I'll do it later"** — saves the prescanning link. The link is also sent via email confirmation.
+   - If the vacancy has a Telegram deep-link code, the screen also shows **"Open in Telegram"** so the candidate can continue from the candidate bot on mobile.
 6. The prescanning link remains valid until: (a) the vacancy is archived, or (b) the prescanning is completed
 7. Candidate receives a confirmation email with: application acknowledgment, prescanning link, vacancy details, and instructions
 8. After prescanning completes, AI evaluates and decides:
@@ -222,6 +223,18 @@ Candidates can apply via two surfaces: the **web app** (public job board) and th
    - **Reject** — candidate is moved to rejected status
 9. If advanced to interview, candidate receives an interview link and completes the interview (chat or meet, depending on vacancy configuration)
 10. After interview completes, AI evaluates and decides to shortlist or reject the candidate
+
+#### Candidate-facing Telegram shortcuts
+
+- The public landing page exposes visible Telegram CTAs for both surfaces:
+  - a candidate-bot CTA for job seekers
+  - an HR-bot CTA for recruiters evaluating the Telegram workflow
+- The public HR-bot CTA is discovery-only. Actual HR account linking still happens from the authenticated web app in **Settings -> Telegram**, which generates a one-time deep link for the recruiter's own account.
+- Candidate-facing web screens also expose Telegram shortcuts in key places:
+  - post-apply / prescanning-ready screen
+  - candidate "My Applications" area
+  - candidate application detail screen
+- When the app knows the vacancy's `telegram_code`, the shortcut uses the vacancy-specific deep link `https://t.me/<bot>?start=vac_<telegram_code>` so the candidate lands in the same vacancy flow inside Telegram.
 
 ### 6.2 Telegram bot flow (PR1 — deep-link apply)
 

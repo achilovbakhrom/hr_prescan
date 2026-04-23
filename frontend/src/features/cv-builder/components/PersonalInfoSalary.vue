@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import InputNumber from 'primevue/inputnumber'
-import Select from 'primevue/select'
+import Select from '@/shared/components/AppSelect.vue'
 import ToggleSwitch from 'primevue/toggleswitch'
 
 defineProps<{

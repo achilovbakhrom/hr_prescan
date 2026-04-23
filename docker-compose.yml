@@ -125,8 +125,8 @@ services:
   livekit:
     image: livekit/livekit-server:latest
     ports:
-      - "7880:7880"
-      - "7881:7881/udp"
+      - "${LOCAL_LIVEKIT_PORT:-7880}:7880"
+      - "${LOCAL_LIVEKIT_RTC_PORT:-7881}:7881/udp"
     environment:
       LIVEKIT_CONFIG: |
         port: 7880
