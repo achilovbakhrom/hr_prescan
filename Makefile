@@ -3,7 +3,9 @@
        lint format typecheck test \
        up-monitoring up-management up-all \
        clean reset-db backup-db ensure-env \
-       local-setup local-infra local-backend local-backend-all local-frontend local-stop local-stop-all \
+       local-setup local-infra local-backend local-celery local-celery-beat local-backend-all local-all local-frontend local-stop local-stop-all \
+       local-pip local-migrate local-makemigrations local-createsuperuser local-shell \
+       local-telegram-hr local-telegram-candidate \
        local-test local-test-backend local-test-frontend local-test-e2e \
        local-telegram local-telegram-webhook
 
@@ -144,100 +146,160 @@ reset-db: ## Reset database (destructive!)
 # ─── Local Dev (native Django + Celery + Vite, infra in Docker) ─────────────
 
 VENV = $(CURDIR)/backend/.venv/bin
+LOCAL_PYTHON ?= $(shell command -v python3.13 || command -v python3.12 || command -v python3)
+LOCAL_DOCKER_CONTEXT ?= desktop-linux
+LOCAL_COMPOSE_PROJECT_NAME ?= hr_prescan_local
+LOCAL_SERVICE_HOST ?= 127.0.0.1
+LOCAL_DJANGO_PORT ?= 8000
+LOCAL_FRONTEND_PORT ?= 5173
+LOCAL_POSTGRES_PORT ?= 35432
+LOCAL_REDIS_PORT ?= 36379
+LOCAL_RABBITMQ_PORT ?= 35672
+LOCAL_RABBITMQ_MGMT_PORT ?= 35673
+LOCAL_MINIO_API_PORT ?= 39000
+LOCAL_MINIO_CONSOLE_PORT ?= 39001
+LOCAL_LIVEKIT_PORT ?= 37880
+LOCAL_LIVEKIT_RTC_PORT ?= 37881
+LOCAL_DOCKER_COMPOSE = COMPOSE_PROJECT_NAME=$(LOCAL_COMPOSE_PROJECT_NAME) \
+	LOCAL_DJANGO_PORT=$(LOCAL_DJANGO_PORT) \
+	LOCAL_FRONTEND_PORT=$(LOCAL_FRONTEND_PORT) \
+	LOCAL_POSTGRES_PORT=$(LOCAL_POSTGRES_PORT) \
+	LOCAL_REDIS_PORT=$(LOCAL_REDIS_PORT) \
+	LOCAL_RABBITMQ_PORT=$(LOCAL_RABBITMQ_PORT) \
+	LOCAL_RABBITMQ_MGMT_PORT=$(LOCAL_RABBITMQ_MGMT_PORT) \
+	LOCAL_MINIO_API_PORT=$(LOCAL_MINIO_API_PORT) \
+	LOCAL_MINIO_CONSOLE_PORT=$(LOCAL_MINIO_CONSOLE_PORT) \
+	LOCAL_LIVEKIT_PORT=$(LOCAL_LIVEKIT_PORT) \
+	LOCAL_LIVEKIT_RTC_PORT=$(LOCAL_LIVEKIT_RTC_PORT) \
+	docker --context $(LOCAL_DOCKER_CONTEXT) compose
+LOCAL_POSTGRES_DB ?= hr_prescan
+LOCAL_POSTGRES_USER ?= hr_prescan
+LOCAL_POSTGRES_PASSWORD ?= supersecretpassword
+LOCAL_POSTGRES_WAIT_TIMEOUT ?= 30
+LOCAL_POSTGRES_HOST ?= $(LOCAL_SERVICE_HOST)
+LOCAL_REDIS_URL ?= redis://$(LOCAL_SERVICE_HOST):$(LOCAL_REDIS_PORT)/0
+LOCAL_RABBITMQ_URL ?= amqp://guest:guest@$(LOCAL_SERVICE_HOST):$(LOCAL_RABBITMQ_PORT)//
+LOCAL_LIVEKIT_URL ?= ws://$(LOCAL_SERVICE_HOST):$(LOCAL_LIVEKIT_PORT)
+LOCAL_BACKEND_ENV = POSTGRES_DB=$(LOCAL_POSTGRES_DB) POSTGRES_USER=$(LOCAL_POSTGRES_USER) POSTGRES_PASSWORD=$(LOCAL_POSTGRES_PASSWORD) POSTGRES_HOST=$(LOCAL_POSTGRES_HOST) POSTGRES_PORT=$(LOCAL_POSTGRES_PORT) REDIS_URL=$(LOCAL_REDIS_URL) RABBITMQ_URL=$(LOCAL_RABBITMQ_URL) LIVEKIT_URL=$(LOCAL_LIVEKIT_URL)
+
+check-local-python: ## Ensure backend/.venv uses a supported Python version
+	@test -x "$(VENV)/python" || { echo "Missing backend/.venv. Run 'make local-setup'."; exit 1; }
+	@$(VENV)/python -c "import sys; version = sys.version.split()[0]; print(f'Using backend venv Python {version}'); raise SystemExit(0 if sys.version_info < (3, 14) else 'ERROR: backend/.venv uses Python 3.14+, which is not supported here. Recreate it with python3.13 or python3.12: rm -rf backend/.venv && make local-setup')"
+
+check-local-postgres: ## Ensure local Docker Postgres matches expected local credentials
+	@$(LOCAL_DOCKER_COMPOSE) up -d postgres >/dev/null
+	@command -v psql >/dev/null 2>&1 || { \
+		echo "ERROR: psql is required for Postgres preflight checks."; \
+		exit 1; \
+	}
+	@attempts=0; \
+	until PGPASSWORD=$(LOCAL_POSTGRES_PASSWORD) psql -h $(LOCAL_POSTGRES_HOST) -p $(LOCAL_POSTGRES_PORT) -U $(LOCAL_POSTGRES_USER) -d $(LOCAL_POSTGRES_DB) -c "SELECT 1;" >/dev/null 2>&1; do \
+		attempts=$$((attempts + 1)); \
+		if [ $$attempts -ge $(LOCAL_POSTGRES_WAIT_TIMEOUT) ]; then \
+			echo "ERROR: Postgres is not reachable with the configured settings."; \
+			echo "  host=$(LOCAL_POSTGRES_HOST) port=$(LOCAL_POSTGRES_PORT) db=$(LOCAL_POSTGRES_DB) user=$(LOCAL_POSTGRES_USER)"; \
+			echo "Waited $(LOCAL_POSTGRES_WAIT_TIMEOUT)s for the container to accept connections."; \
+			echo "If this is a fresh local setup, reset the isolated local stack with:"; \
+			echo "  $(LOCAL_DOCKER_COMPOSE) down -v"; \
+			echo "  make local-setup"; \
+			exit 1; \
+		fi; \
+		sleep 1; \
+	done
 
 local-setup: ## First-time local dev setup: venv, deps, infra, migrate
 	@test -f backend/.env || cp backend/.env.example backend/.env
 	@test -f frontend/.env || cp frontend/.env.example frontend/.env
-	docker compose up -d postgres redis rabbitmq minio livekit
-	@test -d backend/.venv || python3 -m venv backend/.venv
+	$(LOCAL_DOCKER_COMPOSE) up -d postgres redis rabbitmq minio livekit
+	@test -d backend/.venv || $(LOCAL_PYTHON) -m venv backend/.venv
 	$(VENV)/pip install -r backend/requirements.txt
 	cd frontend && npm install
 	@echo "Waiting for Postgres to be ready..."
-	@until docker compose exec -T postgres pg_isready -U hr_prescan 2>/dev/null; do sleep 1; done
+	@until PGPASSWORD=$(LOCAL_POSTGRES_PASSWORD) psql -h $(LOCAL_POSTGRES_HOST) -p $(LOCAL_POSTGRES_PORT) -U $(LOCAL_POSTGRES_USER) -d $(LOCAL_POSTGRES_DB) -c "SELECT 1;" >/dev/null 2>&1; do sleep 1; done
 	$(MAKE) local-migrate
 	@echo ""
 	@echo "Local dev ready! Run:"
 	@echo "  make local-all       # Start everything (backend + celery + frontend)"
 	@echo "  make local-backend-all  # Django + Celery worker + Celery beat (no frontend)"
-	@echo "  make local-backend   # Django only on :8000"
-	@echo "  make local-frontend  # Vite only on :5173"
+	@echo "  make local-backend   # Django only on :$(LOCAL_DJANGO_PORT)"
+	@echo "  make local-frontend  # Vite only on :$(LOCAL_FRONTEND_PORT)"
 
 local-infra: ensure-env ## Start only infra in Docker (stop app containers to free ports)
-	-@docker compose stop django celery-worker celery-beat frontend nginx 2>/dev/null || true
-	docker compose up -d postgres redis rabbitmq minio livekit
+	-@$(LOCAL_DOCKER_COMPOSE) stop django celery-worker celery-beat frontend nginx 2>/dev/null || true
+	$(LOCAL_DOCKER_COMPOSE) up -d postgres redis rabbitmq minio livekit
 
-local-backend: ## Run Django dev server natively
-	cd backend && $(VENV)/python manage.py runserver 0.0.0.0:8000
+local-backend: check-local-python ## Run Django dev server natively
+	cd backend && $(LOCAL_BACKEND_ENV) $(VENV)/python manage.py runserver 0.0.0.0:$(LOCAL_DJANGO_PORT)
 
-local-celery: ## Run Celery worker natively
-	cd backend && $(VENV)/celery -A config worker -l info --concurrency=2
+local-celery: check-local-python ## Run Celery worker natively
+	cd backend && $(LOCAL_BACKEND_ENV) $(VENV)/python dev_autoreload.py $(VENV)/celery -A config worker -l info --concurrency=2
 
-local-celery-beat: ## Run Celery beat natively
-	cd backend && $(VENV)/celery -A config beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+local-celery-beat: check-local-python ## Run Celery beat natively
+	cd backend && $(LOCAL_BACKEND_ENV) $(VENV)/python dev_autoreload.py $(VENV)/celery -A config beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
 
 local-frontend: ## Run Vite dev server natively
-	cd frontend && npm run dev
+	cd frontend && npm run dev -- --host 0.0.0.0 --port $(LOCAL_FRONTEND_PORT)
 
-local-backend-all: local-infra ## Start infra + Django + Celery worker + Celery beat
+local-backend-all: local-infra check-local-python check-local-postgres ## Start infra + Django + Celery worker + Celery beat
 	@echo "Starting infra containers..."
 	@sleep 3
 	@echo "Running migrations..."
-	@cd backend && $(VENV)/python manage.py migrate --noinput
+	@cd backend && $(LOCAL_BACKEND_ENV) $(VENV)/python manage.py migrate --noinput
 	@echo "Starting Django server..."
-	@cd backend && $(VENV)/python manage.py runserver 0.0.0.0:8000 &
+	@cd backend && $(LOCAL_BACKEND_ENV) $(VENV)/python manage.py runserver 0.0.0.0:$(LOCAL_DJANGO_PORT) &
 	@echo "Starting Celery worker..."
-	@cd backend && $(VENV)/celery -A config worker -l info --concurrency=2 &
+	@cd backend && $(LOCAL_BACKEND_ENV) $(VENV)/python dev_autoreload.py $(VENV)/celery -A config worker -l info --concurrency=2 &
 	@echo "Starting Celery beat..."
-	@cd backend && $(VENV)/celery -A config beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler &
+	@cd backend && $(LOCAL_BACKEND_ENV) $(VENV)/python dev_autoreload.py $(VENV)/celery -A config beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler &
 	@echo ""
 	@echo "Backend services started in background:"
-	@echo "  Django:   http://localhost:8000"
+	@echo "  Django:   http://localhost:$(LOCAL_DJANGO_PORT)"
 	@echo "  Celery:   worker + beat"
-	@echo "  RabbitMQ: http://localhost:15672"
-	@echo "  MinIO:    http://localhost:9001"
+	@echo "  RabbitMQ: http://localhost:$(LOCAL_RABBITMQ_MGMT_PORT)"
+	@echo "  MinIO:    http://localhost:$(LOCAL_MINIO_CONSOLE_PORT)"
 	@echo ""
 	@echo "Run 'make local-stop' to stop everything."
 
-local-all: local-infra ## Start infra + backend + celery + frontend (all in background)
+local-all: local-infra check-local-python check-local-postgres ## Start infra + backend + celery + frontend (all in background)
 	@echo "Starting infra containers..."
 	@sleep 3
 	@echo "Starting Django server..."
-	@cd backend && $(VENV)/python manage.py runserver 0.0.0.0:8000 &
+	@cd backend && $(LOCAL_BACKEND_ENV) $(VENV)/python manage.py runserver 0.0.0.0:$(LOCAL_DJANGO_PORT) &
 	@echo "Starting Celery worker..."
-	@cd backend && $(VENV)/celery -A config worker -l info --concurrency=2 &
+	@cd backend && $(LOCAL_BACKEND_ENV) $(VENV)/python dev_autoreload.py $(VENV)/celery -A config worker -l info --concurrency=2 &
 	@echo "Starting Vite dev server..."
-	@cd frontend && npm run dev &
+	@cd frontend && npm run dev -- --host 0.0.0.0 --port $(LOCAL_FRONTEND_PORT) &
 	@echo ""
 	@echo "All services started in background:"
-	@echo "  Django:   http://localhost:8000"
-	@echo "  Vite:     http://localhost:5173"
-	@echo "  RabbitMQ: http://localhost:15672"
-	@echo "  MinIO:    http://localhost:9001"
+	@echo "  Django:   http://localhost:$(LOCAL_DJANGO_PORT)"
+	@echo "  Vite:     http://localhost:$(LOCAL_FRONTEND_PORT)"
+	@echo "  RabbitMQ: http://localhost:$(LOCAL_RABBITMQ_MGMT_PORT)"
+	@echo "  MinIO:    http://localhost:$(LOCAL_MINIO_CONSOLE_PORT)"
 	@echo ""
 	@echo "Run 'make local-stop' to stop everything."
 
 local-pip: ## Install Python dependencies (local)
 	$(VENV)/pip install -r backend/requirements.txt
 
-local-migrate: ## Run migrations (local)
-	cd backend && $(VENV)/python manage.py migrate
+local-migrate: check-local-python check-local-postgres ## Run migrations (local)
+	cd backend && $(LOCAL_BACKEND_ENV) $(VENV)/python manage.py migrate
 
-local-makemigrations: ## Create migrations (local)
-	cd backend && $(VENV)/python manage.py makemigrations
+local-makemigrations: check-local-python ## Create migrations (local)
+	cd backend && $(LOCAL_BACKEND_ENV) $(VENV)/python manage.py makemigrations
 
-local-createsuperuser: ## Create superuser (local)
-	cd backend && $(VENV)/python manage.py createsuperuser
+local-createsuperuser: check-local-python ## Create superuser (local)
+	cd backend && $(LOCAL_BACKEND_ENV) $(VENV)/python manage.py createsuperuser
 
-local-shell: ## Django shell (local)
-	cd backend && $(VENV)/python manage.py shell
+local-shell: check-local-python ## Django shell (local)
+	cd backend && $(LOCAL_BACKEND_ENV) $(VENV)/python manage.py shell
 
 local-telegram: local-telegram-hr ## Run HR Telegram bot in polling mode (alias)
 
-local-telegram-hr: ## Run HR Telegram bot in polling mode (local dev)
-	cd backend && $(VENV)/python manage.py run_telegram_bot --role hr
+local-telegram-hr: check-local-python ## Run HR Telegram bot in polling mode (local dev)
+	cd backend && $(LOCAL_BACKEND_ENV) $(VENV)/python manage.py run_telegram_bot --role hr
 
-local-telegram-candidate: ## Run Candidate Telegram bot in polling mode (local dev)
-	cd backend && $(VENV)/python manage.py run_telegram_bot --role candidate
+local-telegram-candidate: check-local-python ## Run Candidate Telegram bot in polling mode (local dev)
+	cd backend && $(LOCAL_BACKEND_ENV) $(VENV)/python manage.py run_telegram_bot --role candidate
 
 local-telegram-webhook: ## Start ngrok tunnel + register Telegram webhook (local dev)
 	./deploy/scripts/telegram-ngrok.sh 8000
@@ -248,7 +310,7 @@ local-stop: ## Stop everything (infra + background processes)
 	-@pkill -f "celery -A config worker" 2>/dev/null || true
 	-@pkill -f "celery -A config beat" 2>/dev/null || true
 	-@pkill -f "vite" 2>/dev/null || true
-	docker compose down
+	$(LOCAL_DOCKER_COMPOSE) down
 	@echo "All stopped."
 
 local-stop-all: ## Force-kill all local backend/frontend processes + stop Docker
@@ -258,9 +320,9 @@ local-stop-all: ## Force-kill all local backend/frontend processes + stop Docker
 	-@pkill -9 -f "celery.*config" 2>/dev/null && echo "  Celery beat stopped" || true
 	-@pkill -9 -f "vite" 2>/dev/null && echo "  Vite stopped" || true
 	-@pkill -9 -f "node.*frontend" 2>/dev/null && echo "  Node frontend stopped" || true
-	-@lsof -ti :8000 | xargs kill -9 2>/dev/null && echo "  Port 8000 freed" || true
-	-@lsof -ti :5173 | xargs kill -9 2>/dev/null && echo "  Port 5173 freed" || true
-	docker compose down
+	-@lsof -ti :$(LOCAL_DJANGO_PORT) | xargs kill -9 2>/dev/null && echo "  Port $(LOCAL_DJANGO_PORT) freed" || true
+	-@lsof -ti :$(LOCAL_FRONTEND_PORT) | xargs kill -9 2>/dev/null && echo "  Port $(LOCAL_FRONTEND_PORT) freed" || true
+	$(LOCAL_DOCKER_COMPOSE) down
 	@echo "All force-stopped."
 
 # ─── Testing (local) ─────────────────────────────────────────────────────────

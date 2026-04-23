@@ -215,3 +215,15 @@ export function countryDisplayName(country: Country, locale: string): string {
   if (locale === 'ru' && country.nameRu) return country.nameRu
   return country.name
 }
+
+export function resolveCountryDisplayName(
+  countryCode: string | null | undefined,
+  locale: string,
+): string {
+  const normalizedCode = countryCode?.trim().toUpperCase()
+
+  if (!normalizedCode) return ''
+
+  const country = COUNTRIES.find((item) => item.code === normalizedCode)
+  return country ? countryDisplayName(country, locale) : countryCode?.trim() ?? ''
+}

@@ -155,6 +155,7 @@ body,
   .p-card,
   .p-panel,
   .p-dialog,
+  .p-select-overlay,
   .p-dropdown-panel,
   .p-multiselect-panel,
   .p-overlaypanel,
@@ -234,70 +235,92 @@ body,
    Global modern tab styling (PrimeVue TabView)
    ============================================ */
 
-/* Tab list — underline container */
+/* Tab list — restrained underline container */
 .p-tabview-tablist,
 .p-tablist {
-  border-bottom: 2px solid var(--color-border-soft);
-  gap: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-bottom: 1px solid var(--color-border-soft);
   background: transparent;
 }
 
-/* Individual tab headers */
+/* Individual tab items */
+.p-tabview-tablist-item,
+.p-tab {
+  margin: 0 0 -1px;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  transition:
+    border-bottom-color 180ms var(--ease-ios),
+    color 180ms var(--ease-ios);
+}
+
 .p-tabview-tab-header,
 .p-tab {
   cursor: pointer;
-  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+  padding: 0.65rem 0.95rem;
+  border: none;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  background: transparent;
+  color: var(--color-text-muted);
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--color-text-muted);
-  border: none;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -2px;
+  line-height: 1.2;
   transition:
-    color 0.2s ease,
-    border-bottom-color 0.2s ease,
-    background-color 0.2s ease;
-  background: transparent;
-  border-radius: 0;
+    color 180ms var(--ease-ios),
+    background-color 180ms var(--ease-ios);
 }
 
 /* Hover state */
-.p-tabview-tab-header:hover,
+.p-tabview-tablist-item:hover .p-tabview-tab-header,
 .p-tab:hover {
-  color: var(--color-text-secondary);
-  background-color: var(--color-surface-raised);
-  border-bottom-color: var(--color-border-soft);
+  color: var(--color-text-primary);
+  background: color-mix(in srgb, var(--color-surface-raised) 88%, white);
 }
 
 /* Active tab */
-.p-tabview-tab-header[data-p-active='true'],
+.p-tabview-tablist-item[data-p-active='true'],
+.p-tabview-tablist-item.p-tabview-tablist-item-active,
+.p-tab[data-p-active='true'],
+.p-tab.p-tab-active {
+  border-bottom-color: var(--color-accent);
+}
+
+.p-tabview-tablist-item[data-p-active='true'] .p-tabview-tab-header,
+.p-tabview-tablist-item.p-tabview-tablist-item-active .p-tabview-tab-header,
+.p-tabview-tab-header[aria-selected='true'],
 .p-tabview-tab-header.p-tabview-active-tab-header,
 .p-tabview-tab-header.p-highlight,
 .p-tab[data-p-active='true'],
 .p-tab.p-tab-active {
-  color: var(--color-accent);
+  color: var(--color-text-primary);
   font-weight: 600;
-  border-bottom-color: var(--color-accent);
-  background-color: var(--color-accent-soft);
 }
 
-/* Dark-mode tab overrides — tokens already swap via .dark selector, but the
-   hover background needs a subtler tint in dark to avoid washing out. */
-.dark .p-tabview-tab-header:hover,
+.p-tabview-tab-header:focus-visible,
+.p-tab:focus-visible {
+  outline: 2px solid var(--color-border-ring);
+  outline-offset: 2px;
+}
+
+/* Dark-mode tab overrides */
+.dark .p-tabview-tablist,
+.dark .p-tablist {
+  border-bottom-color: rgba(148, 163, 184, 0.2);
+}
+
+.dark .p-tabview-tablist-item:hover .p-tabview-tab-header,
 .dark .p-tab:hover {
-  color: var(--color-text-secondary);
-  background-color: var(--color-surface-raised);
-  border-bottom-color: var(--color-border-soft);
-}
-
-.dark .p-tabview-tab-header[data-p-active='true'],
-.dark .p-tabview-tab-header.p-tabview-active-tab-header,
-.dark .p-tabview-tab-header.p-highlight,
-.dark .p-tab[data-p-active='true'],
-.dark .p-tab.p-tab-active {
-  color: var(--color-accent);
-  border-bottom-color: var(--color-accent);
-  background-color: var(--color-accent-soft);
+  color: var(--color-text-primary);
+  background: rgba(51, 65, 85, 0.5);
 }
 
 /* Tab panels container */
@@ -323,8 +346,16 @@ body,
 
 /* Compact padding on mobile */
 @media (max-width: 639px) {
+  .p-tabview-tablist,
+  .p-tablist {
+    border-radius: 1.25rem;
+    padding: 0.3rem;
+    gap: 0.25rem;
+  }
+
   .p-tabview-tab-header,
   .p-tab {
+    min-height: 2.2rem;
     padding: 0.5rem 0.75rem;
     font-size: 0.8125rem;
   }

@@ -1,10 +1,14 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { resolveCountryDisplayName } from '@/shared/constants/countries'
 import type { Company } from '../types/company.types'
 
-defineProps<{ company: Company }>()
+const props = defineProps<{ company: Company }>()
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
+
+const countryName = computed(() => resolveCountryDisplayName(props.company.country, locale.value))
 </script>
 
 <template>
@@ -17,7 +21,7 @@ const { t } = useI18n()
     </div>
     <div>
       <p class="text-sm text-gray-500">{{ t('companies.country') }}</p>
-      <p class="font-medium">{{ company.country }}</p>
+      <p class="font-medium">{{ countryName }}</p>
     </div>
     <div v-if="company.website">
       <p class="text-sm text-gray-500">{{ t('companies.website') }}</p>

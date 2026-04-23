@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import Select from 'primevue/select'
+import Select from '@/shared/components/AppSelect.vue'
 import CompanyLogo from '@/shared/components/CompanyLogo.vue'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
@@ -21,16 +21,30 @@ const accountPrefix = computed(() =>
     : '',
 )
 
+interface CompanyOption {
+  label: string
+  value: string
+  logo?: string | null
+  isPersonal?: boolean
+}
+
 const companyOptions = computed(() => {
-  const options: { label: string; value: string }[] = []
+  const options: CompanyOption[] = []
   if (authStore.companies.length > 0)
-    options.push({ label: t('common.personal'), value: 'personal' })
+    options.push({ label: t('common.personal'), value: 'personal', isPersonal: true })
   for (const m of authStore.companies)
-    options.push({ label: `${accountPrefix.value}${m.company.name}`, value: m.company.id })
+    options.push({
+      label: `${accountPrefix.value}${m.company.name}`,
+      value: m.company.id,
+      logo: m.company.logo,
+    })
   return options
 })
 
 const showSwitcher = computed(() => companyOptions.value.length > 1)
+const activeCompanyOption = computed(
+  () => companyOptions.value.find((option) => option.value === activeCompanyId.value) ?? null,
+)
 
 async function handleCompanySwitch(value: string): Promise<void> {
   if (value === activeCompanyId.value) return
@@ -42,22 +56,50 @@ async function handleCompanySwitch(value: string): Promise<void> {
 
 <template>
   <div v-if="showSwitcher" class="hidden items-center gap-2 sm:inline-flex">
-    <CompanyLogo
-      v-if="authStore.user?.company"
-      :logo="authStore.user.company.logo"
-      :name="authStore.user.company.name"
-      size="xs"
-      rounded="md"
-    />
     <Select
       :model-value="activeCompanyId"
       :options="companyOptions"
       option-label="label"
       option-value="value"
-      class="!text-xs"
-      :pt="{ root: { class: '!py-1 !px-2 !min-w-0 max-w-48' }, label: { class: '!text-xs !py-0' } }"
+      class="max-w-56 min-w-44 text-xs"
+      size="small"
       @update:model-value="handleCompanySwitch"
-    />
+    >
+      <template #value="{ placeholder }">
+        <div
+          v-if="activeCompanyOption"
+          class="flex min-w-0 items-center gap-2 py-0.5 text-left text-xs font-medium"
+        >
+          <span
+            v-if="activeCompanyOption.isPersonal"
+            class="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[color:var(--color-accent-soft)] text-[color:var(--color-accent)]"
+          >
+            <i class="pi pi-user text-[10px]"></i>
+          </span>
+          <CompanyLogo
+            v-else
+            :logo="activeCompanyOption.logo"
+            :name="activeCompanyOption.label"
+            size="xs"
+            rounded="md"
+          />
+          <span class="truncate">{{ activeCompanyOption.label }}</span>
+        </div>
+        <span v-else class="text-xs text-[color:var(--color-text-muted)]">{{ placeholder }}</span>
+      </template>
+      <template #option="{ option }">
+        <div class="flex min-w-0 items-center gap-2 py-0.5 text-sm">
+          <span
+            v-if="option.isPersonal"
+            class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-[color:var(--color-accent-soft)] text-[color:var(--color-accent)]"
+          >
+            <i class="pi pi-user text-xs"></i>
+          </span>
+          <CompanyLogo v-else :logo="option.logo" :name="option.label" size="xs" rounded="md" />
+          <span class="truncate">{{ option.label }}</span>
+        </div>
+      </template>
+    </Select>
   </div>
   <div
     v-else-if="authStore.user?.company"

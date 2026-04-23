@@ -3,14 +3,18 @@
  * CompanyInfoView — read-only company metadata panel.
  * Renders inside a GlassCard on CompanyDetailPage.
  */
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { resolveCountryDisplayName } from '@/shared/constants/countries'
 import type { Company } from '../types/company.types'
 
-defineProps<{
+const props = defineProps<{
   company: Company
 }>()
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
+
+const countryName = computed(() => resolveCountryDisplayName(props.company.country, locale.value))
 </script>
 
 <template>
@@ -28,7 +32,7 @@ const { t } = useI18n()
         {{ t('companies.country') }}
       </p>
       <p class="mt-1 font-medium text-[color:var(--color-text-primary)]">
-        {{ company.country }}
+        {{ countryName }}
       </p>
     </div>
     <div v-if="company.website">

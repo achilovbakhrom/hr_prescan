@@ -61,6 +61,7 @@ The AI agent evaluates candidates at each step and decides whether to advance th
 - **Registration creates the user's own account**: one Company (with the user as `account_owner` and `is_default=True` membership) plus a 14-day trial. Additional companies are added from the **Companies** page.
 - **Soft delete** marks `Company.is_deleted=True`: affects every member of that company, transfers each affected user's default to their next non-deleted membership, and historical vacancies keep the company name for display. The acting user cannot delete their last non-deleted company.
 - Data isolation: vacancy/application/interview queries scope to the caller's memberships (for invitees) or to all companies on the caller's account (for the owner).
+- Company API responses expose the company's country as a human-readable country name. Client create/update requests may still submit the ISO-backed country code selected from the reference list.
 
 ---
 

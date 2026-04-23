@@ -2,12 +2,14 @@
 /**
  * CompanyDetailHeader — glass header card with logo + name + edit button.
  */
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import GlassCard from '@/shared/components/GlassCard.vue'
+import { resolveCountryDisplayName } from '@/shared/constants/countries'
 import type { Company } from '../types/company.types'
 
-defineProps<{
+const props = defineProps<{
   company: Company
   editing: boolean
 }>()
@@ -16,7 +18,9 @@ defineEmits<{
   edit: []
 }>()
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
+
+const countryName = computed(() => resolveCountryDisplayName(props.company.country, locale.value))
 </script>
 
 <template>
@@ -40,7 +44,7 @@ const { t } = useI18n()
             {{ company.name }}
           </h1>
           <p v-if="company.country" class="text-xs text-[color:var(--color-text-muted)]">
-            {{ company.country }}
+            {{ countryName }}
           </p>
         </div>
       </div>

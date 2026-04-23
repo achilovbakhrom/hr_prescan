@@ -14,8 +14,11 @@ services:
       context: ./frontend
       target: build
     command: npm run dev -- --host 0.0.0.0
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
     ports:
-      - "5173:5173"
+      - "${LOCAL_FRONTEND_PORT:-5173}:5173"
     env_file:
       - ./frontend/.env
     networks:
@@ -29,37 +32,43 @@ services:
         python manage.py migrate --noinput &&
         python manage.py runserver 0.0.0.0:8000
       "
+    volumes:
+      - ./backend:/app
     ports:
-      - "8000:8000"
+      - "${LOCAL_DJANGO_PORT:-8000}:8000"
 
   # Expose PostgreSQL for local tools
   postgres:
     ports:
-      - "5432:5432"
+      - "${LOCAL_POSTGRES_PORT:-5432}:5432"
 
   # Expose Redis for local tools
   redis:
     ports:
-      - "6380:6379"
+      - "${LOCAL_REDIS_PORT:-6380}:6379"
 
   # Expose RabbitMQ ports (AMQP + Management UI)
   rabbitmq:
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "${LOCAL_RABBITMQ_PORT:-5672}:5672"
+      - "${LOCAL_RABBITMQ_MGMT_PORT:-15672}:15672"
 
   # Celery worker
   celery-worker:
     entrypoint: []
-    command: celery -A config worker -l info --concurrency=2
+    command: python dev_autoreload.py celery -A config worker -l info --concurrency=2
+    volumes:
+      - ./backend:/app
 
   # Celery beat
   celery-beat:
     entrypoint: []
-    command: celery -A config beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    command: python dev_autoreload.py celery -A config beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    volumes:
+      - ./backend:/app
 
   # Expose MinIO ports (API + Console)
   minio:
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "${LOCAL_MINIO_API_PORT:-9000}:9000"
+      - "${LOCAL_MINIO_CONSOLE_PORT:-9001}:9001"

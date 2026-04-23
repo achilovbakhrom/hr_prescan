@@ -12,17 +12,14 @@ import { useI18n } from 'vue-i18n'
 import { useVacancyStore } from '@/features/vacancies/stores/vacancy.store'
 import { useInterviewStore } from '@/features/interviews/stores/interview.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
-import { useAIAssistant } from '@/shared/composables/useAIAssistant'
 import DashboardStatsCard from './DashboardStatsCard.vue'
 import DashboardPipelineOverview from './DashboardPipelineOverview.vue'
 import DashboardActivityFeed from './DashboardActivityFeed.vue'
-import DashboardAIAssistantTeaser from './DashboardAIAssistantTeaser.vue'
 
 const router = useRouter()
 const { t } = useI18n()
 const vacancyStore = useVacancyStore()
 const interviewStore = useInterviewStore()
-const ai = useAIAssistant()
 
 const activeVacancies = computed(
   () => vacancyStore.vacancies.filter((v) => v.status === 'published').length,
@@ -62,7 +59,7 @@ const statsSublabel = computed(
     <!-- Main column -->
     <div class="flex flex-col gap-6">
       <!-- Stats grid -->
-      <div class="grid grid-cols-2 gap-4 xl:grid-cols-4">
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <DashboardStatsCard
           icon="pi pi-briefcase"
           icon-accent="default"
@@ -103,7 +100,6 @@ const statsSublabel = computed(
 
     <!-- Rail -->
     <aside class="flex flex-col gap-6">
-      <DashboardAIAssistantTeaser @open="ai.open()" />
       <DashboardActivityFeed :interviews="recentInterviews" />
     </aside>
   </div>

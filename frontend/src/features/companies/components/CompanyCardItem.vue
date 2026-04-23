@@ -3,13 +3,15 @@
  * CompanyCardItem — single glass card for the companies grid.
  * Extracted from CompanyListPage to respect the 200-line file cap.
  */
+import { computed } from 'vue'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
 import GlassCard from '@/shared/components/GlassCard.vue'
 import { useI18n } from 'vue-i18n'
+import { resolveCountryDisplayName } from '@/shared/constants/countries'
 import type { UserCompanyMembership } from '../types/company.types'
 
-defineProps<{
+const props = defineProps<{
   company: UserCompanyMembership
   canDelete: boolean
 }>()
@@ -20,7 +22,9 @@ defineEmits<{
   delete: []
 }>()
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
+
+const countryName = computed(() => resolveCountryDisplayName(props.company.country, locale.value))
 </script>
 
 <template>
@@ -46,7 +50,7 @@ const { t } = useI18n()
           v-if="company.customIndustry || company.country"
           class="truncate text-xs text-[color:var(--color-text-muted)]"
         >
-          {{ [company.customIndustry, company.country].filter(Boolean).join(' · ') }}
+          {{ [company.customIndustry, countryName].filter(Boolean).join(' · ') }}
         </p>
       </div>
     </div>

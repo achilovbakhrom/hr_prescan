@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from apps.accounts.models import User
+from apps.common.country_display import resolve_country_display_name
 
 
 class AdminCompanyListOutputSerializer(serializers.Serializer):
@@ -8,11 +9,14 @@ class AdminCompanyListOutputSerializer(serializers.Serializer):
     name = serializers.CharField()
     industry = serializers.CharField()
     size = serializers.CharField()
-    country = serializers.CharField()
+    country = serializers.SerializerMethodField()
     user_count = serializers.IntegerField()
     vacancy_count = serializers.IntegerField()
     is_deleted = serializers.BooleanField()
     created_at = serializers.DateTimeField()
+
+    def get_country(self, obj) -> str:
+        return resolve_country_display_name(obj.country)
 
 
 class AdminCompanyDetailOutputSerializer(serializers.Serializer):
@@ -20,13 +24,16 @@ class AdminCompanyDetailOutputSerializer(serializers.Serializer):
     name = serializers.CharField()
     industry = serializers.CharField()
     size = serializers.CharField()
-    country = serializers.CharField()
+    country = serializers.SerializerMethodField()
     website = serializers.URLField(allow_null=True)
     description = serializers.CharField(allow_null=True)
     is_deleted = serializers.BooleanField()
     deleted_at = serializers.DateTimeField(allow_null=True)
     created_at = serializers.DateTimeField()
     updated_at = serializers.DateTimeField()
+
+    def get_country(self, obj) -> str:
+        return resolve_country_display_name(obj.country)
 
 
 class AdminCompanyUpdateInputSerializer(serializers.Serializer):

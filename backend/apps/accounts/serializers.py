@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from apps.accounts.models import Company, Invitation, User
 from apps.accounts.permissions import HRPermissions
+from apps.common.country_display import resolve_country_display_name
 
 
 class CompanyOutputSerializer(serializers.ModelSerializer):
@@ -10,6 +11,7 @@ class CompanyOutputSerializer(serializers.ModelSerializer):
         read_only=True,
         slug_field="slug",
     )
+    country = serializers.SerializerMethodField()
 
     class Meta:
         model = Company
@@ -28,6 +30,9 @@ class CompanyOutputSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
         read_only_fields = fields
+
+    def get_country(self, obj: Company) -> str:
+        return resolve_country_display_name(obj.country)
 
 
 class UserOutputSerializer(serializers.ModelSerializer):

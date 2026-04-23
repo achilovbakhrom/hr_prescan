@@ -20,10 +20,14 @@ const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const companyStore = useCompanyStore()
+const activeTab = ref(0)
 const editing = ref(false)
 const saving = ref(false)
 
-onMounted(() => companyStore.fetchCompanyDetail(route.params.id as string))
+onMounted(() => {
+  activeTab.value = 0
+  companyStore.fetchCompanyDetail(route.params.id as string)
+})
 
 async function handleSave(payload: {
   name: string
@@ -76,8 +80,8 @@ async function handleSave(payload: {
         {{ companyStore.error }}
       </p>
 
-      <TabView>
-        <TabPanel value="info" :header="t('common.info', 'Info')">
+      <TabView v-model:activeIndex="activeTab">
+        <TabPanel value="0" :header="t('common.info', 'Info')">
           <div class="py-3">
             <GlassCard>
               <CompanyInfoView v-if="!editing" :company="companyStore.currentCompany" />
@@ -91,7 +95,7 @@ async function handleSave(payload: {
             </GlassCard>
           </div>
         </TabPanel>
-        <TabPanel value="members" :header="t('settings.team.title', 'Members')">
+        <TabPanel value="1" :header="t('settings.team.title', 'Members')">
           <div class="py-3">
             <GlassCard>
               <p class="text-sm text-[color:var(--color-text-muted)]">
@@ -100,7 +104,7 @@ async function handleSave(payload: {
             </GlassCard>
           </div>
         </TabPanel>
-        <TabPanel value="vacancies" :header="t('nav.vacancies')">
+        <TabPanel value="2" :header="t('nav.vacancies')">
           <div class="py-3">
             <GlassCard>
               <p class="text-sm text-[color:var(--color-text-muted)]">

@@ -13,6 +13,7 @@ from apps.accounts.services import (
     soft_delete_company,
     update_user_company,
 )
+from apps.common.country_display import resolve_country_display_name
 from apps.common.exceptions import ApplicationError
 
 
@@ -27,7 +28,7 @@ class UserCompanyListOutputSerializer(serializers.Serializer):
     )
     custom_industry = serializers.CharField(source="company.custom_industry")
     size = serializers.CharField(source="company.size")
-    country = serializers.CharField(source="company.country")
+    country = serializers.SerializerMethodField()
     logo = serializers.CharField(source="company.logo", allow_null=True)
     website = serializers.CharField(source="company.website", allow_null=True)
     description = serializers.CharField(source="company.description", allow_null=True)
@@ -36,6 +37,9 @@ class UserCompanyListOutputSerializer(serializers.Serializer):
     role = serializers.CharField()
     created_at = serializers.DateTimeField(source="company.created_at")
     updated_at = serializers.DateTimeField(source="company.updated_at")
+
+    def get_country(self, obj: CompanyMembership) -> str:
+        return resolve_country_display_name(obj.company.country)
 
 
 class UserCompanyListCreateApi(APIView):
