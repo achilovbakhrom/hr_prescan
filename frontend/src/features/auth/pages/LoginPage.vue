@@ -148,7 +148,7 @@ function handleTelegramError(msg: string): void {
         type="submit"
         :label="t('auth.login.submit')"
         :loading="authStore.loading"
-        class="mt-2 w-full"
+        class="auth-primary-button mt-2 w-full"
       />
     </form>
 
@@ -163,3 +163,17 @@ function handleTelegramError(msg: string): void {
     </template>
   </AuthShell>
 </template>
+
+<style scoped>
+:global(html.dark) .auth-primary-button {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+  border-color: #3b82f6 !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.28) !important;
+}
+
+:global(html.dark) .auth-primary-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
+  border-color: #60a5fa !important;
+}
+</style>

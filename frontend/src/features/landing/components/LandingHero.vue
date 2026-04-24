@@ -68,7 +68,7 @@ const heroHighlights = computed(() => [
             />
             <button
               type="button"
-              class="group flex w-full items-center justify-center gap-2.5 rounded-full border border-[color:var(--color-border-glass)] bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(255,255,255,0.68))] px-5 py-3 text-sm font-semibold text-[color:var(--color-text-primary)] shadow-[0_14px_36px_rgba(15,23,42,0.08)] backdrop-blur-xl transition-all hover:-translate-y-px hover:border-[color:color-mix(in_srgb,var(--color-accent)_30%,var(--color-border-glass))] hover:shadow-[0_18px_42px_rgba(15,23,42,0.12)] dark:bg-[linear-gradient(180deg,rgba(15,23,42,0.72),rgba(15,23,42,0.58))] sm:w-auto"
+              class="group flex w-full cursor-pointer items-center justify-center gap-2.5 rounded-full border border-[color:var(--color-border-glass)] bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(255,255,255,0.68))] px-5 py-3 text-sm font-semibold text-[color:var(--color-text-primary)] shadow-[0_14px_36px_rgba(15,23,42,0.08)] backdrop-blur-xl transition-all hover:-translate-y-px hover:border-[color:color-mix(in_srgb,var(--color-accent)_30%,var(--color-border-glass))] hover:shadow-[0_18px_42px_rgba(15,23,42,0.12)] dark:bg-[linear-gradient(180deg,rgba(15,23,42,0.72),rgba(15,23,42,0.58))] sm:w-auto"
               @click="router.push({ name: ROUTE_NAMES.JOB_BOARD })"
             >
               <span

@@ -942,8 +942,13 @@
   },
   "settings": {
     "title": "Sozlamalar",
+    "sections": "Bo'limlar",
     "profile": {
       "title": "Profil",
+      "subtitle": "Shaxsiy ma'lumotlar va hisob sozlamalari.",
+      "invitations": "Takliflar",
+      "personalInfo": "Shaxsiy ma'lumot",
+      "notifications": "Bildirishnomalar",
       "firstName": "Ism",
       "lastName": "Familiya",
       "email": "Email",
@@ -959,7 +964,9 @@
       "invitedBy": "{name} tomonidan taklif qilingan",
       "expires": "{date} da tugaydi",
       "accept": "Qabul qilish",
-      "acceptInvitationHint": "Taklifni qabul qilsangiz, o'sha kompaniyaga o'tasiz."
+      "acceptInvitationHint": "Taklifni qabul qilsangiz, o'sha kompaniyaga o'tasiz.",
+      "invitationAccepted": "Endi siz {company} tarkibidasiz",
+      "acceptInvitationError": "Taklifni qabul qilib bo'lmadi"
     },
     "company": {
       "title": "Kompaniya profili",
@@ -1194,7 +1201,9 @@
     "openBot": "Telegram da ochish",
     "linkCodeExpires": "Havola 10 daqiqada tugaydi",
     "generating": "Havola yaratilmoqda...",
-    "disconnected": "Telegram uzildi"
+    "disconnected": "Telegram uzildi",
+    "generateLinkError": "Telegram ulash havolasini yaratib bo'lmadi",
+    "disconnectError": "Telegramni uzib bo'lmadi"
   },
   "aiAssistant": {
     "title": "AI yordamchi",

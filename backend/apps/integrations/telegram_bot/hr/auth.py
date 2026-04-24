@@ -8,6 +8,7 @@ matches it against an unused ``TelegramLinkCode`` and links the accounts.
 from __future__ import annotations
 
 from apps.integrations.telegram_bot.client import TelegramClient
+from apps.integrations.telegram_bot.hr.i18n import text as hr_text
 from apps.integrations.telegram_bot.hr.linking import (
     get_hr_bot_user,
     looks_like_code,
@@ -15,6 +16,7 @@ from apps.integrations.telegram_bot.hr.linking import (
     send_email_link_code,
     verify_email_link_code,
 )
+from apps.integrations.telegram_bot.i18n import normalize_language
 from apps.integrations.telegram_bot.sessions import get_session
 
 
@@ -26,36 +28,51 @@ def handle_start(
     telegram_username: str = "",
     first_name: str = "",
     last_name: str = "",
+    language_code: str = "",
     payload: str = "",
 ) -> None:
     """Handle ``/start`` for the HR bot, optionally auto-linking via deep-link payload."""
+    if payload:
+        from apps.integrations.telegram_bot.hr.deep_link import request_deep_link_confirmation
+
+        request_deep_link_confirmation(client=client, chat_id=chat_id, telegram_id=telegram_id, token=payload)
+        return
+
     user = get_hr_bot_user(telegram_id=telegram_id)
     if user:
+        from apps.integrations.telegram_bot.hr.onboarding_flow import ensure_onboarding_ready
+
+        if not ensure_onboarding_ready(client=client, chat_id=chat_id, user=user, text=""):
+            return
         client.send_message(
             chat_id=chat_id,
-            text=(f"Welcome back, {user.first_name}!\n\nType your request or /help to see what I can do."),
+            text=hr_text("welcome_back", user=user, name=user.first_name),
         )
         return
 
-    if payload:
-        _try_deep_link(
-            client=client,
-            chat_id=chat_id,
-            telegram_id=telegram_id,
-            telegram_username=telegram_username,
-            token=payload,
-        )
-        return
+    from apps.integrations.telegram_bot.hr.onboarding import get_or_create_hr_bot_user
+    from apps.integrations.telegram_bot.hr.onboarding_flow import send_language_picker
 
+    language = normalize_language(lang_code=language_code)
+    user = get_or_create_hr_bot_user(
+        telegram_id=telegram_id,
+        telegram_username=telegram_username,
+        first_name=first_name,
+        last_name=last_name,
+        language=language,
+    )
     client.send_message(
         chat_id=chat_id,
         text=(
             "Welcome to PreScreen AI!\n\n"
-            "If you already have an HR or admin account, send me your work email and I'll send a 6-digit code.\n\n"
-            "If you're new, create your company at "
-            f"{_public_site_url()} and come back here."
+            f"I created a Telegram workspace for you as {user.first_name}.\n\n"
+            "Choose your language to continue.\n\n"
+            "Later, sign in on the web with Google and use Settings -> Telegram to connect this bot. "
+            "I'll ask you to confirm here before merging the accounts."
         ),
+        parse_mode="Markdown",
     )
+    send_language_picker(client=client, chat_id=chat_id)
 
 
 def try_link_code(
@@ -65,24 +82,28 @@ def try_link_code(
     telegram_id: int,
     telegram_username: str,
     text: str,
-) -> None:
-    """Handle messages from unlinked HR users via work-email verification."""
+    language_code: str = "",
+) -> bool:
+    """Handle existing-account email verification.
+
+    Returns True when the message was consumed by auth. A False return means
+    the caller can create a Telegram-first workspace and route the text to AI.
+    """
+    language = normalize_language(lang_code=language_code)
     if looks_like_email(text=text):
         success, result = send_email_link_code(telegram_id=telegram_id, email=text)
         if success:
             client.send_message(
                 chat_id=chat_id,
-                text=(
-                    f"I sent a 6-digit code to {result}.\n\n"
-                    "Reply here with that code to connect your Telegram account."
-                ),
+                text=hr_text("email_code_sent", lang=language, email=result),
             )
         else:
             client.send_message(
                 chat_id=chat_id,
-                text=result + f"\n\nIf you don't have an account yet, start at {_public_site_url()}.",
+                text=result + hr_text("email_link_failed_suffix", lang=language),
+                parse_mode="Markdown",
             )
-        return
+        return True
 
     session = get_session(role="hr", telegram_id=telegram_id)
     if session.get("state") == "awaiting_email_code" and looks_like_code(text=text):
@@ -95,92 +116,15 @@ def try_link_code(
             company_name = user.company.name if user.company else ""
             client.send_message(
                 chat_id=chat_id,
-                text=(
-                    f"Connected as {user.email}"
-                    + (f" ({company_name})" if company_name else "")
-                    + "\n\nYou can now manage your HR tasks here. Type /help to see what I can do."
+                text=hr_text(
+                    "connected",
+                    user=user,
+                    email=user.email,
+                    company=f" ({company_name})" if company_name else "",
                 ),
             )
-            return
+            return True
         client.send_message(chat_id=chat_id, text=error)
-        return
+        return True
 
-    client.send_message(
-        chat_id=chat_id,
-        text=(
-            "Your Telegram account is not linked yet.\n\n"
-            "Send your HR/admin work email and I'll email you a 6-digit verification code.\n\n"
-            "You can still use the web Settings -> Telegram deep link if you prefer."
-        ),
-    )
-
-
-def _try_deep_link(
-    *,
-    client: TelegramClient,
-    chat_id: int,
-    telegram_id: int,
-    telegram_username: str,
-    token: str,
-) -> None:
-    """Auto-link an HR account using a deep-link token from the /start payload."""
-    from django.db import IntegrityError, transaction
-    from django.utils import timezone
-
-    from apps.integrations.models import TelegramLinkCode
-
-    try:
-        with transaction.atomic():
-            link = (
-                TelegramLinkCode.objects.filter(
-                    code=token,
-                    is_used=False,
-                    expires_at__gt=timezone.now(),
-                )
-                .select_related("user")
-                .select_for_update()
-                .first()
-            )
-
-            if link is None:
-                client.send_message(
-                    chat_id=chat_id,
-                    text=(
-                        "This link has expired or is invalid.\n\nPlease generate a new one from Settings -> Telegram."
-                    ),
-                )
-                return
-
-            if not isinstance(telegram_id, int) or telegram_id <= 0:
-                client.send_message(chat_id=chat_id, text="Invalid Telegram account.")
-                return
-
-            user = link.user
-            user.telegram_id = telegram_id
-            user.telegram_username = telegram_username
-            user.save(update_fields=["telegram_id", "telegram_username", "updated_at"])
-
-            link.is_used = True
-            link.save(update_fields=["is_used", "updated_at"])
-    except IntegrityError:
-        client.send_message(
-            chat_id=chat_id,
-            text="This Telegram account is already linked to another user. Please unlink it first.",
-        )
-        return
-
-    company_name = user.company.name if user.company else ""
-    client.send_message(
-        chat_id=chat_id,
-        text=(
-            f"Connected as {user.email}"
-            + (f" ({company_name})" if company_name else "")
-            + "\n\nYou can now manage your HR tasks here. Type /help to see what I can do."
-        ),
-    )
-
-
-def _public_site_url() -> str:
-    from django.conf import settings
-
-    return settings.FRONTEND_URL.rstrip("/")
+    return False

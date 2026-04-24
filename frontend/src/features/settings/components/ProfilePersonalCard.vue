@@ -35,7 +35,7 @@ const authStore = useAuthStore()
           class="mt-0.5 inline-flex items-center gap-1.5 text-xs uppercase tracking-wider text-[color:var(--color-accent-ai)]"
         >
           <i class="pi pi-shield text-[10px]"></i>
-          {{ authStore.user?.role }}
+          {{ authStore.user?.role ? t(`settings.team.roles.${authStore.user.role}`) : '' }}
         </p>
       </div>
     </div>

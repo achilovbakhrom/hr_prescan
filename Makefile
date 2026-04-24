@@ -240,7 +240,7 @@ local-celery-beat: check-local-python ## Run Celery beat natively
 local-frontend: ## Run Vite dev server natively
 	cd frontend && npm run dev -- --host 0.0.0.0 --port $(LOCAL_FRONTEND_PORT)
 
-local-backend-all: local-infra check-local-python check-local-postgres ## Start infra + Django + Celery worker + Celery beat
+local-backend-all: local-infra check-local-python check-local-postgres ## Start infra + Django + Celery + Telegram bots
 	@echo "Starting infra containers..."
 	@sleep 3
 	@echo "Running migrations..."
@@ -251,10 +251,17 @@ local-backend-all: local-infra check-local-python check-local-postgres ## Start 
 	@cd backend && $(LOCAL_BACKEND_ENV) $(VENV)/python dev_autoreload.py $(VENV)/celery -A config worker -l info --concurrency=2 &
 	@echo "Starting Celery beat..."
 	@cd backend && $(LOCAL_BACKEND_ENV) $(VENV)/python dev_autoreload.py $(VENV)/celery -A config beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler &
+	@echo "Starting Telegram HR bot..."
+	-@pkill -f "manage.py run_telegram_bot --role hr" 2>/dev/null || true
+	@cd backend && $(LOCAL_BACKEND_ENV) $(VENV)/python manage.py run_telegram_bot --role hr &
+	@echo "Starting Telegram Candidate bot..."
+	-@pkill -f "manage.py run_telegram_bot --role candidate" 2>/dev/null || true
+	@cd backend && $(LOCAL_BACKEND_ENV) $(VENV)/python manage.py run_telegram_bot --role candidate &
 	@echo ""
 	@echo "Backend services started in background:"
 	@echo "  Django:   http://localhost:$(LOCAL_DJANGO_PORT)"
 	@echo "  Celery:   worker + beat"
+	@echo "  Telegram: HR + candidate polling bots"
 	@echo "  RabbitMQ: http://localhost:$(LOCAL_RABBITMQ_MGMT_PORT)"
 	@echo "  MinIO:    http://localhost:$(LOCAL_MINIO_CONSOLE_PORT)"
 	@echo ""
@@ -309,6 +316,8 @@ local-stop: ## Stop everything (infra + background processes)
 	-@pkill -f "manage.py runserver" 2>/dev/null || true
 	-@pkill -f "celery -A config worker" 2>/dev/null || true
 	-@pkill -f "celery -A config beat" 2>/dev/null || true
+	-@pkill -f "manage.py run_telegram_bot --role hr" 2>/dev/null || true
+	-@pkill -f "manage.py run_telegram_bot --role candidate" 2>/dev/null || true
 	-@pkill -f "vite" 2>/dev/null || true
 	$(LOCAL_DOCKER_COMPOSE) down
 	@echo "All stopped."
@@ -318,6 +327,8 @@ local-stop-all: ## Force-kill all local backend/frontend processes + stop Docker
 	-@pkill -9 -f "manage.py runserver" 2>/dev/null && echo "  Django stopped" || true
 	-@pkill -9 -f "celery -A config" 2>/dev/null && echo "  Celery worker stopped" || true
 	-@pkill -9 -f "celery.*config" 2>/dev/null && echo "  Celery beat stopped" || true
+	-@pkill -9 -f "manage.py run_telegram_bot --role hr" 2>/dev/null && echo "  Telegram HR bot stopped" || true
+	-@pkill -9 -f "manage.py run_telegram_bot --role candidate" 2>/dev/null && echo "  Telegram candidate bot stopped" || true
 	-@pkill -9 -f "vite" 2>/dev/null && echo "  Vite stopped" || true
 	-@pkill -9 -f "node.*frontend" 2>/dev/null && echo "  Node frontend stopped" || true
 	-@lsof -ti :$(LOCAL_DJANGO_PORT) | xargs kill -9 2>/dev/null && echo "  Port $(LOCAL_DJANGO_PORT) freed" || true

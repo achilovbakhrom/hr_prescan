@@ -40,7 +40,7 @@ const showWordmark = computed(() => props.variant !== 'glyph')
     :is="linked ? 'RouterLink' : 'div'"
     :to="linked ? to : undefined"
     class="app-logo inline-flex items-center gap-2"
-    aria-label="HR PreScan"
+    aria-label="PreScreen AI"
   >
     <svg
       v-if="showGlyph"
@@ -97,7 +97,7 @@ const showWordmark = computed(() => props.variant !== 'glyph')
       class="app-logo__wordmark font-semibold tracking-tight"
       :class="dims.wordmark"
     >
-      HR PreScan
+      PreScreen AI
     </span>
   </component>
 </template>

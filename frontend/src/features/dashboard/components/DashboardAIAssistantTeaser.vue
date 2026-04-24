@@ -32,7 +32,7 @@ const { t } = useI18n()
       </p>
       <button
         type="button"
-        class="mt-2 flex items-center justify-between gap-3 rounded-[--radius-sm] border border-[color:var(--color-border-glass)] bg-[color:var(--color-surface-raised)] px-3 py-2 text-left text-sm text-[color:var(--color-text-muted)] transition-colors hover:border-[color:var(--color-accent-ai)] hover:text-[color:var(--color-text-primary)]"
+        class="mt-2 flex cursor-pointer items-center justify-between gap-3 rounded-[--radius-sm] border border-[color:var(--color-border-glass)] bg-[color:var(--color-surface-raised)] px-3 py-2 text-left text-sm text-[color:var(--color-text-muted)] transition-colors hover:border-[color:var(--color-accent-ai)] hover:text-[color:var(--color-text-primary)] dark:border-violet-300/20 dark:bg-violet-300/10 dark:text-slate-200 dark:hover:border-violet-300/45 dark:hover:bg-violet-300/15"
         @click="$emit('open')"
       >
         <span class="flex items-center gap-2">

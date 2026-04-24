@@ -22,6 +22,7 @@ class CandidateApplicationListApi(APIView):
 
     def get(self, request: Request) -> Response:
         applications = get_candidate_applications(
+            candidate=request.user,
             candidate_email=request.user.email,
         )
         return Response(
@@ -38,6 +39,7 @@ class CandidateApplicationDetailApi(APIView):
     def get(self, request: Request, application_id: str) -> Response:
         application = get_candidate_application_by_id(
             application_id=application_id,
+            candidate=request.user,
             candidate_email=request.user.email,
         )
         if application is None:

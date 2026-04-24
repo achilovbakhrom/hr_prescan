@@ -1,9 +1,10 @@
 from django.conf import settings
 from rest_framework import status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.accounts.models import User
 from apps.accounts.permissions import HasHRPermission
 from apps.integrations.telegram_bot.bots import (
     ROLE_CANDIDATE,
@@ -43,16 +44,22 @@ class TelegramWebhookApi(APIView):
 
 
 class TelegramLinkCodeApi(APIView):
-    """GET /api/hr/telegram/link-code/ — generate a deep link for HRs to connect Telegram."""
+    """GET /api/telegram/link-code/ — generate a deep link to connect Telegram."""
 
-    permission_classes = [HasHRPermission]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         from apps.integrations.models import TelegramLinkCode
 
+        bot_username, payload_prefix = _telegram_bot_for_user(request.user)
+        if not bot_username:
+            return Response(
+                {"detail": "Telegram bot is not configured for this user role."},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+
         link = TelegramLinkCode.generate(user=request.user)
-        bot_username = settings.TELEGRAM_HR_BOT_USERNAME.lstrip("@")
-        link_url = f"https://t.me/{bot_username}?start={link.code}"
+        link_url = f"https://t.me/{bot_username}?start={payload_prefix}{link.code}"
         return Response(
             {
                 "link_url": link_url,
@@ -62,9 +69,9 @@ class TelegramLinkCodeApi(APIView):
 
 
 class TelegramStatusApi(APIView):
-    """GET /api/hr/telegram/status/ — check Telegram connection status."""
+    """GET /api/telegram/status/ — check Telegram connection status."""
 
-    permission_classes = [HasHRPermission]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user = request.user
@@ -77,9 +84,9 @@ class TelegramStatusApi(APIView):
 
 
 class TelegramUnlinkApi(APIView):
-    """POST /api/hr/telegram/unlink/ — disconnect Telegram account."""
+    """POST /api/telegram/unlink/ — disconnect Telegram account."""
 
-    permission_classes = [HasHRPermission]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         user = request.user
@@ -89,10 +96,41 @@ class TelegramUnlinkApi(APIView):
         return Response({"detail": "Telegram account disconnected."})
 
 
+class HRTelegramLinkCodeApi(TelegramLinkCodeApi):
+    """Backward-compatible HR route with the original HR permission check."""
+
+    permission_classes = [HasHRPermission]
+
+
+class HRTelegramStatusApi(TelegramStatusApi):
+    """Backward-compatible HR route with the original HR permission check."""
+
+    permission_classes = [HasHRPermission]
+
+
+class HRTelegramUnlinkApi(TelegramUnlinkApi):
+    """Backward-compatible HR route with the original HR permission check."""
+
+    permission_classes = [HasHRPermission]
+
+
+def _telegram_bot_for_user(user: User) -> tuple[str, str]:
+    if user.role == User.Role.CANDIDATE:
+        username = getattr(settings, "TELEGRAM_CANDIDATE_BOT_USERNAME", "")
+        return username.strip().lstrip("@"), "link_"
+    if user.role in (User.Role.ADMIN, User.Role.HR):
+        username = getattr(settings, "TELEGRAM_HR_BOT_USERNAME", "")
+        return username.strip().lstrip("@"), ""
+    return "", ""
+
+
 # Re-exported here for clarity in URL routing.
 __all__ = [
     "ROLE_CANDIDATE",
     "ROLE_HR",
+    "HRTelegramLinkCodeApi",
+    "HRTelegramStatusApi",
+    "HRTelegramUnlinkApi",
     "TelegramLinkCodeApi",
     "TelegramStatusApi",
     "TelegramUnlinkApi",

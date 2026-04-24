@@ -64,11 +64,14 @@ async function acceptInvitation(inv: PendingInvitation): Promise<void> {
   try {
     const result = await authService.acceptCompanyInvitation(inv.token)
     authStore.user = result.user
-    successMessage.value = `You are now part of ${inv.accountOwnerName}`
+    successMessage.value = t('settings.profile.invitationAccepted', {
+      company: inv.accountOwnerName,
+    })
     invitations.value = invitations.value.filter((i) => i.id !== inv.id)
   } catch (err: unknown) {
     const axiosErr = err as { response?: { data?: { detail?: string } } }
-    errorMessage.value = axiosErr.response?.data?.detail ?? 'Failed to accept invitation'
+    errorMessage.value =
+      axiosErr.response?.data?.detail ?? t('settings.profile.acceptInvitationError')
   } finally {
     acceptingToken.value = null
   }
@@ -90,7 +93,7 @@ function scrollToSection(id: string): void {
         {{ t('settings.profile.title') }}
       </h1>
       <p class="text-sm text-[color:var(--color-text-muted)]">
-        {{ t('settings.profile.subtitle') || 'Personal details and account preferences.' }}
+        {{ t('settings.profile.subtitle') }}
       </p>
     </header>
 

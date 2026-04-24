@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import Menu from 'primevue/menu'
@@ -12,9 +12,14 @@ import AppLogo from '@/shared/components/AppLogo.vue'
 import type { MenuItem } from 'primevue/menuitem'
 
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
 const { t } = useI18n()
 const userMenu = ref<InstanceType<typeof Menu> | null>(null)
+
+const isAuthEntryPage = computed(
+  () => route.name === ROUTE_NAMES.LOGIN || route.name === ROUTE_NAMES.REGISTER,
+)
 
 const menuItems = computed<MenuItem[]>(() => [
   {
@@ -55,8 +60,7 @@ function initials(): string {
   >
     <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
       <RouterLink to="/" class="flex items-center gap-2.5">
-        <AppLogo size="sm" />
-        <span class="text-xl font-bold tracking-tight text-gray-900">PreScreen AI</span>
+        <AppLogo size="sm" :linked="false" />
       </RouterLink>
 
       <slot name="center" />
@@ -99,6 +103,7 @@ function initials(): string {
         <!-- Not authenticated: show sign in / register -->
         <template v-else>
           <RouterLink
+            v-if="!isAuthEntryPage"
             :to="{ name: ROUTE_NAMES.LOGIN }"
             class="rounded-lg bg-blue-600 dark:bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
           >

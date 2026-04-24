@@ -50,6 +50,11 @@ def create_user_company(
         role=User.Role.ADMIN,
         is_default=not has_default,
     )
+    if not has_default and user.company_id is None:
+        user.company = company
+        user.role = User.Role.ADMIN
+        user.onboarding_completed = True
+        user.save(update_fields=["company", "role", "onboarding_completed", "updated_at"])
     return company
 
 

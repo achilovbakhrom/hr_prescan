@@ -10,7 +10,15 @@ from __future__ import annotations
 import logging
 
 from apps.integrations.telegram_bot.bots import ROLE_HR, get_client
+from apps.integrations.telegram_bot.hr.i18n import text as hr_text
 from apps.integrations.telegram_bot.hr.linking import get_hr_bot_user
+from apps.integrations.telegram_bot.hr.onboarding_flow import (
+    ensure_onboarding_ready,
+    handle_company_name_reply,
+    handle_onboarding_callback,
+    is_onboarding_callback,
+)
+from apps.integrations.telegram_bot.i18n import normalize_language
 from apps.integrations.telegram_bot.voice import transcribe_voice
 
 logger = logging.getLogger(__name__)
@@ -18,6 +26,11 @@ logger = logging.getLogger(__name__)
 
 def handle_update(update_data: dict) -> None:
     """Process an incoming Telegram update for the HR bot."""
+    callback = update_data.get("callback_query")
+    if callback:
+        _handle_callback(callback=callback)
+        return
+
     message = update_data.get("message", {})
     chat_id = message.get("chat", {}).get("id")
     if not chat_id:
@@ -26,6 +39,8 @@ def handle_update(update_data: dict) -> None:
     client = get_client(role=ROLE_HR)
     telegram_id = message.get("from", {}).get("id")
     telegram_username = message.get("from", {}).get("username", "")
+    language_code = message.get("from", {}).get("language_code", "")
+    fallback_lang = normalize_language(lang_code=language_code)
 
     voice = message.get("voice")
     if voice:
@@ -33,7 +48,7 @@ def handle_update(update_data: dict) -> None:
         if not text:
             client.send_message(
                 chat_id=chat_id,
-                text="Sorry, I couldn't transcribe that voice message.",
+                text=hr_text("voice_error", lang=fallback_lang),
             )
             return
         client.send_message(chat_id=chat_id, text=f"__{text}__", parse_mode="Markdown")
@@ -56,6 +71,7 @@ def handle_update(update_data: dict) -> None:
             telegram_username=telegram_username,
             first_name=first_name,
             last_name=last_name,
+            language_code=language_code,
             payload=payload,
         )
         return
@@ -68,13 +84,37 @@ def handle_update(update_data: dict) -> None:
     if user is None:
         from apps.integrations.telegram_bot.hr.auth import try_link_code
 
-        try_link_code(
+        handled = try_link_code(
             client=client,
             chat_id=chat_id,
             telegram_id=telegram_id,
             telegram_username=telegram_username,
             text=text,
+            language_code=language_code,
         )
+        if handled:
+            return
+
+        from apps.integrations.telegram_bot.hr.onboarding import get_or_create_hr_bot_user
+
+        sender = message.get("from", {})
+        user = get_or_create_hr_bot_user(
+            telegram_id=telegram_id,
+            telegram_username=telegram_username,
+            first_name=sender.get("first_name", ""),
+            last_name=sender.get("last_name", ""),
+            language=fallback_lang,
+        )
+        client.send_message(
+            chat_id=chat_id,
+            text=hr_text("workspace_created", user=user),
+            parse_mode="Markdown",
+        )
+
+    if handle_company_name_reply(client=client, chat_id=chat_id, user=user, text=text):
+        return
+
+    if not ensure_onboarding_ready(client=client, chat_id=chat_id, user=user, text=text):
         return
 
     _route_to_assistant(client=client, chat_id=chat_id, user=user, text=text)
@@ -100,19 +140,49 @@ def _route_to_assistant(*, client, chat_id, user, text: str) -> None:
     client.send_message(chat_id=chat_id, text=response_text, parse_mode="Markdown")
 
 
+def _handle_callback(*, callback: dict) -> None:
+    client = get_client(role=ROLE_HR)
+    callback_id = callback.get("id")
+    try:
+        _process_callback(client=client, callback=callback)
+    finally:
+        if callback_id:
+            client.answer_callback_query(callback_query_id=callback_id)
+
+
+def _process_callback(*, client, callback: dict) -> None:
+    data = callback.get("data", "")
+    chat_id = callback.get("message", {}).get("chat", {}).get("id")
+    sender = callback.get("from", {})
+    telegram_id = sender.get("id")
+    if not chat_id or not telegram_id:
+        return
+
+    if is_onboarding_callback(data=data):
+        handle_onboarding_callback(client=client, chat_id=chat_id, telegram_id=telegram_id, data=data)
+        return
+
+    from apps.integrations.telegram_bot.hr.deep_link import handle_link_callback, is_link_callback
+
+    if is_link_callback(data=data):
+        handle_link_callback(
+            client=client,
+            chat_id=chat_id,
+            telegram_id=telegram_id,
+            telegram_username=sender.get("username", ""),
+            data=data,
+        )
+        return
+
+    logger.debug("Unhandled HR callback: %r", data)
+
+
 def _handle_help(*, client, chat_id) -> None:
+    user = get_hr_bot_user(telegram_id=chat_id)
+    if user is not None and not ensure_onboarding_ready(client=client, chat_id=chat_id, user=user, text="/help"):
+        return
+
     client.send_message(
         chat_id=chat_id,
-        text=(
-            "I can help with:\n\n"
-            "*Vacancies* -- list, create, update, publish, pause, archive, delete\n"
-            "*Companies* -- list, create, update, delete\n"
-            "*Candidates* -- list, status changes, notes\n"
-            "*Interviews* -- list, cancel, reset\n"
-            "*Dashboard* -- stats, summaries\n"
-            "*Subscription* -- plan info, usage\n"
-            "*Team* -- invite, manage members\n\n"
-            "Just describe what you need in natural language!\n"
-            "You can also send voice messages."
-        ),
+        text=hr_text("help", user=user),
     )

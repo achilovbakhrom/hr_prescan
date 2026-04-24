@@ -52,6 +52,10 @@ html.dark {
   --shadow-glass-1: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.5);
   --shadow-glass-float: 0 2px 4px rgba(0, 0, 0, 0.5), 0 24px 48px rgba(0, 0, 0, 0.6);
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.35);
+
+  --p-datatable-header-cell-background: rgba(255, 255, 255, 0.055);
+  --p-datatable-header-cell-hover-background: rgba(255, 255, 255, 0.08);
+  --p-datatable-header-cell-selected-background: rgba(255, 255, 255, 0.08);
 }
 
 /* Body MUST be transparent in dark — the AnimatedBackground is a
@@ -254,8 +258,22 @@ html.dark tr {
   border-color: #334155 !important;
 }
 html.dark th {
-  background-color: #1e293b !important;
+  background-color: transparent !important;
   color: #f8fafc !important;
+}
+html.dark .p-datatable,
+html.dark .p-datatable .p-datatable-table-container,
+html.dark .p-datatable .p-datatable-table,
+html.dark .p-datatable .p-datatable-thead,
+html.dark .p-datatable .p-datatable-thead > tr {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+html.dark .p-datatable .p-datatable-thead > tr > th,
+html.dark th.p-datatable-header-cell,
+html.dark thead.p-datatable-thead > tr > th {
+  background: rgba(255, 255, 255, 0.055) !important;
+  background-color: rgba(255, 255, 255, 0.055) !important;
 }
 html.dark td {
   border-color: #334155 !important;

@@ -58,7 +58,7 @@ const widthClass: Record<Width, string> = {
       </div>
 
       <GlassCard class="relative z-10">
-        <header v-if="title || subtitle || $slots.header" class="mb-6 text-center">
+        <div v-if="title || subtitle || $slots.header" class="mb-6 text-center">
           <slot name="header">
             <h1
               v-if="title"
@@ -70,7 +70,7 @@ const widthClass: Record<Width, string> = {
               {{ subtitle }}
             </p>
           </slot>
-        </header>
+        </div>
 
         <slot />
 

@@ -14,6 +14,7 @@ export type BackgroundMode =
 
 const SCHEME_KEY = 'hr_prescan_color_scheme'
 const BG_KEY = 'hr_prescan_bg_mode'
+const DEFAULT_BACKGROUND_MODE: BackgroundMode = 'mesh'
 
 const VALID_BG_MODES: readonly BackgroundMode[] = [
   'off',
@@ -32,10 +33,10 @@ function readScheme(): ColorScheme {
 
 function readBackground(): BackgroundMode {
   const v = localStorage.getItem(BG_KEY)
-  if (v === null) return 'vellum'
+  if (v === null) return DEFAULT_BACKGROUND_MODE
   if ((VALID_BG_MODES as readonly string[]).includes(v)) return v as BackgroundMode
-  localStorage.setItem(BG_KEY, 'vellum')
-  return 'vellum'
+  localStorage.setItem(BG_KEY, DEFAULT_BACKGROUND_MODE)
+  return DEFAULT_BACKGROUND_MODE
 }
 
 export const useThemeStore = defineStore('theme', () => {

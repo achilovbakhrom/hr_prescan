@@ -5,8 +5,7 @@
  * The landing route is registered outside of PublicLayout (see
  * `frontend/src/app/router.ts`), so this page provides its own PageShell
  * wrapper to get AnimatedBackground + FloatingBackgroundPicker. It also
- * pins the background to Vellum (the signature mood for marketing) unless
- * the user has explicitly picked a different variant via the picker.
+ * honors the global background default and any explicit user choice.
  */
 import AnimatedBackground from '@/shared/components/AnimatedBackground.vue'
 import FloatingBackgroundPicker from '@/shared/components/FloatingBackgroundPicker.vue'

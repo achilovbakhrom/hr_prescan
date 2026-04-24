@@ -170,7 +170,7 @@ onMounted(async () => {
         </div>
 
         <div
-          class="rounded-[24px] border border-[color:var(--color-border-glass)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-accent-ai)_14%,white),transparent)] p-5"
+          class="rounded-[24px] border border-[color:var(--color-border-glass)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-accent-ai)_14%,white),transparent)] p-5 dark:border-violet-300/20 dark:bg-[linear-gradient(180deg,rgba(124,58,237,0.18),rgba(30,41,59,0.42))]"
         >
           <p class="text-xs uppercase tracking-[0.16em] text-[color:var(--color-accent-ai)]">
             {{ t('aiAssistant.title') }}
@@ -183,7 +183,7 @@ onMounted(async () => {
           </p>
           <button
             type="button"
-            class="mt-5 flex w-full items-center justify-between rounded-[18px] border border-[color:var(--color-border-glass)] bg-white/70 px-4 py-3 text-left text-sm text-[color:var(--color-text-muted)] transition-colors hover:border-[color:var(--color-accent-ai)] hover:text-[color:var(--color-text-primary)] dark:bg-white/5"
+            class="mt-5 flex w-full cursor-pointer items-center justify-between rounded-[18px] border border-[color:var(--color-border-glass)] bg-white/70 px-4 py-3 text-left text-sm text-[color:var(--color-text-muted)] transition-colors hover:border-[color:var(--color-accent-ai)] hover:text-[color:var(--color-text-primary)] dark:border-violet-300/20 dark:bg-violet-300/10 dark:text-slate-200 dark:hover:border-violet-300/45 dark:hover:bg-violet-300/15"
             @click="aiAssistant.open()"
           >
             <span class="flex items-center gap-2">

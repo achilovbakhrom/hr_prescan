@@ -229,9 +229,15 @@ Candidates can apply via two surfaces: the **web app** (public job board) and th
 - The public landing page exposes visible Telegram CTAs for both surfaces:
   - a candidate-bot CTA for job seekers
   - an HR-bot CTA for recruiters evaluating the Telegram workflow
+- For authenticated users, the web header language switcher persists the selected locale to `User.language` through `PATCH /api/auth/me/`; future web sessions and bot replies use that stored preference.
 - The public HR-bot CTA is usable:
-  - existing HR/admin users can open the public bot and link themselves by entering their work email and confirming a 6-digit code sent to that email
-  - authenticated HR/admin users can still use **Settings -> Telegram** in the web app to generate a one-time deep link for instant linking
+  - new HR users can start directly in Telegram; `/start` creates a Telegram-first admin placeholder account, requires them to pick a language (en / ru / uz), then requires them to create a company before using vacancy, candidate, interview, team, dashboard, or subscription commands
+  - selecting a language in the HR bot writes the same `User.language` field used by the web app; if the Telegram workspace is later merged into a web account, that selected language follows the merged account
+  - until a Telegram-first HR user has a company, blocked HR-bot prompts include a **Create company** inline button; after the user taps it, the company-name prompt is shown without repeating that button
+  - existing HR/admin users can still open the public bot and link themselves by entering their work email and confirming a 6-digit code sent to that email before a Telegram-first placeholder is created
+  - authenticated HR/admin users can still use **Settings -> Telegram** in the web app to generate a one-time deep link; the HR bot asks for confirmation before connecting it
+  - if that person later creates a web account and connects Telegram from web settings, the Telegram-first placeholder workspace is merged into the confirmed web account, including companies, vacancies, team memberships, invitations, notifications, messages, and subscription state where applicable; if the web account already has a default company, that company remains the default after merge
+- Authenticated candidate users can use **Profile -> Telegram** in the web app to generate a one-time `link_<token>` deep link. The candidate bot asks for confirmation before connecting the Telegram identity to the web profile.
 - Candidate-facing web screens also expose Telegram shortcuts in key places:
   - post-apply / prescanning-ready screen
   - candidate "My Applications" area
@@ -246,29 +252,35 @@ The candidate bot lets a candidate browse entry points, apply, and complete pres
 1. Someone (HR, friend, job board, landing page) shares a deep link:
    - `https://t.me/<bot>?start=vac_<telegram_code>` for a vacancy entry
    - `https://t.me/<bot>?start=ps_<prescan_token>` for an exact prescanning session
+   - `https://t.me/<bot>?start=link_<token>` for linking an authenticated candidate web profile
 2. Candidate opens the link → Telegram launches the bot → bot receives `/start ...`
-3. Bot **auto-creates a candidate `User`** if this Telegram identity hasn't been seen before:
+3. For `link_<token>`, the bot validates the one-time token and asks the Telegram user to confirm the connection before any auto-signup logic runs.
+   - If the user confirms and this Telegram identity has no separate account, the bot links the Telegram identity to the existing candidate `User`.
+   - If the user confirms and this Telegram identity already owns a bot-created placeholder candidate account (`tg_<telegram_id>@telegram.local`), the placeholder account is merged into the existing web candidate account. Applications, in-app notifications, direct messages, and CV profile data are reassigned or unioned, then the placeholder account is deactivated.
+   - The bot never auto-merges a real Telegram-linked user account into another profile. If the Telegram identity is already connected to a non-placeholder or non-candidate user, the link is rejected as a conflict.
+4. Otherwise, the bot **auto-creates a candidate `User`** if this Telegram identity hasn't been seen before:
    - Email is set to a placeholder `tg_<telegram_id>@telegram.local` (`email_verified=False`) — a real address can be collected later for vacancies that require it
    - First/last name and Telegram username come from the Telegram profile
    - `onboarding_completed=False` so the web app still walks them through onboarding if they ever sign in there
-4. For vacancy deep links, the bot fetches the vacancy (must be **published + public** — private/draft/paused vacancies show "no longer available") and renders a vacancy card with `[Apply]` and `[Back]` inline buttons
-5. Candidate taps `[Apply]`:
+5. For vacancy deep links, the bot fetches the vacancy (must be **published + public** — private/draft/paused vacancies show "no longer available") and renders a vacancy card with `[Apply]` and `[Back]` inline buttons
+6. Candidate taps `[Apply]`:
    - If the vacancy has `cv_required=True` and the bot has no CV on file for this user, the bot asks the candidate to send a PDF/DOCX. The pending apply is stored on the bot session, so as soon as the document arrives the apply resumes automatically.
    - Otherwise the bot calls the same `submit_application` service the web flow uses (`apps/applications/services/application_crud.py`). The resulting `Application` is bound to the candidate `User`, so HR sees it identically to web applications.
-6. Bot confirms with "✅ Application submitted!" and tells the candidate they'll be DM'd when there's news.
-7. Candidate can complete prescanning inside Telegram in two ways:
+7. Bot confirms with "✅ Application submitted!" and tells the candidate they'll be DM'd when there's news.
+8. Candidate can complete prescanning inside Telegram in two ways:
    - start from the bot menu using the 6-digit vacancy code
    - open a `ps_<prescan_token>` deep link from the web flow and continue the same prescanning session in Telegram
-8. Prescanning inside Telegram is chat-based:
+9. Prescanning inside Telegram is chat-based:
    - answers can be text or voice
    - the bot stores progress and can resume an in-progress Telegram prescreening session from the same deep link
-9. Outside explicit prescanning states, free-text candidate messages are routed to the candidate AI assistant so the bot can help with job search, application status, and interview-prep style requests.
+10. Outside explicit prescanning states, free-text candidate messages are routed to the candidate AI assistant so the bot can help with job search, application status, and interview-prep style requests.
 
 #### Notes & constraints
 
-- One Telegram identity = one `User`. The same person applying via Telegram and via web (with the same email) is reconciled by `bind_existing_applications` once their email is filled in.
+- One Telegram identity = one active `User`. Bot-created placeholder candidate accounts can be merged into a later web candidate account only through a confirmed `link_<token>` flow.
+- Candidate dashboards include applications bound by candidate user ID and applications matching the candidate email, so merged Telegram applications remain visible even if their original placeholder email differs from the web email.
 - Bot UI is **button-driven** wherever possible (Telegram inline keyboards) — free-text replies outside structured steps are routed to the candidate AI agent.
-- Bot auto-detects language from `message.from.language_code` (en / ru / uz). Strings live in `apps/integrations/telegram_bot/i18n.py`.
+- Bot-created users are seeded from `message.from.language_code` (en / ru / uz), then bot strings use the stored `User.language`. Authenticated web users can change the same field from the header language switcher.
 
 ---
 

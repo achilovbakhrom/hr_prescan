@@ -3,7 +3,7 @@ from uuid import UUID
 
 from django.db.models import Q, QuerySet
 
-from apps.accounts.models import Company
+from apps.accounts.models import Company, User
 from apps.applications.models import Application
 from apps.vacancies.models import Vacancy
 
@@ -132,11 +132,12 @@ def get_application_by_id(
 
 def get_candidate_applications(
     *,
+    candidate: User,
     candidate_email: str,
 ) -> QuerySet[Application]:
-    """Return all applications by a candidate email for their dashboard."""
+    """Return all applications bound to the candidate or matching their email."""
     return (
-        Application.objects.filter(candidate_email=candidate_email)
+        Application.objects.filter(Q(candidate=candidate) | Q(candidate_email=candidate_email))
         .select_related("vacancy", "vacancy__company")
         .order_by("-created_at")
     )
@@ -145,11 +146,12 @@ def get_candidate_applications(
 def get_candidate_application_by_id(
     *,
     application_id: UUID,
+    candidate: User,
     candidate_email: str,
 ) -> Application | None:
     """Get a single application for a candidate view."""
     return (
         Application.objects.select_related("vacancy", "vacancy__company")
-        .filter(id=application_id, candidate_email=candidate_email)
+        .filter(Q(candidate=candidate) | Q(candidate_email=candidate_email), id=application_id)
         .first()
     )

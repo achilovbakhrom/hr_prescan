@@ -113,7 +113,7 @@ class Vacancy(BaseModel):
         ]
 
     def save(self, *args, **kwargs):
-        if self.pk is None and self.telegram_code is None:
+        if self._state.adding and self.telegram_code is None:
             self.telegram_code = self._generate_telegram_code()
         super().save(*args, **kwargs)
 

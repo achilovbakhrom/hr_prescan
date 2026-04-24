@@ -406,6 +406,9 @@ GET    /api/notifications/stream/         — SSE stream for real-time
 ```
 POST   /api/telegram/hr/webhook/          — receives updates from the HR bot
 POST   /api/telegram/candidate/webhook/   — receives updates from the candidate bot
+GET    /api/telegram/status/              — current user's Telegram link status
+GET    /api/telegram/link-code/           — current user's one-time Telegram link
+POST   /api/telegram/unlink/              — disconnects the current user's Telegram profile
 ```
 
 Each endpoint verifies its own `X-Telegram-Bot-Api-Secret-Token` header and dispatches the update to a Celery task (`process_telegram_update`) which routes to the bot's handler module.
@@ -418,8 +421,8 @@ The platform hosts **two independent Telegram bots** that share infrastructure b
 
 | Bot | Audience | Purpose |
 |---|---|---|
-| **HR bot** (`@<TELEGRAM_HR_BOT_USERNAME>`) | Recruiters | Manage vacancies, candidates, interviews via the LangChain ReAct agent (`apps.common.ai_assistant.process_ai_command`). Linked to existing HR `User` rows via one-time deep-link tokens (`TelegramLinkCode`). |
-| **Candidate bot** (`@<TELEGRAM_CANDIDATE_BOT_USERNAME>`) | Job seekers | Find vacancies, apply, take prescan interview, track applications. Auto-creates a candidate `User` on first `/start`. |
+| **HR bot** (`@<TELEGRAM_HR_BOT_USERNAME>`) | Recruiters | Manage vacancies, candidates, interviews via the LangChain ReAct agent (`apps.common.ai_assistant.process_ai_command`). Links existing HR/admin `User` rows via confirmed one-time deep-link tokens (`TelegramLinkCode`) or email verification codes, and can create a Telegram-first admin placeholder account for new users. Telegram-first users pick language first, persisted to `User.language`, then must create a company before other HR commands are routed; no-company prompts include a Create company inline button until the company-name entry flow starts. Confirmed web linking merges the placeholder workspace contents into the web account while preserving the web account's default company. |
+| **Candidate bot** (`@<TELEGRAM_CANDIDATE_BOT_USERNAME>`) | Job seekers | Find vacancies, apply, take prescan interview, track applications. Confirms `link_<token>` before linking an existing candidate profile, safely merges bot-created placeholder candidate accounts, and otherwise auto-creates a candidate `User` on first `/start`. |
 
 ### Code layout
 
@@ -433,12 +436,16 @@ backend/apps/integrations/telegram_bot/
 ├── voice.py            # transcribe_voice(client, file_id) — Gemini
 ├── hr/                 # HR bot
 │   ├── handlers.py     # update dispatcher, routes free text to LangChain agent
-│   ├── auth.py         # deep-link linking via TelegramLinkCode
+│   ├── auth.py         # confirmed deep-link/email-code linking via TelegramLinkCode
+│   ├── deep_link.py    # deep-link confirmation callback flow
+│   ├── onboarding.py   # Telegram-first HR/admin placeholder account + merge
 │   └── history.py      # Redis-backed conversation history for the agent
 └── candidate/          # Candidate bot
     ├── handlers.py     # update dispatcher (text/voice/document/callback)
     ├── auth.py         # auto-signup via get_or_create_candidate_user
     ├── apply.py        # deep-link `vac_<uuid>` apply flow
+    ├── linking.py      # confirmed web-profile linking + placeholder account merge
+    ├── merge.py        # candidate placeholder account data union
     ├── menus.py        # inline keyboards + callback grammar
     └── uploads.py      # CV document ingestion → MinIO
 ```

@@ -29,7 +29,7 @@ const { t } = useI18n()
     <span
       class="block px-3 pt-2 pb-3 text-xs font-semibold uppercase tracking-wider text-[color:var(--color-text-muted)]"
     >
-      {{ t('settings.sections') || 'Sections' }}
+      {{ t('settings.sections') }}
     </span>
     <nav class="flex flex-col gap-1">
       <button

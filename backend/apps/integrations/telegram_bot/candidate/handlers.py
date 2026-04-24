@@ -9,16 +9,13 @@ from apps.integrations.telegram_bot.bots import ROLE_CANDIDATE, get_client
 from apps.integrations.telegram_bot.candidate.apply import confirm_apply
 from apps.integrations.telegram_bot.candidate.assistant import route_to_assistant
 from apps.integrations.telegram_bot.candidate.auth import get_or_create_candidate_user
-from apps.integrations.telegram_bot.candidate.menus import (
-    CB_MENU,
-    CB_VAC_APPLY,
-    main_menu_keyboard,
-    parse_callback,
-)
-from apps.integrations.telegram_bot.candidate.start import handle_start_command
+from apps.integrations.telegram_bot.candidate.language import telegram_language, user_language
+from apps.integrations.telegram_bot.candidate.linking import handle_account_link_callback, is_account_link_callback
+from apps.integrations.telegram_bot.candidate.menus import CB_MENU, CB_VAC_APPLY, main_menu_keyboard, parse_callback
+from apps.integrations.telegram_bot.candidate.start import handle_account_link_start, handle_start_command
 from apps.integrations.telegram_bot.candidate.states import STATE_PS_CV, STATE_PS_INTERVIEW
 from apps.integrations.telegram_bot.candidate.uploads import handle_document
-from apps.integrations.telegram_bot.i18n import normalize_language, t
+from apps.integrations.telegram_bot.i18n import t
 from apps.integrations.telegram_bot.sessions import get_session
 from apps.integrations.telegram_bot.voice import transcribe_voice
 
@@ -42,21 +39,38 @@ def handle_update(update_data: dict) -> None:
     if not chat_id or not telegram_id:
         return
 
-    lang = normalize_language(lang_code=sender.get("language_code"))
+    lang = telegram_language(telegram_id=telegram_id, lang_code=sender.get("language_code"))
+
+    document = message.get("document")
+    voice = message.get("voice")
+    if not document and not voice:
+        text = (message.get("text") or "").strip()
+        if text == "/start" or text.startswith("/start "):
+            payload = text[7:].strip() if text.startswith("/start ") else ""
+            if handle_account_link_start(
+                client=client,
+                chat_id=chat_id,
+                telegram_id=telegram_id,
+                telegram_username=sender.get("username", ""),
+                payload=payload,
+                lang=lang,
+            ):
+                return
+
     user = get_or_create_candidate_user(
         telegram_id=telegram_id,
         telegram_username=sender.get("username", ""),
         first_name=sender.get("first_name", ""),
         last_name=sender.get("last_name", ""),
+        language=lang,
     )
+    lang = user_language(user=user, fallback=lang)
     session = get_session(role=ROLE_CANDIDATE, telegram_id=telegram_id)
 
-    document = message.get("document")
     if document:
         _handle_document(client=client, chat_id=chat_id, user=user, document=document, session=session, lang=lang)
         return
 
-    voice = message.get("voice")
     if voice:
         text = transcribe_voice(client=client, file_id=voice.get("file_id")) or ""
         if not text:
@@ -130,13 +144,26 @@ def _process_callback(*, client, callback: dict) -> None:
     if not chat_id or not telegram_id:
         return
 
-    lang = normalize_language(lang_code=sender.get("language_code"))
+    lang = telegram_language(telegram_id=telegram_id, lang_code=sender.get("language_code"))
+    if is_account_link_callback(data=data):
+        handle_account_link_callback(
+            client=client,
+            chat_id=chat_id,
+            telegram_id=telegram_id,
+            telegram_username=sender.get("username", ""),
+            data=data,
+            lang=lang,
+        )
+        return
+
     user = get_or_create_candidate_user(
         telegram_id=telegram_id,
         telegram_username=sender.get("username", ""),
         first_name=sender.get("first_name", ""),
         last_name=sender.get("last_name", ""),
+        language=lang,
     )
+    lang = user_language(user=user, fallback=lang)
     session = get_session(role=ROLE_CANDIDATE, telegram_id=telegram_id)
     action, arg = parse_callback(data=data)
 

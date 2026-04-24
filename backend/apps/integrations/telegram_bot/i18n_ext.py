@@ -45,6 +45,55 @@ _STRINGS_EXT: dict[str, dict[str, str]] = {
             "Siz shuningdek veb-saytda Telegram orqali kirishingiz mumkin."
         ),
     },
+    "candidate.link_success": {
+        "en": "✅ Telegram is connected to your PreScreen AI profile.",
+        "ru": "✅ Telegram подключён к вашему профилю PreScreen AI.",
+        "uz": "✅ Telegram PreScreen AI profilingizga ulandi.",
+    },
+    "candidate.link_merged": {
+        "en": "✅ Telegram is connected. Your Telegram bot profile data was merged into this PreScreen AI profile.",
+        "ru": "✅ Telegram подключён. Данные вашего профиля из Telegram-бота объединены с этим профилем PreScreen AI.",
+        "uz": "✅ Telegram ulandi. Telegram botdagi profil ma'lumotlaringiz ushbu PreScreen AI profiliga birlashtirildi.",
+    },
+    "candidate.link_confirm": {
+        "en": (
+            "Connect this Telegram account to {email}?\n\n"
+            "If this Telegram account already has a bot profile, its applications and CV data will be merged."
+        ),
+        "ru": (
+            "Подключить этот Telegram-аккаунт к {email}?\n\n"
+            "Если в Telegram-боте уже есть профиль, его отклики и данные резюме будут объединены."
+        ),
+        "uz": (
+            "Ushbu Telegram akkauntini {email} profiliga ulaysizmi?\n\n"
+            "Agar Telegram botda profil mavjud bo'lsa, arizalar va CV ma'lumotlari birlashtiriladi."
+        ),
+    },
+    "candidate.link_invalid": {
+        "en": "This Telegram link is invalid or expired. Generate a new link in your profile settings.",
+        "ru": "Эта ссылка Telegram недействительна или устарела. Создайте новую ссылку в настройках профиля.",
+        "uz": "Bu Telegram havolasi noto'g'ri yoki muddati tugagan. Profil sozlamalarida yangi havola yarating.",
+    },
+    "candidate.link_conflict": {
+        "en": "This Telegram account is already connected to another profile.",
+        "ru": "Этот Telegram-аккаунт уже подключён к другому профилю.",
+        "uz": "Bu Telegram akkaunti allaqachon boshqa profilga ulangan.",
+    },
+    "candidate.link_cancelled": {
+        "en": "Telegram connection was cancelled.",
+        "ru": "Подключение Telegram отменено.",
+        "uz": "Telegram ulanishi bekor qilindi.",
+    },
+    "candidate.btn_link_confirm": {
+        "en": "✅ Connect",
+        "ru": "✅ Подключить",
+        "uz": "✅ Ulanish",
+    },
+    "candidate.btn_link_cancel": {
+        "en": "Cancel",
+        "ru": "Отмена",
+        "uz": "Bekor qilish",
+    },
     # ----- main menu -----
     "candidate.main_menu": {
         "en": "What would you like to do?\n\nYou can also ask me about jobs, your applications, or interview prep in plain text.",

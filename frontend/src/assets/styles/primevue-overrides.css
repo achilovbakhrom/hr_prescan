@@ -675,6 +675,12 @@
   text-align: center;
 }
 
+.dark .p-datatable .p-datatable-thead > tr > th {
+  background: rgba(255, 255, 255, 0.055) !important;
+  border-bottom-color: rgba(148, 163, 184, 0.18);
+  color: #cbd5e1;
+}
+
 /* Pagination container — chrome can be glass */
 .p-paginator {
   background-color: var(--color-surface-glass-1);

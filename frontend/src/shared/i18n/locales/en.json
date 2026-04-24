@@ -949,8 +949,13 @@
   },
   "settings": {
     "title": "Settings",
+    "sections": "Sections",
     "profile": {
       "title": "Profile",
+      "subtitle": "Personal details and account preferences.",
+      "invitations": "Invitations",
+      "personalInfo": "Personal information",
+      "notifications": "Notifications",
       "firstName": "First Name",
       "lastName": "Last Name",
       "email": "Email",
@@ -966,7 +971,9 @@
       "invitedBy": "Invited by {name}",
       "expires": "Expires {date}",
       "accept": "Accept",
-      "acceptInvitationHint": "Accepting an invitation will switch you to that company."
+      "acceptInvitationHint": "Accepting an invitation will switch you to that company.",
+      "invitationAccepted": "You are now part of {company}",
+      "acceptInvitationError": "Failed to accept invitation"
     },
     "company": {
       "title": "Company Profile",
@@ -1201,7 +1208,9 @@
     "openBot": "Open in Telegram",
     "linkCodeExpires": "Link expires in 10 minutes",
     "generating": "Generating link...",
-    "disconnected": "Telegram disconnected"
+    "disconnected": "Telegram disconnected",
+    "generateLinkError": "Failed to generate Telegram link code",
+    "disconnectError": "Failed to disconnect Telegram"
   },
   "aiAssistant": {
     "title": "AI Assistant",

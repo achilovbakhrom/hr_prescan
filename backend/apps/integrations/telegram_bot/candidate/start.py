@@ -6,6 +6,7 @@ from apps.integrations.telegram_bot.candidate.deep_links import (
     get_prescreen_interview,
     parse_deep_link_vacancy,
 )
+from apps.integrations.telegram_bot.candidate.linking import request_account_link
 from apps.integrations.telegram_bot.i18n import t
 
 
@@ -31,3 +32,15 @@ def handle_start_command(*, client, chat_id: int, user, payload: str, lang: str)
 
     client.send_message(chat_id=chat_id, text=t("candidate.welcome", lang=lang))
     return False
+
+
+def handle_account_link_start(
+    *,
+    client,
+    chat_id: int,
+    telegram_id: int,
+    telegram_username: str,
+    payload: str,
+    lang: str,
+) -> bool:
+    return request_account_link(client=client, chat_id=chat_id, telegram_id=telegram_id, payload=payload, lang=lang)

@@ -63,7 +63,6 @@ watch(
         >
           <div class="flex items-center gap-2">
             <AppLogo size="sm" />
-            <span class="text-lg font-bold text-gray-900">PreScreen AI</span>
           </div>
           <button
             type="button"

@@ -98,7 +98,7 @@ function handleMenuToggle(): void {
           href="/jobs"
           target="_blank"
           rel="noopener"
-          class="group hidden items-center gap-2 rounded-full border border-[color:var(--color-border-glass)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-surface-raised)_84%,white),color-mix(in_srgb,var(--color-surface-raised)_96%,white))] px-2.5 py-1.5 text-xs font-semibold text-[color:var(--color-text-primary)] shadow-[0_10px_24px_rgba(15,23,42,0.08)] transition-all hover:-translate-y-px hover:border-[color:color-mix(in_srgb,var(--color-accent)_28%,var(--color-border-glass))] hover:shadow-[0_14px_28px_rgba(15,23,42,0.12)] dark:bg-[rgba(15,23,42,0.55)] dark:hover:bg-[rgba(15,23,42,0.72)] sm:flex"
+          class="group hidden cursor-pointer items-center gap-2 rounded-full border border-[color:var(--color-border-glass)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-surface-raised)_84%,white),color-mix(in_srgb,var(--color-surface-raised)_96%,white))] px-2.5 py-1.5 text-xs font-semibold text-[color:var(--color-text-primary)] shadow-[0_10px_24px_rgba(15,23,42,0.08)] transition-all hover:-translate-y-px hover:border-[color:color-mix(in_srgb,var(--color-accent)_28%,var(--color-border-glass))] hover:shadow-[0_14px_28px_rgba(15,23,42,0.12)] dark:bg-[rgba(15,23,42,0.55)] dark:hover:bg-[rgba(15,23,42,0.72)] sm:flex"
         >
           <span
             class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[color:var(--color-accent-soft)] text-[color:var(--color-accent)] transition-colors group-hover:bg-[color:var(--color-accent)] group-hover:text-white"

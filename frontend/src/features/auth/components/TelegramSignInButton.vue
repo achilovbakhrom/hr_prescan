@@ -22,8 +22,14 @@ const emit = defineEmits<{
 const { t } = useI18n()
 const botUsername = import.meta.env.VITE_TELEGRAM_BOT_USERNAME as string
 const loading = ref(false)
+const darkMode = ref(isDarkMode())
+let themeObserver: MutationObserver | null = null
 
 const callbackName = `__onTelegramAuth_${Date.now()}`
+
+function isDarkMode(): boolean {
+  return document.documentElement.classList.contains('dark')
+}
 
 async function onTelegramAuth(user: TelegramWidgetUser): Promise<void> {
   loading.value = true
@@ -75,11 +81,21 @@ function handleMessage(e: MessageEvent): void {
 onMounted(() => {
   // Register global callback (fallback for widget redirect mode)
   ;(window as unknown as Record<string, unknown>)[callbackName] = onTelegramAuth
+  darkMode.value = isDarkMode()
+  themeObserver = new MutationObserver(() => {
+    darkMode.value = isDarkMode()
+  })
+  themeObserver.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['class'],
+  })
   window.addEventListener('message', handleMessage)
 })
 
 onUnmounted(() => {
   delete (window as unknown as Record<string, unknown>)[callbackName]
+  themeObserver?.disconnect()
+  themeObserver = null
   window.removeEventListener('message', handleMessage)
 })
 </script>
@@ -88,12 +104,18 @@ onUnmounted(() => {
   <div v-if="botUsername" class="mb-4">
     <button
       type="button"
-      class="flex w-full items-center justify-center gap-3 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 shadow-sm transition-colors hover:bg-gray-50"
+      class="social-auth-telegram"
       :disabled="loading"
-      :class="loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'"
+      :class="{
+        'social-auth-telegram--dark': darkMode,
+        'opacity-50 cursor-not-allowed': loading,
+        'cursor-pointer': !loading,
+      }"
       @click="openTelegramAuth"
     >
-      <i v-if="!loading" class="pi pi-telegram text-[#2AABEE]" />
+      <span v-if="!loading" class="social-auth-telegram__icon">
+        <i class="pi pi-telegram text-[#2AABEE]" />
+      </span>
       <svg v-else class="animate-spin" width="18" height="18" viewBox="0 0 24 24" fill="none">
         <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" class="opacity-25" />
         <path
@@ -106,3 +128,64 @@ onUnmounted(() => {
     </button>
   </div>
 </template>
+
+<style scoped>
+.social-auth-telegram {
+  display: flex;
+  width: 100%;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #3c4043;
+  padding-inline: 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1;
+  box-shadow: var(--shadow-card);
+  transition:
+    background-color 160ms var(--ease-ios),
+    border-color 160ms var(--ease-ios);
+}
+
+.social-auth-telegram__icon {
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 18px;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.social-auth-telegram__icon .pi {
+  display: block;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.social-auth-telegram:hover:not(:disabled) {
+  background: #f8fafd;
+}
+
+.social-auth-telegram:focus-visible {
+  outline: 2px solid var(--color-border-ring);
+  outline-offset: 2px;
+}
+
+.social-auth-telegram--dark {
+  border-color: #3c4043;
+  background: #202124;
+  color: #ffffff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.28);
+}
+
+.social-auth-telegram--dark:hover:not(:disabled) {
+  border-color: #4b5563;
+  background: #2a2b2f;
+}
+</style>

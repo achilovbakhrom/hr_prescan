@@ -9,10 +9,11 @@ import secrets
 from django.conf import settings
 from django.core.cache import cache
 from django.core.mail import send_mail
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 
 from apps.accounts.models import User
 from apps.integrations.telegram_bot.bots import ROLE_HR
+from apps.integrations.telegram_bot.hr.onboarding import is_hr_placeholder, merge_hr_placeholder
 from apps.integrations.telegram_bot.sessions import update_session
 
 logger = logging.getLogger(__name__)
@@ -96,23 +97,36 @@ def verify_email_link_code(
     if not payload or payload.get("code") != code.strip():
         return None, "That verification code is invalid or expired."
 
-    user = (
-        User.objects.filter(
-            id=payload.get("user_id"),
-            role__in=ALLOWED_ROLES,
-            is_active=True,
-        )
-        .select_related("company")
-        .first()
-    )
-    if user is None:
-        cache.delete(EMAIL_LINK_CACHE_KEY.format(telegram_id=telegram_id))
-        return None, "That account is no longer available."
-
-    user.telegram_id = telegram_id
-    user.telegram_username = telegram_username
     try:
-        user.save(update_fields=["telegram_id", "telegram_username", "updated_at"])
+        with transaction.atomic():
+            user = (
+                User.objects.select_for_update()
+                .filter(
+                    id=payload.get("user_id"),
+                    role__in=ALLOWED_ROLES,
+                    is_active=True,
+                )
+                .select_related("company")
+                .first()
+            )
+            if user is None:
+                cache.delete(EMAIL_LINK_CACHE_KEY.format(telegram_id=telegram_id))
+                return None, "That account is no longer available."
+
+            existing = (
+                User.objects.select_for_update()
+                .filter(telegram_id=telegram_id, role__in=ALLOWED_ROLES)
+                .exclude(id=user.id)
+                .first()
+            )
+            if existing is not None:
+                if not is_hr_placeholder(user=existing, telegram_id=telegram_id):
+                    return None, "This Telegram account is already linked to another user."
+                merge_hr_placeholder(source=existing, target=user)
+
+            user.telegram_id = telegram_id
+            user.telegram_username = telegram_username
+            user.save(update_fields=["telegram_id", "telegram_username", "updated_at"])
     except IntegrityError:
         return None, "This Telegram account is already linked to another user."
 

@@ -34,6 +34,7 @@ def get_or_create_candidate_user(
     telegram_username: str = "",
     first_name: str = "",
     last_name: str = "",
+    language: str = User.Language.EN,
 ) -> User:
     """Return the candidate User for this Telegram identity, creating it if needed.
 
@@ -63,11 +64,14 @@ def get_or_create_candidate_user(
             )
             user.telegram_id = telegram_id
             user.telegram_username = telegram_username
+            if language in User.Language.values:
+                user.language = language
             user.onboarding_completed = False
             user.save(
                 update_fields=[
                     "telegram_id",
                     "telegram_username",
+                    "language",
                     "onboarding_completed",
                     "updated_at",
                 ]

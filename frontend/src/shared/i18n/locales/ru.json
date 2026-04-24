@@ -949,8 +949,13 @@
   },
   "settings": {
     "title": "Настройки",
+    "sections": "Разделы",
     "profile": {
       "title": "Профиль",
+      "subtitle": "Личные данные и настройки аккаунта.",
+      "invitations": "Приглашения",
+      "personalInfo": "Личная информация",
+      "notifications": "Уведомления",
       "firstName": "Имя",
       "lastName": "Фамилия",
       "email": "Электронная почта",
@@ -966,7 +971,9 @@
       "invitedBy": "Пригласил(а) {name}",
       "expires": "Истекает {date}",
       "accept": "Принять",
-      "acceptInvitationHint": "Принятие приглашения переключит вас на эту компанию."
+      "acceptInvitationHint": "Принятие приглашения переключит вас на эту компанию.",
+      "invitationAccepted": "Вы теперь в компании {company}",
+      "acceptInvitationError": "Не удалось принять приглашение"
     },
     "company": {
       "title": "Профиль компании",
@@ -1201,7 +1208,9 @@
     "openBot": "Открыть в Telegram",
     "linkCodeExpires": "Ссылка действует 10 минут",
     "generating": "Генерация ссылки...",
-    "disconnected": "Telegram отключён"
+    "disconnected": "Telegram отключён",
+    "generateLinkError": "Не удалось создать ссылку для подключения Telegram",
+    "disconnectError": "Не удалось отключить Telegram"
   },
   "aiAssistant": {
     "title": "AI Ассистент",
