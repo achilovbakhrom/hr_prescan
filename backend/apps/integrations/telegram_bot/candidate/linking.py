@@ -106,12 +106,7 @@ def confirm_account_link(*, token: str, telegram_id: int, telegram_username: str
                 return LinkResult(ok=False)
 
             target = link.user
-            existing = (
-                User.objects.select_for_update()
-                .filter(telegram_id=telegram_id)
-                .exclude(id=target.id)
-                .first()
-            )
+            existing = User.objects.select_for_update().filter(telegram_id=telegram_id).exclude(id=target.id).first()
             if existing is not None:
                 if not _is_mergeable_telegram_candidate(user=existing, telegram_id=telegram_id):
                     return LinkResult(ok=False, conflict=True)
@@ -136,11 +131,15 @@ def confirm_account_link(*, token: str, telegram_id: int, telegram_username: str
 
 
 def _get_valid_link(*, token: str) -> TelegramLinkCode | None:
-    return TelegramLinkCode.objects.select_related("user").filter(
-        code=token,
-        is_used=False,
-        expires_at__gt=timezone.now(),
-    ).first()
+    return (
+        TelegramLinkCode.objects.select_related("user")
+        .filter(
+            code=token,
+            is_used=False,
+            expires_at__gt=timezone.now(),
+        )
+        .first()
+    )
 
 
 def _get_valid_link_for_update(*, token: str) -> TelegramLinkCode | None:

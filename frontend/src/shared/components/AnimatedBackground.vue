@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useThemeStore, type BackgroundMode } from '@/shared/stores/theme.store'
+import { useThemeStore } from '@/shared/stores/theme.store'
 import BackgroundMesh from './backgrounds/BackgroundMesh.vue'
 import BackgroundConstellation from './backgrounds/BackgroundConstellation.vue'
 import BackgroundVellum from './backgrounds/BackgroundVellum.vue'
@@ -32,7 +32,6 @@ const current = computed(() => {
   if (mode === 'off') return null
   return variantMap[mode] ?? null
 })
-
 </script>
 
 <template>

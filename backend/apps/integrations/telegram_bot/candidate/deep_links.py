@@ -23,10 +23,14 @@ def parse_deep_link_vacancy(*, payload: str) -> UUID | None:
         pass
 
     if raw.isdigit():
-        vacancy = Vacancy.objects.filter(
-            telegram_code=int(raw),
-            is_deleted=False,
-        ).only("id").first()
+        vacancy = (
+            Vacancy.objects.filter(
+                telegram_code=int(raw),
+                is_deleted=False,
+            )
+            .only("id")
+            .first()
+        )
         return vacancy.id if vacancy else None
 
     return None

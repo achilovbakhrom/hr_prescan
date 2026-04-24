@@ -152,10 +152,7 @@ class CandidateApplicationListOutputSerializer(serializers.ModelSerializer):
             return str(latest.interview_token)
 
         session = (
-            obj.sessions.filter(session_type="prescanning")
-            .exclude(status="cancelled")
-            .order_by("-created_at")
-            .first()
+            obj.sessions.filter(session_type="prescanning").exclude(status="cancelled").order_by("-created_at").first()
         )
         return str(session.interview_token) if session else None
 

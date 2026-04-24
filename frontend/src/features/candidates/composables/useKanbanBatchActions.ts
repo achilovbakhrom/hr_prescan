@@ -52,11 +52,18 @@ export function useKanbanBatchActions(
     const matching = matchingStatus(fromStatus)
     if (!matching.length) return
 
-    confirmMove(`Move all ${matching.length} "${fromStatus}" candidate(s) to "${toStatus}"?`, async () => {
-      if (vacancyId()) await candidateService.batchMove(vacancyId(), { fromStatus, toStatus })
-      else await moveIds(matching.map((candidate) => candidate.id), toStatus)
-      fetchCandidates()
-    })
+    confirmMove(
+      `Move all ${matching.length} "${fromStatus}" candidate(s) to "${toStatus}"?`,
+      async () => {
+        if (vacancyId()) await candidateService.batchMove(vacancyId(), { fromStatus, toStatus })
+        else
+          await moveIds(
+            matching.map((candidate) => candidate.id),
+            toStatus,
+          )
+        fetchCandidates()
+      },
+    )
   }
 
   function handleBatchMoveByScore(
@@ -73,30 +80,44 @@ export function useKanbanBatchActions(
     })
     if (!matching.length) return
 
-    confirmMove(`Move ${matching.length} candidate(s) matching this score filter to "${toStatus}"?`, async () => {
-      if (vacancyId()) {
-        await candidateService.batchMove(vacancyId(), {
-          fromStatus,
-          toStatus,
-          scoreField: scoreField as ScoreField,
-          ...(direction === 'below' ? { maxScore: threshold } : { minScore: threshold }),
-        })
-      } else {
-        await moveIds(matching.map((candidate) => candidate.id), toStatus)
-      }
-      fetchCandidates()
-    })
+    confirmMove(
+      `Move ${matching.length} candidate(s) matching this score filter to "${toStatus}"?`,
+      async () => {
+        if (vacancyId()) {
+          await candidateService.batchMove(vacancyId(), {
+            fromStatus,
+            toStatus,
+            scoreField: scoreField as ScoreField,
+            ...(direction === 'below' ? { maxScore: threshold } : { minScore: threshold }),
+          })
+        } else {
+          await moveIds(
+            matching.map((candidate) => candidate.id),
+            toStatus,
+          )
+        }
+        fetchCandidates()
+      },
+    )
   }
 
   function handleBatchMoveNoCv(fromStatus: ApplicationStatus, toStatus: ApplicationStatus): void {
     const matching = matchingStatus(fromStatus).filter((candidate) => !candidate.cvFile)
     if (!matching.length) return
 
-    confirmMove(`Move ${matching.length} "${fromStatus}" candidate(s) without CV to "${toStatus}"?`, async () => {
-      if (vacancyId()) await candidateService.batchMove(vacancyId(), { fromStatus, toStatus, hasCv: false })
-      else await moveIds(matching.map((candidate) => candidate.id), toStatus)
-      fetchCandidates()
-    })
+    confirmMove(
+      `Move ${matching.length} "${fromStatus}" candidate(s) without CV to "${toStatus}"?`,
+      async () => {
+        if (vacancyId())
+          await candidateService.batchMove(vacancyId(), { fromStatus, toStatus, hasCv: false })
+        else
+          await moveIds(
+            matching.map((candidate) => candidate.id),
+            toStatus,
+          )
+        fetchCandidates()
+      },
+    )
   }
 
   function handleBatchMoveByDays(
@@ -104,14 +125,28 @@ export function useKanbanBatchActions(
     toStatus: ApplicationStatus,
     days: number,
   ): void {
-    const matching = matchingStatus(fromStatus).filter((candidate) => olderThanDays(candidate.createdAt, days))
+    const matching = matchingStatus(fromStatus).filter((candidate) =>
+      olderThanDays(candidate.createdAt, days),
+    )
     if (!matching.length) return
 
-    confirmMove(`Move ${matching.length} candidate(s) idle for more than ${days} days to "${toStatus}"?`, async () => {
-      if (vacancyId()) await candidateService.batchMove(vacancyId(), { fromStatus, toStatus, daysSinceApplied: days })
-      else await moveIds(matching.map((candidate) => candidate.id), toStatus)
-      fetchCandidates()
-    })
+    confirmMove(
+      `Move ${matching.length} candidate(s) idle for more than ${days} days to "${toStatus}"?`,
+      async () => {
+        if (vacancyId())
+          await candidateService.batchMove(vacancyId(), {
+            fromStatus,
+            toStatus,
+            daysSinceApplied: days,
+          })
+        else
+          await moveIds(
+            matching.map((candidate) => candidate.id),
+            toStatus,
+          )
+        fetchCandidates()
+      },
+    )
   }
 
   function handleSoftDeleteAll(status: ApplicationStatus): void {

@@ -19,8 +19,7 @@ const router = useRouter()
 const candidateStore = useCandidateStore()
 
 const latestTelegramApplication = computed(
-  () =>
-    candidateStore.myApplications.find((app) => app.prescanToken || app.telegramCode) ?? null,
+  () => candidateStore.myApplications.find((app) => app.prescanToken || app.telegramCode) ?? null,
 )
 
 onMounted(() => candidateStore.fetchMyApplications())

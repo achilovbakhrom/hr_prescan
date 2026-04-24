@@ -33,9 +33,7 @@ def build_candidate_profile_cv_snapshot(*, candidate: User | None) -> dict | Non
             {"language": item.language.name, "level": item.get_proficiency_display()}
             for item in profile.languages.all()
         ],
-        "certifications": [
-            item.name for item in profile.certifications.all() if item.name
-        ],
+        "certifications": [item.name for item in profile.certifications.all() if item.name],
         "summary": profile.summary or profile.headline,
         "content_language": candidate.language or "en",
     }

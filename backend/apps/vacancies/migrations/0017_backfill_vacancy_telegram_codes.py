@@ -14,9 +14,7 @@ def _next_code(existing_codes: set[int]) -> int:
 
 def backfill_telegram_codes(apps, schema_editor):
     Vacancy = apps.get_model("vacancies", "Vacancy")
-    existing_codes = set(
-        Vacancy.objects.exclude(telegram_code__isnull=True).values_list("telegram_code", flat=True)
-    )
+    existing_codes = set(Vacancy.objects.exclude(telegram_code__isnull=True).values_list("telegram_code", flat=True))
 
     vacancies = Vacancy.objects.filter(telegram_code__isnull=True).only("id", "telegram_code")
     for vacancy in vacancies.iterator():

@@ -35,7 +35,9 @@ def _snapshot_text(user, profile, data):
         if item["description"]:
             lines.append(item["description"])
     for item in data["education"]:
-        lines.extend(["", "Education", f"{item['degree']} {item['field']} at {item['institution']} {item['year']}".strip()])
+        lines.extend(
+            ["", "Education", f"{item['degree']} {item['field']} at {item['institution']} {item['year']}".strip()]
+        )
     return "\n".join(line for line in lines if line)
 
 
@@ -88,7 +90,16 @@ def backfill_profile_resume_snapshots(apps, schema_editor):
             "summary": profile.summary or profile.headline,
             "content_language": application.candidate.language or "en",
         }
-        if not any([data["summary"], data["skills"], data["experience"], data["education"], data["languages"], data["certifications"]]):
+        if not any(
+            [
+                data["summary"],
+                data["skills"],
+                data["experience"],
+                data["education"],
+                data["languages"],
+                data["certifications"],
+            ]
+        ):
             continue
         application.cv_parsed_text = _snapshot_text(application.candidate, profile, data)[:50000]
         application.cv_parsed_data = data

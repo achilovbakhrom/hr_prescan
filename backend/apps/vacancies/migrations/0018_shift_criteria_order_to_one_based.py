@@ -4,11 +4,7 @@ from django.db.models import F, Min
 
 def shift_zero_based_criteria_order(apps, schema_editor):
     VacancyCriteria = apps.get_model("vacancies", "VacancyCriteria")
-    groups = (
-        VacancyCriteria.objects.values("vacancy_id", "step")
-        .annotate(min_order=Min("order"))
-        .filter(min_order=0)
-    )
+    groups = VacancyCriteria.objects.values("vacancy_id", "step").annotate(min_order=Min("order")).filter(min_order=0)
 
     for group in groups.iterator():
         VacancyCriteria.objects.filter(
