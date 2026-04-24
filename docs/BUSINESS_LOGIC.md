@@ -210,7 +210,7 @@ Candidates can apply via two surfaces: the **web app** (public job board) and th
 
 1. Candidate finds a vacancy (public job board or direct link)
 2. Candidate fills in personal details (name, email, phone). No account required.
-3. Candidate uploads CV/resume (optional but recommended; PDF, DOCX supported). If an authenticated candidate does not upload a CV for this application and has a generated CV saved on their platform profile, the application automatically reuses the active saved CV, falling back to the latest saved CV with a file.
+3. Candidate uploads CV/resume (optional but recommended; PDF, DOCX supported). If an authenticated candidate does not upload a CV for this application, the application automatically reuses the candidate's platform resume data. If the candidate also has a generated platform CV PDF, the active saved CV file is attached, falling back to the latest saved CV with a file.
 4. System creates the application and simultaneously creates a prescanning session with a unique link
    - If the candidate already has an active application for the same vacancy and email, the submission is blocked as a duplicate.
    - If the previous application for that vacancy and email is Archived or was cleared from archive, the same application row is reopened as a fresh Applied application, old active sessions are cancelled, scoring/notes are reset, and a new prescanning session is created.

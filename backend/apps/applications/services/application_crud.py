@@ -9,7 +9,11 @@ from apps.applications.services.application_reopen import (
     get_existing_application,
     reopen_application,
 )
-from apps.applications.services.cv_selection import get_candidate_platform_cv
+from apps.applications.services.cv_selection import get_candidate_platform_cv, is_candidate_platform_cv_file
+from apps.applications.services.profile_cv_snapshot import (
+    apply_candidate_profile_cv_snapshot,
+    build_candidate_profile_cv_snapshot,
+)
 from apps.common.exceptions import ApplicationError
 from apps.common.messages import (
     MSG_ALREADY_APPLIED,
@@ -48,7 +52,13 @@ def submit_application(
     if not cv_file_path:
         cv_file_path, cv_original_filename = get_candidate_platform_cv(candidate=candidate)
 
-    if vacancy.cv_required and not cv_file_path:
+    should_snapshot_profile = not cv_file_path or is_candidate_platform_cv_file(
+        candidate=candidate,
+        cv_file_path=cv_file_path,
+    )
+    profile_snapshot = build_candidate_profile_cv_snapshot(candidate=candidate) if should_snapshot_profile else None
+
+    if vacancy.cv_required and not cv_file_path and profile_snapshot is None:
         raise ApplicationError(str(MSG_CV_REQUIRED))
 
     existing = get_existing_application(vacancy=vacancy, candidate_email=candidate_email)
@@ -65,7 +75,8 @@ def submit_application(
             cv_original_filename=cv_original_filename,
             channel=channel,
         )
-        _enqueue_cv_processing(application=application, cv_file_path=cv_file_path)
+        snapshot_applied = apply_candidate_profile_cv_snapshot(application=application, snapshot=profile_snapshot)
+        _enqueue_cv_processing(application=application, cv_file_path=cv_file_path, snapshot_applied=snapshot_applied)
         return _submission_result(application=application, prescan_session=prescan_session)
 
     try:
@@ -81,7 +92,8 @@ def submit_application(
     except IntegrityError:
         raise ApplicationError(str(MSG_ALREADY_APPLIED)) from None
 
-    _enqueue_cv_processing(application=application, cv_file_path=cv_file_path)
+    snapshot_applied = apply_candidate_profile_cv_snapshot(application=application, snapshot=profile_snapshot)
+    _enqueue_cv_processing(application=application, cv_file_path=cv_file_path, snapshot_applied=snapshot_applied)
 
     # Create prescanning session immediately (always chat mode)
     prescan_session = Interview.objects.create(
@@ -96,14 +108,17 @@ def submit_application(
     return _submission_result(application=application, prescan_session=prescan_session)
 
 
-def _enqueue_cv_processing(*, application: Application, cv_file_path: str) -> None:
-    if not cv_file_path:
+def _enqueue_cv_processing(*, application: Application, cv_file_path: str, snapshot_applied: bool = False) -> None:
+    if not cv_file_path and not snapshot_applied:
         return
     from django.db import transaction
 
-    from apps.applications.tasks import process_cv
+    from apps.applications.tasks import calculate_cv_match, process_cv
 
-    transaction.on_commit(lambda: process_cv.delay(str(application.id)))
+    if cv_file_path:
+        transaction.on_commit(lambda: process_cv.delay(str(application.id)))
+    else:
+        transaction.on_commit(lambda: calculate_cv_match.delay(str(application.id)))
 
 
 def _submission_result(*, application: Application, prescan_session: Interview) -> dict:

@@ -41,6 +41,10 @@ def process_cv_text(*, application_id: UUID) -> None:
     else:
         text = file_bytes.decode("utf-8", errors="ignore")
 
+    if not text.strip() and application.cv_parsed_text:
+        logger.warning("process_cv_text: extracted no text for %s, keeping existing profile snapshot", application_id)
+        return
+
     application.cv_parsed_text = text[:50000]
     application.save(update_fields=["cv_parsed_text", "updated_at"])
     logger.info("process_cv_text: saved %d chars for application %s", len(text), application_id)
