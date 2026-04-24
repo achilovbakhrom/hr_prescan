@@ -85,6 +85,13 @@ def handle_update(update_data: dict) -> None:
 
 def _handle_text(*, client, chat_id: int, user, text: str, session: dict, lang: str) -> None:
     state = session.get("state", "")
+    if text == "/start" or text.startswith("/start "):
+        payload = text[7:].strip() if text.startswith("/start ") else ""
+        if handle_start_command(client=client, chat_id=chat_id, user=user, payload=payload, lang=lang):
+            return
+        _send_main_menu(client=client, chat_id=chat_id, lang=lang)
+        return
+
     if state in ("reg_name", "reg_phone"):
         from apps.integrations.telegram_bot.candidate.registration import handle_registration_text
 
@@ -95,13 +102,6 @@ def _handle_text(*, client, chat_id: int, user, text: str, session: dict, lang: 
         from apps.integrations.telegram_bot.candidate.prescreening import handle_prescreening_text
 
         handle_prescreening_text(client=client, chat_id=chat_id, user=user, text=text, session=session, lang=lang)
-        return
-
-    if text == "/start" or text.startswith("/start "):
-        payload = text[7:].strip() if text.startswith("/start ") else ""
-        if handle_start_command(client=client, chat_id=chat_id, user=user, payload=payload, lang=lang):
-            return
-        _send_main_menu(client=client, chat_id=chat_id, lang=lang)
         return
 
     if text in ("/menu", "/help"):

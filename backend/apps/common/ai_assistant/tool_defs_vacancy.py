@@ -159,8 +159,8 @@ VACANCY_TOOL_DEFINITIONS = [
         "function": {
             "name": "generate_questions",
             "description": (
-                "AI-generate competencies (skill goals) for prescanning or interview. These are NOT literal questions "
-                "— they are skills/knowledge areas the AI interviewer will evaluate candidates on through conversation."
+                "AI-generate literal candidate-facing questions for prescanning or interview. "
+                "These questions are stored and asked directly to candidates."
             ),
             "parameters": {
                 "type": "object",

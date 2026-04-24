@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.permissions import HasHRPermission, HRPermissions
+from apps.accounts.selectors import get_user_live_company_ids
 from apps.applications.selectors import get_application_by_id
 from apps.common.exceptions import ApplicationError
 from apps.common.messages import (
@@ -14,8 +15,8 @@ from apps.common.messages import (
 )
 from apps.interviews.models import Interview
 from apps.interviews.selectors import (
-    get_company_interviews,
     get_interview_by_id,
+    get_user_interviews,
 )
 from apps.interviews.serializers import (
     InterviewDetailOutputSerializer,
@@ -36,8 +37,7 @@ class HRApplicationInterviewApi(APIView):
     hr_permission = HRPermissions.MANAGE_INTERVIEWS
 
     def get(self, request: Request, application_id: str) -> Response:
-        company = request.user.company
-        if company is None:
+        if not get_user_live_company_ids(user=request.user):
             return Response(
                 {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
@@ -45,7 +45,7 @@ class HRApplicationInterviewApi(APIView):
 
         application = get_application_by_id(
             application_id=application_id,
-            company=company,
+            user=request.user,
         )
         if application is None:
             return Response(
@@ -94,8 +94,7 @@ class HRInterviewListApi(APIView):
         )
 
     def get(self, request: Request) -> Response:
-        company = request.user.company
-        if company is None:
+        if not get_user_live_company_ids(user=request.user):
             return Response(
                 {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
@@ -104,8 +103,8 @@ class HRInterviewListApi(APIView):
         filter_serializer = self.FilterSerializer(data=request.query_params)
         filter_serializer.is_valid(raise_exception=True)
 
-        interviews = get_company_interviews(
-            company=company,
+        interviews = get_user_interviews(
+            user=request.user,
             status=filter_serializer.validated_data.get("status"),
         )
 
@@ -122,8 +121,7 @@ class HRInterviewDetailApi(APIView):
     hr_permission = HRPermissions.MANAGE_INTERVIEWS
 
     def get(self, request: Request, interview_id: str) -> Response:
-        company = request.user.company
-        if company is None:
+        if not get_user_live_company_ids(user=request.user):
             return Response(
                 {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
@@ -131,7 +129,7 @@ class HRInterviewDetailApi(APIView):
 
         interview = get_interview_by_id(
             interview_id=interview_id,
-            company=company,
+            user=request.user,
         )
         if interview is None:
             return Response(
@@ -152,8 +150,7 @@ class CancelInterviewApi(APIView):
     hr_permission = HRPermissions.MANAGE_INTERVIEWS
 
     def post(self, request: Request, interview_id: str) -> Response:
-        company = request.user.company
-        if company is None:
+        if not get_user_live_company_ids(user=request.user):
             return Response(
                 {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
@@ -161,7 +158,7 @@ class CancelInterviewApi(APIView):
 
         interview = get_interview_by_id(
             interview_id=interview_id,
-            company=company,
+            user=request.user,
         )
         if interview is None:
             return Response(

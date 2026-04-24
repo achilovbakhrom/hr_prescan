@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import logging
 
-from apps.applications.services import submit_application
+from apps.applications.services import get_candidate_platform_cv, submit_application
 from apps.common.exceptions import ApplicationError
 from apps.common.messages import MSG_ALREADY_APPLIED
 from apps.integrations.telegram_bot.bots import ROLE_CANDIDATE
@@ -73,7 +73,8 @@ def confirm_apply(
         client.send_message(chat_id=chat_id, text=t("candidate.vacancy_not_found", lang=lang))
         return False
 
-    if vacancy.cv_required and not cv_file_path:
+    platform_cv_path, _ = get_candidate_platform_cv(candidate=user)
+    if vacancy.cv_required and not cv_file_path and not platform_cv_path:
         update_session(
             role=ROLE_CANDIDATE,
             telegram_id=user.telegram_id,

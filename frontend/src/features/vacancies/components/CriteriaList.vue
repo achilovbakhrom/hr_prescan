@@ -110,10 +110,10 @@ function handleSubmit(): void {
       <Column field="description" :header="t('common.description')">
         <template #body="{ data }">{{ getTranslatedDescription(data) }}</template>
       </Column>
-      <Column field="weight" header="Weight" style="width: 100px" />
-      <Column header="Default" style="width: 100px">
+      <Column field="weight" :header="t('vacancies.weight')" style="width: 100px" />
+      <Column :header="t('vacancies.default')" style="width: 100px">
         <template #body="{ data }">
-          <Tag v-if="data.isDefault" value="Default" severity="info" />
+          <Tag v-if="data.isDefault" :value="t('vacancies.default')" severity="info" />
         </template>
       </Column>
       <Column :header="t('common.actions')" style="width: 120px">
@@ -139,13 +139,13 @@ function handleSubmit(): void {
       </Column>
       <template #empty>
         <div class="py-8 text-center text-gray-500">
-          No criteria defined yet. Add evaluation criteria for this vacancy.
+          {{ t('vacancies.noCriteria') }}
         </div>
       </template>
     </DataTable>
     <Dialog
       v-model:visible="showDialog"
-      :header="isEditing ? 'Edit Criteria' : t('vacancies.addCriteria')"
+      :header="isEditing ? t('vacancies.editCriteria') : t('vacancies.addCriteria')"
       :style="{ width: '500px' }"
       modal
     >
@@ -159,14 +159,14 @@ function handleSubmit(): void {
           <InputText v-model="formDescription" class="w-full" placeholder="Brief description" />
         </div>
         <div>
-          <label class="mb-1 block text-sm font-medium">Weight</label>
+          <label class="mb-1 block text-sm font-medium">{{ t('vacancies.weight') }}</label>
           <InputNumber v-model="formWeight" class="w-full" :min="1" :max="10" />
         </div>
       </div>
       <template #footer>
         <Button :label="t('common.cancel')" severity="secondary" text @click="showDialog = false" />
         <Button
-          :label="isEditing ? t('common.save') : 'Add'"
+          :label="isEditing ? t('common.save') : t('common.add')"
           :disabled="!formName.trim()"
           @click="handleSubmit"
         />

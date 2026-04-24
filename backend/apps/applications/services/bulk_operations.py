@@ -4,8 +4,9 @@ from django.db import transaction
 from django.db.models import Q
 
 from apps.accounts.models import User
+from apps.accounts.selectors import get_user_live_company_ids
 from apps.applications.models import Application
-from apps.applications.services.application_crud import STATUS_TRANSITIONS
+from apps.applications.services.status_transitions import STATUS_TRANSITIONS
 from apps.common.exceptions import ApplicationError
 from apps.common.messages import MSG_STATUS_TRANSITION_INVALID
 
@@ -26,7 +27,7 @@ def bulk_update_status(
 
     applications = Application.objects.filter(
         id__in=application_ids,
-        vacancy__company=updated_by.company,
+        vacancy__company_id__in=get_user_live_company_ids(user=updated_by),
     ).select_related("vacancy")
 
     updated = 0
@@ -54,7 +55,7 @@ def soft_delete_applications(
 
     return Application.objects.filter(
         id__in=application_ids,
-        vacancy__company=updated_by.company,
+        vacancy__company_id__in=get_user_live_company_ids(user=updated_by),
         status=Application.Status.ARCHIVED,
     ).update(is_deleted=True, updated_at=timezone.now())
 
@@ -93,7 +94,7 @@ def bulk_move_by_filter(
 
     qs = Application.objects.filter(
         vacancy_id=vacancy_id,
-        vacancy__company=updated_by.company,
+        vacancy__company_id__in=get_user_live_company_ids(user=updated_by),
         status=from_status,
         is_deleted=False,
     )

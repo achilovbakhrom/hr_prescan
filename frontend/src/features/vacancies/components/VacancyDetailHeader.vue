@@ -4,19 +4,21 @@
  * one-directional state-transition actions (draft → published ↔ paused →
  * archived). Copy-share-link button included.
  */
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import Button from 'primevue/button'
 import GlassCard from '@/shared/components/GlassCard.vue'
 import VacancyStatusBadge from './VacancyStatusBadge.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
+import { buildCandidateTelegramBotUrl } from '@/shared/utils/telegram'
 import type { VacancyStatus } from '../types/vacancy.types'
 
 const props = defineProps<{
   title: string
   status: VacancyStatus
   shareToken?: string
+  telegramCode?: number | null
   loading: boolean
   companyName?: string | null
 }>()
@@ -27,6 +29,8 @@ const { t } = useI18n()
 const router = useRouter()
 
 const linkCopied = ref(false)
+const codeCopied = ref(false)
+const telegramUrl = computed(() => buildCandidateTelegramBotUrl(null, props.telegramCode ?? null))
 
 function copyShareLink(): void {
   if (!props.shareToken) return
@@ -35,6 +39,16 @@ function copyShareLink(): void {
     linkCopied.value = true
     setTimeout(() => {
       linkCopied.value = false
+    }, 2000)
+  })
+}
+
+function copyTelegramCode(): void {
+  if (!props.telegramCode) return
+  navigator.clipboard.writeText(String(props.telegramCode)).then(() => {
+    codeCopied.value = true
+    setTimeout(() => {
+      codeCopied.value = false
     }, 2000)
   })
 }
@@ -109,6 +123,27 @@ function copyShareLink(): void {
           size="small"
           outlined
           @click="copyShareLink"
+        />
+        <Button
+          v-if="telegramCode"
+          as="a"
+          :href="telegramUrl"
+          target="_blank"
+          rel="noopener"
+          :label="`TG ${telegramCode}`"
+          icon="pi pi-telegram"
+          severity="secondary"
+          size="small"
+          outlined
+        />
+        <Button
+          v-if="telegramCode"
+          :aria-label="codeCopied ? t('common.copied') : t('common.copy')"
+          :icon="codeCopied ? 'pi pi-check' : 'pi pi-copy'"
+          :severity="codeCopied ? 'success' : 'secondary'"
+          size="small"
+          outlined
+          @click="copyTelegramCode"
         />
       </div>
     </div>

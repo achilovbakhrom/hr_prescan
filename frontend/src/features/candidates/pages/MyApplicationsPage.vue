@@ -4,7 +4,7 @@
  * Card grid; each card = glass surface + vacancy meta + status pill + CTA.
  * Spec: docs/design/spec.md §9.
  */
-import { onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
@@ -17,6 +17,11 @@ import { ROUTE_NAMES } from '@/shared/constants/routes'
 const { t } = useI18n()
 const router = useRouter()
 const candidateStore = useCandidateStore()
+
+const latestTelegramApplication = computed(
+  () =>
+    candidateStore.myApplications.find((app) => app.prescanToken || app.telegramCode) ?? null,
+)
 
 onMounted(() => candidateStore.fetchMyApplications())
 
@@ -58,6 +63,8 @@ function browseJobs(): void {
     </p>
 
     <CandidateTelegramShortcut
+      :prescan-token="latestTelegramApplication?.prescanToken ?? null"
+      :telegram-code="latestTelegramApplication?.telegramCode ?? null"
       :title="t('candidates.myApplication.telegramTitle')"
       :hint="t('candidates.myApplication.telegramHint')"
       :open-label="t('candidates.application.openInTelegram')"

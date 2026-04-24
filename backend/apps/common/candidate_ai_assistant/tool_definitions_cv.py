@@ -1,3 +1,10 @@
+from apps.common.candidate_ai_assistant.tool_schemas_cv import (
+    CERTIFICATION_ITEM_SCHEMA,
+    EDUCATION_ITEM_SCHEMA,
+    LANGUAGE_ITEM_SCHEMA,
+    WORK_EXPERIENCE_ITEM_SCHEMA,
+)
+
 CV_TOOL_DEFINITIONS = [
     {
         "type": "function",
@@ -115,6 +122,7 @@ CV_TOOL_DEFINITIONS = [
                             "Array of {company_name, position, employment_type, location, "
                             "start_date (YYYY-MM-DD), end_date (YYYY-MM-DD or null), is_current, description}"
                         ),
+                        "items": WORK_EXPERIENCE_ITEM_SCHEMA,
                     },
                     "educations": {
                         "type": "array",
@@ -122,20 +130,24 @@ CV_TOOL_DEFINITIONS = [
                             "Array of {institution, degree, field_of_study, "
                             "start_date (YYYY-MM-DD), end_date (YYYY-MM-DD), description}"
                         ),
+                        "items": EDUCATION_ITEM_SCHEMA,
                     },
                     "skills": {
                         "type": "array",
                         "description": "Flat array of skill names as strings",
+                        "items": {"type": "string"},
                     },
                     "languages": {
                         "type": "array",
                         "description": (
                             "Array of {language: name, proficiency: beginner|intermediate|advanced|native}"
                         ),
+                        "items": LANGUAGE_ITEM_SCHEMA,
                     },
                     "certifications": {
                         "type": "array",
                         "description": "Array of {name, issuing_organization, issue_date (YYYY-MM-DD)}",
+                        "items": CERTIFICATION_ITEM_SCHEMA,
                     },
                 },
             },

@@ -2,7 +2,8 @@ from uuid import UUID
 
 from django.db.models import QuerySet
 
-from apps.accounts.models import Company
+from apps.accounts.models import Company, User
+from apps.accounts.selectors import get_user_live_company_ids
 from apps.interviews.models import Interview, InterviewIntegrityFlag, InterviewScore
 
 
@@ -22,19 +23,40 @@ def get_company_interviews(
     return qs
 
 
+def get_user_interviews(
+    *,
+    user: User,
+    status: str | None = None,
+) -> QuerySet[Interview]:
+    """Return interviews across every non-deleted company the user belongs to."""
+    qs = Interview.objects.filter(
+        application__vacancy__company_id__in=get_user_live_company_ids(user=user),
+    ).select_related(
+        "application",
+        "application__vacancy",
+        "application__candidate",
+    )
+    if status:
+        qs = qs.filter(status=status)
+    return qs
+
+
 def get_interview_by_id(
     *,
     interview_id: UUID,
     company: Company | None = None,
+    user: User | None = None,
 ) -> Interview | None:
-    """Get a single interview, optionally scoped to a company."""
+    """Get a single interview, scoped to a company or any company the user belongs to."""
     qs = Interview.objects.select_related(
         "application",
         "application__vacancy",
         "application__vacancy__company",
         "application__candidate",
     )
-    if company:
+    if user:
+        qs = qs.filter(application__vacancy__company_id__in=get_user_live_company_ids(user=user))
+    elif company:
         qs = qs.filter(application__vacancy__company=company)
     return qs.filter(id=interview_id).first()
 
@@ -96,13 +118,16 @@ def get_integrity_flags(
     *,
     interview_id: UUID,
     company: Company | None = None,
+    user: User | None = None,
 ) -> QuerySet[InterviewIntegrityFlag] | None:
-    """Return integrity flags for an interview by ID, optionally scoped to a company.
+    """Return integrity flags for an interview by ID, scoped to a company or user.
 
-    Returns None if the interview does not exist (or does not belong to the company).
+    Returns None if the interview does not exist or is out of scope.
     """
     interview_qs = Interview.objects.filter(id=interview_id)
-    if company:
+    if user:
+        interview_qs = interview_qs.filter(application__vacancy__company_id__in=get_user_live_company_ids(user=user))
+    elif company:
         interview_qs = interview_qs.filter(application__vacancy__company=company)
 
     interview = interview_qs.first()

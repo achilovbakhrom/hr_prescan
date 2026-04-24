@@ -13,6 +13,7 @@ export interface Application {
   vacancyId: string
   vacancyTitle: string
   telegramCode?: number | null
+  prescanToken?: string | null
   candidateName: string
   candidateEmail: string
   candidatePhone: string

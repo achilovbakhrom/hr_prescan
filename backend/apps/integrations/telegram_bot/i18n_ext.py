@@ -179,16 +179,16 @@ _STRINGS_EXT: dict[str, dict[str, str]] = {
     "candidate.ps_starting": {
         "en": (
             "🚀 Starting prescreening for *{title}*.\n\n"
-            "Please answer each question thoughtfully. "
+            "Please answer naturally. "
             "You can reply with text or a voice message."
         ),
         "ru": (
             "🚀 Начинаем прескрининг на вакансию *{title}*.\n\n"
-            "Отвечайте обдуманно. Можно отвечать текстом или голосовым сообщением."
+            "Отвечайте естественно. Можно отвечать текстом или голосовым сообщением."
         ),
         "uz": (
             "🚀 *{title}* vakansiyasi uchun preskreeningni boshlayapmiz.\n\n"
-            "Har bir savolga o'ylab javob bering. "
+            "Tabiiy javob bering. "
             "Matn yoki ovozli xabar bilan javob berishingiz mumkin."
         ),
     },

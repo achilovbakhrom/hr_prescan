@@ -1,5 +1,6 @@
 import json
 import logging
+from typing import Any
 
 from langchain_core.tools import StructuredTool
 from pydantic import Field as PydanticField
@@ -63,6 +64,16 @@ JSON_TYPE_MAP = {
 }
 
 
+def _python_type_from_schema(schema: dict) -> type:
+    json_type = schema.get("type", "string")
+    if json_type == "array":
+        item_type = _python_type_from_schema(schema.get("items") or {"type": "string"})
+        return list[item_type]  # type: ignore[valid-type]
+    if json_type == "object":
+        return dict[str, Any]
+    return JSON_TYPE_MAP.get(json_type, str)
+
+
 def _execute_tool(*, user, name, args):
     """Execute a tool call and return result dict."""
     handler = CANDIDATE_TOOL_MAP.get(name)
@@ -93,8 +104,7 @@ def build_langchain_tools(user):
         # Build Pydantic model fields dynamically from JSON schema
         model_fields = {}
         for field_name, field_info in properties.items():
-            json_type = field_info.get("type", "string")
-            python_type = JSON_TYPE_MAP.get(json_type, str)
+            python_type = _python_type_from_schema(field_info)
             field_desc = field_info.get("description", "")
             if "enum" in field_info:
                 field_desc += f" Options: {', '.join(field_info['enum'])}"
@@ -106,7 +116,7 @@ def build_langchain_tools(user):
                 )
             else:
                 model_fields[field_name] = (
-                    python_type | None,
+                    python_type,
                     PydanticField(default=None, description=field_desc),
                 )
 

@@ -5,12 +5,8 @@ from django.db.models import Count, F, Q, QuerySet
 from django.db.models.functions import Greatest
 
 from apps.accounts.models import Company, User
+from apps.accounts.selectors import get_user_live_company_ids
 from apps.vacancies.models import InterviewQuestion, Vacancy, VacancyCriteria
-
-
-def _user_live_company_ids(user: User) -> list:
-    return list(user.memberships.filter(company__is_deleted=False).values_list("company_id", flat=True))
-
 
 _VACANCY_COUNTERS = {
     "criteria_count": Count("criteria"),
@@ -70,7 +66,7 @@ def get_user_vacancies(
 ) -> QuerySet[Vacancy]:
     """Return vacancies across every non-deleted company the user belongs to."""
     return _apply_vacancy_filters(
-        Vacancy.objects.filter(company_id__in=_user_live_company_ids(user)),
+        Vacancy.objects.filter(company_id__in=get_user_live_company_ids(user=user)),
         status=status,
         include_deleted=include_deleted,
     )
@@ -88,7 +84,7 @@ def get_user_vacancy_by_id(*, vacancy_id: UUID, user: User) -> Vacancy | None:
     """Get a vacancy by ID, scoped to any company the user belongs to."""
     return (
         Vacancy.objects.select_related("company", "created_by")
-        .filter(id=vacancy_id, is_deleted=False, company_id__in=_user_live_company_ids(user))
+        .filter(id=vacancy_id, is_deleted=False, company_id__in=get_user_live_company_ids(user=user))
         .first()
     )
 

@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.permissions import HasHRPermission, HRPermissions
+from apps.accounts.selectors import get_user_live_company_ids
 from apps.common.messages import (
     MSG_INTERVIEW_NOT_FOUND,
     MSG_NO_RECORDING,
@@ -26,8 +27,7 @@ class InterviewTranscriptApi(APIView):
     hr_permission = HRPermissions.MANAGE_INTERVIEWS
 
     def get(self, request: Request, interview_id: str) -> Response:
-        company = request.user.company
-        if company is None:
+        if not get_user_live_company_ids(user=request.user):
             return Response(
                 {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
@@ -35,7 +35,7 @@ class InterviewTranscriptApi(APIView):
 
         interview = get_interview_by_id(
             interview_id=interview_id,
-            company=company,
+            user=request.user,
         )
         if interview is None:
             return Response(
@@ -65,8 +65,7 @@ class InterviewRecordingApi(APIView):
     hr_permission = HRPermissions.MANAGE_INTERVIEWS
 
     def get(self, request: Request, interview_id: str) -> Response:
-        company = request.user.company
-        if company is None:
+        if not get_user_live_company_ids(user=request.user):
             return Response(
                 {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
@@ -74,7 +73,7 @@ class InterviewRecordingApi(APIView):
 
         interview = get_interview_by_id(
             interview_id=interview_id,
-            company=company,
+            user=request.user,
         )
         if interview is None:
             return Response(
@@ -115,14 +114,13 @@ class IntegrityFlagsApi(APIView):
     hr_permission = HRPermissions.MANAGE_INTERVIEWS
 
     def get(self, request: Request, interview_id: str) -> Response:
-        company = request.user.company
-        if company is None:
+        if not get_user_live_company_ids(user=request.user):
             return Response(
                 {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        flags = get_integrity_flags(interview_id=interview_id, company=company)
+        flags = get_integrity_flags(interview_id=interview_id, user=request.user)
         if flags is None:
             return Response(
                 {"detail": str(MSG_INTERVIEW_NOT_FOUND)},

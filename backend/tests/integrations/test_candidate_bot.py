@@ -12,7 +12,8 @@ from apps.integrations.models import TelegramLinkCode
 from apps.integrations.telegram_bot.bots import ROLE_CANDIDATE
 from apps.integrations.telegram_bot.candidate.auth import get_or_create_candidate_user
 from apps.integrations.telegram_bot.candidate.handlers import handle_update
-from apps.integrations.telegram_bot.sessions import clear_session, get_session
+from apps.integrations.telegram_bot.candidate.states import SK_VACANCY_ID, STATE_PS_CODE
+from apps.integrations.telegram_bot.sessions import clear_session, get_session, update_session
 from apps.interviews.models import Interview
 
 TG_USER = {
@@ -168,6 +169,48 @@ class TestStartCommand:
         tg_user = User.objects.get(telegram_id=TG_USER["id"])
         assert application.candidate == tg_user
         assert interview.status == Interview.Status.IN_PROGRESS
+        session = get_session(role=ROLE_CANDIDATE, telegram_id=TG_USER["id"])
+        assert session.get(SK_VACANCY_ID) == str(vacancy.id)
+
+    def test_start_with_prescan_token_overrides_code_prompt_state(self, vacancy):
+        user = get_or_create_candidate_user(
+            telegram_id=TG_USER["id"],
+            telegram_username=TG_USER["username"],
+            first_name=TG_USER["first_name"],
+            last_name=TG_USER["last_name"],
+        )
+        application = Application.objects.create(
+            vacancy=vacancy,
+            candidate=user,
+            candidate_name="Alex Tester",
+            candidate_email=user.email,
+        )
+        interview = Interview.objects.create(
+            application=application,
+            session_type=Interview.SessionType.PRESCANNING,
+            screening_mode=Interview.ScreeningMode.CHAT,
+            status=Interview.Status.PENDING,
+            language="en",
+        )
+        update_session(role=ROLE_CANDIDATE, telegram_id=TG_USER["id"], state=STATE_PS_CODE)
+
+        with (
+            patch(
+                "apps.integrations.telegram_bot.client.requests.post",
+            ) as post_mock,
+            patch(
+                "apps.integrations.telegram_bot.client.requests.get",
+            ),
+        ):
+            post_mock.return_value.json.return_value = {"ok": True, "result": {}}
+            handle_update(_make_message_update(f"/start ps_{interview.interview_token}"))
+
+        interview.refresh_from_db()
+        assert interview.status == Interview.Status.IN_PROGRESS
+        session = get_session(role=ROLE_CANDIDATE, telegram_id=TG_USER["id"])
+        assert session.get(SK_VACANCY_ID) == str(vacancy.id)
+        sent_text = "".join(str(call.kwargs.get("json", {}).get("text", "")) for call in post_mock.call_args_list)
+        assert "6-digit" not in sent_text
 
     def test_start_with_link_token_requires_confirmation_without_autosignup(self, candidate_user):
         link = TelegramLinkCode.generate(user=candidate_user)

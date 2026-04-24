@@ -1,8 +1,6 @@
 from apps.applications.services.application_crud import (
-    STATUS_TRANSITIONS,
     create_interview_session,
     submit_application,
-    update_application_status,
 )
 from apps.applications.services.bulk_operations import (
     add_hr_note,
@@ -16,11 +14,13 @@ from apps.applications.services.cv_processing import (
     calculate_match_score,
     process_cv_text,
 )
+from apps.applications.services.cv_selection import get_candidate_platform_cv
 from apps.applications.services.s3_utils import (
     _get_s3_client,
     generate_cv_download_url,
     upload_cv_to_s3,
 )
+from apps.applications.services.status_transitions import STATUS_TRANSITIONS, update_application_status
 
 # Backward-compatible alias for the old private name
 _STATUS_TRANSITIONS = STATUS_TRANSITIONS
@@ -41,6 +41,7 @@ __all__ = [
     "calculate_match_score",
     "create_interview_session",
     "generate_cv_download_url",
+    "get_candidate_platform_cv",
     "process_cv_text",
     "soft_delete_applications",
     "submit_application",

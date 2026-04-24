@@ -169,7 +169,6 @@ def start_interview_submission(*, client, chat_id: int, user, session: dict, lan
         chat_id=chat_id,
         user=user,
         interview=result["prescan_session"],
-        questions=questions,
         vacancy_title=vacancy.title if vacancy else "",
         lang=lang,
     )

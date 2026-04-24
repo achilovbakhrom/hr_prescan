@@ -130,6 +130,7 @@ async function handleBatchTranslate(
         :title="vacancy.title"
         :status="vacancy.status"
         :share-token="vacancy.shareToken"
+        :telegram-code="vacancy.telegramCode"
         :company-name="vacancy.companyName"
         :loading="vacancyStore.loading"
         @status-change="handleStatusChange"

@@ -169,7 +169,7 @@ Each vacancy has a two-step AI screening pipeline. HR configures each step durin
 - **Mode:** Always chat — AI converses with the candidate via real-time text messaging in the browser
 - **Purpose:** Quick initial screening to filter out clearly unqualified candidates
 - **Configuration:**
-  - Questions — AI-generated based on vacancy, HR can review/edit/add/remove
+  - Questions — literal candidate-facing questions AI-generated based on the vacancy, which HR can review/edit/add/remove
   - Evaluation criteria — fixed categories + custom HR-defined criteria (see 7.5)
   - Additional prompt — free-text field where HR writes any instructions for the AI agent (e.g., "Focus on communication skills", "Be lenient with junior candidates")
 - No camera or microphone required
@@ -182,7 +182,7 @@ Each vacancy has a two-step AI screening pipeline. HR configures each step durin
 - **Purpose:** Deeper, more rigorous AI evaluation for candidates who passed prescanning
 - **To enable:** HR must configure questions and evaluation criteria for the interview step
 - **Configuration:**
-  - Questions — own set, separate from prescanning questions; tougher and more domain-specific
+  - Questions — own set of literal candidate-facing questions, separate from prescanning questions; tougher and more domain-specific
   - Evaluation criteria — own set, separate from prescanning criteria
   - Additional prompt — free-text field for HR instructions (e.g., "Be strict about technical knowledge", "Test system design thinking")
   - Mode — Chat or Meet
@@ -210,8 +210,10 @@ Candidates can apply via two surfaces: the **web app** (public job board) and th
 
 1. Candidate finds a vacancy (public job board or direct link)
 2. Candidate fills in personal details (name, email, phone). No account required.
-3. Candidate uploads CV/resume (optional but recommended; PDF, DOCX supported)
+3. Candidate uploads CV/resume (optional but recommended; PDF, DOCX supported). If an authenticated candidate does not upload a CV for this application and has a generated CV saved on their platform profile, the application automatically reuses the active saved CV, falling back to the latest saved CV with a file.
 4. System creates the application and simultaneously creates a prescanning session with a unique link
+   - If the candidate already has an active application for the same vacancy and email, the submission is blocked as a duplicate.
+   - If the previous application for that vacancy and email is Archived or was cleared from archive, the same application row is reopened as a fresh Applied application, old active sessions are cancelled, scoring/notes are reset, and a new prescanning session is created.
 5. Candidate sees a post-apply screen with two options:
    - **"Start Prescanning Now"** — opens the prescanning chat immediately
    - **"I'll do it later"** — saves the prescanning link. The link is also sent via email confirmation.
@@ -244,6 +246,7 @@ Candidates can apply via two surfaces: the **web app** (public job board) and th
   - candidate application detail screen
 - When the app knows the exact prescanning session token, the shortcut uses `https://t.me/<bot>?start=ps_<prescan_token>` so the candidate resumes the same application session inside Telegram.
 - When only the vacancy's `telegram_code` is known, the shortcut falls back to `https://t.me/<bot>?start=vac_<telegram_code>` so the candidate lands in the correct vacancy flow inside Telegram.
+- Every vacancy has a unique 6-digit Telegram code. Legacy vacancies created before code generation was enforced are backfilled, candidate application list/detail APIs return both the exact prescanning token and the vacancy code when available, and the HR vacancy header shows a copyable `TG <code>` chip.
 
 ### 6.2 Telegram bot flow
 
@@ -264,13 +267,14 @@ The candidate bot lets a candidate browse entry points, apply, and complete pres
    - `onboarding_completed=False` so the web app still walks them through onboarding if they ever sign in there
 5. For vacancy deep links, the bot fetches the vacancy (must be **published + public** — private/draft/paused vacancies show "no longer available") and renders a vacancy card with `[Apply]` and `[Back]` inline buttons
 6. Candidate taps `[Apply]`:
-   - If the vacancy has `cv_required=True` and the bot has no CV on file for this user, the bot asks the candidate to send a PDF/DOCX. The pending apply is stored on the bot session, so as soon as the document arrives the apply resumes automatically.
+   - If the vacancy has `cv_required=True` and the bot has no uploaded CV in the current flow and no saved platform CV for this user, the bot asks the candidate to send a PDF/DOCX. The pending apply is stored on the bot session, so as soon as the document arrives the apply resumes automatically.
    - Otherwise the bot calls the same `submit_application` service the web flow uses (`apps/applications/services/application_crud.py`). The resulting `Application` is bound to the candidate `User`, so HR sees it identically to web applications.
 7. Bot confirms with "✅ Application submitted!" and tells the candidate they'll be DM'd when there's news.
 8. Candidate can complete prescanning inside Telegram in two ways:
    - start from the bot menu using the 6-digit vacancy code
    - open a `ps_<prescan_token>` deep link from the web flow and continue the same prescanning session in Telegram
 9. Prescanning inside Telegram is chat-based:
+   - Telegram uses the same conversational AI chat engine as web prescanning; vacancy questions are competencies for the AI to assess, not a rigid numbered questionnaire.
    - answers can be text or voice
    - the bot stores progress and can resume an in-progress Telegram prescreening session from the same deep link
 10. Outside explicit prescanning states, free-text candidate messages are routed to the candidate AI assistant so the bot can help with job search, application status, and interview-prep style requests.
@@ -332,6 +336,7 @@ Prescanning is the initial AI screening step. It is always enabled and always co
 7. Candidate sees a "Thank you" screen with a suggestion to create an account (if unauthenticated)
 8. AI evaluates the candidate and produces prescanning scores
 9. AI decides: advance to interview (if enabled) or shortlist (if interview disabled) — or reject
+   - The structured recommendation from the evaluation step is the source of truth for the final status. The live chat ending marker only signals that the session should close; if the evaluation says "not recommended" / "reject", the candidate is rejected and must not be shortlisted.
 
 ### 7.3 Step 2: Interview (optional)
 
@@ -451,6 +456,8 @@ Each step (prescanning and interview) produces its own independent set of scores
 ### 9.2 Candidate Pipeline per Vacancy
 
 Candidates are managed within the vacancy detail page via two views:
+
+- HR candidate list/detail/actions and interview review endpoints are scoped to every non-deleted company in the user's memberships, not only the currently selected/default company. This keeps vacancy detail, candidate pipeline access, and prescanning/interview data consistent for multi-company users.
 
 **Kanban Board View:**
 - Columns: Applied, Prescanned, Interviewed (if interview enabled), Shortlisted, Hired, Rejected, Archived
@@ -593,7 +600,7 @@ Expired → Applied (reactivate), Archived
 Archived → Applied (restore)
 ```
 
-**Soft delete:** Archived candidates can be permanently hidden via "Clear archive." Data is retained in the database but not shown in the UI.
+**Soft delete:** Archived candidates can be permanently hidden via "Clear archive." Data is retained in the database but not shown in the UI. If the candidate applies again to the same vacancy with the same email, the hidden application is reopened instead of creating a duplicate.
 
 ---
 

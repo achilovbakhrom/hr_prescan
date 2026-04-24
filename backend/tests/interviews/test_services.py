@@ -2,6 +2,7 @@ from decimal import Decimal
 from unittest.mock import patch
 
 from apps.applications.models import Application
+from apps.interviews.chat_service.evaluation_prompt import derive_ai_decision_from_evaluation
 from apps.interviews.models import Interview
 from apps.interviews.services import (
     cancel_interview,
@@ -32,8 +33,8 @@ class TestStartSession:
 
 
 class TestCompleteSession:
-    def test_complete_prescanning_advances_to_prescanned(self, vacancy):
-        """Completing prescanning with 'advance' decision moves app to PRESCANNED."""
+    def test_complete_prescanning_advances_to_shortlisted_when_final_step(self, vacancy):
+        """Completing prescanning with 'advance' decision shortlists if interview is disabled."""
         app = ApplicationFactory(vacancy=vacancy, status=Application.Status.APPLIED)
         session = InterviewFactory(
             application=app,
@@ -53,7 +54,7 @@ class TestCompleteSession:
         assert completed.overall_score == Decimal("7.50")
 
         app.refresh_from_db()
-        assert app.status == Application.Status.PRESCANNED
+        assert app.status == Application.Status.SHORTLISTED
 
     def test_complete_prescanning_rejects(self, vacancy):
         """Completing prescanning with 'reject' decision moves app to REJECTED."""
@@ -101,6 +102,30 @@ class TestCompleteSession:
             status=Interview.Status.PENDING,
         ).first()
         assert interview_session is not None
+
+    def test_evaluation_negative_recommendation_overrides_live_advance_marker(self):
+        """A negative evaluator recommendation must reject even if chat ended with advance."""
+        result = {
+            "overall_score": 6.0,
+            "summary": (
+                "\u041d\u0435 \u0440\u0435\u043a\u043e\u043c\u0435\u043d\u0434\u0443\u0435\u0442\u0441\u044f "
+                "\u043a \u043f\u0440\u043e\u0434\u0432\u0438\u0436\u0435\u043d\u0438\u044e. "
+                "\u041a\u0430\u043d\u0434\u0438\u0434\u0430\u0442 \u043f\u0440\u043e\u044f\u0432"
+                "\u043b\u044f\u0435\u0442 \u043d\u0438\u0437\u043a\u0438\u0439 "
+                "\u0443\u0440\u043e\u0432\u0435\u043d\u044c."
+            ),
+        }
+
+        assert derive_ai_decision_from_evaluation(result, fallback="advance") == "reject"
+
+    def test_evaluation_structured_recommendation_overrides_summary(self):
+        result = {
+            "overall_score": 6.0,
+            "summary": "Candidate has some experience but gave short answers.",
+            "recommendation": "reject",
+        }
+
+        assert derive_ai_decision_from_evaluation(result, fallback="advance") == "reject"
 
 
 class TestCancelInterview:

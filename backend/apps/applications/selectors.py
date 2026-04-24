@@ -4,6 +4,7 @@ from uuid import UUID
 from django.db.models import Q, QuerySet
 
 from apps.accounts.models import Company, User
+from apps.accounts.selectors import get_user_live_company_ids
 from apps.applications.models import Application
 from apps.vacancies.models import Vacancy
 
@@ -72,9 +73,9 @@ def get_vacancy_applications_filtered(
     return qs.order_by(ordering)
 
 
-def get_company_applications_filtered(
+def get_user_applications_filtered(
     *,
-    company: Company,
+    user: User,
     status: str | None = None,
     vacancy_id: UUID | None = None,
     min_score: Decimal | None = None,
@@ -82,7 +83,7 @@ def get_company_applications_filtered(
     ordering: str = "-created_at",
     search: str | None = None,
 ) -> QuerySet[Application]:
-    """Return filtered applications across all vacancies of a company."""
+    """Return filtered applications across every company the user belongs to."""
     allowed_orderings = {
         "-created_at",
         "created_at",
@@ -95,7 +96,10 @@ def get_company_applications_filtered(
         ordering = "-created_at"
 
     qs = (
-        Application.objects.filter(vacancy__company=company, is_deleted=False)
+        Application.objects.filter(
+            vacancy__company_id__in=get_user_live_company_ids(user=user),
+            is_deleted=False,
+        )
         .select_related("candidate", "vacancy", "vacancy__company")
         .prefetch_related("sessions")
     )
@@ -122,10 +126,13 @@ def get_application_by_id(
     *,
     application_id: UUID,
     company: Company | None = None,
+    user: User | None = None,
 ) -> Application | None:
-    """Get a single application, optionally scoped to a company via vacancy."""
+    """Get a single application, scoped to a company or any company the user belongs to."""
     qs = Application.objects.select_related("vacancy", "vacancy__company", "candidate")
-    if company:
+    if user:
+        qs = qs.filter(vacancy__company_id__in=get_user_live_company_ids(user=user))
+    elif company:
         qs = qs.filter(vacancy__company=company)
     return qs.filter(id=application_id).first()
 
@@ -139,6 +146,7 @@ def get_candidate_applications(
     return (
         Application.objects.filter(Q(candidate=candidate) | Q(candidate_email=candidate_email))
         .select_related("vacancy", "vacancy__company")
+        .prefetch_related("sessions")
         .order_by("-created_at")
     )
 

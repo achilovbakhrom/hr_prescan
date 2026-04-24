@@ -9,7 +9,7 @@ DEFAULT_CRITERIA = [
         "name": "Technical Skills",
         "description": "Relevant technical knowledge and abilities",
         "weight": 3,
-        "order": 0,
+        "order": 1,
         "translations": {
             "en": "Technical Skills: Relevant technical knowledge and abilities",
             "ru": "Технические навыки: Соответствующие технические знания и навыки",
@@ -20,7 +20,7 @@ DEFAULT_CRITERIA = [
         "name": "Communication",
         "description": "Clarity of expression and listening skills",
         "weight": 2,
-        "order": 1,
+        "order": 2,
         "translations": {
             "en": "Communication: Clarity of expression and listening skills",
             "ru": "Коммуникация: Ясность изложения и навыки слушания",
@@ -31,7 +31,7 @@ DEFAULT_CRITERIA = [
         "name": "Problem Solving",
         "description": "Analytical thinking and creative solutions",
         "weight": 3,
-        "order": 2,
+        "order": 3,
         "translations": {
             "en": "Problem Solving: Analytical thinking and creative solutions",
             "ru": "Решение проблем: Аналитическое мышление и креативные решения",
@@ -42,7 +42,7 @@ DEFAULT_CRITERIA = [
         "name": "Cultural Fit",
         "description": "Alignment with company values and team dynamics",
         "weight": 2,
-        "order": 3,
+        "order": 4,
         "translations": {
             "en": "Cultural Fit: Alignment with company values and team dynamics",
             "ru": "Соответствие культуре: Соответствие ценностям компании и динамике команды",
@@ -53,7 +53,7 @@ DEFAULT_CRITERIA = [
         "name": "Experience Relevance",
         "description": "Relevance of prior experience to the role",
         "weight": 2,
-        "order": 4,
+        "order": 5,
         "translations": {
             "en": "Experience Relevance: Relevance of prior experience to the role",
             "ru": "Релевантность опыта: Релевантность предыдущего опыта данной роли",

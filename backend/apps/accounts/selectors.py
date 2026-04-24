@@ -25,6 +25,18 @@ def get_company_by_id(*, company_id: UUID) -> Company | None:
     return Company.objects.filter(id=company_id).first()
 
 
+def get_user_live_company_ids(*, user: User) -> list[UUID]:
+    """Return IDs of non-deleted companies the user belongs to."""
+    company_ids = list(user.memberships.filter(company__is_deleted=False).values_list("company_id", flat=True))
+    if (
+        user.company_id
+        and user.company_id not in company_ids
+        and Company.objects.filter(id=user.company_id, is_deleted=False).exists()
+    ):
+        company_ids.append(user.company_id)
+    return company_ids
+
+
 def get_account_invitations(*, account_owner: User) -> QuerySet[Invitation]:
     """Return all invitations for an account (across all its companies)."""
     return (

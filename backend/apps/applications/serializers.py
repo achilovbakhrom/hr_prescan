@@ -123,6 +123,7 @@ class CandidateApplicationListOutputSerializer(serializers.ModelSerializer):
         source="vacancy.company.name",
         read_only=True,
     )
+    prescan_token = serializers.SerializerMethodField()
 
     class Meta:
         model = Application
@@ -131,10 +132,32 @@ class CandidateApplicationListOutputSerializer(serializers.ModelSerializer):
             "vacancy_title",
             "telegram_code",
             "company_name",
+            "prescan_token",
             "status",
             "created_at",
         ]
         read_only_fields = fields
+
+    def get_prescan_token(self, obj: Application) -> str | None:
+        sessions = getattr(obj, "_prefetched_objects_cache", {}).get("sessions")
+        if sessions is not None:
+            active = [
+                session
+                for session in sessions
+                if session.session_type == "prescanning" and session.status != "cancelled"
+            ]
+            if not active:
+                return None
+            latest = max(active, key=lambda session: session.created_at)
+            return str(latest.interview_token)
+
+        session = (
+            obj.sessions.filter(session_type="prescanning")
+            .exclude(status="cancelled")
+            .order_by("-created_at")
+            .first()
+        )
+        return str(session.interview_token) if session else None
 
 
 class CandidateApplicationDetailOutputSerializer(serializers.ModelSerializer):

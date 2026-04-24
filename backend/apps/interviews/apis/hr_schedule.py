@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.permissions import HasHRPermission, HRPermissions
+from apps.accounts.selectors import get_user_live_company_ids
 from apps.applications.selectors import get_application_by_id
 from apps.common.exceptions import ApplicationError
 from apps.common.messages import (
@@ -38,8 +39,7 @@ class ScheduleHumanInterviewApi(APIView):
         meeting_link = serializers.URLField(required=False, default="", allow_blank=True)
 
     def post(self, request: Request, application_id: str) -> Response:
-        company = request.user.company
-        if company is None:
+        if not get_user_live_company_ids(user=request.user):
             return Response(
                 {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
@@ -47,7 +47,7 @@ class ScheduleHumanInterviewApi(APIView):
 
         application = get_application_by_id(
             application_id=application_id,
-            company=company,
+            user=request.user,
         )
         if application is None:
             return Response(
@@ -75,8 +75,7 @@ class ObserverTokenApi(APIView):
     hr_permission = HRPermissions.MANAGE_INTERVIEWS
 
     def get(self, request: Request, interview_id: str) -> Response:
-        company = request.user.company
-        if company is None:
+        if not get_user_live_company_ids(user=request.user):
             return Response(
                 {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
@@ -84,7 +83,7 @@ class ObserverTokenApi(APIView):
 
         interview = get_interview_by_id(
             interview_id=interview_id,
-            company=company,
+            user=request.user,
         )
         if interview is None:
             return Response(
@@ -110,8 +109,7 @@ class ResetInterviewApi(APIView):
     hr_permission = HRPermissions.MANAGE_INTERVIEWS
 
     def post(self, request: Request, interview_id: str) -> Response:
-        company = request.user.company
-        if company is None:
+        if not get_user_live_company_ids(user=request.user):
             return Response(
                 {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
@@ -119,7 +117,7 @@ class ResetInterviewApi(APIView):
 
         interview = get_interview_by_id(
             interview_id=interview_id,
-            company=company,
+            user=request.user,
         )
         if interview is None:
             return Response(
@@ -148,8 +146,7 @@ class HRVoiceMessageAudioApi(APIView):
     hr_permission = HRPermissions.MANAGE_INTERVIEWS
 
     def get(self, request: Request, interview_id: str, message_index: int) -> Response:
-        company = request.user.company
-        interview = get_interview_by_id(interview_id=interview_id, company=company)
+        interview = get_interview_by_id(interview_id=interview_id, user=request.user)
         if interview is None:
             return Response(
                 {"detail": str(MSG_INTERVIEW_NOT_FOUND)},

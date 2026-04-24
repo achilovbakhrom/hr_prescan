@@ -4,8 +4,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.permissions import HasHRPermission, HRPermissions
+from apps.accounts.selectors import get_user_live_company_ids
 from apps.applications.models import Application
-from apps.applications.selectors import get_company_applications_filtered
+from apps.applications.selectors import get_user_applications_filtered
 from apps.applications.serializers import ApplicationListOutputSerializer
 from apps.common.messages import MSG_NOT_IN_COMPANY
 
@@ -47,8 +48,7 @@ class HRAllCandidatesListApi(APIView):
         search = serializers.CharField(required=False)
 
     def get(self, request: Request) -> Response:
-        company = request.user.company
-        if company is None:
+        if not get_user_live_company_ids(user=request.user):
             return Response(
                 {"detail": str(MSG_NOT_IN_COMPANY)},
                 status=status.HTTP_404_NOT_FOUND,
@@ -58,8 +58,8 @@ class HRAllCandidatesListApi(APIView):
         filter_serializer.is_valid(raise_exception=True)
         data = filter_serializer.validated_data
 
-        applications = get_company_applications_filtered(
-            company=company,
+        applications = get_user_applications_filtered(
+            user=request.user,
             status=data.get("status"),
             vacancy_id=data.get("vacancy_id"),
             ordering=data.get("ordering", "-created_at"),

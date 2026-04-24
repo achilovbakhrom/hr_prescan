@@ -17,7 +17,7 @@ LANGUAGE_NAMES = {"en": "English", "ru": "Russian", "uz": "Uzbek"}
 
 def _language_instruction(lang_code: str) -> str:
     name = LANGUAGE_NAMES.get(lang_code, "English")
-    return f"Write ALL output text (including the 'text' field of each competency) in {name}. Do not mix languages."
+    return f"Write ALL output text (including each question's 'text' field) in {name}. Do not mix languages."
 
 
 def generate_interview_questions(*, vacancy: Vacancy, step: str = ScreeningStep.PRESCANNING) -> list[InterviewQuestion]:
@@ -29,15 +29,15 @@ def generate_interview_questions(*, vacancy: Vacancy, step: str = ScreeningStep.
 
     if step == ScreeningStep.PRESCANNING:
         step_instruction = (
-            "Generate 4-7 competencies for a QUICK initial AI prescanning. "
+            "Generate 4-7 direct candidate-facing questions for a QUICK initial AI prescanning. "
             "Focus on foundational skills, basic fit, motivation, and general "
-            "qualifications the candidate must demonstrate."
+            "qualifications."
         )
     else:
         step_instruction = (
-            "Generate 7-10 competencies for a RIGOROUS AI interview. "
+            "Generate 7-10 direct candidate-facing questions for a RIGOROUS AI interview. "
             "Focus on deeper technical skills, real-world problem solving, "
-            "domain expertise, and advanced knowledge the candidate must demonstrate."
+            "domain expertise, and advanced knowledge."
         )
 
     try:
@@ -64,19 +64,18 @@ def generate_interview_questions(*, vacancy: Vacancy, step: str = ScreeningStep.
                 system_instruction=(
                     f"You are an expert HR interviewer. {step_instruction}\n\n"
                     f"{language_instruction}\n\n"
-                    "Each competency is a SKILL GOAL -- something the AI interviewer "
-                    "should evaluate the candidate on. These are NOT literal questions. "
-                    "The AI interviewer will decide how to probe each competency through "
-                    "its own follow-up questions during the conversation.\n\n"
-                    "Write each competency as a clear goal statement. Examples:\n"
-                    '- "Candidate should demonstrate proficiency with React hooks (useState, useEffect, custom hooks)"\n'
-                    '- "Candidate should show understanding of RESTful API design and best practices"\n'
-                    '- "Candidate should be able to explain their approach to handling tight deadlines"\n'
-                    '- "Candidate should demonstrate knowledge of financial reporting standards"\n\n'
-                    "Make competencies specific to the role, not generic. "
-                    "Write in natural, human-like language.\n\n"
-                    "Return JSON with a 'competencies' array. Each item has:\n"
-                    '- "text": the competency goal (1-2 sentences)\n'
+                    "Each item MUST be a literal question that can be shown directly "
+                    "to the candidate in chat. Do NOT write evaluation goals, rubric "
+                    'statements, or sentences starting like "Candidate should..." or '
+                    '"Кандидат должен...".\n\n'
+                    "Good examples:\n"
+                    '- "Can you describe a project where you used React hooks to solve a real UI problem?"\n'
+                    '- "How do you usually design and validate a REST API before implementation?"\n'
+                    '- "Tell me about a time when you had to work under a tight deadline. What did you do?"\n'
+                    '- "Какие шаги вы выполняете при проверке пропусков и регистрации номеров транспорта?"\n\n'
+                    "Make questions specific to the role, concise, natural, and answerable by a candidate.\n\n"
+                    "Return JSON with a 'questions' array. Each item has:\n"
+                    '- "text": the literal question to ask the candidate\n'
                     '- "category": one of "Hard Skill", "Soft Skill", "Domain Knowledge", "Cultural Fit"'
                 ),
                 temperature=0.8,
@@ -85,7 +84,7 @@ def generate_interview_questions(*, vacancy: Vacancy, step: str = ScreeningStep.
         )
 
         data = json.loads(response.text)
-        questions_data = data.get("competencies", data.get("questions", []))
+        questions_data = data.get("questions", [])
     except Exception as exc:
         logger.exception("Failed to generate questions with AI for vacancy %s", vacancy.id)
         raise ApplicationError(str(MSG_AI_QUESTIONS_FAILED)) from exc

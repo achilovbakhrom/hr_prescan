@@ -8,7 +8,8 @@ from django.conf import settings
 from google.genai import types
 
 from apps.common.messages import MSG_EVALUATION_MALFORMED
-from apps.interviews.chat_service._constants import _language_name, get_client
+from apps.interviews.chat_service._constants import get_client
+from apps.interviews.chat_service.evaluation_prompt import build_eval_prompt, derive_ai_decision_from_evaluation
 from apps.interviews.models import Interview, InterviewScore
 
 logger = logging.getLogger(__name__)
@@ -64,7 +65,7 @@ def evaluate_chat_interview(interview: Interview, *, ai_decision: str = "advance
 
     step_label = "prescanning" if step == Interview.SessionType.PRESCANNING else "interview"
 
-    eval_prompt = _build_eval_prompt(vacancy, criteria_json, transcript_text, step_label, interview.language)
+    eval_prompt = build_eval_prompt(vacancy, criteria_json, transcript_text, step_label, interview.language)
 
     response = client.models.generate_content(
         model=settings.GEMINI_MODEL,
@@ -104,41 +105,6 @@ def evaluate_chat_interview(interview: Interview, *, ai_decision: str = "advance
     _save_scores_and_complete(interview, result, criteria_list, ai_decision, step, complete_session)
 
 
-def _build_eval_prompt(vacancy, criteria_json: str, transcript_text: str, step_label: str, language: str) -> str:
-    """Build the evaluation prompt sent to Gemini."""
-    return f"""You are an expert HR evaluator. Analyze this {step_label} transcript and score the candidate.
-
-## Position
-{vacancy.title} at {vacancy.company.name}
-
-## Job Description
-{vacancy.description}
-
-## Requirements
-{vacancy.requirements or "Not specified"}
-
-## Evaluation Criteria
-{criteria_json}
-
-## {step_label.title()} Transcript
-{transcript_text}
-
-## Your Task
-Score the candidate on EACH criteria (1-10 scale) and provide a brief note explaining each score.
-Also provide an overall summary (2-3 sentences) and an overall weighted score (1-10).
-Write all notes and the summary in {_language_name(language)}.
-
-Respond with ONLY valid JSON in this exact format:
-{{
-  "scores": [
-    {{"criteria_id": "<uuid>", "score": 8, "notes": "Brief explanation"}},
-    ...
-  ],
-  "overall_score": 7.5,
-  "summary": "Overall assessment of the candidate in 2-3 sentences."
-}}"""
-
-
 def _save_scores_and_complete(
     interview: Interview, result: dict, criteria_list: list, ai_decision: str, step: str, complete_session
 ) -> None:
@@ -171,6 +137,7 @@ def _save_scores_and_complete(
 
     # Store translation for the original language
     interview.ai_summary_translations = {lang: summary}
+    final_decision = derive_ai_decision_from_evaluation(result, fallback=ai_decision)
 
     complete_session(
         interview=interview,
@@ -178,7 +145,7 @@ def _save_scores_and_complete(
         ai_summary=summary,
         ai_summary_translations=interview.ai_summary_translations,
         transcript=interview.chat_history or [],
-        ai_decision=ai_decision,
+        ai_decision=final_decision,
     )
 
     logger.info(
@@ -186,6 +153,6 @@ def _save_scores_and_complete(
         interview.id,
         step,
         interview.overall_score or 0,
-        ai_decision,
+        final_decision,
         len(score_objects),
     )

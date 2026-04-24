@@ -15,6 +15,7 @@ import { useCandidateStore } from '../stores/candidate.store'
 import CandidateKanban from '../components/CandidateKanban.vue'
 import CandidateListTable from '../components/CandidateListTable.vue'
 import CandidateListToolbar from '../components/CandidateListToolbar.vue'
+import { useKanbanBatchActions } from '../composables/useKanbanBatchActions'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { Application, ApplicationStatus } from '../types/candidate.types'
 
@@ -67,6 +68,12 @@ function onSearchInput(): void {
   if (searchTimeout) clearTimeout(searchTimeout)
   searchTimeout = setTimeout(fetchCandidates, 300)
 }
+
+const batchActions = useKanbanBatchActions(
+  () => candidateStore.candidates,
+  () => vacancyId.value,
+  fetchCandidates,
+)
 
 function viewDetail(candidate: Application): void {
   router.push({ name: ROUTE_NAMES.CANDIDATE_DETAIL, params: { id: candidate.id } })
@@ -177,7 +184,13 @@ function handleKanbanStatusChange(candidateId: string, status: ApplicationStatus
       v-else
       :candidates="candidateStore.candidates"
       :loading="candidateStore.loading"
+      :interview-enabled="true"
       @status-change="handleKanbanStatusChange"
+      @batch-move="batchActions.handleBatchMove"
+      @batch-move-by-score="batchActions.handleBatchMoveByScore"
+      @batch-move-no-cv="batchActions.handleBatchMoveNoCv"
+      @batch-move-by-days="batchActions.handleBatchMoveByDays"
+      @soft-delete-all="batchActions.handleSoftDeleteAll"
     />
 
     <ConfirmDialog />

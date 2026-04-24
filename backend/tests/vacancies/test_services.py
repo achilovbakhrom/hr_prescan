@@ -1,11 +1,16 @@
+from unittest.mock import patch
+
 import pytest
 
 from apps.common.exceptions import ApplicationError
 from apps.interviews.models import Interview
 from apps.vacancies.models import InterviewQuestion, ScreeningStep, Vacancy
+from apps.vacancies.serializers import VacancyDetailOutputSerializer
 from apps.vacancies.services import (
     archive_vacancy,
+    create_default_criteria,
     create_vacancy,
+    generate_interview_questions,
     pause_vacancy,
     publish_vacancy,
 )
@@ -31,6 +36,37 @@ class TestCreateVacancy:
         assert "Problem Solving" in names
         assert "Cultural Fit" in names
         assert "Experience Relevance" in names
+        assert list(criteria.order_by("order").values_list("order", flat=True)) == [1, 2, 3, 4, 5]
+        assert isinstance(vac.telegram_code, int)
+        assert 100000 <= vac.telegram_code <= 999999
+        assert VacancyDetailOutputSerializer(vac).data["telegram_code"] == vac.telegram_code
+
+
+class TestGenerateInterviewQuestions:
+    def test_generates_literal_candidate_questions(self, vacancy):
+        class FakeResponse:
+            text = (
+                '{"questions": ['
+                '{"text": "Какие шаги вы выполняете при проверке пропусков?", '
+                '"category": "Domain Knowledge"}'
+                "]}"
+            )
+
+        with patch("apps.vacancies.services.vacancy_ai.genai.Client") as client_cls:
+            client = client_cls.return_value
+            client.models.generate_content.return_value = FakeResponse()
+
+            questions = generate_interview_questions(vacancy=vacancy, step=ScreeningStep.PRESCANNING)
+
+        assert len(questions) == 1
+        assert questions[0].text == "Какие шаги вы выполняете при проверке пропусков?"
+        assert questions[0].category == "Domain Knowledge"
+        _, kwargs = client.models.generate_content.call_args
+        instruction = kwargs["config"].system_instruction
+        assert "literal question" in instruction
+        assert "Candidate should" in instruction
+        assert "Return JSON with a 'questions' array" in instruction
+        assert "Return JSON with a 'competencies' array" not in instruction
 
 
 class TestPublishVacancy:
@@ -61,6 +97,7 @@ class TestPublishVacancy:
             is_active=True,
             order=1,
         )
+        create_default_criteria(vacancy=vac, step=ScreeningStep.PRESCANNING)
         # No interview questions yet
 
         with pytest.raises(ApplicationError, match="interview questions"):

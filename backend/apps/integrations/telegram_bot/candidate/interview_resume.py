@@ -4,14 +4,11 @@ from __future__ import annotations
 
 from apps.integrations.telegram_bot.bots import ROLE_CANDIDATE
 from apps.integrations.telegram_bot.candidate.interview_flow import (
-    _complete_interview,
-    _send_question,
+    _send_last_ai_message,
     start_bot_interview,
 )
 from apps.integrations.telegram_bot.candidate.states import (
     SK_INTERVIEW_ID,
-    SK_QUESTION_COUNT,
-    SK_QUESTION_IDX,
     SK_VACANCY_ID,
     STATE_PS_INTERVIEW,
 )
@@ -61,14 +58,11 @@ def resume_bot_interview(*, client, chat_id: int, user, interview, lang: str) ->
             chat_id=chat_id,
             user=user,
             interview=interview,
-            questions=questions,
             vacancy_title=interview.application.vacancy.title,
             lang=lang,
         )
         return
 
-    history = list(interview.chat_history or [])
-    answered_count = sum(1 for message in history if message.get("role") == "user")
     update_session(
         role=ROLE_CANDIDATE,
         telegram_id=user.telegram_id,
@@ -76,8 +70,6 @@ def resume_bot_interview(*, client, chat_id: int, user, interview, lang: str) ->
         **{
             SK_VACANCY_ID: str(interview.application.vacancy_id),
             SK_INTERVIEW_ID: str(interview.id),
-            SK_QUESTION_IDX: answered_count,
-            SK_QUESTION_COUNT: len(questions),
         },
     )
 
@@ -86,21 +78,4 @@ def resume_bot_interview(*, client, chat_id: int, user, interview, lang: str) ->
         text=t("candidate.ps_resume", lang=lang, title=interview.application.vacancy.title),
         parse_mode="Markdown",
     )
-
-    last_ai_message = next((message for message in reversed(history) if message.get("role") == "ai"), None)
-    if last_ai_message and last_ai_message.get("text"):
-        client.send_message(chat_id=chat_id, text=last_ai_message["text"], parse_mode="Markdown")
-        return
-
-    if answered_count < len(questions):
-        _send_question(
-            client=client,
-            chat_id=chat_id,
-            interview=interview,
-            questions=questions,
-            idx=answered_count,
-            lang=lang,
-        )
-        return
-
-    _complete_interview(client=client, chat_id=chat_id, user=user, interview=interview, lang=lang)
+    _send_last_ai_message(client=client, chat_id=chat_id, interview=interview, lang=lang)
