@@ -17,10 +17,5 @@ def get_session_score(obj: Application, session_type: str) -> float | None:
 
 
 def get_session_token(obj: Application, session_type: str) -> str | None:
-    session = (
-        obj.sessions.filter(session_type=session_type)
-        .exclude(status="cancelled")
-        .order_by("-created_at")
-        .first()
-    )
+    session = obj.sessions.filter(session_type=session_type).exclude(status="cancelled").order_by("-created_at").first()
     return str(session.interview_token) if session else None
