@@ -94,7 +94,7 @@ const hasInterview = computed(() => props.candidate.interviewEnabled ?? false)
       <div class="py-3">
         <GlassCard>
           <MatchScoreView
-            :overall-score="candidate.matchScore"
+            :cv-match-score="candidate.matchScore"
             :match-details="candidate.matchDetails"
             :match-notes-translations="candidate.matchNotesTranslations"
             :application-id="candidate.id"

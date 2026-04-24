@@ -8,6 +8,7 @@ import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import GlassSurface from '@/shared/components/GlassSurface.vue'
 import ApplicationStatusBadge from './ApplicationStatusBadge.vue'
+import { calculateOverallScore } from '../utils/score'
 import type { Application } from '../types/candidate.types'
 
 const props = defineProps<{
@@ -36,6 +37,14 @@ const formattedDate = computed(() =>
     month: 'short',
     day: 'numeric',
     year: 'numeric',
+  }),
+)
+
+const overallScore = computed(() =>
+  calculateOverallScore({
+    cvMatchScore: props.application.matchScore,
+    prescanningScore: props.application.prescanningScore,
+    interviewScore: props.application.interviewScore,
   }),
 )
 
@@ -84,16 +93,22 @@ const ctaLabel = computed(() => {
     >
       <div class="flex flex-col">
         <span class="text-[11px] uppercase tracking-wider text-[color:var(--color-text-muted)]">
-          {{ t('candidates.matchScore') }}
+          {{ t('candidates.overallScore') }}
         </span>
         <span
-          v-if="application.matchScore !== null"
+          v-if="overallScore !== null"
           class="font-mono text-lg font-semibold text-[color:var(--color-accent-ai)]"
         >
-          {{ application.matchScore }}%
+          {{ overallScore }}%
         </span>
         <span v-else class="text-xs text-[color:var(--color-text-muted)]">
           {{ t('candidates.myApplication.cvBeingAnalyzed') }}
+        </span>
+        <span
+          v-if="application.matchScore !== null"
+          class="mt-1 text-xs text-[color:var(--color-text-secondary)]"
+        >
+          {{ t('candidates.cvScore') }}: {{ application.matchScore }}%
         </span>
       </div>
       <div class="flex flex-col items-end">

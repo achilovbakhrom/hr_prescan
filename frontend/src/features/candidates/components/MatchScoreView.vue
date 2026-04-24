@@ -2,9 +2,10 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import TranslatableText from '@/shared/components/TranslatableText.vue'
+import { calculateOverallScore, normalizeScreeningScore } from '../utils/score'
 
 const props = defineProps<{
-  overallScore: number | null
+  cvMatchScore: number | null
   matchDetails: MatchDetails | null
   matchNotesTranslations?: Record<string, string>
   applicationId?: string
@@ -22,35 +23,16 @@ interface MatchDetails {
   missing_skills?: string[]
 }
 
-const cvScore = computed(() => props.overallScore)
-const prescanningScoreNorm = computed(() => {
-  if (props.prescanningScore === null) return null
-  return Math.round(props.prescanningScore * 10) // convert 1-10 to 0-100
-})
-const interviewScoreNorm = computed(() => {
-  if (props.interviewScore === null) return null
-  return Math.round(props.interviewScore * 10) // convert 1-10 to 0-100
-})
-
-const combinedScore = computed(() => {
-  const cv = cvScore.value
-  const ps = prescanningScoreNorm.value
-  const iv = interviewScoreNorm.value
-
-  // If all three available: 30% CV, 30% prescanning, 40% interview
-  if (cv !== null && ps !== null && iv !== null) return Math.round(cv * 0.3 + ps * 0.3 + iv * 0.4)
-  // CV + prescanning: 40% CV, 60% prescanning
-  if (cv !== null && ps !== null) return Math.round(cv * 0.4 + ps * 0.6)
-  // CV + interview: 40% CV, 60% interview
-  if (cv !== null && iv !== null) return Math.round(cv * 0.4 + iv * 0.6)
-  // Prescanning + interview: 40% prescanning, 60% interview
-  if (ps !== null && iv !== null) return Math.round(ps * 0.4 + iv * 0.6)
-  // Single scores
-  if (iv !== null) return iv
-  if (ps !== null) return ps
-  if (cv !== null) return cv
-  return null
-})
+const cvScore = computed(() => props.cvMatchScore)
+const prescanningScoreNorm = computed(() => normalizeScreeningScore(props.prescanningScore))
+const interviewScoreNorm = computed(() => normalizeScreeningScore(props.interviewScore))
+const combinedScore = computed(() =>
+  calculateOverallScore({
+    cvMatchScore: props.cvMatchScore,
+    prescanningScore: props.prescanningScore,
+    interviewScore: props.interviewScore,
+  }),
+)
 
 const recommendation = computed(() => {
   if (combinedScore.value === null) return null

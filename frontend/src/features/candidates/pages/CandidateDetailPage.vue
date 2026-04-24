@@ -15,6 +15,7 @@ import CandidateActions from '../components/CandidateActions.vue'
 import CandidateScoreCard from '../components/CandidateScoreCard.vue'
 import CandidateDetailTabs from '../components/CandidateDetailTabs.vue'
 import { candidateService } from '../services/candidate.service'
+import { calculateOverallScore } from '../utils/score'
 import type { ApplicationStatus } from '../types/candidate.types'
 
 const { t } = useI18n()
@@ -33,6 +34,20 @@ const {
 const candidateId = computed(() => route.params.id as string)
 const candidate = computed(() => candidateStore.currentCandidate)
 const hasInterview = computed(() => candidate.value?.interviewEnabled ?? false)
+const effectivePrescanningScore = computed(
+  () => prescanningScore.value ?? candidate.value?.prescanningScore ?? null,
+)
+const effectiveInterviewScore = computed(
+  () => interviewScore.value ?? candidate.value?.interviewScore ?? null,
+)
+const overallScore = computed(() => {
+  if (!candidate.value) return null
+  return calculateOverallScore({
+    cvMatchScore: candidate.value.matchScore,
+    prescanningScore: effectivePrescanningScore.value,
+    interviewScore: effectiveInterviewScore.value,
+  })
+})
 
 const tabNames = computed(() => {
   const base = ['overview', 'cv', 'prescanning']
@@ -122,8 +137,8 @@ async function handleDownloadCv(): Promise<void> {
             :candidate="candidate"
             :loading="candidateStore.loading"
             :active-tab="activeTab"
-            :prescanning-score="prescanningScore"
-            :interview-score="interviewScore"
+            :prescanning-score="effectivePrescanningScore"
+            :interview-score="effectiveInterviewScore"
             :ai-summary="aiSummary"
             :ai-summary-translations="aiSummaryTranslations"
             :ai-summary-interview-id="aiSummaryInterviewId"
@@ -136,9 +151,9 @@ async function handleDownloadCv(): Promise<void> {
         <aside class="hidden lg:block">
           <div class="sticky top-4">
             <CandidateScoreCard
-              :overall-score="candidate.matchScore"
-              :prescanning-score="prescanningScore"
-              :interview-score="interviewScore"
+              :overall-score="overallScore"
+              :prescanning-score="effectivePrescanningScore"
+              :interview-score="effectiveInterviewScore"
               :cv-match-score="candidate.matchScore"
             />
           </div>

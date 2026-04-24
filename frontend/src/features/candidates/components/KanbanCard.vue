@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { calculateOverallScore } from '../utils/score'
 import type { Application } from '../types/candidate.types'
 import type { ColumnDef } from './KanbanColumn.vue'
 
@@ -27,17 +28,11 @@ function formatDate(dateStr: string): string {
 }
 
 function getOverallScore(c: Application): number | null {
-  const cv = c.matchScore != null ? Number(c.matchScore) : null
-  const ps = c.prescanningScore != null ? Number(c.prescanningScore) * 10 : null
-  const iv = c.interviewScore != null ? Number(c.interviewScore) * 10 : null
-
-  if (cv != null && ps != null && iv != null) return Math.round(cv * 0.2 + ps * 0.3 + iv * 0.5)
-  if (cv != null && ps != null) return Math.round(cv * 0.4 + ps * 0.6)
-  if (ps != null && iv != null) return Math.round(ps * 0.4 + iv * 0.6)
-  if (cv != null) return Math.round(cv)
-  if (ps != null) return Math.round(ps)
-  if (iv != null) return Math.round(iv)
-  return null
+  return calculateOverallScore({
+    cvMatchScore: c.matchScore,
+    prescanningScore: c.prescanningScore,
+    interviewScore: c.interviewScore,
+  })
 }
 
 function getScoreColor(score: number): string {

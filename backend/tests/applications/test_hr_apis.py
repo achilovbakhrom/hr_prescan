@@ -1,9 +1,12 @@
+from decimal import Decimal
+
 from rest_framework import status
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from apps.accounts.models import CompanyMembership, User
 from apps.accounts.permissions import HRPermissions
 from apps.applications.apis import (
+    CandidateApplicationListApi,
     HRAllCandidatesListApi,
     HRApplicationDetailApi,
     HRApplicationListApi,
@@ -78,6 +81,52 @@ def test_candidate_detail_api_uses_user_memberships():
 
     assert response.status_code == status.HTTP_200_OK
     assert response.data["id"] == str(application.id)
+
+
+def test_candidate_detail_api_includes_screening_scores():
+    user, second_company = _hr_user_with_two_companies()
+    vacancy = VacancyFactory(company=second_company, created_by=user)
+    application = ApplicationFactory(vacancy=vacancy, candidate_name="Jane Candidate")
+    InterviewFactory(
+        application=application,
+        session_type=Interview.SessionType.PRESCANNING,
+        status=Interview.Status.COMPLETED,
+        overall_score=Decimal("4.00"),
+    )
+    factory = APIRequestFactory()
+    request = factory.get(f"/api/hr/candidates/{application.id}/")
+    force_authenticate(request, user=user)
+
+    response = HRApplicationDetailApi.as_view()(request, application_id=str(application.id))
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data["prescanning_score"] == 4.0
+    assert response.data["interview_score"] is None
+
+
+def test_candidate_applications_api_includes_scores(vacancy, candidate_user):
+    application = ApplicationFactory(
+        vacancy=vacancy,
+        candidate=candidate_user,
+        candidate_email=candidate_user.email,
+        match_score=Decimal("85.00"),
+    )
+    InterviewFactory(
+        application=application,
+        session_type=Interview.SessionType.PRESCANNING,
+        status=Interview.Status.COMPLETED,
+        overall_score=Decimal("4.00"),
+    )
+    factory = APIRequestFactory()
+    request = factory.get("/api/candidate/applications/")
+    force_authenticate(request, user=candidate_user)
+
+    response = CandidateApplicationListApi.as_view()(request)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data[0]["match_score"] == "85.00"
+    assert response.data[0]["prescanning_score"] == 4.0
+    assert response.data[0]["interview_score"] is None
 
 
 def test_candidate_interview_api_uses_user_memberships():

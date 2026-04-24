@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ApplicationStatusBadge from './ApplicationStatusBadge.vue'
 import TranslatableText from '@/shared/components/TranslatableText.vue'
+import { calculateOverallScore, normalizeScreeningScore } from '../utils/score'
 import type { ApplicationDetail } from '../types/candidate.types'
 
 const props = defineProps<{
@@ -21,25 +22,13 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
-const overallScore = computed(() => {
-  const cv = props.candidate.matchScore
-  const ps = props.prescanningScore != null ? Math.round(props.prescanningScore * 10) : null
-  const iv = props.interviewScore != null ? Math.round(props.interviewScore * 10) : null
-
-  // If all three available: 30% CV, 30% prescanning, 40% interview
-  if (cv != null && ps != null && iv != null) return Math.round(cv * 0.3 + ps * 0.3 + iv * 0.4)
-  // CV + prescanning: 40% CV, 60% prescanning
-  if (cv != null && ps != null) return Math.round(cv * 0.4 + ps * 0.6)
-  // CV + interview: 40% CV, 60% interview
-  if (cv != null && iv != null) return Math.round(cv * 0.4 + iv * 0.6)
-  // Prescanning + interview: 40% prescanning, 60% interview
-  if (ps != null && iv != null) return Math.round(ps * 0.4 + iv * 0.6)
-  // Single scores
-  if (iv != null) return iv
-  if (ps != null) return ps
-  if (cv != null) return cv
-  return null
-})
+const overallScore = computed(() =>
+  calculateOverallScore({
+    cvMatchScore: props.candidate.matchScore,
+    prescanningScore: props.prescanningScore,
+    interviewScore: props.interviewScore,
+  }),
+)
 
 function scoreColor(score: number): string {
   if (score >= 75) return 'text-green-600'
@@ -143,7 +132,7 @@ const recommendation = computed(() => {
         <p
           v-if="props.prescanningScore != null"
           class="mt-0.5 text-base font-bold sm:mt-1 sm:text-lg"
-          :class="scoreColor(props.prescanningScore * 10)"
+          :class="scoreColor(normalizeScreeningScore(props.prescanningScore) ?? 0)"
         >
           {{ props.prescanningScore }}/10
         </p>
@@ -160,7 +149,7 @@ const recommendation = computed(() => {
         <p
           v-if="props.interviewScore != null"
           class="mt-0.5 text-base font-bold sm:mt-1 sm:text-lg"
-          :class="scoreColor(props.interviewScore * 10)"
+          :class="scoreColor(normalizeScreeningScore(props.interviewScore) ?? 0)"
         >
           {{ props.interviewScore }}/10
         </p>

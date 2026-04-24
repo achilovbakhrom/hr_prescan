@@ -13,6 +13,7 @@ import CandidateTelegramShortcut from '@/shared/components/CandidateTelegramShor
 import ApplicationStatusBadge from '../components/ApplicationStatusBadge.vue'
 import ApplicationTimeline from '../components/ApplicationTimeline.vue'
 import { useCandidateStore } from '../stores/candidate.store'
+import { calculateOverallScore } from '../utils/score'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 
 const { t } = useI18n()
@@ -22,6 +23,14 @@ const router = useRouter()
 const candidateStore = useCandidateStore()
 const applicationId = computed(() => route.params.id as string)
 const application = computed(() => candidateStore.currentApplication)
+const overallScore = computed(() => {
+  if (!application.value) return null
+  return calculateOverallScore({
+    cvMatchScore: application.value.matchScore,
+    prescanningScore: application.value.prescanningScore,
+    interviewScore: application.value.interviewScore,
+  })
+})
 
 onMounted(() => candidateStore.fetchMyApplicationDetail(applicationId.value))
 
@@ -110,15 +119,55 @@ function goBack(): void {
               {{ t('candidates.matchScore') }}
             </span>
             <p
-              v-if="application.matchScore !== null"
+              v-if="overallScore !== null"
               class="mt-2 font-mono text-5xl font-semibold leading-none tracking-tight text-[color:var(--color-accent-ai)]"
             >
-              {{ application.matchScore }}%
+              {{ overallScore }}%
             </p>
             <p v-else class="mt-2 text-sm text-[color:var(--color-text-muted)]">
               <i class="pi pi-spin pi-spinner mr-1.5"></i>
               {{ t('candidates.myApplication.cvBeingAnalyzed') }}
             </p>
+            <div
+              class="mt-5 grid grid-cols-1 gap-3 border-t border-[color:var(--color-border-soft)] pt-4 sm:grid-cols-3"
+            >
+              <div>
+                <span class="text-xs text-[color:var(--color-text-muted)]">
+                  {{ t('candidates.cvScore') }}
+                </span>
+                <p
+                  class="mt-1 font-mono text-lg font-semibold text-[color:var(--color-text-primary)]"
+                >
+                  {{ application.matchScore !== null ? `${application.matchScore}%` : '—' }}
+                </p>
+              </div>
+              <div>
+                <span class="text-xs text-[color:var(--color-text-muted)]">
+                  {{ t('candidates.prescanScore') }}
+                </span>
+                <p
+                  class="mt-1 font-mono text-lg font-semibold text-[color:var(--color-text-primary)]"
+                >
+                  {{
+                    application.prescanningScore !== null
+                      ? `${application.prescanningScore}/10`
+                      : '—'
+                  }}
+                </p>
+              </div>
+              <div>
+                <span class="text-xs text-[color:var(--color-text-muted)]">
+                  {{ t('candidates.interviewScore') }}
+                </span>
+                <p
+                  class="mt-1 font-mono text-lg font-semibold text-[color:var(--color-text-primary)]"
+                >
+                  {{
+                    application.interviewScore !== null ? `${application.interviewScore}/10` : '—'
+                  }}
+                </p>
+              </div>
+            </div>
           </GlassCard>
 
           <GlassCard :title="t('candidates.cv')">

@@ -283,6 +283,7 @@ The candidate bot lets a candidate browse entry points, apply, and complete pres
 
 - One Telegram identity = one active `User`. Bot-created placeholder candidate accounts can be merged into a later web candidate account only through a confirmed `link_<token>` flow.
 - Candidate dashboards include applications bound by candidate user ID and applications matching the candidate email, so merged Telegram applications remain visible even if their original placeholder email differs from the web email.
+- Candidate "My Applications" list/detail responses expose CV match, prescanning, and interview scores. The primary displayed score is the overall screening score from prescanning/interview when available; CV match is shown separately and only acts as a fallback before screening results exist.
 - Bot UI is **button-driven** wherever possible (Telegram inline keyboards) — free-text replies outside structured steps are routed to the candidate AI agent.
 - Bot-created users are seeded from `message.from.language_code` (en / ru / uz), then bot strings use the stored `User.language`. Authenticated web users can change the same field from the header language switcher.
 
