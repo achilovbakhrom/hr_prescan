@@ -4,8 +4,9 @@ import logging
 import os
 import time
 
-from livekit.agents import VoicePipelineAgent
-from livekit.plugins import deepgram, elevenlabs, google
+from livekit.agents import llm
+from livekit.agents.pipeline import VoicePipelineAgent
+from livekit.plugins import deepgram, elevenlabs, google, silero
 
 from context import fetch_interview_context
 from evaluator import evaluate_interview
@@ -15,6 +16,7 @@ from prompt import build_system_prompt
 logger = logging.getLogger("interview-agent")
 
 ELEVENLABS_VOICE_ID = os.environ.get("ELEVENLABS_VOICE_ID", "21m00Tcm4TlvDq8ikWAM")
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3-flash-preview")
 
 
 async def create_interview_agent(ctx) -> VoicePipelineAgent:
@@ -24,6 +26,7 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
 
     # Build system prompt
     system_prompt = build_system_prompt(context=context)
+    chat_ctx = llm.ChatContext().append(role="system", text=system_prompt)
 
     # Configure STT (Speech-to-Text)
     stt = deepgram.STT(
@@ -32,8 +35,8 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
     )
 
     # Configure LLM
-    llm = google.LLM(
-        model="gemini-3-flash-preview",
+    gemini_llm = google.LLM(
+        model=GEMINI_MODEL,
         temperature=0.7,
     )
 
@@ -44,10 +47,11 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
     )
 
     agent = VoicePipelineAgent(
+        vad=silero.VAD.load(),
         stt=stt,
-        llm=llm,
+        llm=gemini_llm,
         tts=tts,
-        chat_ctx=system_prompt,
+        chat_ctx=chat_ctx,
     )
 
     # Collect transcript entries during the interview

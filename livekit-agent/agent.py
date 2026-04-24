@@ -14,7 +14,7 @@ async def entrypoint(ctx) -> None:
     """Called when a new interview room is created."""
     logger.info("Agent joining room: %s", ctx.room.name)
     agent = await create_interview_agent(ctx)
-    await agent.start()
+    agent.start(ctx.room)
 
 
 if __name__ == "__main__":

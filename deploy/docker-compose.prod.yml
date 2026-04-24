@@ -247,6 +247,18 @@ services:
   # --- LiveKit Agent ---
   livekit-agent:
     image: ghcr.io/${GITHUB_REPOSITORY}/livekit-agent:${IMAGE_TAG:-latest}
+    environment:
+      - LIVEKIT_URL=ws://livekit:7880
+      - LIVEKIT_API_KEY=${LIVEKIT_API_KEY}
+      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET}
+      - DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-3-flash-preview}
+      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
+      - ELEVENLABS_VOICE_ID=${ELEVENLABS_VOICE_ID:-21m00Tcm4TlvDq8ikWAM}
+      - BACKEND_API_URL=http://django:8000
+      - INTERNAL_API_KEY=${INTERNAL_API_KEY}
+      - RABBITMQ_URL=amqp://${RABBITMQ_USER}:${RABBITMQ_PASS}@rabbitmq:5672//
     restart: unless-stopped
     deploy:
       resources:
