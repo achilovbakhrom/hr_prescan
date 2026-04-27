@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "apps.common",
     "apps.accounts",
     "apps.vacancies",
+    "apps.job_parser",
     "apps.applications",
     "apps.interviews",
     "apps.notifications",
@@ -120,6 +121,10 @@ CELERY_BEAT_SCHEDULE = {
     "check-expired-trials": {
         "task": "apps.subscriptions.tasks.check_expired_trials",
         "schedule": crontab(hour=0, minute=15),
+    },
+    "refresh-parsed-vacancy-actuality": {
+        "task": "apps.job_parser.tasks.refresh_parsed_vacancy_actuality",
+        "schedule": crontab(hour=1, minute=30),
     },
 }
 

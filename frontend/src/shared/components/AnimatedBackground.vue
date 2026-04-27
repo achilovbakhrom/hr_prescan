@@ -6,6 +6,7 @@ import BackgroundConstellation from './backgrounds/BackgroundConstellation.vue'
 import BackgroundVellum from './backgrounds/BackgroundVellum.vue'
 import BackgroundAurora from './backgrounds/BackgroundAurora.vue'
 import BackgroundWaves from './backgrounds/BackgroundWaves.vue'
+import BackgroundOcean from './backgrounds/BackgroundOcean.vue'
 import BackgroundRays from './backgrounds/BackgroundRays.vue'
 
 /**
@@ -24,6 +25,7 @@ const variantMap = {
   vellum: BackgroundVellum,
   aurora: BackgroundAurora,
   waves: BackgroundWaves,
+  ocean: BackgroundOcean,
   rays: BackgroundRays,
 } as const
 

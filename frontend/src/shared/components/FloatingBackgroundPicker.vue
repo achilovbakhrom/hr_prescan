@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * FloatingBackgroundPicker — fixed bottom-right control that lets users pick
- * one of 3 backgrounds (Mesh / Constellation / Vellum).
+ * one of the available animated backgrounds.
  * Dark mode was removed — theme-cycle button is gone.
  *
  * Replaces the legacy BackgroundModeSwitcher.vue popover.
@@ -28,10 +28,11 @@ interface ThumbDef {
 const THUMBS: readonly ThumbDef[] = [
   { code: 'mesh', label: 'Mesh' },
   { code: 'constellation', label: 'Constellation' },
-  { code: 'vellum', label: 'Vellum' },
+  { code: 'vellum', label: 'Sheets' },
   { code: 'aurora', label: 'Aurora' },
-  { code: 'waves', label: 'Waves' },
-  { code: 'rays', label: 'Rays' },
+  { code: 'waves', label: 'Flow' },
+  { code: 'ocean', label: 'Ocean' },
+  { code: 'rays', label: 'Planes' },
 ]
 
 const themeStore = useThemeStore()

@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
 import pytest
+from django.core.exceptions import ValidationError
 
 from apps.common.exceptions import ApplicationError
 from apps.interviews.models import Interview
@@ -40,6 +41,19 @@ class TestCreateVacancy:
         assert isinstance(vac.telegram_code, int)
         assert 100000 <= vac.telegram_code <= 999999
         assert VacancyDetailOutputSerializer(vac).data["telegram_code"] == vac.telegram_code
+
+    def test_vacancy_telegram_code_must_be_six_digits(self, company, hr_user):
+        """Telegram vacancy codes are always six-digit numeric codes."""
+        vac = Vacancy(
+            company=company,
+            created_by=hr_user,
+            title="Backend Developer",
+            description="We need a backend developer.",
+            telegram_code=12345,
+        )
+
+        with pytest.raises(ValidationError):
+            vac.full_clean()
 
 
 class TestGenerateInterviewQuestions:

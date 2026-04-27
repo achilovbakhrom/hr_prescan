@@ -1,140 +1,124 @@
 <script setup lang="ts">
 /**
- * BackgroundMesh — 5 large blurred blobs drifting on coprime timers.
- * Uses mix-blend-mode: screen in dark / multiply in light for color interplay.
- * Reduced-motion: blobs freeze at their start positions.
+ * BackgroundMesh — continuous layered color field.
+ * Replaces separate blobs with broad gradient sheets so the default background
+ * feels richer and less spotty. Motion is slow background-position drift only.
  */
 </script>
 
 <template>
   <div aria-hidden="true" class="mesh-root pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-    <div class="mesh-blob mesh-blob--a" />
-    <div class="mesh-blob mesh-blob--b" />
-    <div class="mesh-blob mesh-blob--c" />
-    <div class="mesh-blob mesh-blob--d" />
-    <div class="mesh-blob mesh-blob--e" />
+    <div class="mesh-field" />
+    <div class="mesh-sheen" />
+    <div class="mesh-grain" />
   </div>
 </template>
 
 <style scoped>
 .mesh-root {
   isolation: isolate;
-  background-color: transparent;
+  background:
+    linear-gradient(135deg, rgba(248, 250, 252, 0.86), rgba(241, 245, 249, 0.62)),
+    var(--color-surface-base);
 }
 
-.mesh-blob {
+.mesh-field,
+.mesh-sheen,
+.mesh-grain {
   position: absolute;
-  border-radius: 50%;
-  filter: blur(var(--blur-xl));
-  will-change: transform;
-  opacity: 0.45;
+  inset: -16%;
+}
+
+.mesh-field {
+  background:
+    radial-gradient(ellipse 78% 54% at 12% 18%, rgba(37, 99, 235, 0.26), transparent 68%),
+    radial-gradient(ellipse 72% 58% at 86% 24%, rgba(20, 184, 166, 0.2), transparent 68%),
+    radial-gradient(ellipse 70% 60% at 48% 88%, rgba(244, 114, 182, 0.16), transparent 70%),
+    linear-gradient(120deg, rgba(124, 92, 255, 0.12), rgba(253, 186, 116, 0.12), transparent 72%);
+  background-size:
+    120% 120%,
+    118% 118%,
+    130% 130%,
+    160% 160%;
+  filter: blur(34px) saturate(1.12);
+  opacity: 0.92;
   mix-blend-mode: multiply;
+  animation: mesh-field-drift 34s ease-in-out infinite alternate;
 }
 
-:global(.dark .mesh-blob) {
-  opacity: 0.1;
+.mesh-sheen {
+  background:
+    linear-gradient(105deg, transparent 18%, rgba(255, 255, 255, 0.38) 43%, transparent 67%),
+    linear-gradient(18deg, rgba(37, 99, 235, 0.06), transparent 48%);
+  filter: blur(20px);
+  opacity: 0.52;
+  transform: rotate(-4deg);
+  animation: mesh-sheen-drift 26s ease-in-out infinite alternate;
+}
+
+.mesh-grain {
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(15, 23, 42, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.026) 1px, transparent 1px);
+  background-size: 76px 76px;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.72), transparent 72%);
+  opacity: 0.28;
+}
+
+:global(.dark .mesh-root) {
+  background:
+    linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(2, 6, 23, 0.9)), var(--color-surface-base);
+}
+
+:global(.dark .mesh-field) {
+  opacity: 0.5;
   mix-blend-mode: screen;
+  filter: blur(42px) saturate(1.18);
 }
 
-/* -------- Blob A (blue) — 15%, 20% -------- */
-.mesh-blob--a {
-  top: 20%;
-  left: 15%;
-  width: 65vmin;
-  height: 65vmin;
-  transform: translate(-50%, -50%);
-  background: #2563eb;
-  animation: mesh-drift-a 14s ease-in-out infinite alternate;
+:global(.dark .mesh-sheen) {
+  opacity: 0.2;
 }
 
-/* -------- Blob B (ai-violet) — 75%, 30% -------- */
-.mesh-blob--b {
-  top: 30%;
-  left: 75%;
-  width: 70vmin;
-  height: 70vmin;
-  transform: translate(-50%, -50%);
-  background: #7c5cff;
-  animation: mesh-drift-b 17s ease-in-out infinite alternate;
+:global(.dark .mesh-grain) {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  opacity: 0.22;
 }
 
-/* -------- Blob C (celebrate-peach) — 50%, 55% -------- */
-.mesh-blob--c {
-  top: 55%;
-  left: 50%;
-  width: 80vmin;
-  height: 80vmin;
-  transform: translate(-50%, -50%);
-  background: #ff9b73;
-  animation: mesh-drift-c 19s ease-in-out infinite alternate;
-}
-
-/* -------- Blob D (soft-teal) — 20%, 80% -------- */
-.mesh-blob--d {
-  top: 80%;
-  left: 20%;
-  width: 55vmin;
-  height: 55vmin;
-  transform: translate(-50%, -50%);
-  background: #06b6d4;
-  animation: mesh-drift-d 21s ease-in-out infinite alternate;
-}
-
-/* -------- Blob E (soft-pink) — 85%, 75% -------- */
-.mesh-blob--e {
-  top: 75%;
-  left: 85%;
-  width: 50vmin;
-  height: 50vmin;
-  transform: translate(-50%, -50%);
-  background: #f472b6;
-  animation: mesh-drift-e 23s ease-in-out infinite alternate;
-}
-
-/* Each blob drifts −6% → +6% of viewport on both axes, no rotation. */
-@keyframes mesh-drift-a {
+@keyframes mesh-field-drift {
   0% {
-    transform: translate(calc(-50% - 6vw), calc(-50% - 6vh));
+    background-position:
+      0% 0%,
+      100% 0%,
+      50% 100%,
+      0% 50%;
+    transform: scale(1) rotate(0deg);
   }
   100% {
-    transform: translate(calc(-50% + 6vw), calc(-50% + 6vh));
+    background-position:
+      12% 8%,
+      88% 12%,
+      42% 86%,
+      100% 44%;
+    transform: scale(1.04) rotate(1.5deg);
   }
 }
-@keyframes mesh-drift-b {
+
+@keyframes mesh-sheen-drift {
   0% {
-    transform: translate(calc(-50% + 6vw), calc(-50% - 6vh));
+    transform: translateX(-3%) rotate(-4deg);
   }
   100% {
-    transform: translate(calc(-50% - 6vw), calc(-50% + 6vh));
-  }
-}
-@keyframes mesh-drift-c {
-  0% {
-    transform: translate(calc(-50% - 5vw), calc(-50% + 6vh));
-  }
-  100% {
-    transform: translate(calc(-50% + 5vw), calc(-50% - 6vh));
-  }
-}
-@keyframes mesh-drift-d {
-  0% {
-    transform: translate(calc(-50% + 6vw), calc(-50% + 4vh));
-  }
-  100% {
-    transform: translate(calc(-50% - 6vw), calc(-50% - 4vh));
-  }
-}
-@keyframes mesh-drift-e {
-  0% {
-    transform: translate(calc(-50% - 4vw), calc(-50% - 6vh));
-  }
-  100% {
-    transform: translate(calc(-50% + 4vw), calc(-50% + 6vh));
+    transform: translateX(3%) rotate(-2deg);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mesh-blob {
+  .mesh-field,
+  .mesh-sheen {
     animation: none !important;
   }
 }

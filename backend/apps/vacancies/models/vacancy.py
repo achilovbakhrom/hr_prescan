@@ -102,7 +102,7 @@ class Vacancy(BaseModel):
     is_deleted = models.BooleanField(default=False)
     keywords = models.JSONField(default=list, blank=True)  # AI-generated search keywords
     search_vector = SearchVectorField(null=True, blank=True)
-    telegram_code = models.PositiveIntegerField(unique=True, null=True, blank=True)
+    telegram_code = models.PositiveIntegerField(unique=True, blank=True)
 
     class Meta:
         app_label = "vacancies"
@@ -110,6 +110,12 @@ class Vacancy(BaseModel):
         ordering = ["-created_at"]
         indexes = [
             GinIndex(fields=["search_vector"], name="vacancy_search_vector_gin"),
+        ]
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(telegram_code__gte=100_000, telegram_code__lte=999_999),
+                name="vacancy_telegram_code_6_digits",
+            ),
         ]
 
     def save(self, *args, **kwargs):

@@ -483,11 +483,11 @@ ELEVENLABS_VOICE_ID=VEWZvLXUrFL3O7dUnBSW
 
 # === TELEGRAM — production bots only (created in Step 9) ===
 TELEGRAM_HR_BOT_TOKEN=
-TELEGRAM_HR_BOT_USERNAME=
+TELEGRAM_HR_BOT_USERNAME=hr_prescreen_ai_bot
 TELEGRAM_HR_WEBHOOK_SECRET=paste_prod_value_here
 TELEGRAM_HR_WEBHOOK_URL=https://prescreen-app.com/api/telegram/hr/webhook/
 TELEGRAM_CANDIDATE_BOT_TOKEN=
-TELEGRAM_CANDIDATE_BOT_USERNAME=
+TELEGRAM_CANDIDATE_BOT_USERNAME=candidate_preview_ai_bot
 TELEGRAM_CANDIDATE_WEBHOOK_SECRET=paste_prod_value_here
 TELEGRAM_CANDIDATE_WEBHOOK_URL=https://prescreen-app.com/api/telegram/candidate/webhook/
 
@@ -612,8 +612,8 @@ You need 4 bots total: HR and Candidate for each environment.
 |---|---|---|
 | Dev HR | `prescreen_dev_hr_bot` | dev server `TELEGRAM_HR_BOT_TOKEN` |
 | Dev Candidate | `prescreen_dev_candidate_bot` | dev server `TELEGRAM_CANDIDATE_BOT_TOKEN` |
-| Prod HR | `prescreen_hr_bot` | prod server `TELEGRAM_HR_BOT_TOKEN` |
-| Prod Candidate | `prescreen_candidate_bot` | prod server `TELEGRAM_CANDIDATE_BOT_TOKEN` |
+| Prod HR | `hr_prescreen_ai_bot` | prod server `TELEGRAM_HR_BOT_TOKEN` |
+| Prod Candidate | `candidate_preview_ai_bot` | prod server `TELEGRAM_CANDIDATE_BOT_TOKEN` |
 
 After creating bots, update the `.env` files on each server with the tokens, then restart Django:
 

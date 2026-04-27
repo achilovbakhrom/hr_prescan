@@ -135,6 +135,25 @@ HR provides the following information:
 - HR chooses visibility per vacancy
 - **External sharing** — each vacancy has a unique URL that HR can post on external platforms (LinkedIn, job boards, social media, company website). Candidates clicking the link are directed to the vacancy page on PreScan to apply
 
+### 5.2.1 External Vacancy Parsing
+
+HR can configure external parsing sources per company to collect vacancy drafts from job boards and Telegram job channels before publishing them on PreScan.
+
+- Supported source types start with HeadHunter (`hh.ru`, `hh.uz`) and Telegram job channels/messages.
+- Parsed vacancies are stored separately from internal `Vacancy` rows until HR imports them.
+- Importing a parsed vacancy creates a **Draft** and **Private** internal vacancy so HR can review, edit screening settings, add questions, and publish manually.
+- Parsed vacancies are scoped to the HR user's live company memberships and cannot be shared across tenants.
+- Actuality statuses for parsed vacancies:
+  - **Active** — seen in the latest source sync or newly ingested from Telegram.
+  - **Stale** — no longer present in the latest sync, but not confirmed closed.
+  - **Expired** — the source-provided expiration date has passed.
+  - **Closed** — the source reports the vacancy is archived/closed.
+  - **Unknown** — imported data does not contain enough actuality signals.
+  - **Imported** — HR already created an internal vacancy draft from this parsed vacancy.
+- HeadHunter sources use source API signals where available (`archived`, missing from latest sync, expiration date).
+- Telegram channel vacancies do not have a reliable official open/closed signal; they start as Active and are marked Stale by a daily TTL refresh when they have not been seen again for the source's `ttl_days` setting (default 30 days).
+- Closed or expired parsed vacancies cannot be imported.
+
 ### 5.3 Vacancy Lifecycle
 
 Vacancies follow a one-directional lifecycle. Once published, a vacancy cannot return to draft.

@@ -52,6 +52,7 @@ from apps.interviews.urls import (
 from apps.interviews.urls import (
     public_urlpatterns as interview_public_urlpatterns,
 )
+from apps.job_parser.urls import hr_urlpatterns as job_parser_hr_urlpatterns
 from apps.notifications.urls import (
     candidate_urlpatterns as notification_candidate_urlpatterns,
 )
@@ -86,6 +87,7 @@ urlpatterns = [
     path("api/hr/company/", include((hr_urlpatterns, "hr"))),
     path("api/hr/companies/", include((user_companies_urlpatterns, "hr-companies"))),
     path("api/hr/vacancies/", include((vacancy_hr_urlpatterns, "hr-vacancies"))),
+    path("api/hr/job-parser/", include((job_parser_hr_urlpatterns, "hr-job-parser"))),
     path("api/hr/vacancies/", include((application_hr_vacancy_urlpatterns, "hr-applications"))),
     path("api/hr/candidates/", include((application_hr_candidate_urlpatterns, "hr-candidates"))),
     path("api/hr/candidates/", include((interview_hr_candidate_urlpatterns, "hr-interview-schedule"))),

@@ -10,6 +10,7 @@ export type BackgroundMode =
   | 'vellum'
   | 'aurora'
   | 'waves'
+  | 'ocean'
   | 'rays'
 
 const SCHEME_KEY = 'hr_prescan_color_scheme'
@@ -23,6 +24,7 @@ const VALID_BG_MODES: readonly BackgroundMode[] = [
   'vellum',
   'aurora',
   'waves',
+  'ocean',
   'rays',
 ]
 

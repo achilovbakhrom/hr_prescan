@@ -154,9 +154,6 @@ body,
   .p-card,
   .p-panel,
   .p-dialog,
-  .p-select-overlay,
-  .p-dropdown-panel,
-  .p-multiselect-panel,
   .p-overlaypanel,
   .p-menu {
     background-color: var(--color-surface-glass-1) !important;

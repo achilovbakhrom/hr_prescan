@@ -142,9 +142,6 @@ html.dark .bg-glass-float {
 html.dark .p-card,
 html.dark .p-panel,
 html.dark .p-dialog,
-html.dark .p-select-overlay,
-html.dark .p-dropdown-panel,
-html.dark .p-multiselect-panel,
 html.dark .p-overlaypanel,
 html.dark .p-menu,
 html.dark .surface {
@@ -157,6 +154,32 @@ html.dark .surface {
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.35),
     0 8px 24px rgba(0, 0, 0, 0.5) !important;
+}
+
+html.dark .p-select-overlay,
+html.dark .p-dropdown-panel,
+html.dark .p-multiselect-overlay,
+html.dark .p-multiselect-panel,
+html.dark .p-autocomplete-overlay {
+  background: #1e293b !important;
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html.dark .p-select-list-container,
+html.dark .p-dropdown-items-wrapper,
+html.dark .p-multiselect-list-container,
+html.dark .p-multiselect-items-wrapper,
+html.dark .p-autocomplete-list-container,
+html.dark .p-select-list,
+html.dark .p-dropdown-items,
+html.dark .p-multiselect-list,
+html.dark .p-multiselect-items,
+html.dark .p-autocomplete-list {
+  background: #1e293b !important;
+  background-color: #1e293b !important;
 }
 
 /* ---- Inputs ---- */
@@ -241,7 +264,6 @@ html.dark .shadow-2xl {
 
 /* ---- Nav & sticky bars: solid dark strip, no transparency ---- */
 html.dark nav,
-html.dark header,
 html.dark .sticky {
   background-color: #0f172a !important;
   border-bottom-color: #334155 !important;

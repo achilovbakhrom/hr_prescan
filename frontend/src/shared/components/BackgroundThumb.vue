@@ -29,10 +29,11 @@ defineProps<Props>()
 
 .bg-thumb[data-kind='mesh'] {
   background:
-    radial-gradient(circle at 25% 30%, #7c5cff 0%, transparent 55%),
-    radial-gradient(circle at 70% 40%, #2563eb 0%, transparent 50%),
-    radial-gradient(circle at 50% 75%, #ff9b73 0%, transparent 55%);
-  filter: blur(3px) saturate(1.3);
+    radial-gradient(ellipse at 18% 22%, rgba(37, 99, 235, 0.7), transparent 58%),
+    radial-gradient(ellipse at 82% 30%, rgba(20, 184, 166, 0.58), transparent 58%),
+    radial-gradient(ellipse at 52% 86%, rgba(244, 114, 182, 0.5), transparent 62%),
+    linear-gradient(135deg, rgba(124, 92, 255, 0.28), rgba(253, 186, 116, 0.22));
+  filter: blur(2px) saturate(1.25);
 }
 
 .bg-thumb[data-kind='constellation'] {
@@ -48,7 +49,9 @@ defineProps<Props>()
 
 .bg-thumb[data-kind='vellum'] {
   background:
-    radial-gradient(ellipse at 50% 40%, var(--color-surface-raised), transparent 70%),
+    linear-gradient(112deg, transparent 0 28%, rgba(255, 255, 255, 0.72) 29% 33%, transparent 34%),
+    linear-gradient(112deg, transparent 0 64%, rgba(15, 23, 42, 0.12) 65% 66%, transparent 67%),
+    radial-gradient(ellipse at 18% 12%, rgba(59, 130, 246, 0.35), transparent 58%),
     linear-gradient(135deg, var(--color-surface-base), var(--color-surface-sunken));
 }
 
@@ -62,27 +65,34 @@ defineProps<Props>()
 
 .bg-thumb[data-kind='waves'] {
   background:
-    linear-gradient(180deg, transparent 50%, rgba(96, 165, 250, 0.35) 55%, transparent 60%),
-    linear-gradient(180deg, transparent 65%, rgba(196, 181, 253, 0.35) 72%, transparent 78%),
-    linear-gradient(180deg, transparent 80%, rgba(253, 186, 116, 0.35) 88%, transparent 94%),
+    linear-gradient(155deg, transparent 30%, rgba(37, 99, 235, 0.42) 31% 34%, transparent 35%),
+    linear-gradient(155deg, transparent 50%, rgba(20, 184, 166, 0.36) 51% 54%, transparent 55%),
+    linear-gradient(155deg, transparent 68%, rgba(124, 92, 255, 0.32) 69% 72%, transparent 73%),
     var(--color-surface-raised);
-  filter: blur(1.5px);
+  filter: blur(0.6px);
+}
+
+.bg-thumb[data-kind='ocean'] {
+  background:
+    linear-gradient(175deg, rgba(248, 250, 252, 0.58) 0 24%, transparent 25%),
+    linear-gradient(160deg, transparent 34%, rgba(20, 184, 166, 0.38) 35% 38%, transparent 39%),
+    linear-gradient(160deg, transparent 56%, rgba(14, 165, 233, 0.34) 57% 60%, transparent 61%),
+    radial-gradient(ellipse at 34% 62%, rgba(37, 99, 235, 0.48), transparent 52%),
+    linear-gradient(180deg, rgba(219, 234, 254, 0.84), rgba(125, 211, 252, 0.42));
+  filter: saturate(1.16);
 }
 
 .bg-thumb[data-kind='rays'] {
   background:
-    conic-gradient(
-      from 210deg at 25% 25%,
-      transparent 0deg,
-      rgba(96, 165, 250, 0.35) 25deg,
-      transparent 55deg,
-      rgba(196, 181, 253, 0.3) 95deg,
-      transparent 135deg,
-      rgba(253, 186, 116, 0.25) 180deg,
-      transparent 220deg,
-      transparent 360deg
+    repeating-linear-gradient(
+      118deg,
+      transparent 0 9px,
+      rgba(15, 23, 42, 0.12) 10px 11px,
+      transparent 12px 21px
     ),
+    linear-gradient(118deg, transparent 12%, rgba(37, 99, 235, 0.34) 25%, transparent 38%),
+    linear-gradient(118deg, transparent 46%, rgba(20, 184, 166, 0.28) 58%, transparent 72%),
     var(--color-surface-raised);
-  filter: blur(2px);
+  filter: blur(0.8px);
 }
 </style>
