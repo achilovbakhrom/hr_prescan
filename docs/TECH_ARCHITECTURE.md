@@ -422,7 +422,7 @@ The platform hosts **two independent Telegram bots** that share infrastructure b
 | Bot | Audience | Purpose |
 |---|---|---|
 | **HR bot** (`@<TELEGRAM_HR_BOT_USERNAME>`) | Recruiters | Manage vacancies, candidates, interviews via the LangChain ReAct agent (`apps.common.ai_assistant.process_ai_command`). Links existing HR/admin `User` rows via confirmed one-time deep-link tokens (`TelegramLinkCode`) or email verification codes, and can create a Telegram-first admin placeholder account for new users. Telegram-first users pick language first, persisted to `User.language`, then must create a company before other HR commands are routed; no-company prompts include a Create company inline button until the company-name entry flow starts. Confirmed web linking merges the placeholder workspace contents into the web account while preserving the web account's default company. |
-| **Candidate bot** (`@<TELEGRAM_CANDIDATE_BOT_USERNAME>`) | Job seekers | Find vacancies, apply, take prescan interview, track applications. Confirms `link_<token>` before linking an existing candidate profile, safely merges bot-created placeholder candidate accounts, and otherwise auto-creates a candidate `User` on first `/start`. |
+| **Candidate bot** (`@<TELEGRAM_CANDIDATE_BOT_USERNAME>`) | Job seekers | Find vacancies, apply, take prescan interview, track applications, and create CVs through the candidate AI assistant. Confirms `link_<token>` before linking an existing candidate profile, safely merges bot-created placeholder candidate accounts, and otherwise auto-creates a candidate `User` on first `/start`; Telegram-first candidates register with phone first, then choose a persisted bot language. |
 
 ### Code layout
 

@@ -110,8 +110,9 @@ def _create_telegram_workspace(language: str = User.Language.RU) -> tuple[User, 
         role=User.Role.ADMIN,
         is_default=True,
     )
+    placeholder.onboarding_completed = True
     placeholder.company = company
-    placeholder.save(update_fields=["company", "updated_at"])
+    placeholder.save(update_fields=["company", "onboarding_completed", "updated_at"])
     vacancy = Vacancy.objects.create(
         company=company,
         created_by=placeholder,
@@ -173,3 +174,33 @@ class TestHRDeepLinking:
         assert CompanyMembership.objects.get(user=web_admin, company=web_company).is_default is True
         assert CompanyMembership.objects.get(user=web_admin, company=telegram_company).is_default is False
         assert web_admin.company == web_company
+
+
+class TestHRLanguageSettings:
+    def test_start_for_existing_user_exposes_language_button(self):
+        _create_telegram_workspace(language=User.Language.EN)
+
+        with (
+            patch("apps.integrations.telegram_bot.client.requests.post") as post_mock,
+            patch("apps.integrations.telegram_bot.client.requests.get"),
+        ):
+            post_mock.return_value.json.return_value = {"ok": True, "result": {}}
+            handle_update(_make_message_update("/start"))
+
+        markups = [call.kwargs.get("json", {}).get("reply_markup", {}) for call in post_mock.call_args_list]
+        assert any("hr:lang:menu" in str(markup) for markup in markups)
+
+    def test_language_callback_updates_stored_language(self):
+        user, _company, _vacancy = _create_telegram_workspace(language=User.Language.EN)
+
+        with (
+            patch("apps.integrations.telegram_bot.client.requests.post") as post_mock,
+            patch("apps.integrations.telegram_bot.client.requests.get"),
+        ):
+            post_mock.return_value.json.return_value = {"ok": True, "result": {}}
+            handle_update(_make_callback_update("hr:lang:ru"))
+
+        user.refresh_from_db()
+        sent_text = " ".join(str(call.kwargs.get("json", {}).get("text", "")) for call in post_mock.call_args_list)
+        assert user.language == User.Language.RU
+        assert "Язык сохранён" in sent_text

@@ -6,6 +6,7 @@ from apps.integrations.telegram_bot.candidate.deep_links import (
     get_prescreen_interview,
     parse_deep_link_vacancy,
 )
+from apps.integrations.telegram_bot.candidate.language import set_user_language
 from apps.integrations.telegram_bot.candidate.linking import request_account_link
 from apps.integrations.telegram_bot.i18n import t
 
@@ -20,6 +21,7 @@ def handle_start_command(*, client, chat_id: int, user, payload: str, lang: str)
 
             from apps.integrations.telegram_bot.candidate.interview_resume import resume_bot_interview
 
+            lang = set_user_language(user=user, language=interview.language, fallback=lang)
             resume_bot_interview(client=client, chat_id=chat_id, user=user, interview=interview, lang=lang)
             return True
 

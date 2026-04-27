@@ -3,6 +3,8 @@
 # Registration states — used when user.phone is not yet set
 STATE_REG_NAME = "reg_name"
 STATE_REG_PHONE = "reg_phone"
+STATE_ONBOARD_PHONE = "onboard_phone"
+STATE_CV_UPLOAD = "cv_upload"
 
 # Prescreening flow states
 STATE_PS_CODE = "ps_code"  # waiting for 6-digit vacancy code
@@ -17,9 +19,11 @@ STATE_PS_INTERVIEW = "ps_interview"  # answering interview questions
 SK_VACANCY_ID = "ps_vacancy_id"
 SK_NAME = "ps_name"
 SK_PHONE = "ps_phone"
+SK_LANG = "ps_lang"
 SK_CV_PATH = "ps_cv_path"
 SK_CV_FILENAME = "ps_cv_filename"
 SK_INTERVIEW_ID = "ps_interview_id"
 SK_QUESTION_IDX = "ps_question_idx"
 SK_QUESTION_COUNT = "ps_question_count"
 SK_REG_NAME = "reg_name_value"
+SK_PENDING_START_PAYLOAD = "pending_start_payload"

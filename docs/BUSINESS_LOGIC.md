@@ -42,7 +42,7 @@ The AI agent evaluates candidates at each step and decides whether to advance th
 - No account required to apply or complete prescanning/interview
 - Account creation is optional (allows tracking application status and reusing profile across vacancies)
 - Uploads CV/resume (optional but recommended)
-- Builds and exports a CV through the candidate AI assistant (single chat surface — no separate "AI Generate CV" / "AI Chat" buttons on the CV builder)
+- Builds and exports a CV through the candidate AI assistant (single chat surface — no separate "AI Generate CV" / "AI Chat" buttons on the CV builder). If the candidate provides a date of birth in the CV profile, they must be at least 14 years old.
 - Completes AI prescanning (always via chat) after applying
 - If advanced by AI, completes AI interview (chat or meet, depending on vacancy configuration)
 - Can start prescanning immediately after applying or return later via the link
@@ -274,6 +274,9 @@ The candidate bot lets a candidate browse entry points, apply, and complete pres
    - start from the bot menu using the 6-digit vacancy code
    - open a `ps_<prescan_token>` deep link from the web flow and continue the same prescanning session in Telegram
 9. Prescanning inside Telegram is chat-based:
+   - when the candidate enters a vacancy code or opens an exact prescreening deep link, the bot UI switches to the vacancy/interview `prescanning_language` so the Telegram flow matches the language selected in the web app
+   - if the candidate has no phone number saved, the bot asks for a new phone number instead of showing an empty placeholder confirmation
+   - during the CV step, saved platform CVs are offered first (active CV first), and the candidate can either select one of them or upload a new file; optional CV steps can still be skipped
    - Telegram uses the same conversational AI chat engine as web prescanning; vacancy questions are competencies for the AI to assess, not a rigid numbered questionnaire.
    - answers can be text or voice
    - the bot stores progress and can resume an in-progress Telegram prescreening session from the same deep link
@@ -285,7 +288,9 @@ The candidate bot lets a candidate browse entry points, apply, and complete pres
 - Candidate dashboards include applications bound by candidate user ID and applications matching the candidate email, so merged Telegram applications remain visible even if their original placeholder email differs from the web email.
 - Candidate "My Applications" list/detail responses expose CV match, prescanning, and interview scores. The primary displayed score is the overall screening score from prescanning/interview when available; CV match is shown separately and only acts as a fallback before screening results exist.
 - Bot UI is **button-driven** wherever possible (Telegram inline keyboards) — free-text replies outside structured steps are routed to the candidate AI agent.
-- Bot-created users are seeded from `message.from.language_code` (en / ru / uz), then bot strings use the stored `User.language`. Authenticated web users can change the same field from the header language switcher.
+- Bot-created users are seeded from `message.from.language_code` (en / ru / uz), then bot strings use the stored `User.language`. Authenticated web users can change the same field from the header language switcher; HR and candidate Telegram bot UIs also expose a language picker that updates `User.language` for future bot replies.
+- New Telegram candidate users must register in the bot before they can use vacancy, prescreening, CV, or assistant actions. Registration asks for a phone number first using Telegram's native contact-sharing button (manual phone entry is still accepted), then asks the candidate to choose the bot language (`en` / `ru` / `uz`). The selected language is persisted to `User.language` and drives future bot replies. If the user opened a vacancy/prescreening deep link first, the bot resumes that payload after required onboarding.
+- Candidate Telegram bot menus expose direct buttons for job search, prescreening, creating a CV with the candidate AI assistant, viewing saved CVs, uploading an existing CV file, downloading generated/uploaded CV files, and changing language.
 
 ---
 

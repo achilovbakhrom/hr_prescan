@@ -17,6 +17,7 @@ from apps.integrations.telegram_bot.hr.onboarding_flow import (
     handle_company_name_reply,
     handle_onboarding_callback,
     is_onboarding_callback,
+    send_language_picker,
 )
 from apps.integrations.telegram_bot.i18n import normalize_language
 from apps.integrations.telegram_bot.voice import transcribe_voice
@@ -110,6 +111,10 @@ def handle_update(update_data: dict) -> None:
             text=hr_text("workspace_created", user=user),
             parse_mode="Markdown",
         )
+
+    if text in ("/language", "/lang"):
+        send_language_picker(client=client, chat_id=chat_id)
+        return
 
     if handle_company_name_reply(client=client, chat_id=chat_id, user=user, text=text):
         return

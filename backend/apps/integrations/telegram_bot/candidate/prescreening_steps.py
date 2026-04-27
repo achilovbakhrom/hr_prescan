@@ -11,20 +11,21 @@ from uuid import UUID
 
 from apps.common.exceptions import ApplicationError
 from apps.integrations.telegram_bot.bots import ROLE_CANDIDATE
+from apps.integrations.telegram_bot.candidate.language import set_user_language
 from apps.integrations.telegram_bot.candidate.menus import (
     confirm_name_keyboard,
     confirm_phone_keyboard,
-    cv_keyboard,
 )
 from apps.integrations.telegram_bot.candidate.states import (
     SK_CV_FILENAME,
     SK_CV_PATH,
+    SK_LANG,
     SK_NAME,
     SK_PHONE,
     SK_VACANCY_ID,
+    STATE_PS_CHANGE_PHONE,
     STATE_PS_CONFIRM_NAME,
     STATE_PS_CONFIRM_PHONE,
-    STATE_PS_CV,
 )
 from apps.integrations.telegram_bot.i18n import t
 from apps.integrations.telegram_bot.sessions import clear_session, update_session
@@ -56,12 +57,13 @@ def handle_vacancy_code(*, client, chat_id: int, user, text: str, lang: str) -> 
         client.send_message(chat_id=chat_id, text=t("candidate.ps_code_not_found", lang=lang, code=text))
         return
 
+    lang = _apply_prescreening_language(user=user, language=vacancy.prescanning_language, fallback=lang)
     name = user.full_name or ""
     update_session(
         role=ROLE_CANDIDATE,
         telegram_id=user.telegram_id,
         state=STATE_PS_CONFIRM_NAME,
-        **{SK_VACANCY_ID: str(vacancy.id), SK_NAME: name},
+        **{SK_VACANCY_ID: str(vacancy.id), SK_NAME: name, SK_LANG: lang},
     )
     client.send_message(
         chat_id=chat_id,
@@ -91,7 +93,12 @@ def handle_new_phone(*, client, chat_id: int, user, text: str, session: dict, la
 
 
 def go_to_confirm_phone(*, client, chat_id: int, user, session: dict, lang: str) -> None:
-    phone = user.phone or ""
+    phone = session.get(SK_PHONE) or user.phone or ""
+    if not phone:
+        update_session(role=ROLE_CANDIDATE, telegram_id=user.telegram_id, state=STATE_PS_CHANGE_PHONE)
+        client.send_message(chat_id=chat_id, text=t("candidate.ps_ask_new_phone", lang=lang))
+        return
+
     update_session(
         role=ROLE_CANDIDATE,
         telegram_id=user.telegram_id,
@@ -107,19 +114,9 @@ def go_to_confirm_phone(*, client, chat_id: int, user, session: dict, lang: str)
 
 
 def go_to_cv_step(*, client, chat_id: int, user, session: dict, lang: str) -> None:
-    from apps.vacancies.models import Vacancy
+    from apps.integrations.telegram_bot.candidate.prescreening_cv import go_to_cv_step as show_cv_step
 
-    vacancy = Vacancy.objects.filter(id=session.get(SK_VACANCY_ID)).first()
-    update_session(role=ROLE_CANDIDATE, telegram_id=user.telegram_id, state=STATE_PS_CV)
-    if vacancy and vacancy.cv_required:
-        client.send_message(chat_id=chat_id, text=t("candidate.ps_cv_required", lang=lang))
-    else:
-        client.send_message(
-            chat_id=chat_id,
-            text=t("candidate.ps_cv_optional", lang=lang),
-            reply_markup=cv_keyboard(lang=lang),
-            parse_mode="Markdown",
-        )
+    show_cv_step(client=client, chat_id=chat_id, user=user, session=session, lang=lang)
 
 
 def start_interview_submission(*, client, chat_id: int, user, session: dict, lang: str) -> None:
@@ -172,3 +169,7 @@ def start_interview_submission(*, client, chat_id: int, user, session: dict, lan
         vacancy_title=vacancy.title if vacancy else "",
         lang=lang,
     )
+
+
+def _apply_prescreening_language(*, user, language: str, fallback: str) -> str:
+    return set_user_language(user=user, language=language, fallback=fallback)

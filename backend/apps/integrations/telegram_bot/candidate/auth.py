@@ -109,8 +109,9 @@ def complete_registration(
     user.first_name = first_name
     user.last_name = last_name
     user.phone = phone
+    user.onboarding_completed = True
     user.set_password(password)
-    user.save(update_fields=["first_name", "last_name", "phone", "password", "updated_at"])
+    user.save(update_fields=["first_name", "last_name", "phone", "password", "onboarding_completed", "updated_at"])
 
     logger.info("Registration completed for tg_id=%s", user.telegram_id)
     return password

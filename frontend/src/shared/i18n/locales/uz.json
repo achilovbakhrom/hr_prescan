@@ -93,6 +93,7 @@
     "maxLength": "Maksimal {max} ta belgi",
     "invalidUrl": "To'g'ri URL kiriting",
     "invalidDate": "To'g'ri sana kiriting",
+    "minAge": "Yosh kamida {age} bo'lishi kerak",
     "positiveNumber": "Musbat son bo'lishi kerak",
     "salaryRange": "Maksimal maosh minimaldan katta bo'lishi kerak",
     "endDateAfterStart": "Tugash sanasi boshlanish sanasidan keyin bo'lishi kerak"
@@ -1257,6 +1258,12 @@
       "skills": "Ko'nikmalar",
       "languages": "Tillar"
     },
+    "preview": {
+      "title": "Jonli ko'rinish",
+      "yourName": "Ismingiz",
+      "headline": "Kasbiy sarlavha",
+      "empty": "Ko'rinishni ko'rish uchun ma'lumotlaringizni qo'shishni boshlang."
+    },
     "personal": {
       "headline": "Sarlavha",
       "headlinePlaceholder": "masalan, Katta Frontend dasturchi",
@@ -1419,6 +1426,7 @@
   },
   "myCvs": {
     "title": "Mening CV larim",
+    "subtitle": "Profilingiz va yaratilgan CV fayllaringiz.",
     "goToBuilder": "CV yaratish",
     "empty": "Hozircha CV lar yo'q",
     "emptyHint": "Birinchi CV ingizni yaratish va PDF generatsiya qilish uchun CV yaratish bo'limiga o'ting.",

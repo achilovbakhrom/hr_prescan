@@ -24,3 +24,13 @@ def stored_language_for_telegram(*, telegram_id: int, fallback: str = DEFAULT_LA
 def user_language(*, user: User, fallback: str = DEFAULT_LANGUAGE) -> str:
     lang = user.language or fallback
     return lang if lang in SUPPORTED_LANGUAGES else DEFAULT_LANGUAGE
+
+
+def set_user_language(*, user: User, language: str, fallback: str = DEFAULT_LANGUAGE) -> str:
+    lang = language if language in SUPPORTED_LANGUAGES else fallback
+    if lang not in SUPPORTED_LANGUAGES:
+        lang = DEFAULT_LANGUAGE
+    if user.language != lang:
+        user.language = lang
+        user.save(update_fields=["language", "updated_at"])
+    return lang

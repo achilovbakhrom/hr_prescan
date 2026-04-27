@@ -73,6 +73,7 @@ async function handleSave(): Promise<void> {
     headline: headline.value,
     summary: summary.value,
     location: location.value,
+    dateOfBirth: formatDate(dateOfBirth.value),
     linkedinUrl: linkedinUrl.value || undefined,
     githubUrl: githubUrl.value || undefined,
     websiteUrl: websiteUrl.value || undefined,

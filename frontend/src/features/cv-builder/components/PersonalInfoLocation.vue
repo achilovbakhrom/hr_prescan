@@ -15,6 +15,8 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const maxDateOfBirth = new Date()
+maxDateOfBirth.setFullYear(maxDateOfBirth.getFullYear() - 14)
 
 function hasError(field: string, errors: Record<string, string>): boolean {
   return field in errors
@@ -47,6 +49,7 @@ function hasError(field: string, errors: Record<string, string>): boolean {
         id="dateOfBirth"
         :model-value="dateOfBirth"
         dateFormat="yy-mm-dd"
+        :max-date="maxDateOfBirth"
         :placeholder="t('cvBuilder.personal.dateOfBirthPlaceholder')"
         showIcon
         class="w-full"

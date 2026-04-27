@@ -168,7 +168,7 @@ export const cvBuilderService = {
     const { data } = await apiClient.post<{ improved: string }>(`${BASE}/cv/improve-section`, {
       section,
       content,
-      jobTitle,
+      job_title: jobTitle,
     })
     return data.improved
   },

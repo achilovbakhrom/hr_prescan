@@ -23,8 +23,6 @@ function formatDate(dateStr: string): string {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
   })
 }
 
@@ -40,47 +38,72 @@ function templateLabel(template: string): string {
 
 <template>
   <div
-    class="rounded-xl border bg-white dark:bg-gray-800 p-4 transition-all"
-    :class="cv.isActive ? 'border-green-200 bg-green-50/20' : 'border-gray-200'"
+    class="rounded-lg border p-4 shadow-glass backdrop-blur-md transition-all"
+    :class="
+      cv.isActive
+        ? 'border-emerald-300/70 bg-emerald-50/70 dark:border-emerald-500/35 dark:bg-emerald-950/35'
+        : 'border-[color:var(--color-border-soft)] bg-[color:var(--color-surface-glass-1)] dark:border-white/10 dark:bg-slate-800/70'
+    "
   >
-    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <div class="flex items-center gap-3">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div class="flex min-w-0 items-start gap-3">
         <div
-          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg"
-          :class="cv.isActive ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'"
+          class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg"
+          :class="
+            cv.isActive
+              ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300'
+              : 'bg-[color:var(--color-surface-sunken)] text-[color:var(--color-text-muted)] dark:bg-white/10'
+          "
         >
           <i class="pi pi-file-pdf text-lg"></i>
         </div>
-        <div class="min-w-0">
-          <div class="flex items-center gap-2">
-            <p class="truncate font-medium text-gray-900">{{ cv.name }}</p>
+        <div class="min-w-0 flex-1">
+          <div class="flex min-w-0 flex-wrap items-center gap-2">
+            <p
+              class="min-w-0 max-w-full truncate font-semibold text-[color:var(--color-text-primary)]"
+            >
+              {{ cv.name }}
+            </p>
             <Tag
               v-if="cv.isActive"
               :value="t('myCvs.active')"
               severity="success"
-              class="!text-[10px]"
+              class="shrink-0 !text-[10px]"
             />
           </div>
-          <div class="flex flex-wrap items-center gap-2 text-xs text-gray-500">
-            <span>{{ templateLabel(cv.template) }}</span>
-            <span>&middot;</span>
-            <span>{{ formatDate(cv.createdAt) }}</span>
+          <div class="mt-2 flex flex-wrap gap-2 text-xs text-[color:var(--color-text-muted)]">
+            <span
+              class="inline-flex max-w-full items-center gap-1.5 rounded-md bg-[color:var(--color-surface-sunken)] px-2 py-1 dark:bg-white/10"
+            >
+              <i class="pi pi-file text-[10px]"></i>
+              <span class="truncate">{{ templateLabel(cv.template) }}</span>
+            </span>
+            <span
+              class="inline-flex max-w-full items-center gap-1.5 rounded-md bg-[color:var(--color-surface-sunken)] px-2 py-1 dark:bg-white/10"
+            >
+              <i class="pi pi-calendar text-[10px]"></i>
+              <span class="truncate">{{ formatDate(cv.createdAt) }}</span>
+            </span>
           </div>
         </div>
       </div>
 
-      <div class="flex items-center gap-3">
+      <div
+        class="flex items-center justify-between gap-3 border-t border-[color:var(--color-border-soft)] pt-3 dark:border-white/10 sm:border-t-0 sm:pt-0"
+      >
         <div class="flex items-center gap-2">
-          <span class="text-xs text-gray-500">{{
-            cv.isActive ? t('myCvs.active') : t('myCvs.inactive')
-          }}</span>
+          <span
+            class="max-w-28 text-right text-xs font-medium leading-tight text-[color:var(--color-text-secondary)] sm:max-w-24"
+          >
+            {{ cv.isActive ? t('myCvs.activeLabel') : t('myCvs.activate') }}
+          </span>
           <ToggleSwitch
             :modelValue="cv.isActive"
             :disabled="actionLoading === cv.id"
             @update:modelValue="emit('toggleActive', cv)"
           />
         </div>
-        <span class="h-5 w-px bg-gray-200"></span>
+        <span class="h-5 w-px bg-[color:var(--color-border-soft)] dark:bg-white/10"></span>
         <Button
           v-if="cv.downloadUrl"
           icon="pi pi-eye"

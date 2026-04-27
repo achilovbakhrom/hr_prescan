@@ -19,7 +19,7 @@ CV_TOOL_DEFINITIONS = [
                 "properties": {
                     "section": {
                         "type": "string",
-                        "enum": ["summary", "experience_description"],
+                        "enum": ["headline", "summary", "experience_description"],
                         "description": "Which CV section to improve",
                     },
                     "content": {

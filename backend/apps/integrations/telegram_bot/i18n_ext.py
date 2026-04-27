@@ -105,6 +105,96 @@ _STRINGS_EXT: dict[str, dict[str, str]] = {
         "ru": "🎯 Пройти прескрининг",
         "uz": "🎯 Preskreeningdan o'tish",
     },
+    "candidate.btn_cv_center": {
+        "en": "📄 CV",
+        "ru": "📄 Резюме",
+        "uz": "📄 CV",
+    },
+    "candidate.btn_my_cvs": {
+        "en": "My CVs",
+        "ru": "Мои резюме",
+        "uz": "CVlarim",
+    },
+    "candidate.btn_generate_cv": {
+        "en": "✨ Generate CV",
+        "ru": "✨ Создать резюме",
+        "uz": "✨ CV yaratish",
+    },
+    "candidate.btn_download_cv": {
+        "en": "Download CV",
+        "ru": "Скачать резюме",
+        "uz": "CV yuklab olish",
+    },
+    "candidate.btn_share_phone": {
+        "en": "Share phone number",
+        "ru": "Поделиться номером",
+        "uz": "Telefon raqamni yuborish",
+    },
+    "candidate.btn_language": {
+        "en": "🌐 Language",
+        "ru": "🌐 Язык",
+        "uz": "🌐 Til",
+    },
+    "candidate.language_prompt": {
+        "en": "Choose bot language:",
+        "ru": "Выберите язык бота:",
+        "uz": "Bot tilini tanlang:",
+    },
+    "candidate.language_saved": {
+        "en": "Language saved.",
+        "ru": "Язык сохранён.",
+        "uz": "Til saqlandi.",
+    },
+    "candidate.onboard_ask_phone": {
+        "en": "Let's register you first. Send your phone number to continue, for example +998901234567.",
+        "ru": "Сначала зарегистрируем вас. Отправьте номер телефона, чтобы продолжить, например +998901234567.",
+        "uz": "Avval ro'yxatdan o'tamiz. Davom etish uchun telefon raqamingizni yuboring, masalan +998901234567.",
+    },
+    "candidate.onboard_complete": {
+        "en": "Phone saved. You can now use the bot.",
+        "ru": "Номер сохранён. Теперь можно пользоваться ботом.",
+        "uz": "Telefon raqami saqlandi. Endi botdan foydalanishingiz mumkin.",
+    },
+    "candidate.cv_center": {
+        "en": "CV center. Choose what you want to do:",
+        "ru": "Центр резюме. Выберите действие:",
+        "uz": "CV markazi. Kerakli amalni tanlang:",
+    },
+    "candidate.cv_empty": {
+        "en": "You do not have saved CVs yet. Upload a file or generate a CV from your profile.",
+        "ru": "У вас пока нет сохранённых резюме. Загрузите файл или создайте резюме из профиля.",
+        "uz": "Hozircha saqlangan CV yo'q. Fayl yuklang yoki profilingizdan CV yarating.",
+    },
+    "candidate.cv_list_title": {
+        "en": "Your saved CVs:",
+        "ru": "Ваши сохранённые резюме:",
+        "uz": "Saqlangan CVlaringiz:",
+    },
+    "candidate.cv_generating": {
+        "en": "Generating your CV...",
+        "ru": "Создаю резюме...",
+        "uz": "CV yaratilmoqda...",
+    },
+    "candidate.cv_generated": {
+        "en": "CV generated: *{name}*",
+        "ru": "Резюме создано: *{name}*",
+        "uz": "CV yaratildi: *{name}*",
+    },
+    "candidate.cv_generate_failed": {
+        "en": "Could not generate a CV yet. Fill your profile on the web or try again later.",
+        "ru": "Пока не удалось создать резюме. Заполните профиль на сайте или попробуйте позже.",
+        "uz": "Hozircha CV yaratib bo'lmadi. Vebda profilni to'ldiring yoki keyinroq urinib ko'ring.",
+    },
+    "candidate.cv_upload_prompt": {
+        "en": "Send your CV file as PDF, DOCX, DOC or TXT.",
+        "ru": "Отправьте резюме файлом PDF, DOCX, DOC или TXT.",
+        "uz": "CV faylingizni PDF, DOCX, DOC yoki TXT shaklida yuboring.",
+    },
+    "candidate.cv_uploaded_to_profile": {
+        "en": "CV uploaded and saved: *{name}*",
+        "ru": "Резюме загружено и сохранено: *{name}*",
+        "uz": "CV yuklandi va saqlandi: *{name}*",
+    },
     # ----- prescreening buttons -----
     "candidate.btn_confirm": {
         "en": "✅ Confirm",
@@ -120,6 +210,16 @@ _STRINGS_EXT: dict[str, dict[str, str]] = {
         "en": "Skip (no CV)",
         "ru": "Пропустить (без резюме)",
         "uz": "O'tkazib yuborish (rezyumesiz)",
+    },
+    "candidate.btn_upload_new_cv": {
+        "en": "📎 Upload new CV",
+        "ru": "📎 Загрузить новое резюме",
+        "uz": "📎 Yangi CV yuklash",
+    },
+    "candidate.cv_active_suffix": {
+        "en": "(active)",
+        "ru": "(активное)",
+        "uz": "(faol)",
     },
     # ----- prescreening flow -----
     "candidate.ps_ask_code": {
@@ -175,6 +275,26 @@ _STRINGS_EXT: dict[str, dict[str, str]] = {
             "📎 Arizangizni kuchaytirish uchun rezyume biriktiring (PDF, DOCX, TXT).\n"
             "Bu vakansiya uchun rezyume *majburiy emas*."
         ),
+    },
+    "candidate.ps_cv_choose": {
+        "en": "📎 Choose one of your saved CVs or upload a new PDF/DOCX/TXT file:",
+        "ru": "📎 Выберите одно из сохранённых резюме или загрузите новый файл PDF/DOCX/TXT:",
+        "uz": "📎 Saqlangan CVlardan birini tanlang yoki yangi PDF/DOCX/TXT fayl yuklang:",
+    },
+    "candidate.ps_cv_upload_prompt": {
+        "en": "Send your CV as a PDF, DOCX, DOC or TXT file.",
+        "ru": "Отправьте резюме файлом PDF, DOCX, DOC или TXT.",
+        "uz": "CV faylingizni PDF, DOCX, DOC yoki TXT shaklida yuboring.",
+    },
+    "candidate.ps_cv_selected": {
+        "en": "✅ Selected CV: *{name}*",
+        "ru": "✅ Выбрано резюме: *{name}*",
+        "uz": "✅ Tanlangan CV: *{name}*",
+    },
+    "candidate.ps_cv_not_found": {
+        "en": "This CV is no longer available. Choose another one or upload a new file.",
+        "ru": "Это резюме больше недоступно. Выберите другое или загрузите новый файл.",
+        "uz": "Bu CV endi mavjud emas. Boshqasini tanlang yoki yangi fayl yuklang.",
     },
     "candidate.ps_starting": {
         "en": (

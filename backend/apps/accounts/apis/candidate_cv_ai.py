@@ -69,7 +69,7 @@ class CvImproveSectionApi(APIView):
     permission_classes = [IsCandidate]
 
     class InputSerializer(serializers.Serializer):
-        section = serializers.ChoiceField(choices=["summary", "experience_description"])
+        section = serializers.ChoiceField(choices=["headline", "summary", "experience_description"])
         content = serializers.CharField()
         job_title = serializers.CharField(required=False, allow_blank=True)
 

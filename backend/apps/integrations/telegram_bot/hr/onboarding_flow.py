@@ -10,6 +10,7 @@ from apps.integrations.telegram_bot.sessions import clear_session_field, get_ses
 
 CB_CREATE_COMPANY = "hr:create_company"
 CB_LANG_PREFIX = "hr:lang:"
+CB_LANG_MENU = f"{CB_LANG_PREFIX}menu"
 SESSION_AWAITING_COMPANY = "hr_awaiting_company_name"
 SESSION_LANGUAGE_SELECTED = "hr_language_selected"
 
@@ -28,6 +29,10 @@ def send_language_picker(*, client, chat_id: int) -> None:
             ]
         ),
     )
+
+
+def language_settings_keyboard():
+    return inline_keyboard([[button(text="🌐 Language / Язык / Til", callback_data=CB_LANG_MENU)]])
 
 
 def handle_onboarding_callback(*, client, chat_id: int, telegram_id: int, data: str) -> bool:
@@ -57,6 +62,7 @@ def handle_company_name_reply(*, client, chat_id: int, user: User, text: str) ->
     client.send_message(
         chat_id=chat_id,
         text=_text(user=user, key="company_created", company=company.name),
+        reply_markup=language_settings_keyboard(),
         parse_mode="Markdown",
     )
     return True
@@ -110,14 +116,22 @@ def _handle_language_callback(*, client, chat_id: int, telegram_id: int, data: s
     user.save(update_fields=["language", "updated_at"])
     update_session(role=ROLE_HR, telegram_id=telegram_id, **{SESSION_LANGUAGE_SELECTED: True})
 
-    client.send_message(chat_id=chat_id, text=_text(user=user, key="language_saved"))
-    if not _has_company(user=user):
+    has_company = _has_company(user=user)
+    client.send_message(
+        chat_id=chat_id,
+        text=_text(user=user, key="language_saved"),
+        reply_markup=language_settings_keyboard() if has_company else None,
+    )
+    if not has_company:
         send_company_required(client=client, chat_id=chat_id, user=user)
 
 
 def _create_company_keyboard(*, user: User | None = None):
     return inline_keyboard(
-        [[button(text=_text(user=user, key="create_company_button"), callback_data=CB_CREATE_COMPANY)]]
+        [
+            [button(text=_text(user=user, key="create_company_button"), callback_data=CB_CREATE_COMPANY)],
+            [button(text="🌐 Language / Язык / Til", callback_data=CB_LANG_MENU)],
+        ]
     )
 
 

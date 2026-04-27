@@ -21,7 +21,11 @@ def _handle_improve_cv_section(*, user, params):
             "action": "improve_cv_section",
         }
 
-    section_label = "Professional Summary" if section == "summary" else "Experience Description"
+    section_label = {
+        "headline": "Headline",
+        "summary": "Professional Summary",
+        "experience_description": "Experience Description",
+    }.get(section, "CV Section")
     job_context = f" for a {job_title} role" if job_title else ""
 
     prompt = (

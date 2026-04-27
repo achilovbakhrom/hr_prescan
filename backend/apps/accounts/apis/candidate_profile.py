@@ -1,3 +1,4 @@
+from django.utils import timezone
 from rest_framework import serializers, status
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -15,6 +16,16 @@ from apps.common.models import Skill
 # ---------------------------------------------------------------------------
 # CandidateProfileApi  (GET, PATCH)  /api/candidate/profile/
 # ---------------------------------------------------------------------------
+
+MIN_CANDIDATE_AGE = 14
+
+
+def _latest_allowed_birth_date():
+    today = timezone.localdate()
+    try:
+        return today.replace(year=today.year - MIN_CANDIDATE_AGE)
+    except ValueError:
+        return today.replace(year=today.year - MIN_CANDIDATE_AGE, day=28)
 
 
 class CandidateProfileApi(APIView):
@@ -56,6 +67,11 @@ class CandidateProfileApi(APIView):
             allow_blank=True,
         )
         is_open_to_work = serializers.BooleanField(required=False)
+
+        def validate_date_of_birth(self, value):
+            if value and value > _latest_allowed_birth_date():
+                raise serializers.ValidationError(f"Candidate must be at least {MIN_CANDIDATE_AGE} years old.")
+            return value
 
     def _get_full_profile(self, pk):
         return (

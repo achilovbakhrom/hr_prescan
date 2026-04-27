@@ -27,20 +27,20 @@ function progressColor(score: number): string {
 
 <template>
   <div
-    class="mb-6 rounded-xl border border-blue-200 dark:border-blue-800 bg-gradient-to-r from-blue-50/50 to-white p-5"
+    class="mb-6 rounded-lg border border-[color:var(--color-border-soft)] bg-[color:var(--color-surface-glass-1)] p-5 shadow-glass backdrop-blur-md dark:border-white/10 dark:bg-slate-800/70"
   >
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div class="flex items-center gap-4">
         <div
-          class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-950 text-blue-600"
+          class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300"
         >
           <i class="pi pi-user text-xl"></i>
         </div>
         <div class="min-w-0">
-          <p class="font-semibold text-gray-900">
+          <p class="font-semibold text-[color:var(--color-text-primary)]">
             {{ profile.headline || t('myCvs.profileCard.noHeadline') }}
           </p>
-          <p v-if="profile.location" class="text-sm text-gray-500">
+          <p v-if="profile.location" class="text-sm text-[color:var(--color-text-muted)]">
             <i class="pi pi-map-marker mr-1 text-xs"></i>{{ profile.location }}
           </p>
           <div class="mt-1.5 flex items-center gap-2">
@@ -50,7 +50,9 @@ function progressColor(score: number): string {
               class="!h-1.5 w-24"
               :pt="{ value: { class: progressColor(profile.completeness.score) } }"
             />
-            <span class="text-xs font-medium text-gray-500">{{ profile.completeness.score }}%</span>
+            <span class="text-xs font-medium text-[color:var(--color-text-muted)]"
+              >{{ profile.completeness.score }}%</span
+            >
           </div>
         </div>
       </div>
@@ -74,7 +76,7 @@ function progressColor(score: number): string {
           v-tooltip.top="t('common.edit')"
           @click="router.push({ name: ROUTE_NAMES.CV_BUILDER })"
         />
-        <span class="h-5 w-px bg-gray-200"></span>
+        <span class="h-5 w-px bg-[color:var(--color-border-soft)] dark:bg-white/10"></span>
         <Button
           icon="pi pi-trash"
           severity="danger"
@@ -89,14 +91,22 @@ function progressColor(score: number): string {
 
     <div
       class="mt-4 flex items-center justify-between rounded-lg px-3 py-2"
-      :class="profile.isOpenToWork ? 'bg-green-50' : 'bg-gray-100'"
+      :class="
+        profile.isOpenToWork
+          ? 'bg-emerald-50 text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-200'
+          : 'bg-[color:var(--color-surface-sunken)] text-[color:var(--color-text-muted)] dark:bg-white/10'
+      "
     >
       <div class="flex items-center gap-2">
         <i
           class="pi text-sm"
-          :class="profile.isOpenToWork ? 'pi-eye text-green-600' : 'pi-eye-slash text-gray-400'"
+          :class="
+            profile.isOpenToWork
+              ? 'pi-eye text-emerald-600 dark:text-emerald-300'
+              : 'pi-eye-slash text-[color:var(--color-text-muted)]'
+          "
         ></i>
-        <span class="text-sm" :class="profile.isOpenToWork ? 'text-green-700' : 'text-gray-500'">
+        <span class="text-sm">
           {{ profile.isOpenToWork ? t('myCvs.cvIsVisible') : t('myCvs.cvIsHidden') }}
         </span>
       </div>

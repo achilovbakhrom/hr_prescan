@@ -125,6 +125,31 @@ _STRINGS: dict[str, dict[str, str]] = {
         "ru": "◀ Назад",
         "uz": "◀ Orqaga",
     },
+    "candidate.btn_search_jobs": {
+        "en": "🔎 Search Jobs",
+        "ru": "🔎 Найти вакансии",
+        "uz": "🔎 Vakansiya qidirish",
+    },
+    "candidate.btn_create_cv_ai": {
+        "en": "✨ Create CV with AI",
+        "ru": "✨ Создать резюме с AI",
+        "uz": "✨ AI bilan CV yaratish",
+    },
+    "candidate.ai_prompt_search_jobs": {
+        "en": "Show me available jobs.",
+        "ru": "Покажи мне доступные вакансии.",
+        "uz": "Menga mavjud vakansiyalarni ko'rsat.",
+    },
+    "candidate.ai_prompt_create_cv": {
+        "en": "Help me create my CV.",
+        "ru": "Помоги мне создать резюме.",
+        "uz": "CV yaratishga yordam ber.",
+    },
+    "candidate.onboard_phone_saved": {
+        "en": "Phone saved. Now choose the bot language.",
+        "ru": "Номер сохранён. Теперь выберите язык бота.",
+        "uz": "Telefon raqami saqlandi. Endi bot tilini tanlang.",
+    },
     **_STRINGS_EXT,
 }
 

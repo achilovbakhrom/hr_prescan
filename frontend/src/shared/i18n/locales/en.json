@@ -93,6 +93,7 @@
     "maxLength": "Must be at most {max} characters",
     "invalidUrl": "Must be a valid URL",
     "invalidDate": "Must be a valid date",
+    "minAge": "Must be at least {age} years old",
     "positiveNumber": "Must be a positive number",
     "salaryRange": "Maximum salary must be greater than minimum",
     "endDateAfterStart": "End date must be after start date"
@@ -1264,6 +1265,12 @@
       "skills": "Skills",
       "languages": "Languages"
     },
+    "preview": {
+      "title": "Live preview",
+      "yourName": "Your name",
+      "headline": "Professional title",
+      "empty": "Start adding your details to see the preview."
+    },
     "personal": {
       "headline": "Headline",
       "headlinePlaceholder": "e.g. Senior Frontend Developer",
@@ -1426,6 +1433,7 @@
   },
   "myCvs": {
     "title": "My CVs",
+    "subtitle": "Your profile and generated CV files.",
     "goToBuilder": "CV Builder",
     "empty": "No CVs yet",
     "emptyHint": "Go to the CV Builder to create your first CV and generate a PDF.",

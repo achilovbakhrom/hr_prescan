@@ -12,7 +12,9 @@ import logging
 
 from apps.integrations.telegram_bot.bots import ROLE_CANDIDATE
 from apps.integrations.telegram_bot.candidate.menus import (
+    CB_PS_CV_SELECT,
     CB_PS_CV_SKIP,
+    CB_PS_CV_UPLOAD,
     CB_PS_NAME_CHANGE,
     CB_PS_NAME_CONFIRM,
     CB_PS_PHONE_CHANGE,
@@ -65,6 +67,18 @@ def handle_prescreening_callback(*, client, chat_id: int, user, data: str, sessi
         updated_session = {**session, SK_CV_PATH: "", SK_CV_FILENAME: ""}
         update_session(role=ROLE_CANDIDATE, telegram_id=user.telegram_id, **{SK_CV_PATH: "", SK_CV_FILENAME: ""})
         start_interview_submission(client=client, chat_id=chat_id, user=user, session=updated_session, lang=lang)
+
+    elif data == CB_PS_CV_UPLOAD:
+        from apps.integrations.telegram_bot.candidate.prescreening_cv import prompt_upload_new_cv
+
+        prompt_upload_new_cv(client=client, chat_id=chat_id, lang=lang)
+
+    elif data.startswith(f"{CB_PS_CV_SELECT}:"):
+        action, cv_id = data.rsplit(":", 1)
+        if action == CB_PS_CV_SELECT:
+            from apps.integrations.telegram_bot.candidate.prescreening_cv import handle_cv_select
+
+            handle_cv_select(client=client, chat_id=chat_id, user=user, cv_id=cv_id, session=session, lang=lang)
 
 
 def handle_prescreening_text(*, client, chat_id: int, user, text: str, session: dict, lang: str) -> None:

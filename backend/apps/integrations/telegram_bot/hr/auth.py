@@ -40,13 +40,17 @@ def handle_start(
 
     user = get_hr_bot_user(telegram_id=telegram_id)
     if user:
-        from apps.integrations.telegram_bot.hr.onboarding_flow import ensure_onboarding_ready
+        from apps.integrations.telegram_bot.hr.onboarding_flow import (
+            ensure_onboarding_ready,
+            language_settings_keyboard,
+        )
 
         if not ensure_onboarding_ready(client=client, chat_id=chat_id, user=user, text=""):
             return
         client.send_message(
             chat_id=chat_id,
             text=hr_text("welcome_back", user=user, name=user.first_name),
+            reply_markup=language_settings_keyboard(),
         )
         return
 
