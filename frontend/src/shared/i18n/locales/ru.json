@@ -195,7 +195,7 @@
       "country": "Страна",
       "countryRequired": "Укажите страну",
       "email": "Рабочий email",
-      "emailPlaceholder": "you@company.com",
+      "emailPlaceholder": "you{'@'}company.com",
       "emailRequired": "Введите корректный email",
       "submit": "Продолжить",
       "submitError": "Не удалось завершить настройку. Попробуйте ещё раз."

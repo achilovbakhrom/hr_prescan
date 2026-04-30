@@ -195,7 +195,7 @@
       "country": "Country",
       "countryRequired": "Country is required",
       "email": "Work email",
-      "emailPlaceholder": "you@company.com",
+      "emailPlaceholder": "you{'@'}company.com",
       "emailRequired": "Please enter a valid email address",
       "submit": "Continue",
       "submitError": "Could not complete setup. Please try again."

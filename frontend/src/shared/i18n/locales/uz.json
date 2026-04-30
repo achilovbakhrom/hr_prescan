@@ -188,7 +188,7 @@
       "country": "Davlat",
       "countryRequired": "Davlat majburiy",
       "email": "Ish email manzili",
-      "emailPlaceholder": "you@company.com",
+      "emailPlaceholder": "you{'@'}company.com",
       "emailRequired": "To'g'ri email manzilini kiriting",
       "submit": "Davom etish",
       "submitError": "Sozlashni yakunlab bo'lmadi. Qaytadan urinib ko'ring."
