@@ -1,4 +1,5 @@
 import axios, { AxiosHeaders, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios'
+import { redirectToLogin } from './authRedirect'
 import { clearTokens, loadTokens, saveTokens, type StoredAuthTokens } from './authTokens'
 import { convertKeysToCamelCase, convertKeysToSnakeCase } from './caseTransform'
 
@@ -71,12 +72,6 @@ apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 })
 
 let refreshPromise: Promise<StoredAuthTokens> | null = null
-
-function redirectToLogin(): void {
-  if (window.location.pathname !== '/login') {
-    window.location.href = '/login'
-  }
-}
 
 async function refreshStoredTokens(): Promise<StoredAuthTokens> {
   const tokens = loadTokens()

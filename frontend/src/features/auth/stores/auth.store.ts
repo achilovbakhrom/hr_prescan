@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 import { extractErrorMessage } from '@/shared/api/errors'
 import { setLocale } from '@/shared/i18n'
 import { saveUserLanguage } from '@/shared/services/language.service'
+import { redirectToLogin } from '@/shared/api/authRedirect'
 import { authService } from '../services/auth.service'
 import { loadTokens, saveTokens, clearTokens } from './auth-tokens'
 import { AUTH_TOKENS_CHANGED_EVENT } from '@/shared/api/authTokens'
@@ -101,6 +102,7 @@ export const useAuthStore = defineStore('auth', () => {
       user.value = null
       tokens.value = null
       clearTokens()
+      redirectToLogin()
       return null
     }
   }
