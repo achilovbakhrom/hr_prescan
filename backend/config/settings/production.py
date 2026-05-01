@@ -24,6 +24,7 @@ ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",")
 # Security
 # ---------------------------------------------------------------------------
 SECURE_SSL_REDIRECT = True
+SECURE_REDIRECT_EXEMPT = [r"^metrics/?$"]
 SECURE_HSTS_SECONDS = 31536000  # 1 year
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
