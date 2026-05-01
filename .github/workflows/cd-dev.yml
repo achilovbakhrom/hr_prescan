@@ -93,6 +93,7 @@ jobs:
     env:
       # Three-file override stack: base → prod settings → staging resource limits
       CF: -f docker-compose.yml -f deploy/docker-compose.prod.yml -f deploy/docker-compose.staging.yml
+      MONITORING_CF: -f docker-compose.yml -f deploy/docker-compose.prod.yml -f deploy/docker-compose.staging.yml -f deploy/docker-compose.monitoring.yml
 
     steps:
       - name: Sync compose files
@@ -113,6 +114,11 @@ jobs:
 
       - name: Pull new images
         run: IMAGE_TAG=${{ env.DEV_IMAGE_TAG }} docker compose $CF pull
+
+      - name: Ensure observability stack is up
+        run: |
+          docker compose $MONITORING_CF pull grafana prometheus loki promtail jaeger
+          ENVIRONMENT=development docker compose $MONITORING_CF up -d --wait grafana prometheus loki promtail jaeger
 
       - name: Ensure stateful services are up (first deploy bootstrap)
         run: |

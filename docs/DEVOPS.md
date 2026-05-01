@@ -119,7 +119,9 @@ pip install opentelemetry-api \
 **Purpose:** Centralized log aggregation. All container logs → Loki → queryable in Grafana.
 
 **Setup:**
-- Promtail (or Docker logging driver) ships container stdout/stderr to Loki
+- Promtail ships Docker container stdout/stderr to Loki
+- Grafana provisions Prometheus, Loki, and Jaeger datasources from `deploy/monitoring/grafana/provisioning/datasources.yml`
+- Monitoring ports bind to `127.0.0.1` by default. Use SSH tunnels for remote access instead of exposing Grafana/Loki/Prometheus publicly.
 - Structured JSON logging in Django (use `python-json-logger`)
 - Log levels: DEBUG (dev), INFO (prod default), WARNING, ERROR, CRITICAL
 - Correlation: include `trace_id` in logs for linking to Jaeger traces
@@ -852,6 +854,25 @@ services:
 ## 12. Useful Operational Commands
 
 ```bash
+# Start monitoring locally
+make up-monitoring
+
+# Start monitoring on dev/prod compose stack
+docker compose \
+  -f docker-compose.yml \
+  -f deploy/docker-compose.prod.yml \
+  -f deploy/docker-compose.staging.yml \
+  -f deploy/docker-compose.monitoring.yml \
+  up -d grafana prometheus loki promtail jaeger
+
+# Access remote Grafana securely from your machine
+ssh -L 3000:127.0.0.1:3000 <user>@<server>
+# Then open http://127.0.0.1:3000
+
+# Access remote Jaeger securely from your machine
+ssh -L 16686:127.0.0.1:16686 <user>@<server>
+# Then open http://127.0.0.1:16686
+
 # View logs for a specific service
 docker compose logs -f django
 

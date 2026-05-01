@@ -1,16 +1,22 @@
 # Monitoring stack — run with:
 # docker compose -f docker-compose.yml -f deploy/docker-compose.monitoring.yml up -d
+#
+# Ports bind to localhost by default. Use SSH tunnels for remote servers or set
+# MONITORING_BIND_ADDRESS=0.0.0.0 only behind a trusted firewall/VPN.
 
 services:
   grafana:
     image: grafana/grafana:latest
     ports:
-      - "3000:3000"
+      - "${MONITORING_BIND_ADDRESS:-127.0.0.1}:3000:3000"
     environment:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
     volumes:
       - grafana_data:/var/lib/grafana
+      - ./deploy/monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./deploy/monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
     networks:
       - monitoring
     restart: unless-stopped
@@ -25,12 +31,16 @@ services:
   prometheus:
     image: prom/prometheus:latest
     ports:
-      - "9090:9090"
+      - "${MONITORING_BIND_ADDRESS:-127.0.0.1}:9090:9090"
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT:-development}
     volumes:
       - ./deploy/monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./deploy/monitoring/prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
       - prometheus_data:/prometheus
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--config.expand-env=true"
       - "--storage.tsdb.retention.time=15d"
     networks:
       - monitoring
@@ -47,8 +57,8 @@ services:
   jaeger:
     image: jaegertracing/all-in-one:latest
     ports:
-      - "16686:16686"
-      - "4317:4317"
+      - "${MONITORING_BIND_ADDRESS:-127.0.0.1}:16686:16686"
+      - "${MONITORING_BIND_ADDRESS:-127.0.0.1}:4317:4317"
     environment:
       COLLECTOR_OTLP_ENABLED: "true"
     volumes:
@@ -68,8 +78,11 @@ services:
   loki:
     image: grafana/loki:latest
     ports:
-      - "3100:3100"
+      - "${MONITORING_BIND_ADDRESS:-127.0.0.1}:3100:3100"
+    command:
+      - "-config.file=/etc/loki/loki.yml"
     volumes:
+      - ./deploy/monitoring/loki/loki.yml:/etc/loki/loki.yml:ro
       - loki_data:/loki
     networks:
       - monitoring
@@ -82,11 +95,34 @@ services:
         reservations:
           memory: 64M
 
+  promtail:
+    image: grafana/promtail:latest
+    command:
+      - "-config.file=/etc/promtail/promtail.yml"
+    volumes:
+      - ./deploy/monitoring/promtail/promtail.yml:/etc/promtail/promtail.yml:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - promtail_positions:/tmp
+    networks:
+      - monitoring
+    depends_on:
+      - loki
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: "0.25"
+        reservations:
+          memory: 32M
+
 volumes:
   grafana_data:
   prometheus_data:
   jaeger_data:
   loki_data:
+  promtail_positions:
 
 networks:
   monitoring:

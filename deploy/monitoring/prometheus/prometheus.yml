@@ -2,17 +2,11 @@ global:
   scrape_interval: 15s
   evaluation_interval: 15s
   external_labels:
-    cluster: hr-prescan-prod
-    env: production
+    cluster: hr-prescan
+    env: ${ENVIRONMENT}
 
 rule_files:
   - "alerts.yml"
-
-alerting:
-  alertmanagers:
-    - static_configs:
-        - targets:
-            - alertmanager:9093
 
 scrape_configs:
   - job_name: "prometheus"
@@ -23,3 +17,8 @@ scrape_configs:
     metrics_path: /metrics
     static_configs:
       - targets: ["django:8000"]
+
+  - job_name: "livekit"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["livekit:7880"]
