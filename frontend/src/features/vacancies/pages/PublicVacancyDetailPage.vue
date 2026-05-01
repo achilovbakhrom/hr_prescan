@@ -52,7 +52,7 @@ onMounted(async () => {
 })
 
 function goApply(): void {
-  if (!vacancy.value) return
+  if (!vacancy.value || vacancy.value.canApply === false) return
   router.push(`/jobs/${vacancy.value.id}/apply`)
 }
 </script>
@@ -154,7 +154,7 @@ function goApply(): void {
         </div>
 
         <div class="fixed bottom-4 right-4 z-40 sm:hidden">
-          <GlassSurface level="float" class="rounded-full !p-0">
+          <GlassSurface v-if="vacancy.canApply !== false" level="float" class="rounded-full !p-0">
             <Button
               :label="t('jobBoard.apply')"
               icon="pi pi-send"

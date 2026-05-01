@@ -83,6 +83,7 @@ const { t } = useI18n()
 
       <div class="hidden sm:block">
         <Button
+          v-if="vacancy.canApply !== false"
           :label="t('jobBoard.apply')"
           icon="pi pi-send"
           size="large"

@@ -146,7 +146,7 @@ HR can configure external parsing sources per company to collect vacancy drafts 
 - HeadHunter parsing does not require a source URL. A source parses the selected HeadHunter vacancy feed by source type; optional settings can narrow the feed (`text`, `area`, `employer_id`) or limit pagination (`page`, `max_pages`, `per_page`).
 - If HeadHunter rejects anonymous API requests from the deployment environment, the parser records the HTTP status/body in the source sync error and can use configured HeadHunter authorization headers.
 - Parsed vacancies without contact information are skipped and are not stored.
-- Parsed vacancies are stored separately from internal `Vacancy` rows until HR imports them.
+- Parsed vacancies are stored separately from internal `Vacancy` rows. Active parsed vacancies can appear on the public job board as read-only content, but they cannot be applied to and do not start prescreening/interview workflows.
 - HeadHunter source sync is started through a Celery-backed parsing endpoint. HR can stop a running source sync; the task is revoked and the parser also checks for the stop state between fetched pages/items.
 - Importing a parsed vacancy creates a **Draft** and **Private** internal vacancy so HR can review, edit screening settings, add questions, and publish manually.
 - Parsed vacancies are scoped to the HR user's live company memberships and cannot be shared across tenants.
@@ -589,7 +589,7 @@ All batch actions require confirmation before executing.
 
 - Landing page showing all public vacancies across companies
 - Search and filter by: title, location, salary range, company, skills
-- Each vacancy has a detail page with apply button
+- Internal published vacancies have a detail page with an apply button. Parsed external vacancies can appear as read-only content without apply or prescreening actions.
 - SEO-friendly URLs for vacancies
 - Company profile pages (name, logo, description, active vacancies)
 

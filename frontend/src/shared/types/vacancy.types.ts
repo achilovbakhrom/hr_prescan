@@ -50,4 +50,7 @@ export interface Vacancy {
   companyName?: string | null
   /** Company logo URL returned by list endpoints (may be absent on detail) */
   companyLogo?: string | null
+  canApply?: boolean
+  contentSource?: 'internal' | 'parsed'
+  externalUrl?: string
 }
