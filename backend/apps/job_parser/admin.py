@@ -29,6 +29,15 @@ class ParsedVacancySourceAdmin(admin.ModelAdmin):
     ]
     actions = ["start_parsing", "stop_parsing"]
 
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        if db_field.name == "url":
+            kwargs["help_text"] = (
+                "Optional. HeadHunter parsing uses the selected source type and settings, not this URL."
+            )
+        if db_field.name == "settings":
+            kwargs["help_text"] = "Optional HH filters: text, area, employer_id, page, max_pages, per_page."
+        return super().formfield_for_dbfield(db_field, request, **kwargs)
+
     @admin.action(description="Start parsing selected sources")
     def start_parsing(self, request, queryset):
         started = 0

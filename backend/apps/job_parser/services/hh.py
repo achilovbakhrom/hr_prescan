@@ -47,7 +47,7 @@ def sync_hh_source(*, source: ParsedVacancySource) -> dict:
 def _fetch_hh_items(*, source: ParsedVacancySource) -> list[dict]:
     settings = source.settings or {}
     first_page = int(settings.get("page", 0))
-    max_pages = max(1, min(int(settings.get("max_pages", 1)), 20))
+    max_pages = max(1, min(int(settings.get("max_pages", 20)), 20))
     items: list[dict] = []
     for page in range(first_page, first_page + max_pages):
         if _stop_requested(source=source):
@@ -56,7 +56,7 @@ def _fetch_hh_items(*, source: ParsedVacancySource) -> list[dict]:
             "text": settings.get("text", ""),
             "area": settings.get("area", ""),
             "employer_id": settings.get("employer_id", ""),
-            "per_page": min(int(settings.get("per_page", 20)), 100),
+            "per_page": min(int(settings.get("per_page", 100)), 100),
             "page": page,
         }
         response = _hh_get(

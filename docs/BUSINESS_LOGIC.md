@@ -143,6 +143,7 @@ HR can configure external parsing sources per company to collect vacancy drafts 
 
 - Supported source types start with HeadHunter (`hh.ru`, `hh.uz`) and Telegram job channels/messages.
 - Parsing sources are disabled by default. HR must explicitly activate a source before background parsing can run.
+- HeadHunter parsing does not require a source URL. A source parses the selected HeadHunter vacancy feed by source type; optional settings can narrow the feed (`text`, `area`, `employer_id`) or limit pagination (`page`, `max_pages`, `per_page`).
 - Parsed vacancies without contact information are skipped and are not stored.
 - Parsed vacancies are stored separately from internal `Vacancy` rows until HR imports them.
 - HeadHunter source sync is started through a Celery-backed parsing endpoint. HR can stop a running source sync; the task is revoked and the parser also checks for the stop state between fetched pages/items.

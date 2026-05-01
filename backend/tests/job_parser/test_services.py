@@ -209,6 +209,25 @@ class TestHeadHunterSync:
         assert result["skipped_no_contact"] == 1
         assert ParsedVacancy.objects.filter(source=source, external_id="no-contact").exists() is False
 
+    def test_sync_hh_source_does_not_require_url_or_filters(self, company, hr_user):
+        source = ParsedVacancySource.objects.create(
+            company=company,
+            created_by=hr_user,
+            name="All HH vacancies",
+            source_type=ParsedVacancySource.Type.HH_UZ,
+            is_active=True,
+        )
+        list_response = Mock()
+        list_response.json.return_value = {"items": [], "pages": 1}
+        list_response.raise_for_status.return_value = None
+
+        with patch("apps.job_parser.services.hh.requests.get", return_value=list_response) as request_get:
+            result = sync_hh_source(source=source)
+
+        assert result["parsed"] == 0
+        request_get.assert_called_once()
+        assert request_get.call_args.kwargs["params"] == {"per_page": 100, "page": 0}
+
 
 class TestParserSyncControl:
     def test_start_source_sync_queues_celery_task(self, company, hr_user):
