@@ -34,7 +34,7 @@ export const candidateService = {
       formData.append('cv_id', data.cvId)
     }
     const response = await apiClient.post<Application>(
-      `/public/vacancies/${vacancyId}/apply`,
+      `/public/vacancies/${vacancyId}/apply/`,
       formData,
       { headers: { 'Content-Type': 'multipart/form-data' } },
     )
@@ -43,12 +43,12 @@ export const candidateService = {
 
   // Candidate (auth required)
   async getMyApplications(): Promise<Application[]> {
-    const response = await apiClient.get<Application[]>('/candidate/applications')
+    const response = await apiClient.get<Application[]>('/candidate/applications/')
     return response.data
   },
 
   async getMyApplicationDetail(id: string): Promise<ApplicationDetail> {
-    const response = await apiClient.get<ApplicationDetail>(`/candidate/applications/${id}`)
+    const response = await apiClient.get<ApplicationDetail>(`/candidate/applications/${id}/`)
     return response.data
   },
 
@@ -57,7 +57,7 @@ export const candidateService = {
     vacancyId: string,
     params?: { status?: string; ordering?: string; search?: string },
   ): Promise<Application[]> {
-    const response = await apiClient.get<Application[]>(`/hr/vacancies/${vacancyId}/candidates`, {
+    const response = await apiClient.get<Application[]>(`/hr/vacancies/${vacancyId}/candidates/`, {
       params,
     })
     return response.data
@@ -69,33 +69,35 @@ export const candidateService = {
     search?: string
     vacancyId?: string
   }): Promise<Application[]> {
-    const response = await apiClient.get<Application[]>('/hr/candidates', { params })
+    const response = await apiClient.get<Application[]>('/hr/candidates/', { params })
     return response.data
   },
 
   async getCandidateDetail(id: string): Promise<ApplicationDetail> {
-    const response = await apiClient.get<ApplicationDetail>(`/hr/candidates/${id}`)
+    const response = await apiClient.get<ApplicationDetail>(`/hr/candidates/${id}/`)
     return response.data
   },
 
   async updateCandidateStatus(id: string, status: ApplicationStatus): Promise<Application> {
-    const response = await apiClient.patch<Application>(`/hr/candidates/${id}/status`, { status })
+    const response = await apiClient.patch<Application>(`/hr/candidates/${id}/status/`, { status })
     return response.data
   },
 
   async addCandidateNote(id: string, note: string): Promise<ApplicationDetail> {
-    const response = await apiClient.post<ApplicationDetail>(`/hr/candidates/${id}/notes`, { note })
+    const response = await apiClient.post<ApplicationDetail>(`/hr/candidates/${id}/notes/`, {
+      note,
+    })
     return response.data
   },
 
   // Messaging
   async getMessages(candidateId: string): Promise<Message[]> {
-    const response = await apiClient.get<Message[]>(`/hr/candidates/${candidateId}/messages`)
+    const response = await apiClient.get<Message[]>(`/hr/candidates/${candidateId}/messages/`)
     return response.data
   },
 
   async sendMessage(candidateId: string, content: string): Promise<Message> {
-    const response = await apiClient.post<Message>(`/hr/candidates/${candidateId}/messages`, {
+    const response = await apiClient.post<Message>(`/hr/candidates/${candidateId}/messages/`, {
       content,
     })
     return response.data
@@ -103,7 +105,7 @@ export const candidateService = {
 
   // Email
   async sendEmail(candidateId: string, payload: SendEmailPayload): Promise<void> {
-    await apiClient.post(`/hr/candidates/${candidateId}/email`, payload)
+    await apiClient.post(`/hr/candidates/${candidateId}/email/`, payload)
   },
 
   // Schedule human interview
@@ -111,7 +113,7 @@ export const candidateService = {
     candidateId: string,
     payload: ScheduleInterviewPayload,
   ): Promise<void> {
-    await apiClient.post(`/hr/candidates/${candidateId}/schedule-human-interview`, payload)
+    await apiClient.post(`/hr/candidates/${candidateId}/schedule-human-interview/`, payload)
   },
 
   // Interview data for candidate
@@ -120,21 +122,21 @@ export const candidateService = {
     sessionType?: string,
   ): Promise<Record<string, unknown>> {
     const params = sessionType ? { session_type: sessionType } : undefined
-    const response = await apiClient.get(`/hr/candidates/${candidateId}/interview`, { params })
+    const response = await apiClient.get(`/hr/candidates/${candidateId}/interview/`, { params })
     return response.data as Record<string, unknown>
   },
 
   // CV download
   async getCvDownloadUrl(candidateId: string): Promise<{ url: string; filename: string }> {
     const response = await apiClient.get<{ url: string; filename: string }>(
-      `/hr/candidates/${candidateId}/cv-download`,
+      `/hr/candidates/${candidateId}/cv-download/`,
     )
     return response.data
   },
 
   // Bulk actions
   async bulkUpdateStatus(applicationIds: string[], status: ApplicationStatus): Promise<void> {
-    await apiClient.patch('/hr/candidates/bulk-status', {
+    await apiClient.patch('/hr/candidates/bulk-status/', {
       application_ids: applicationIds,
       status,
     })
@@ -154,7 +156,7 @@ export const candidateService = {
     },
   ): Promise<{ moved: number }> {
     const response = await apiClient.post<{ moved: number }>(
-      `/hr/vacancies/${vacancyId}/candidates/batch-move`,
+      `/hr/vacancies/${vacancyId}/candidates/batch-move/`,
       {
         from_status: params.fromStatus,
         to_status: params.toStatus,
@@ -170,7 +172,7 @@ export const candidateService = {
 
   // Soft delete archived candidates
   async softDelete(applicationIds: string[]): Promise<{ deleted: number }> {
-    const response = await apiClient.post<{ deleted: number }>('/hr/candidates/soft-delete', {
+    const response = await apiClient.post<{ deleted: number }>('/hr/candidates/soft-delete/', {
       application_ids: applicationIds,
     })
     return response.data

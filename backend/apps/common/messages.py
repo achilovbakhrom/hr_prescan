@@ -70,6 +70,7 @@ MSG_URL_RESOLVE_FAILED = _("Could not resolve the URL hostname.")
 MSG_WEBSITE_FETCH_FAILED = _("Could not fetch the website.")
 MSG_WEBSITE_EXTRACT_FAILED = _("Could not extract text from the website.")
 MSG_AI_QUESTIONS_FAILED = _("Failed to generate questions. Please try again.")
+MSG_AI_CRITERIA_FAILED = _("Failed to generate evaluation criteria. Please try again.")
 MSG_CRITERIA_NOT_FOUND = _("Criteria not found.")
 MSG_QUESTION_NOT_FOUND = _("Question not found.")
 

@@ -124,6 +124,8 @@ HR provides the following information:
 - **Company** — required. Dropdown lists all companies the user is a member of; pre-selected to their default. The AI vacancy assistant uses the default implicitly if the user has one company, otherwise it asks.
 - **Title** — job position name
 - **Description** — detailed job description and responsibilities
+- **AI assistant input** — HR can paste long job descriptions into the AI assistant for vacancy creation; recent chat history may be shortened for model context, but the current pasted vacancy text is preserved up to the request limit.
+- **AI assistant publication setup** — after creating a vacancy draft, the AI assistant asks whether it should generate prescanning questions and role-specific evaluation criteria/competencies itself. If HR agrees (for example, says "generate yourself"), it generates both and can publish the vacancy in the same flow.
 - **Required Skills** — key skills and qualifications needed
 - **Salary Range** — min/max salary (optional, can be hidden from candidates)
 - **Location** — remote, onsite, or hybrid (with city/country if applicable)
@@ -189,7 +191,7 @@ Each vacancy has a two-step AI screening pipeline. HR configures each step durin
 - **Purpose:** Quick initial screening to filter out clearly unqualified candidates
 - **Configuration:**
   - Questions — literal candidate-facing questions AI-generated based on the vacancy, which HR can review/edit/add/remove
-  - Evaluation criteria — fixed categories + custom HR-defined criteria (see 7.5)
+  - Evaluation criteria / competencies — fixed categories plus optional AI-generated or HR-defined criteria (see 7.5)
   - Additional prompt — free-text field where HR writes any instructions for the AI agent (e.g., "Focus on communication skills", "Be lenient with junior candidates")
 - No camera or microphone required
 - No video recording; the transcript is the primary artifact

@@ -7,7 +7,7 @@ from apps.accounts.permissions import HasHRPermission, HRPermissions
 from apps.common.exceptions import ApplicationError
 from apps.common.messages import MSG_CRITERIA_NOT_FOUND, MSG_VACANCY_NOT_FOUND
 from apps.vacancies.models import ScreeningStep
-from apps.vacancies.selectors import get_vacancy_by_id, get_vacancy_criteria
+from apps.vacancies.selectors import get_user_vacancy_by_id, get_vacancy_criteria
 from apps.vacancies.serializers import VacancyCriteriaOutputSerializer
 from apps.vacancies.services import (
     add_vacancy_criteria,
@@ -36,7 +36,7 @@ class VacancyCriteriaListCreateApi(APIView):
         )
 
     def get(self, request: Request, vacancy_id: str) -> Response:
-        vacancy = get_vacancy_by_id(vacancy_id=vacancy_id, company=request.user.company)
+        vacancy = get_user_vacancy_by_id(vacancy_id=vacancy_id, user=request.user)
         if vacancy is None:
             return Response({"detail": str(MSG_VACANCY_NOT_FOUND)}, status=status.HTTP_404_NOT_FOUND)
 
@@ -48,7 +48,7 @@ class VacancyCriteriaListCreateApi(APIView):
         )
 
     def post(self, request: Request, vacancy_id: str) -> Response:
-        vacancy = get_vacancy_by_id(vacancy_id=vacancy_id, company=request.user.company)
+        vacancy = get_user_vacancy_by_id(vacancy_id=vacancy_id, user=request.user)
         if vacancy is None:
             return Response({"detail": str(MSG_VACANCY_NOT_FOUND)}, status=status.HTTP_404_NOT_FOUND)
 
@@ -78,7 +78,7 @@ class VacancyCriteriaDetailApi(APIView):
         order = serializers.IntegerField(required=False)
 
     def put(self, request: Request, vacancy_id: str, criteria_id: str) -> Response:
-        vacancy = get_vacancy_by_id(vacancy_id=vacancy_id, company=request.user.company)
+        vacancy = get_user_vacancy_by_id(vacancy_id=vacancy_id, user=request.user)
         if vacancy is None:
             return Response({"detail": str(MSG_VACANCY_NOT_FOUND)}, status=status.HTTP_404_NOT_FOUND)
 
@@ -96,7 +96,7 @@ class VacancyCriteriaDetailApi(APIView):
         )
 
     def delete(self, request: Request, vacancy_id: str, criteria_id: str) -> Response:
-        vacancy = get_vacancy_by_id(vacancy_id=vacancy_id, company=request.user.company)
+        vacancy = get_user_vacancy_by_id(vacancy_id=vacancy_id, user=request.user)
         if vacancy is None:
             return Response({"detail": str(MSG_VACANCY_NOT_FOUND)}, status=status.HTTP_404_NOT_FOUND)
 

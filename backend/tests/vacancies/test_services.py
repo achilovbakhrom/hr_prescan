@@ -12,6 +12,7 @@ from apps.vacancies.services import (
     create_default_criteria,
     create_vacancy,
     generate_interview_questions,
+    generate_vacancy_criteria,
     pause_vacancy,
     publish_vacancy,
 )
@@ -81,6 +82,36 @@ class TestGenerateInterviewQuestions:
         assert "Candidate should" in instruction
         assert "Return JSON with a 'questions' array" in instruction
         assert "Return JSON with a 'competencies' array" not in instruction
+
+
+class TestGenerateVacancyCriteria:
+    def test_generates_role_specific_criteria(self, vacancy):
+        class FakeResponse:
+            text = (
+                '{"criteria": ['
+                '{"name": "API Design", '
+                '"description": "Can explain pragmatic REST API design tradeoffs", '
+                '"weight": 4}'
+                "]}"
+            )
+
+        with patch("apps.vacancies.services.criteria_ai.genai.Client") as client_cls:
+            client = client_cls.return_value
+            client.models.generate_content.return_value = FakeResponse()
+            initial_max_order = vacancy.criteria.filter(step=ScreeningStep.PRESCANNING).order_by("-order")[0].order
+
+            criteria = generate_vacancy_criteria(vacancy=vacancy, step=ScreeningStep.PRESCANNING)
+
+        assert len(criteria) == 1
+        assert criteria[0].name == "API Design"
+        assert criteria[0].description == "Can explain pragmatic REST API design tradeoffs"
+        assert criteria[0].weight == 4
+        assert criteria[0].is_default is False
+        assert criteria[0].order == initial_max_order + 1
+        _, kwargs = client.models.generate_content.call_args
+        instruction = kwargs["config"].system_instruction
+        assert "evaluation criterion" in instruction
+        assert "not a candidate-facing question" in instruction
 
 
 class TestPublishVacancy:

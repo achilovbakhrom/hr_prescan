@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 
 from apps.accounts.permissions import HasHRPermission, HRPermissions
 from apps.applications.models import Application
+from apps.applications.selectors import get_application_by_id
 from apps.notifications.models import Notification
 from apps.notifications.selectors import get_unread_count, get_user_notifications
 from apps.notifications.serializers import (
@@ -148,16 +149,7 @@ class HRMessageListApi(APIView):
 
     @staticmethod
     def _get_application(request: Request, application_id: str) -> Application | None:
-        try:
-            return Application.objects.select_related(
-                "candidate",
-                "vacancy",
-            ).get(
-                id=application_id,
-                vacancy__company=request.user.company,
-            )
-        except Application.DoesNotExist:
-            return None
+        return get_application_by_id(application_id=application_id, user=request.user)
 
 
 class CandidateMessageListApi(APIView):

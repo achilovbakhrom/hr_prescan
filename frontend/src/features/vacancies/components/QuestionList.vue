@@ -148,24 +148,24 @@ function handleSubmit(): void {
       </Column>
       <template #empty>
         <div class="py-8 text-center text-gray-500">
-          No competencies yet. Add manually or generate with AI.
+          No questions yet. Add manually or generate with AI.
         </div>
       </template>
     </DataTable>
     <Dialog
       v-model:visible="showDialog"
-      :header="isEditing ? 'Edit Competency' : t('vacancies.addQuestion')"
+      :header="isEditing ? 'Edit Question' : t('vacancies.addQuestion')"
       :style="{ width: '500px' }"
       modal
     >
       <div class="space-y-4">
         <div>
-          <label class="mb-1 block text-sm font-medium">Competency *</label>
+          <label class="mb-1 block text-sm font-medium">Question *</label>
           <Textarea
             v-model="formText"
             class="w-full"
             rows="3"
-            placeholder="e.g. Candidate should demonstrate proficiency with React hooks"
+            placeholder="e.g. Can you describe a project where you used React hooks?"
           />
         </div>
         <div>

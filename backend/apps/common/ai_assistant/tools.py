@@ -42,12 +42,15 @@ from apps.common.ai_assistant.handlers_vacancy import (
     handle_archive_vacancy,
     handle_create_vacancy,
     handle_delete_vacancy,
-    handle_generate_questions,
     handle_list_vacancies,
     handle_pause_vacancy,
     handle_publish_vacancy,
-    handle_regenerate_keywords,
     handle_update_vacancy,
+)
+from apps.common.ai_assistant.handlers_vacancy_generation import (
+    handle_generate_criteria,
+    handle_generate_questions,
+    handle_regenerate_keywords,
 )
 from apps.common.ai_assistant.tool_defs_actions import (
     FRONTEND_ACTION_TOOL_DEFINITIONS,
@@ -85,6 +88,7 @@ TOOL_MAP = {
     "archive_vacancy": handle_archive_vacancy,
     "delete_vacancy": handle_delete_vacancy,
     "generate_questions": handle_generate_questions,
+    "generate_criteria": handle_generate_criteria,
     "regenerate_keywords": handle_regenerate_keywords,
     "list_companies": handle_list_companies,
     "create_company": handle_create_company,

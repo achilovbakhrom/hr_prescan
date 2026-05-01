@@ -33,15 +33,15 @@ def batch_translate_vacancy_items(
 
     Returns list of {id, translations} dicts with updated translations.
     """
-    from apps.vacancies.models import InterviewQuestion, Vacancy, VacancyCriteria
+    from apps.vacancies.models import InterviewQuestion, VacancyCriteria
+    from apps.vacancies.selectors import get_user_vacancy_by_id
 
     lang_name = LANGUAGE_NAMES.get(target_language)
     if not lang_name:
         raise ApplicationError(f"Unsupported language: {target_language}")
 
-    try:
-        vacancy = Vacancy.objects.get(id=vacancy_id, company=user.company)
-    except Vacancy.DoesNotExist:
+    vacancy = get_user_vacancy_by_id(vacancy_id=vacancy_id, user=user)
+    if vacancy is None:
         raise ApplicationError("Vacancy not found.") from None
 
     if item_type == "criteria":

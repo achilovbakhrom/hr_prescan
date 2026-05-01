@@ -6,6 +6,8 @@ import { useAuthStore } from '@/features/auth/stores/auth.store'
 
 const STORAGE_KEY_PREFIX = 'prescreen_ai_assistant_history'
 const MAX_MESSAGES = 200 // 100 prompts × 2 (user + assistant)
+const CONTEXT_HISTORY_MESSAGES = 10
+const CONTEXT_HISTORY_MESSAGE_CHARS = 1200
 
 function getStorageKey(role: string): string {
   return `${STORAGE_KEY_PREFIX}_${role}`
@@ -24,6 +26,11 @@ function loadHistory(role: string): AIMessage[] {
 function saveHistory(msgs: AIMessage[], role: string): void {
   const trimmed = msgs.slice(-MAX_MESSAGES)
   localStorage.setItem(getStorageKey(role), JSON.stringify(trimmed))
+}
+
+function trimContextContent(content: string): string {
+  if (content.length <= CONTEXT_HISTORY_MESSAGE_CHARS) return content
+  return `${content.slice(0, CONTEXT_HISTORY_MESSAGE_CHARS)}...`
 }
 
 const isOpen = ref(false)
@@ -104,10 +111,11 @@ export function useAIAssistant() {
         currentParams: route.params,
       }
 
-      // Send last 10 messages as conversation history for context
-      const recentHistory = messages.value.slice(-11, -1).map((m) => ({
+      // Send recent history, but cap each item so pasted vacancy text does not
+      // make every later assistant request oversized.
+      const recentHistory = messages.value.slice(-(CONTEXT_HISTORY_MESSAGES + 1), -1).map((m) => ({
         role: m.role,
-        content: m.content,
+        content: trimContextContent(m.content),
       }))
       if (recentHistory.length > 0) {
         context.conversationHistory = recentHistory

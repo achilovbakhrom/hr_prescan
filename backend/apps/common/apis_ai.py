@@ -14,6 +14,7 @@ from apps.common.messages import MSG_NOT_IN_COMPANY
 _rate_limit_store: dict[str, list[float]] = defaultdict(list)
 RATE_LIMIT_MAX = 50
 RATE_LIMIT_WINDOW = 3600  # 1 hour
+AI_ASSISTANT_MESSAGE_MAX_LENGTH = 20000
 
 
 def _check_rate_limit(user_id: str) -> bool:
@@ -29,7 +30,7 @@ def _check_rate_limit(user_id: str) -> bool:
 
 
 class AIAssistantInputSerializer(serializers.Serializer):
-    message = serializers.CharField(max_length=2000)
+    message = serializers.CharField(max_length=AI_ASSISTANT_MESSAGE_MAX_LENGTH)
     context = serializers.DictField(required=False, default=None)
 
 

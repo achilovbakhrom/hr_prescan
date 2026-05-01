@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.permissions import HasHRPermission, HRPermissions
-from apps.applications.models import Application
+from apps.applications.selectors import get_application_by_id
 from apps.common.exceptions import ApplicationError
 from apps.notifications.serializers import (
     BulkStatusUpdateInputSerializer,
@@ -23,12 +23,8 @@ class SendCandidateEmailApi(APIView):
     hr_permission = HRPermissions.MANAGE_CANDIDATES
 
     def post(self, request: Request, application_id: str) -> Response:
-        try:
-            application = Application.objects.select_related("vacancy").get(
-                id=application_id,
-                vacancy__company=request.user.company,
-            )
-        except Application.DoesNotExist:
+        application = get_application_by_id(application_id=application_id, user=request.user)
+        if application is None:
             return Response(
                 {"detail": "Application not found."},
                 status=status.HTTP_404_NOT_FOUND,

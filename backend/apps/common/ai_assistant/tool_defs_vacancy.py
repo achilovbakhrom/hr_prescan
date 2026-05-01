@@ -1,5 +1,7 @@
 """Tool definitions for vacancy-related operations."""
 
+from apps.common.ai_assistant.tool_defs_vacancy_generation import VACANCY_GENERATION_TOOL_DEFINITIONS
+
 VACANCY_TOOL_DEFINITIONS = [
     {
         "type": "function",
@@ -154,34 +156,5 @@ VACANCY_TOOL_DEFINITIONS = [
             },
         },
     },
-    {
-        "type": "function",
-        "function": {
-            "name": "generate_questions",
-            "description": (
-                "AI-generate literal candidate-facing questions for prescanning or interview. "
-                "These questions are stored and asked directly to candidates."
-            ),
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "vacancy_title": {"type": "string"},
-                    "step": {"type": "string", "enum": ["prescanning", "interview"], "default": "prescanning"},
-                },
-                "required": ["vacancy_title"],
-            },
-        },
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "regenerate_keywords",
-            "description": "AI-regenerate search keywords for a vacancy",
-            "parameters": {
-                "type": "object",
-                "properties": {"vacancy_title": {"type": "string"}},
-                "required": ["vacancy_title"],
-            },
-        },
-    },
+    *VACANCY_GENERATION_TOOL_DEFINITIONS,
 ]

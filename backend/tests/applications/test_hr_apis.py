@@ -1,4 +1,5 @@
 from decimal import Decimal
+from unittest.mock import patch
 
 from rest_framework import status
 from rest_framework.test import APIRequestFactory, force_authenticate
@@ -13,6 +14,7 @@ from apps.applications.apis import (
 )
 from apps.interviews.apis import HRApplicationInterviewApi
 from apps.interviews.models import Interview
+from apps.notifications.apis import HRMessageListApi, SendCandidateEmailApi
 from tests.factories import ApplicationFactory, CompanyFactory, InterviewFactory, UserFactory, VacancyFactory
 
 
@@ -149,3 +151,36 @@ def test_candidate_interview_api_uses_user_memberships():
 
     assert response.status_code == status.HTTP_200_OK
     assert response.data["id"] == str(interview.id)
+
+
+def test_candidate_messages_api_uses_user_memberships():
+    user, second_company = _hr_user_with_two_companies()
+    candidate = UserFactory(company=None, role=User.Role.CANDIDATE)
+    vacancy = VacancyFactory(company=second_company, created_by=user)
+    application = ApplicationFactory(vacancy=vacancy, candidate=candidate)
+    factory = APIRequestFactory()
+    request = factory.get(f"/api/hr/candidates/{application.id}/messages/")
+    force_authenticate(request, user=user)
+
+    response = HRMessageListApi.as_view()(request, application_id=str(application.id))
+
+    assert response.status_code == status.HTTP_200_OK
+
+
+def test_candidate_email_api_uses_user_memberships():
+    user, second_company = _hr_user_with_two_companies()
+    vacancy = VacancyFactory(company=second_company, created_by=user)
+    application = ApplicationFactory(vacancy=vacancy)
+    factory = APIRequestFactory()
+    request = factory.post(
+        f"/api/hr/candidates/{application.id}/email/",
+        {"subject": "Next step", "body": "Please check your email."},
+        format="json",
+    )
+    force_authenticate(request, user=user)
+
+    with patch("apps.notifications.tasks.send_candidate_email.delay") as delay:
+        response = SendCandidateEmailApi.as_view()(request, application_id=str(application.id))
+
+    assert response.status_code == status.HTTP_200_OK
+    delay.assert_called_once()

@@ -12,6 +12,7 @@ concurrency:
 env:
   REGISTRY: ghcr.io
   IMAGE_PREFIX: ghcr.io/${{ github.repository }}
+  DEV_IMAGE_TAG: dev-${{ github.sha }}
 
 jobs:
   # ---------------------------------------------------------------------------
@@ -41,7 +42,7 @@ jobs:
           context: ./backend
           push: true
           tags: |
-            ${{ env.IMAGE_PREFIX }}/backend:${{ github.sha }}
+            ${{ env.IMAGE_PREFIX }}/backend:${{ env.DEV_IMAGE_TAG }}
             ${{ env.IMAGE_PREFIX }}/backend:dev
           cache-from: type=gha,scope=backend-dev
           cache-to: type=gha,mode=max,scope=backend-dev
@@ -52,7 +53,7 @@ jobs:
           context: ./frontend
           push: true
           tags: |
-            ${{ env.IMAGE_PREFIX }}/frontend:${{ github.sha }}
+            ${{ env.IMAGE_PREFIX }}/frontend:${{ env.DEV_IMAGE_TAG }}
             ${{ env.IMAGE_PREFIX }}/frontend:dev
           build-args: |
             VITE_API_URL=https://dev.prescreen-app.com/api
@@ -71,7 +72,7 @@ jobs:
           context: ./livekit-agent
           push: true
           tags: |
-            ${{ env.IMAGE_PREFIX }}/livekit-agent:${{ github.sha }}
+            ${{ env.IMAGE_PREFIX }}/livekit-agent:${{ env.DEV_IMAGE_TAG }}
             ${{ env.IMAGE_PREFIX }}/livekit-agent:dev
           cache-from: type=gha,scope=livekit-agent-dev
           cache-to: type=gha,mode=max,scope=livekit-agent-dev
@@ -111,11 +112,11 @@ jobs:
             docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Pull new images
-        run: IMAGE_TAG=${{ github.sha }} docker compose $CF pull
+        run: IMAGE_TAG=${{ env.DEV_IMAGE_TAG }} docker compose $CF pull
 
       - name: Ensure stateful services are up (first deploy bootstrap)
         run: |
-          IMAGE_TAG=${{ github.sha }} \
+          IMAGE_TAG=${{ env.DEV_IMAGE_TAG }} \
             docker compose $CF up -d --wait postgres redis rabbitmq minio livekit
 
       # Validate the new image imports cleanly — Django's `check` walks
@@ -125,7 +126,7 @@ jobs:
       # broken image into rotation.
       - name: Validate new backend image (django check)
         run: |
-          IMAGE_TAG=${{ github.sha }} \
+          IMAGE_TAG=${{ env.DEV_IMAGE_TAG }} \
             docker compose $CF run --rm --no-deps django python manage.py check --deploy --fail-level=ERROR
 
       # The backend image's entrypoint.sh applies migrations and collectstatic
@@ -138,11 +139,11 @@ jobs:
           CURRENT=$(docker compose $CF ps -q django | wc -l)
           if [ "$CURRENT" -eq 0 ]; then
             echo "First deploy: starting django container"
-            IMAGE_TAG=${{ github.sha }} \
+            IMAGE_TAG=${{ env.DEV_IMAGE_TAG }} \
               docker compose $CF up -d --no-deps --wait django
           else
             echo "Rolling update: scale 2 -> 1"
-            IMAGE_TAG=${{ github.sha }} \
+            IMAGE_TAG=${{ env.DEV_IMAGE_TAG }} \
               docker compose $CF up -d --no-deps --scale django=2 --no-recreate django
             for i in $(seq 1 24); do
               HEALTHY=$(docker compose $CF ps --format '{{.Service}} {{.Health}}' | grep -c '^django healthy$' || true)
@@ -151,7 +152,7 @@ jobs:
               sleep 5
             done
             docker compose $CF exec -T nginx nginx -s reload || true
-            IMAGE_TAG=${{ github.sha }} \
+            IMAGE_TAG=${{ env.DEV_IMAGE_TAG }} \
               docker compose $CF up -d --no-deps --scale django=1 django
           fi
 
@@ -159,17 +160,17 @@ jobs:
         run: |
           # SIGTERM lets workers finish their current task before stopping
           docker compose $CF stop celery-worker
-          IMAGE_TAG=${{ github.sha }} \
+          IMAGE_TAG=${{ env.DEV_IMAGE_TAG }} \
             docker compose $CF up -d --no-deps --wait celery-worker celery-beat
 
       - name: Rolling update — frontend & nginx
         run: |
-          IMAGE_TAG=${{ github.sha }} \
+          IMAGE_TAG=${{ env.DEV_IMAGE_TAG }} \
             docker compose $CF up -d --no-deps --wait nginx
 
       - name: Rolling update — livekit-agent
         run: |
-          IMAGE_TAG=${{ github.sha }} \
+          IMAGE_TAG=${{ env.DEV_IMAGE_TAG }} \
             docker compose $CF up -d --no-deps livekit-agent
 
       - name: Smoke test

@@ -77,10 +77,10 @@ services:
     deploy:
       resources:
         limits:
-          memory: 128M
+          memory: 256M
           cpus: "0.10"
         reservations:
-          memory: 32M
+          memory: 64M
 
   livekit:
     deploy:

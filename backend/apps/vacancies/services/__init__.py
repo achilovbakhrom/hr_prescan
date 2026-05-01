@@ -3,6 +3,7 @@ from .company_info import (
     parse_company_info_from_file,
     parse_company_info_from_url,
 )
+from .criteria_ai import generate_vacancy_criteria
 from .criteria_questions import (
     DEFAULT_CRITERIA,
     add_interview_question,
@@ -38,6 +39,7 @@ __all__ = [
     "delete_vacancy_criteria",
     "detect_language",
     "generate_interview_questions",
+    "generate_vacancy_criteria",
     "generate_vacancy_keywords",
     "parse_company_info_from_file",
     "parse_company_info_from_url",

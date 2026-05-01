@@ -13,7 +13,7 @@ export async function translateContent(params: {
   /** Use `/translate/` (any auth) instead of `/hr/translate/` (HR-only). */
   scope?: 'hr' | 'public'
 }): Promise<TranslateResponse> {
-  const endpoint = params.scope === 'public' ? '/translate' : '/hr/translate'
+  const endpoint = params.scope === 'public' ? '/translate/' : '/hr/translate/'
   const { scope: _scope, ...body } = params
   void _scope
   const response = await apiClient.post<TranslateResponse>(endpoint, body)
@@ -36,6 +36,6 @@ export async function batchTranslateItems(params: {
   step: 'prescanning' | 'interview'
   targetLanguage: string
 }): Promise<BatchTranslateResponse> {
-  const response = await apiClient.post<BatchTranslateResponse>('/hr/translate/batch', params)
+  const response = await apiClient.post<BatchTranslateResponse>('/hr/translate/batch/', params)
   return response.data
 }

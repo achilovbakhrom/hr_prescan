@@ -12,7 +12,7 @@ from apps.common.messages import (
     MSG_UNSUPPORTED_FILE_TYPE,
     MSG_VACANCY_NOT_FOUND,
 )
-from apps.vacancies.selectors import get_vacancy_by_id
+from apps.vacancies.selectors import get_user_vacancy_by_id
 from apps.vacancies.serializers import VacancyDetailOutputSerializer
 from apps.vacancies.services import (
     archive_vacancy,
@@ -33,7 +33,7 @@ class VacancyStatusApi(APIView):
         action = serializers.ChoiceField(choices=["publish", "pause", "archive"])
 
     def patch(self, request: Request, vacancy_id: str) -> Response:
-        vacancy = get_vacancy_by_id(vacancy_id=vacancy_id, company=request.user.company)
+        vacancy = get_user_vacancy_by_id(vacancy_id=vacancy_id, user=request.user)
         if vacancy is None:
             return Response({"detail": str(MSG_VACANCY_NOT_FOUND)}, status=status.HTTP_404_NOT_FOUND)
 
@@ -119,7 +119,7 @@ class VacancyRegenerateKeywordsApi(APIView):
     hr_permission = HRPermissions.MANAGE_VACANCIES
 
     def post(self, request: Request, vacancy_id: str) -> Response:
-        vacancy = get_vacancy_by_id(vacancy_id=vacancy_id, company=request.user.company)
+        vacancy = get_user_vacancy_by_id(vacancy_id=vacancy_id, user=request.user)
         if vacancy is None:
             return Response({"detail": str(MSG_VACANCY_NOT_FOUND)}, status=status.HTTP_404_NOT_FOUND)
 
