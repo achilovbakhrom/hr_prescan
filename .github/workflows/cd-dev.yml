@@ -121,7 +121,7 @@ jobs:
       - name: Ensure observability stack is up
         run: |
           docker compose $MONITORING_CF pull grafana prometheus loki promtail jaeger
-          docker compose $MONITORING_CF up -d --wait grafana prometheus loki promtail jaeger
+          docker compose $MONITORING_CF up -d --force-recreate --wait grafana prometheus loki promtail jaeger
 
       - name: Ensure stateful services are up (first deploy bootstrap)
         run: |

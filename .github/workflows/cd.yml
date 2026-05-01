@@ -152,7 +152,7 @@ jobs:
              docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml -f deploy/docker-compose.monitoring.yml \
                pull grafana prometheus loki promtail jaeger && \
              docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml -f deploy/docker-compose.monitoring.yml \
-               up -d --wait grafana prometheus loki promtail jaeger"
+               up -d --force-recreate --wait grafana prometheus loki promtail jaeger"
 
       - name: Ensure stateful services are up (first deploy bootstrap)
         run: |

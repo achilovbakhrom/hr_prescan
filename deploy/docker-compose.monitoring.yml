@@ -21,8 +21,10 @@ services:
       - ./deploy/monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
       - ./deploy/monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
     networks:
-      - monitoring
-      - frontend-net
+      monitoring:
+        aliases:
+          - grafana
+      frontend-net: {}
     restart: unless-stopped
     deploy:
       resources:
@@ -44,8 +46,10 @@ services:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.retention.time=15d"
     networks:
-      - monitoring
-      - backend
+      monitoring:
+        aliases:
+          - prometheus
+      backend: {}
     restart: unless-stopped
     deploy:
       resources:
@@ -65,8 +69,10 @@ services:
     volumes:
       - jaeger_data:/badger
     networks:
-      - monitoring
-      - backend
+      monitoring:
+        aliases:
+          - jaeger
+      backend: {}
     restart: unless-stopped
     deploy:
       resources:
@@ -86,7 +92,9 @@ services:
       - ./deploy/monitoring/loki/loki.yml:/etc/loki/loki.yml:ro
       - loki_data:/loki
     networks:
-      - monitoring
+      monitoring:
+        aliases:
+          - loki
     restart: unless-stopped
     deploy:
       resources:
@@ -106,7 +114,9 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - promtail_positions:/tmp
     networks:
-      - monitoring
+      monitoring:
+        aliases:
+          - promtail
     depends_on:
       - loki
     restart: unless-stopped
