@@ -11,6 +11,14 @@ class ParsedVacancySource(BaseModel):
         HH_UZ = "hh_uz", "hh.uz"
         TELEGRAM = "telegram", "Telegram"
 
+    class SyncStatus(models.TextChoices):
+        IDLE = "idle", "Idle"
+        RUNNING = "running", "Running"
+        STOPPING = "stopping", "Stopping"
+        SUCCEEDED = "succeeded", "Succeeded"
+        FAILED = "failed", "Failed"
+        CANCELLED = "cancelled", "Cancelled"
+
     company = models.ForeignKey(
         "accounts.Company",
         on_delete=models.CASCADE,
@@ -25,8 +33,13 @@ class ParsedVacancySource(BaseModel):
     source_type = models.CharField(max_length=20, choices=Type.choices)
     url = models.URLField(max_length=500, blank=True, default="")
     settings = models.JSONField(default=dict, blank=True)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
     last_synced_at = models.DateTimeField(null=True, blank=True)
+    sync_status = models.CharField(max_length=20, choices=SyncStatus.choices, default=SyncStatus.IDLE)
+    sync_task_id = models.CharField(max_length=255, blank=True, default="")
+    sync_started_at = models.DateTimeField(null=True, blank=True)
+    sync_finished_at = models.DateTimeField(null=True, blank=True)
+    sync_error = models.TextField(blank=True, default="")
 
     class Meta:
         ordering = ["-created_at"]

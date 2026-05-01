@@ -7,7 +7,7 @@ from django.utils import timezone
 
 from apps.common.exceptions import ApplicationError
 from apps.job_parser.models import ParsedVacancy, ParsedVacancySource
-from apps.job_parser.services.normalization import clean_text
+from apps.job_parser.services.normalization import clean_text, has_contact_info
 from apps.job_parser.services.parsed_vacancy_crud import upsert_parsed_vacancy
 
 SALARY_RE = re.compile(
@@ -37,6 +37,8 @@ def parse_telegram_job_message(
     text = clean_text(message_text)
     if not text:
         raise ApplicationError("Telegram message text is empty.")
+    if not has_contact_info(message_text):
+        raise ApplicationError("Telegram vacancy does not include contact information.")
 
     title = _guess_title(message_text)
     salary_min, salary_max, currency = _guess_salary(text)

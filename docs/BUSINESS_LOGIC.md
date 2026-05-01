@@ -142,7 +142,10 @@ HR provides the following information:
 HR can configure external parsing sources per company to collect vacancy drafts from job boards and Telegram job channels before publishing them on PreScan.
 
 - Supported source types start with HeadHunter (`hh.ru`, `hh.uz`) and Telegram job channels/messages.
+- Parsing sources are disabled by default. HR must explicitly activate a source before background parsing can run.
+- Parsed vacancies without contact information are skipped and are not stored.
 - Parsed vacancies are stored separately from internal `Vacancy` rows until HR imports them.
+- HeadHunter source sync is started through a Celery-backed parsing endpoint. HR can stop a running source sync; the task is revoked and the parser also checks for the stop state between fetched pages/items.
 - Importing a parsed vacancy creates a **Draft** and **Private** internal vacancy so HR can review, edit screening settings, add questions, and publish manually.
 - Parsed vacancies are scoped to the HR user's live company memberships and cannot be shared across tenants.
 - Actuality statuses for parsed vacancies:

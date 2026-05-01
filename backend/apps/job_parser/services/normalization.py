@@ -10,11 +10,25 @@ from django.utils.html import strip_tags
 from apps.vacancies.models import Vacancy
 
 WHITESPACE_RE = re.compile(r"\s+")
+EMAIL_RE = re.compile(r"\b[\w.+-]+@[\w.-]+\.[a-z]{2,}\b", re.I)
+PHONE_RE = re.compile(r"(?:\+?\d[\d\s().-]{7,}\d)")
+TELEGRAM_RE = re.compile(r"(?:https?://)?t\.me/[A-Za-z0-9_]+|@[A-Za-z0-9_]{4,}", re.I)
 
 
 def clean_text(value: object) -> str:
     text = strip_tags(str(value or ""))
     return WHITESPACE_RE.sub(" ", unescape(text)).strip()
+
+
+def has_contact_info(value: object) -> bool:
+    text = clean_text(value)
+    if EMAIL_RE.search(text) or TELEGRAM_RE.search(text):
+        return True
+    for match in PHONE_RE.finditer(text):
+        digits = re.sub(r"\D", "", match.group(0))
+        if len(digits) >= 9:
+            return True
+    return False
 
 
 def make_fingerprint(*, title: str, company_name: str = "", location: str = "") -> str:

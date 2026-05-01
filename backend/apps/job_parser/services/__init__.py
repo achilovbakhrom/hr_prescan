@@ -5,6 +5,7 @@ from apps.job_parser.services.parsed_vacancy_crud import (
     refresh_telegram_actuality,
     upsert_parsed_vacancy,
 )
+from apps.job_parser.services.sync_control import start_source_sync, stop_source_sync
 from apps.job_parser.services.telegram import parse_telegram_job_message
 
 __all__ = [
@@ -12,6 +13,8 @@ __all__ = [
     "parse_telegram_job_message",
     "refresh_source_actuality",
     "refresh_telegram_actuality",
+    "start_source_sync",
+    "stop_source_sync",
     "sync_hh_source",
     "upsert_parsed_vacancy",
 ]

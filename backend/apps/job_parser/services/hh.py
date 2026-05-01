@@ -6,7 +6,7 @@ from django.utils.dateparse import parse_datetime
 
 from apps.common.exceptions import ApplicationError
 from apps.job_parser.models import ParsedVacancy, ParsedVacancySource
-from apps.job_parser.services.normalization import clean_text
+from apps.job_parser.services.normalization import clean_text, has_contact_info
 from apps.job_parser.services.parsed_vacancy_crud import refresh_source_actuality, upsert_parsed_vacancy
 
 HH_API_BASE_URLS = {
@@ -22,16 +22,26 @@ def sync_hh_source(*, source: ParsedVacancySource) -> dict:
     sync_started_at = timezone.now()
     items = _fetch_hh_items(source=source)
     parsed_count = 0
+    skipped_no_contact = 0
 
     for item in items:
-        detail = _fetch_hh_detail(source=source, vacancy_id=item["id"]) if source.settings.get("fetch_details") else {}
+        if _stop_requested(source=source):
+            return {"parsed": parsed_count, "skipped_no_contact": skipped_no_contact, "cancelled": True}
+        detail = (
+            _fetch_hh_detail(source=source, vacancy_id=item["id"])
+            if source.settings.get("fetch_details", True) or source.settings.get("require_contact", True)
+            else {}
+        )
+        if source.settings.get("require_contact", True) and not _has_hh_contact(item=item, detail=detail):
+            skipped_no_contact += 1
+            continue
         upsert_parsed_vacancy(source=source, payload=_map_hh_item(item=item, detail=detail))
         parsed_count += 1
 
     stale_count = refresh_source_actuality(source=source, sync_started_at=sync_started_at)
     source.last_synced_at = timezone.now()
     source.save(update_fields=["last_synced_at", "updated_at"])
-    return {"parsed": parsed_count, "stale_or_expired": stale_count}
+    return {"parsed": parsed_count, "skipped_no_contact": skipped_no_contact, "stale_or_expired": stale_count}
 
 
 def _fetch_hh_items(*, source: ParsedVacancySource) -> list[dict]:
@@ -40,6 +50,8 @@ def _fetch_hh_items(*, source: ParsedVacancySource) -> list[dict]:
     max_pages = max(1, min(int(settings.get("max_pages", 1)), 20))
     items: list[dict] = []
     for page in range(first_page, first_page + max_pages):
+        if _stop_requested(source=source):
+            break
         params = {
             "text": settings.get("text", ""),
             "area": settings.get("area", ""),
@@ -56,6 +68,16 @@ def _fetch_hh_items(*, source: ParsedVacancySource) -> list[dict]:
         if page + 1 >= int(response.get("pages") or 0):
             break
     return items
+
+
+def _stop_requested(*, source: ParsedVacancySource) -> bool:
+    return ParsedVacancySource.objects.filter(
+        id=source.id,
+        sync_status__in=[
+            ParsedVacancySource.SyncStatus.STOPPING,
+            ParsedVacancySource.SyncStatus.CANCELLED,
+        ],
+    ).exists()
 
 
 def _fetch_hh_detail(*, source: ParsedVacancySource, vacancy_id: str) -> dict:
@@ -78,6 +100,15 @@ def _hh_get(*, source: ParsedVacancySource, path: str, params: dict) -> dict:
     except requests.RequestException as exc:
         raise ApplicationError("HeadHunter source sync failed.") from exc
     return response.json()
+
+
+def _has_hh_contact(*, item: dict, detail: dict) -> bool:
+    contacts = detail.get("contacts") or item.get("contacts") or {}
+    if contacts.get("email"):
+        return True
+    if contacts.get("phones"):
+        return True
+    return has_contact_info(contacts) or has_contact_info(detail.get("description"))
 
 
 def _map_hh_item(*, item: dict, detail: dict) -> dict:

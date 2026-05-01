@@ -18,6 +18,11 @@ class ParsedVacancySourceOutputSerializer(serializers.ModelSerializer):
             "settings",
             "is_active",
             "last_synced_at",
+            "sync_status",
+            "sync_task_id",
+            "sync_started_at",
+            "sync_finished_at",
+            "sync_error",
             "created_at",
             "updated_at",
         ]
@@ -29,7 +34,7 @@ class ParsedVacancySourceInputSerializer(serializers.Serializer):
     source_type = serializers.ChoiceField(choices=ParsedVacancySource.Type.choices)
     url = serializers.URLField(required=False, allow_blank=True, default="")
     settings = serializers.DictField(required=False, default=dict)
-    is_active = serializers.BooleanField(required=False, default=True)
+    is_active = serializers.BooleanField(required=False, default=False)
 
 
 class ParsedVacancyOutputSerializer(serializers.ModelSerializer):

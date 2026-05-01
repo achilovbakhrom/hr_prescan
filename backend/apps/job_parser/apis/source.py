@@ -9,8 +9,7 @@ from apps.common.exceptions import ApplicationError
 from apps.job_parser.models import ParsedVacancySource
 from apps.job_parser.selectors import get_user_source_by_id, get_user_sources
 from apps.job_parser.serializers import ParsedVacancySourceInputSerializer, ParsedVacancySourceOutputSerializer
-from apps.job_parser.services import sync_hh_source
-from apps.job_parser.tasks import sync_parsed_vacancy_source_task
+from apps.job_parser.services import start_source_sync, stop_source_sync, sync_hh_source
 
 MSG_COMPANY_NOT_FOUND_OR_NOT_MEMBER = "Company not found or you are not a member."
 
@@ -50,9 +49,36 @@ class ParsedVacancySourceSyncApi(APIView):
         source = get_user_source_by_id(user=request.user, source_id=source_id)
         if source is None:
             return Response({"detail": "Source not found."}, status=status.HTTP_404_NOT_FOUND)
-        if request.query_params.get("async") == "1":
-            sync_parsed_vacancy_source_task.delay(str(source.id))
-            return Response({"detail": "Sync scheduled."}, status=status.HTTP_202_ACCEPTED)
+        try:
+            source = start_source_sync(source=source)
+        except ApplicationError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_409_CONFLICT)
+        return Response(ParsedVacancySourceOutputSerializer(source).data, status=status.HTTP_202_ACCEPTED)
+
+
+class ParsedVacancySourceStopApi(APIView):
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_VACANCIES
+
+    def post(self, request: Request, source_id) -> Response:
+        source = get_user_source_by_id(user=request.user, source_id=source_id)
+        if source is None:
+            return Response({"detail": "Source not found."}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            source = stop_source_sync(source=source)
+        except ApplicationError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_409_CONFLICT)
+        return Response(ParsedVacancySourceOutputSerializer(source).data, status=status.HTTP_202_ACCEPTED)
+
+
+class ParsedVacancySourceSyncNowApi(APIView):
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_VACANCIES
+
+    def post(self, request: Request, source_id) -> Response:
+        source = get_user_source_by_id(user=request.user, source_id=source_id)
+        if source is None:
+            return Response({"detail": "Source not found."}, status=status.HTTP_404_NOT_FOUND)
         try:
             result = sync_hh_source(source=source)
         except ApplicationError as exc:
