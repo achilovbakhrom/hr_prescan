@@ -76,8 +76,10 @@ REST_FRAMEWORK.update(  # noqa: F405
 )
 
 # ---------------------------------------------------------------------------
-# Static / Media — served via S3/MinIO in prod
+# Static / Media — media uses S3/MinIO; nginx proxies static admin assets to Django.
 # ---------------------------------------------------------------------------
+SERVE_STATIC_VIA_DJANGO = os.environ.get("SERVE_STATIC_VIA_DJANGO", "true").lower() == "true"
+
 STORAGES = {
     "default": {
         "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",

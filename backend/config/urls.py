@@ -2,7 +2,10 @@
 Root URL configuration for HR PreScan.
 """
 
+from django.conf import settings
 from django.contrib import admin
+from django.contrib.staticfiles.views import serve as staticfiles_serve
+from django.db.transaction import non_atomic_requests
 from django.http import JsonResponse
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
@@ -132,3 +135,6 @@ urlpatterns = [
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
     path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
 ]
+
+if getattr(settings, "SERVE_STATIC_VIA_DJANGO", False):
+    urlpatterns.append(path("static/<path:path>", non_atomic_requests(staticfiles_serve), {"insecure": True}))

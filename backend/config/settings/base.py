@@ -207,6 +207,7 @@ LOCALE_PATHS = [
 # Static files
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+SERVE_STATIC_VIA_DJANGO = os.environ.get("SERVE_STATIC_VIA_DJANGO", "false").lower() == "true"
 
 # Media files
 MEDIA_URL = "media/"
