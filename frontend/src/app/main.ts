@@ -15,6 +15,7 @@ import Aura from '@primevue/themes/aura'
 import App from './App.vue'
 import { router } from './router'
 import { i18n, detectAndApplyLocale } from '@/shared/i18n'
+import { initializeGoogleAnalytics } from '@/shared/analytics/googleAnalytics'
 
 import '@/assets/styles/main.css'
 import '@/assets/styles/primevue-overrides.css'
@@ -36,6 +37,8 @@ app.use(PrimeVue, {
 })
 app.use(ConfirmationService)
 app.use(ToastService)
+
+initializeGoogleAnalytics(router)
 
 app.mount('#app')
 

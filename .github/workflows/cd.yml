@@ -81,6 +81,7 @@ jobs:
             VITE_TELEGRAM_CANDIDATE_BOT_USERNAME=candidate_preview_ai_bot
             VITE_TELEGRAM_HR_BOT_USERNAME=hr_prescreen_ai_bot
             VITE_BILLING_ENABLED=false
+            VITE_GA_MEASUREMENT_ID=${{ vars.GA_MEASUREMENT_ID || '' }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,scope=frontend
           cache-to: type=gha,mode=max,scope=frontend
