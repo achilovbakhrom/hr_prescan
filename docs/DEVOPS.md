@@ -121,7 +121,7 @@ pip install opentelemetry-api \
 **Setup:**
 - Promtail ships Docker container stdout/stderr to Loki
 - Grafana provisions Prometheus, Loki, and Jaeger datasources from `deploy/monitoring/grafana/provisioning/datasources.yml`
-- Monitoring ports bind to `127.0.0.1` by default. Use SSH tunnels for remote access instead of exposing Grafana/Loki/Prometheus publicly.
+- Monitoring ports bind to `127.0.0.1` by default. Grafana may be exposed through the production nginx reverse proxy with `GRAFANA_DOMAIN` (for example `grafana.prescreen-app.com`) and `GRAFANA_CERT_DOMAIN` after a matching TLS certificate exists; Prometheus, Loki, and Jaeger stay private and should still be accessed by tunnel/VPN.
 - Structured JSON logging in Django (use `python-json-logger`)
 - Log levels: DEBUG (dev), INFO (prod default), WARNING, ERROR, CRITICAL
 - Correlation: include `trace_id` in logs for linking to Jaeger traces

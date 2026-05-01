@@ -46,6 +46,7 @@ Log into your domain registrar. Add three A records for `prescreen-app.com`:
 | A | `@` | `<prod server IP>` | 3600 |
 | A | `www` | `<prod server IP>` | 3600 |
 | A | `dev` | `<dev server IP>` | 3600 |
+| A | `grafana` | `<prod server IP>` | 3600 |
 
 Find your server IPs in Contabo Customer Control Panel → Your Services.
 
@@ -56,6 +57,7 @@ Check propagation later with:
 ```bash
 dig +short prescreen-app.com         # must return prod IP
 dig +short dev.prescreen-app.com     # must return dev IP
+dig +short grafana.prescreen-app.com # must return prod IP
 ```
 
 ---

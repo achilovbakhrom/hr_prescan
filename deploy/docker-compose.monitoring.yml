@@ -13,12 +13,16 @@ services:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
       GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_SERVER_DOMAIN: ${GRAFANA_DOMAIN:-grafana.${DOMAIN}}
+      GF_SERVER_ROOT_URL: https://${GRAFANA_DOMAIN:-grafana.${DOMAIN}}/
+      GF_SECURITY_COOKIE_SECURE: "true"
     volumes:
       - grafana_data:/var/lib/grafana
       - ./deploy/monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
       - ./deploy/monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
     networks:
       - monitoring
+      - frontend-net
     restart: unless-stopped
     deploy:
       resources:
@@ -123,6 +127,9 @@ volumes:
 
 networks:
   monitoring:
+  frontend-net:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME:-prescreen}_frontend-net
   backend:
     external: true
-    name: ${COMPOSE_PROJECT_NAME:-agent-afa99b9b}_backend
+    name: ${COMPOSE_PROJECT_NAME:-prescreen}_backend
