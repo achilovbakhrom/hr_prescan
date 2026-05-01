@@ -8,10 +8,7 @@ from apps.job_parser.services import refresh_telegram_actuality, sync_hh_source
 @shared_task(bind=True, name="apps.job_parser.tasks.sync_parsed_vacancy_source")
 def sync_parsed_vacancy_source_task(self, source_id: str) -> dict:
     source = ParsedVacancySource.objects.get(id=source_id, is_active=True)
-    if (
-        source.sync_task_id == self.request.id
-        and source.sync_status == ParsedVacancySource.SyncStatus.CANCELLED
-    ):
+    if source.sync_task_id == self.request.id and source.sync_status == ParsedVacancySource.SyncStatus.CANCELLED:
         return {"cancelled": True}
     source.sync_status = ParsedVacancySource.SyncStatus.RUNNING
     source.sync_task_id = self.request.id or source.sync_task_id
