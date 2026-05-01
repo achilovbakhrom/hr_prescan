@@ -111,6 +111,9 @@ jobs:
       url: https://${{ vars.DOMAIN }}
     permissions:
       contents: read
+    env:
+      GRAFANA_DOMAIN: grafana.prescreen-app.com
+      GRAFANA_CERT_DOMAIN: grafana.prescreen-app.com
 
     steps:
       - name: Checkout (for smoke-test script)

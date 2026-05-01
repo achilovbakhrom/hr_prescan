@@ -95,6 +95,8 @@ jobs:
       # Three-file override stack: base → prod settings → staging resource limits
       CF: -f docker-compose.yml -f deploy/docker-compose.prod.yml -f deploy/docker-compose.staging.yml
       MONITORING_CF: -f docker-compose.yml -f deploy/docker-compose.prod.yml -f deploy/docker-compose.staging.yml -f deploy/docker-compose.monitoring.yml
+      GRAFANA_DOMAIN: grafana.dev.prescreen-app.com
+      GRAFANA_CERT_DOMAIN: grafana.dev.prescreen-app.com
 
     steps:
       - name: Sync compose files
