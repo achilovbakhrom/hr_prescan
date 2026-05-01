@@ -291,6 +291,10 @@ SIMPLE_JWT = {
 # Google OAuth
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
 
+# HeadHunter parser
+HH_USER_AGENT = os.environ.get("HH_USER_AGENT", "HR PreScan vacancy parser")
+HH_ACCESS_TOKEN = os.environ.get("HH_ACCESS_TOKEN", "")
+
 # E2E test hooks — exposes DEBUG-only endpoints (e.g. /auth/debug/oauth-simulate/)
 # that let the E2E suite bypass real OAuth providers. Must be false in production.
 ALLOW_E2E_HOOKS = os.environ.get("ALLOW_E2E_HOOKS", "false").lower() in ("1", "true", "yes")

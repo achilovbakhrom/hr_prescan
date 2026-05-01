@@ -2,6 +2,7 @@ from datetime import timedelta
 from unittest.mock import Mock, patch
 
 import pytest
+import requests
 from django.utils import timezone
 
 from apps.common.exceptions import ApplicationError
@@ -227,6 +228,19 @@ class TestHeadHunterSync:
         assert result["parsed"] == 0
         request_get.assert_called_once()
         assert request_get.call_args.kwargs["params"] == {"per_page": 100, "page": 0}
+
+    def test_sync_hh_source_stores_http_error_detail(self, company, hr_user):
+        source = _source(company, hr_user)
+        response = Mock()
+        response.status_code = 403
+        response.text = '{"errors":[{"type":"forbidden"}]}'
+        response.raise_for_status.side_effect = requests.HTTPError(response=response)
+
+        with (
+            patch("apps.job_parser.services.hh.requests.get", return_value=response),
+            pytest.raises(ApplicationError, match="HTTP 403"),
+        ):
+            sync_hh_source(source=source)
 
 
 class TestParserSyncControl:

@@ -81,6 +81,8 @@ services:
       # dev to block test-account spam. Leave empty in prod.
       - EMAIL_SUPPRESS_DOMAINS=${EMAIL_SUPPRESS_DOMAINS:-}
       - GEOIP2_DB_PATH=/app/data/dbip-country-lite.mmdb
+      - HH_USER_AGENT=${HH_USER_AGENT:-HR PreScan vacancy parser}
+      - HH_ACCESS_TOKEN=${HH_ACCESS_TOKEN:-}
     volumes:
       - geoip_data:/app/data
     restart: unless-stopped
@@ -193,6 +195,8 @@ services:
       - TELEGRAM_CANDIDATE_BOT_TOKEN=${TELEGRAM_CANDIDATE_BOT_TOKEN}
       - TELEGRAM_CANDIDATE_BOT_USERNAME=${TELEGRAM_CANDIDATE_BOT_USERNAME}
       - TELEGRAM_CANDIDATE_WEBHOOK_SECRET=${TELEGRAM_CANDIDATE_WEBHOOK_SECRET}
+      - HH_USER_AGENT=${HH_USER_AGENT:-HR PreScan vacancy parser}
+      - HH_ACCESS_TOKEN=${HH_ACCESS_TOKEN:-}
     restart: unless-stopped
     deploy:
       resources:

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import requests
+from django.conf import settings
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
@@ -93,13 +94,33 @@ def _hh_get(*, source: ParsedVacancySource, path: str, params: dict) -> dict:
         response = requests.get(
             f"{base_url}{path}",
             params=params,
-            headers={"User-Agent": "HR PreScan vacancy parser"},
+            headers=_hh_headers(source=source),
             timeout=20,
         )
         response.raise_for_status()
     except requests.RequestException as exc:
-        raise ApplicationError("HeadHunter source sync failed.") from exc
+        status = getattr(exc.response, "status_code", None)
+        body = (getattr(exc.response, "text", "") or "")[:300]
+        detail = "HeadHunter API request failed"
+        if status:
+            detail = f"{detail}: HTTP {status}"
+        if body:
+            detail = f"{detail} - {body}"
+        raise ApplicationError(detail) from exc
     return response.json()
+
+
+def _hh_headers(*, source: ParsedVacancySource) -> dict[str, str]:
+    user_agent = getattr(settings, "HH_USER_AGENT", "HR PreScan vacancy parser")
+    headers = {
+        "Accept": "application/json",
+        "User-Agent": user_agent,
+        "HH-User-Agent": user_agent,
+    }
+    access_token = (source.settings or {}).get("access_token") or getattr(settings, "HH_ACCESS_TOKEN", "")
+    if access_token:
+        headers["Authorization"] = f"Bearer {access_token}"
+    return headers
 
 
 def _has_hh_contact(*, item: dict, detail: dict) -> bool:
