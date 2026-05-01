@@ -5,6 +5,7 @@ import { setLocale } from '@/shared/i18n'
 import { saveUserLanguage } from '@/shared/services/language.service'
 import { authService } from '../services/auth.service'
 import { loadTokens, saveTokens, clearTokens } from './auth-tokens'
+import { AUTH_TOKENS_CHANGED_EVENT } from '@/shared/api/authTokens'
 import type { CompanyMembership } from '@/shared/types/auth.types'
 import type {
   AcceptInvitationRequest,
@@ -40,6 +41,10 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isAuthenticated = computed(() => !!tokens.value?.access && !!user.value)
   const hasMultipleCompanies = computed(() => companies.value.length > 1)
+
+  window.addEventListener(AUTH_TOKENS_CHANGED_EVENT, () => {
+    tokens.value = loadTokens()
+  })
 
   async function withLoading<T>(fn: () => Promise<T>): Promise<T> {
     loading.value = true
@@ -89,7 +94,7 @@ export const useAuthStore = defineStore('auth', () => {
     if (!tokens.value?.refresh) return null
     try {
       const response = await authService.refreshToken(tokens.value.refresh)
-      tokens.value = { ...tokens.value, access: response.access }
+      tokens.value = { ...tokens.value, ...response }
       saveTokens(tokens.value)
       return response.access
     } catch {

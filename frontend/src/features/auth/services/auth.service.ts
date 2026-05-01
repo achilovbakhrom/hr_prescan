@@ -7,6 +7,7 @@ import type {
   PendingInvitation,
   RegisterRequest,
   User,
+  AuthTokens,
 } from '../types/auth.types'
 
 // All paths end with `/` because Django's APPEND_SLASH=True issues a
@@ -27,8 +28,8 @@ export const authService = {
     await apiClient.post('/auth/logout/', { refresh: refreshToken })
   },
 
-  async refreshToken(refreshToken: string): Promise<{ access: string }> {
-    const response = await apiClient.post<{ access: string }>('/auth/token/refresh/', {
+  async refreshToken(refreshToken: string): Promise<AuthTokens> {
+    const response = await apiClient.post<AuthTokens>('/auth/token/refresh/', {
       refresh: refreshToken,
     })
     return response.data

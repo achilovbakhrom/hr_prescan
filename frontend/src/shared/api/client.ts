@@ -1,59 +1,9 @@
-import axios, { type AxiosResponse, type InternalAxiosRequestConfig } from 'axios'
-
-const TOKENS_KEY = 'hr_prescan_tokens'
+import axios, { AxiosHeaders, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios'
+import { clearTokens, loadTokens, saveTokens, type StoredAuthTokens } from './authTokens'
+import { convertKeysToCamelCase, convertKeysToSnakeCase } from './caseTransform'
 
 interface RetryableRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean
-}
-
-/**
- * Convert camelCase keys to snake_case (Django convention).
- */
-function toSnakeCase(str: string): string {
-  return str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`)
-}
-
-function convertKeysToSnakeCase(obj: unknown): unknown {
-  if (Array.isArray(obj)) {
-    return obj.map(convertKeysToSnakeCase)
-  }
-  if (
-    obj !== null &&
-    typeof obj === 'object' &&
-    !(obj instanceof File) &&
-    !(obj instanceof Blob) &&
-    !(obj instanceof FormData)
-  ) {
-    return Object.fromEntries(
-      Object.entries(obj as Record<string, unknown>).map(([key, value]) => [
-        toSnakeCase(key),
-        convertKeysToSnakeCase(value),
-      ]),
-    )
-  }
-  return obj
-}
-
-/**
- * Convert snake_case keys to camelCase (frontend convention).
- */
-function toCamelCase(str: string): string {
-  return str.replace(/_([a-z])/g, (_, letter: string) => letter.toUpperCase())
-}
-
-function convertKeysToCamelCase(obj: unknown): unknown {
-  if (Array.isArray(obj)) {
-    return obj.map(convertKeysToCamelCase)
-  }
-  if (obj !== null && typeof obj === 'object') {
-    return Object.fromEntries(
-      Object.entries(obj as Record<string, unknown>).map(([key, value]) => [
-        toCamelCase(key),
-        convertKeysToCamelCase(value),
-      ]),
-    )
-  }
-  return obj
 }
 
 const baseURL = ((import.meta.env.VITE_API_URL as string | undefined) ?? '/api').replace(/\/$/, '')
@@ -64,6 +14,24 @@ export const apiClient = axios.create({
     'Content-Type': 'application/json',
   },
 })
+
+const refreshClient = axios.create({
+  baseURL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
+interface RefreshResponse {
+  access: string
+  refresh?: string
+}
+
+function setAuthorizationHeader(config: InternalAxiosRequestConfig, token: string): void {
+  const headers = AxiosHeaders.from(config.headers)
+  headers.set('Authorization', `Bearer ${token}`)
+  config.headers = headers
+}
 
 // Ensure trailing slash + convert request body & params keys to snake_case
 apiClient.interceptors.request.use((config) => {
@@ -97,39 +65,32 @@ apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const locale = localStorage.getItem('hr_prescan_locale') || 'en'
   config.headers['Accept-Language'] = locale
 
-  const raw = localStorage.getItem(TOKENS_KEY)
-  if (raw) {
-    try {
-      const tokens = JSON.parse(raw) as { access: string }
-      config.headers.Authorization = `Bearer ${tokens.access}`
-    } catch {
-      // Invalid token data, skip
-    }
-  }
+  const tokens = loadTokens()
+  if (tokens?.access) setAuthorizationHeader(config, tokens.access)
   return config
 })
 
-let isRefreshing = false
-let failedQueue: Array<{
-  resolve: (token: string) => void
-  reject: (error: unknown) => void
-}> = []
-
-function processQueue(error: unknown, token: string | null): void {
-  failedQueue.forEach((promise) => {
-    if (error) {
-      promise.reject(error)
-    } else if (token) {
-      promise.resolve(token)
-    }
-  })
-  failedQueue = []
-}
+let refreshPromise: Promise<StoredAuthTokens> | null = null
 
 function redirectToLogin(): void {
   if (window.location.pathname !== '/login') {
     window.location.href = '/login'
   }
+}
+
+async function refreshStoredTokens(): Promise<StoredAuthTokens> {
+  const tokens = loadTokens()
+  if (!tokens?.refresh) throw new Error('Missing refresh token')
+
+  const response = await refreshClient.post<RefreshResponse>('/auth/token/refresh/', {
+    refresh: tokens.refresh,
+  })
+  const updatedTokens = {
+    access: response.data.access,
+    refresh: response.data.refresh ?? tokens.refresh,
+  }
+  saveTokens(updatedTokens)
+  return updatedTokens
 }
 
 apiClient.interceptors.response.use(
@@ -153,45 +114,19 @@ apiClient.interceptors.response.use(
       return Promise.reject(error)
     }
 
-    if (isRefreshing) {
-      return new Promise<string>((resolve, reject) => {
-        failedQueue.push({ resolve, reject })
-      }).then((token) => {
-        originalRequest.headers.Authorization = `Bearer ${token}`
-        return apiClient(originalRequest)
-      })
-    }
-
     originalRequest._retry = true
-    isRefreshing = true
-
-    const raw = localStorage.getItem(TOKENS_KEY)
-    if (!raw) {
-      isRefreshing = false
-      redirectToLogin()
-      return Promise.reject(error)
-    }
+    refreshPromise ??= refreshStoredTokens().finally(() => {
+      refreshPromise = null
+    })
 
     try {
-      const tokens = JSON.parse(raw) as { access: string; refresh: string }
-      const response = await axios.post<{ access: string }>(`${baseURL}/auth/token/refresh/`, {
-        refresh: tokens.refresh,
-      })
-
-      const newAccess = response.data.access
-      const updatedTokens = { ...tokens, access: newAccess }
-      localStorage.setItem(TOKENS_KEY, JSON.stringify(updatedTokens))
-
-      processQueue(null, newAccess)
-      originalRequest.headers.Authorization = `Bearer ${newAccess}`
+      const tokens = await refreshPromise
+      setAuthorizationHeader(originalRequest, tokens.access)
       return apiClient(originalRequest)
     } catch (refreshError) {
-      processQueue(refreshError, null)
-      localStorage.removeItem(TOKENS_KEY)
+      clearTokens()
       redirectToLogin()
       return Promise.reject(refreshError)
-    } finally {
-      isRefreshing = false
     }
   },
 )
