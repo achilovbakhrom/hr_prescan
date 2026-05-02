@@ -21,7 +21,7 @@ const { t } = useI18n()
         <AppLogo variant="glyph" size="sm" :linked="false" />
         <span
           class="font-mono text-[10px] font-semibold uppercase tracking-widest text-[color:var(--color-accent-ai)]"
-          >AI assistant</span
+          >{{ t('aiAssistant.title') }}</span
         >
       </div>
       <h3 class="text-base font-semibold text-[color:var(--color-text-primary)]">

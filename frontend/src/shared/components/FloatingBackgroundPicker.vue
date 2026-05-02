@@ -14,6 +14,7 @@
  *   - `Enter` / `Space` on a thumb selects it
  */
 import { nextTick, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useThemeStore, type BackgroundMode } from '@/shared/stores/theme.store'
 import { useBackgroundPickerKeys } from '@/shared/composables/useBackgroundPickerKeys'
 import GlassSurface from './GlassSurface.vue'
@@ -36,6 +37,7 @@ const THUMBS: readonly ThumbDef[] = [
 ]
 
 const themeStore = useThemeStore()
+const { t } = useI18n()
 const open = ref(false)
 const rootRef = ref<HTMLElement | null>(null)
 const thumbRefs = ref<HTMLButtonElement[]>([])
@@ -86,7 +88,7 @@ useBackgroundPickerKeys({ rootRef, isOpen: open, toggle: toggleOpen, close })
     ref="rootRef"
     class="fixed bottom-4 right-4 z-50 flex items-center gap-2"
     role="toolbar"
-    aria-label="Background picker"
+    :aria-label="t('backgroundPicker.title')"
   >
     <Transition name="picker">
       <GlassSurface
@@ -96,7 +98,7 @@ useBackgroundPickerKeys({ rootRef, isOpen: open, toggle: toggleOpen, close })
       >
         <div
           role="radiogroup"
-          aria-label="Background variant"
+          :aria-label="t('backgroundPicker.variant')"
           class="grid grid-cols-2 gap-1.5 md:flex md:flex-row md:gap-1.5"
         >
           <button
@@ -124,8 +126,8 @@ useBackgroundPickerKeys({ rootRef, isOpen: open, toggle: toggleOpen, close })
       class="fbp-trigger bg-glass-float border-glass shadow-glass-float"
       :aria-expanded="open"
       aria-haspopup="true"
-      aria-label="Background picker"
-      title="Background (? or Alt+B)"
+      :aria-label="t('backgroundPicker.title')"
+      :title="t('backgroundPicker.shortcut')"
       @click="toggleOpen"
     >
       <i class="pi pi-palette" />

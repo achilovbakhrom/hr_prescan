@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import Popover from 'primevue/popover'
 import { useLocale } from '../composables/useLocale'
 import type { SupportedLocale } from '../composables/useLocale'
 
 const { currentLocale, currentLocaleOption, localeOptions, switchLocale } = useLocale()
+const { t } = useI18n()
 const popover = ref()
 
 function toggle(event: Event): void {
@@ -28,7 +30,7 @@ function selectLocale(code: SupportedLocale): void {
     rounded
     size="small"
     class="!gap-1 !px-2.5"
-    aria-label="Select language"
+    :aria-label="t('common.aria.selectLanguage')"
     aria-haspopup="true"
     @click="toggle"
   />

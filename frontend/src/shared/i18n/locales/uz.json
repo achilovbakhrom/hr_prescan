@@ -42,6 +42,7 @@
     "inactive": "Nofaol",
     "showMore": "Ko'proq ko'rsatish",
     "showLess": "Kamroq ko'rsatish",
+    "unread": "O'qilmagan",
     "createdAt": "Yaratilgan",
     "updatedAt": "Yangilangan",
     "total": "jami",
@@ -58,6 +59,18 @@
     "name": "Nomi",
     "description": "Tavsif",
     "customIndustry": "Sohangisingizni kiriting",
+    "aria": {
+      "toggleMenu": "Menyuni almashtirish",
+      "userMenu": "Foydalanuvchi menyusi",
+      "selectLanguage": "Tilni tanlash",
+      "mainNavigation": "Asosiy navigatsiya",
+      "mobileNavigation": "Mobil navigatsiya",
+      "mobileMenu": "Mobil menyu",
+      "closeNavigationMenu": "Navigatsiya menyusini yopish",
+      "openMenu": "Menyuni ochish",
+      "loadingTable": "Jadval yuklanmoqda",
+      "loadingContent": "Kontent yuklanmoqda"
+    },
     "customIndustryPlaceholder": "Sohangiz nomini kiriting"
   },
   "nav": {
@@ -153,6 +166,8 @@
     "acceptInvitation": {
       "title": "Taklifni qabul qilish",
       "subtitle": "Siz kompaniyaga taklif qilindingiz",
+      "join": "{owner} jamoasiga HR xodimi sifatida qo'shiling.",
+      "joinWithCompanies": "{owner} jamoasiga {companies} kompaniyalariga kirish huquqi bilan HR xodimi sifatida qo'shiling.",
       "firstName": "Ism",
       "lastName": "Familiya",
       "password": "Parol",
@@ -520,9 +535,30 @@
     "default": "Standart",
     "editCriteria": "Mezonni tahrirlash",
     "noCriteria": "Hozircha mezonlar yo'q. Bu vakansiya uchun baholash mezonlarini qo'shing.",
+    "noQuestions": "Hali savollar yo'q. Qo'lda qo'shing yoki AI bilan yarating.",
     "generateQuestions": "AI bilan yaratish",
     "addQuestion": "Savol qo'shish",
+    "editQuestion": "Savolni tahrirlash",
     "addCriteria": "Mezon qo'shish",
+    "criteriaForm": {
+      "name": "Nomi",
+      "namePlaceholder": "masalan, muloqot ko'nikmalari",
+      "descriptionPlaceholder": "Qisqa tavsif"
+    },
+    "questionCategories": {
+      "hardSkill": "Hard skill",
+      "softSkill": "Soft skill",
+      "domainKnowledge": "Soha bilimi",
+      "culturalFit": "Madaniy moslik"
+    },
+    "questionForm": {
+      "question": "Savol",
+      "category": "Kategoriya",
+      "source": "Manba",
+      "manual": "Qo'lda",
+      "questionPlaceholder": "masalan, React hooks ishlatgan loyihangiz haqida gapirib bering",
+      "categoryPlaceholder": "Kategoriyani tanlang"
+    },
     "deleteConfirm": "Bu vakansiyani butunlay o'chirishni xohlaysizmi?",
     "deleteConfirmHeader": "Vakansiyani o'chirish",
     "deleteConfirmMessage": "«{title}» ni butunlay o'chirasizmi? Bu amalni qaytarib bo'lmaydi.",
@@ -562,6 +598,8 @@
     "table": "Jadval",
     "kanban": "Kanban",
     "search": "Ism yoki email bo'yicha qidirish",
+    "filterByStatus": "Holat bo'yicha filtrlash",
+    "sortBy": "Saralash",
     "status": {
       "applied": "Ariza topshirgan",
       "prescanned": "Oldindan tekshirilgan",
@@ -600,9 +638,48 @@
       "moveToPrescanned": "Oldindan tekshiruvga",
       "moveToInterviewed": "Suhbatga"
     },
+    "kanbanActions": {
+      "rejectAll": "Barchasini rad etish",
+      "rejectByCvMatch": "CV mosligi < ... bo'yicha rad etish",
+      "rejectNoCv": "CV yo'q bo'lsa rad etish",
+      "rejectIdle": "... kundan ko'p kutganlarni rad etish",
+      "shortlistAll": "Barchasini tanlash",
+      "hireAll": "Barchasini yollash",
+      "archiveAll": "Barchasini arxivlash",
+      "moveAllToInterviewed": "Barchasini suhbatga o'tkazish",
+      "rejectByPrescanScore": "Oldindan tekshiruv bali < ... bo'yicha rad etish",
+      "shortlistByPrescanScore": "Oldindan tekshiruv bali > ... bo'yicha tanlash",
+      "rejectByInterviewScore": "Suhbat bali < ... bo'yicha rad etish",
+      "shortlistByInterviewScore": "Suhbat bali > ... bo'yicha tanlash",
+      "resetAllToApplied": "Barchasini ariza topshirganga qaytarish",
+      "restoreAllToApplied": "Barchasini ariza topshirganga tiklash",
+      "clearAll": "Barchasini tozalash (soft delete)"
+    },
+    "scoreFields": {
+      "cvMatch": "CV mosligi",
+      "prescan": "oldindan tekshiruv bali",
+      "interview": "suhbat bali"
+    },
+    "scoreDirections": {
+      "below": "dan past",
+      "above": "dan yuqori"
+    },
+    "scoreTitles": {
+      "overall": "Umumiy ball: {score}%",
+      "processing": "Qayta ishlanmoqda...",
+      "cvMatch": "CV moslik bali",
+      "prescan": "Oldindan tekshiruv bali",
+      "interview": "Suhbat bali"
+    },
+    "scoreLabels": {
+      "cv": "CV",
+      "prescan": "Oldindan tekshiruv",
+      "interview": "Suhbat"
+    },
     "application": {
       "title": "Bu lavozimga ariza topshirish",
       "name": "To'liq ism",
+      "namePlaceholder": "Ali Valiyev",
       "email": "Email",
       "phone": "Telefon",
       "uploadCv": "CV yuklash",
@@ -646,12 +723,34 @@
     "dialogs": {
       "bulkConfirmHeader": "Ommaviy amalni tasdiqlash",
       "bulkConfirmMessage": "{count} nomzod(lar)ga {action} ni qo'llashni xohlaysizmi?",
+      "batchMoveHeader": "Ommaviy ko'chirish",
+      "batchMoveByScoreHeader": "Ball bo'yicha ommaviy ko'chirish",
+      "batchMoveNoCvHeader": "Ommaviy ko'chirish (CV yo'q)",
+      "batchMoveIdleHeader": "Ommaviy ko'chirish (kutayotganlar)",
+      "batchMoveAllMessage": "{count} ta \"{from}\" nomzod(lar)ini \"{to}\" holatiga ko'chirasizmi?",
+      "batchMoveScoreMessage": "{field} {threshold} {direction} bo'lgan {count} ta nomzod(lar)ni \"{to}\" holatiga ko'chirasizmi?",
+      "batchMoveScoreFilterMessage": "\"{from}\" nomzodlaridan {field} {threshold} {direction} bo'lganlarni \"{to}\" holatiga ko'chirasizmi?",
+      "batchMoveNoCvMessage": "CVsiz {count} ta \"{from}\" nomzod(lar)ni \"{to}\" holatiga ko'chirasizmi?",
+      "batchMoveNoCvAllMessage": "\"{from}\" holatidagi barcha CVsiz nomzodlarni \"{to}\" holatiga ko'chirasizmi?",
+      "batchMoveIdleMessage": "{days} kundan ko'p kutgan {count} ta nomzod(lar)ni \"{to}\" holatiga ko'chirasizmi?",
+      "batchMoveIdleFilterMessage": "\"{from}\" holatidagi {days} kundan ko'p kutgan nomzodlarni \"{to}\" holatiga ko'chirasizmi?",
+      "clearArchiveHeader": "Arxivni tozalash",
+      "clearArchiveMessage": "{count} ta arxivlangan nomzod(lar)ni doimiy yashirasizmi?",
+      "clearArchiveDetailedMessage": "{count} ta arxivlangan nomzod(lar)ni doimiy yashirasizmi? Ular endi hech qayerda ko'rinmaydi.",
+      "thresholdTitle": "{field} {direction} bo'lsa {action}",
+      "scoreBelow": "Ball past",
+      "scoreAbove": "Ball yuqori",
+      "rejectIdleHeader": "Kutayotgan nomzodlarni rad etish",
+      "appliedMoreThanDays": "Ariza ... kundan oldin topshirilgan",
+      "daysSuffix": "kun",
       "statusChangeHeader": "Holat o'zgarishini tasdiqlash",
       "resetHeader": "Nomzod holatini tiklash",
       "resetMessage": "{name} ni Ariza topshirganga qaytarasizmi? Bu faol seanslarni bekor qiladi va yangi oldindan tekshiruv havolasini yaratadi.",
       "moveMessage": "{name} ni {status} ga ko'chirasizmi?",
       "yesReset": "Ha, tiklash",
       "yesMove": "Ha, ko'chirish",
+      "yesMoveAll": "Ha, barchasini ko'chirish",
+      "yesClearAll": "Ha, barchasini tozalash",
       "yesShortlist": "Ha, tanlash",
       "yesHire": "Ha, yollash",
       "yesReject": "Ha, rad etish",
@@ -725,6 +824,23 @@
       "subjectPlaceholder": "Email mavzusi",
       "body": "Matn",
       "bodyPlaceholder": "Email matni"
+    },
+    "humanInterview": {
+      "title": "Inson intervyusini rejalashtirish",
+      "scheduledFor": "{name} uchun intervyu rejalashtirildi",
+      "schedulingFor": "{name} uchun intervyu rejalashtirilmoqda",
+      "dateTime": "Sana va vaqt",
+      "dateTimePlaceholder": "Sana va vaqtni tanlang",
+      "interviewerName": "Intervyuer ismi",
+      "interviewerPlaceholder": "masalan, John Smith",
+      "meetingLink": "Uchrashuv havolasi (ixtiyoriy)",
+      "meetingLinkPlaceholder": "masalan, https://meet.google.com/...",
+      "schedule": "Rejalashtirish"
+    },
+    "interviewScores": {
+      "performance": "Suhbat natijalari",
+      "empty": "Suhbat yakunlangandan keyin ballar shu yerda ko'rinadi.",
+      "integrityFlags": "Halollik belgilari"
     },
     "myApplication": {
       "progress": "Ariza jarayoni",
@@ -832,8 +948,15 @@
       "overallScore": "Umumiy halollik bali",
       "flagsDetected": "{count} ta bayroq aniqlandi",
       "noFlags": "Halollik bayroqlari aniqlanmadi. Intervyu barcha tekshiruvlardan o'tdi.",
+      "noFlagsShort": "Halollik bayroqlari aniqlanmadi.",
       "details": "Tafsilotlar",
       "recorded": "Qayd etilgan:",
+      "atTimestamp": "{time} da",
+      "severity": {
+        "low": "PAST",
+        "medium": "O'RTA",
+        "high": "YUQORI"
+      },
       "flagLabels": {
         "face_not_visible": "Yuz ko'rinmayapti",
         "multiple_faces": "Bir nechta yuz",
@@ -1016,6 +1139,7 @@
       "title": "Jamoa boshqaruvi",
       "invite": "HR menejerni taklif qilish",
       "email": "Email manzili",
+      "emailPlaceholder": "Email manzilini kiriting",
       "send": "Taklifnoma yuborish",
       "members": "Jamoa a'zolari",
       "invitations": "Kutilayotgan takliflar",
@@ -1023,6 +1147,13 @@
       "companiesHelp": "Ushbu a'zo qaysi kompaniyalarga kirish huquqiga ega bo‘lishini tanlang.",
       "noCompanies": "Mavjud kompaniya yo‘q. Avval kompaniya yarating.",
       "selectAtLeastOneCompany": "Kamida bitta kompaniyani tanlang.",
+      "sent": "Yuborilgan",
+      "expires": "Tugaydi",
+      "invitationStatus": {
+        "accepted": "Qabul qilingan",
+        "expired": "Muddati tugagan",
+        "pending": "Kutilmoqda"
+      },
       "activate": "Faollashtirish",
       "deactivate": "Faolsizlantirish",
       "role": "Lavozim",
@@ -1071,6 +1202,7 @@
   },
   "admin": {
     "title": "Administrator paneli",
+    "blocked": "Bloklangan",
     "dashboard": {
       "totalCompanies": "Jami kompaniyalar",
       "totalUsers": "Jami foydalanuvchilar",
@@ -1081,6 +1213,7 @@
     "companies": {
       "title": "Kompaniyalar",
       "name": "Kompaniya nomi",
+      "searchPlaceholder": "Kompaniyalarni qidirish...",
       "plan": "Tarif",
       "status": "Holat",
       "users": "Foydalanuvchilar",
@@ -1091,11 +1224,24 @@
     },
     "users": {
       "title": "Foydalanuvchilar",
+      "allRoles": "Barcha rollar",
+      "searchPlaceholder": "Foydalanuvchilarni qidirish...",
+      "filterByRole": "Rol bo'yicha filtrlash",
       "name": "Ism",
       "email": "Email",
       "role": "Lavozim",
       "company": "Kompaniya",
       "status": "Holat"
+    },
+    "plans": {
+      "name": "Tarif nomi",
+      "tier": "Daraja",
+      "monthlyPrice": "Oylik narx",
+      "yearlyPrice": "Yillik narx",
+      "maxVacancies": "Maks. vakansiyalar",
+      "maxInterviewsPerMonth": "Maks. intervyu/oy",
+      "maxHrUsers": "Maks. HR foydalanuvchilar",
+      "storage": "Xotira"
     },
     "analytics": {
       "activeSubscriptions": "Faol obunalar",
@@ -1114,6 +1260,7 @@
   "notifications": {
     "title": "Bildirishnomalar",
     "markAllRead": "Barchasini o'qilgan deb belgilash",
+    "markRead": "O'qilgan deb belgilash",
     "noNotifications": "Hozircha bildirishnomalar yo'q",
     "newApplication": "Yangi ariza",
     "interviewCompleted": "Intervyu yakunlandi",
@@ -1127,6 +1274,8 @@
     "forbiddenHint": "Bu sahifaga kirish huquqingiz yo'q.",
     "forbiddenDesc": "Bu sahifaga kirish huquqingiz yo'q.",
     "needAccess": "Kirish kerakmi? Administratoringizga yoki quyidagi manzilga murojaat qiling:",
+    "contactSupport": "Bu xato deb hisoblasangiz, quyidagi manzilga murojaat qiling:",
+    "urgentSupport": "Shoshilinch yordam kerakmi? Quyidagi manzilga murojaat qiling:",
     "serverError": "Server xatoligi",
     "serverErrorHint": "Bizning tomonimizda xatolik yuz berdi. Keyinroq qayta urinib ko'ring.",
     "serverErrorDesc": "Bizning tomonimizda xatolik yuz berdi. Jamoamizga xabar berildi.",
@@ -1135,10 +1284,19 @@
     "tryAgain": "Qayta urinish"
   },
   "cookies": {
+    "title": "Cookie roziligi",
     "message": "Tajribangizni yaxshilash uchun cookie-fayllardan foydalanamiz. Davom etish orqali cookie siyosatimizga rozilik bildirasiz.",
     "accept": "Qabul qilish",
     "decline": "Rad etish",
     "learnMore": "Batafsil"
+  },
+  "backgroundPicker": {
+    "title": "Fon tanlash",
+    "variant": "Fon varianti",
+    "shortcut": "Fon (? yoki Alt+B)"
+  },
+  "legal": {
+    "lastUpdated": "Yangilangan: {date}"
   },
   "trial": {
     "banner": "Siz Professional tarifning 14 kunlik bepul sinov muddatidasiz.",

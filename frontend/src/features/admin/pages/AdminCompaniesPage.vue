@@ -40,7 +40,7 @@ onMounted(() => adminStore.fetchCompanies())
     <AdminFiltersBar>
       <InputText
         v-model="search"
-        placeholder="Search companies..."
+        :placeholder="t('admin.companies.searchPlaceholder')"
         class="w-56"
         @keyup.enter="handleSearch"
       />
@@ -58,9 +58,9 @@ onMounted(() => adminStore.fetchCompanies())
       class="admin-table text-sm"
     >
       <Column field="name" :header="t('admin.companies.name')" sortable />
-      <Column field="industry" header="Industry" sortable />
-      <Column field="size" header="Size" sortable />
-      <Column field="country" header="Country" />
+      <Column field="industry" :header="t('settings.company.industry')" sortable />
+      <Column field="size" :header="t('settings.company.size')" sortable />
+      <Column field="country" :header="t('settings.company.country')" />
       <Column field="planTier" :header="t('admin.companies.plan')" sortable>
         <template #body="{ data }">
           <span
@@ -89,11 +89,11 @@ onMounted(() => adminStore.fetchCompanies())
                 : 'bg-[color:color-mix(in_srgb,var(--color-danger)_15%,transparent)] text-[color:var(--color-danger)]'
             "
           >
-            {{ (data as AdminCompany).isActive ? 'Active' : 'Blocked' }}
+            {{ (data as AdminCompany).isActive ? t('common.active') : t('admin.blocked') }}
           </span>
         </template>
       </Column>
-      <Column field="createdAt" header="Created">
+      <Column field="createdAt" :header="t('common.createdAt')">
         <template #body="{ data }">
           <span class="font-mono text-xs text-[color:var(--color-text-muted)]">{{
             formatDate((data as AdminCompany).createdAt)

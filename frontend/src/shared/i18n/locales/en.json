@@ -42,6 +42,7 @@
     "inactive": "Inactive",
     "showMore": "Show more",
     "showLess": "Show less",
+    "unread": "Unread",
     "createdAt": "Created",
     "updatedAt": "Updated",
     "total": "total",
@@ -58,6 +59,18 @@
     "name": "Name",
     "description": "Description",
     "customIndustry": "Specify your industry",
+    "aria": {
+      "toggleMenu": "Toggle menu",
+      "userMenu": "User menu",
+      "selectLanguage": "Select language",
+      "mainNavigation": "Main navigation",
+      "mobileNavigation": "Mobile navigation",
+      "mobileMenu": "Mobile menu",
+      "closeNavigationMenu": "Close navigation menu",
+      "openMenu": "Open menu",
+      "loadingTable": "Loading table",
+      "loadingContent": "Loading content"
+    },
     "customIndustryPlaceholder": "Enter your industry name"
   },
   "nav": {
@@ -160,6 +173,8 @@
     "acceptInvitation": {
       "title": "Accept Invitation",
       "subtitle": "You've been invited to join a company",
+      "join": "Join {owner} as an HR team member.",
+      "joinWithCompanies": "Join {owner} as an HR team member with access to {companies}.",
       "firstName": "First Name",
       "lastName": "Last Name",
       "password": "Password",
@@ -527,9 +542,30 @@
     "default": "Default",
     "editCriteria": "Edit Criteria",
     "noCriteria": "No criteria defined yet. Add evaluation criteria for this vacancy.",
+    "noQuestions": "No questions yet. Add manually or generate with AI.",
     "generateQuestions": "Generate with AI",
     "addQuestion": "Add Question",
+    "editQuestion": "Edit Question",
     "addCriteria": "Add Criteria",
+    "criteriaForm": {
+      "name": "Name",
+      "namePlaceholder": "e.g. Communication Skills",
+      "descriptionPlaceholder": "Brief description"
+    },
+    "questionCategories": {
+      "hardSkill": "Hard Skill",
+      "softSkill": "Soft Skill",
+      "domainKnowledge": "Domain Knowledge",
+      "culturalFit": "Cultural Fit"
+    },
+    "questionForm": {
+      "question": "Question",
+      "category": "Category",
+      "source": "Source",
+      "manual": "Manual",
+      "questionPlaceholder": "e.g. Can you describe a project where you used React hooks?",
+      "categoryPlaceholder": "Select category"
+    },
     "deleteConfirm": "Are you sure you want to permanently delete this vacancy?",
     "deleteConfirmHeader": "Delete Vacancy",
     "deleteConfirmMessage": "Permanently delete \"{title}\"? This cannot be undone.",
@@ -569,6 +605,8 @@
     "table": "Table",
     "kanban": "Kanban",
     "search": "Search by name or email",
+    "filterByStatus": "Filter by status",
+    "sortBy": "Sort by",
     "status": {
       "applied": "Applied",
       "prescanned": "Prescanned",
@@ -607,9 +645,48 @@
       "moveToPrescanned": "Move to Prescanned",
       "moveToInterviewed": "Move to Interviewed"
     },
+    "kanbanActions": {
+      "rejectAll": "Reject all",
+      "rejectByCvMatch": "Reject by CV match < ...",
+      "rejectNoCv": "Reject with no CV",
+      "rejectIdle": "Reject idle > ... days",
+      "shortlistAll": "Shortlist all",
+      "hireAll": "Hire all",
+      "archiveAll": "Archive all",
+      "moveAllToInterviewed": "Move all to Interviewed",
+      "rejectByPrescanScore": "Reject by prescan score < ...",
+      "shortlistByPrescanScore": "Shortlist by prescan score > ...",
+      "rejectByInterviewScore": "Reject by interview score < ...",
+      "shortlistByInterviewScore": "Shortlist by interview score > ...",
+      "resetAllToApplied": "Reset all to Applied",
+      "restoreAllToApplied": "Restore all to Applied",
+      "clearAll": "Clear all (soft delete)"
+    },
+    "scoreFields": {
+      "cvMatch": "CV match",
+      "prescan": "prescan score",
+      "interview": "interview score"
+    },
+    "scoreDirections": {
+      "below": "below",
+      "above": "above"
+    },
+    "scoreTitles": {
+      "overall": "Overall score: {score}%",
+      "processing": "Processing...",
+      "cvMatch": "CV match score",
+      "prescan": "Prescanning score",
+      "interview": "Interview score"
+    },
+    "scoreLabels": {
+      "cv": "CV",
+      "prescan": "Prescan",
+      "interview": "Interview"
+    },
     "application": {
       "title": "Apply for this Position",
       "name": "Full Name",
+      "namePlaceholder": "John Doe",
       "email": "Email",
       "phone": "Phone",
       "uploadCv": "Upload CV",
@@ -653,12 +730,34 @@
     "dialogs": {
       "bulkConfirmHeader": "Confirm Bulk Action",
       "bulkConfirmMessage": "Are you sure you want to {action} {count} candidate(s)?",
+      "batchMoveHeader": "Batch Move",
+      "batchMoveByScoreHeader": "Batch Move by Score",
+      "batchMoveNoCvHeader": "Batch Move (No CV)",
+      "batchMoveIdleHeader": "Batch Move (Idle)",
+      "batchMoveAllMessage": "Move all {count} \"{from}\" candidate(s) to \"{to}\"?",
+      "batchMoveScoreMessage": "Move {count} candidate(s) with {field} {direction} {threshold} to \"{to}\"?",
+      "batchMoveScoreFilterMessage": "Move \"{from}\" candidates with {field} {direction} {threshold} to \"{to}\"?",
+      "batchMoveNoCvMessage": "Move {count} \"{from}\" candidate(s) without CV to \"{to}\"?",
+      "batchMoveNoCvAllMessage": "Move all \"{from}\" candidates without CV to \"{to}\"?",
+      "batchMoveIdleMessage": "Move {count} candidate(s) idle for more than {days} days to \"{to}\"?",
+      "batchMoveIdleFilterMessage": "Move \"{from}\" candidates idle for more than {days} days to \"{to}\"?",
+      "clearArchiveHeader": "Clear Archive",
+      "clearArchiveMessage": "Permanently hide all {count} archived candidate(s)?",
+      "clearArchiveDetailedMessage": "Permanently hide all {count} archived candidate(s)? They will no longer appear anywhere.",
+      "thresholdTitle": "{action} where {field} {direction}...",
+      "scoreBelow": "Score below",
+      "scoreAbove": "Score above",
+      "rejectIdleHeader": "Reject idle candidates",
+      "appliedMoreThanDays": "Applied more than ... days ago",
+      "daysSuffix": "days",
       "statusChangeHeader": "Confirm Status Change",
       "resetHeader": "Reset Candidate Status",
       "resetMessage": "Reset {name} back to Applied? This will cancel active sessions and create a new prescanning link.",
       "moveMessage": "Move {name} to {status}?",
       "yesReset": "Yes, reset",
       "yesMove": "Yes, move",
+      "yesMoveAll": "Yes, move all",
+      "yesClearAll": "Yes, clear all",
       "yesShortlist": "Yes, shortlist",
       "yesHire": "Yes, hire",
       "yesReject": "Yes, reject",
@@ -732,6 +831,23 @@
       "subjectPlaceholder": "Email subject",
       "body": "Body",
       "bodyPlaceholder": "Email body"
+    },
+    "humanInterview": {
+      "title": "Schedule Human Interview",
+      "scheduledFor": "Interview scheduled for {name}",
+      "schedulingFor": "Scheduling interview for: {name}",
+      "dateTime": "Date & Time",
+      "dateTimePlaceholder": "Select date and time",
+      "interviewerName": "Interviewer Name",
+      "interviewerPlaceholder": "e.g. John Smith",
+      "meetingLink": "Meeting Link (optional)",
+      "meetingLinkPlaceholder": "e.g. https://meet.google.com/...",
+      "schedule": "Schedule"
+    },
+    "interviewScores": {
+      "performance": "Interview Performance",
+      "empty": "Interview scores will appear here after the interview is completed.",
+      "integrityFlags": "Integrity Flags"
     },
     "myApplication": {
       "progress": "Application Progress",
@@ -839,8 +955,15 @@
       "overallScore": "Overall Integrity Score",
       "flagsDetected": "Based on {count} flag(s) detected",
       "noFlags": "No integrity flags detected. The interview passed all checks.",
+      "noFlagsShort": "No integrity flags detected.",
       "details": "Details",
       "recorded": "Recorded:",
+      "atTimestamp": "at {time}",
+      "severity": {
+        "low": "LOW",
+        "medium": "MEDIUM",
+        "high": "HIGH"
+      },
       "flagLabels": {
         "face_not_visible": "Face Not Visible",
         "multiple_faces": "Multiple Faces",
@@ -1023,6 +1146,7 @@
       "title": "Team Management",
       "invite": "Invite HR Manager",
       "email": "Email Address",
+      "emailPlaceholder": "Enter email address",
       "send": "Send Invitation",
       "members": "Team Members",
       "invitations": "Pending Invitations",
@@ -1030,6 +1154,13 @@
       "companiesHelp": "Choose which companies this member will have access to.",
       "noCompanies": "No companies available. Create one first.",
       "selectAtLeastOneCompany": "Select at least one company.",
+      "sent": "Sent",
+      "expires": "Expires",
+      "invitationStatus": {
+        "accepted": "Accepted",
+        "expired": "Expired",
+        "pending": "Pending"
+      },
       "activate": "Activate",
       "deactivate": "Deactivate",
       "role": "Role",
@@ -1078,6 +1209,7 @@
   },
   "admin": {
     "title": "Admin Panel",
+    "blocked": "Blocked",
     "dashboard": {
       "totalCompanies": "Total Companies",
       "totalUsers": "Total Users",
@@ -1088,6 +1220,7 @@
     "companies": {
       "title": "Companies",
       "name": "Company Name",
+      "searchPlaceholder": "Search companies...",
       "plan": "Plan",
       "status": "Status",
       "users": "Users",
@@ -1098,11 +1231,24 @@
     },
     "users": {
       "title": "Users",
+      "allRoles": "All Roles",
+      "searchPlaceholder": "Search users...",
+      "filterByRole": "Filter by role",
       "name": "Name",
       "email": "Email",
       "role": "Role",
       "company": "Company",
       "status": "Status"
+    },
+    "plans": {
+      "name": "Plan Name",
+      "tier": "Tier",
+      "monthlyPrice": "Monthly Price",
+      "yearlyPrice": "Yearly Price",
+      "maxVacancies": "Max Vacancies",
+      "maxInterviewsPerMonth": "Max Interviews/Mo",
+      "maxHrUsers": "Max HR Users",
+      "storage": "Storage"
     },
     "analytics": {
       "activeSubscriptions": "Active Subscriptions",
@@ -1121,6 +1267,7 @@
   "notifications": {
     "title": "Notifications",
     "markAllRead": "Mark all as read",
+    "markRead": "Mark as read",
     "noNotifications": "No notifications yet",
     "newApplication": "New application",
     "interviewCompleted": "Interview completed",
@@ -1134,6 +1281,8 @@
     "forbiddenHint": "You don't have permission to access this page.",
     "forbiddenDesc": "You don't have permission to access this page.",
     "needAccess": "Need access? Contact your administrator or",
+    "contactSupport": "If you believe this is an error, please contact",
+    "urgentSupport": "Need urgent help? Contact",
     "serverError": "Server Error",
     "serverErrorHint": "Something went wrong on our end. Please try again later.",
     "serverErrorDesc": "Something went wrong on our end. Our team has been notified.",
@@ -1142,10 +1291,19 @@
     "tryAgain": "Try Again"
   },
   "cookies": {
+    "title": "Cookie consent",
     "message": "We use cookies to improve your experience. By continuing, you agree to our cookie policy.",
     "accept": "Accept",
     "decline": "Decline",
     "learnMore": "Learn more"
+  },
+  "backgroundPicker": {
+    "title": "Background picker",
+    "variant": "Background variant",
+    "shortcut": "Background (? or Alt+B)"
+  },
+  "legal": {
+    "lastUpdated": "Last updated: {date}"
   },
   "trial": {
     "banner": "You're on a 14-day free trial of the Professional plan.",

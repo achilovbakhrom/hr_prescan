@@ -40,12 +40,12 @@ const editId = ref('')
 const formText = ref('')
 const formCategory = ref('')
 
-const categoryOptions = [
-  { label: 'Hard Skill', value: 'Hard Skill' },
-  { label: 'Soft Skill', value: 'Soft Skill' },
-  { label: 'Domain Knowledge', value: 'Domain Knowledge' },
-  { label: 'Cultural Fit', value: 'Cultural Fit' },
-]
+const categoryOptions = computed(() => [
+  { label: t('vacancies.questionCategories.hardSkill'), value: 'Hard Skill' },
+  { label: t('vacancies.questionCategories.softSkill'), value: 'Soft Skill' },
+  { label: t('vacancies.questionCategories.domainKnowledge'), value: 'Domain Knowledge' },
+  { label: t('vacancies.questionCategories.culturalFit'), value: 'Cultural Fit' },
+])
 
 function openAdd(): void {
   isEditing.value = false
@@ -115,15 +115,15 @@ function handleSubmit(): void {
           <span class="text-sm">{{ getTranslatedText(data) }}</span>
         </template>
       </Column>
-      <Column field="category" header="Category" style="width: 160px">
+      <Column field="category" :header="t('vacancies.questionForm.category')" style="width: 160px">
         <template #body="{ data }">
           <Tag v-if="data.category" :value="data.category" severity="secondary" />
         </template>
       </Column>
-      <Column field="source" header="Source" style="width: 120px">
+      <Column field="source" :header="t('vacancies.questionForm.source')" style="width: 120px">
         <template #body="{ data }">
           <Tag
-            :value="data.source === 'ai_generated' ? 'AI' : 'Manual'"
+            :value="data.source === 'ai_generated' ? 'AI' : t('vacancies.questionForm.manual')"
             :severity="data.source === 'ai_generated' ? 'info' : 'secondary'"
           />
         </template>
@@ -150,42 +150,46 @@ function handleSubmit(): void {
       </Column>
       <template #empty>
         <div class="py-8 text-center text-gray-500">
-          No questions yet. Add manually or generate with AI.
+          {{ t('vacancies.noQuestions') }}
         </div>
       </template>
     </DataTable>
     <Dialog
       v-model:visible="showDialog"
-      :header="isEditing ? 'Edit Question' : t('vacancies.addQuestion')"
+      :header="isEditing ? t('vacancies.editQuestion') : t('vacancies.addQuestion')"
       :style="{ width: '500px' }"
       modal
     >
       <div class="space-y-4">
         <div>
-          <label class="mb-1 block text-sm font-medium">Question *</label>
+          <label class="mb-1 block text-sm font-medium"
+            >{{ t('vacancies.questionForm.question') }} *</label
+          >
           <Textarea
             v-model="formText"
             class="w-full"
             rows="3"
-            placeholder="e.g. Can you describe a project where you used React hooks?"
+            :placeholder="t('vacancies.questionForm.questionPlaceholder')"
           />
         </div>
         <div>
-          <label class="mb-1 block text-sm font-medium">Category</label>
+          <label class="mb-1 block text-sm font-medium">{{
+            t('vacancies.questionForm.category')
+          }}</label>
           <Select
             v-model="formCategory"
             :options="categoryOptions"
             option-label="label"
             option-value="value"
             class="w-full"
-            placeholder="Select category"
+            :placeholder="t('vacancies.questionForm.categoryPlaceholder')"
           />
         </div>
       </div>
       <template #footer>
         <Button :label="t('common.cancel')" severity="secondary" text @click="showDialog = false" />
         <Button
-          :label="isEditing ? t('common.save') : 'Add'"
+          :label="isEditing ? t('common.save') : t('common.add')"
           :disabled="!formText.trim()"
           @click="handleSubmit"
         />

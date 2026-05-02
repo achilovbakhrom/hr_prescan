@@ -1,22 +1,15 @@
 import { useConfirm } from 'primevue/useconfirm'
+import { useI18n } from 'vue-i18n'
 import { candidateService } from '../services/candidate.service'
 import { useCandidateStore } from '../stores/candidate.store'
 import type { Application, ApplicationStatus } from '../types/candidate.types'
-
-type ScoreField = 'match_score' | 'prescanning_score' | 'interview_score'
-
-function scoreValue(candidate: Application, field: string): number | null {
-  if (field === 'match_score') return candidate.matchScore
-  if (field === 'prescanning_score') return candidate.prescanningScore
-  if (field === 'interview_score') return candidate.interviewScore
-  return null
-}
-
-function olderThanDays(createdAt: string, days: number): boolean {
-  const created = Date.parse(createdAt)
-  if (Number.isNaN(created)) return false
-  return created < Date.now() - days * 24 * 60 * 60 * 1000
-}
+import {
+  olderThanDays,
+  scoreFieldLabel,
+  scoreValue,
+  statusLabel,
+  type ScoreField,
+} from '../utils/candidateActionLabels'
 
 export function useKanbanBatchActions(
   candidates: () => Application[],
@@ -24,6 +17,7 @@ export function useKanbanBatchActions(
   fetchCandidates: () => void,
 ) {
   const confirm = useConfirm()
+  const { t } = useI18n()
   const candidateStore = useCandidateStore()
 
   async function moveIds(ids: string[], status: ApplicationStatus): Promise<void> {
@@ -34,10 +28,10 @@ export function useKanbanBatchActions(
   function confirmMove(message: string, accept: () => Promise<void>): void {
     confirm.require({
       message,
-      header: 'Batch Move',
+      header: t('candidates.dialogs.batchMoveHeader'),
       icon: 'pi pi-arrows-alt',
-      acceptLabel: 'Yes, move',
-      rejectLabel: 'Cancel',
+      acceptLabel: t('candidates.dialogs.yesMove'),
+      rejectLabel: t('common.cancel'),
       accept: () => {
         void accept()
       },
@@ -53,7 +47,11 @@ export function useKanbanBatchActions(
     if (!matching.length) return
 
     confirmMove(
-      `Move all ${matching.length} "${fromStatus}" candidate(s) to "${toStatus}"?`,
+      t('candidates.dialogs.batchMoveAllMessage', {
+        count: matching.length,
+        from: statusLabel(t, fromStatus),
+        to: statusLabel(t, toStatus),
+      }),
       async () => {
         if (vacancyId()) await candidateService.batchMove(vacancyId(), { fromStatus, toStatus })
         else
@@ -81,7 +79,13 @@ export function useKanbanBatchActions(
     if (!matching.length) return
 
     confirmMove(
-      `Move ${matching.length} candidate(s) matching this score filter to "${toStatus}"?`,
+      t('candidates.dialogs.batchMoveScoreMessage', {
+        count: matching.length,
+        field: scoreFieldLabel(t, scoreField),
+        direction: t(`candidates.scoreDirections.${direction}`),
+        threshold,
+        to: statusLabel(t, toStatus),
+      }),
       async () => {
         if (vacancyId()) {
           await candidateService.batchMove(vacancyId(), {
@@ -106,7 +110,11 @@ export function useKanbanBatchActions(
     if (!matching.length) return
 
     confirmMove(
-      `Move ${matching.length} "${fromStatus}" candidate(s) without CV to "${toStatus}"?`,
+      t('candidates.dialogs.batchMoveNoCvMessage', {
+        count: matching.length,
+        from: statusLabel(t, fromStatus),
+        to: statusLabel(t, toStatus),
+      }),
       async () => {
         if (vacancyId())
           await candidateService.batchMove(vacancyId(), { fromStatus, toStatus, hasCv: false })
@@ -131,7 +139,11 @@ export function useKanbanBatchActions(
     if (!matching.length) return
 
     confirmMove(
-      `Move ${matching.length} candidate(s) idle for more than ${days} days to "${toStatus}"?`,
+      t('candidates.dialogs.batchMoveIdleMessage', {
+        count: matching.length,
+        days,
+        to: statusLabel(t, toStatus),
+      }),
       async () => {
         if (vacancyId())
           await candidateService.batchMove(vacancyId(), {
@@ -154,12 +166,12 @@ export function useKanbanBatchActions(
     if (!matching.length) return
 
     confirm.require({
-      message: `Permanently hide all ${matching.length} archived candidate(s)?`,
-      header: 'Clear Archive',
+      message: t('candidates.dialogs.clearArchiveMessage', { count: matching.length }),
+      header: t('candidates.dialogs.clearArchiveHeader'),
       icon: 'pi pi-trash',
       acceptClass: 'p-button-danger',
-      acceptLabel: 'Yes, clear all',
-      rejectLabel: 'Cancel',
+      acceptLabel: t('candidates.dialogs.yesClearAll'),
+      rejectLabel: t('common.cancel'),
       accept: async () => {
         await candidateService.softDelete(matching.map((candidate) => candidate.id))
         fetchCandidates()

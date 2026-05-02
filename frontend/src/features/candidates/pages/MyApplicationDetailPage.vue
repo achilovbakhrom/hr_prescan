@@ -55,7 +55,7 @@ function goBack(): void {
         severity="secondary"
         text
         rounded
-        aria-label="Back"
+        :aria-label="t('common.back')"
         @click="goBack"
       />
       <h1 class="text-2xl font-semibold tracking-tight text-[color:var(--color-text-primary)]">

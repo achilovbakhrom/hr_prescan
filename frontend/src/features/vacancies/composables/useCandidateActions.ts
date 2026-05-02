@@ -3,56 +3,12 @@ import { useI18n } from 'vue-i18n'
 import { useCandidateStore } from '@/features/candidates/stores/candidate.store'
 import { candidateService } from '@/features/candidates/services/candidate.service'
 import type { Application, ApplicationStatus } from '@/shared/types/candidate.types'
-
-const STATUS_DIALOG_KEY: Record<
-  ApplicationStatus,
-  { message: string; accept: string; icon: string; acceptClass: string } | undefined
-> = {
-  prescanned: {
-    message: 'candidates.dialogs.msgPrescanned',
-    accept: 'candidates.dialogs.yesMove',
-    icon: 'pi pi-check',
-    acceptClass: 'p-button-info',
-  },
-  interviewed: {
-    message: 'candidates.dialogs.msgInterviewed',
-    accept: 'candidates.dialogs.yesMove',
-    icon: 'pi pi-check',
-    acceptClass: 'p-button-info',
-  },
-  shortlisted: {
-    message: 'candidates.dialogs.msgShortlisted',
-    accept: 'candidates.dialogs.yesShortlist',
-    icon: 'pi pi-check-circle',
-    acceptClass: 'p-button-success',
-  },
-  hired: {
-    message: 'candidates.dialogs.msgHired',
-    accept: 'candidates.dialogs.yesHire',
-    icon: 'pi pi-check-circle',
-    acceptClass: 'p-button-success',
-  },
-  rejected: {
-    message: 'candidates.dialogs.msgRejected',
-    accept: 'candidates.dialogs.yesReject',
-    icon: 'pi pi-exclamation-triangle',
-    acceptClass: 'p-button-danger',
-  },
-  archived: {
-    message: 'candidates.dialogs.msgArchived',
-    accept: 'candidates.dialogs.yesMove',
-    icon: 'pi pi-inbox',
-    acceptClass: '',
-  },
-  applied: {
-    message: 'candidates.dialogs.msgApplied',
-    accept: 'candidates.dialogs.yesReset',
-    icon: 'pi pi-refresh',
-    acceptClass: '',
-  },
-  expired: undefined,
-}
-
+import { STATUS_DIALOG_KEY } from '@/features/candidates/utils/statusDialogConfig'
+import {
+  scoreFieldLabel,
+  statusLabel,
+  type ScoreField,
+} from '@/features/candidates/utils/candidateActionLabels'
 export function useCandidateActions(vacancyId: () => string, fetchCandidates: () => void) {
   const confirm = useConfirm()
   const candidateStore = useCandidateStore()
@@ -100,11 +56,15 @@ export function useCandidateActions(vacancyId: () => string, fetchCandidates: ()
     if (!count) return
 
     confirm.require({
-      message: `Move all ${count} "${fromStatus}" candidate(s) to "${toStatus}"?`,
-      header: 'Batch Move',
+      message: t('candidates.dialogs.batchMoveAllMessage', {
+        count,
+        from: statusLabel(t, fromStatus),
+        to: statusLabel(t, toStatus),
+      }),
+      header: t('candidates.dialogs.batchMoveHeader'),
       icon: 'pi pi-arrows-alt',
-      acceptLabel: 'Yes, move all',
-      rejectLabel: 'Cancel',
+      acceptLabel: t('candidates.dialogs.yesMoveAll'),
+      rejectLabel: t('common.cancel'),
       accept: async () => {
         await candidateService.batchMove(vacancyId(), { fromStatus, toStatus })
         fetchCandidates()
@@ -119,25 +79,23 @@ export function useCandidateActions(vacancyId: () => string, fetchCandidates: ()
     threshold: number,
     direction: 'below' | 'above',
   ): void {
-    const dirLabel = direction === 'below' ? '<' : '>'
-    const fieldLabel =
-      scoreField === 'match_score'
-        ? 'CV match'
-        : scoreField === 'prescanning_score'
-          ? 'prescan score'
-          : 'interview score'
-
     confirm.require({
-      message: `Move "${fromStatus}" candidates with ${fieldLabel} ${dirLabel} ${threshold} to "${toStatus}"?`,
-      header: 'Batch Move by Score',
+      message: t('candidates.dialogs.batchMoveScoreFilterMessage', {
+        from: statusLabel(t, fromStatus),
+        field: scoreFieldLabel(t, scoreField),
+        direction: t(`candidates.scoreDirections.${direction}`),
+        threshold,
+        to: statusLabel(t, toStatus),
+      }),
+      header: t('candidates.dialogs.batchMoveByScoreHeader'),
       icon: 'pi pi-filter',
-      acceptLabel: 'Yes, move',
-      rejectLabel: 'Cancel',
+      acceptLabel: t('candidates.dialogs.yesMove'),
+      rejectLabel: t('common.cancel'),
       accept: async () => {
         await candidateService.batchMove(vacancyId(), {
           fromStatus,
           toStatus,
-          scoreField: scoreField as 'match_score' | 'prescanning_score' | 'interview_score',
+          scoreField: scoreField as ScoreField,
           ...(direction === 'below' ? { maxScore: threshold } : { minScore: threshold }),
         })
         fetchCandidates()
@@ -147,11 +105,14 @@ export function useCandidateActions(vacancyId: () => string, fetchCandidates: ()
 
   function handleBatchMoveNoCv(fromStatus: ApplicationStatus, toStatus: ApplicationStatus): void {
     confirm.require({
-      message: `Move all "${fromStatus}" candidates without CV to "${toStatus}"?`,
-      header: 'Batch Move (No CV)',
+      message: t('candidates.dialogs.batchMoveNoCvAllMessage', {
+        from: statusLabel(t, fromStatus),
+        to: statusLabel(t, toStatus),
+      }),
+      header: t('candidates.dialogs.batchMoveNoCvHeader'),
       icon: 'pi pi-file',
-      acceptLabel: 'Yes, move',
-      rejectLabel: 'Cancel',
+      acceptLabel: t('candidates.dialogs.yesMove'),
+      rejectLabel: t('common.cancel'),
       accept: async () => {
         await candidateService.batchMove(vacancyId(), { fromStatus, toStatus, hasCv: false })
         fetchCandidates()
@@ -165,11 +126,15 @@ export function useCandidateActions(vacancyId: () => string, fetchCandidates: ()
     days: number,
   ): void {
     confirm.require({
-      message: `Move "${fromStatus}" candidates idle for more than ${days} days to "${toStatus}"?`,
-      header: 'Batch Move (Idle)',
+      message: t('candidates.dialogs.batchMoveIdleFilterMessage', {
+        from: statusLabel(t, fromStatus),
+        days,
+        to: statusLabel(t, toStatus),
+      }),
+      header: t('candidates.dialogs.batchMoveIdleHeader'),
       icon: 'pi pi-clock',
-      acceptLabel: 'Yes, move',
-      rejectLabel: 'Cancel',
+      acceptLabel: t('candidates.dialogs.yesMove'),
+      rejectLabel: t('common.cancel'),
       accept: async () => {
         await candidateService.batchMove(vacancyId(), {
           fromStatus,
@@ -186,12 +151,12 @@ export function useCandidateActions(vacancyId: () => string, fetchCandidates: ()
     if (!candidates.length) return
 
     confirm.require({
-      message: `Permanently hide all ${candidates.length} archived candidate(s)? They will no longer appear anywhere.`,
-      header: 'Clear Archive',
+      message: t('candidates.dialogs.clearArchiveDetailedMessage', { count: candidates.length }),
+      header: t('candidates.dialogs.clearArchiveHeader'),
       icon: 'pi pi-trash',
       acceptClass: 'p-button-danger',
-      acceptLabel: 'Yes, clear all',
-      rejectLabel: 'Cancel',
+      acceptLabel: t('candidates.dialogs.yesClearAll'),
+      rejectLabel: t('common.cancel'),
       accept: async () => {
         const ids = candidates.map((c) => c.id)
         await candidateService.softDelete(ids)
@@ -206,11 +171,12 @@ export function useCandidateActions(vacancyId: () => string, fetchCandidates: ()
     onClear: () => void,
   ): void {
     const count = selectedCandidates.length
-    const label = status === 'shortlisted' ? 'shortlist' : 'reject'
+    const label =
+      status === 'shortlisted' ? t('candidates.actions.shortlist') : t('candidates.actions.reject')
 
     confirm.require({
-      message: `Are you sure you want to ${label} ${count} candidate(s)?`,
-      header: 'Confirm Bulk Action',
+      message: t('candidates.dialogs.bulkConfirmMessage', { action: label, count }),
+      header: t('candidates.dialogs.bulkConfirmHeader'),
       icon: 'pi pi-exclamation-triangle',
       acceptClass: status === 'rejected' ? 'p-button-danger' : 'p-button-success',
       accept: async () => {

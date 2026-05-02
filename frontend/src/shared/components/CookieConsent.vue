@@ -46,7 +46,7 @@ function decline(): void {
       class="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-2xl"
       role="dialog"
       aria-modal="false"
-      aria-label="Cookie consent"
+      :aria-label="t('cookies.title')"
       aria-live="polite"
     >
       <div

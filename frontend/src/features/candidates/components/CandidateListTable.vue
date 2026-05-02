@@ -117,7 +117,9 @@ function scoreClasses(score: number): string {
       <template #empty>
         <div class="py-10 text-center text-[color:var(--color-text-muted)]">
           <i class="pi pi-users mb-2 text-3xl"></i>
-          <p v-if="searchQuery" class="text-sm">No candidates matching "{{ searchQuery }}"</p>
+          <p v-if="searchQuery" class="text-sm">
+            {{ t('candidates.noMatchingCandidates', { query: searchQuery }) }}
+          </p>
           <p v-else class="text-sm">{{ t('candidates.noCandidates') }}</p>
         </div>
       </template>

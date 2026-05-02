@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import ProgressBar from 'primevue/progressbar'
 import TranslatableText from '@/shared/components/TranslatableText.vue'
 import type { InterviewScore } from '../types/interview.types'
@@ -6,6 +7,8 @@ import type { InterviewScore } from '../types/interview.types'
 defineProps<{
   scores: InterviewScore[]
 }>()
+
+const { t } = useI18n()
 
 function scoreColor(score: number): string {
   if (score >= 80) return 'text-green-600'
@@ -17,7 +20,7 @@ function scoreColor(score: number): string {
 
 <template>
   <div class="space-y-4">
-    <p v-if="scores.length === 0" class="text-sm text-gray-500">No scores available yet.</p>
+    <p v-if="scores.length === 0" class="text-sm text-gray-500">{{ t('interviews.noScores') }}</p>
 
     <div
       v-for="score in scores"

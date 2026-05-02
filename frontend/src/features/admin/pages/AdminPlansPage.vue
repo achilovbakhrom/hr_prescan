@@ -26,12 +26,12 @@ onMounted(() => adminStore.fetchPlans())
       size="small"
       class="admin-table text-sm"
     >
-      <Column field="name" header="Plan Name">
+      <Column field="name" :header="t('admin.plans.name')">
         <template #body="{ data }">
           <span class="font-medium text-[color:var(--color-text-primary)]">{{ data.name }}</span>
         </template>
       </Column>
-      <Column field="tier" header="Tier">
+      <Column field="tier" :header="t('admin.plans.tier')">
         <template #body="{ data }">
           <span
             class="rounded-full bg-[color:var(--color-accent-soft)] px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-[color:var(--color-accent)]"
@@ -39,36 +39,36 @@ onMounted(() => adminStore.fetchPlans())
           >
         </template>
       </Column>
-      <Column header="Monthly Price">
+      <Column :header="t('admin.plans.monthlyPrice')">
         <template #body="{ data }">
           <span class="font-mono tabular-nums text-[color:var(--color-text-secondary)]"
             >${{ data.priceMonthly }}</span
           >
         </template>
       </Column>
-      <Column header="Yearly Price">
+      <Column :header="t('admin.plans.yearlyPrice')">
         <template #body="{ data }">
           <span class="font-mono tabular-nums text-[color:var(--color-text-secondary)]"
             >${{ data.priceYearly }}</span
           >
         </template>
       </Column>
-      <Column field="maxVacancies" header="Max Vacancies">
+      <Column field="maxVacancies" :header="t('admin.plans.maxVacancies')">
         <template #body="{ data }">
           <span class="font-mono tabular-nums">{{ data.maxVacancies }}</span>
         </template>
       </Column>
-      <Column field="maxInterviewsPerMonth" header="Max Interviews/Mo">
+      <Column field="maxInterviewsPerMonth" :header="t('admin.plans.maxInterviewsPerMonth')">
         <template #body="{ data }">
           <span class="font-mono tabular-nums">{{ data.maxInterviewsPerMonth }}</span>
         </template>
       </Column>
-      <Column field="maxHrUsers" header="Max HR Users">
+      <Column field="maxHrUsers" :header="t('admin.plans.maxHrUsers')">
         <template #body="{ data }">
           <span class="font-mono tabular-nums">{{ data.maxHrUsers }}</span>
         </template>
       </Column>
-      <Column header="Storage">
+      <Column :header="t('admin.plans.storage')">
         <template #body="{ data }">
           <span class="font-mono tabular-nums text-[color:var(--color-text-secondary)]"
             >{{ data.maxStorageGb }} GB</span

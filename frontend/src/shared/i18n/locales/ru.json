@@ -42,6 +42,7 @@
     "inactive": "Неактивен",
     "showMore": "Показать ещё",
     "showLess": "Свернуть",
+    "unread": "Непрочитанные",
     "createdAt": "Создано",
     "updatedAt": "Обновлено",
     "total": "всего",
@@ -58,6 +59,18 @@
     "name": "Название",
     "description": "Описание",
     "customIndustry": "Укажите вашу отрасль",
+    "aria": {
+      "toggleMenu": "Переключить меню",
+      "userMenu": "Меню пользователя",
+      "selectLanguage": "Выбрать язык",
+      "mainNavigation": "Основная навигация",
+      "mobileNavigation": "Мобильная навигация",
+      "mobileMenu": "Мобильное меню",
+      "closeNavigationMenu": "Закрыть меню навигации",
+      "openMenu": "Открыть меню",
+      "loadingTable": "Загрузка таблицы",
+      "loadingContent": "Загрузка содержимого"
+    },
     "customIndustryPlaceholder": "Введите название отрасли"
   },
   "nav": {
@@ -160,6 +173,8 @@
     "acceptInvitation": {
       "title": "Принять приглашение",
       "subtitle": "Вас пригласили присоединиться к компании",
+      "join": "Присоединиться к {owner} как HR-специалист.",
+      "joinWithCompanies": "Присоединиться к {owner} как HR-специалист с доступом к {companies}.",
       "firstName": "Имя",
       "lastName": "Фамилия",
       "password": "Пароль",
@@ -527,9 +542,30 @@
     "default": "По умолчанию",
     "editCriteria": "Редактировать критерий",
     "noCriteria": "Критерии пока не заданы. Добавьте критерии оценки для этой вакансии.",
+    "noQuestions": "Вопросов пока нет. Добавьте вручную или сгенерируйте с ИИ.",
     "generateQuestions": "Сгенерировать с ИИ",
     "addQuestion": "Добавить вопрос",
+    "editQuestion": "Редактировать вопрос",
     "addCriteria": "Добавить критерий",
+    "criteriaForm": {
+      "name": "Название",
+      "namePlaceholder": "например, коммуникативные навыки",
+      "descriptionPlaceholder": "Краткое описание"
+    },
+    "questionCategories": {
+      "hardSkill": "Hard skills",
+      "softSkill": "Soft skills",
+      "domainKnowledge": "Предметная область",
+      "culturalFit": "Культурное соответствие"
+    },
+    "questionForm": {
+      "question": "Вопрос",
+      "category": "Категория",
+      "source": "Источник",
+      "manual": "Вручную",
+      "questionPlaceholder": "например, расскажите о проекте, где вы использовали React hooks",
+      "categoryPlaceholder": "Выберите категорию"
+    },
     "deleteConfirm": "Вы уверены, что хотите безвозвратно удалить эту вакансию?",
     "deleteConfirmHeader": "Удаление вакансии",
     "deleteConfirmMessage": "Безвозвратно удалить «{title}»? Это действие нельзя отменить.",
@@ -569,6 +605,8 @@
     "table": "Таблица",
     "kanban": "Канбан",
     "search": "Поиск по имени или email",
+    "filterByStatus": "Фильтр по статусу",
+    "sortBy": "Сортировать по",
     "status": {
       "applied": "Подал заявку",
       "prescanned": "Прошёл прескрининг",
@@ -607,9 +645,48 @@
       "moveToPrescanned": "В прескрининг",
       "moveToInterviewed": "В интервью"
     },
+    "kanbanActions": {
+      "rejectAll": "Отклонить всех",
+      "rejectByCvMatch": "Отклонить по соответствию CV < ...",
+      "rejectNoCv": "Отклонить без CV",
+      "rejectIdle": "Отклонить неактивных > ... дней",
+      "shortlistAll": "Всех в шорт-лист",
+      "hireAll": "Нанять всех",
+      "archiveAll": "В архив всех",
+      "moveAllToInterviewed": "Всех в интервью",
+      "rejectByPrescanScore": "Отклонить по баллу прескрининга < ...",
+      "shortlistByPrescanScore": "В шорт-лист по баллу прескрининга > ...",
+      "rejectByInterviewScore": "Отклонить по баллу интервью < ...",
+      "shortlistByInterviewScore": "В шорт-лист по баллу интервью > ...",
+      "resetAllToApplied": "Всех вернуть в «Подал заявку»",
+      "restoreAllToApplied": "Всех восстановить в «Подал заявку»",
+      "clearAll": "Очистить всех (soft delete)"
+    },
+    "scoreFields": {
+      "cvMatch": "соответствие CV",
+      "prescan": "балл прескрининга",
+      "interview": "балл интервью"
+    },
+    "scoreDirections": {
+      "below": "ниже",
+      "above": "выше"
+    },
+    "scoreTitles": {
+      "overall": "Общий балл: {score}%",
+      "processing": "Обработка...",
+      "cvMatch": "Балл соответствия CV",
+      "prescan": "Балл прескрининга",
+      "interview": "Балл интервью"
+    },
+    "scoreLabels": {
+      "cv": "CV",
+      "prescan": "Прескрининг",
+      "interview": "Интервью"
+    },
     "application": {
       "title": "Отклик на вакансию",
       "name": "ФИО",
+      "namePlaceholder": "Иван Иванов",
       "email": "Электронная почта",
       "phone": "Телефон",
       "uploadCv": "Загрузить резюме",
@@ -653,12 +730,34 @@
     "dialogs": {
       "bulkConfirmHeader": "Подтверждение массового действия",
       "bulkConfirmMessage": "Вы уверены, что хотите {action} {count} кандидат(ов)?",
+      "batchMoveHeader": "Массовое перемещение",
+      "batchMoveByScoreHeader": "Массовое перемещение по баллам",
+      "batchMoveNoCvHeader": "Массовое перемещение (без CV)",
+      "batchMoveIdleHeader": "Массовое перемещение (неактивные)",
+      "batchMoveAllMessage": "Переместить всех {count} кандидат(ов) из «{from}» в «{to}»?",
+      "batchMoveScoreMessage": "Переместить {count} кандидат(ов) с {field} {direction} {threshold} в «{to}»?",
+      "batchMoveScoreFilterMessage": "Переместить кандидатов из «{from}» с {field} {direction} {threshold} в «{to}»?",
+      "batchMoveNoCvMessage": "Переместить {count} кандидат(ов) из «{from}» без CV в «{to}»?",
+      "batchMoveNoCvAllMessage": "Переместить всех кандидатов из «{from}» без CV в «{to}»?",
+      "batchMoveIdleMessage": "Переместить {count} кандидат(ов), неактивных более {days} дн., в «{to}»?",
+      "batchMoveIdleFilterMessage": "Переместить кандидатов из «{from}», неактивных более {days} дн., в «{to}»?",
+      "clearArchiveHeader": "Очистить архив",
+      "clearArchiveMessage": "Скрыть навсегда всех архивных кандидатов ({count})?",
+      "clearArchiveDetailedMessage": "Скрыть навсегда всех архивных кандидатов ({count})? Они больше нигде не будут отображаться.",
+      "thresholdTitle": "{action}, если {field} {direction}...",
+      "scoreBelow": "Балл ниже",
+      "scoreAbove": "Балл выше",
+      "rejectIdleHeader": "Отклонить неактивных кандидатов",
+      "appliedMoreThanDays": "Заявка подана более ... дней назад",
+      "daysSuffix": "дн.",
       "statusChangeHeader": "Подтверждение изменения статуса",
       "resetHeader": "Сброс статуса кандидата",
       "resetMessage": "Сбросить {name} в статус «Подал заявку»? Активные сессии будут отменены, будет создана новая ссылка на прескрининг.",
       "moveMessage": "Переместить {name} в статус «{status}»?",
       "yesReset": "Да, сбросить",
       "yesMove": "Да, переместить",
+      "yesMoveAll": "Да, переместить всех",
+      "yesClearAll": "Да, очистить всех",
       "yesShortlist": "Да, в шорт-лист",
       "yesHire": "Да, нанять",
       "yesReject": "Да, отклонить",
@@ -732,6 +831,23 @@
       "subjectPlaceholder": "Тема письма",
       "body": "Текст",
       "bodyPlaceholder": "Текст письма"
+    },
+    "humanInterview": {
+      "title": "Запланировать интервью с HR",
+      "scheduledFor": "Интервью запланировано для {name}",
+      "schedulingFor": "Планирование интервью для: {name}",
+      "dateTime": "Дата и время",
+      "dateTimePlaceholder": "Выберите дату и время",
+      "interviewerName": "Имя интервьюера",
+      "interviewerPlaceholder": "например, Иван Петров",
+      "meetingLink": "Ссылка на встречу (необязательно)",
+      "meetingLinkPlaceholder": "например, https://meet.google.com/...",
+      "schedule": "Запланировать"
+    },
+    "interviewScores": {
+      "performance": "Результаты интервью",
+      "empty": "Баллы интервью появятся здесь после завершения интервью.",
+      "integrityFlags": "Флаги честности"
     },
     "myApplication": {
       "progress": "Прогресс заявки",
@@ -839,8 +955,15 @@
       "overallScore": "Общая оценка честности",
       "flagsDetected": "На основе {count} обнаруженных нарушений",
       "noFlags": "Нарушений не обнаружено. Собеседование прошло все проверки.",
+      "noFlagsShort": "Нарушений не обнаружено.",
       "details": "Подробности",
       "recorded": "Зафиксировано:",
+      "atTimestamp": "на {time}",
+      "severity": {
+        "low": "НИЗКИЙ",
+        "medium": "СРЕДНИЙ",
+        "high": "ВЫСОКИЙ"
+      },
       "flagLabels": {
         "face_not_visible": "Лицо не видно",
         "multiple_faces": "Несколько лиц",
@@ -1023,6 +1146,7 @@
       "title": "Управление командой",
       "invite": "Пригласить HR-менеджера",
       "email": "Адрес электронной почты",
+      "emailPlaceholder": "Введите email",
       "send": "Отправить приглашение",
       "members": "Участники команды",
       "invitations": "Ожидающие приглашения",
@@ -1030,6 +1154,13 @@
       "companiesHelp": "Выберите, к каким компаниям участник получит доступ.",
       "noCompanies": "Нет доступных компаний. Сначала создайте компанию.",
       "selectAtLeastOneCompany": "Выберите хотя бы одну компанию.",
+      "sent": "Отправлено",
+      "expires": "Истекает",
+      "invitationStatus": {
+        "accepted": "Принято",
+        "expired": "Истекло",
+        "pending": "Ожидает"
+      },
       "activate": "Активировать",
       "deactivate": "Деактивировать",
       "role": "Роль",
@@ -1078,6 +1209,7 @@
   },
   "admin": {
     "title": "Панель администратора",
+    "blocked": "Заблокирован",
     "dashboard": {
       "totalCompanies": "Всего компаний",
       "totalUsers": "Всего пользователей",
@@ -1088,6 +1220,7 @@
     "companies": {
       "title": "Компании",
       "name": "Название компании",
+      "searchPlaceholder": "Поиск компаний...",
       "plan": "Тариф",
       "status": "Статус",
       "users": "Пользователи",
@@ -1098,11 +1231,24 @@
     },
     "users": {
       "title": "Пользователи",
+      "allRoles": "Все роли",
+      "searchPlaceholder": "Поиск пользователей...",
+      "filterByRole": "Фильтр по роли",
       "name": "Имя",
       "email": "Электронная почта",
       "role": "Роль",
       "company": "Компания",
       "status": "Статус"
+    },
+    "plans": {
+      "name": "Название тарифа",
+      "tier": "Уровень",
+      "monthlyPrice": "Цена за месяц",
+      "yearlyPrice": "Цена за год",
+      "maxVacancies": "Макс. вакансий",
+      "maxInterviewsPerMonth": "Макс. интервью/мес.",
+      "maxHrUsers": "Макс. HR-пользователей",
+      "storage": "Хранилище"
     },
     "analytics": {
       "activeSubscriptions": "Активные подписки",
@@ -1121,6 +1267,7 @@
   "notifications": {
     "title": "Уведомления",
     "markAllRead": "Отметить все как прочитанные",
+    "markRead": "Отметить как прочитанное",
     "noNotifications": "Уведомлений пока нет",
     "newApplication": "Новая заявка",
     "interviewCompleted": "Собеседование завершено",
@@ -1134,6 +1281,8 @@
     "forbiddenHint": "У вас нет прав для доступа к этой странице.",
     "forbiddenDesc": "У вас нет прав для доступа к этой странице.",
     "needAccess": "Нужен доступ? Обратитесь к администратору или",
+    "contactSupport": "Если вы считаете, что это ошибка, свяжитесь с",
+    "urgentSupport": "Нужна срочная помощь? Свяжитесь с",
     "serverError": "Ошибка сервера",
     "serverErrorHint": "Что-то пошло не так. Пожалуйста, попробуйте позже.",
     "serverErrorDesc": "Что-то пошло не так. Наша команда уже уведомлена.",
@@ -1142,10 +1291,19 @@
     "tryAgain": "Попробовать снова"
   },
   "cookies": {
+    "title": "Согласие на cookie",
     "message": "Мы используем файлы cookie для улучшения вашего опыта. Продолжая, вы соглашаетесь с нашей политикой использования cookie.",
     "accept": "Принять",
     "decline": "Отклонить",
     "learnMore": "Подробнее"
+  },
+  "backgroundPicker": {
+    "title": "Выбор фона",
+    "variant": "Вариант фона",
+    "shortcut": "Фон (? или Alt+B)"
+  },
+  "legal": {
+    "lastUpdated": "Обновлено: {date}"
   },
   "trial": {
     "banner": "У вас 14-дневный бесплатный пробный период плана Professional.",

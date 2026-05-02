@@ -4,6 +4,7 @@
  * Unread state gets a subtle accent tint + dot; read state is muted.
  */
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import type { Notification, NotificationType } from '../types/notification.types'
 
@@ -27,6 +28,7 @@ const typeIcons: Record<NotificationType, string> = {
 }
 
 const icon = computed(() => typeIcons[props.notification.type] ?? 'pi pi-bell')
+const { t } = useI18n()
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleString()
@@ -57,7 +59,7 @@ function formatDate(dateStr: string): string {
         <span
           v-if="!notification.isRead"
           class="h-2 w-2 shrink-0 rounded-full bg-[color:var(--color-accent)]"
-          aria-label="unread"
+          :aria-label="t('common.unread')"
         />
       </div>
       <p class="mt-1 text-sm text-[color:var(--color-text-secondary)]">
@@ -73,7 +75,7 @@ function formatDate(dateStr: string): string {
       text
       rounded
       size="small"
-      aria-label="Mark as read"
+      :aria-label="t('notifications.markRead')"
       @click.stop="$emit('markRead')"
     />
   </li>

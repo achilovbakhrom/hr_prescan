@@ -141,7 +141,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
           <button
             type="button"
             class="flex h-9 w-9 items-center justify-center rounded-md text-[color:var(--color-text-secondary)] transition-colors hover:bg-[color:var(--color-surface-raised)] md:hidden"
-            aria-label="Open menu"
+            :aria-label="t('common.aria.openMenu')"
             @click="mobileOpen = !mobileOpen"
           >
             <i class="pi text-lg" :class="mobileOpen ? 'pi-times' : 'pi-bars'"></i>

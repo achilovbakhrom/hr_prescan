@@ -29,11 +29,11 @@ function getStatusSeverity(invitation: Invitation): 'success' | 'warn' | 'danger
 }
 
 function getStatusLabel(invitation: Invitation): string {
-  if (invitation.isAccepted) return 'Accepted'
+  if (invitation.isAccepted) return t('settings.team.invitationStatus.accepted')
   const now = new Date()
   const expires = new Date(invitation.expiresAt)
-  if (expires < now) return 'Expired'
-  return 'Pending'
+  if (expires < now) return t('settings.team.invitationStatus.expired')
+  return t('settings.team.invitationStatus.pending')
 }
 </script>
 
@@ -55,12 +55,12 @@ function getStatusLabel(invitation: Invitation): string {
         />
       </template>
     </Column>
-    <Column header="Sent">
+    <Column :header="t('settings.team.sent')">
       <template #body="{ data }">
         {{ formatDate((data as Invitation).createdAt) }}
       </template>
     </Column>
-    <Column header="Expires">
+    <Column :header="t('settings.team.expires')">
       <template #body="{ data }">
         {{ formatDate((data as Invitation).expiresAt) }}
       </template>

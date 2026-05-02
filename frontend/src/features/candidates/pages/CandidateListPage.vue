@@ -88,7 +88,7 @@ function handleKanbanStatusChange(candidateId: string, status: ApplicationStatus
       ? t('candidates.dialogs.resetMessage', { name: candidate.candidateName })
       : t('candidates.dialogs.moveMessage', {
           name: candidate.candidateName,
-          status: status.replace(/_/g, ' '),
+          status: t(`candidates.status.${status}`),
         }),
     header: isReset
       ? t('candidates.dialogs.resetHeader')

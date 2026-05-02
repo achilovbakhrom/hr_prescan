@@ -43,7 +43,7 @@ function goBack(): void {
       />
     </template>
     <template #footer>
-      If you believe this is an error, please contact
+      {{ t('errors.contactSupport') }}
       <a
         href="mailto:support@hrprescan.com"
         class="text-[color:var(--color-accent)] hover:underline"

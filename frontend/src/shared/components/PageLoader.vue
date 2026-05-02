@@ -1,13 +1,18 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
 interface Props {
   message?: string
   overlay?: boolean
 }
 
-withDefaults(defineProps<Props>(), {
-  message: 'Loading...',
+const props = withDefaults(defineProps<Props>(), {
   overlay: false,
 })
+
+const { t } = useI18n()
+const messageText = computed(() => props.message ?? t('common.loading'))
 </script>
 
 <template>
@@ -19,7 +24,7 @@ withDefaults(defineProps<Props>(), {
         : 'min-h-64 w-full',
     ]"
     role="status"
-    :aria-label="message"
+    :aria-label="messageText"
     aria-busy="true"
     aria-live="polite"
   >
@@ -34,6 +39,6 @@ withDefaults(defineProps<Props>(), {
     </div>
 
     <!-- Message -->
-    <p class="text-sm font-medium text-gray-600">{{ message }}</p>
+    <p class="text-sm font-medium text-gray-600">{{ messageText }}</p>
   </div>
 </template>

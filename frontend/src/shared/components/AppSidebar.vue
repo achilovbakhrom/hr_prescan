@@ -148,7 +148,7 @@ function isActive(path: string): boolean {
     class="flex h-full shrink-0 flex-col border-r border-gray-100 bg-white transition-all duration-200 dark:border-gray-800 dark:bg-gray-950"
     :class="collapsed ? 'w-16' : 'w-60'"
     role="navigation"
-    aria-label="Main navigation"
+    :aria-label="t('common.aria.mainNavigation')"
   >
     <nav class="flex flex-1 flex-col gap-0.5 overflow-y-auto px-2 py-3">
       <template v-for="(section, sIdx) in filteredSections" :key="sIdx">

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
 import LanguageSwitcher from '@/shared/components/LanguageSwitcher.vue'
@@ -16,6 +17,7 @@ const emit = defineEmits<{
 
 const route = useRoute()
 const authStore = useAuthStore()
+const { t } = useI18n()
 
 watch(
   () => route.path,
@@ -56,7 +58,7 @@ watch(
         class="fixed inset-y-0 left-0 z-50 flex w-[80vw] max-w-72 flex-col bg-white dark:bg-gray-800 shadow-xl lg:hidden"
         role="dialog"
         aria-modal="true"
-        aria-label="Mobile navigation"
+        :aria-label="t('common.aria.mobileNavigation')"
       >
         <div
           class="flex h-16 items-center justify-between border-b border-gray-200 dark:border-gray-700 px-4"
@@ -67,7 +69,7 @@ watch(
           <button
             type="button"
             class="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-700"
-            aria-label="Close navigation menu"
+            :aria-label="t('common.aria.closeNavigationMenu')"
             @click="emit('close')"
           >
             <i class="pi pi-times text-base"></i>

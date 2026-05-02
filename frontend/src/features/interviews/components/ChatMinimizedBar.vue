@@ -60,7 +60,7 @@ const { t } = useI18n()
           text
           rounded
           size="small"
-          title="Close"
+          :title="t('common.close')"
           @click.stop="emit('close')"
         />
       </div>

@@ -73,7 +73,7 @@ function formatDate(dateStr: string): string {
     <template #empty>
       <div class="py-8 text-center text-gray-500">
         <i class="pi pi-users mb-2 text-3xl"></i>
-        <p v-if="searchQuery">No candidates matching "{{ searchQuery }}"</p>
+        <p v-if="searchQuery">{{ t('candidates.noMatchingCandidates', { query: searchQuery }) }}</p>
         <p v-else>{{ t('candidates.noCandidates') }}</p>
       </div>
     </template>

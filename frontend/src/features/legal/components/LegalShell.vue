@@ -10,6 +10,7 @@
  * just provides the centered prose container + page header.
  */
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 
 defineProps<{
@@ -18,6 +19,7 @@ defineProps<{
 }>()
 
 const router = useRouter()
+const { t } = useI18n()
 function goBack(): void {
   router.back()
 }
@@ -29,7 +31,7 @@ function goBack(): void {
       <!-- Page header -->
       <div class="mb-6">
         <Button
-          label="Back"
+          :label="t('common.back')"
           icon="pi pi-arrow-left"
           text
           severity="secondary"
@@ -42,7 +44,7 @@ function goBack(): void {
           {{ title }}
         </h1>
         <p class="mt-2 text-sm text-[color:var(--color-text-muted)]">
-          Last updated: {{ lastUpdated }}
+          {{ t('legal.lastUpdated', { date: lastUpdated }) }}
         </p>
       </div>
 

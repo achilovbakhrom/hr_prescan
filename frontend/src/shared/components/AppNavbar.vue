@@ -90,7 +90,7 @@ function handleMenuToggle(): void {
           icon="pi pi-bars"
           text
           severity="secondary"
-          aria-label="Toggle menu"
+          :aria-label="t('common.aria.toggleMenu')"
           @click="handleMenuToggle"
         />
         <AppLogo size="sm" to="/" />
@@ -143,7 +143,7 @@ function handleMenuToggle(): void {
           severity="info"
           size="small"
           class="relative"
-          aria-label="Pending invitations"
+          :aria-label="t('settings.profile.invitations')"
           @click="router.push({ name: ROUTE_NAMES.PROFILE })"
         >
           <template #icon
@@ -171,7 +171,7 @@ function handleMenuToggle(): void {
         <button
           type="button"
           class="flex items-center gap-2 rounded-xl px-2 py-1 transition-colors hover:bg-white/80 dark:hover:bg-gray-900"
-          aria-label="User menu"
+          :aria-label="t('common.aria.userMenu')"
           aria-haspopup="true"
           @click="toggleUserMenu"
         >

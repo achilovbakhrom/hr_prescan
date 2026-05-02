@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
 interface Props {
   rows?: number
   columns?: number
@@ -10,13 +12,15 @@ withDefaults(defineProps<Props>(), {
   columns: 4,
   showHeader: true,
 })
+
+const { t } = useI18n()
 </script>
 
 <template>
   <div
     class="overflow-hidden rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 shadow-sm"
     role="status"
-    aria-label="Loading table"
+    :aria-label="t('common.aria.loadingTable')"
     aria-busy="true"
   >
     <!-- Table header -->

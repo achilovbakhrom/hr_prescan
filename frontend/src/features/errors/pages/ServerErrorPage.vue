@@ -43,7 +43,7 @@ function reload(): void {
       />
     </template>
     <template #footer>
-      Need urgent help? Contact
+      {{ t('errors.urgentSupport') }}
       <a
         href="mailto:support@hrprescan.com"
         class="text-[color:var(--color-accent)] hover:underline"

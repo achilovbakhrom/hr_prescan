@@ -114,12 +114,12 @@ function handleSubmit(): void {
           id="inviteEmail"
           v-model="email"
           type="email"
-          placeholder="Enter email address"
+          :placeholder="t('settings.team.emailPlaceholder')"
           :invalid="submitted && emailInvalid"
           class="w-full"
         />
         <small v-if="submitted && emailInvalid" class="text-red-500">
-          Please enter a valid email address.
+          {{ t('auth.register.emailInvalid') }}
         </small>
       </div>
 

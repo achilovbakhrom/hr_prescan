@@ -59,7 +59,9 @@ onMounted(async () => {
 
 <template>
   <div>
-    <h3 class="mb-3 text-sm font-semibold text-gray-600">Interview Performance</h3>
+    <h3 class="mb-3 text-sm font-semibold text-gray-600">
+      {{ t('candidates.interviewScores.performance') }}
+    </h3>
 
     <div v-if="loading" class="py-4 text-center">
       <i class="pi pi-spinner pi-spin text-xl text-gray-400"></i>
@@ -67,7 +69,7 @@ onMounted(async () => {
 
     <div v-else-if="!data || data.scores.length === 0">
       <p class="text-sm text-gray-400">
-        Interview scores will appear here after the interview is completed.
+        {{ t('candidates.interviewScores.empty') }}
       </p>
     </div>
 
@@ -104,7 +106,9 @@ onMounted(async () => {
       </div>
 
       <div v-if="data.integrityFlags.length > 0" class="mt-4">
-        <h4 class="mb-2 text-xs font-semibold text-gray-500">Integrity Flags</h4>
+        <h4 class="mb-2 text-xs font-semibold text-gray-500">
+          {{ t('candidates.interviewScores.integrityFlags') }}
+        </h4>
         <div class="space-y-1.5">
           <div
             v-for="flag in data.integrityFlags"

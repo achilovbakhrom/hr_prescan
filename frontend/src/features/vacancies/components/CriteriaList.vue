@@ -153,12 +153,22 @@ function handleSubmit(): void {
     >
       <div class="space-y-4">
         <div>
-          <label class="mb-1 block text-sm font-medium">Name *</label>
-          <InputText v-model="formName" class="w-full" placeholder="e.g. Communication Skills" />
+          <label class="mb-1 block text-sm font-medium"
+            >{{ t('vacancies.criteriaForm.name') }} *</label
+          >
+          <InputText
+            v-model="formName"
+            class="w-full"
+            :placeholder="t('vacancies.criteriaForm.namePlaceholder')"
+          />
         </div>
         <div>
-          <label class="mb-1 block text-sm font-medium">Description</label>
-          <InputText v-model="formDescription" class="w-full" placeholder="Brief description" />
+          <label class="mb-1 block text-sm font-medium">{{ t('common.description') }}</label>
+          <InputText
+            v-model="formDescription"
+            class="w-full"
+            :placeholder="t('vacancies.criteriaForm.descriptionPlaceholder')"
+          />
         </div>
         <div>
           <label class="mb-1 block text-sm font-medium">{{ t('vacancies.weight') }}</label>

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
 interface Props {
   lines?: number
   showAvatar?: boolean
@@ -8,13 +10,15 @@ withDefaults(defineProps<Props>(), {
   lines: 3,
   showAvatar: false,
 })
+
+const { t } = useI18n()
 </script>
 
 <template>
   <div
     class="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-6 shadow-sm"
     role="status"
-    aria-label="Loading content"
+    :aria-label="t('common.aria.loadingContent')"
     aria-busy="true"
   >
     <!-- Avatar / icon placeholder -->

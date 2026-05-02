@@ -104,7 +104,11 @@ function isActive(path: string): boolean {
 </script>
 
 <template>
-  <nav class="flex-1 overflow-y-auto px-3 py-4" role="navigation" aria-label="Mobile menu">
+  <nav
+    class="flex-1 overflow-y-auto px-3 py-4"
+    role="navigation"
+    :aria-label="t('common.aria.mobileMenu')"
+  >
     <ul class="flex flex-col gap-1" role="list">
       <li v-for="item in filteredItems" :key="item.to" role="listitem">
         <RouterLink

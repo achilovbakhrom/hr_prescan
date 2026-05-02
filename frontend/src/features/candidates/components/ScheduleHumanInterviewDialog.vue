@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Dialog from 'primevue/dialog'
 import Calendar from 'primevue/calendar'
 import InputText from 'primevue/inputtext'
@@ -21,6 +22,7 @@ const interviewerName = ref('')
 const meetingLink = ref('')
 const submitting = ref(false)
 const submitted = ref(false)
+const { t } = useI18n()
 
 watch(
   () => props.visible,
@@ -57,7 +59,7 @@ async function handleSubmit(): Promise<void> {
 <template>
   <Dialog
     :visible="props.visible"
-    header="Schedule Human Interview"
+    :header="t('candidates.humanInterview.title')"
     :modal="true"
     :closable="true"
     :style="{ width: '500px' }"
@@ -65,46 +67,58 @@ async function handleSubmit(): Promise<void> {
   >
     <div v-if="submitted" class="py-4 text-center">
       <i class="pi pi-check-circle mb-2 text-3xl text-green-500"></i>
-      <p class="text-sm text-gray-700">Interview scheduled for {{ props.candidateName }}</p>
+      <p class="text-sm text-gray-700">
+        {{ t('candidates.humanInterview.scheduledFor', { name: props.candidateName }) }}
+      </p>
     </div>
 
     <div v-else class="space-y-4">
-      <p class="text-sm text-gray-500">Scheduling interview for: {{ props.candidateName }}</p>
+      <p class="text-sm text-gray-500">
+        {{ t('candidates.humanInterview.schedulingFor', { name: props.candidateName }) }}
+      </p>
 
       <div>
-        <label class="mb-1 block text-sm font-medium text-gray-700"> Date & Time </label>
+        <label class="mb-1 block text-sm font-medium text-gray-700">
+          {{ t('candidates.humanInterview.dateTime') }}
+        </label>
         <Calendar
           v-model="dateTime"
           show-time
           hour-format="24"
           :min-date="new Date()"
           class="w-full"
-          placeholder="Select date and time"
+          :placeholder="t('candidates.humanInterview.dateTimePlaceholder')"
         />
       </div>
 
       <div>
-        <label class="mb-1 block text-sm font-medium text-gray-700"> Interviewer Name </label>
-        <InputText v-model="interviewerName" class="w-full" placeholder="e.g. John Smith" />
+        <label class="mb-1 block text-sm font-medium text-gray-700">
+          {{ t('candidates.humanInterview.interviewerName') }}
+        </label>
+        <InputText
+          v-model="interviewerName"
+          class="w-full"
+          :placeholder="t('candidates.humanInterview.interviewerPlaceholder')"
+        />
       </div>
 
       <div>
         <label class="mb-1 block text-sm font-medium text-gray-700">
-          Meeting Link (optional)
+          {{ t('candidates.humanInterview.meetingLink') }}
         </label>
         <InputText
           v-model="meetingLink"
           class="w-full"
-          placeholder="e.g. https://meet.google.com/..."
+          :placeholder="t('candidates.humanInterview.meetingLinkPlaceholder')"
         />
       </div>
     </div>
 
     <template #footer>
       <div v-if="!submitted" class="flex justify-end gap-2">
-        <Button label="Cancel" severity="secondary" text @click="emit('close')" />
+        <Button :label="t('common.cancel')" severity="secondary" text @click="emit('close')" />
         <Button
-          label="Schedule"
+          :label="t('candidates.humanInterview.schedule')"
           icon="pi pi-calendar-plus"
           :loading="submitting"
           :disabled="!dateTime || !interviewerName.trim()"

@@ -57,11 +57,21 @@ const labelClass =
         {{ t('auth.acceptInvitation.title') }}
       </h1>
       <p class="text-sm text-[color:var(--color-text-secondary)]">
-        Join <strong>{{ accountOwnerName }}</strong> as an HR team member<template
-          v-if="companyNames.length"
+        <i18n-t
+          :keypath="
+            companyNames.length
+              ? 'auth.acceptInvitation.joinWithCompanies'
+              : 'auth.acceptInvitation.join'
+          "
+          tag="span"
         >
-          with access to <strong>{{ companyNames.join(', ') }}</strong></template
-        >.
+          <template #owner>
+            <strong>{{ accountOwnerName }}</strong>
+          </template>
+          <template #companies>
+            <strong>{{ companyNames.join(', ') }}</strong>
+          </template>
+        </i18n-t>
       </p>
     </div>
 
@@ -83,12 +93,12 @@ const labelClass =
           <InputText
             id="firstName"
             v-model="firstName"
-            placeholder="First name"
+            :placeholder="t('auth.register.firstNamePlaceholder')"
             :invalid="submitted && errors.firstName"
             class="w-full"
           />
           <small v-if="submitted && errors.firstName" class="text-[color:var(--color-danger)]">
-            First name is required.
+            {{ t('auth.register.firstNameRequired') }}
           </small>
         </div>
         <div class="flex flex-col gap-1.5">
@@ -98,12 +108,12 @@ const labelClass =
           <InputText
             id="lastName"
             v-model="lastName"
-            placeholder="Last name"
+            :placeholder="t('auth.register.lastNamePlaceholder')"
             :invalid="submitted && errors.lastName"
             class="w-full"
           />
           <small v-if="submitted && errors.lastName" class="text-[color:var(--color-danger)]">
-            Last name is required.
+            {{ t('auth.register.lastNameRequired') }}
           </small>
         </div>
       </div>
@@ -115,7 +125,7 @@ const labelClass =
         <Password
           v-model="password"
           input-id="password"
-          placeholder="Minimum 8 characters"
+          :placeholder="t('auth.register.passwordPlaceholder')"
           toggle-mask
           :invalid="submitted && errors.password"
           class="w-full"
@@ -133,7 +143,7 @@ const labelClass =
         <Password
           v-model="confirmPassword"
           input-id="confirmPassword"
-          placeholder="Confirm your password"
+          :placeholder="t('auth.register.confirmPasswordPlaceholder')"
           :feedback="false"
           toggle-mask
           :invalid="submitted && errors.confirmPassword"

@@ -81,7 +81,7 @@ onMounted(() => notificationStore.fetchNotifications())
         @click="filterMode = 'all'"
       />
       <Button
-        label="Unread"
+        :label="t('common.unread')"
         :outlined="filterMode !== 'unread'"
         size="small"
         @click="filterMode = 'unread'"

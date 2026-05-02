@@ -3,7 +3,7 @@
  * AdminUsersPage — denser admin table for user management.
  * Glass toolbar + solid DataTable rows per spec §9.
  */
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
@@ -20,12 +20,12 @@ const adminStore = useAdminStore()
 const search = ref('')
 const roleFilter = ref<string | undefined>(undefined)
 
-const roleOptions = [
-  { label: 'All Roles', value: undefined },
-  { label: 'Admin', value: 'admin' },
-  { label: 'HR', value: 'hr' },
-  { label: 'Candidate', value: 'candidate' },
-]
+const roleOptions = computed(() => [
+  { label: t('admin.users.allRoles'), value: undefined },
+  { label: t('settings.team.roles.admin'), value: 'admin' },
+  { label: t('settings.team.roles.hr'), value: 'hr' },
+  { label: t('settings.team.roles.candidate'), value: 'candidate' },
+])
 
 function handleSearch(): void {
   adminStore.fetchUsers({
@@ -65,7 +65,7 @@ onMounted(() => adminStore.fetchUsers())
     <AdminFiltersBar>
       <InputText
         v-model="search"
-        placeholder="Search users..."
+        :placeholder="t('admin.users.searchPlaceholder')"
         class="w-56"
         @keyup.enter="handleSearch"
       />
@@ -74,7 +74,7 @@ onMounted(() => adminStore.fetchUsers())
         :options="roleOptions"
         option-label="label"
         option-value="value"
-        placeholder="Filter by role"
+        :placeholder="t('admin.users.filterByRole')"
         class="w-40"
         @change="handleSearch"
       />
@@ -129,11 +129,11 @@ onMounted(() => adminStore.fetchUsers())
                 : 'bg-[color:color-mix(in_srgb,var(--color-danger)_15%,transparent)] text-[color:var(--color-danger)]'
             "
           >
-            {{ (data as AdminUser).isActive ? 'Active' : 'Blocked' }}
+            {{ (data as AdminUser).isActive ? t('common.active') : t('admin.blocked') }}
           </span>
         </template>
       </Column>
-      <Column field="createdAt" header="Created">
+      <Column field="createdAt" :header="t('common.createdAt')">
         <template #body="{ data }">
           <span class="font-mono text-xs text-[color:var(--color-text-muted)]">{{
             formatDate((data as AdminUser).createdAt)

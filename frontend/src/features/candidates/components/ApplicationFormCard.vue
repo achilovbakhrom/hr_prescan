@@ -111,7 +111,7 @@ function onFileSelect(event: FileUploadSelectEvent): void {
           <InputText
             :model-value="name"
             class="w-full"
-            placeholder="John Doe"
+            :placeholder="t('candidates.application.namePlaceholder')"
             :invalid="!!errors.name"
             @update:model-value="emit('update:name', ($event as string) ?? '')"
           />

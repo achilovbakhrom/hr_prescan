@@ -114,7 +114,7 @@ function toggleRowMenu(event: Event, id: string) {
       </template>
     </Column>
 
-    <Column header="CV" sortable sort-field="matchScore" style="min-width: 70px">
+    <Column :header="t('candidates.cv')" sortable sort-field="matchScore" style="min-width: 70px">
       <template #body="{ data }">
         <span
           v-if="(data as Application).matchScore !== null"

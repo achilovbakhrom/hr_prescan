@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { calculateOverallScore } from '../utils/score'
 import type { Application } from '../types/candidate.types'
 import type { ColumnDef } from './KanbanColumn.vue'
@@ -12,6 +13,8 @@ const emit = defineEmits<{
   click: []
   dragStart: [event: DragEvent]
 }>()
+
+const { t } = useI18n()
 
 function getInitials(name: string): string {
   return name
@@ -84,14 +87,14 @@ function onDragStart(event: DragEvent): void {
           getScoreColor(getOverallScore(candidate)!),
           getScoreRingColor(getOverallScore(candidate)!),
         ]"
-        :title="`Overall score: ${getOverallScore(candidate)}%`"
+        :title="t('candidates.scoreTitles.overall', { score: getOverallScore(candidate) })"
       >
         {{ getOverallScore(candidate) }}
       </div>
       <div
         v-else-if="candidate.cvFile && candidate.matchScore === null"
         class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-gray-200"
-        title="Processing..."
+        :title="t('candidates.scoreTitles.processing')"
       >
         <i class="pi pi-spinner pi-spin text-xs text-gray-400"></i>
       </div>
@@ -115,9 +118,9 @@ function onDragStart(event: DragEvent): void {
       <span
         v-if="candidate.matchScore !== null"
         class="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[10px] font-medium bg-blue-50 dark:bg-blue-950 text-blue-700"
-        title="CV match score"
+        :title="t('candidates.scoreTitles.cvMatch')"
       >
-        CV {{ candidate.matchScore }}%
+        {{ t('candidates.scoreLabels.cv') }} {{ candidate.matchScore }}%
       </span>
       <span
         v-if="candidate.prescanningScore != null"
@@ -129,9 +132,9 @@ function onDragStart(event: DragEvent): void {
               ? 'bg-amber-50 text-amber-700'
               : 'bg-red-50 text-red-700'
         "
-        title="Prescanning score"
+        :title="t('candidates.scoreTitles.prescan')"
       >
-        Prescan {{ candidate.prescanningScore }}/10
+        {{ t('candidates.scoreLabels.prescan') }} {{ candidate.prescanningScore }}/10
       </span>
       <span
         v-if="candidate.interviewScore != null"
@@ -143,9 +146,9 @@ function onDragStart(event: DragEvent): void {
               ? 'bg-amber-50 text-amber-700'
               : 'bg-red-50 text-red-700'
         "
-        title="Interview score"
+        :title="t('candidates.scoreTitles.interview')"
       >
-        Interview {{ candidate.interviewScore }}/10
+        {{ t('candidates.scoreLabels.interview') }} {{ candidate.interviewScore }}/10
       </span>
     </div>
   </div>

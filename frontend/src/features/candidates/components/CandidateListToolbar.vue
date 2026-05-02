@@ -52,7 +52,7 @@ const { t } = useI18n()
         :options="statusOptions"
         option-label="label"
         option-value="value"
-        placeholder="Filter by status"
+        :placeholder="t('candidates.filterByStatus')"
         class="w-full sm:w-48"
         @update:model-value="$emit('update:statusFilter', $event)"
       />
@@ -61,7 +61,7 @@ const { t } = useI18n()
         :options="orderingOptions"
         option-label="label"
         option-value="value"
-        placeholder="Sort by"
+        :placeholder="t('candidates.sortBy')"
         class="w-full sm:w-48"
         @update:model-value="$emit('update:orderingFilter', String($event))"
       />

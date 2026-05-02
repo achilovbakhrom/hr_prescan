@@ -134,15 +134,20 @@ function confirmThreshold() {
   showThreshold.value = false
 }
 
+function scoreFieldLabel(field: string): string {
+  if (field === 'match_score') return t('candidates.scoreFields.cvMatch')
+  if (field === 'prescanning_score') return t('candidates.scoreFields.prescan')
+  return t('candidates.scoreFields.interview')
+}
+
 const thresholdTitle = computed(() => {
   const c = thresholdCtx.value
-  const fl =
-    c.field === 'match_score'
-      ? 'CV match'
-      : c.field === 'prescanning_score'
-        ? 'prescanning score'
-        : 'interview score'
-  return `${c.to === 'rejected' ? 'Reject' : 'Shortlist'} where ${fl} ${c.dir}...`
+  return t('candidates.dialogs.thresholdTitle', {
+    action:
+      c.to === 'rejected' ? t('candidates.actions.reject') : t('candidates.actions.shortlist'),
+    field: scoreFieldLabel(c.field),
+    direction: t(`candidates.scoreDirections.${c.dir}`),
+  })
 })
 const thresholdMax = computed(() => (thresholdCtx.value.field === 'match_score' ? 100 : 10))
 
@@ -168,6 +173,7 @@ function confirmDays() {
 
 function getMenuItems(status: ApplicationStatus) {
   return buildColumnMenuItems(status, {
+    t,
     columnCounts: columnCounts.value,
     interviewEnabled: !!props.interviewEnabled,
     emitBatchMove: (f, t) => emit('batchMove', f, t),
@@ -215,7 +221,9 @@ function onDrop(event: DragEvent, status: ApplicationStatus): void {
   >
     <div class="flex flex-col gap-3">
       <label class="text-sm text-gray-600">{{
-        thresholdCtx.dir === 'below' ? 'Score below' : 'Score above'
+        thresholdCtx.dir === 'below'
+          ? t('candidates.dialogs.scoreBelow')
+          : t('candidates.dialogs.scoreAbove')
       }}</label>
       <InputNumber
         v-model="thresholdVal"
@@ -238,18 +246,18 @@ function onDrop(event: DragEvent, status: ApplicationStatus): void {
 
   <Dialog
     v-model:visible="showDays"
-    header="Reject idle candidates"
+    :header="t('candidates.dialogs.rejectIdleHeader')"
     modal
     :style="{ width: '360px' }"
   >
     <div class="flex flex-col gap-3">
-      <label class="text-sm text-gray-600">Applied more than ... days ago</label>
+      <label class="text-sm text-gray-600">{{ t('candidates.dialogs.appliedMoreThanDays') }}</label>
       <InputNumber
         v-model="daysVal"
         :min="1"
         :max="365"
         show-buttons
-        suffix=" days"
+        :suffix="` ${t('candidates.dialogs.daysSuffix')}`"
         class="w-full"
       />
     </div>

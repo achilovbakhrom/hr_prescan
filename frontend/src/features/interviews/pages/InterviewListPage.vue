@@ -61,7 +61,7 @@ function openDetail(id: string): void {
         :options="statusOptions"
         option-label="label"
         option-value="value"
-        placeholder="Filter by status"
+        :placeholder="t('candidates.filterByStatus')"
         class="w-full sm:w-48"
         @change="handleFilterChange"
       />

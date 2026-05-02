@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import InputText from 'primevue/inputtext'
 
 defineProps<{
@@ -13,6 +14,8 @@ const emit = defineEmits<{
   'update:githubUrl': [value: string]
   'update:websiteUrl': [value: string]
 }>()
+
+const { t } = useI18n()
 </script>
 
 <template>
@@ -48,7 +51,9 @@ const emit = defineEmits<{
     </div>
 
     <div class="flex flex-col gap-1">
-      <label for="websiteUrl" class="text-sm font-medium text-gray-700"> Website </label>
+      <label for="websiteUrl" class="text-sm font-medium text-gray-700">
+        {{ t('cvBuilder.personalInfo.websiteUrl') }}
+      </label>
       <InputText
         id="websiteUrl"
         :model-value="websiteUrl"
