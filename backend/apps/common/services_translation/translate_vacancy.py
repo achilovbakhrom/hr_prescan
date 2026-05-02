@@ -10,6 +10,7 @@ from google import genai
 from google.genai import types
 
 from apps.common.exceptions import ApplicationError
+from apps.common.services_translation.gemini import generate_translation_content
 from apps.common.services_translation.translate_text import LANGUAGE_NAMES
 
 logger = logging.getLogger(__name__)
@@ -144,8 +145,8 @@ def batch_translate_vacancy_items(
 
     try:
         client = genai.Client(api_key=settings.GOOGLE_API_KEY)
-        response = client.models.generate_content(
-            model=settings.GEMINI_TRANSLATION_MODEL,
+        response = generate_translation_content(
+            client=client,
             contents=[
                 types.Content(
                     role="user",

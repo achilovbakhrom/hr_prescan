@@ -1,9 +1,12 @@
 import json
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
+from django.test import override_settings
+from google.genai import errors, types
 from rest_framework.test import APIClient
 
+from apps.common.services_translation.gemini import _translation_model_names, generate_translation_content
 from apps.common.services_translation.translate_vacancy import _parse_translated_items, batch_translate_vacancy_items
 from apps.vacancies.models import ScreeningStep, Vacancy
 
@@ -111,3 +114,35 @@ def test_parse_translated_items_accepts_fenced_json_array():
     response = SimpleNamespace(text='```json\n[{"id": "item-1", "text": "Translated"}]\n```', parsed=None)
 
     assert _parse_translated_items(response) == [{"id": "item-1", "text": "Translated"}]
+
+
+@override_settings(GEMINI_TRANSLATION_MODEL="missing-model", GEMINI_MODEL="gemini-3-flash-preview")
+def test_generate_translation_content_falls_back_when_translation_model_is_missing():
+    missing_model = errors.ClientError(
+        404,
+        {"error": {"status": "NOT_FOUND", "message": "model is unavailable"}},
+        None,
+    )
+    response = SimpleNamespace(text="Translated")
+    client = SimpleNamespace(
+        models=SimpleNamespace(
+            generate_content=Mock(side_effect=[missing_model, response]),
+        )
+    )
+
+    result = generate_translation_content(
+        client=client,
+        contents=[types.Content(role="user", parts=[types.Part(text="Translate me")])],
+        config=types.GenerateContentConfig(temperature=0.2),
+    )
+
+    assert result is response
+    assert [call.kwargs["model"] for call in client.models.generate_content.call_args_list] == [
+        "missing-model",
+        "gemini-3-flash-preview",
+    ]
+
+
+@override_settings(GEMINI_TRANSLATION_MODEL="gemini-2.0-flash-lite", GEMINI_MODEL="gemini-3-flash-preview")
+def test_translation_model_names_skip_deprecated_configured_model():
+    assert _translation_model_names() == ["gemini-3-flash-preview"]
