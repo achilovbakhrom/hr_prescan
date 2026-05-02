@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useToast } from 'primevue/usetoast'
 import Button from 'primevue/button'
 import { getLocale } from '@/shared/i18n'
 import { translateContent } from '@/shared/api/translate'
+import { getApiErrorMessage } from '@/shared/api/errors'
 
 const props = defineProps<{
   text: string
@@ -11,6 +13,7 @@ const props = defineProps<{
   model: string
   objectId: string
   field: string
+  shareToken?: string
   /** Use `/translate/` (any auth) instead of `/hr/translate/` (HR-only). */
   scope?: 'hr' | 'public'
 }>()
@@ -20,6 +23,7 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const toast = useToast()
 const translating = ref(false)
 
 const currentLocale = computed(() => getLocale())
@@ -46,12 +50,18 @@ async function handleTranslate() {
       objectId: props.objectId,
       field: props.field,
       targetLanguage: currentLocale.value,
+      shareToken: props.shareToken,
       scope: props.scope,
     })
     const updated = { ...props.translations, [result.language]: result.translatedText }
     emit('translated', updated)
-  } catch {
-    // Translation failed — button stays visible for retry
+    toast.add({ severity: 'success', summary: t('common.success'), life: 2000 })
+  } catch (error) {
+    toast.add({
+      severity: 'error',
+      summary: getApiErrorMessage(error, t('common.error')),
+      life: 4500,
+    })
   } finally {
     translating.value = false
   }

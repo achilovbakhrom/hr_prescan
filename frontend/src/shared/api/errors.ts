@@ -80,6 +80,11 @@ export function extractErrorMessage(err: unknown): string {
   return 'An unexpected error occurred'
 }
 
+export function getApiErrorMessage(err: unknown, fallback: string): string {
+  const message = extractErrorMessage(err)
+  return message === 'An unexpected error occurred' ? fallback : message
+}
+
 /**
  * Extract error details as an ApiValidationError if field-level errors exist,
  * otherwise returns a plain Error with the message.

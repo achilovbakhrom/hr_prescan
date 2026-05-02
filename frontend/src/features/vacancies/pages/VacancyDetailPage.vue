@@ -11,8 +11,7 @@ import VacancyDetailsForm from '../components/VacancyDetailsForm.vue'
 import VacancyScreeningSection from '../components/VacancyScreeningSection.vue'
 import VacancySettingsSection from '../components/VacancySettingsSection.vue'
 import CandidatesTab from '../components/CandidatesTab.vue'
-import { batchTranslateItems } from '@/shared/api/translate'
-import { getLocale } from '@/shared/i18n'
+import { useVacancyBatchTranslation } from '../composables/useVacancyBatchTranslation'
 import type { VacancyStatus } from '../types/vacancy.types'
 
 const { t } = useI18n()
@@ -65,6 +64,13 @@ const interviewCriteria = computed(
 
 const candidatesTotal = computed(() => vacancy.value?.candidatesTotal ?? 0)
 const candidatesShortlisted = computed(() => vacancy.value?.candidatesShortlisted ?? 0)
+const { translatingKey, handleBatchTranslate } = useVacancyBatchTranslation(vacancyId, vacancy)
+const prescanningLoading = computed(
+  () => vacancyStore.loading || translatingKey.value?.startsWith('prescanning:') === true,
+)
+const interviewLoading = computed(
+  () => vacancyStore.loading || translatingKey.value?.startsWith('interview:') === true,
+)
 
 onMounted(() => {
   vacancyStore.fetchVacancyDetail(vacancyId.value)
@@ -84,29 +90,6 @@ async function handleStatusChange(status: VacancyStatus): Promise<void> {
     toast.add({ severity: 'success', summary: t(messageKey), life: 2500 })
   } catch {
     toast.add({ severity: 'error', summary: vacancyStore.error || t('common.error'), life: 4500 })
-  }
-}
-
-async function handleBatchTranslate(
-  itemType: 'criteria' | 'questions',
-  step: 'prescanning' | 'interview',
-): Promise<void> {
-  try {
-    const result = await batchTranslateItems({
-      vacancyId: vacancyId.value,
-      itemType,
-      step,
-      targetLanguage: getLocale(),
-    })
-    if (vacancy.value) {
-      const itemList = itemType === 'criteria' ? vacancy.value.criteria : vacancy.value.questions
-      for (const translated of result.items) {
-        const item = itemList.find((i) => i.id === translated.id)
-        if (item) item.translations = translated.translations
-      }
-    }
-  } catch {
-    /* silent */
   }
 }
 </script>
@@ -154,7 +137,7 @@ async function handleBatchTranslate(
             step="prescanning"
             :questions="prescanningQuestions"
             :criteria="prescanningCriteria"
-            :loading="vacancyStore.loading"
+            :loading="prescanningLoading"
             @add-question="(d) => vacancyStore.addQuestion(vacancyId, d)"
             @update-question="(qId, d) => vacancyStore.updateQuestion(vacancyId, qId, d)"
             @delete-question="(qId) => vacancyStore.deleteQuestion(vacancyId, qId)"
@@ -173,7 +156,7 @@ async function handleBatchTranslate(
             step="interview"
             :questions="interviewQuestions"
             :criteria="interviewCriteria"
-            :loading="vacancyStore.loading"
+            :loading="interviewLoading"
             @add-question="(d) => vacancyStore.addQuestion(vacancyId, d)"
             @update-question="(qId, d) => vacancyStore.updateQuestion(vacancyId, qId, d)"
             @delete-question="(qId) => vacancyStore.deleteQuestion(vacancyId, qId)"

@@ -87,6 +87,7 @@ function goApply(): void {
             :object-id="vacancy.id"
             field="description"
             scope="public"
+            :share-token="isShareRoute ? String(route.params.token) : undefined"
             @translated="(tr) => (vacancy!.descriptionTranslations = tr)"
           >
             <template #default="{ text }">
@@ -111,6 +112,7 @@ function goApply(): void {
             :object-id="vacancy.id"
             field="requirements"
             scope="public"
+            :share-token="isShareRoute ? String(route.params.token) : undefined"
             @translated="(tr) => (vacancy!.requirementsTranslations = tr)"
           >
             <template #default="{ text }">
@@ -133,6 +135,7 @@ function goApply(): void {
             :object-id="vacancy.id"
             field="responsibilities"
             scope="public"
+            :share-token="isShareRoute ? String(route.params.token) : undefined"
             @translated="(tr) => (vacancy!.responsibilitiesTranslations = tr)"
           >
             <template #default="{ text }">

@@ -92,6 +92,8 @@ function handleSubmit(): void {
           icon="pi pi-language"
           severity="secondary"
           size="small"
+          :loading="loading"
+          :disabled="loading"
           @click="emit('translateAll')"
         />
         <Button

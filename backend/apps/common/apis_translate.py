@@ -2,7 +2,7 @@ import time
 from collections import defaultdict
 
 from rest_framework import serializers, status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -16,14 +16,22 @@ RATE_LIMIT_MAX = 50
 RATE_LIMIT_WINDOW = 3600
 
 
-def _check_rate_limit(user_id: str) -> bool:
+def _check_rate_limit(key: str) -> bool:
     now = time.time()
     window_start = now - RATE_LIMIT_WINDOW
-    _rate_limit_store[user_id] = [t for t in _rate_limit_store[user_id] if t > window_start]
-    if len(_rate_limit_store[user_id]) >= RATE_LIMIT_MAX:
+    _rate_limit_store[key] = [t for t in _rate_limit_store[key] if t > window_start]
+    if len(_rate_limit_store[key]) >= RATE_LIMIT_MAX:
         return False
-    _rate_limit_store[user_id].append(now)
+    _rate_limit_store[key].append(now)
     return True
+
+
+def _rate_limit_key(request: Request) -> str:
+    if request.user.is_authenticated:
+        return f"user:{request.user.id}"
+    forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR", "")
+    ip_address = forwarded_for.split(",", 1)[0].strip() or request.META.get("REMOTE_ADDR", "anonymous")
+    return f"ip:{ip_address}"
 
 
 class TranslateInputSerializer(serializers.Serializer):
@@ -31,6 +39,7 @@ class TranslateInputSerializer(serializers.Serializer):
     object_id = serializers.UUIDField()
     field = serializers.CharField(max_length=50)
     target_language = serializers.ChoiceField(choices=["en", "ru", "uz"])
+    share_token = serializers.UUIDField(required=False)
 
     def validate(self, attrs):
         key = (attrs["model"], attrs["field"])
@@ -40,7 +49,7 @@ class TranslateInputSerializer(serializers.Serializer):
 
 
 def _do_translate(request: Request, public_only: bool) -> Response:
-    if not _check_rate_limit(str(request.user.id)):
+    if not _check_rate_limit(_rate_limit_key(request)):
         return Response(
             {"detail": "Rate limit exceeded. Max 50 translation requests per hour."},
             status=status.HTTP_429_TOO_MANY_REQUESTS,
@@ -55,6 +64,11 @@ def _do_translate(request: Request, public_only: bool) -> Response:
         if not field_config.get("public", False):
             return Response(
                 {"detail": "This field requires elevated permissions. Use /api/hr/translate/ instead."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        if not _can_translate_public_object(data):
+            return Response(
+                {"detail": "This content is not available for public translation."},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
@@ -72,6 +86,24 @@ def _do_translate(request: Request, public_only: bool) -> Response:
     )
 
 
+def _can_translate_public_object(data: dict) -> bool:
+    if data["model"] != "vacancy":
+        return True
+
+    from apps.vacancies.models import Vacancy
+
+    try:
+        vacancy = Vacancy.objects.only("id", "status", "visibility", "share_token").get(id=data["object_id"])
+    except Vacancy.DoesNotExist:
+        return False
+
+    if vacancy.status != Vacancy.Status.PUBLISHED:
+        return False
+    if vacancy.visibility == Vacancy.Visibility.PUBLIC:
+        return True
+    return data.get("share_token") is not None and vacancy.share_token == data["share_token"]
+
+
 class TranslateAIContentApi(APIView):
     """POST /api/hr/translate/ — Translate AI-generated content (HR-only)."""
 
@@ -84,12 +116,11 @@ class TranslateAIContentApi(APIView):
 class TranslatePublicContentApi(APIView):
     """POST /api/translate/ — Translate public content (vacancy + employer fields).
 
-    Any authenticated user (HR or candidate) can hit this endpoint. Private
-    fields (interview scores, application notes) are rejected here — those
-    require /api/hr/translate/.
+    Any visitor can hit this endpoint. Private fields (interview scores,
+    application notes) are rejected here — those require /api/hr/translate/.
     """
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def post(self, request: Request) -> Response:
         return _do_translate(request, public_only=True)
@@ -107,7 +138,7 @@ class BatchTranslateApi(APIView):
         target_language = serializers.ChoiceField(choices=["en", "ru", "uz"])
 
     def post(self, request: Request) -> Response:
-        if not _check_rate_limit(str(request.user.id)):
+        if not _check_rate_limit(_rate_limit_key(request)):
             return Response(
                 {"detail": "Rate limit exceeded. Max 50 translation requests per hour."},
                 status=status.HTTP_429_TOO_MANY_REQUESTS,

@@ -136,6 +136,7 @@ HR provides the following information:
 - **Private** — accessible only via a direct shareable link (HR generates and distributes the link)
 - HR chooses visibility per vacancy
 - **External sharing** — each vacancy has a unique URL that HR can post on external platforms (LinkedIn, job boards, social media, company website). Candidates clicking the link are directed to the vacancy page on PreScan to apply
+- Public vacancy pages can translate visible vacancy content (description, requirements, responsibilities) for visitors without requiring candidate login. Private HR evaluation content remains HR-only.
 
 ### 5.2.1 External Vacancy Parsing
 

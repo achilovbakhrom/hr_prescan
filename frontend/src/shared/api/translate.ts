@@ -10,6 +10,7 @@ export async function translateContent(params: {
   objectId: string
   field: string
   targetLanguage: string
+  shareToken?: string
   /** Use `/translate/` (any auth) instead of `/hr/translate/` (HR-only). */
   scope?: 'hr' | 'public'
 }): Promise<TranslateResponse> {
