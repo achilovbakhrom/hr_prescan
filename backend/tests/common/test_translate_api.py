@@ -85,8 +85,7 @@ def test_batch_translate_persists_wrapped_json_items(vacancy, hr_user):
     criteria = list(vacancy.criteria.filter(step=ScreeningStep.PRESCANNING).order_by("order"))
     payload = {
         "items": [
-            {"id": str(criterion.id), "text": f"Критерий {index}"}
-            for index, criterion in enumerate(criteria, start=1)
+            {"id": str(criterion.id), "text": f"Критерий {index}"} for index, criterion in enumerate(criteria, start=1)
         ]
     }
 
