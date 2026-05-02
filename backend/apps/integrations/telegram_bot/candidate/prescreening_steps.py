@@ -32,7 +32,8 @@ from apps.integrations.telegram_bot.sessions import clear_session, update_sessio
 
 logger = logging.getLogger(__name__)
 
-_PHONE_RE = re.compile(r"^\+?[\d\s\-()]{7,20}$")
+_CONTACT_MIN_LENGTH = 3
+_CONTACT_MAX_LENGTH = 50
 
 
 def handle_vacancy_code(*, client, chat_id: int, user, text: str, lang: str) -> None:
@@ -67,7 +68,13 @@ def handle_vacancy_code(*, client, chat_id: int, user, text: str, lang: str) -> 
     )
     client.send_message(
         chat_id=chat_id,
-        text=t("candidate.ps_confirm_name", lang=lang, title=vacancy.title, company=vacancy.company.name, name=name),
+        text=t(
+            "candidate.ps_confirm_name",
+            lang=lang,
+            title=_md_escape(vacancy.title),
+            company=_md_escape(vacancy.company.name),
+            name=_md_escape(name),
+        ),
         reply_markup=confirm_name_keyboard(lang=lang),
         parse_mode="Markdown",
     )
@@ -85,11 +92,12 @@ def handle_new_name(*, client, chat_id: int, user, text: str, session: dict, lan
 
 
 def handle_new_phone(*, client, chat_id: int, user, text: str, session: dict, lang: str) -> None:
-    if not _PHONE_RE.match(text.strip()):
-        client.send_message(chat_id=chat_id, text=t("candidate.reg_invalid_phone", lang=lang))
+    contact = re.sub(r"\s+", " ", text.strip())
+    if not (_CONTACT_MIN_LENGTH <= len(contact) <= _CONTACT_MAX_LENGTH):
+        client.send_message(chat_id=chat_id, text=t("candidate.ps_invalid_contact", lang=lang))
         return
-    update_session(role=ROLE_CANDIDATE, telegram_id=user.telegram_id, **{SK_PHONE: text.strip()})
-    go_to_cv_step(client=client, chat_id=chat_id, user=user, session={**session, SK_PHONE: text.strip()}, lang=lang)
+    update_session(role=ROLE_CANDIDATE, telegram_id=user.telegram_id, **{SK_PHONE: contact})
+    go_to_cv_step(client=client, chat_id=chat_id, user=user, session={**session, SK_PHONE: contact}, lang=lang)
 
 
 def go_to_confirm_phone(*, client, chat_id: int, user, session: dict, lang: str) -> None:
@@ -107,7 +115,7 @@ def go_to_confirm_phone(*, client, chat_id: int, user, session: dict, lang: str)
     )
     client.send_message(
         chat_id=chat_id,
-        text=t("candidate.ps_confirm_phone", lang=lang, phone=phone or "—"),
+        text=t("candidate.ps_confirm_phone", lang=lang, phone=_md_escape(phone or "—")),
         reply_markup=confirm_phone_keyboard(lang=lang),
         parse_mode="Markdown",
     )
@@ -173,3 +181,8 @@ def start_interview_submission(*, client, chat_id: int, user, session: dict, lan
 
 def _apply_prescreening_language(*, user, language: str, fallback: str) -> str:
     return set_user_language(user=user, language=language, fallback=fallback)
+
+
+def _md_escape(text: str) -> str:
+    """Escape Telegram Markdown (legacy) special characters."""
+    return text.replace("_", "\\_").replace("*", "\\*").replace("[", "\\[").replace("`", "\\`")

@@ -66,6 +66,12 @@ def build_system_prompt(interview: Interview) -> str:
 - Skills needed: {", ".join(vacancy.skills) if vacancy.skills else "Not specified"}
 - Experience level: {vacancy.get_experience_level_display()}
 {cv_section}{additional_prompt}
+## Candidate Contact Handling
+- The candidate may be unauthenticated. Do not require an email address during the conversation.
+- If you need contact details for HR follow-up, ask once in general terms:
+  "Please leave any contact method where HR can reach you, such as phone, email, Telegram, or WhatsApp."
+- Accept whatever contact method the candidate gives. Do not validate it as email-only.
+
 ## Competencies to Evaluate
 Each competency below is a skill goal you need to assess. Do NOT read these to the candidate.
 Instead, design your own questions and follow-ups to figure out whether the candidate truly

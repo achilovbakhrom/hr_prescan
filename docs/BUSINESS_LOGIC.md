@@ -236,7 +236,7 @@ Candidates can apply via two surfaces: the **web app** (public job board) and th
 ### 6.1 Web flow
 
 1. Candidate finds a vacancy (public job board or direct link)
-2. Candidate fills in personal details (name, email, phone). No account required.
+2. Candidate fills in personal details. No account is required. The standard web form collects name, email, and optional phone; assistant-led unauthenticated prescreening must ask for a general HR contact method instead of requiring email-only contact.
 3. Candidate uploads CV/resume (optional but recommended; PDF, DOCX supported). If an authenticated candidate does not upload a CV for this application, the application automatically reuses the candidate's platform resume data. If the candidate also has a generated platform CV PDF, the active saved CV file is attached, falling back to the latest saved CV with a file.
 4. System creates the application and simultaneously creates a prescanning session with a unique link
    - If the candidate already has an active application for the same vacancy and email, the submission is blocked as a duplicate.
@@ -302,7 +302,7 @@ The candidate bot lets a candidate browse entry points, apply, and complete pres
    - open a `ps_<prescan_token>` deep link from the web flow and continue the same prescanning session in Telegram
 9. Prescanning inside Telegram is chat-based:
    - when the candidate enters a vacancy code or opens an exact prescreening deep link, the bot UI switches to the vacancy/interview `prescanning_language` so the Telegram flow matches the language selected in the web app
-   - if the candidate has no phone number saved, the bot asks for a new phone number instead of showing an empty placeholder confirmation
+   - if the candidate has no saved contact, the bot asks for any contact HR can use (phone, email, Telegram, WhatsApp, etc.) instead of requiring email-only or phone-only contact
    - during the CV step, saved platform CVs are offered first (active CV first), and the candidate can either select one of them or upload a new file; optional CV steps can still be skipped
    - Telegram uses the same conversational AI chat engine as web prescanning; vacancy questions are competencies for the AI to assess, not a rigid numbered questionnaire.
    - answers can be text or voice
@@ -362,7 +362,7 @@ Prescanning is the initial AI screening step. It is always enabled and always co
 **Prescanning Flow:**
 1. Candidate opens the prescanning link
 2. AI greeting message appears immediately
-3. AI asks questions one by one; candidate types responses
+3. AI asks questions one by one; candidate types responses. If contact details are needed from an unauthenticated candidate, the AI asks for any HR contact method such as phone, email, Telegram, or WhatsApp, and must not require email specifically.
 4. AI can ask follow-up questions or probe deeper based on answers
 5. Prescanning concludes when AI determines it has gathered enough information
 6. AI thanks the candidate and ends the session

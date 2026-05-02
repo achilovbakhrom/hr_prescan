@@ -248,14 +248,19 @@ _STRINGS_EXT: dict[str, dict[str, str]] = {
         "uz": "To'liq ismingizni kiriting:",
     },
     "candidate.ps_confirm_phone": {
-        "en": "Your phone number:\n*{phone}*\n\nIs this correct?",
-        "ru": "Ваш номер телефона:\n*{phone}*\n\nВсё верно?",
-        "uz": "Telefon raqamingiz:\n*{phone}*\n\nTo'g'rimi?",
+        "en": "Your contact for HR:\n*{phone}*\n\nIs this correct?",
+        "ru": "Ваш контакт для HR:\n*{phone}*\n\nВсё верно?",
+        "uz": "HR bog'lanishi uchun kontaktingiz:\n*{phone}*\n\nTo'g'rimi?",
     },
     "candidate.ps_ask_new_phone": {
-        "en": "Enter your phone number:",
-        "ru": "Введите номер телефона:",
-        "uz": "Telefon raqamingizni kiriting:",
+        "en": "Leave any contact where HR can reach you: phone, email, Telegram, WhatsApp, etc.",
+        "ru": "Оставьте любой контакт для связи с HR: телефон, email, Telegram, WhatsApp и т.д.",
+        "uz": "HR siz bilan bog'lanishi uchun istalgan kontaktni qoldiring: telefon, email, Telegram, WhatsApp va boshqalar.",
+    },
+    "candidate.ps_invalid_contact": {
+        "en": "Please enter a contact HR can use, such as a phone number, email, Telegram, or WhatsApp.",
+        "ru": "Введите контакт для связи с HR: телефон, email, Telegram или WhatsApp.",
+        "uz": "HR bog'lanishi uchun kontakt kiriting: telefon, email, Telegram yoki WhatsApp.",
     },
     "candidate.ps_cv_required": {
         "en": "📎 This vacancy requires a CV. Please upload it (PDF, DOCX, TXT):",
