@@ -2,8 +2,11 @@ import type { Router } from 'vue-router'
 
 declare global {
   interface Window {
-    dataLayer?: unknown[]
-    gtag?: (...args: unknown[]) => void
+    dataLayer?: IArguments[]
+    gtag?: {
+      (...args: unknown[]): void
+      q?: IArguments[]
+    }
   }
 }
 
@@ -26,10 +29,12 @@ function loadGoogleAnalyticsScript(id: string): void {
 }
 
 function trackPageView(path: string, title: string): void {
-  if (!isEnabled() || !window.gtag || path === lastTrackedPath) return
+  if (!isEnabled() || !window.gtag || path === lastTrackedPath || !measurementId) return
 
   lastTrackedPath = path
   window.gtag('event', 'page_view', {
+    send_to: measurementId,
+    page_location: window.location.href,
     page_path: path,
     page_title: title,
   })
@@ -40,8 +45,8 @@ export function initializeGoogleAnalytics(router: Router): void {
 
   initialized = true
   window.dataLayer = window.dataLayer || []
-  window.gtag = function gtag(...args: unknown[]) {
-    window.dataLayer?.push(args)
+  window.gtag = function gtag() {
+    window.dataLayer?.push(arguments)
   }
 
   window.gtag('js', new Date())
