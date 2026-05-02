@@ -2,6 +2,7 @@
 
 import json
 import logging
+import re
 from uuid import UUID
 
 from django.conf import settings
@@ -12,6 +13,72 @@ from apps.common.exceptions import ApplicationError
 from apps.common.services_translation.translate_text import LANGUAGE_NAMES
 
 logger = logging.getLogger(__name__)
+
+_JSON_FENCE_RE = re.compile(r"^```(?:json)?\s*(?P<body>.*?)\s*```$", re.DOTALL | re.IGNORECASE)
+
+
+def _translation_response_schema() -> types.Schema:
+    return types.Schema(
+        type=types.Type.ARRAY,
+        items=types.Schema(
+            type=types.Type.OBJECT,
+            properties={
+                "id": types.Schema(type=types.Type.STRING),
+                "text": types.Schema(type=types.Type.STRING),
+            },
+            required=["id", "text"],
+        ),
+    )
+
+
+def _json_from_response_text(text: str) -> object:
+    text = text.strip()
+    fence_match = _JSON_FENCE_RE.match(text)
+    if fence_match:
+        text = fence_match.group("body").strip()
+
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        start_positions = [pos for pos in (text.find("["), text.find("{")) if pos >= 0]
+        if not start_positions:
+            raise
+        start = min(start_positions)
+        end = max(text.rfind("]"), text.rfind("}"))
+        if end <= start:
+            raise
+        return json.loads(text[start : end + 1])
+
+
+def _parse_translated_items(response) -> list[dict[str, str]]:
+    parsed = getattr(response, "parsed", None)
+    payload = parsed if parsed is not None else _json_from_response_text(getattr(response, "text", "") or "")
+
+    if isinstance(payload, dict):
+        if isinstance(payload.get("id"), str) and isinstance(payload.get("text"), str):
+            payload = [payload]
+        else:
+            for key in ("items", "translations", "results"):
+                if isinstance(payload.get(key), list):
+                    payload = payload[key]
+                    break
+            else:
+                payload = [{"id": key, "text": value} for key, value in payload.items()]
+
+    if not isinstance(payload, list):
+        raise ValueError("Translation response must be a JSON array.")
+
+    translated_items: list[dict[str, str]] = []
+    for item in payload:
+        if not isinstance(item, dict):
+            continue
+        item_id = item.get("id")
+        text = item.get("text")
+        if isinstance(item_id, str) and isinstance(text, str):
+            translated_items.append({"id": item_id, "text": text})
+    if not translated_items:
+        raise ValueError("Translation response did not include any translated items.")
+    return translated_items
 
 
 def batch_translate_vacancy_items(
@@ -89,16 +156,25 @@ def batch_translate_vacancy_items(
                 system_instruction=(
                     f"You are a professional translator. Translate each item's 'text' field to {lang_name}. "
                     "Preserve professional tone and technical terms. "
-                    "Return ONLY a valid JSON array with the same structure: "
-                    '[{"id": "...", "text": "translated text"}, ...]'
+                    "Return a JSON array with the same structure: "
+                    '[{"id": "...", "text": "translated text"}, ...]. '
+                    "Do not wrap it in an object or Markdown."
                 ),
                 temperature=0.2,
                 response_mime_type="application/json",
+                response_schema=_translation_response_schema(),
             ),
         )
-        translated_items = json.loads(response.text)
+        translated_items = _parse_translated_items(response)
     except Exception as e:
-        logger.error("Batch translation error: %s", e)
+        logger.exception(
+            "Batch translation error for vacancy=%s item_type=%s step=%s target_language=%s response=%r",
+            vacancy_id,
+            item_type,
+            step,
+            target_language,
+            getattr(locals().get("response", None), "text", None),
+        )
         raise ApplicationError("Translation failed. Please try again.") from e
 
     # Build lookup of translated texts
