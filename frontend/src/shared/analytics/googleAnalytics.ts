@@ -46,6 +46,8 @@ export function initializeGoogleAnalytics(router: Router): void {
   initialized = true
   window.dataLayer = window.dataLayer || []
   window.gtag = function gtag() {
+    // Google gtag expects the native arguments object, not a rest-args array.
+    // eslint-disable-next-line prefer-rest-params
     window.dataLayer?.push(arguments)
   }
 
