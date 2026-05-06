@@ -53,4 +53,5 @@ export interface Vacancy {
   canApply?: boolean
   contentSource?: 'internal' | 'parsed'
   externalUrl?: string
+  hasContactInfo?: boolean
 }

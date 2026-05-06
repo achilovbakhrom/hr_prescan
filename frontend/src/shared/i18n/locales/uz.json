@@ -1359,6 +1359,7 @@
     "noJobs": "Mezonlaringizga mos ish topilmadi",
     "noJobsHint": "Filtrlar yoki qidiruv so'zlarini o'zgartirib ko'ring",
     "apply": "Ariza topshirish",
+    "openSource": "Manbani ochish",
     "viewDetails": "Tafsilotlarni ko'rish",
     "postedOn": "Joylashtirilgan",
     "openPositions": "{count} ochiq ish o'rni"

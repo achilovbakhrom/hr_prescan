@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 
 from apps.common.messages import MSG_VACANCY_NOT_FOUND
 from apps.job_parser.selectors import get_public_parsed_vacancies, get_public_parsed_vacancy_by_id
-from apps.job_parser.serializers import (
+from apps.job_parser.serializers_public import (
     PublicParsedVacancyDetailOutputSerializer,
     PublicParsedVacancyListOutputSerializer,
 )

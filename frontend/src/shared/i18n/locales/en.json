@@ -1366,6 +1366,7 @@
     "noJobs": "No jobs match your criteria",
     "noJobsHint": "Try adjusting your filters or search terms",
     "apply": "Apply Now",
+    "openSource": "Open source",
     "viewDetails": "View Details",
     "postedOn": "Posted",
     "openPositions": "{count} open positions"

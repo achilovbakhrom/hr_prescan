@@ -51,6 +51,15 @@ function formatRelativeDate(dateStr: string): string {
   if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`
   return d.toLocaleDateString([], { month: 'short', day: 'numeric' })
 }
+
+function shouldShowExternalLink(job: Vacancy): boolean {
+  return (
+    job.contentSource === 'parsed' &&
+    job.canApply === false &&
+    job.hasContactInfo !== true &&
+    !!job.externalUrl
+  )
+}
 </script>
 
 <template>
@@ -65,9 +74,12 @@ function formatRelativeDate(dateStr: string): string {
       v-for="job in jobs"
       :key="job.id"
       interactive
-      as="button"
+      as="article"
+      tabindex="0"
       class="group block w-full cursor-pointer p-4 text-left sm:p-5"
       @click="emit('select', job.id)"
+      @keydown.enter="emit('select', job.id)"
+      @keydown.space.prevent="emit('select', job.id)"
     >
       <div class="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <div class="min-w-0 flex-1">
@@ -142,11 +154,24 @@ function formatRelativeDate(dateStr: string): string {
           </span>
         </div>
         <span
-          class="shrink-0 font-mono text-[10px] text-[color:var(--color-text-muted)] sm:text-xs"
+          class="shrink-0 self-start font-mono text-[10px] text-[color:var(--color-text-muted)] sm:self-center sm:text-xs"
         >
           {{ formatRelativeDate(job.createdAt) }}
         </span>
       </div>
+
+      <a
+        v-if="shouldShowExternalLink(job)"
+        :href="job.externalUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="mt-3 inline-flex w-fit items-center gap-1.5 rounded-md bg-[color:var(--color-accent-soft)] px-2.5 py-1.5 text-xs font-medium text-[color:var(--color-accent)] ease-ios transition-colors hover:bg-[color:var(--color-accent)] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-border-ring)]"
+        @click.stop
+        @keydown.stop
+      >
+        <i class="pi pi-external-link text-[10px]"></i>
+        {{ t('jobBoard.openSource') }}
+      </a>
     </GlassSurface>
   </div>
 

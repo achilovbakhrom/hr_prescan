@@ -15,6 +15,11 @@ HH_API_BASE_URLS = {
     ParsedVacancySource.Type.HH_UZ: "https://api.hh.uz",
 }
 
+HH_SITE_ACCESS_TOKEN_SETTINGS = {
+    ParsedVacancySource.Type.HH_RU: "HH_RU_ACCESS_TOKEN",
+    ParsedVacancySource.Type.HH_UZ: "HH_UZ_ACCESS_TOKEN",
+}
+
 
 def sync_hh_source(*, source: ParsedVacancySource) -> dict:
     if source.source_type not in HH_API_BASE_URLS:
@@ -117,10 +122,19 @@ def _hh_headers(*, source: ParsedVacancySource) -> dict[str, str]:
         "User-Agent": user_agent,
         "HH-User-Agent": user_agent,
     }
-    access_token = (source.settings or {}).get("access_token") or getattr(settings, "HH_ACCESS_TOKEN", "")
+    access_token = _hh_access_token(source=source)
     if access_token:
         headers["Authorization"] = f"Bearer {access_token}"
     return headers
+
+
+def _hh_access_token(*, source: ParsedVacancySource) -> str:
+    source_token = (source.settings or {}).get("access_token")
+    if source_token:
+        return str(source_token)
+    site_setting = HH_SITE_ACCESS_TOKEN_SETTINGS.get(source.source_type, "")
+    site_token = getattr(settings, site_setting, "") if site_setting else ""
+    return site_token or getattr(settings, "HH_ACCESS_TOKEN", "")
 
 
 def _has_hh_contact(*, item: dict, detail: dict) -> bool:

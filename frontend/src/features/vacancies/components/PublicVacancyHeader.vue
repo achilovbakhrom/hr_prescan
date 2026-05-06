@@ -31,6 +31,15 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+
+function shouldShowExternalLink(vacancy: VacancyWithCompany): boolean {
+  return (
+    vacancy.contentSource === 'parsed' &&
+    vacancy.canApply === false &&
+    vacancy.hasContactInfo !== true &&
+    !!vacancy.externalUrl
+  )
+}
 </script>
 
 <template>
@@ -89,6 +98,16 @@ const { t } = useI18n()
           size="large"
           @click="emit('apply')"
         />
+        <a
+          v-else-if="shouldShowExternalLink(vacancy)"
+          :href="vacancy.externalUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 rounded-md bg-[color:var(--color-accent)] px-4 py-3 text-sm font-semibold text-white shadow-sm ease-ios transition-colors hover:bg-[color:var(--color-accent-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-border-ring)]"
+        >
+          <i class="pi pi-external-link text-xs"></i>
+          {{ t('jobBoard.openSource') }}
+        </a>
       </div>
     </div>
 

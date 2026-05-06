@@ -3,6 +3,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 import requests
+from django.test import override_settings
 from django.utils import timezone
 
 from apps.common.exceptions import ApplicationError
@@ -241,6 +242,32 @@ class TestHeadHunterSync:
             pytest.raises(ApplicationError, match="HTTP 403"),
         ):
             sync_hh_source(source=source)
+
+    @override_settings(HH_UZ_ACCESS_TOKEN="hh-uz-token", HH_ACCESS_TOKEN="generic-token")
+    def test_sync_hh_source_uses_hh_uz_access_token(self, company, hr_user):
+        source = _source(company, hr_user, ParsedVacancySource.Type.HH_UZ)
+        list_response = Mock()
+        list_response.json.return_value = {"items": [], "pages": 1}
+        list_response.raise_for_status.return_value = None
+
+        with patch("apps.job_parser.services.hh.requests.get", return_value=list_response) as request_get:
+            sync_hh_source(source=source)
+
+        assert request_get.call_args.kwargs["headers"]["Authorization"] == "Bearer hh-uz-token"
+
+    @override_settings(HH_UZ_ACCESS_TOKEN="hh-uz-token", HH_ACCESS_TOKEN="generic-token")
+    def test_sync_hh_source_prefers_source_access_token(self, company, hr_user):
+        source = _source(company, hr_user, ParsedVacancySource.Type.HH_UZ)
+        source.settings = {"access_token": "source-token"}
+        source.save(update_fields=["settings", "updated_at"])
+        list_response = Mock()
+        list_response.json.return_value = {"items": [], "pages": 1}
+        list_response.raise_for_status.return_value = None
+
+        with patch("apps.job_parser.services.hh.requests.get", return_value=list_response) as request_get:
+            sync_hh_source(source=source)
+
+        assert request_get.call_args.kwargs["headers"]["Authorization"] == "Bearer source-token"
 
 
 class TestParserSyncControl:

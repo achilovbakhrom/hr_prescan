@@ -55,6 +55,15 @@ function goApply(): void {
   if (!vacancy.value || vacancy.value.canApply === false) return
   router.push(`/jobs/${vacancy.value.id}/apply`)
 }
+
+const showExternalLink = computed(() => {
+  return (
+    vacancy.value?.contentSource === 'parsed' &&
+    vacancy.value.canApply === false &&
+    vacancy.value.hasContactInfo !== true &&
+    !!vacancy.value.externalUrl
+  )
+})
 </script>
 
 <template>
@@ -165,6 +174,17 @@ function goApply(): void {
               size="large"
               @click="goApply"
             />
+          </GlassSurface>
+          <GlassSurface v-else-if="showExternalLink" level="float" class="rounded-full !p-0">
+            <a
+              :href="vacancy.externalUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-2 rounded-full bg-[color:var(--color-accent)] px-4 py-3 text-sm font-semibold text-white shadow-sm"
+            >
+              <i class="pi pi-external-link text-xs"></i>
+              {{ t('jobBoard.openSource') }}
+            </a>
           </GlassSurface>
         </div>
       </template>

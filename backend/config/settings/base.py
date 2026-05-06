@@ -293,7 +293,16 @@ GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
 
 # HeadHunter parser
 HH_USER_AGENT = os.environ.get("HH_USER_AGENT", "HR PreScan vacancy parser")
+HH_TOKEN_URL = os.environ.get("HH_TOKEN_URL", "https://api.hh.ru/token")
 HH_ACCESS_TOKEN = os.environ.get("HH_ACCESS_TOKEN", "")
+HH_RU_ACCESS_TOKEN = os.environ.get("HH_RU_ACCESS_TOKEN", "")
+HH_UZ_ACCESS_TOKEN = os.environ.get("HH_UZ_ACCESS_TOKEN", "")
+HH_CLIENT_ID = os.environ.get("HH_CLIENT_ID", "")
+HH_CLIENT_SECRET = os.environ.get("HH_CLIENT_SECRET", "")
+HH_RU_CLIENT_ID = os.environ.get("HH_RU_CLIENT_ID", "")
+HH_RU_CLIENT_SECRET = os.environ.get("HH_RU_CLIENT_SECRET", "")
+HH_UZ_CLIENT_ID = os.environ.get("HH_UZ_CLIENT_ID", "")
+HH_UZ_CLIENT_SECRET = os.environ.get("HH_UZ_CLIENT_SECRET", "")
 
 # E2E test hooks — exposes DEBUG-only endpoints (e.g. /auth/debug/oauth-simulate/)
 # that let the E2E suite bypass real OAuth providers. Must be false in production.

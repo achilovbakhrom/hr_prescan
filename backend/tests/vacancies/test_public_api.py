@@ -47,6 +47,8 @@ def test_public_job_board_includes_parsed_vacancies_as_read_only(company, hr_use
     assert by_id[str(internal.id)]["content_source"] == "internal"
     assert by_id[str(parsed.id)]["can_apply"] is False
     assert by_id[str(parsed.id)]["content_source"] == "parsed"
+    assert by_id[str(parsed.id)]["external_url"] == "https://hh.uz/vacancy/1"
+    assert by_id[str(parsed.id)]["has_contact_info"] is False
 
 
 def test_public_parsed_vacancy_detail_is_read_only(company, hr_user):
@@ -63,3 +65,5 @@ def test_public_parsed_vacancy_detail_is_read_only(company, hr_user):
     assert response.data["cv_required"] is False
     assert response.data["interview_duration"] == 0
     assert response.data["telegram_code"] is None
+    assert response.data["external_url"] == "https://hh.uz/vacancy/1"
+    assert response.data["has_contact_info"] is False

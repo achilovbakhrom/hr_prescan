@@ -249,6 +249,13 @@ DEEPGRAM_API_KEY=
 ELEVENLABS_API_KEY=
 ELEVENLABS_VOICE_ID=VEWZvLXUrFL3O7dUnBSW
 
+# === HEADHUNTER / hh.uz ===
+HH_USER_AGENT=HR PreScan vacancy parser
+HH_TOKEN_URL=https://api.hh.ru/token
+HH_UZ_ACCESS_TOKEN=
+HH_UZ_CLIENT_ID=
+HH_UZ_CLIENT_SECRET=
+
 # === TELEGRAM — fill in after Step 9 (Telegram bots) ===
 TELEGRAM_HR_BOT_TOKEN=
 TELEGRAM_HR_BOT_USERNAME=
@@ -271,6 +278,15 @@ INTERNAL_API_KEY=paste_generated_value_here
 
 Save: `Ctrl+O` → Enter → `Ctrl+X`
 
+For hh.uz, generate the application token deliberately and reuse the same `HH_UZ_ACCESS_TOKEN` in dev and prod when both environments use the same hh.uz application credentials:
+
+```bash
+cd /opt/prescreen/backend
+python manage.py generate_hh_app_token --source-type hh_uz
+```
+
+Do not run token generation independently in both environments for the same hh.uz application. HeadHunter revokes the previous application token when a new one is generated.
+
 Create the project-root `.env` for Docker Compose variable substitution:
 
 ```bash
@@ -278,6 +294,9 @@ cat > /opt/prescreen/.env << EOF
 DOMAIN=dev.prescreen-app.com
 GITHUB_REPOSITORY=achilovbakhrom/hr_prescan
 IMAGE_TAG=dev
+HH_USER_AGENT=HR PreScan vacancy parser
+HH_TOKEN_URL=https://api.hh.ru/token
+HH_UZ_ACCESS_TOKEN=
 EOF
 ```
 
@@ -483,6 +502,13 @@ DEEPGRAM_API_KEY=
 ELEVENLABS_API_KEY=
 ELEVENLABS_VOICE_ID=VEWZvLXUrFL3O7dUnBSW
 
+# === HEADHUNTER / hh.uz ===
+HH_USER_AGENT=HR PreScan vacancy parser
+HH_TOKEN_URL=https://api.hh.ru/token
+HH_UZ_ACCESS_TOKEN=
+HH_UZ_CLIENT_ID=
+HH_UZ_CLIENT_SECRET=
+
 # === TELEGRAM — production bots only (created in Step 9) ===
 TELEGRAM_HR_BOT_TOKEN=
 TELEGRAM_HR_BOT_USERNAME=hr_prescreen_ai_bot
@@ -515,6 +541,9 @@ cat > /opt/prescreen/.env << EOF
 DOMAIN=prescreen-app.com
 GITHUB_REPOSITORY=achilovbakhrom/hr_prescan
 IMAGE_TAG=latest
+HH_USER_AGENT=HR PreScan vacancy parser
+HH_TOKEN_URL=https://api.hh.ru/token
+HH_UZ_ACCESS_TOKEN=
 EOF
 ```
 
