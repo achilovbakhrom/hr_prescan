@@ -31,7 +31,9 @@ def test_parsed_vacancy_has_contact_info_uses_hh_contacts_payload():
 
 def test_parsed_vacancy_is_publicly_usable_with_contact_or_external_url():
     no_contact = SimpleNamespace(description="", requirements="", responsibilities="", raw_payload={}, external_url="")
-    with_url = SimpleNamespace(description="", requirements="", responsibilities="", raw_payload={}, external_url="https://hh.uz/vacancy/1")
+    with_url = SimpleNamespace(
+        description="", requirements="", responsibilities="", raw_payload={}, external_url="https://hh.uz/vacancy/1"
+    )
     with_contact = SimpleNamespace(
         description="Contact: @company_hr",
         requirements="",
