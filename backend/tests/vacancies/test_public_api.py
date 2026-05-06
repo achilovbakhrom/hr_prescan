@@ -22,6 +22,9 @@ def _parsed_vacancy(company, hr_user) -> ParsedVacancy:
         requirements="Python",
         responsibilities="Develop services",
         skills=["Python"],
+        salary_min=1000,
+        salary_max=2000,
+        salary_currency="USD",
         location="Tashkent",
         company_name="External Co",
         status=ParsedVacancy.Status.ACTIVE,
@@ -29,7 +32,7 @@ def _parsed_vacancy(company, hr_user) -> ParsedVacancy:
     )
 
 
-def test_public_job_board_includes_parsed_vacancies_as_read_only(company, hr_user):
+def test_public_job_board_includes_parsed_vacancies_as_read_only_with_source_url(company, hr_user):
     internal = VacancyFactory(
         company=company,
         created_by=hr_user,
@@ -51,6 +54,17 @@ def test_public_job_board_includes_parsed_vacancies_as_read_only(company, hr_use
     assert by_id[str(parsed.id)]["has_contact_info"] is False
 
 
+def test_public_job_board_excludes_unreachable_parsed_vacancies(company, hr_user):
+    parsed = _parsed_vacancy(company, hr_user)
+    parsed.external_url = ""
+    parsed.save(update_fields=["external_url", "updated_at"])
+
+    response = APIClient().get("/api/public/vacancies/")
+
+    assert response.status_code == 200
+    assert str(parsed.id) not in {item["id"] for item in response.data}
+
+
 def test_public_parsed_vacancy_detail_is_read_only(company, hr_user):
     parsed = _parsed_vacancy(company, hr_user)
 
@@ -65,5 +79,19 @@ def test_public_parsed_vacancy_detail_is_read_only(company, hr_user):
     assert response.data["cv_required"] is False
     assert response.data["interview_duration"] == 0
     assert response.data["telegram_code"] is None
+    assert response.data["salary_min"] == "1000.00"
+    assert response.data["salary_max"] == "2000.00"
+    assert response.data["salary_currency"] == "USD"
+    assert response.data["is_remote"] is False
     assert response.data["external_url"] == "https://hh.uz/vacancy/1"
     assert response.data["has_contact_info"] is False
+
+
+def test_public_parsed_vacancy_detail_returns_404_when_no_contact_or_source_url(company, hr_user):
+    parsed = _parsed_vacancy(company, hr_user)
+    parsed.external_url = ""
+    parsed.save(update_fields=["external_url", "updated_at"])
+
+    response = APIClient().get(f"/api/public/vacancies/{parsed.id}/")
+
+    assert response.status_code == 404

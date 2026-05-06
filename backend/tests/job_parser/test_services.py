@@ -186,7 +186,7 @@ class TestHeadHunterSync:
         assert parsed.salary_min == 1500
         assert ParsedVacancy.objects.get(source=source, external_id="old").status == ParsedVacancy.Status.STALE
 
-    def test_sync_hh_source_skips_items_without_contact(self, company, hr_user):
+    def test_sync_hh_source_keeps_items_without_contact_when_external_url_exists(self, company, hr_user):
         source = _source(company, hr_user)
         list_response = Mock()
         list_response.json.return_value = {
@@ -207,9 +207,33 @@ class TestHeadHunterSync:
         with patch("apps.job_parser.services.hh.requests.get", side_effect=[list_response, detail_response]):
             result = sync_hh_source(source=source)
 
+        assert result["parsed"] == 1
+        assert result["skipped_no_contact"] == 0
+        assert ParsedVacancy.objects.filter(source=source, external_id="no-contact").exists() is True
+
+    def test_sync_hh_source_skips_items_without_contact_or_external_url(self, company, hr_user):
+        source = _source(company, hr_user)
+        list_response = Mock()
+        list_response.json.return_value = {
+            "items": [
+                {
+                    "id": "unreachable",
+                    "name": "Hidden Recruiter Role",
+                    "snippet": {"responsibility": "Build APIs"},
+                }
+            ]
+        }
+        list_response.raise_for_status.return_value = None
+        detail_response = Mock()
+        detail_response.json.return_value = {"id": "unreachable", "contacts": None, "description": "No contacts here"}
+        detail_response.raise_for_status.return_value = None
+
+        with patch("apps.job_parser.services.hh.requests.get", side_effect=[list_response, detail_response]):
+            result = sync_hh_source(source=source)
+
         assert result["parsed"] == 0
         assert result["skipped_no_contact"] == 1
-        assert ParsedVacancy.objects.filter(source=source, external_id="no-contact").exists() is False
+        assert ParsedVacancy.objects.filter(source=source, external_id="unreachable").exists() is False
 
     def test_sync_hh_source_does_not_require_url_or_filters(self, company, hr_user):
         source = ParsedVacancySource.objects.create(

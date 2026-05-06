@@ -10,6 +10,7 @@ from apps.job_parser.serializers_public import (
     PublicParsedVacancyDetailOutputSerializer,
     PublicParsedVacancyListOutputSerializer,
 )
+from apps.job_parser.services.contact_detection import parsed_vacancy_is_publicly_usable
 from apps.vacancies.selectors import get_public_vacancies, get_vacancy_by_id, get_vacancy_by_share_token
 from apps.vacancies.serializers import PublicVacancyDetailOutputSerializer, PublicVacancyListOutputSerializer
 
@@ -44,6 +45,7 @@ class PublicVacancyListApi(APIView):
                 salary_min=filters.get("salary_min"),
                 salary_max=filters.get("salary_max"),
             )
+            parsed_vacancies = [item for item in parsed_vacancies if parsed_vacancy_is_publicly_usable(item)]
             items.extend(PublicParsedVacancyListOutputSerializer(parsed_vacancies, many=True).data)
 
         items.sort(key=lambda item: item.get("created_at") or "", reverse=True)
@@ -66,6 +68,8 @@ class PublicVacancyDetailApi(APIView):
             vacancy = get_vacancy_by_id(vacancy_id=vacancy_id)
             if vacancy is None:
                 parsed_vacancy = get_public_parsed_vacancy_by_id(vacancy_id=vacancy_id)
+                if parsed_vacancy is not None and not parsed_vacancy_is_publicly_usable(parsed_vacancy):
+                    parsed_vacancy = None
 
         if vacancy is None and parsed_vacancy is None:
             return Response({"detail": str(MSG_VACANCY_NOT_FOUND)}, status=status.HTTP_404_NOT_FOUND)

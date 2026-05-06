@@ -91,6 +91,7 @@ static_collected/
 # Codex local state
 .codex/
 .codex-task-state/
+.playwright-mcp/
 
 # UI redesign screenshot scratch (local only)
 docs/design/baseline/

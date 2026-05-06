@@ -136,7 +136,7 @@ HR provides the following information:
 - **Private** — accessible only via a direct shareable link (HR generates and distributes the link)
 - HR chooses visibility per vacancy
 - **External sharing** — each vacancy has a unique URL that HR can post on external platforms (LinkedIn, job boards, social media, company website). Candidates clicking the link are directed to the vacancy page on PreScan to apply
-- Public vacancy pages can translate visible vacancy content (description, requirements, responsibilities) for visitors without requiring candidate login. Private HR evaluation content remains HR-only.
+- Public vacancy pages can translate visible internal vacancy content (description, requirements, responsibilities) for authenticated users. Anonymous visitors do not see translation controls, and private HR evaluation content remains HR-only.
 
 ### 5.2.1 External Vacancy Parsing
 
@@ -146,7 +146,7 @@ HR can configure external parsing sources per company to collect vacancy drafts 
 - Parsing sources are disabled by default. HR must explicitly activate a source before background parsing can run.
 - HeadHunter parsing does not require a source URL. A source parses the selected HeadHunter vacancy feed by source type; optional settings can narrow the feed (`text`, `area`, `employer_id`) or limit pagination (`page`, `max_pages`, `per_page`).
 - If HeadHunter rejects anonymous API requests from the deployment environment, the parser records the HTTP status/body in the source sync error and can use configured HeadHunter authorization headers. Site-specific tokens are supported; `hh.uz` uses `HH_UZ_ACCESS_TOKEN` when present, falling back to the generic `HH_ACCESS_TOKEN`. `HH_UZ_CLIENT_ID` and `HH_UZ_CLIENT_SECRET` are used only for deliberate app-token generation/rotation, because generating a new HeadHunter app token revokes the previous token.
-- Parsed vacancies can be stored even when the source does not expose direct contact information (email, phone, Telegram, or WhatsApp). When a public parsed vacancy has no usable contact information, its public card/detail page shows the source vacancy link instead; the link opens in a new browser tab.
+- Parsed vacancies can be stored when the source exposes either direct contact information (email, phone, Telegram, or WhatsApp) or a source vacancy URL. When a public parsed vacancy has no usable contact information, its public card/detail page shows the source vacancy link instead; the link opens in a new browser tab. Parsed vacancies that have neither contact information nor a source URL are skipped and are not shown publicly.
 - Parsed vacancies are stored separately from internal `Vacancy` rows. Active parsed vacancies can appear on the public job board as read-only content, but they cannot be applied to and do not start prescreening/interview workflows.
 - HeadHunter source sync is started through a Celery-backed parsing endpoint. HR can stop a running source sync; the task is revoked and the parser also checks for the stop state between fetched pages/items.
 - Importing a parsed vacancy creates a **Draft** and **Private** internal vacancy so HR can review, edit screening settings, add questions, and publish manually.

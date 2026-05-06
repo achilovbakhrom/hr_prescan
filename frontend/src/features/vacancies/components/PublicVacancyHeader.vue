@@ -70,11 +70,11 @@ function shouldShowExternalLink(vacancy: VacancyWithCompany): boolean {
           />
           <span class="inline-flex items-center gap-1">
             <i class="pi pi-briefcase text-[10px]"></i>
-            {{ EMPLOYMENT_LABELS[vacancy.employmentType] }}
+            {{ EMPLOYMENT_LABELS[vacancy.employmentType] || vacancy.employmentType }}
           </span>
           <span class="inline-flex items-center gap-1">
             <i class="pi pi-star text-[10px]"></i>
-            {{ EXPERIENCE_LABELS[vacancy.experienceLevel] }}
+            {{ EXPERIENCE_LABELS[vacancy.experienceLevel] || vacancy.experienceLevel }}
           </span>
           <span class="inline-flex items-center gap-1">
             <i class="pi pi-calendar text-[10px]"></i>

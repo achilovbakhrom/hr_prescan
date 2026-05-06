@@ -26,6 +26,11 @@ def parsed_vacancy_has_contact_info(vacancy: Any) -> bool:
     return text_has_contact_info(" ".join(str(part or "") for part in text_parts))
 
 
+def parsed_vacancy_is_publicly_usable(vacancy: Any) -> bool:
+    """A parsed vacancy must expose a contact path or a source URL before public display."""
+    return bool(str(getattr(vacancy, "external_url", "") or "").strip()) or parsed_vacancy_has_contact_info(vacancy)
+
+
 def text_has_contact_info(text: str) -> bool:
     if EMAIL_RE.search(text) or TELEGRAM_RE.search(text) or WHATSAPP_RE.search(text):
         return True

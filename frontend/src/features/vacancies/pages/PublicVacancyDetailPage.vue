@@ -1,12 +1,4 @@
 <script setup lang="ts">
-/**
- * PublicVacancyDetailPage — public vacancy detail + share-token view.
- *
- * T13 redesign: glass header block on top of ambient background, content
- * organised into glass cards. Sticky Apply CTA floats bottom-right on
- * mobile; inline at top on desktop. Sub-blocks are extracted so this
- * page stays ≤200 lines.
- */
 import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
@@ -19,6 +11,7 @@ import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { Vacancy } from '../types/vacancy.types'
 import type { Company } from '@/features/companies/types/company.types'
 import { sanitizeHtml } from '@/shared/utils/sanitize'
+import { useAuthStore } from '@/features/auth/stores/auth.store'
 import TranslatableText from '@/shared/components/TranslatableText.vue'
 import PublicVacancyHeader from '../components/PublicVacancyHeader.vue'
 import PublicVacancyCompanyCard from '../components/PublicVacancyCompanyCard.vue'
@@ -31,6 +24,7 @@ interface VacancyWithCompany extends Vacancy {
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
+const authStore = useAuthStore()
 const vacancy = ref<VacancyWithCompany | null>(null)
 const loading = ref(false)
 const error = ref<string | null>(null)
@@ -64,6 +58,9 @@ const showExternalLink = computed(() => {
     !!vacancy.value.externalUrl
   )
 })
+const showTranslationControls = computed(
+  () => authStore.isAuthenticated && vacancy.value?.contentSource !== 'parsed',
+)
 </script>
 
 <template>
@@ -96,6 +93,7 @@ const showExternalLink = computed(() => {
             :object-id="vacancy.id"
             field="description"
             scope="public"
+            :show-translate-button="showTranslationControls"
             :share-token="isShareRoute ? String(route.params.token) : undefined"
             @translated="(tr) => (vacancy!.descriptionTranslations = tr)"
           >
@@ -121,6 +119,7 @@ const showExternalLink = computed(() => {
             :object-id="vacancy.id"
             field="requirements"
             scope="public"
+            :show-translate-button="showTranslationControls"
             :share-token="isShareRoute ? String(route.params.token) : undefined"
             @translated="(tr) => (vacancy!.requirementsTranslations = tr)"
           >
@@ -144,6 +143,7 @@ const showExternalLink = computed(() => {
             :object-id="vacancy.id"
             field="responsibilities"
             scope="public"
+            :show-translate-button="showTranslationControls"
             :share-token="isShareRoute ? String(route.params.token) : undefined"
             @translated="(tr) => (vacancy!.responsibilitiesTranslations = tr)"
           >

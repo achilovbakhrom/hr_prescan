@@ -16,6 +16,7 @@ const props = defineProps<{
   shareToken?: string
   /** Use `/translate/` (any auth) instead of `/hr/translate/` (HR-only). */
   scope?: 'hr' | 'public'
+  showTranslateButton?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -36,6 +37,7 @@ const displayText = computed(() => {
 })
 
 const showTranslateButton = computed(() => {
+  if (props.showTranslateButton === false) return false
   if (!props.text) return false
   // Show button whenever current locale's translation is missing
   return !props.translations?.[currentLocale.value]

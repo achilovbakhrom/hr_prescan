@@ -1,6 +1,10 @@
 from types import SimpleNamespace
 
-from apps.job_parser.services.contact_detection import parsed_vacancy_has_contact_info, text_has_contact_info
+from apps.job_parser.services.contact_detection import (
+    parsed_vacancy_has_contact_info,
+    parsed_vacancy_is_publicly_usable,
+    text_has_contact_info,
+)
 
 
 def test_text_has_contact_info_for_email_telegram_whatsapp_and_phone():
@@ -23,3 +27,19 @@ def test_parsed_vacancy_has_contact_info_uses_hh_contacts_payload():
     )
 
     assert parsed_vacancy_has_contact_info(vacancy)
+
+
+def test_parsed_vacancy_is_publicly_usable_with_contact_or_external_url():
+    no_contact = SimpleNamespace(description="", requirements="", responsibilities="", raw_payload={}, external_url="")
+    with_url = SimpleNamespace(description="", requirements="", responsibilities="", raw_payload={}, external_url="https://hh.uz/vacancy/1")
+    with_contact = SimpleNamespace(
+        description="Contact: @company_hr",
+        requirements="",
+        responsibilities="",
+        raw_payload={},
+        external_url="",
+    )
+
+    assert parsed_vacancy_is_publicly_usable(no_contact) is False
+    assert parsed_vacancy_is_publicly_usable(with_url) is True
+    assert parsed_vacancy_is_publicly_usable(with_contact) is True

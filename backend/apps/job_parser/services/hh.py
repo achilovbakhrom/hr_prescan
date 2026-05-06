@@ -38,10 +38,11 @@ def sync_hh_source(*, source: ParsedVacancySource) -> dict:
             if source.settings.get("fetch_details", True) or source.settings.get("require_contact", True)
             else {}
         )
-        if source.settings.get("require_contact", True) and not _has_hh_contact(item=item, detail=detail):
+        payload = _map_hh_item(item=item, detail=detail)
+        if not _has_hh_contact(item=item, detail=detail) and not payload["external_url"]:
             skipped_no_contact += 1
             continue
-        upsert_parsed_vacancy(source=source, payload=_map_hh_item(item=item, detail=detail))
+        upsert_parsed_vacancy(source=source, payload=payload)
         parsed_count += 1
 
     stale_count = refresh_source_actuality(source=source, sync_started_at=sync_started_at)
