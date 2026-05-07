@@ -1,100 +1,56 @@
 <script setup lang="ts">
-/**
- * PublicJobBoardPage — public list of published vacancies.
- *
- * T13 redesign: content sits on glass primitives on top of the ambient
- * AnimatedBackground supplied by PublicLayout. Header becomes a glass
- * block (`GlassSurface level="float"`), cards compose `GlassCard`.
- */
-import { ref, computed, onMounted, watch } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { vacancyService } from '../services/vacancy.service'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
-import type { Vacancy } from '../types/vacancy.types'
+import Button from 'primevue/button'
 import JobSearchBar from '../components/JobSearchBar.vue'
 import JobFilterSidebar from '../components/JobFilterSidebar.vue'
 import JobCardList from '../components/JobCardList.vue'
+import { usePublicJobSearch } from '../composables/usePublicJobSearch'
 
 const { t } = useI18n()
 const router = useRouter()
-const jobs = ref<Vacancy[]>([])
-const loading = ref(false)
 const showMobileFilters = ref(false)
+const loadMoreTrigger = ref<HTMLElement | null>(null)
+let observer: IntersectionObserver | null = null
 
-// Filters
-const search = ref('')
-const locationFilter = ref('')
-const employmentType = ref<string | null>(null)
-const experienceLevel = ref<string | null>(null)
-const remoteOnly = ref(false)
-const salaryMin = ref<number | null>(null)
-const salaryMax = ref<number | null>(null)
+const {
+  jobs,
+  loading,
+  loadingMore,
+  hasMore,
+  jobCount,
+  search,
+  locationFilter,
+  employmentType,
+  experienceLevel,
+  remoteOnly,
+  salaryMin,
+  salaryMax,
+  activeFilterCount,
+  fetchJobs,
+  loadMore,
+  toggleEmploymentType,
+  toggleExperienceLevel,
+  toggleRemote,
+  clearFilters,
+} = usePublicJobSearch()
 
-const activeFilterCount = computed(() => {
-  let count = 0
-  if (search.value) count++
-  if (locationFilter.value) count++
-  if (employmentType.value) count++
-  if (experienceLevel.value) count++
-  if (remoteOnly.value) count++
-  if (salaryMin.value !== null) count++
-  if (salaryMax.value !== null) count++
-  return count
+onMounted(() => {
+  void fetchJobs()
+  observer = new IntersectionObserver(
+    ([entry]) => {
+      if (entry?.isIntersecting) void loadMore()
+    },
+    { rootMargin: '320px' },
+  )
+  if (loadMoreTrigger.value) observer.observe(loadMoreTrigger.value)
 })
 
-let searchTimeout: ReturnType<typeof setTimeout> | null = null
-watch([search, locationFilter, salaryMin, salaryMax], () => {
-  if (searchTimeout) clearTimeout(searchTimeout)
-  searchTimeout = setTimeout(fetchJobs, 400)
+onBeforeUnmount(() => {
+  observer?.disconnect()
 })
-
-onMounted(() => fetchJobs())
-
-async function fetchJobs(): Promise<void> {
-  loading.value = true
-  try {
-    jobs.value = await vacancyService.getPublicList({
-      search: search.value || undefined,
-      location: locationFilter.value || undefined,
-      isRemote: remoteOnly.value ? true : undefined,
-      employmentType: employmentType.value ?? undefined,
-      experienceLevel: experienceLevel.value ?? undefined,
-      salaryMin: salaryMin.value ?? undefined,
-      salaryMax: salaryMax.value ?? undefined,
-    })
-  } catch {
-    /* silent */
-  } finally {
-    loading.value = false
-  }
-}
-
-function toggleEmploymentType(value: string): void {
-  employmentType.value = employmentType.value === value ? null : value
-  fetchJobs()
-}
-
-function toggleExperienceLevel(value: string): void {
-  experienceLevel.value = experienceLevel.value === value ? null : value
-  fetchJobs()
-}
-
-function toggleRemote(): void {
-  remoteOnly.value = !remoteOnly.value
-  fetchJobs()
-}
-
-function clearFilters(): void {
-  search.value = ''
-  locationFilter.value = ''
-  employmentType.value = null
-  experienceLevel.value = null
-  remoteOnly.value = false
-  salaryMin.value = null
-  salaryMax.value = null
-  fetchJobs()
-}
 
 function navigateToDetail(id: string): void {
   router.push({ name: ROUTE_NAMES.JOB_DETAIL, params: { id } })
@@ -107,7 +63,7 @@ function navigateToDetail(id: string): void {
       :search="search"
       :location="locationFilter"
       :loading="loading"
-      :job-count="jobs.length"
+      :job-count="jobCount"
       @update:search="search = $event"
       @update:location="locationFilter = $event"
       @submit="fetchJobs"
@@ -174,11 +130,26 @@ function navigateToDetail(id: string): void {
 
           <JobCardList
             :jobs="jobs"
-            :loading="loading"
+            :loading="loading && jobs.length === 0"
             :active-filter-count="activeFilterCount"
             @select="navigateToDetail"
             @clear-filters="clearFilters"
           />
+
+          <div ref="loadMoreTrigger" class="flex min-h-16 items-center justify-center py-5">
+            <i
+              v-if="loadingMore"
+              class="pi pi-spinner pi-spin text-xl text-[color:var(--color-text-muted)]"
+            ></i>
+            <Button
+              v-else-if="hasMore"
+              :label="t('common.showMore')"
+              icon="pi pi-chevron-down"
+              text
+              size="small"
+              @click="loadMore"
+            />
+          </div>
         </div>
       </div>
     </div>

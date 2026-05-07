@@ -40,12 +40,15 @@ class ParsedVacancySource(BaseModel):
     sync_started_at = models.DateTimeField(null=True, blank=True)
     sync_finished_at = models.DateTimeField(null=True, blank=True)
     sync_error = models.TextField(blank=True, default="")
+    last_seen_external_id = models.CharField(max_length=255, blank=True, default="")
+    last_seen_published_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ["-created_at"]
         indexes = [
             models.Index(fields=["company", "source_type"]),
             models.Index(fields=["is_active", "last_synced_at"]),
+            models.Index(fields=["source_type", "is_active", "last_synced_at"], name="job_parser_source__8f5a6f_idx"),
         ]
 
     def __str__(self) -> str:

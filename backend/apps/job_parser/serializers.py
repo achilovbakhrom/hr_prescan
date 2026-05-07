@@ -23,6 +23,8 @@ class ParsedVacancySourceOutputSerializer(serializers.ModelSerializer):
             "sync_started_at",
             "sync_finished_at",
             "sync_error",
+            "last_seen_external_id",
+            "last_seen_published_at",
             "created_at",
             "updated_at",
         ]

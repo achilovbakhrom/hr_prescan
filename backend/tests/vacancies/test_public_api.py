@@ -54,6 +54,24 @@ def test_public_job_board_includes_parsed_vacancies_as_read_only_with_source_url
     assert by_id[str(parsed.id)]["has_contact_info"] is False
 
 
+def test_public_job_board_supports_page_pagination(company, hr_user):
+    VacancyFactory(
+        company=company,
+        created_by=hr_user,
+        title="Internal Product Manager",
+        status=Vacancy.Status.PUBLISHED,
+        visibility=Vacancy.Visibility.PUBLIC,
+    )
+    _parsed_vacancy(company, hr_user)
+
+    response = APIClient().get("/api/public/vacancies/?page=1&page_size=1")
+
+    assert response.status_code == 200
+    assert response.data["count"] == 2
+    assert response.data["next"] is not None
+    assert len(response.data["results"]) == 1
+
+
 def test_public_job_board_excludes_unreachable_parsed_vacancies(company, hr_user):
     parsed = _parsed_vacancy(company, hr_user)
     parsed.external_url = ""

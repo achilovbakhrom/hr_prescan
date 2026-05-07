@@ -1,24 +1,13 @@
 from __future__ import annotations
 
-import requests
-from django.conf import settings
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
 from apps.common.exceptions import ApplicationError
 from apps.job_parser.models import ParsedVacancy, ParsedVacancySource
+from apps.job_parser.services.hh_api import HH_API_BASE_URLS, hh_get
 from apps.job_parser.services.normalization import clean_text, has_contact_info
 from apps.job_parser.services.parsed_vacancy_crud import refresh_source_actuality, upsert_parsed_vacancy
-
-HH_API_BASE_URLS = {
-    ParsedVacancySource.Type.HH_RU: "https://api.hh.ru",
-    ParsedVacancySource.Type.HH_UZ: "https://api.hh.uz",
-}
-
-HH_SITE_ACCESS_TOKEN_SETTINGS = {
-    ParsedVacancySource.Type.HH_RU: "HH_RU_ACCESS_TOKEN",
-    ParsedVacancySource.Type.HH_UZ: "HH_UZ_ACCESS_TOKEN",
-}
 
 
 def sync_hh_source(*, source: ParsedVacancySource) -> dict:
@@ -26,7 +15,8 @@ def sync_hh_source(*, source: ParsedVacancySource) -> dict:
         raise ApplicationError("Source is not a HeadHunter source.")
 
     sync_started_at = timezone.now()
-    items = _fetch_hh_items(source=source)
+    checkpoint_external_id = source.last_seen_external_id
+    items, reached_checkpoint = _fetch_hh_items(source=source, checkpoint_external_id=checkpoint_external_id)
     parsed_count = 0
     skipped_no_contact = 0
 
@@ -45,17 +35,32 @@ def sync_hh_source(*, source: ParsedVacancySource) -> dict:
         upsert_parsed_vacancy(source=source, payload=payload)
         parsed_count += 1
 
-    stale_count = refresh_source_actuality(source=source, sync_started_at=sync_started_at)
+    stale_count = refresh_source_actuality(
+        source=source,
+        sync_started_at=sync_started_at,
+        mark_missing_stale=not bool(checkpoint_external_id),
+    )
+    update_fields = ["last_synced_at", "updated_at"]
     source.last_synced_at = timezone.now()
-    source.save(update_fields=["last_synced_at", "updated_at"])
-    return {"parsed": parsed_count, "skipped_no_contact": skipped_no_contact, "stale_or_expired": stale_count}
+    if items:
+        source.last_seen_external_id = str(items[0].get("id") or "")
+        source.last_seen_published_at = _parse_hh_datetime(items[0].get("published_at"))
+        update_fields.extend(["last_seen_external_id", "last_seen_published_at"])
+    source.save(update_fields=update_fields)
+    return {
+        "parsed": parsed_count,
+        "skipped_no_contact": skipped_no_contact,
+        "stale_or_expired": stale_count,
+        "reached_checkpoint": reached_checkpoint,
+    }
 
 
-def _fetch_hh_items(*, source: ParsedVacancySource) -> list[dict]:
+def _fetch_hh_items(*, source: ParsedVacancySource, checkpoint_external_id: str = "") -> tuple[list[dict], bool]:
     settings = source.settings or {}
     first_page = int(settings.get("page", 0))
     max_pages = max(1, min(int(settings.get("max_pages", 20)), 20))
     items: list[dict] = []
+    reached_checkpoint = False
     for page in range(first_page, first_page + max_pages):
         if _stop_requested(source=source):
             break
@@ -66,15 +71,21 @@ def _fetch_hh_items(*, source: ParsedVacancySource) -> list[dict]:
             "per_page": min(int(settings.get("per_page", 100)), 100),
             "page": page,
         }
-        response = _hh_get(
+        response = hh_get(
             source=source,
             path="/vacancies",
             params={key: value for key, value in params.items() if value not in ("", None)},
         )
-        items.extend(response.get("items") or [])
+        for item in response.get("items") or []:
+            if checkpoint_external_id and str(item.get("id") or "") == checkpoint_external_id:
+                reached_checkpoint = True
+                break
+            items.append(item)
+        if reached_checkpoint:
+            break
         if page + 1 >= int(response.get("pages") or 0):
             break
-    return items
+    return items, reached_checkpoint
 
 
 def _stop_requested(*, source: ParsedVacancySource) -> bool:
@@ -89,53 +100,9 @@ def _stop_requested(*, source: ParsedVacancySource) -> bool:
 
 def _fetch_hh_detail(*, source: ParsedVacancySource, vacancy_id: str) -> dict:
     try:
-        return _hh_get(source=source, path=f"/vacancies/{vacancy_id}", params={})
+        return hh_get(source=source, path=f"/vacancies/{vacancy_id}", params={})
     except ApplicationError:
         return {}
-
-
-def _hh_get(*, source: ParsedVacancySource, path: str, params: dict) -> dict:
-    base_url = HH_API_BASE_URLS[source.source_type]
-    try:
-        response = requests.get(
-            f"{base_url}{path}",
-            params=params,
-            headers=_hh_headers(source=source),
-            timeout=20,
-        )
-        response.raise_for_status()
-    except requests.RequestException as exc:
-        status = getattr(exc.response, "status_code", None)
-        body = (getattr(exc.response, "text", "") or "")[:300]
-        detail = "HeadHunter API request failed"
-        if status:
-            detail = f"{detail}: HTTP {status}"
-        if body:
-            detail = f"{detail} - {body}"
-        raise ApplicationError(detail) from exc
-    return response.json()
-
-
-def _hh_headers(*, source: ParsedVacancySource) -> dict[str, str]:
-    user_agent = getattr(settings, "HH_USER_AGENT", "HR PreScan vacancy parser")
-    headers = {
-        "Accept": "application/json",
-        "User-Agent": user_agent,
-        "HH-User-Agent": user_agent,
-    }
-    access_token = _hh_access_token(source=source)
-    if access_token:
-        headers["Authorization"] = f"Bearer {access_token}"
-    return headers
-
-
-def _hh_access_token(*, source: ParsedVacancySource) -> str:
-    source_token = (source.settings or {}).get("access_token")
-    if source_token:
-        return str(source_token)
-    site_setting = HH_SITE_ACCESS_TOKEN_SETTINGS.get(source.source_type, "")
-    site_token = getattr(settings, site_setting, "") if site_setting else ""
-    return site_token or getattr(settings, "HH_ACCESS_TOKEN", "")
 
 
 def _has_hh_contact(*, item: dict, detail: dict) -> bool:

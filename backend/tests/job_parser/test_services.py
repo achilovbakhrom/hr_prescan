@@ -17,6 +17,7 @@ from apps.job_parser.services import (
     sync_hh_source,
     upsert_parsed_vacancy,
 )
+from apps.job_parser.tasks import sync_active_parsed_vacancy_sources_task
 from apps.vacancies.models import Vacancy
 
 
@@ -176,7 +177,7 @@ class TestHeadHunterSync:
         }
         detail_response.raise_for_status.return_value = None
 
-        with patch("apps.job_parser.services.hh.requests.get", side_effect=[list_response, detail_response]):
+        with patch("apps.job_parser.services.hh_api.requests.get", side_effect=[list_response, detail_response]):
             result = sync_hh_source(source=source)
 
         parsed = ParsedVacancy.objects.get(source=source, external_id="new")
@@ -185,6 +186,51 @@ class TestHeadHunterSync:
         assert parsed.title == "Python Engineer"
         assert parsed.salary_min == 1500
         assert ParsedVacancy.objects.get(source=source, external_id="old").status == ParsedVacancy.Status.STALE
+        source.refresh_from_db()
+        assert source.last_seen_external_id == "new"
+        assert source.last_seen_published_at is not None
+
+    def test_sync_hh_source_stops_at_previous_checkpoint(self, company, hr_user):
+        source = _source(company, hr_user)
+        source.last_seen_external_id = "old"
+        source.save(update_fields=["last_seen_external_id", "updated_at"])
+        ParsedVacancy.objects.create(
+            source=source,
+            external_id="old",
+            title="Old role",
+            status=ParsedVacancy.Status.ACTIVE,
+            last_seen_at=timezone.now() - timedelta(days=2),
+            fingerprint="old",
+        )
+        list_response = Mock()
+        list_response.json.return_value = {
+            "items": [
+                {
+                    "id": "new",
+                    "name": "Fresh Python Engineer",
+                    "alternate_url": "https://hh.ru/vacancy/new",
+                    "snippet": {"responsibility": "Build APIs"},
+                    "published_at": "2026-04-21T10:00:00+0300",
+                },
+                {"id": "old", "name": "Old role"},
+                {"id": "older", "name": "Older role"},
+            ],
+            "pages": 1,
+        }
+        list_response.raise_for_status.return_value = None
+        detail_response = Mock()
+        detail_response.json.return_value = {"id": "new", "contacts": {"email": "hr@example.com"}}
+        detail_response.raise_for_status.return_value = None
+
+        with patch("apps.job_parser.services.hh_api.requests.get", side_effect=[list_response, detail_response]):
+            result = sync_hh_source(source=source)
+
+        source.refresh_from_db()
+        assert result["parsed"] == 1
+        assert result["reached_checkpoint"] is True
+        assert source.last_seen_external_id == "new"
+        assert ParsedVacancy.objects.filter(source=source, external_id="older").exists() is False
+        assert ParsedVacancy.objects.get(source=source, external_id="old").status == ParsedVacancy.Status.ACTIVE
 
     def test_sync_hh_source_keeps_items_without_contact_when_external_url_exists(self, company, hr_user):
         source = _source(company, hr_user)
@@ -204,7 +250,7 @@ class TestHeadHunterSync:
         detail_response.json.return_value = {"id": "no-contact", "contacts": None, "description": "No contacts here"}
         detail_response.raise_for_status.return_value = None
 
-        with patch("apps.job_parser.services.hh.requests.get", side_effect=[list_response, detail_response]):
+        with patch("apps.job_parser.services.hh_api.requests.get", side_effect=[list_response, detail_response]):
             result = sync_hh_source(source=source)
 
         assert result["parsed"] == 1
@@ -228,7 +274,7 @@ class TestHeadHunterSync:
         detail_response.json.return_value = {"id": "unreachable", "contacts": None, "description": "No contacts here"}
         detail_response.raise_for_status.return_value = None
 
-        with patch("apps.job_parser.services.hh.requests.get", side_effect=[list_response, detail_response]):
+        with patch("apps.job_parser.services.hh_api.requests.get", side_effect=[list_response, detail_response]):
             result = sync_hh_source(source=source)
 
         assert result["parsed"] == 0
@@ -247,7 +293,7 @@ class TestHeadHunterSync:
         list_response.json.return_value = {"items": [], "pages": 1}
         list_response.raise_for_status.return_value = None
 
-        with patch("apps.job_parser.services.hh.requests.get", return_value=list_response) as request_get:
+        with patch("apps.job_parser.services.hh_api.requests.get", return_value=list_response) as request_get:
             result = sync_hh_source(source=source)
 
         assert result["parsed"] == 0
@@ -262,7 +308,7 @@ class TestHeadHunterSync:
         response.raise_for_status.side_effect = requests.HTTPError(response=response)
 
         with (
-            patch("apps.job_parser.services.hh.requests.get", return_value=response),
+            patch("apps.job_parser.services.hh_api.requests.get", return_value=response),
             pytest.raises(ApplicationError, match="HTTP 403"),
         ):
             sync_hh_source(source=source)
@@ -274,7 +320,7 @@ class TestHeadHunterSync:
         list_response.json.return_value = {"items": [], "pages": 1}
         list_response.raise_for_status.return_value = None
 
-        with patch("apps.job_parser.services.hh.requests.get", return_value=list_response) as request_get:
+        with patch("apps.job_parser.services.hh_api.requests.get", return_value=list_response) as request_get:
             sync_hh_source(source=source)
 
         assert request_get.call_args.kwargs["headers"]["Authorization"] == "Bearer hh-uz-token"
@@ -288,7 +334,7 @@ class TestHeadHunterSync:
         list_response.json.return_value = {"items": [], "pages": 1}
         list_response.raise_for_status.return_value = None
 
-        with patch("apps.job_parser.services.hh.requests.get", return_value=list_response) as request_get:
+        with patch("apps.job_parser.services.hh_api.requests.get", return_value=list_response) as request_get:
             sync_hh_source(source=source)
 
         assert request_get.call_args.kwargs["headers"]["Authorization"] == "Bearer source-token"
@@ -329,3 +375,18 @@ class TestParserSyncControl:
         assert updated.sync_status == ParsedVacancySource.SyncStatus.CANCELLED
         assert updated.sync_finished_at is not None
         revoke.assert_called_once_with("task-123")
+
+    def test_periodic_sync_queues_due_active_hh_sources(self, company, hr_user):
+        due = _source(company, hr_user)
+        not_due = _source(company, hr_user)
+        not_due.last_synced_at = timezone.now()
+        not_due.save(update_fields=["last_synced_at", "updated_at"])
+        running = _source(company, hr_user)
+        running.sync_status = ParsedVacancySource.SyncStatus.RUNNING
+        running.save(update_fields=["sync_status", "updated_at"])
+
+        with patch("apps.job_parser.tasks.start_source_sync", return_value=due) as start_sync:
+            result = sync_active_parsed_vacancy_sources_task()
+
+        assert result == {"queued": 1, "skipped_running": 1, "skipped_not_due": 1}
+        start_sync.assert_called_once_with(source=due)

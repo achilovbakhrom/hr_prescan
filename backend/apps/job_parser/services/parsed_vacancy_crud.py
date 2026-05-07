@@ -43,13 +43,20 @@ def upsert_parsed_vacancy(*, source: ParsedVacancySource, payload: dict) -> Pars
     return vacancy
 
 
-def refresh_source_actuality(*, source: ParsedVacancySource, sync_started_at: timezone.datetime) -> int:
+def refresh_source_actuality(
+    *,
+    source: ParsedVacancySource,
+    sync_started_at: timezone.datetime,
+    mark_missing_stale: bool = True,
+) -> int:
     qs = source.vacancies.exclude(status__in=[ParsedVacancy.Status.IMPORTED, ParsedVacancy.Status.CLOSED])
-    stale_count = qs.filter(last_seen_at__lt=sync_started_at).update(
-        status=ParsedVacancy.Status.STALE,
-        actuality_reason="Not present in the latest source sync.",
-        updated_at=timezone.now(),
-    )
+    stale_count = 0
+    if mark_missing_stale:
+        stale_count = qs.filter(last_seen_at__lt=sync_started_at).update(
+            status=ParsedVacancy.Status.STALE,
+            actuality_reason="Not present in the latest source sync.",
+            updated_at=timezone.now(),
+        )
     expired_count = qs.filter(expires_at__lt=timezone.now()).update(
         status=ParsedVacancy.Status.EXPIRED,
         actuality_reason="External vacancy expiration date has passed.",

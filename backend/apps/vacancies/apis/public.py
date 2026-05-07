@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.common.messages import MSG_VACANCY_NOT_FOUND
+from apps.common.pagination import StandardPagination
 from apps.job_parser.selectors import get_public_parsed_vacancies, get_public_parsed_vacancy_by_id
 from apps.job_parser.serializers_public import (
     PublicParsedVacancyDetailOutputSerializer,
@@ -28,12 +29,17 @@ class PublicVacancyListApi(APIView):
         experience_level = serializers.CharField(required=False)
         salary_min = serializers.IntegerField(required=False)
         salary_max = serializers.IntegerField(required=False)
+        page = serializers.IntegerField(required=False, min_value=1)
+        page_size = serializers.IntegerField(required=False, min_value=1, max_value=100)
 
     def get(self, request: Request) -> Response:
         filter_serializer = self.FilterSerializer(data=request.query_params)
         filter_serializer.is_valid(raise_exception=True)
 
         filters = filter_serializer.validated_data
+        pagination_requested = "page" in request.query_params or "page_size" in request.query_params
+        filters.pop("page", None)
+        filters.pop("page_size", None)
         vacancies = get_public_vacancies(**filters)
         items = _with_apply_flag(PublicVacancyListOutputSerializer(vacancies, many=True).data, can_apply=True)
 
@@ -49,6 +55,10 @@ class PublicVacancyListApi(APIView):
             items.extend(PublicParsedVacancyListOutputSerializer(parsed_vacancies, many=True).data)
 
         items.sort(key=lambda item: item.get("created_at") or "", reverse=True)
+        if pagination_requested:
+            paginator = StandardPagination()
+            page = paginator.paginate_queryset(items, request)
+            return paginator.get_paginated_response(page)
         return Response(items, status=status.HTTP_200_OK)
 
 

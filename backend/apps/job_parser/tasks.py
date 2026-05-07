@@ -1,8 +1,11 @@
+from datetime import timedelta
+
 from celery import shared_task
 from django.utils import timezone
 
 from apps.job_parser.models import ParsedVacancySource
 from apps.job_parser.services import refresh_telegram_actuality, sync_hh_source
+from apps.job_parser.services.sync_control import start_source_sync
 
 
 @shared_task(bind=True, name="apps.job_parser.tasks.sync_parsed_vacancy_source")
@@ -61,3 +64,37 @@ def sync_parsed_vacancy_source_task(self, source_id: str) -> dict:
 @shared_task(name="apps.job_parser.tasks.refresh_parsed_vacancy_actuality")
 def refresh_parsed_vacancy_actuality_task() -> dict:
     return {"telegram_stale": refresh_telegram_actuality()}
+
+
+@shared_task(name="apps.job_parser.tasks.sync_active_parsed_vacancy_sources")
+def sync_active_parsed_vacancy_sources_task() -> dict:
+    now = timezone.now()
+    queued = 0
+    skipped_running = 0
+    skipped_not_due = 0
+    sources = ParsedVacancySource.objects.filter(
+        source_type__in=[ParsedVacancySource.Type.HH_RU, ParsedVacancySource.Type.HH_UZ],
+        is_active=True,
+    )
+    for source in sources:
+        if source.sync_status in (
+            ParsedVacancySource.SyncStatus.RUNNING,
+            ParsedVacancySource.SyncStatus.STOPPING,
+        ):
+            skipped_running += 1
+            continue
+        interval = _source_sync_interval_minutes(source)
+        if source.last_synced_at and source.last_synced_at > now - timedelta(minutes=interval):
+            skipped_not_due += 1
+            continue
+        start_source_sync(source=source)
+        queued += 1
+    return {"queued": queued, "skipped_running": skipped_running, "skipped_not_due": skipped_not_due}
+
+
+def _source_sync_interval_minutes(source: ParsedVacancySource) -> int:
+    try:
+        interval = int((source.settings or {}).get("sync_interval_minutes", 60))
+    except (TypeError, ValueError):
+        interval = 60
+    return max(15, min(interval, 24 * 60))

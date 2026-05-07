@@ -126,6 +126,10 @@ CELERY_BEAT_SCHEDULE = {
         "task": "apps.job_parser.tasks.refresh_parsed_vacancy_actuality",
         "schedule": crontab(hour=1, minute=30),
     },
+    "sync-active-parsed-vacancy-sources": {
+        "task": "apps.job_parser.tasks.sync_active_parsed_vacancy_sources",
+        "schedule": crontab(minute="*/15"),
+    },
 }
 
 # MinIO / S3 storage
