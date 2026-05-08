@@ -66,7 +66,6 @@ class VacancyListOutputSerializer(serializers.ModelSerializer):
             "is_remote",
             "employment_type",
             "experience_level",
-            "deadline",
             "interview_mode",
             "interview_enabled",
             "cv_required",
@@ -121,7 +120,6 @@ class VacancyDetailOutputSerializer(serializers.ModelSerializer):
             "is_remote",
             "employment_type",
             "experience_level",
-            "deadline",
             "status",
             "visibility",
             "share_token",
@@ -170,7 +168,6 @@ class PublicVacancyListOutputSerializer(serializers.ModelSerializer):
             "salary_min",
             "salary_max",
             "salary_currency",
-            "deadline",
             "created_at",
         ]
         read_only_fields = fields
@@ -196,7 +193,6 @@ class PublicVacancyDetailOutputSerializer(serializers.ModelSerializer):
             "experience_level",
             "company",
             "cv_required",
-            "deadline",
             "interview_duration",
             "telegram_code",
             "title_translations",

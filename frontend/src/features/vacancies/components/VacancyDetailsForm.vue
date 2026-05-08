@@ -33,7 +33,6 @@ const initialData = (): Partial<CreateVacancyRequest> => ({
   isRemote: props.vacancy.isRemote,
   employmentType: props.vacancy.employmentType,
   experienceLevel: props.vacancy.experienceLevel,
-  deadline: props.vacancy.deadline,
   companyId: props.vacancy.company?.id ?? undefined,
 })
 
@@ -75,7 +74,6 @@ async function handleSave(): Promise<void> {
       isRemote: payload.isRemote,
       employmentType: payload.employmentType,
       experienceLevel: payload.experienceLevel,
-      deadline: payload.deadline,
     })
     toast.add({ severity: 'success', summary: t('common.saved'), life: 2500 })
   } catch {
@@ -112,7 +110,6 @@ async function handleSave(): Promise<void> {
         v-model:is-remote="form.isRemote.value"
         v-model:employment-type="form.employmentType.value"
         v-model:experience-level="form.experienceLevel.value"
-        v-model:deadline="form.deadline.value"
         :has-error="form.hasError"
         :field-error="form.fieldError"
       />

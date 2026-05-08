@@ -5,6 +5,7 @@
  */
 import { computed } from 'vue'
 import ProgressBar from 'primevue/progressbar'
+import { useI18n } from 'vue-i18n'
 
 const props = defineProps<{
   label: string
@@ -12,6 +13,8 @@ const props = defineProps<{
   limit: number
   unit?: string
 }>()
+
+const { t } = useI18n()
 
 const percentage = computed(() => {
   if (props.limit === 0) return 0
@@ -41,7 +44,11 @@ const displayUsed = computed(() =>
 )
 
 const displayLimit = computed(() =>
-  props.unit ? `${props.limit} ${props.unit}` : String(props.limit),
+  props.limit === 0
+    ? t('subscriptions.unlimited')
+    : props.unit
+      ? `${props.limit} ${props.unit}`
+      : String(props.limit),
 )
 </script>
 

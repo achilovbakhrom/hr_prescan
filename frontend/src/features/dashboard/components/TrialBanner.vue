@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
+import { BILLING_ENABLED } from '@/shared/constants/billing'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import GlassSurface from '@/shared/components/GlassSurface.vue'
 
@@ -12,7 +13,7 @@ const { t } = useI18n()
 const authStore = useAuthStore()
 
 const user = computed(() => authStore.user)
-const isTrial = computed(() => user.value?.subscriptionStatus === 'trial')
+const isTrial = computed(() => BILLING_ENABLED && user.value?.subscriptionStatus === 'trial')
 const daysRemaining = computed(() => {
   if (!user.value?.trialEndsAt) return null
   const diff = new Date(user.value.trialEndsAt).getTime() - Date.now()

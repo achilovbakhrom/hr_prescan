@@ -54,7 +54,6 @@ class VacancyListCreateApi(APIView):
             required=False,
             default=Vacancy.ExperienceLevel.MIDDLE,
         )
-        deadline = serializers.DateField(required=False, allow_null=True)
         visibility = serializers.ChoiceField(
             choices=Vacancy.Visibility.choices,
             required=False,

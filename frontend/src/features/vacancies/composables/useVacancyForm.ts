@@ -27,9 +27,6 @@ export function useVacancyForm(
   const isRemote = ref(initialData()?.isRemote ?? false)
   const employmentType = ref<EmploymentType>(initialData()?.employmentType ?? 'full_time')
   const experienceLevel = ref<ExperienceLevel>(initialData()?.experienceLevel ?? 'middle')
-  const deadline = ref<Date | null>(
-    initialData()?.deadline ? new Date(initialData()!.deadline!) : null,
-  )
   const visibility = ref<VacancyVisibility>(initialData()?.visibility ?? 'public')
   const cvRequired = ref(initialData()?.cvRequired ?? false)
   const prescanningPrompt = ref(initialData()?.prescanningPrompt ?? '')
@@ -71,7 +68,6 @@ export function useVacancyForm(
     isRemote: 0,
     employmentType: 0,
     experienceLevel: 0,
-    deadline: 0,
     companyId: 1,
     companyInfo: 1,
     prescanningPrompt: 2,
@@ -132,7 +128,6 @@ export function useVacancyForm(
     isRemote.value = d.isRemote ?? false
     employmentType.value = d.employmentType ?? 'full_time'
     experienceLevel.value = d.experienceLevel ?? 'middle'
-    deadline.value = d.deadline ? new Date(d.deadline) : null
     visibility.value = d.visibility ?? 'public'
     cvRequired.value = d.cvRequired ?? false
     prescanningPrompt.value = d.prescanningPrompt ?? ''
@@ -159,7 +154,6 @@ export function useVacancyForm(
       isRemote: isRemote.value,
       employmentType: employmentType.value,
       experienceLevel: experienceLevel.value,
-      deadline: deadline.value ? deadline.value.toISOString().split('T')[0] : null,
       visibility: visibility.value,
       cvRequired: cvRequired.value,
       prescanningPrompt: prescanningPrompt.value || undefined,
@@ -186,7 +180,6 @@ export function useVacancyForm(
     isRemote,
     employmentType,
     experienceLevel,
-    deadline,
     visibility,
     cvRequired,
     prescanningPrompt,

@@ -16,8 +16,11 @@ export interface CompanySubscription {
 }
 
 export interface SubscriptionUsage {
+  billingEnabled: boolean
+  freeAccessActiveUserTarget: number
+  hasSubscription: boolean
   vacancies: { used: number; limit: number }
-  interviews: { used: number; limit: number }
+  interviewsThisMonth: { used: number; limit: number }
   hrUsers: { used: number; limit: number }
   storage: { usedGb: number; limitGb: number }
 }

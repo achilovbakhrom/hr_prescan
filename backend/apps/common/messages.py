@@ -64,6 +64,7 @@ MSG_ONLY_PUBLISHED_PAUSED_ARCHIVE = _("Only published or paused vacancies can be
 MSG_ONLY_ARCHIVED_DELETE = _("Only archived vacancies can be deleted.")
 MSG_FILE_EXTRACT_FAILED = _("Could not extract text from the uploaded file.")
 MSG_AI_COMPANY_INFO_FAILED = _("Failed to generate company info. Please try again.")
+MSG_AI_VACANCY_CONTENT_FAILED = _("Failed to generate vacancy content. Please try again.")
 MSG_INTERNAL_URL_NOT_ALLOWED = _("Internal or private URLs are not allowed.")
 MSG_INVALID_URL = _("Invalid URL.")
 MSG_URL_RESOLVE_FAILED = _("Could not resolve the URL hostname.")

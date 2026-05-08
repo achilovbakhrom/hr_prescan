@@ -68,6 +68,10 @@ def generate_interview_questions(*, vacancy: Vacancy, step: str = ScreeningStep.
                     "to the candidate in chat. Do NOT write evaluation goals, rubric "
                     'statements, or sentences starting like "Candidate should..." or '
                     '"Кандидат должен...".\n\n'
+                    "Prefer evidence-based questions about real work, tradeoffs, decisions, "
+                    "and examples. Avoid generic trivia, leading questions, yes/no questions, "
+                    "illegal or discriminatory topics, and questions that require confidential "
+                    "information from previous employers.\n\n"
                     "Good examples:\n"
                     '- "Can you describe a project where you used React hooks to solve a real UI problem?"\n'
                     '- "How do you usually design and validate a REST API before implementation?"\n'

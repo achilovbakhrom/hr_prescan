@@ -37,15 +37,15 @@ async function regenerateKeywords(): Promise<void> {
 
 function formatSalary(): string {
   const { salaryMin, salaryMax, salaryCurrency } = props.vacancy
-  if (!salaryMin && !salaryMax) return t('vacancies.overview.salaryNotSpecified')
-  if (salaryMin && salaryMax) {
+  if (salaryMin == null && salaryMax == null) return t('vacancies.overview.salaryNegotiable')
+  if (salaryMin != null && salaryMax != null) {
     return t('vacancies.overview.salaryRange', {
       min: formatMoney(salaryMin),
       max: formatMoney(salaryMax),
       currency: salaryCurrency,
     })
   }
-  if (salaryMin)
+  if (salaryMin != null)
     return t('vacancies.overview.salaryFrom', {
       amount: formatMoney(salaryMin),
       currency: salaryCurrency,

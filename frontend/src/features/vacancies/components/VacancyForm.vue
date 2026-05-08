@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useToast } from 'primevue/usetoast'
 import Button from 'primevue/button'
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
@@ -9,6 +10,7 @@ import type { FieldErrors } from '@/shared/api/errors'
 import type { Company } from '@/features/companies/types/company.types'
 import type { CreateVacancyRequest } from '../types/vacancy.types'
 import { useVacancyForm } from '../composables/useVacancyForm'
+import { vacancyService } from '../services/vacancy.service'
 import VacancyBasicInfoTab from './VacancyBasicInfoTab.vue'
 import VacancyCompanyTab from './VacancyCompanyTab.vue'
 import VacancyPrescanningTab from './VacancyPrescanningTab.vue'
@@ -26,6 +28,7 @@ const props = defineProps<{
 const emit = defineEmits<{ save: [data: CreateVacancyRequest] }>()
 
 const { t } = useI18n()
+const toast = useToast()
 
 const form = useVacancyForm(
   () => props.initialData,
@@ -40,6 +43,8 @@ watch(
 )
 
 const showCreateDialog = ref(false)
+const generatingBasicInfo = ref(false)
+const canGenerateBasicInfo = computed(() => form.title.value.trim().length >= 5)
 
 async function handleCompanyCreated(company: Company): Promise<void> {
   // Re-fetch memberships so the new company is in the dropdown with correct is_default state.
@@ -52,6 +57,40 @@ async function handleCompanyCreated(company: Company): Promise<void> {
 
 function handleSave(): void {
   emit('save', form.buildPayload())
+}
+
+async function handleGenerateBasicInfo(): Promise<void> {
+  if (!canGenerateBasicInfo.value || generatingBasicInfo.value) return
+  generatingBasicInfo.value = true
+  try {
+    const content = await vacancyService.generateContent({
+      title: form.title.value.trim(),
+      skills: form.skills.value,
+      salaryMin: form.salaryMin.value,
+      salaryMax: form.salaryMax.value,
+      salaryCurrency: form.salaryCurrency.value,
+      location: form.location.value || undefined,
+      isRemote: form.isRemote.value,
+      employmentType: form.employmentType.value,
+      experienceLevel: form.experienceLevel.value,
+    })
+    form.description.value = content.description
+    form.requirements.value = content.requirements
+    form.responsibilities.value = content.responsibilities
+    toast.add({
+      severity: 'success',
+      summary: t('vacancies.form.generateWithAISuccess'),
+      life: 2500,
+    })
+  } catch {
+    toast.add({
+      severity: 'error',
+      summary: t('vacancies.form.generateWithAIError'),
+      life: 4000,
+    })
+  } finally {
+    generatingBasicInfo.value = false
+  }
 }
 </script>
 
@@ -76,9 +115,12 @@ function handleSave(): void {
           v-model:is-remote="form.isRemote.value"
           v-model:employment-type="form.employmentType.value"
           v-model:experience-level="form.experienceLevel.value"
-          v-model:deadline="form.deadline.value"
+          :show-generate-ai="true"
+          :can-generate-ai="canGenerateBasicInfo"
+          :generating-ai="generatingBasicInfo"
           :has-error="form.hasError"
           :field-error="form.fieldError"
+          @generate-ai="handleGenerateBasicInfo"
         />
       </TabPanel>
 

@@ -7,6 +7,8 @@ import type {
   InterviewQuestion,
   CreateVacancyRequest,
   UpdateVacancyRequest,
+  GenerateVacancyContentRequest,
+  GeneratedVacancyContent,
 } from '../types/vacancy.types'
 
 interface PublicVacancyFilters {
@@ -40,6 +42,14 @@ export const vacancyService = {
 
   async create(data: CreateVacancyRequest): Promise<Vacancy> {
     const response = await apiClient.post<Vacancy>('/hr/vacancies/', data)
+    return response.data
+  },
+
+  async generateContent(data: GenerateVacancyContentRequest): Promise<GeneratedVacancyContent> {
+    const response = await apiClient.post<GeneratedVacancyContent>(
+      '/hr/vacancies/generate-content/',
+      data,
+    )
     return response.data
   },
 

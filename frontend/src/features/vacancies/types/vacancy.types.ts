@@ -66,7 +66,6 @@ export interface CreateVacancyRequest {
   isRemote?: boolean
   employmentType?: EmploymentType
   experienceLevel?: ExperienceLevel
-  deadline?: string | null
   visibility?: VacancyVisibility
   interviewMode?: InterviewMode
   interviewEnabled?: boolean
@@ -80,3 +79,21 @@ export interface CreateVacancyRequest {
 }
 
 export type UpdateVacancyRequest = Partial<CreateVacancyRequest>
+
+export interface GenerateVacancyContentRequest {
+  title: string
+  skills?: string[]
+  salaryMin?: number | null
+  salaryMax?: number | null
+  salaryCurrency?: string
+  location?: string
+  isRemote?: boolean
+  employmentType?: EmploymentType
+  experienceLevel?: ExperienceLevel
+}
+
+export interface GeneratedVacancyContent {
+  description: string
+  requirements: string
+  responsibilities: string
+}

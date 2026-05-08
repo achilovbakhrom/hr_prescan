@@ -10,6 +10,7 @@ import { useI18n } from 'vue-i18n'
 import PlanCard from '../components/PlanCard.vue'
 import PricingPeriodToggle from '../components/PricingPeriodToggle.vue'
 import { useSubscriptionStore } from '../stores/subscription.store'
+import { BILLING_ENABLED, FREE_ACCESS_ACTIVE_USER_TARGET } from '@/shared/constants/billing'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { BillingPeriod } from '../types/subscription.types'
 
@@ -33,23 +34,29 @@ onMounted(() => subscriptionStore.fetchPlans())
         class="bg-glass-1 border-glass shadow-glass inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-medium text-[color:var(--color-accent-ai)]"
       >
         <i class="pi pi-tag text-[10px]"></i>
-        {{ t('subscriptions.simpleTransparent') || 'Simple, transparent pricing' }}
+        {{
+          BILLING_ENABLED
+            ? t('subscriptions.simpleTransparent') || 'Simple, transparent pricing'
+            : t('subscriptions.earlyAccessTitle')
+        }}
       </span>
       <h1 class="text-display mt-5 mx-auto max-w-3xl text-[color:var(--color-text-primary)]">
-        {{ t('subscriptions.choosePlan') }}
+        {{ BILLING_ENABLED ? t('subscriptions.choosePlan') : t('subscriptions.earlyAccessFree') }}
       </h1>
       <p
         class="mx-auto mt-5 max-w-2xl text-base text-[color:var(--color-text-secondary)] sm:text-lg"
       >
         {{
-          t('subscriptions.choosePlanSub') ||
-          'Scale your hiring process with the right plan for your team. No hidden fees. Cancel anytime.'
+          BILLING_ENABLED
+            ? t('subscriptions.choosePlanSub') ||
+              'Scale your hiring process with the right plan for your team. No hidden fees. Cancel anytime.'
+            : t('subscriptions.earlyAccessBody', { count: FREE_ACCESS_ACTIVE_USER_TARGET })
         }}
       </p>
     </div>
 
     <!-- Toggle -->
-    <div class="pricing-toggle mt-10 flex justify-center">
+    <div v-if="BILLING_ENABLED" class="pricing-toggle mt-10 flex justify-center">
       <PricingPeriodToggle v-model="billingPeriod" />
     </div>
 
@@ -69,6 +76,8 @@ onMounted(() => subscriptionStore.fetchPlans())
         :key="plan.id"
         :plan="plan"
         :billing-period="billingPeriod"
+        :billing-enabled="BILLING_ENABLED"
+        :free-access-active-user-target="FREE_ACCESS_ACTIVE_USER_TARGET"
         @select="handleSelectPlan"
       />
     </div>
@@ -82,8 +91,11 @@ onMounted(() => subscriptionStore.fetchPlans())
     <div class="pricing-footer mt-16 text-center">
       <p class="text-sm text-[color:var(--color-text-muted)]">
         <i class="pi pi-shield mr-1.5 text-[color:var(--color-success)]"></i>
-        {{ t('landing.promo.noCreditCard') }} ·
-        {{ t('landing.promo.freeTrial') }}
+        {{
+          BILLING_ENABLED
+            ? `${t('landing.promo.noCreditCard')} · ${t('landing.promo.freeTrial')}`
+            : t('subscriptions.earlyAccessNoAction')
+        }}
       </p>
     </div>
   </div>

@@ -33,6 +33,7 @@ _VACANCY_COUNTERS = {
         distinct=True,
     ),
 }
+_NEGOTIABLE_SALARY_Q = Q(salary_min__isnull=True, salary_max__isnull=True)
 
 
 def _apply_vacancy_filters(qs: QuerySet[Vacancy], *, status: str | None, include_deleted: bool) -> QuerySet[Vacancy]:
@@ -134,9 +135,9 @@ def get_public_vacancies(
     if experience_level:
         qs = qs.filter(experience_level=experience_level)
     if salary_min is not None:
-        qs = qs.filter(salary_max__gte=salary_min)
+        qs = qs.filter(_NEGOTIABLE_SALARY_Q | Q(salary_max__gte=salary_min) | Q(salary_max__isnull=True))
     if salary_max is not None:
-        qs = qs.filter(salary_min__lte=salary_max)
+        qs = qs.filter(_NEGOTIABLE_SALARY_Q | Q(salary_min__lte=salary_max) | Q(salary_min__isnull=True))
     return qs
 
 

@@ -49,15 +49,15 @@ export function formatSalaryRange(
   t: (key: string, params?: Record<string, unknown>) => string,
 ): string {
   const { salaryMin, salaryMax, salaryCurrency } = vacancy
-  if (!salaryMin && !salaryMax) return t('vacancies.overview.salaryNotSpecified')
-  if (salaryMin && salaryMax) {
+  if (salaryMin == null && salaryMax == null) return t('vacancies.overview.salaryNegotiable')
+  if (salaryMin != null && salaryMax != null) {
     return t('vacancies.overview.salaryRange', {
       min: formatMoney(salaryMin),
       max: formatMoney(salaryMax),
       currency: salaryCurrency,
     })
   }
-  if (salaryMin)
+  if (salaryMin != null)
     return t('vacancies.overview.salaryFrom', {
       amount: formatMoney(salaryMin),
       currency: salaryCurrency,

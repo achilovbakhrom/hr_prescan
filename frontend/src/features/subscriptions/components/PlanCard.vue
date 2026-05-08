@@ -9,12 +9,15 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import GlassCard from '@/shared/components/GlassCard.vue'
+import { FREE_ACCESS_ACTIVE_USER_TARGET } from '@/shared/constants/billing'
 import type { SubscriptionPlan, BillingPeriod } from '../types/subscription.types'
 
 const props = defineProps<{
   plan: SubscriptionPlan
   billingPeriod: BillingPeriod
   isCurrentPlan?: boolean
+  billingEnabled?: boolean
+  freeAccessActiveUserTarget?: number
 }>()
 
 const emit = defineEmits<{
@@ -28,6 +31,12 @@ const price = computed(() =>
 )
 
 const periodLabel = computed(() => (props.billingPeriod === 'monthly' ? '/mo' : '/yr'))
+
+const actionLabel = computed(() => {
+  if (props.isCurrentPlan) return t('subscriptions.currentPlan')
+  if (!props.billingEnabled) return t('landing.hero.getStarted')
+  return t('landing.hero.getStarted')
+})
 
 const features = computed(() => [
   `${props.plan.maxVacancies} vacancies`,
@@ -65,7 +74,7 @@ const accent = computed<'default' | 'ai'>(() => (isHighlighted.value ? 'ai' : 'd
         </p>
       </div>
 
-      <div class="mt-5 flex items-end gap-1.5">
+      <div v-if="billingEnabled" class="mt-5 flex items-end gap-1.5">
         <span
           class="font-mono text-5xl font-semibold leading-none tracking-tight text-[color:var(--color-text-primary)]"
         >
@@ -73,6 +82,20 @@ const accent = computed<'default' | 'ai'>(() => (isHighlighted.value ? 'ai' : 'd
         </span>
         <span class="pb-1.5 font-mono text-sm text-[color:var(--color-text-muted)]">
           {{ periodLabel }}
+        </span>
+      </div>
+      <div v-else class="mt-5 flex flex-col gap-1">
+        <span
+          class="font-mono text-3xl font-semibold leading-none text-[color:var(--color-text-primary)]"
+        >
+          {{ t('subscriptions.earlyAccessFree') }}
+        </span>
+        <span class="text-sm text-[color:var(--color-text-muted)]">
+          {{
+            t('subscriptions.untilUserTarget', {
+              count: freeAccessActiveUserTarget ?? FREE_ACCESS_ACTIVE_USER_TARGET,
+            })
+          }}
         </span>
       </div>
 
@@ -100,7 +123,7 @@ const accent = computed<'default' | 'ai'>(() => (isHighlighted.value ? 'ai' : 'd
       </ul>
 
       <Button
-        :label="isCurrentPlan ? t('subscriptions.currentPlan') : t('landing.hero.getStarted')"
+        :label="actionLabel"
         :disabled="isCurrentPlan"
         :outlined="!isHighlighted && !isCurrentPlan"
         :severity="isHighlighted ? undefined : 'secondary'"

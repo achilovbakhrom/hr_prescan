@@ -6,7 +6,6 @@ import Button from 'primevue/button'
 import GlassCard from '@/shared/components/GlassCard.vue'
 import GlassSurface from '@/shared/components/GlassSurface.vue'
 import { vacancyService } from '../services/vacancy.service'
-import { formatDate } from '../composables/useVacancyLabels'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { Vacancy } from '../types/vacancy.types'
 import type { Company } from '@/features/companies/types/company.types'
@@ -156,14 +155,6 @@ const showTranslationControls = computed(
         </GlassCard>
 
         <PublicVacancyCompanyCard v-if="vacancy.company" :company="vacancy.company" />
-
-        <div
-          v-if="vacancy.deadline"
-          class="text-xs text-[color:var(--color-text-muted)] sm:text-sm"
-        >
-          <i class="pi pi-clock mr-1"></i>{{ t('vacancies.form.deadline') }}:
-          <span class="font-mono">{{ formatDate(vacancy.deadline) }}</span>
-        </div>
 
         <div class="fixed bottom-4 right-4 z-40 sm:hidden">
           <GlassSurface v-if="vacancy.canApply !== false" level="float" class="rounded-full !p-0">

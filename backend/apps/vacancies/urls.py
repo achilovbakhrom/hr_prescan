@@ -2,6 +2,7 @@ from django.urls import path
 
 from apps.vacancies.apis import (
     GenerateQuestionsApi,
+    GenerateVacancyContentApi,
     ParseCompanyFileApi,
     ParseCompanyUrlApi,
     PublicVacancyDetailApi,
@@ -19,6 +20,7 @@ from apps.vacancies.apis import (
 # HR URLs — mounted at /api/hr/vacancies/
 hr_urlpatterns = [
     path("", VacancyListCreateApi.as_view(), name="vacancy-list-create"),
+    path("generate-content/", GenerateVacancyContentApi.as_view(), name="vacancy-generate-content"),
     path("parse-company-file/", ParseCompanyFileApi.as_view(), name="parse-company-file"),
     path("parse-company-url/", ParseCompanyUrlApi.as_view(), name="parse-company-url"),
     path("<uuid:vacancy_id>/", VacancyDetailApi.as_view(), name="vacancy-detail"),

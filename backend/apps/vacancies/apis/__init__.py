@@ -17,6 +17,7 @@ from apps.vacancies.apis.vacancy_actions import (
     VacancyRegenerateKeywordsApi,
     VacancyStatusApi,
 )
+from apps.vacancies.apis.vacancy_content import GenerateVacancyContentApi
 from apps.vacancies.apis.vacancy_crud import (
     VacancyListCreateApi,
 )
@@ -26,6 +27,7 @@ from apps.vacancies.apis.vacancy_detail import (
 
 __all__ = [
     "GenerateQuestionsApi",
+    "GenerateVacancyContentApi",
     "ParseCompanyFileApi",
     "ParseCompanyUrlApi",
     "PublicVacancyDetailApi",

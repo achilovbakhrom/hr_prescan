@@ -1,3 +1,4 @@
+from django.conf import settings
 from rest_framework import serializers, status
 from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
@@ -77,6 +78,12 @@ class UserSubscriptionApi(APIView):
         )
 
     def post(self, request: Request) -> Response:
+        if not settings.BILLING_ENABLED:
+            return Response(
+                {"detail": "Billing is temporarily disabled while early access is open."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
         input_serializer = SubscribeInputSerializer(data=request.data)
         input_serializer.is_valid(raise_exception=True)
 
@@ -101,6 +108,12 @@ class CancelSubscriptionApi(APIView):
     permission_classes = [IsAdmin]
 
     def post(self, request: Request) -> Response:
+        if not settings.BILLING_ENABLED:
+            return Response(
+                {"detail": "Billing is temporarily disabled while early access is open."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
         subscription = get_user_subscription(user=request.user)
         if subscription is None:
             return Response(

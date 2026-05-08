@@ -68,11 +68,13 @@ The AI agent evaluates candidates at each step and decides whether to advance th
 ## 4. Subscription & Billing
 
 ### 4.1 Billing Model
-- Subscription-based (monthly/yearly, yearly = 2 months free)
-- Payment integration (Stripe or similar)
+- **Early-access billing pause:** payments and hard subscription limits are disabled until the platform reaches at least 500 active users. HR accounts can use the product without entering payment details during this acquisition phase.
+- Billing is controlled by `BILLING_ENABLED`. While it is false, quota checks for vacancies, AI sessions, and HR users pass automatically, trial-expiry downgrades are skipped, and subscription upgrade/cancel endpoints reject plan changes.
+- Future billing model: subscription-based (monthly/yearly, yearly = 2 months free)
+- Future payment integration: Stripe or similar
 - **Subscription is per-User, not per-Company.** One HR user pays once; plan limits aggregate across every company they own or are a member of.
-- 14-day free trial on Pro plan for every new HR user (no credit card required)
-- Automatic downgrade to Free when trial expires without payment
+- Trial subscription records may still be created for new HR users, but they do not restrict access while billing is paused.
+- When billing is re-enabled, 14-day free trial and automatic downgrade behavior applies again unless updated here.
 
 ### 4.2 Plans
 
@@ -110,7 +112,8 @@ The AI agent evaluates candidates at each step and decides whether to advance th
 - SLA guarantees (99.9% uptime)
 
 ### 4.3 Overage & Limits
-- When a limit is reached (vacancies, interviews), the action is blocked with a clear upgrade prompt
+- While billing is paused, overage limits are informational only and must not block core HR workflows.
+- When billing is enabled and a limit is reached (vacancies, interviews), the action is blocked with a clear upgrade prompt
 - No surprise charges — hard limits, not soft caps
 - HR can see current usage vs. limits on the dashboard
 - Admin receives email notification at 80% and 100% of monthly interview quota
@@ -123,13 +126,13 @@ The AI agent evaluates candidates at each step and decides whether to advance th
 HR provides the following information:
 - **Company** — required. Dropdown lists all companies the user is a member of; pre-selected to their default. The AI vacancy assistant uses the default implicitly if the user has one company, otherwise it asks.
 - **Title** — job position name
-- **Description** — detailed job description and responsibilities
+- **Description** — detailed job description and responsibilities. HR can generate this with AI after entering a title with at least 5 characters.
+- **AI-generated vacancy content** — the Basic Info form can generate candidate-facing description, requirements, and responsibilities from the title and optional context. Generated content is AI-graded for relevance, specificity, formatting, compliance, and unsupported claims; low-scoring drafts are revised once before being returned to HR.
 - **AI assistant input** — HR can paste long job descriptions into the AI assistant for vacancy creation; recent chat history may be shortened for model context, but the current pasted vacancy text is preserved up to the request limit.
 - **AI assistant publication setup** — after creating a vacancy draft, the AI assistant asks whether it should generate prescanning questions and role-specific evaluation criteria/competencies itself. If HR agrees (for example, says "generate yourself"), it generates both and can publish the vacancy in the same flow.
 - **Required Skills** — key skills and qualifications needed
-- **Salary Range** — min/max salary (optional, can be hidden from candidates)
-- **Location** — remote, onsite, or hybrid (with city/country if applicable)
-- **Deadline** — application closing date
+- **Salary Range** — min/max salary is optional. If both min and max are empty, the vacancy salary is treated as negotiable and should remain visible in public listings as "Negotiable".
+- **Location** — optional remote, onsite, or hybrid context (with city/country if applicable)
 
 ### 5.2 Vacancy Visibility & Sharing
 - **Public** — listed on the platform's public job board, searchable by anyone
@@ -150,6 +153,7 @@ HR can configure external parsing sources per company to collect vacancy drafts 
 - Active HeadHunter sources are synced automatically by Celery Beat. The dispatcher runs every 15 minutes and queues each active HeadHunter source when its per-source `sync_interval_minutes` setting is due; the default interval is 60 minutes and values below 15 minutes are clamped to 15 minutes.
 - HeadHunter sources keep a checkpoint of the newest vacancy seen in the last successful scan (`last_seen_external_id` and publish time). Subsequent scans read the newest feed pages until they reach that checkpoint, then stop, so the parser does not repeatedly process the same vacancy set. Incremental scans do not mark older rows stale just because they were skipped by the checkpoint window; full first scans still mark missing rows stale.
 - Parsed vacancies can be stored when the source exposes either direct contact information (email, phone, Telegram, or WhatsApp) or a source vacancy URL. The platform stores a computed contact-info flag on parsed vacancies so public listing can skip unreachable rows without scanning every raw payload on each request. When a public parsed vacancy has no usable contact information, its public card/detail page shows the source vacancy link instead; the link opens in a new browser tab. Parsed vacancies that have neither contact information nor a source URL are skipped and are not shown publicly.
+- Parsed vacancies without salary min/max are treated as salary negotiable and must still appear in public job board results, including when salary filters are applied.
 - Parsed vacancies are stored separately from internal `Vacancy` rows. Active parsed vacancies can appear on the public job board as read-only content, but they cannot be applied to and do not start prescreening/interview workflows.
 - HeadHunter source sync is started through a Celery-backed parsing endpoint. HR can stop a running source sync; the task is revoked and the parser also checks for the stop state between fetched pages/items.
 - Importing a parsed vacancy creates a **Draft** and **Private** internal vacancy so HR can review, edit screening settings, add questions, and publish manually.
@@ -678,10 +682,9 @@ Archived → Applied (restore)
 
 ### 14.2 Subscription Selection
 
-1. After email verification, company is redirected to pricing page
-2. Chooses a subscription plan (or starts a free trial)
-3. Enters payment details (credit card via Stripe or similar)
-4. Subscription activated — company dashboard becomes accessible
+1. During early access, after email verification the company can enter the dashboard without choosing a paid plan or entering payment details.
+2. Pricing and subscription pages show early-access messaging while payments are paused.
+3. After billing is re-enabled, company subscription selection can require choosing a plan, starting a trial, and entering payment details before paid-plan activation.
 
 ### 14.3 Managing Companies
 

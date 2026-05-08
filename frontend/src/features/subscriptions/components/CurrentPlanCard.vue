@@ -11,6 +11,7 @@ import type { CompanySubscription } from '../types/subscription.types'
 
 defineProps<{
   subscription: CompanySubscription
+  billingEnabled?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -81,7 +82,10 @@ function formatDate(dateStr: string): string {
       </span>
     </div>
 
-    <div v-if="subscription.isActive" class="mt-5 flex flex-wrap items-center gap-2">
+    <div
+      v-if="subscription.isActive && billingEnabled"
+      class="mt-5 flex flex-wrap items-center gap-2"
+    >
       <Button
         v-if="!showCancelConfirm"
         :label="t('subscriptions.cancelSubscription')"

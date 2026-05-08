@@ -1,18 +1,11 @@
 <script setup lang="ts">
 /**
- * VacancyCreatePage — multi-step wizard presented inside a GlassCard.
- * The VacancyForm component already uses a 5-tab TabView; we render a
- * glass-chip progress bar above it as a redundant visual breadcrumb. The
- * user can still navigate via the underlying tabs as before — no business-
- * logic change.
- * Spec: docs/design/spec.md §9 Vacancies (wizard).
+ * VacancyCreatePage — vacancy creation form presented inside a GlassCard.
  */
-import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import GlassCard from '@/shared/components/GlassCard.vue'
 import VacancyForm from '../components/VacancyForm.vue'
-import VacancyWizardSteps from '../components/VacancyWizardSteps.vue'
 import { useVacancyStore } from '../stores/vacancy.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { CreateVacancyRequest } from '../types/vacancy.types'
@@ -20,14 +13,6 @@ import type { CreateVacancyRequest } from '../types/vacancy.types'
 const { t } = useI18n()
 const router = useRouter()
 const vacancyStore = useVacancyStore()
-
-const steps = computed(() => [
-  { key: 'basics', label: t('vacancies.form.basicInfo') },
-  { key: 'company', label: t('vacancies.form.companyInfo') },
-  { key: 'prescanning', label: t('vacancies.form.prescanning') },
-  { key: 'interview', label: t('vacancies.form.interview') },
-  { key: 'review', label: t('vacancies.form.settings') },
-])
 
 async function handleSave(data: CreateVacancyRequest): Promise<void> {
   try {
@@ -55,9 +40,6 @@ async function handleSave(data: CreateVacancyRequest): Promise<void> {
         {{ t('vacancies.createTitle') }}
       </h1>
     </div>
-
-    <!-- Progress breadcrumb — purely visual; the TabView below owns focus -->
-    <VacancyWizardSteps :steps="steps" :active-index="0" :max-reached="steps.length - 1" />
 
     <GlassCard>
       <VacancyForm

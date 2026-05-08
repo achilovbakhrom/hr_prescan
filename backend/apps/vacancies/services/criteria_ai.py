@@ -70,6 +70,9 @@ def generate_vacancy_criteria(*, vacancy: Vacancy, step: str = ScreeningStep.PRE
                     f"{language_instruction}\n\n"
                     "Each item is an evaluation criterion, not a candidate-facing question. "
                     "Use concise names and practical descriptions that explain what the AI should score.\n\n"
+                    "Make criteria observable from a short AI screening conversation. Avoid duplicate "
+                    "criteria, generic traits without evidence, illegal/discriminatory attributes, "
+                    "and criteria that require private personal data.\n\n"
                     "Return JSON with a 'criteria' array. Each item has:\n"
                     '- "name": a short competency name\n'
                     '- "description": what strong evidence for this competency looks like\n'

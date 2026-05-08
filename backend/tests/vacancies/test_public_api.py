@@ -72,6 +72,29 @@ def test_public_job_board_supports_page_pagination(company, hr_user):
     assert len(response.data["results"]) == 1
 
 
+def test_public_job_board_keeps_negotiable_salary_vacancies_when_salary_filter_is_set(company, hr_user):
+    internal = VacancyFactory(
+        company=company,
+        created_by=hr_user,
+        title="Internal Negotiable Role",
+        status=Vacancy.Status.PUBLISHED,
+        visibility=Vacancy.Visibility.PUBLIC,
+        salary_min=None,
+        salary_max=None,
+    )
+    parsed = _parsed_vacancy(company, hr_user)
+    parsed.salary_min = None
+    parsed.salary_max = None
+    parsed.save(update_fields=["salary_min", "salary_max", "updated_at"])
+
+    response = APIClient().get("/api/public/vacancies/?salary_min=5000")
+
+    assert response.status_code == 200
+    ids = {item["id"] for item in response.data}
+    assert str(internal.id) in ids
+    assert str(parsed.id) in ids
+
+
 def test_public_job_board_excludes_unreachable_parsed_vacancies(company, hr_user):
     parsed = _parsed_vacancy(company, hr_user)
     parsed.external_url = ""

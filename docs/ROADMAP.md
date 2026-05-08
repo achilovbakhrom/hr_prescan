@@ -82,7 +82,7 @@ Mark tasks with `[x]` as they are completed.
 
 **Goal:** HR can create, edit, publish, and share vacancies.
 
-- [x] 4.1 Create `vacancies` app — Vacancy model (title, description, skills, salary, location, deadline, status, visibility)
+- [x] 4.1 Create `vacancies` app — Vacancy model (title, description, skills, salary, location, status, visibility)
 - [x] 4.2 VacancyCriteria model (fixed + custom evaluation criteria per vacancy)
 - [x] 4.3 InterviewQuestion model (AI-generated + HR-editable questions)
 - [x] 4.4 Vacancy CRUD API (create, update, list, detail)
@@ -223,6 +223,7 @@ Mark tasks with `[x]` as they are completed.
 - [x] 11.5 Trial period logic
 - [x] 11.6 Frontend: pricing page
 - [x] 11.7 Frontend: subscription management page (current plan, upgrade, billing history)
+- [x] 11.8 Temporarily pause billing and quota enforcement for early access until 500 active users
 
 ---
 

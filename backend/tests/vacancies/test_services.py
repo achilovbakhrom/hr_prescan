@@ -12,6 +12,7 @@ from apps.vacancies.services import (
     create_default_criteria,
     create_vacancy,
     generate_interview_questions,
+    generate_vacancy_content,
     generate_vacancy_criteria,
     pause_vacancy,
     publish_vacancy,
@@ -80,6 +81,8 @@ class TestGenerateInterviewQuestions:
         instruction = kwargs["config"].system_instruction
         assert "literal question" in instruction
         assert "Candidate should" in instruction
+        assert "evidence-based questions" in instruction
+        assert "discriminatory" in instruction
         assert "Return JSON with a 'questions' array" in instruction
         assert "Return JSON with a 'competencies' array" not in instruction
 
@@ -112,6 +115,73 @@ class TestGenerateVacancyCriteria:
         instruction = kwargs["config"].system_instruction
         assert "evaluation criterion" in instruction
         assert "not a candidate-facing question" in instruction
+        assert "observable from a short AI screening conversation" in instruction
+        assert "discriminatory" in instruction
+
+
+class TestGenerateVacancyContent:
+    def test_generates_and_grades_vacancy_content(self):
+        class DraftResponse:
+            text = (
+                '{"description": "<p>Build backend APIs.</p>", '
+                '"requirements": "- Python\\n- Django", '
+                '"responsibilities": "- Build APIs\\n- Review code"}'
+            )
+
+        class GradeResponse:
+            text = '{"score": 9, "notes": []}'
+
+        with patch("apps.vacancies.services.vacancy_content_ai.genai.Client") as client_cls:
+            client = client_cls.return_value
+            client.models.generate_content.side_effect = [DraftResponse(), GradeResponse()]
+
+            content = generate_vacancy_content(title="Backend Developer", language="en")
+
+        assert content["description"] == "<p>Build backend APIs.</p>"
+        assert content["requirements"] == "- Python\n- Django"
+        assert content["responsibilities"] == "- Build APIs\n- Review code"
+        assert client.models.generate_content.call_count == 2
+
+        generation_instruction = client.models.generate_content.call_args_list[0].kwargs["config"].system_instruction
+        grading_instruction = client.models.generate_content.call_args_list[1].kwargs["config"].system_instruction
+        assert "Do not invent company names" in generation_instruction
+        assert "discriminatory" in generation_instruction
+        assert "strict AI quality reviewer" in grading_instruction
+        assert "no invented facts" in grading_instruction
+
+    def test_revises_low_scoring_vacancy_content(self):
+        class DraftResponse:
+            text = (
+                '{"description": "<p>Great opportunity.</p>", '
+                '"requirements": "- Hard worker", '
+                '"responsibilities": "- Do tasks"}'
+            )
+
+        class GradeResponse:
+            text = '{"score": 6, "notes": ["too generic"]}'
+
+        class RevisedResponse:
+            text = (
+                '{"description": "<p>Develop and maintain backend services for product workflows.</p>", '
+                '"requirements": "- Python\\n- Django\\n- REST API design", '
+                '"responsibilities": "- Build APIs\\n- Improve reliability\\n- Collaborate with frontend"}'
+            )
+
+        with patch("apps.vacancies.services.vacancy_content_ai.genai.Client") as client_cls:
+            client = client_cls.return_value
+            client.models.generate_content.side_effect = [
+                DraftResponse(),
+                GradeResponse(),
+                RevisedResponse(),
+            ]
+
+            content = generate_vacancy_content(title="Backend Developer", language="en")
+
+        assert "backend services" in content["description"]
+        assert client.models.generate_content.call_count == 3
+        revision_instruction = client.models.generate_content.call_args_list[2].kwargs["config"].system_instruction
+        assert "reviewer notes" in revision_instruction
+        assert "Keep only facts supported" in revision_instruction
 
 
 class TestPublishVacancy:

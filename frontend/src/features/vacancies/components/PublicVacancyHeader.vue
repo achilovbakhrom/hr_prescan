@@ -83,7 +83,6 @@ function shouldShowExternalLink(vacancy: VacancyWithCompany): boolean {
         </div>
 
         <p
-          v-if="formatSalaryRange(vacancy, t) !== t('vacancies.overview.salaryNotSpecified')"
           class="mt-3 inline-flex items-center rounded-md bg-[color:var(--color-accent-celebrate-soft)] px-2.5 py-1 font-mono text-sm font-semibold text-[color:var(--color-accent-celebrate)]"
         >
           {{ formatSalaryRange(vacancy, t) }}

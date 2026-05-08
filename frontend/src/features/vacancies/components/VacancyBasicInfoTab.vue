@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
 import Editor from 'primevue/editor'
 import Dropdown from '@/shared/components/AppSelect.vue'
 import InputNumber from 'primevue/inputnumber'
-import Calendar from 'primevue/calendar'
 import ToggleSwitch from 'primevue/toggleswitch'
 import Chips from 'primevue/chips'
 import {
@@ -19,7 +19,11 @@ import type { EmploymentType, ExperienceLevel } from '../types/vacancy.types'
 const props = defineProps<{
   hasError: (field: string) => boolean
   fieldError: (field: string) => string
+  showGenerateAi?: boolean
+  canGenerateAi?: boolean
+  generatingAi?: boolean
 }>()
+const emit = defineEmits<{ generateAi: [] }>()
 const title = defineModel<string>('title', { required: true })
 const description = defineModel<string>('description', { required: true })
 const requirements = defineModel<string>('requirements', { required: true })
@@ -32,7 +36,6 @@ const location = defineModel<string>('location', { required: true })
 const isRemote = defineModel<boolean>('isRemote', { required: true })
 const employmentType = defineModel<EmploymentType>('employmentType', { required: true })
 const experienceLevel = defineModel<ExperienceLevel>('experienceLevel', { required: true })
-const deadline = defineModel<Date | null>('deadline', { required: true })
 
 const { t } = useI18n()
 const employmentOptions = computed(() => getEmploymentOptions(t))
@@ -42,9 +45,23 @@ const experienceOptions = computed(() => getExperienceOptions(t))
 <template>
   <div class="space-y-4 py-2">
     <div>
-      <label class="mb-1 block text-sm font-medium"
-        >{{ t('vacancies.form.title') }} <span class="text-red-500">*</span></label
-      >
+      <div class="mb-1 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <label class="block text-sm font-medium"
+          >{{ t('vacancies.form.title') }} <span class="text-red-500">*</span></label
+        >
+        <Button
+          v-if="props.showGenerateAi"
+          type="button"
+          :label="t('vacancies.form.generateWithAI')"
+          icon="pi pi-sparkles"
+          size="small"
+          severity="secondary"
+          outlined
+          :loading="props.generatingAi"
+          :disabled="!props.canGenerateAi || props.generatingAi"
+          @click="emit('generateAi')"
+        />
+      </div>
       <InputText
         v-model="title"
         class="w-full"
@@ -96,6 +113,38 @@ const experienceOptions = computed(() => getExperienceOptions(t))
         props.fieldError('responsibilities')
       }}</small>
     </div>
+
+    <div class="pt-2">
+      <h4 class="text-sm font-semibold text-gray-700">{{ t('vacancies.form.compensation') }}</h4>
+      <p class="mt-1 text-xs text-gray-500">{{ t('vacancies.form.salaryNegotiableHint') }}</p>
+    </div>
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div>
+        <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.salaryMin') }}</label>
+        <InputNumber v-model="salaryMin" class="w-full" :invalid="props.hasError('salaryMin')" />
+        <small v-if="props.hasError('salaryMin')" class="text-red-500">{{
+          props.fieldError('salaryMin')
+        }}</small>
+      </div>
+      <div>
+        <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.salaryMax') }}</label>
+        <InputNumber v-model="salaryMax" class="w-full" :invalid="props.hasError('salaryMax')" />
+        <small v-if="props.hasError('salaryMax')" class="text-red-500">{{
+          props.fieldError('salaryMax')
+        }}</small>
+      </div>
+      <div>
+        <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.currency') }}</label>
+        <Dropdown
+          v-model="salaryCurrency"
+          :options="CURRENCY_OPTIONS"
+          option-label="label"
+          option-value="value"
+          class="w-full"
+        />
+      </div>
+    </div>
+
     <div>
       <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.skills') }}</label>
       <Chips v-model="skills" class="w-full" :placeholder="t('vacancies.form.skillsPlaceholder')" />
@@ -106,7 +155,10 @@ const experienceOptions = computed(() => getExperienceOptions(t))
 
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
       <div>
-        <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.location') }}</label>
+        <label class="mb-1 block text-sm font-medium">
+          {{ t('vacancies.form.location') }}
+          <span class="font-normal text-gray-400">({{ t('common.optional') }})</span>
+        </label>
         <InputText
           v-model="location"
           class="w-full"
@@ -154,47 +206,6 @@ const experienceOptions = computed(() => getExperienceOptions(t))
         <small v-if="props.hasError('experienceLevel')" class="text-red-500">{{
           props.fieldError('experienceLevel')
         }}</small>
-      </div>
-    </div>
-    <div>
-      <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.deadline') }}</label>
-      <Calendar
-        v-model="deadline"
-        class="w-full md:w-1/2"
-        date-format="yy-mm-dd"
-        :show-icon="true"
-        :invalid="props.hasError('deadline')"
-      />
-      <small v-if="props.hasError('deadline')" class="text-red-500">{{
-        props.fieldError('deadline')
-      }}</small>
-    </div>
-
-    <h4 class="pt-2 text-sm font-semibold text-gray-700">{{ t('vacancies.form.compensation') }}</h4>
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-      <div>
-        <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.salaryMin') }}</label>
-        <InputNumber v-model="salaryMin" class="w-full" :invalid="props.hasError('salaryMin')" />
-        <small v-if="props.hasError('salaryMin')" class="text-red-500">{{
-          props.fieldError('salaryMin')
-        }}</small>
-      </div>
-      <div>
-        <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.salaryMax') }}</label>
-        <InputNumber v-model="salaryMax" class="w-full" :invalid="props.hasError('salaryMax')" />
-        <small v-if="props.hasError('salaryMax')" class="text-red-500">{{
-          props.fieldError('salaryMax')
-        }}</small>
-      </div>
-      <div>
-        <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.currency') }}</label>
-        <Dropdown
-          v-model="salaryCurrency"
-          :options="CURRENCY_OPTIONS"
-          option-label="label"
-          option-value="value"
-          class="w-full"
-        />
       </div>
     </div>
   </div>

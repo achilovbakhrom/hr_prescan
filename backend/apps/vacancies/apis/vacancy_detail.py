@@ -56,7 +56,6 @@ class VacancyDetailApi(APIView):
             choices=Vacancy.ExperienceLevel.choices,
             required=False,
         )
-        deadline = serializers.DateField(required=False, allow_null=True)
         visibility = serializers.ChoiceField(choices=Vacancy.Visibility.choices, required=False)
         interview_mode = serializers.ChoiceField(
             choices=Vacancy.InterviewMode.choices,

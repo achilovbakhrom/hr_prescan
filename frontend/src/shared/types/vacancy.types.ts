@@ -18,7 +18,6 @@ export interface Vacancy {
   isRemote: boolean
   employmentType: EmploymentType
   experienceLevel: ExperienceLevel
-  deadline: string | null
   status: VacancyStatus
   visibility: VacancyVisibility
   interviewMode: InterviewMode

@@ -139,3 +139,45 @@ def test_generate_and_regenerate_buttons_use_all_user_company_memberships():
     assert generate_response.status_code == 201
     assert regenerate_response.status_code == 202
     keywords_mock.assert_called_once_with(str(vacancy.id))
+
+
+def test_generate_vacancy_content_requires_manage_vacancies_permission():
+    user = UserFactory(role="hr", hr_permissions=[])
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    response = client.post(
+        "/api/hr/vacancies/generate-content/",
+        {"title": "Backend Developer"},
+        format="json",
+    )
+
+    assert response.status_code == 403
+
+
+def test_generate_vacancy_content_returns_generated_fields():
+    user = UserFactory(
+        role="hr",
+        hr_permissions=[HRPermissions.MANAGE_VACANCIES],
+        language="ru",
+    )
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    with patch("apps.vacancies.apis.vacancy_content.generate_vacancy_content") as generate_mock:
+        generate_mock.return_value = {
+            "description": "<p>Описание роли.</p>",
+            "requirements": "- Python",
+            "responsibilities": "- Разрабатывать сервисы",
+        }
+        response = client.post(
+            "/api/hr/vacancies/generate-content/",
+            {"title": "Backend Developer", "location": ""},
+            format="json",
+        )
+
+    assert response.status_code == 200
+    assert response.data["description"] == "<p>Описание роли.</p>"
+    generate_mock.assert_called_once()
+    assert generate_mock.call_args.kwargs["language"] == "ru"
+    assert generate_mock.call_args.kwargs["location"] == ""

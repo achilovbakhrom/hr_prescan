@@ -19,6 +19,7 @@ from .vacancy_ai import (
     generate_vacancy_keywords,
     update_vacancy_search_vector,
 )
+from .vacancy_content_ai import generate_vacancy_content
 from .vacancy_crud import (
     archive_vacancy,
     create_vacancy,
@@ -39,6 +40,7 @@ __all__ = [
     "delete_vacancy_criteria",
     "detect_language",
     "generate_interview_questions",
+    "generate_vacancy_content",
     "generate_vacancy_criteria",
     "generate_vacancy_keywords",
     "parse_company_info_from_file",

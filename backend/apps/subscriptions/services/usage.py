@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.utils import timezone
 
 from apps.accounts.models import User
@@ -14,6 +15,9 @@ def _live_company_ids(user: User) -> list:
 
 def check_vacancy_quota(*, user: User) -> bool:
     """Return True if the user can create more vacancies across their companies."""
+    if not settings.BILLING_ENABLED:
+        return True
+
     subscription = get_user_subscription(user=user)
     if subscription is None:
         return False
@@ -32,6 +36,9 @@ def check_vacancy_quota(*, user: User) -> bool:
 
 def check_interview_quota(*, user: User) -> bool:
     """Return True if the user has not exceeded the monthly interview limit."""
+    if not settings.BILLING_ENABLED:
+        return True
+
     subscription = get_user_subscription(user=user)
     if subscription is None:
         return False
@@ -53,6 +60,9 @@ def check_interview_quota(*, user: User) -> bool:
 
 def check_hr_user_quota(*, user: User) -> bool:
     """Return True if the user's companies can add more HR users in total."""
+    if not settings.BILLING_ENABLED:
+        return True
+
     subscription = get_user_subscription(user=user)
     if subscription is None:
         return False
@@ -78,14 +88,18 @@ def check_hr_user_quota(*, user: User) -> bool:
 
 def get_subscription_usage(*, user: User) -> dict:
     """Return current usage vs plan limits for a user (aggregated across their companies)."""
+    billing_enabled = settings.BILLING_ENABLED
     subscription = get_user_subscription(user=user)
     if subscription is None:
         return {
+            "billing_enabled": billing_enabled,
+            "free_access_active_user_target": settings.BILLING_FREE_ACCESS_ACTIVE_USER_TARGET,
             "has_subscription": False,
             "plan": None,
             "vacancies": {"used": 0, "limit": 0},
             "interviews_this_month": {"used": 0, "limit": 0},
             "hr_users": {"used": 0, "limit": 0},
+            "storage": {"used_gb": 0, "limit_gb": 0},
         }
 
     plan = subscription.plan
@@ -118,6 +132,8 @@ def get_subscription_usage(*, user: User) -> dict:
     trial_ends_at = owner.trial_ends_at.isoformat() if owner.trial_ends_at else None
 
     return {
+        "billing_enabled": billing_enabled,
+        "free_access_active_user_target": settings.BILLING_FREE_ACCESS_ACTIVE_USER_TARGET,
         "has_subscription": True,
         "plan": {
             "name": plan.name,
@@ -129,14 +145,18 @@ def get_subscription_usage(*, user: User) -> dict:
         "trial_ends_at": trial_ends_at,
         "vacancies": {
             "used": vacancy_count,
-            "limit": plan.max_vacancies,
+            "limit": plan.max_vacancies if billing_enabled else 0,
         },
         "interviews_this_month": {
             "used": interview_count,
-            "limit": plan.max_interviews_per_month,
+            "limit": plan.max_interviews_per_month if billing_enabled else 0,
         },
         "hr_users": {
             "used": hr_user_count,
-            "limit": plan.max_hr_users,
+            "limit": plan.max_hr_users if billing_enabled else 0,
+        },
+        "storage": {
+            "used_gb": 0,
+            "limit_gb": plan.max_storage_gb if billing_enabled else 0,
         },
     }

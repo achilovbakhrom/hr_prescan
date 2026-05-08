@@ -2,6 +2,7 @@ import logging
 from datetime import timedelta
 from decimal import Decimal
 
+from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
 
@@ -117,6 +118,9 @@ def cancel_subscription(*, subscription: UserSubscription) -> UserSubscription:
 @transaction.atomic
 def expire_trial(*, user: User) -> None:
     """Downgrade a user from trial to the Free plan."""
+    if not settings.BILLING_ENABLED:
+        return
+
     free_plan = SubscriptionPlan.objects.filter(
         tier=SubscriptionPlan.Tier.FREE,
         is_active=True,
@@ -156,6 +160,9 @@ def expire_trial(*, user: User) -> None:
 
 def check_and_expire_trials() -> int:
     """Check all trial users and downgrade expired ones. Returns count of expired trials."""
+    if not settings.BILLING_ENABLED:
+        return 0
+
     now = timezone.now()
     expired_users = User.objects.filter(
         subscription_status=User.SubscriptionStatus.TRIAL,

@@ -275,7 +275,6 @@ vacancies
 ├── location, location_type (remote | onsite | hybrid)
 ├── visibility (public | private), share_token
 ├── status (draft | active | paused | closed)
-├── deadline
 ├── interview_duration_minutes, interview_language (en | ru)
 └── created_at, updated_at
 

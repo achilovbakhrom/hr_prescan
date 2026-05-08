@@ -6,6 +6,8 @@ from apps.accounts.models import User
 from apps.accounts.selectors import get_user_live_company_ids
 from apps.job_parser.models import ParsedVacancy, ParsedVacancySource
 
+_NEGOTIABLE_SALARY_Q = Q(salary_min__isnull=True, salary_max__isnull=True)
+
 
 def get_user_sources(*, user: User, source_type: str | None = None) -> QuerySet[ParsedVacancySource]:
     qs = ParsedVacancySource.objects.select_related("company", "created_by").filter(
@@ -66,9 +68,9 @@ def get_public_parsed_vacancies(
     if employment_type:
         qs = qs.filter(employment_type__icontains=employment_type)
     if salary_min is not None:
-        qs = qs.filter(salary_max__gte=salary_min)
+        qs = qs.filter(_NEGOTIABLE_SALARY_Q | Q(salary_max__gte=salary_min) | Q(salary_max__isnull=True))
     if salary_max is not None:
-        qs = qs.filter(salary_min__lte=salary_max)
+        qs = qs.filter(_NEGOTIABLE_SALARY_Q | Q(salary_min__lte=salary_max) | Q(salary_min__isnull=True))
     return qs
 
 

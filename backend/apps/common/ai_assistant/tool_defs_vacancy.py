@@ -90,7 +90,7 @@ VACANCY_TOOL_DEFINITIONS = [
                         "description": (
                             "Object with fields to change. Available fields: title, description, requirements, "
                             "responsibilities, skills, salary_min, salary_max, salary_currency, location, is_remote, "
-                            "employment_type, experience_level, deadline, visibility, interview_enabled, cv_required"
+                            "employment_type, experience_level, visibility, interview_enabled, cv_required"
                         ),
                         "properties": {
                             "title": {"type": "string"},

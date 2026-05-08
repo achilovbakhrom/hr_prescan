@@ -71,7 +71,6 @@ class Vacancy(BaseModel):
         choices=ExperienceLevel.choices,
         default=ExperienceLevel.MIDDLE,
     )
-    deadline = models.DateField(null=True, blank=True)
     status = models.CharField(
         max_length=20,
         choices=Status.choices,

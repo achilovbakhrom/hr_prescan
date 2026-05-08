@@ -4,7 +4,7 @@
  * Current plan summary + usage metrics + upgrade grid + billing history.
  * Spec: docs/design/spec.md §9.
  */
-import { ref, onMounted } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import GlassCard from '@/shared/components/GlassCard.vue'
 import UsageMeter from '../components/UsageMeter.vue'
@@ -12,17 +12,24 @@ import PlanCard from '../components/PlanCard.vue'
 import CurrentPlanCard from '../components/CurrentPlanCard.vue'
 import BillingHistoryCard from '../components/BillingHistoryCard.vue'
 import { useSubscriptionStore } from '../stores/subscription.store'
+import { BILLING_ENABLED, FREE_ACCESS_ACTIVE_USER_TARGET } from '@/shared/constants/billing'
 import type { BillingPeriod } from '../types/subscription.types'
 
 const { t } = useI18n()
 const subscriptionStore = useSubscriptionStore()
 const upgradePeriod = ref<BillingPeriod>('monthly')
+const billingEnabled = computed(() => subscriptionStore.usage?.billingEnabled ?? BILLING_ENABLED)
+const activeUserTarget = computed(
+  () => subscriptionStore.usage?.freeAccessActiveUserTarget ?? FREE_ACCESS_ACTIVE_USER_TARGET,
+)
 
 async function handleCancel(): Promise<void> {
+  if (!billingEnabled.value) return
   await subscriptionStore.cancelSubscription()
 }
 
 async function handleUpgrade(planId: string): Promise<void> {
+  if (!billingEnabled.value) return
   await subscriptionStore.subscribe(planId, upgradePeriod.value)
   await subscriptionStore.fetchCurrentSubscription()
 }
@@ -56,8 +63,16 @@ onMounted(async () => {
       <CurrentPlanCard
         v-if="subscriptionStore.currentSubscription"
         :subscription="subscriptionStore.currentSubscription"
+        :billing-enabled="billingEnabled"
         @cancel="handleCancel"
       />
+
+      <GlassCard v-if="!billingEnabled" accent="ai" :title="t('subscriptions.earlyAccessTitle')">
+        <div class="flex flex-col gap-2 text-sm text-[color:var(--color-text-secondary)]">
+          <p>{{ t('subscriptions.earlyAccessBody', { count: activeUserTarget }) }}</p>
+          <p>{{ t('subscriptions.earlyAccessNoAction') }}</p>
+        </div>
+      </GlassCard>
 
       <!-- Usage -->
       <GlassCard v-if="subscriptionStore.usage" :title="t('subscriptions.usage')">
@@ -69,8 +84,8 @@ onMounted(async () => {
           />
           <UsageMeter
             :label="t('subscriptions.interviewsUsed')"
-            :used="subscriptionStore.usage?.interviews?.used ?? 0"
-            :limit="subscriptionStore.usage?.interviews?.limit ?? 0"
+            :used="subscriptionStore.usage?.interviewsThisMonth?.used ?? 0"
+            :limit="subscriptionStore.usage?.interviewsThisMonth?.limit ?? 0"
           />
           <UsageMeter
             :label="t('subscriptions.hrUsersUsed')"
@@ -87,7 +102,7 @@ onMounted(async () => {
       </GlassCard>
 
       <!-- Upgrade plans -->
-      <section class="space-y-5">
+      <section v-if="billingEnabled" class="space-y-5">
         <header class="flex flex-col gap-1">
           <h2 class="text-xl font-semibold text-[color:var(--color-text-primary)]">
             {{ t('subscriptions.availablePlans') }}
@@ -112,7 +127,7 @@ onMounted(async () => {
       </section>
 
       <!-- Billing History -->
-      <BillingHistoryCard />
+      <BillingHistoryCard v-if="billingEnabled" />
     </template>
   </div>
 </template>
