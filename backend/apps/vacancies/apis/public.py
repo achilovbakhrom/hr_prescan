@@ -48,13 +48,13 @@ class PublicVacancyListApi(APIView):
         if pagination_requested:
             return _get_paginated_public_vacancies(request=request, filters=filters, vacancies=vacancies)
 
-        items = _with_apply_flag(PublicVacancyListOutputSerializer(vacancies, many=True).data, can_apply=True)
+        internal_qs = vacancies.order_by("-created_at")
+        items = _with_apply_flag(PublicVacancyListOutputSerializer(internal_qs, many=True).data, can_apply=True)
 
         if filters.get("is_remote") is not True and filters.get("experience_level") in (None, "middle"):
-            parsed_vacancies = _get_filtered_public_parsed_vacancies(filters=filters)
+            parsed_vacancies = _get_filtered_public_parsed_vacancies(filters=filters).order_by("-created_at")
             items.extend(PublicParsedVacancyListOutputSerializer(parsed_vacancies, many=True).data)
 
-        items.sort(key=lambda item: item.get("created_at") or "", reverse=True)
         return Response(items, status=status.HTTP_200_OK)
 
 
@@ -109,7 +109,8 @@ def _with_apply_flag(data, *, can_apply: bool):
 def _get_paginated_public_vacancies(*, request: Request, filters: dict, vacancies) -> Response:
     internal_qs = vacancies.order_by("-created_at")
     parsed_qs = _get_filtered_public_parsed_vacancies(filters=filters).order_by("-created_at")
-    total_count = internal_qs.count() + parsed_qs.count()
+    internal_count = internal_qs.count()
+    total_count = internal_count + parsed_qs.count()
 
     paginator = StandardPagination()
     paginator.paginate_queryset(range(total_count), request)
@@ -118,16 +119,15 @@ def _get_paginated_public_vacancies(*, request: Request, filters: dict, vacancie
     start = (page_number - 1) * page_size
     end = start + page_size
 
-    internal_items = list(internal_qs[:end])
-    parsed_items = list(parsed_qs[:end])
-    page_items = sorted(
-        [*internal_items, *parsed_items],
-        key=lambda item: item.created_at,
-        reverse=True,
-    )[start:end]
+    internal_items = list(internal_qs[start:end])
+    parsed_items = []
+    if end > internal_count:
+        parsed_start = max(start - internal_count, 0)
+        parsed_end = end - internal_count
+        parsed_items = list(parsed_qs[parsed_start:parsed_end])
 
     serialized_items = []
-    for item in page_items:
+    for item in [*internal_items, *parsed_items]:
         if item.__class__.__name__ == "Vacancy":
             serialized_items.append(
                 _with_apply_flag(PublicVacancyListOutputSerializer(item).data, can_apply=True),

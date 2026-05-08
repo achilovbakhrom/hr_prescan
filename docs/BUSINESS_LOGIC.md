@@ -141,6 +141,7 @@ HR provides the following information:
 - **External sharing** — each vacancy has a unique URL that HR can post on external platforms (LinkedIn, job boards, social media, company website). Candidates clicking the link are directed to the vacancy page on PreScan to apply
 - Public vacancy pages can translate visible internal vacancy content (description, requirements, responsibilities) for authenticated users. Anonymous visitors do not see translation controls, and private HR evaluation content remains HR-only.
 - The public job board supports paginated loading for search/filter results. The UI loads the first page, then appends more vacancies as the visitor scrolls instead of requesting the entire vacancy list at once.
+- Public job board results show PreScan-created vacancies first, sorted by newest `created_at`; parsed external vacancies are shown after them, also sorted by newest `created_at`.
 
 ### 5.2.1 External Vacancy Parsing
 
