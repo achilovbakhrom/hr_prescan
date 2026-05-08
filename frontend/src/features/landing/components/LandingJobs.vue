@@ -32,7 +32,8 @@ const jobsLoading = ref(false)
 onMounted(async () => {
   jobsLoading.value = true
   try {
-    jobs.value = await vacancyService.getPublicList({})
+    const response = await vacancyService.getPublicListPage({ page: 1, pageSize: 6 })
+    jobs.value = response.results
   } catch {
     /* silent — section degrades to empty state */
   } finally {

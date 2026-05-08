@@ -13,14 +13,32 @@ PHONE_CONTEXT_RE = re.compile(r"(?:phone|tel|call|contact|тел|звон|ном
 
 
 def parsed_vacancy_has_contact_info(vacancy: Any) -> bool:
-    raw_payload = vacancy.raw_payload if isinstance(vacancy.raw_payload, Mapping) else {}
+    if bool(getattr(vacancy, "has_contact_info", False)):
+        return True
+
+    return parsed_payload_has_contact_info(
+        raw_payload=getattr(vacancy, "raw_payload", {}),
+        description=getattr(vacancy, "description", ""),
+        requirements=getattr(vacancy, "requirements", ""),
+        responsibilities=getattr(vacancy, "responsibilities", ""),
+    )
+
+
+def parsed_payload_has_contact_info(
+    *,
+    raw_payload: Any,
+    description: str = "",
+    requirements: str = "",
+    responsibilities: str = "",
+) -> bool:
+    raw_payload = raw_payload if isinstance(raw_payload, Mapping) else {}
     if _contacts_payload_has_contact(raw_payload.get("contacts")):
         return True
 
     text_parts = [
-        getattr(vacancy, "description", ""),
-        getattr(vacancy, "requirements", ""),
-        getattr(vacancy, "responsibilities", ""),
+        description,
+        requirements,
+        responsibilities,
         raw_payload.get("description", ""),
     ]
     return text_has_contact_info(" ".join(str(part or "") for part in text_parts))

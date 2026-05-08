@@ -7,6 +7,7 @@ from django.utils import timezone
 
 from apps.common.exceptions import ApplicationError
 from apps.job_parser.models import ParsedVacancy, ParsedVacancySource
+from apps.job_parser.services.contact_detection import parsed_payload_has_contact_info
 from apps.job_parser.services.normalization import (
     dedupe_skills,
     make_fingerprint,
@@ -117,12 +118,22 @@ def import_parsed_vacancy(*, parsed_vacancy: ParsedVacancy, created_by) -> Vacan
 
 def _build_defaults(*, payload: dict, now: timezone.datetime) -> dict:
     status = payload.get("status") or ParsedVacancy.Status.ACTIVE
+    raw_payload = dict(payload.get("raw_payload") or {})
+    description = str(payload.get("description") or "")
+    requirements = str(payload.get("requirements") or "")
+    responsibilities = str(payload.get("responsibilities") or "")
     return {
         "external_url": str(payload.get("external_url") or ""),
         "company_name": str(payload.get("company_name") or ""),
-        "description": str(payload.get("description") or ""),
-        "requirements": str(payload.get("requirements") or ""),
-        "responsibilities": str(payload.get("responsibilities") or ""),
+        "description": description,
+        "requirements": requirements,
+        "responsibilities": responsibilities,
+        "has_contact_info": parsed_payload_has_contact_info(
+            raw_payload=raw_payload,
+            description=description,
+            requirements=requirements,
+            responsibilities=responsibilities,
+        ),
         "skills": dedupe_skills(list(payload.get("skills") or [])),
         "salary_min": normalize_decimal(payload.get("salary_min")),
         "salary_max": normalize_decimal(payload.get("salary_max")),
@@ -134,5 +145,5 @@ def _build_defaults(*, payload: dict, now: timezone.datetime) -> dict:
         "last_seen_at": now,
         "status": status,
         "actuality_reason": str(payload.get("actuality_reason") or ""),
-        "raw_payload": dict(payload.get("raw_payload") or {}),
+        "raw_payload": raw_payload,
     }

@@ -72,5 +72,22 @@ def get_public_parsed_vacancies(
     return qs
 
 
+def get_public_reachable_parsed_vacancies(
+    *,
+    search: str | None = None,
+    location: str | None = None,
+    employment_type: str | None = None,
+    salary_min: int | None = None,
+    salary_max: int | None = None,
+) -> QuerySet[ParsedVacancy]:
+    return get_public_parsed_vacancies(
+        search=search,
+        location=location,
+        employment_type=employment_type,
+        salary_min=salary_min,
+        salary_max=salary_max,
+    ).filter(Q(has_contact_info=True) | ~Q(external_url=""))
+
+
 def get_public_parsed_vacancy_by_id(*, vacancy_id: UUID) -> ParsedVacancy | None:
     return get_public_parsed_vacancies().filter(id=vacancy_id).first()

@@ -6,7 +6,11 @@ from rest_framework.views import APIView
 
 from apps.common.messages import MSG_VACANCY_NOT_FOUND
 from apps.common.pagination import StandardPagination
-from apps.job_parser.selectors import get_public_parsed_vacancies, get_public_parsed_vacancy_by_id
+from apps.job_parser.selectors import (
+    get_public_parsed_vacancies,
+    get_public_parsed_vacancy_by_id,
+    get_public_reachable_parsed_vacancies,
+)
 from apps.job_parser.serializers_public import (
     PublicParsedVacancyDetailOutputSerializer,
     PublicParsedVacancyListOutputSerializer,
@@ -41,24 +45,16 @@ class PublicVacancyListApi(APIView):
         filters.pop("page", None)
         filters.pop("page_size", None)
         vacancies = get_public_vacancies(**filters)
+        if pagination_requested:
+            return _get_paginated_public_vacancies(request=request, filters=filters, vacancies=vacancies)
+
         items = _with_apply_flag(PublicVacancyListOutputSerializer(vacancies, many=True).data, can_apply=True)
 
         if filters.get("is_remote") is not True and filters.get("experience_level") in (None, "middle"):
-            parsed_vacancies = get_public_parsed_vacancies(
-                search=filters.get("search"),
-                location=filters.get("location"),
-                employment_type=filters.get("employment_type"),
-                salary_min=filters.get("salary_min"),
-                salary_max=filters.get("salary_max"),
-            )
-            parsed_vacancies = [item for item in parsed_vacancies if parsed_vacancy_is_publicly_usable(item)]
+            parsed_vacancies = _get_filtered_public_parsed_vacancies(filters=filters)
             items.extend(PublicParsedVacancyListOutputSerializer(parsed_vacancies, many=True).data)
 
         items.sort(key=lambda item: item.get("created_at") or "", reverse=True)
-        if pagination_requested:
-            paginator = StandardPagination()
-            page = paginator.paginate_queryset(items, request)
-            return paginator.get_paginated_response(page)
         return Response(items, status=status.HTTP_200_OK)
 
 
@@ -108,3 +104,47 @@ def _with_apply_flag(data, *, can_apply: bool):
     data["can_apply"] = can_apply
     data["content_source"] = "internal"
     return data
+
+
+def _get_paginated_public_vacancies(*, request: Request, filters: dict, vacancies) -> Response:
+    internal_qs = vacancies.order_by("-created_at")
+    parsed_qs = _get_filtered_public_parsed_vacancies(filters=filters).order_by("-created_at")
+    total_count = internal_qs.count() + parsed_qs.count()
+
+    paginator = StandardPagination()
+    paginator.paginate_queryset(range(total_count), request)
+    page_size = paginator.get_page_size(request) or paginator.page_size
+    page_number = paginator.page.number
+    start = (page_number - 1) * page_size
+    end = start + page_size
+
+    internal_items = list(internal_qs[:end])
+    parsed_items = list(parsed_qs[:end])
+    page_items = sorted(
+        [*internal_items, *parsed_items],
+        key=lambda item: item.created_at,
+        reverse=True,
+    )[start:end]
+
+    serialized_items = []
+    for item in page_items:
+        if item.__class__.__name__ == "Vacancy":
+            serialized_items.append(
+                _with_apply_flag(PublicVacancyListOutputSerializer(item).data, can_apply=True),
+            )
+        else:
+            serialized_items.append(PublicParsedVacancyListOutputSerializer(item).data)
+
+    return paginator.get_paginated_response(serialized_items)
+
+
+def _get_filtered_public_parsed_vacancies(*, filters: dict):
+    if filters.get("is_remote") is True or filters.get("experience_level") not in (None, "middle"):
+        return get_public_parsed_vacancies().none()
+    return get_public_reachable_parsed_vacancies(
+        search=filters.get("search"),
+        location=filters.get("location"),
+        employment_type=filters.get("employment_type"),
+        salary_min=filters.get("salary_min"),
+        salary_max=filters.get("salary_max"),
+    )

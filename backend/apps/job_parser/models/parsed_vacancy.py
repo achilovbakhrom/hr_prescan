@@ -79,6 +79,7 @@ class ParsedVacancy(BaseModel):
     description = models.TextField(blank=True, default="")
     requirements = models.TextField(blank=True, default="")
     responsibilities = models.TextField(blank=True, default="")
+    has_contact_info = models.BooleanField(default=False, db_index=True)
     skills = models.JSONField(default=list, blank=True)
     salary_min = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
     salary_max = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
