@@ -180,9 +180,7 @@ SPECTACULAR_SETTINGS = {
 # Billing is intentionally paused during the early client-acquisition phase.
 # Set BILLING_ENABLED=true when paid subscriptions should be enforced again.
 BILLING_ENABLED = os.environ.get("BILLING_ENABLED", "false").lower() in ("1", "true", "yes")
-BILLING_FREE_ACCESS_ACTIVE_USER_TARGET = int(
-    os.environ.get("BILLING_FREE_ACCESS_ACTIVE_USER_TARGET", "500")
-)
+BILLING_FREE_ACCESS_ACTIVE_USER_TARGET = int(os.environ.get("BILLING_FREE_ACCESS_ACTIVE_USER_TARGET", "500"))
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
