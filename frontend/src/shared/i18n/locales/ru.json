@@ -449,7 +449,7 @@
       "employmentType": "Тип занятости",
       "experienceLevel": "Уровень опыта",
       "deadline": "Срок подачи",
-      "generateWithAI": "Сгенерировать с ИИ",
+      "generateWithAI": "Сгенерировать текст с ИИ",
       "generateWithAISuccess": "Текст вакансии сгенерирован",
       "generateWithAIError": "Не удалось сгенерировать текст вакансии",
       "salaryMin": "Мин. зарплата",

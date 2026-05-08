@@ -449,7 +449,7 @@
       "employmentType": "Employment Type",
       "experienceLevel": "Experience Level",
       "deadline": "Deadline",
-      "generateWithAI": "Generate with AI",
+      "generateWithAI": "Generate content with AI",
       "generateWithAISuccess": "Vacancy content generated",
       "generateWithAIError": "Could not generate vacancy content",
       "salaryMin": "Min Salary",

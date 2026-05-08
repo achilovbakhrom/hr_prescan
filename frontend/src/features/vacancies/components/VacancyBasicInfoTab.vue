@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
@@ -36,8 +35,6 @@ const isRemote = defineModel<boolean>('isRemote', { required: true })
 const employmentType = defineModel<EmploymentType>('employmentType', { required: true })
 const experienceLevel = defineModel<ExperienceLevel>('experienceLevel', { required: true })
 const { t } = useI18n()
-const employmentOptions = computed(() => getEmploymentOptions(t))
-const experienceOptions = computed(() => getExperienceOptions(t))
 </script>
 <template>
   <div class="space-y-4 py-2">
@@ -54,17 +51,19 @@ const experienceOptions = computed(() => getExperienceOptions(t))
       <small v-if="props.hasError('title')" class="text-red-500">{{
         props.fieldError('title')
       }}</small>
-      <VacancyGenerateAiButton
-        v-if="props.showGenerateAi"
-        :can-generate="Boolean(props.canGenerateAi)"
-        :generating="Boolean(props.generatingAi)"
-        @generate="emit('generateAi')"
-      />
     </div>
     <div>
-      <label class="mb-1 block text-sm font-medium">
-        {{ t('vacancies.form.description') }} <span class="text-red-500">*</span>
-      </label>
+      <div class="mb-1 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <label class="block text-sm font-medium">
+          {{ t('vacancies.form.description') }} <span class="text-red-500">*</span>
+        </label>
+        <VacancyGenerateAiButton
+          v-if="props.showGenerateAi"
+          :can-generate="Boolean(props.canGenerateAi)"
+          :generating="Boolean(props.generatingAi)"
+          @generate="emit('generateAi')"
+        />
+      </div>
       <Editor
         v-model="description"
         editorStyle="height: 200px"
@@ -167,7 +166,7 @@ const experienceOptions = computed(() => getExperienceOptions(t))
         }}</label>
         <Dropdown
           v-model="employmentType"
-          :options="employmentOptions"
+          :options="getEmploymentOptions(t)"
           option-label="label"
           option-value="value"
           class="w-full"
@@ -183,7 +182,7 @@ const experienceOptions = computed(() => getExperienceOptions(t))
         }}</label>
         <Dropdown
           v-model="experienceLevel"
-          :options="experienceOptions"
+          :options="getExperienceOptions(t)"
           option-label="label"
           option-value="value"
           class="w-full"
