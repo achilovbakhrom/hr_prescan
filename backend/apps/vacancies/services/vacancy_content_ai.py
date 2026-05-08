@@ -9,7 +9,12 @@ from google.genai import types
 
 from apps.common.exceptions import ApplicationError
 from apps.common.messages import MSG_AI_VACANCY_CONTENT_FAILED
-from apps.vacancies.services.ai_json import load_json_object
+from apps.vacancies.services.ai_json import (
+    has_complete_vacancy_content,
+    load_json_object,
+    normalize_vacancy_content,
+    require_complete_vacancy_content,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -48,9 +53,10 @@ def generate_vacancy_content(
         client = genai.Client(api_key=settings.GOOGLE_API_KEY)
         draft = _generate_content(client=client, context=context)
         grade = _grade_content(client=client, context=context, content=draft)
-        if _score(grade) >= MIN_ACCEPTABLE_SCORE:
+        if _score(grade) >= MIN_ACCEPTABLE_SCORE and has_complete_vacancy_content(draft):
             return draft
-        return _revise_content(client=client, context=context, content=draft, grade=grade)
+        revised = _revise_content(client=client, context=context, content=draft, grade=grade)
+        return require_complete_vacancy_content(revised)
     except Exception as exc:
         logger.exception("Failed to generate vacancy content for title %s", title)
         raise ApplicationError(str(MSG_AI_VACANCY_CONTENT_FAILED)) from exc
@@ -67,7 +73,7 @@ def _generate_content(*, client: genai.Client, context: dict[str, Any]) -> dict[
             response_mime_type="application/json",
         ),
     )
-    return _normalize_content(load_json_object(response.text))
+    return normalize_vacancy_content(load_json_object(response.text))
 
 
 def _grade_content(
@@ -123,7 +129,7 @@ def _revise_content(
             response_mime_type="application/json",
         ),
     )
-    return _normalize_content(load_json_object(response.text))
+    return normalize_vacancy_content(load_json_object(response.text))
 
 
 def _content_payload(context: dict[str, Any]) -> types.Content:
@@ -162,6 +168,7 @@ def _generation_instruction() -> str:
         '- "description": simple safe HTML using only <p>, <ul>, <li>, and <strong>. 120-180 words.\n'
         '- "requirements": 5-8 newline-separated bullet lines, each starting with "- ".\n'
         '- "responsibilities": 5-8 newline-separated bullet lines, each starting with "- ".\n'
+        "Every field must be non-empty. Never return empty strings.\n"
         "Keep the tone clear, direct, and credible. Avoid hype and buzzwords."
     )
 
@@ -181,7 +188,7 @@ def _revision_instruction() -> str:
     return (
         "Revise the vacancy content using the reviewer notes.\n"
         "Keep only facts supported by the original context. Preserve the required JSON fields and formatting.\n"
-        "Write in the requested language only. Return JSON only."
+        "Write in the requested language only. Every field must be non-empty. Return JSON only."
     )
 
 
@@ -190,7 +197,3 @@ def _score(grade: dict[str, Any]) -> int:
         return int(grade.get("score", 0))
     except (TypeError, ValueError):
         return 0
-
-
-def _normalize_content(data: dict[str, Any]) -> dict[str, str]:
-    return {field: str(data.get(field, "")).strip() for field in ("description", "requirements", "responsibilities")}

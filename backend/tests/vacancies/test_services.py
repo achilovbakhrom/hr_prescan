@@ -206,6 +206,43 @@ class TestGenerateVacancyContent:
             "responsibilities": "- Build services",
         }
 
+    def test_revises_empty_draft_even_with_high_grade(self):
+        class DraftResponse:
+            text = "{}"
+
+        class GradeResponse:
+            text = '{"score": 9, "notes": []}'
+
+        class RevisedResponse:
+            text = (
+                '{"description": "<p>Build backend APIs.</p>", '
+                '"requirements": "- Python", '
+                '"responsibilities": "- Build services"}'
+            )
+
+        with patch("apps.vacancies.services.vacancy_content_ai.genai.Client") as client_cls:
+            client = client_cls.return_value
+            client.models.generate_content.side_effect = [DraftResponse(), GradeResponse(), RevisedResponse()]
+
+            content = generate_vacancy_content(title="Backend Developer", language="en")
+
+        assert content["description"] == "<p>Build backend APIs.</p>"
+        assert client.models.generate_content.call_count == 3
+
+    def test_rejects_empty_final_content(self):
+        class EmptyResponse:
+            text = "{}"
+
+        class GradeResponse:
+            text = '{"score": 9, "notes": []}'
+
+        with patch("apps.vacancies.services.vacancy_content_ai.genai.Client") as client_cls:
+            client = client_cls.return_value
+            client.models.generate_content.side_effect = [EmptyResponse(), GradeResponse(), EmptyResponse()]
+
+            with pytest.raises(ApplicationError):
+                generate_vacancy_content(title="Backend Developer", language="en")
+
 
 class TestPublishVacancy:
     def test_publish_requires_prescanning_questions(self, company, hr_user):
