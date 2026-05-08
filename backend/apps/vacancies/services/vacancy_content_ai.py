@@ -9,6 +9,7 @@ from google.genai import types
 
 from apps.common.exceptions import ApplicationError
 from apps.common.messages import MSG_AI_VACANCY_CONTENT_FAILED
+from apps.vacancies.services.ai_json import load_json_object
 
 logger = logging.getLogger(__name__)
 
@@ -66,7 +67,7 @@ def _generate_content(*, client: genai.Client, context: dict[str, Any]) -> dict[
             response_mime_type="application/json",
         ),
     )
-    return _normalize_content(json.loads(response.text))
+    return _normalize_content(load_json_object(response.text))
 
 
 def _grade_content(
@@ -90,7 +91,7 @@ def _grade_content(
             response_mime_type="application/json",
         ),
     )
-    return json.loads(response.text)
+    return load_json_object(response.text)
 
 
 def _revise_content(
@@ -122,7 +123,7 @@ def _revise_content(
             response_mime_type="application/json",
         ),
     )
-    return _normalize_content(json.loads(response.text))
+    return _normalize_content(load_json_object(response.text))
 
 
 def _content_payload(context: dict[str, Any]) -> types.Content:
@@ -192,8 +193,4 @@ def _score(grade: dict[str, Any]) -> int:
 
 
 def _normalize_content(data: dict[str, Any]) -> dict[str, str]:
-    return {
-        "description": str(data.get("description", "")).strip(),
-        "requirements": str(data.get("requirements", "")).strip(),
-        "responsibilities": str(data.get("responsibilities", "")).strip(),
-    }
+    return {field: str(data.get(field, "")).strip() for field in ("description", "requirements", "responsibilities")}

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
 import Editor from 'primevue/editor'
@@ -9,13 +8,13 @@ import Dropdown from '@/shared/components/AppSelect.vue'
 import InputNumber from 'primevue/inputnumber'
 import ToggleSwitch from 'primevue/toggleswitch'
 import Chips from 'primevue/chips'
+import VacancyGenerateAiButton from './VacancyGenerateAiButton.vue'
 import {
   getEmploymentOptions,
   getExperienceOptions,
   CURRENCY_OPTIONS,
 } from '../constants/formOptions'
 import type { EmploymentType, ExperienceLevel } from '../types/vacancy.types'
-
 const props = defineProps<{
   hasError: (field: string) => boolean
   fieldError: (field: string) => string
@@ -36,32 +35,16 @@ const location = defineModel<string>('location', { required: true })
 const isRemote = defineModel<boolean>('isRemote', { required: true })
 const employmentType = defineModel<EmploymentType>('employmentType', { required: true })
 const experienceLevel = defineModel<ExperienceLevel>('experienceLevel', { required: true })
-
 const { t } = useI18n()
 const employmentOptions = computed(() => getEmploymentOptions(t))
 const experienceOptions = computed(() => getExperienceOptions(t))
 </script>
-
 <template>
   <div class="space-y-4 py-2">
     <div>
-      <div class="mb-1 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <label class="block text-sm font-medium"
-          >{{ t('vacancies.form.title') }} <span class="text-red-500">*</span></label
-        >
-        <Button
-          v-if="props.showGenerateAi"
-          type="button"
-          :label="t('vacancies.form.generateWithAI')"
-          icon="pi pi-sparkles"
-          size="small"
-          severity="secondary"
-          outlined
-          :loading="props.generatingAi"
-          :disabled="!props.canGenerateAi || props.generatingAi"
-          @click="emit('generateAi')"
-        />
-      </div>
+      <label class="mb-1 block text-sm font-medium">
+        {{ t('vacancies.form.title') }} <span class="text-red-500">*</span>
+      </label>
       <InputText
         v-model="title"
         class="w-full"
@@ -71,11 +54,17 @@ const experienceOptions = computed(() => getExperienceOptions(t))
       <small v-if="props.hasError('title')" class="text-red-500">{{
         props.fieldError('title')
       }}</small>
+      <VacancyGenerateAiButton
+        v-if="props.showGenerateAi"
+        :can-generate="Boolean(props.canGenerateAi)"
+        :generating="Boolean(props.generatingAi)"
+        @generate="emit('generateAi')"
+      />
     </div>
     <div>
-      <label class="mb-1 block text-sm font-medium"
-        >{{ t('vacancies.form.description') }} <span class="text-red-500">*</span></label
-      >
+      <label class="mb-1 block text-sm font-medium">
+        {{ t('vacancies.form.description') }} <span class="text-red-500">*</span>
+      </label>
       <Editor
         v-model="description"
         editorStyle="height: 200px"
@@ -113,7 +102,6 @@ const experienceOptions = computed(() => getExperienceOptions(t))
         props.fieldError('responsibilities')
       }}</small>
     </div>
-
     <div class="pt-2">
       <h4 class="text-sm font-semibold text-gray-700">{{ t('vacancies.form.compensation') }}</h4>
       <p class="mt-1 text-xs text-gray-500">{{ t('vacancies.form.salaryNegotiableHint') }}</p>
@@ -144,7 +132,6 @@ const experienceOptions = computed(() => getExperienceOptions(t))
         />
       </div>
     </div>
-
     <div>
       <label class="mb-1 block text-sm font-medium">{{ t('vacancies.form.skills') }}</label>
       <Chips v-model="skills" class="w-full" :placeholder="t('vacancies.form.skillsPlaceholder')" />
@@ -152,7 +139,6 @@ const experienceOptions = computed(() => getExperienceOptions(t))
         props.fieldError('skills')
       }}</small>
     </div>
-
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
       <div>
         <label class="mb-1 block text-sm font-medium">

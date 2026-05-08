@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { isAxiosError } from 'axios'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useToast } from 'primevue/usetoast'
@@ -46,6 +47,13 @@ const showCreateDialog = ref(false)
 const generatingBasicInfo = ref(false)
 const canGenerateBasicInfo = computed(() => form.title.value.trim().length >= 5)
 
+function generationErrorMessage(error: unknown): string {
+  if (isAxiosError<{ detail?: string }>(error)) {
+    return error.response?.data?.detail || t('vacancies.form.generateWithAIError')
+  }
+  return t('vacancies.form.generateWithAIError')
+}
+
 async function handleCompanyCreated(company: Company): Promise<void> {
   // Re-fetch memberships so the new company is in the dropdown with correct is_default state.
   form.companiesList.value = [
@@ -74,18 +82,22 @@ async function handleGenerateBasicInfo(): Promise<void> {
       employmentType: form.employmentType.value,
       experienceLevel: form.experienceLevel.value,
     })
-    form.description.value = content.description
-    form.requirements.value = content.requirements
-    form.responsibilities.value = content.responsibilities
+    if (content.description) form.description.value = content.description
+    if (content.requirements) form.requirements.value = content.requirements
+    if (content.responsibilities) form.responsibilities.value = content.responsibilities
+    if (!content.description && !content.requirements && !content.responsibilities) {
+      throw new Error(t('vacancies.form.generateWithAIError'))
+    }
     toast.add({
       severity: 'success',
       summary: t('vacancies.form.generateWithAISuccess'),
       life: 2500,
     })
-  } catch {
+  } catch (error) {
     toast.add({
       severity: 'error',
       summary: t('vacancies.form.generateWithAIError'),
+      detail: generationErrorMessage(error),
       life: 4000,
     })
   } finally {

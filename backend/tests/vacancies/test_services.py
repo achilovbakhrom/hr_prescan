@@ -183,6 +183,29 @@ class TestGenerateVacancyContent:
         assert "reviewer notes" in revision_instruction
         assert "Keep only facts supported" in revision_instruction
 
+    def test_accepts_markdown_fenced_json_response(self):
+        class DraftResponse:
+            text = (
+                '```json\n{"description": "<p>Build backend APIs.</p>", '
+                '"requirements": "- Python", '
+                '"responsibilities": "- Build services"}\n```'
+            )
+
+        class GradeResponse:
+            text = '```json\n{"score": 9, "notes": []}\n```'
+
+        with patch("apps.vacancies.services.vacancy_content_ai.genai.Client") as client_cls:
+            client = client_cls.return_value
+            client.models.generate_content.side_effect = [DraftResponse(), GradeResponse()]
+
+            content = generate_vacancy_content(title="Backend Developer", language="en")
+
+        assert content == {
+            "description": "<p>Build backend APIs.</p>",
+            "requirements": "- Python",
+            "responsibilities": "- Build services",
+        }
+
 
 class TestPublishVacancy:
     def test_publish_requires_prescanning_questions(self, company, hr_user):
