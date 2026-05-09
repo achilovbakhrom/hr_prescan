@@ -4,15 +4,28 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('vacancies', '0020_remove_vacancy_deadline'),
+        ("vacancies", "0020_remove_vacancy_deadline"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='vacancy',
-            name='prescanning_language',
-            field=models.CharField(choices=[('en', 'English'), ('ru', 'Russian'), ('uz', 'Uzbek'), ('kk', 'Kazakh'), ('tr', 'Turkish'), ('ar', 'Arabic'), ('es', 'Spanish'), ('fr', 'French'), ('de', 'German')], default='en', max_length=10),
+            model_name="vacancy",
+            name="prescanning_language",
+            field=models.CharField(
+                choices=[
+                    ("en", "English"),
+                    ("ru", "Russian"),
+                    ("uz", "Uzbek"),
+                    ("kk", "Kazakh"),
+                    ("tr", "Turkish"),
+                    ("ar", "Arabic"),
+                    ("es", "Spanish"),
+                    ("fr", "French"),
+                    ("de", "German"),
+                ],
+                default="en",
+                max_length=10,
+            ),
         ),
     ]

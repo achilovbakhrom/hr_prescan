@@ -4,15 +4,28 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('interviews', '0006_telegram_channel_and_vacancy_code'),
+        ("interviews", "0006_telegram_channel_and_vacancy_code"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='interview',
-            name='language',
-            field=models.CharField(choices=[('en', 'English'), ('ru', 'Russian'), ('uz', 'Uzbek'), ('kk', 'Kazakh'), ('tr', 'Turkish'), ('ar', 'Arabic'), ('es', 'Spanish'), ('fr', 'French'), ('de', 'German')], default='en', max_length=10),
+            model_name="interview",
+            name="language",
+            field=models.CharField(
+                choices=[
+                    ("en", "English"),
+                    ("ru", "Russian"),
+                    ("uz", "Uzbek"),
+                    ("kk", "Kazakh"),
+                    ("tr", "Turkish"),
+                    ("ar", "Arabic"),
+                    ("es", "Spanish"),
+                    ("fr", "French"),
+                    ("de", "German"),
+                ],
+                default="en",
+                max_length=10,
+            ),
         ),
     ]

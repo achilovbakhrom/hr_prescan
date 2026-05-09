@@ -4,15 +4,28 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('accounts', '0024_rework_invitation_to_account'),
+        ("accounts", "0024_rework_invitation_to_account"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='user',
-            name='language',
-            field=models.CharField(choices=[('en', 'English'), ('ru', 'Russian'), ('uz', 'Uzbek'), ('kk', 'Kazakh'), ('tr', 'Turkish'), ('ar', 'Arabic'), ('es', 'Spanish'), ('fr', 'French'), ('de', 'German')], default='en', max_length=5),
+            model_name="user",
+            name="language",
+            field=models.CharField(
+                choices=[
+                    ("en", "English"),
+                    ("ru", "Russian"),
+                    ("uz", "Uzbek"),
+                    ("kk", "Kazakh"),
+                    ("tr", "Turkish"),
+                    ("ar", "Arabic"),
+                    ("es", "Spanish"),
+                    ("fr", "French"),
+                    ("de", "German"),
+                ],
+                default="en",
+                max_length=5,
+            ),
         ),
     ]
