@@ -89,10 +89,6 @@ export function getBrowserLocale(): SupportedLocale {
   return 'en'
 }
 
-function getDefaultLocale(): SupportedLocale {
-  return getStoredLocale() ?? getBrowserLocale()
-}
-
 function applyDocumentLocale(locale: SupportedLocale): void {
   if (typeof document === 'undefined') return
   document.documentElement.lang = locale
@@ -100,11 +96,10 @@ function applyDocumentLocale(locale: SupportedLocale): void {
 }
 
 export function getRequestLocale(): SupportedLocale {
-  return getDefaultLocale()
+  return getLocale()
 }
 
-const initialLocale = getDefaultLocale()
-applyDocumentLocale(initialLocale)
+const initialLocale: SupportedLocale = 'en'
 
 export const i18n = createI18n<[MessageSchema], SupportedLocale>({
   legacy: false,
@@ -126,11 +121,17 @@ export const i18n = createI18n<[MessageSchema], SupportedLocale>({
   numberFormats,
 })
 
-export function setLocale(locale: SupportedLocale): void {
+function applyRuntimeLocale(locale: SupportedLocale, persist: boolean): void {
   // vue-i18n Composition mode exposes locale as a WritableComputedRef but types it as string
   ;(i18n.global.locale as unknown as WritableComputedRef<string>).value = locale
-  if (typeof localStorage !== 'undefined') localStorage.setItem(LOCALE_STORAGE_KEY, locale)
+  if (persist && typeof localStorage !== 'undefined') {
+    localStorage.setItem(LOCALE_STORAGE_KEY, locale)
+  }
   applyDocumentLocale(locale)
+}
+
+export function setLocale(locale: SupportedLocale): void {
+  applyRuntimeLocale(locale, true)
 }
 
 export function getLocale(): SupportedLocale {
@@ -141,17 +142,20 @@ export function getLocale(): SupportedLocale {
 }
 
 export async function detectAndApplyLocale(): Promise<void> {
-  if (getStoredLocale()) return
+  const storedLocale = getStoredLocale()
+  if (storedLocale) {
+    applyRuntimeLocale(storedLocale, false)
+    return
+  }
+
   const browserLocale = getBrowserLocale()
-  ;(i18n.global.locale as unknown as WritableComputedRef<string>).value = browserLocale
-  applyDocumentLocale(browserLocale)
+  applyRuntimeLocale(browserLocale, false)
 
   try {
     const { detectLanguage } = await import('@/shared/services/language.service')
     const detected = await detectLanguage()
     if (SUPPORTED_LOCALES.includes(detected)) {
-      ;(i18n.global.locale as unknown as WritableComputedRef<string>).value = detected
-      applyDocumentLocale(detected)
+      applyRuntimeLocale(detected, false)
     }
   } catch (err) {
     console.warn('[i18n] language detection failed', err)
