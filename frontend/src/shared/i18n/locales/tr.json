@@ -225,6 +225,17 @@
       "telegramHrHint": "Telegram'deki işe alım uzmanı iş akışını keşfetmek için İK botumuzu açın, ardından kaydolduktan sonra Ayarlar'dan hesabınızı bağlayın.",
       "openHrTelegram": "İK Botunu Aç"
     },
+    "mockup": {
+      "title": "AI Ön Tarama",
+      "status": "canlı",
+      "messages": {
+        "aiGreeting": "Merhaba! Ben AI mülakatçınızım. Başlamaya hazır mısınız?",
+        "candidateReady": "Evet, başlayalım.",
+        "aiQuestion": "Yakın zamanda çözdüğünüz karmaşık bir UI sorunundan bahsedin.",
+        "candidateAnswer": "CRDT'ler ve Vue 3 ile gerçek zamanlı ortak çalışma editörü geliştirdim.",
+        "aiScore": "Teknik 9/10 · İletişim 8/10. Mülakat aşamasına ilerliyor."
+      }
+    },
     "features": {
       "title": "AI-İlk İşe Alma Platformu",
       "subtitle": "Akıllı temsilcilerimiz, ilk temastan son puana kadar tüm tarama hattını yönetir.",

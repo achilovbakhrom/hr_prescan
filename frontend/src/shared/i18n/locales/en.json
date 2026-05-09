@@ -232,6 +232,17 @@
       "telegramHrHint": "Open our HR bot to explore the recruiter workflow in Telegram, then connect your account from Settings after signup.",
       "openHrTelegram": "Open HR Bot"
     },
+    "mockup": {
+      "title": "AI Prescan",
+      "status": "live",
+      "messages": {
+        "aiGreeting": "Hi! I'm your AI interviewer. Ready to begin?",
+        "candidateReady": "Yes, let's go.",
+        "aiQuestion": "Tell me about a complex UI challenge you solved recently.",
+        "candidateAnswer": "I built a real-time collaborative editor with CRDTs and Vue 3.",
+        "aiScore": "Technical 9/10 · Communication 8/10. Advancing to interview stage."
+      }
+    },
     "features": {
       "title": "AI-First Hiring Platform",
       "subtitle": "Our intelligent agents handle the entire screening pipeline — from first contact to final score.",

@@ -225,6 +225,17 @@
       "telegramHrHint": "Telegram ichida recruiter flow ni ko'rish uchun HR botimizni oching, ro'yxatdan o'tgandan keyin esa accountni sozlamalardan ulang.",
       "openHrTelegram": "HR botini ochish"
     },
+    "mockup": {
+      "title": "AI preskrining",
+      "status": "jonli",
+      "messages": {
+        "aiGreeting": "Salom! Men sizning AI intervyuchingizman. Boshlashga tayyormisiz?",
+        "candidateReady": "Ha, boshlaymiz.",
+        "aiQuestion": "Yaqinda hal qilgan murakkab UI muammosi haqida aytib bering.",
+        "candidateAnswer": "Men CRDT va Vue 3 bilan real vaqtli hamkorlik muharririni yaratdim.",
+        "aiScore": "Texnika 9/10 · Muloqot 8/10. Intervyu bosqichiga o'tkazildi."
+      }
+    },
     "features": {
       "title": "AI-birinchi yollash platformasi",
       "subtitle": "Bizning aqlli agentlarimiz butun tekshiruv jarayonini boshqaradi — birinchi aloqadan yakuniy bahogacha.",

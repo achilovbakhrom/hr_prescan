@@ -225,6 +225,17 @@
       "telegramHrHint": "Abra nuestro bot de recursos humanos para explorar el flujo de trabajo del reclutador en Telegram, luego conecte su cuenta desde Configuración después de registrarse.",
       "openHrTelegram": "Abrir bot de recursos humanos"
     },
+    "mockup": {
+      "title": "Preselección AI",
+      "status": "en vivo",
+      "messages": {
+        "aiGreeting": "Hola. Soy tu entrevistador AI. ¿Listo para empezar?",
+        "candidateReady": "Sí, empecemos.",
+        "aiQuestion": "Cuéntame sobre un reto complejo de UI que hayas resuelto recientemente.",
+        "candidateAnswer": "Construí un editor colaborativo en tiempo real con CRDTs y Vue 3.",
+        "aiScore": "Técnica 9/10 · Comunicación 8/10. Avanza a la etapa de entrevista."
+      }
+    },
     "features": {
       "title": "AI-Primera plataforma de contratación",
       "subtitle": "Nuestros agentes inteligentes manejan todo el proceso de selección, desde el primer contacto hasta la puntuación final.",

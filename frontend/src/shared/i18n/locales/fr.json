@@ -225,6 +225,17 @@
       "telegramHrHint": "Ouvrez notre bot RH pour explorer le flux de travail du recruteur dans Telegram, puis connectez votre compte depuis Paramètres après l'inscription.",
       "openHrTelegram": "Ouvrir le robot RH"
     },
+    "mockup": {
+      "title": "Présélection AI",
+      "status": "en direct",
+      "messages": {
+        "aiGreeting": "Bonjour. Je suis votre recruteur AI. Prêt à commencer ?",
+        "candidateReady": "Oui, allons-y.",
+        "aiQuestion": "Parlez-moi d'un défi UI complexe que vous avez résolu récemment.",
+        "candidateAnswer": "J'ai construit un éditeur collaboratif en temps réel avec CRDTs et Vue 3.",
+        "aiScore": "Technique 9/10 · Communication 8/10. Passage à l'étape d'entretien."
+      }
+    },
     "features": {
       "title": "AI-Première plateforme d'embauche",
       "subtitle": "Nos agents intelligents gèrent l’ensemble du processus de sélection, du premier contact au score final.",

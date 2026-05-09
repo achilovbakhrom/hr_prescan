@@ -225,6 +225,17 @@
       "telegramHrHint": "Öffnen Sie unseren HR-Bot, um den Personalvermittler-Workflow in Telegram zu erkunden, und verbinden Sie dann nach der Anmeldung Ihr Konto über die Einstellungen.",
       "openHrTelegram": "Öffnen Sie HR Bot"
     },
+    "mockup": {
+      "title": "AI-Vorscreening",
+      "status": "live",
+      "messages": {
+        "aiGreeting": "Hallo. Ich bin Ihr AI-Interviewer. Bereit anzufangen?",
+        "candidateReady": "Ja, legen wir los.",
+        "aiQuestion": "Erzählen Sie mir von einer komplexen UI-Herausforderung, die Sie kürzlich gelöst haben.",
+        "candidateAnswer": "Ich habe einen kollaborativen Echtzeit-Editor mit CRDTs und Vue 3 gebaut.",
+        "aiScore": "Technik 9/10 · Kommunikation 8/10. Weiter zur Interviewphase."
+      }
+    },
     "features": {
       "title": "AI-Erste Einstellungsplattform",
       "subtitle": "Unsere intelligenten Agenten kümmern sich um die gesamte Screening-Pipeline – vom ersten Kontakt bis zum Endergebnis.",

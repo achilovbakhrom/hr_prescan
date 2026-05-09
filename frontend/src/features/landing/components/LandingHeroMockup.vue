@@ -4,32 +4,35 @@
  * beside the hero copy. Extracted from LandingHero so each file stays
  * under the 200-line limit.
  */
-import { ref, onMounted, onUnmounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import GlassCard from '@/shared/components/GlassCard.vue'
 
 interface DemoMessage {
   role: 'ai' | 'candidate'
-  text: string
+  key: string
 }
 
-const visibleMessages = ref<DemoMessage[]>([])
+const { t } = useI18n()
+
+const visibleCount = ref(0)
 const chatDemoComplete = ref(false)
 let demoInterval: ReturnType<typeof setInterval> | null = null
 
 const demoMessages: DemoMessage[] = [
-  { role: 'ai', text: "Hi! I'm your AI interviewer. Ready to begin?" },
-  { role: 'candidate', text: "Yes, let's go." },
-  { role: 'ai', text: 'Tell me about a complex UI challenge you solved recently.' },
-  { role: 'candidate', text: 'I built a real-time collaborative editor with CRDTs and Vue 3.' },
-  { role: 'ai', text: 'Technical 9/10 · Communication 8/10. Advancing to interview stage.' },
+  { role: 'ai', key: 'landing.mockup.messages.aiGreeting' },
+  { role: 'candidate', key: 'landing.mockup.messages.candidateReady' },
+  { role: 'ai', key: 'landing.mockup.messages.aiQuestion' },
+  { role: 'candidate', key: 'landing.mockup.messages.candidateAnswer' },
+  { role: 'ai', key: 'landing.mockup.messages.aiScore' },
 ]
 
+const visibleMessages = computed(() => demoMessages.slice(0, visibleCount.value))
+
 onMounted(() => {
-  let i = 0
   demoInterval = setInterval(() => {
-    if (i < demoMessages.length) {
-      visibleMessages.value.push(demoMessages[i])
-      i++
+    if (visibleCount.value < demoMessages.length) {
+      visibleCount.value++
     } else {
       chatDemoComplete.value = true
       if (demoInterval) clearInterval(demoInterval)
@@ -53,13 +56,15 @@ onUnmounted(() => {
         <i class="pi pi-sparkles text-sm text-[color:var(--color-accent-ai)]"></i>
       </div>
       <div class="flex-1">
-        <p class="text-sm font-semibold text-[color:var(--color-text-primary)]">AI Prescan</p>
+        <p class="text-sm font-semibold text-[color:var(--color-text-primary)]">
+          {{ t('landing.mockup.title') }}
+        </p>
         <div class="flex items-center gap-1.5">
           <span
             class="h-1.5 w-1.5 animate-pulse rounded-full bg-[color:var(--color-success)]"
           ></span>
           <span class="font-mono text-[11px] text-[color:var(--color-text-muted)]">
-            live · 02:14
+            {{ t('landing.mockup.status') }} · 02:14
           </span>
         </div>
       </div>
@@ -82,14 +87,14 @@ onUnmounted(() => {
             <div
               class="rounded-2xl rounded-tl-sm bg-[color:var(--color-surface-raised)] px-3.5 py-2 text-sm text-[color:var(--color-text-primary)]"
             >
-              {{ msg.text }}
+              {{ t(msg.key) }}
             </div>
           </div>
           <div
             v-else
             class="max-w-[80%] rounded-2xl rounded-tr-sm bg-[color:var(--color-accent)] px-3.5 py-2 text-sm text-[color:var(--color-text-on-accent)]"
           >
-            {{ msg.text }}
+            {{ t(msg.key) }}
           </div>
         </div>
       </TransitionGroup>
