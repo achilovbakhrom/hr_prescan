@@ -22,12 +22,13 @@ const emit = defineEmits<{
 const { t } = useI18n()
 const botUsername = import.meta.env.VITE_TELEGRAM_BOT_USERNAME as string
 const loading = ref(false)
-const darkMode = ref(isDarkMode())
+const darkMode = ref(false)
 let themeObserver: MutationObserver | null = null
 
 const callbackName = `__onTelegramAuth_${Date.now()}`
 
 function isDarkMode(): boolean {
+  if (typeof document === 'undefined') return false
   return document.documentElement.classList.contains('dark')
 }
 

@@ -10,7 +10,7 @@ const emit = defineEmits<{
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as string
 const buttonContainer = ref<HTMLElement | null>(null)
 const { t } = useI18n()
-const darkMode = ref(isDarkMode())
+const darkMode = ref(false)
 let themeObserver: MutationObserver | null = null
 
 interface GoogleCredentialResponse {
@@ -40,6 +40,7 @@ function handleCredentialResponse(response: GoogleCredentialResponse): void {
 }
 
 function isDarkMode(): boolean {
+  if (typeof document === 'undefined') return false
   return document.documentElement.classList.contains('dark')
 }
 
