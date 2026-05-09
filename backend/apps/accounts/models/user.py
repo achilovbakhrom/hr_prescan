@@ -113,6 +113,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         ES = "es", "Spanish"
         FR = "fr", "French"
         DE = "de", "German"
+        UK = "uk", "Ukrainian"
 
     language = models.CharField(
         max_length=5,

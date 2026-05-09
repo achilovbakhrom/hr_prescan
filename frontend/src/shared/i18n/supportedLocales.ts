@@ -1,4 +1,15 @@
-export const SUPPORTED_LOCALES = ['en', 'ru', 'uz', 'kk', 'tr', 'ar', 'es', 'fr', 'de'] as const
+export const SUPPORTED_LOCALES = [
+  'en',
+  'ru',
+  'uz',
+  'kk',
+  'tr',
+  'ar',
+  'es',
+  'fr',
+  'de',
+  'uk',
+] as const
 
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number]
 
@@ -20,6 +31,7 @@ export const LOCALE_OPTIONS: LocaleOption[] = [
   { code: 'es', label: 'Español', flag: '🇪🇸' },
   { code: 'fr', label: 'Français', flag: '🇫🇷' },
   { code: 'de', label: 'Deutsch', flag: '🇩🇪' },
+  { code: 'uk', label: 'Українська', flag: '🇺🇦' },
 ]
 
 export const PRESCANNING_LANGUAGE_OPTIONS = LOCALE_OPTIONS.map(({ code, label }) => ({

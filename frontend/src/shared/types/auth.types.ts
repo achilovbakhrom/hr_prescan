@@ -18,7 +18,7 @@ export const HR_PERMISSIONS = {
 export const ALL_HR_PERMISSIONS: HRPermission[] = Object.values(HR_PERMISSIONS)
 
 export type SubscriptionStatus = 'trial' | 'active' | 'past_due' | 'cancelled'
-export type UserLanguage = 'en' | 'ru' | 'uz' | 'kk' | 'tr' | 'ar' | 'es' | 'fr' | 'de'
+export type UserLanguage = 'en' | 'ru' | 'uz' | 'kk' | 'tr' | 'ar' | 'es' | 'fr' | 'de' | 'uk'
 
 export interface User {
   id: string

@@ -9,6 +9,7 @@ import ar from './locales/ar.json'
 import es from './locales/es.json'
 import fr from './locales/fr.json'
 import de from './locales/de.json'
+import uk from './locales/uk.json'
 import {
   LOCALE_STORAGE_KEY,
   SUPPORTED_LOCALES,
@@ -44,6 +45,7 @@ const currencyByLocale: Record<SupportedLocale, string> = {
   es: 'EUR',
   fr: 'EUR',
   de: 'EUR',
+  uk: 'UAH',
 }
 
 const datetimeFormats = Object.fromEntries(
@@ -118,6 +120,7 @@ export const i18n = createI18n<[MessageSchema], SupportedLocale>({
     es,
     fr,
     de,
+    uk,
   },
   datetimeFormats,
   numberFormats,

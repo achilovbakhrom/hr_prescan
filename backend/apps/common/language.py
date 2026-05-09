@@ -23,6 +23,7 @@ LANGUAGE_CHOICES = (
     ("es", "Spanish"),
     ("fr", "French"),
     ("de", "German"),
+    ("uk", "Ukrainian"),
 )
 LANGUAGE_NAMES = dict(LANGUAGE_CHOICES)
 SUPPORTED_LANGUAGES = tuple(code for code, _name in LANGUAGE_CHOICES)
@@ -35,7 +36,7 @@ COUNTRY_TO_LANGUAGE: dict[str, str] = {
     "KZ": "kk",
     "KG": "ru",
     "TJ": "ru",
-    "UA": "ru",
+    "UA": "uk",
     "TR": "tr",
     "SA": "ar",
     "AE": "ar",

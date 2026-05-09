@@ -12,7 +12,7 @@ HR PreScan is a multi-tenant SaaS platform that automates the full candidate scr
 The AI agent evaluates candidates at each step and decides whether to advance them to the next stage or reject them. HR can also manually move candidates between stages at any time. The platform handles the screening pipeline; HR retains full control over final decisions.
 
 **Platform:** Web application (mobile versions planned for later)
-**Languages:** English, Russian, Uzbek, Kazakh, Turkish, Arabic, Spanish, French, and German for the web app, public translation, and AI screening language selection. Telegram bot interface copy currently remains English/Russian/Uzbek, while Telegram prescreening follows the vacancy's selected screening language.
+**Languages:** English, Russian, Uzbek, Kazakh, Turkish, Arabic, Spanish, French, German, and Ukrainian for the web app, public translation, and AI screening language selection. Telegram bot interface copy currently remains English/Russian/Uzbek, while Telegram prescreening follows the vacancy's selected screening language.
 **Tech Stack:** Django (backend) + Vue.js (frontend), deployed via Docker Compose with zero-downtime strategy
 
 ---
@@ -266,7 +266,7 @@ Candidates can apply via two surfaces: the **web app** (public job board) and th
 - The public landing page exposes visible Telegram CTAs for both surfaces:
   - a candidate-bot CTA for job seekers
   - an HR-bot CTA for recruiters evaluating the Telegram workflow
-- The web app supports `en`, `ru`, `uz`, `kk`, `tr`, `ar`, `es`, `fr`, and `de`. If a visitor has not selected a language yet, the web app uses the browser language (`navigator.languages` / `Accept-Language`) before falling back to English; once selected, the locale is stored in `hr_prescan_locale`.
+- The web app supports `en`, `ru`, `uz`, `kk`, `tr`, `ar`, `es`, `fr`, `de`, and `uk`. If a visitor has not selected a language yet, the web app uses the browser language (`navigator.languages` / `Accept-Language`) before falling back to English; once selected, the locale is stored in `hr_prescan_locale`.
 - For authenticated users, the web header language switcher persists the selected locale to `User.language` through `PATCH /api/auth/me/`; future web sessions and AI screening defaults use that stored preference.
 - The public HR-bot CTA is usable:
   - new HR users can start directly in Telegram; `/start` creates a Telegram-first admin placeholder account, requires them to pick a language (en / ru / uz), then requires them to create a company before using vacancy, candidate, interview, team, dashboard, or subscription commands
@@ -356,7 +356,7 @@ Prescanning is the initial AI screening step. It is always enabled and always co
 - No time limit — the conversation continues until all questions are covered
 - AI decides when enough information has been gathered and wraps up naturally
 - A progress indicator shows approximate completion
-- Supported languages: English, Russian, Uzbek, Kazakh, Turkish, Arabic, Spanish, French, and German. HR selects the vacancy `prescanning_language`; new vacancy forms default it from the current web locale.
+- Supported languages: English, Russian, Uzbek, Kazakh, Turkish, Arabic, Spanish, French, German, and Ukrainian. HR selects the vacancy `prescanning_language`; new vacancy forms default it from the current web locale.
 
 **Question Generation:**
 - AI automatically generates prescanning questions based on:
@@ -401,7 +401,7 @@ Interview is the second, more rigorous AI screening step. HR enables it per vaca
 
 **Common to both interview modes:**
 - A progress indicator shows approximate completion
-- Supported languages: English, Russian, Uzbek, Kazakh, Turkish, Arabic, Spanish, French, and German. Interview sessions inherit the vacancy screening language unless explicitly changed by the screening workflow.
+- Supported languages: English, Russian, Uzbek, Kazakh, Turkish, Arabic, Spanish, French, German, and Ukrainian. Interview sessions inherit the vacancy screening language unless explicitly changed by the screening workflow.
 
 **Question Generation:**
 - AI generates interview questions based on:
