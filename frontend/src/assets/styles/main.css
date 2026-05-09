@@ -8,6 +8,34 @@
    reliance on the CSS custom-property token system. */
 @custom-variant dark (&:where(.dark, .dark *));
 
+html {
+  min-height: 100%;
+  overflow-x: hidden;
+  background-color: var(--color-surface-base, #ffffff);
+}
+
+body,
+#__nuxt,
+#app {
+  min-height: 100%;
+  width: 100%;
+  min-width: 0;
+}
+
+body,
+#__nuxt,
+#app {
+  overflow-x: clip;
+}
+
+@supports not (overflow: clip) {
+  body,
+  #__nuxt,
+  #app {
+    overflow-x: hidden;
+  }
+}
+
 /* Light theme ambient wash */
 html:not(.dark) body {
   background-image:
@@ -32,6 +60,8 @@ html:not(.dark) body {
 }
 
 body {
+  margin: 0;
+  background-color: transparent;
   font-family: var(--font-sans);
   font-feature-settings: 'cv11', 'ss01', 'ss03';
 }

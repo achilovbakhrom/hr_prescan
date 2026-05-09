@@ -36,7 +36,7 @@ const mainClass = computed(() => {
 </script>
 
 <template>
-  <div class="relative">
+  <div class="relative isolate min-h-screen overflow-x-clip">
     <!-- Background layer -->
     <AnimatedBackground />
 

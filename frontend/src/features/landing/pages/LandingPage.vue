@@ -33,7 +33,7 @@ useScrollAnimation()
        through every scroll section. Each section is also bg-transparent and
        stacks its content inside GlassCard / GlassSurface — the "floating
        islands on atmosphere" pattern from spec §9. -->
-  <div class="landing-page relative min-h-screen bg-transparent">
+  <div class="landing-page relative isolate min-h-screen overflow-x-clip bg-transparent">
     <!-- Background layer (fixed, full-bleed) -->
     <AnimatedBackground />
 
