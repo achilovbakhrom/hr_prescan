@@ -35,9 +35,11 @@ const themeStore = useThemeStore()
 
 // Auth is short-lived; force Vellum on mount (spec §9).
 onMounted(() => {
-  if (themeStore.backgroundMode !== 'vellum') {
-    themeStore.setBackgroundMode('vellum')
-  }
+  window.setTimeout(() => {
+    if (themeStore.backgroundMode !== 'vellum') {
+      themeStore.setBackgroundMode('vellum')
+    }
+  }, 100)
 })
 
 const widthClass: Record<Width, string> = {

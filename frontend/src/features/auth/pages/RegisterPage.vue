@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Message from 'primevue/message'
@@ -24,6 +24,7 @@ const confirmPassword = ref('')
 const errorMessage = ref<string | null>(null)
 const submitted = ref(false)
 const registered = ref(false)
+const socialAuthReady = ref(false)
 
 const errors = ref({
   firstName: false,
@@ -35,6 +36,10 @@ const errors = ref({
 
 // Google sign-in — credential kept only in memory
 const googleCredential = ref<string | null>(null)
+
+onMounted(() => {
+  socialAuthReady.value = true
+})
 
 function validate(): boolean {
   errors.value.firstName = !firstName.value.trim()
@@ -102,14 +107,18 @@ async function handleTelegramSuccess(
     <template v-else>
       <Message v-if="errorMessage" severity="error" class="mb-4">{{ errorMessage }}</Message>
 
-      <GoogleSignInButton
-        @success="handleGoogleSuccess"
-        @error="(msg: string) => (errorMessage = msg)"
-      />
-      <TelegramSignInButton
-        @success="handleTelegramSuccess"
-        @error="(msg: string) => (errorMessage = msg)"
-      />
+      <div v-if="socialAuthReady">
+        <div>
+          <GoogleSignInButton
+            @success="handleGoogleSuccess"
+            @error="(msg: string) => (errorMessage = msg)"
+          />
+          <TelegramSignInButton
+            @success="handleTelegramSuccess"
+            @error="(msg: string) => (errorMessage = msg)"
+          />
+        </div>
+      </div>
 
       <AuthDivider :label="t('auth.register.orRegisterWithEmail')" />
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import InputText from 'primevue/inputtext'
@@ -24,6 +24,11 @@ const submitted = ref(false)
 
 const emailInvalid = ref(false)
 const passwordInvalid = ref(false)
+const socialAuthReady = ref(false)
+
+onMounted(() => {
+  socialAuthReady.value = true
+})
 
 function validate(): boolean {
   emailInvalid.value = !email.value || !email.value.includes('@')
@@ -96,8 +101,12 @@ function handleTelegramError(msg: string): void {
       {{ errorMessage }}
     </Message>
 
-    <GoogleSignInButton @success="handleGoogleSuccess" @error="handleGoogleError" />
-    <TelegramSignInButton @success="handleTelegramSuccess" @error="handleTelegramError" />
+    <div v-if="socialAuthReady">
+      <div>
+        <GoogleSignInButton @success="handleGoogleSuccess" @error="handleGoogleError" />
+        <TelegramSignInButton @success="handleTelegramSuccess" @error="handleTelegramError" />
+      </div>
+    </div>
 
     <AuthDivider :label="t('auth.login.orSignInWithEmail')" />
 
