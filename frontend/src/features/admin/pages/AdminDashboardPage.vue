@@ -17,7 +17,7 @@ onMounted(() => adminStore.fetchAnalytics())
 </script>
 
 <template>
-  <div class="mx-auto w-full max-w-7xl">
+  <div class="mx-auto w-full max-w-[1440px]">
     <AdminPageHeader :eyebrow="t('admin.title')" :title="t('admin.title')" />
 
     <div v-if="adminStore.loading" class="py-10 text-center">

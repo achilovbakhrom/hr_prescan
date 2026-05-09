@@ -83,7 +83,7 @@ function handleMenuToggle(): void {
 <template>
   <header class="sticky top-0 z-40 px-3 pt-3 sm:px-4 lg:px-6">
     <div
-      class="mx-auto flex h-16 max-w-[1600px] items-center justify-between rounded-[24px] border border-white/50 bg-white/72 px-4 shadow-[0_18px_48px_rgba(15,23,42,0.08)] backdrop-blur-2xl dark:border-white/10 dark:bg-gray-950/72 dark:shadow-black/25"
+      class="mx-auto flex h-16 max-w-[1760px] items-center justify-between rounded-[24px] border border-white/50 bg-white/72 px-4 shadow-[0_18px_48px_rgba(15,23,42,0.08)] backdrop-blur-2xl dark:border-white/10 dark:bg-gray-950/72 dark:shadow-black/25"
     >
       <div class="flex min-w-0 items-center gap-3">
         <Button

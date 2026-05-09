@@ -121,7 +121,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="mx-auto w-full max-w-7xl">
+  <div class="mx-auto w-full max-w-[1440px]">
     <GlassCard class="mb-6 overflow-hidden sm:mb-8">
       <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_290px]">
         <div>

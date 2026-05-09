@@ -35,7 +35,7 @@ function closeMobileNav(): void {
     </template>
 
     <div class="flex flex-1">
-      <div class="mx-auto flex w-full max-w-[1600px] min-w-0 gap-0 xl:px-2">
+      <div class="mx-auto flex w-full max-w-[1760px] min-w-0 gap-0 xl:px-2">
         <AppSidebar
           :collapsed="sidebarCollapsed"
           class="hidden lg:sticky lg:top-24 lg:flex lg:h-[calc(100vh-7rem)] lg:self-start"

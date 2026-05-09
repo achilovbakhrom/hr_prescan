@@ -5,9 +5,10 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const requiresAuth = to.meta.requiresAuth !== false
 
   if (import.meta.server) {
-    if (requiresAuth) {
-      return navigateTo({ name: ROUTE_NAMES.LOGIN, query: { redirect: to.fullPath } })
-    }
+    // Auth tokens are stored in localStorage, so the server cannot know whether
+    // a protected route reload is authenticated. Let the client perform the
+    // redirect after hydrating the auth store; this keeps app routes in the app
+    // layout instead of briefly rendering the public login layout.
     return
   }
 

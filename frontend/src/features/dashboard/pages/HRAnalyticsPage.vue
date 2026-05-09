@@ -34,7 +34,7 @@ function formatScore(score: number | null): string {
 </script>
 
 <template>
-  <div class="mx-auto w-full max-w-7xl">
+  <div class="mx-auto w-full max-w-[1440px]">
     <!-- Sticky glass toolbar -->
     <GlassSurface
       level="1"

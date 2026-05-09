@@ -34,7 +34,7 @@ onMounted(() => adminStore.fetchCompanies())
 </script>
 
 <template>
-  <div class="mx-auto w-full max-w-7xl">
+  <div class="mx-auto w-full max-w-[1440px]">
     <AdminPageHeader :eyebrow="t('admin.title')" :title="t('admin.companies.title')" />
 
     <AdminFiltersBar>

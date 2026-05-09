@@ -87,7 +87,7 @@ function scrollToSection(id: string): void {
 </script>
 
 <template>
-  <div class="mx-auto max-w-6xl">
+  <div class="mx-auto max-w-7xl">
     <header class="mb-6 flex flex-col gap-1">
       <h1 class="text-3xl font-semibold tracking-tight text-[color:var(--color-text-primary)]">
         {{ t('settings.profile.title') }}
