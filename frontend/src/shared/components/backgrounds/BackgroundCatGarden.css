@@ -1,0 +1,231 @@
+.catgarden-root {
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse at 16% 14%, rgba(252, 231, 243, 0.92), transparent 56%),
+    radial-gradient(ellipse at 88% 18%, rgba(187, 247, 208, 0.68), transparent 58%),
+    linear-gradient(180deg, #fff9f3 0%, #eefbf1 56%, #e2f5d8 100%), var(--color-surface-base);
+}
+
+.catgarden-sky,
+.catgarden-meadow,
+.catgarden-vines,
+.catgarden-leaf,
+.catgarden-paw {
+  position: absolute;
+}
+
+.catgarden-sky {
+  inset: -12% -10% 34%;
+  background:
+    radial-gradient(ellipse 46% 28% at 28% 28%, rgba(255, 255, 255, 0.72), transparent 70%),
+    radial-gradient(ellipse 44% 28% at 78% 20%, rgba(254, 240, 138, 0.28), transparent 72%),
+    radial-gradient(ellipse 60% 40% at 54% 62%, rgba(186, 230, 253, 0.26), transparent 76%);
+  filter: blur(20px) saturate(1.05);
+  animation: catgarden-sky-drift 34s ease-in-out infinite alternate;
+}
+
+.catgarden-meadow {
+  inset: auto -8% -16% -8%;
+  height: 42%;
+  background:
+    radial-gradient(ellipse 38% 42% at 18% 42%, rgba(134, 239, 172, 0.34), transparent 72%),
+    radial-gradient(ellipse 36% 38% at 78% 48%, rgba(253, 224, 71, 0.18), transparent 72%),
+    linear-gradient(180deg, transparent 0%, rgba(220, 252, 231, 0.64) 30%, #d9f99d 100%);
+  filter: blur(22px);
+  opacity: 0.82;
+}
+
+.catgarden-vines {
+  inset: -8% -7%;
+  width: 114%;
+  height: 116%;
+  fill: none;
+}
+
+.catgarden-vine {
+  stroke-linecap: round;
+  stroke-width: 2.4;
+  opacity: 0.34;
+  animation: catgarden-vine-drift 42s ease-in-out infinite alternate;
+}
+
+.catgarden-vine--a {
+  stroke: rgba(34, 197, 94, 0.44);
+}
+
+.catgarden-vine--b {
+  stroke: rgba(236, 72, 153, 0.22);
+  animation-delay: -12s;
+}
+
+.catgarden-leaf {
+  width: clamp(24px, 4vw, 48px);
+  aspect-ratio: 1.7 / 1;
+  border-radius: 100% 0 100% 0;
+  background: linear-gradient(135deg, rgba(74, 222, 128, 0.44), rgba(190, 242, 100, 0.2));
+  box-shadow: inset 0 0 0 1px rgba(34, 197, 94, 0.15);
+  filter: drop-shadow(0 14px 18px rgba(34, 197, 94, 0.1));
+  transform-origin: 10% 80%;
+  animation: catgarden-leaf-float 24s ease-in-out infinite;
+}
+
+.catgarden-leaf--one {
+  left: 10%;
+  top: 20%;
+}
+
+.catgarden-leaf--two {
+  right: 14%;
+  top: 36%;
+  width: clamp(18px, 3vw, 34px);
+  animation-delay: -8s;
+}
+
+.catgarden-leaf--three {
+  left: 58%;
+  bottom: 16%;
+  width: clamp(20px, 3.2vw, 40px);
+  animation-delay: -15s;
+}
+
+.catgarden-paw {
+  width: clamp(42px, 6vw, 78px);
+  height: clamp(42px, 6vw, 78px);
+  color: rgba(244, 114, 182, 0.24);
+  transform: rotate(var(--paw-rotate));
+  animation: catgarden-paw-breathe 9s ease-in-out infinite;
+}
+
+.catgarden-paw i,
+.catgarden-paw b {
+  position: absolute;
+  display: block;
+  background: currentColor;
+}
+
+.catgarden-paw i {
+  width: 18%;
+  height: 24%;
+  border-radius: 50%;
+}
+
+.catgarden-paw i:nth-child(1) {
+  left: 16%;
+  top: 16%;
+}
+
+.catgarden-paw i:nth-child(2) {
+  left: 36%;
+  top: 8%;
+}
+
+.catgarden-paw i:nth-child(3) {
+  right: 26%;
+  top: 11%;
+}
+
+.catgarden-paw i:nth-child(4) {
+  right: 10%;
+  top: 26%;
+}
+
+.catgarden-paw b {
+  left: 24%;
+  bottom: 12%;
+  width: 52%;
+  height: 42%;
+  border-radius: 50% 50% 42% 42%;
+}
+
+.catgarden-paw--one {
+  left: 6%;
+  top: 42%;
+}
+
+.catgarden-paw--two {
+  left: 19%;
+  top: 54%;
+  animation-delay: -2s;
+}
+
+.catgarden-paw--three {
+  right: 17%;
+  top: 23%;
+  color: rgba(251, 146, 60, 0.18);
+  animation-delay: -4s;
+}
+
+.catgarden-paw--four {
+  right: 8%;
+  bottom: 23%;
+  color: rgba(74, 222, 128, 0.18);
+  animation-delay: -6s;
+}
+
+.dark .catgarden-root {
+  background:
+    radial-gradient(ellipse at 16% 14%, rgba(76, 29, 149, 0.4), transparent 56%),
+    radial-gradient(ellipse at 88% 18%, rgba(20, 83, 45, 0.52), transparent 58%),
+    linear-gradient(180deg, #111827 0%, #13251d 58%, #102016 100%), var(--color-surface-base);
+}
+
+.dark .catgarden-meadow {
+  opacity: 0.34;
+}
+
+.dark .catgarden-paw {
+  color: rgba(252, 211, 77, 0.13);
+}
+
+.dark .catgarden-vine {
+  opacity: 0.22;
+}
+
+@keyframes catgarden-sky-drift {
+  0% {
+    transform: translate3d(-2%, -1%, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(3%, 2%, 0) scale(1.03);
+  }
+}
+
+@keyframes catgarden-vine-drift {
+  0% {
+    transform: translate3d(-20px, 8px, 0);
+  }
+  100% {
+    transform: translate3d(24px, -10px, 0);
+  }
+}
+
+@keyframes catgarden-leaf-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(-8deg);
+  }
+  50% {
+    transform: translate3d(18px, -16px, 0) rotate(10deg);
+  }
+}
+
+@keyframes catgarden-paw-breathe {
+  0%,
+  100% {
+    opacity: 0.36;
+    transform: rotate(var(--paw-rotate)) scale(0.96);
+  }
+  50% {
+    opacity: 0.72;
+    transform: rotate(var(--paw-rotate)) scale(1.03);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .catgarden-sky,
+  .catgarden-vine,
+  .catgarden-leaf,
+  .catgarden-paw {
+    animation: none !important;
+  }
+}

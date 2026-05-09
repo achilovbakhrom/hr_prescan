@@ -36,6 +36,17 @@ defineProps<Props>()
   filter: blur(2px) saturate(1.25);
 }
 
+.bg-thumb[data-kind='catgarden'] {
+  background:
+    radial-gradient(circle at 33% 36%, rgba(244, 114, 182, 0.82) 0 3px, transparent 4px),
+    radial-gradient(circle at 25% 48%, rgba(244, 114, 182, 0.62) 0 2px, transparent 3px),
+    radial-gradient(circle at 42% 50%, rgba(244, 114, 182, 0.62) 0 2px, transparent 3px),
+    radial-gradient(ellipse at 76% 28%, rgba(74, 222, 128, 0.62), transparent 42%),
+    radial-gradient(ellipse at 20% 18%, rgba(253, 224, 71, 0.42), transparent 46%),
+    linear-gradient(180deg, #fff7ed, #dcfce7);
+  filter: saturate(1.08);
+}
+
 .bg-thumb[data-kind='constellation'] {
   background:
     radial-gradient(circle at 20% 25%, #7c5cff 0 1.5px, transparent 2px),

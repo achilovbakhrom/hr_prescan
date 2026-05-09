@@ -8,6 +8,7 @@ import BackgroundAurora from './backgrounds/BackgroundAurora.vue'
 import BackgroundWaves from './backgrounds/BackgroundWaves.vue'
 import BackgroundOcean from './backgrounds/BackgroundOcean.vue'
 import BackgroundRays from './backgrounds/BackgroundRays.vue'
+import BackgroundCatGarden from './backgrounds/BackgroundCatGarden.vue'
 
 /**
  * AnimatedBackground — orchestrator.
@@ -27,6 +28,7 @@ const variantMap = {
   waves: BackgroundWaves,
   ocean: BackgroundOcean,
   rays: BackgroundRays,
+  catgarden: BackgroundCatGarden,
 } as const
 
 const current = computed(() => {

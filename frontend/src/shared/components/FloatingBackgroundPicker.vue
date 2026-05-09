@@ -27,6 +27,7 @@ interface ThumbDef {
 }
 
 const THUMBS: readonly ThumbDef[] = [
+  { code: 'catgarden', label: 'Cat garden' },
   { code: 'mesh', label: 'Mesh' },
   { code: 'constellation', label: 'Constellation' },
   { code: 'vellum', label: 'Sheets' },

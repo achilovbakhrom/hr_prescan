@@ -4,15 +4,20 @@
  * preview card. Staggered fade-up on mount using CSS keyframes.
  */
 import { useRouter } from 'vue-router'
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import LandingHeroMockup from './LandingHeroMockup.vue'
 import LandingTelegramCtas from './LandingTelegramCtas.vue'
+import LandingCatMascot from './LandingCatMascot.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
+import { useThemeStore } from '@/shared/stores/theme.store'
 
 const router = useRouter()
 const { t } = useI18n()
+const themeStore = useThemeStore()
+const isMounted = ref(false)
+const showCatMascot = computed(() => isMounted.value && themeStore.backgroundMode === 'catgarden')
 const heroHighlights = computed(() => [
   { icon: 'pi pi-bolt', label: '24/7', caption: t('landing.stats.available') },
   {
@@ -26,10 +31,15 @@ const heroHighlights = computed(() => [
     caption: t('landing.features.smartScoringDesc'),
   },
 ])
+
+onMounted(() => {
+  isMounted.value = true
+})
 </script>
 
 <template>
   <section class="relative px-4 pt-20 pb-24 sm:px-6 sm:pt-24 sm:pb-28 lg:pt-32 lg:pb-36">
+    <LandingCatMascot v-if="showCatMascot" />
     <div class="relative mx-auto max-w-7xl">
       <div class="grid items-center gap-10 lg:grid-cols-12 lg:gap-12">
         <!-- Left: copy -->
