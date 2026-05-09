@@ -1,3 +1,4 @@
+from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 
 from apps.common.models import BaseModel
@@ -110,6 +111,12 @@ class ParsedVacancy(BaseModel):
             models.Index(fields=["source", "status"]),
             models.Index(fields=["status", "last_seen_at"]),
             models.Index(fields=["fingerprint"]),
+            GinIndex(fields=["title"], name="parsed_vac_title_trgm", opclasses=["gin_trgm_ops"]),
+            GinIndex(fields=["description"], name="parsed_vac_desc_trgm", opclasses=["gin_trgm_ops"]),
+            GinIndex(fields=["requirements"], name="parsed_vac_req_trgm", opclasses=["gin_trgm_ops"]),
+            GinIndex(fields=["responsibilities"], name="parsed_vac_resp_trgm", opclasses=["gin_trgm_ops"]),
+            GinIndex(fields=["company_name"], name="parsed_vac_company_trgm", opclasses=["gin_trgm_ops"]),
+            GinIndex(fields=["location"], name="parsed_vac_location_trgm", opclasses=["gin_trgm_ops"]),
         ]
 
     def __str__(self) -> str:
