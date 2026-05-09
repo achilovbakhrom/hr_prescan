@@ -27,9 +27,9 @@ Mark tasks with `[x]` as they are completed.
 
 - [x] 1.1 Initialize git repo, add `.gitignore` (Python, Node, Docker, env files)
 - [x] 1.2 Create Django project (`config/`) with settings split (base, local, production, test)
-- [x] 1.3 Create Vue.js project with Vite + TypeScript + Pinia + Vue Router + PrimeVue + Tailwind
+- [x] 1.3 Create Nuxt/Vue.js project with TypeScript + Pinia + PrimeVue + Tailwind
 - [x] 1.4 Create `Dockerfile` for backend (Python 3.12, Gunicorn)
-- [x] 1.5 Create `Dockerfile` for frontend (Node build + Nginx)
+- [x] 1.5 Create `Dockerfile` for frontend (Nuxt Node SSR) and Nginx reverse proxy config
 - [x] 1.6 Create `docker-compose.yml` (base) with all 10 app services
 - [x] 1.7 Create `docker-compose.override.yml` (dev: hot reload, exposed ports)
 - [x] 1.8 Create `docker-compose.monitoring.yml` (Grafana, Prometheus, Jaeger, Loki)

@@ -29,11 +29,13 @@ const VALID_BG_MODES: readonly BackgroundMode[] = [
 ]
 
 function readScheme(): ColorScheme {
+  if (typeof localStorage === 'undefined') return 'light'
   const v = localStorage.getItem(SCHEME_KEY)
   return v === 'dark' ? 'dark' : 'light'
 }
 
 function readBackground(): BackgroundMode {
+  if (typeof localStorage === 'undefined') return DEFAULT_BACKGROUND_MODE
   const v = localStorage.getItem(BG_KEY)
   if (v === null) return DEFAULT_BACKGROUND_MODE
   if ((VALID_BG_MODES as readonly string[]).includes(v)) return v as BackgroundMode
@@ -47,12 +49,13 @@ export const useThemeStore = defineStore('theme', () => {
   const resolvedDark = computed(() => colorScheme.value === 'dark')
 
   function applyDarkClass(): void {
+    if (typeof document === 'undefined') return
     document.documentElement.classList.toggle('dark', resolvedDark.value)
   }
 
   function setColorScheme(scheme: ColorScheme): void {
     colorScheme.value = scheme
-    localStorage.setItem(SCHEME_KEY, scheme)
+    if (typeof localStorage !== 'undefined') localStorage.setItem(SCHEME_KEY, scheme)
     applyDarkClass()
   }
 
@@ -62,7 +65,7 @@ export const useThemeStore = defineStore('theme', () => {
 
   function setBackgroundMode(mode: BackgroundMode): void {
     backgroundMode.value = mode
-    localStorage.setItem(BG_KEY, mode)
+    if (typeof localStorage !== 'undefined') localStorage.setItem(BG_KEY, mode)
   }
 
   watch(resolvedDark, applyDarkClass, { immediate: true })

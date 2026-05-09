@@ -1,14 +1,17 @@
-# Stage 1: Build
-FROM node:22-slim AS build
+# Stage 1: Dependencies
+FROM node:22-slim AS deps
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-RUN npm ci
+COPY package.json yarn.lock ./
+RUN corepack enable && yarn install --frozen-lockfile
+
+# Stage 2: Build
+FROM deps AS build
 
 COPY . .
 
-# Build-time config — Vite bakes these into the bundle. Override via --build-arg.
+# Build-time config — Nuxt/Vite exposes these to the client bundle. Override via --build-arg.
 ARG VITE_API_URL=https://dev.prescreen-app.com/api
 ARG VITE_LIVEKIT_URL=wss://dev.prescreen-app.com/ws/
 ARG VITE_GOOGLE_CLIENT_ID=
@@ -29,15 +32,21 @@ ENV VITE_TELEGRAM_HR_BOT_USERNAME=$VITE_TELEGRAM_HR_BOT_USERNAME
 ENV VITE_BILLING_ENABLED=$VITE_BILLING_ENABLED
 ENV VITE_GA_MEASUREMENT_ID=$VITE_GA_MEASUREMENT_ID
 
-# Skip TS check in image build — ci.yml handles vue-tsc.
-RUN npx vite build
-RUN if [ -n "$VITE_GA_MEASUREMENT_ID" ]; then grep -R "$VITE_GA_MEASUREMENT_ID" dist/assets >/dev/null; fi
+# Skip TS check in image build — ci.yml handles `nuxt typecheck`.
+RUN yarn build
+RUN if [ -n "$VITE_GA_MEASUREMENT_ID" ]; then grep -R "$VITE_GA_MEASUREMENT_ID" .output >/dev/null; fi
 
-# Stage 2: Serve
-FROM nginx:1.27-alpine AS production
+# Stage 3: Serve
+FROM node:22-slim AS production
 
-COPY --from=build /app/dist /usr/share/nginx/html
+WORKDIR /app
 
-EXPOSE 80
+ENV NODE_ENV=production
+ENV NITRO_HOST=0.0.0.0
+ENV NITRO_PORT=3000
 
-CMD ["nginx", "-g", "daemon off;"]
+COPY --from=build /app/.output ./.output
+
+EXPOSE 3000
+
+CMD ["node", ".output/server/index.mjs"]

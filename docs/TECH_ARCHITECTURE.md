@@ -5,7 +5,7 @@
 | Layer | Technology | Purpose |
 |-------|-----------|---------|
 | Backend | Django (Python) | REST API, business logic, auth, SSE |
-| Frontend | Vue.js | SPA (Single Page Application) |
+| Frontend | Nuxt 4 (Vue 3) | Server-side rendered public/app UI |
 | Database | PostgreSQL | Primary relational data store |
 | Cache | Redis | Caching, sessions, SSE pub/sub |
 | File Storage | MinIO (S3-compatible) | CVs, interview recordings, media |
@@ -26,9 +26,9 @@
 │                    Docker Compose                        │
 │                                                          │
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌─────────┐ │
-│  │  Nginx   │  │  Django  │  │  Celery  │  │ Celery  │ │
-│  │ (Vue.js) │  │   API    │  │  Worker  │  │  Beat   │ │
-│  │  :80/443 │  │  :8000   │  │          │  │         │ │
+│  │  Nginx   │  │  Nuxt    │  │  Django  │  │ Celery  │ │
+│  │ :80/443  │  │  SSR     │  │   API    │  │ Worker  │ │
+│  │          │  │  :3000   │  │  :8000   │  │         │ │
 │  └──────────┘  └──────────┘  └──────────┘  └─────────┘ │
 │                                                          │
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐              │
@@ -44,20 +44,21 @@
 └─────────────────────────────────────────────────────────┘
 ```
 
-### 10 Services
+### 11 Services
 
 | # | Service | Image | Port | Role |
 |---|---------|-------|------|------|
-| 1 | **Nginx (Vue.js)** | Custom (node build + nginx) | 80, 443 | Serves frontend SPA, reverse proxy to Django API |
-| 2 | **Django API** | Custom (Python) | 8000 | REST API, auth, SSE notifications, admin |
-| 3 | **PostgreSQL** | postgres:16 | 5432 | Primary database |
-| 4 | **Redis** | redis:7 | 6379 | Cache, sessions, SSE pub/sub channel |
-| 5 | **RabbitMQ** | rabbitmq:3-management | 5672, 15672 | Message broker (Celery tasks + inter-service) |
-| 6 | **Celery Worker** | Same as Django | — | Async task execution |
-| 7 | **Celery Beat** | Same as Django | — | Scheduled task dispatcher |
-| 8 | **LiveKit Server** | livekit/livekit-server | 7880, 7881 | WebRTC SFU, room management |
-| 9 | **LiveKit Agent** | Custom (Python) | — | AI interviewer (Deepgram + Gemini + ElevenLabs) |
-| 10 | **MinIO** | minio/minio | 9000, 9001 | S3-compatible object storage |
+| 1 | **Nginx** | nginx:alpine | 80, 443 | TLS termination, reverse proxy, API/LiveKit routing |
+| 2 | **Nuxt Frontend** | Custom (Node) | 3000 | SSR frontend and client assets |
+| 3 | **Django API** | Custom (Python) | 8000 | REST API, auth, SSE notifications, admin |
+| 4 | **PostgreSQL** | postgres:16 | 5432 | Primary database |
+| 5 | **Redis** | redis:7 | 6379 | Cache, sessions, SSE pub/sub channel |
+| 6 | **RabbitMQ** | rabbitmq:3-management | 5672, 15672 | Message broker (Celery tasks + inter-service) |
+| 7 | **Celery Worker** | Same as Django | — | Async task execution |
+| 8 | **Celery Beat** | Same as Django | — | Scheduled task dispatcher |
+| 9 | **LiveKit Server** | livekit/livekit-server | 7880, 7881 | WebRTC SFU, room management |
+| 10 | **LiveKit Agent** | Custom (Python) | — | AI interviewer (Deepgram + Gemini + ElevenLabs) |
+| 11 | **MinIO** | minio/minio | 9000, 9001 | S3-compatible object storage |
 
 ---
 
@@ -74,7 +75,7 @@
                     ▼           ▼           ▼
             ┌──────────┐  ┌──────────┐  ┌──────────┐
             │  Nginx   │  │ LiveKit  │  │  Django  │
-            │ (Vue.js) │  │  Server  │  │   API    │
+            │ Reverse  │  │  Server  │  │   API    │
             └────┬─────┘  └────┬─────┘  └────┬─────┘
                  │             │              │
                  │ REST        │ Audio        │
@@ -100,9 +101,10 @@
 
 | From | To | Protocol | Purpose |
 |------|----|----------|---------|
-| Browser | Nginx | HTTPS | Serve frontend, proxy API requests |
-| Vue.js | Django API | REST (HTTP) | All CRUD operations, auth, data |
-| Django API | Vue.js | SSE | Real-time notifications (new candidate, interview done) |
+| Browser | Nginx | HTTPS | Serve SSR frontend, proxy API requests |
+| Nginx | Nuxt Frontend | HTTP | SSR page rendering and static assets |
+| Nuxt/Vue | Django API | REST (HTTP) | All CRUD operations, auth, data |
+| Django API | Nuxt/Vue | SSE | Real-time notifications (new candidate, interview done) |
 | Browser | LiveKit Server | WebRTC | Candidate video/audio during interview |
 | Browser | LiveKit Server | WebRTC | HR silent observer mode |
 | LiveKit Server | LiveKit Agent | Internal audio stream | Candidate audio to AI agent |
@@ -191,7 +193,7 @@ agent = VoicePipelineAgent(
 ### 5.1 Candidate Application Flow
 
 ```
-Candidate                 Nginx/Vue.js              Django API           Celery Worker
+Candidate                 Nginx/Nuxt               Django API           Celery Worker
     │                         │                         │                      │
     │  1. Browse vacancies    │                         │                      │
     │ ───────────────────────►│  GET /api/vacancies     │                      │

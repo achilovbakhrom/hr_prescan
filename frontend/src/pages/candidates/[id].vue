@@ -1,0 +1,16 @@
+<script setup lang="ts">
+import CandidateDetailPage from '@/features/candidates/pages/CandidateDetailPage.vue'
+import { USER_ROLES } from '@/shared/constants/roles'
+import { ROUTE_NAMES } from '@/shared/constants/routes'
+
+definePageMeta({
+  name: ROUTE_NAMES.CANDIDATE_DETAIL,
+  layout: 'app',
+  requiresAuth: true,
+  roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
+})
+</script>
+
+<template>
+  <CandidateDetailPage />
+</template>

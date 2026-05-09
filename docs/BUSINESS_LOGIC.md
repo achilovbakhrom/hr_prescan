@@ -13,7 +13,7 @@ The AI agent evaluates candidates at each step and decides whether to advance th
 
 **Platform:** Web application (mobile versions planned for later)
 **Languages:** English, Russian, Uzbek, Kazakh, Turkish, Arabic, Spanish, French, German, and Ukrainian for the web app, public translation, and AI screening language selection. Telegram bot interface copy currently remains English/Russian/Uzbek, while Telegram prescreening follows the vacancy's selected screening language.
-**Tech Stack:** Django (backend) + Vue.js (frontend), deployed via Docker Compose with zero-downtime strategy
+**Tech Stack:** Django (backend) + Nuxt/Vue.js (frontend), deployed via Docker Compose with zero-downtime strategy
 
 ---
 
@@ -139,6 +139,7 @@ HR provides the following information:
 - **Private** — accessible only via a direct shareable link (HR generates and distributes the link)
 - HR chooses visibility per vacancy
 - **External sharing** — each vacancy has a unique URL that HR can post on external platforms (LinkedIn, job boards, social media, company website). Candidates clicking the link are directed to the vacancy page on PreScan to apply
+- Public vacancy detail pages expose candidate-facing SEO metadata and `JobPosting` structured data for indexable `/jobs/:id` URLs. Share-token URLs remain available for direct sharing but are marked `noindex` and canonicalize to the public vacancy URL.
 - Public vacancy pages can translate visible internal vacancy content (description, requirements, responsibilities) for authenticated users. Anonymous visitors do not see translation controls, and private HR evaluation content remains HR-only.
 - The public job board supports paginated loading for search/filter results. The UI loads the first page, then appends more vacancies as the visitor scrolls instead of requesting the entire vacancy list at once.
 - Public job board results show PreScan-created vacancies first, sorted by newest `created_at`; parsed external vacancies are shown after them, also sorted by newest `created_at`.
@@ -601,6 +602,7 @@ All batch actions require confirmation before executing.
 - Search and filter by: title, location, salary range, company, skills
 - Internal published vacancies have a detail page with an apply button. Parsed external vacancies can appear as read-only content without apply or prescreening actions.
 - SEO-friendly URLs for vacancies
+- Public marketing/job/legal pages are included in the static sitemap, and canonical published public vacancy URLs are included in the dynamic vacancy sitemap. Authenticated app pages, application flows, interview routes, share-token links, and public CV token URLs are marked or blocked from indexing.
 - Company profile pages (name, logo, description, active vacancies)
 
 ---

@@ -15,7 +15,6 @@
 
 services:
   nginx:
-    image: ghcr.io/${GITHUB_REPOSITORY}/frontend:${IMAGE_TAG:-dev}
     deploy:
       resources:
         limits:
@@ -23,6 +22,16 @@ services:
           cpus: "0.25"
         reservations:
           memory: 32M
+
+  frontend:
+    image: ghcr.io/${GITHUB_REPOSITORY}/frontend:${IMAGE_TAG:-dev}
+    deploy:
+      resources:
+        limits:
+          memory: 384M
+          cpus: "0.50"
+        reservations:
+          memory: 96M
 
   django:
     image: ghcr.io/${GITHUB_REPOSITORY}/backend:${IMAGE_TAG:-dev}

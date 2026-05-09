@@ -22,12 +22,14 @@ import { landingRoutes } from '@/features/landing/routes'
 import { legalRoutes } from '@/features/legal/routes'
 import { errorRoutes } from '@/features/errors/routes'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
+import { installSeoRouterGuards, type RouteSeoMeta } from '@/shared/seo/routeSeo'
 import type { UserRole } from '@/shared/types/auth.types'
 
 declare module 'vue-router' {
   interface RouteMeta {
     requiresAuth?: boolean
     roles?: UserRole[]
+    seo?: RouteSeoMeta
   }
 }
 
@@ -84,6 +86,8 @@ export const router = createRouter({
     return { top: 0 }
   },
 })
+
+installSeoRouterGuards(router)
 
 router.beforeEach(async (to) => {
   const { useAuthStore } = await import('@/features/auth/stores/auth.store')

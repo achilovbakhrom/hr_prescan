@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, onBeforeUnmount } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import Button from 'primevue/button'
@@ -14,6 +14,7 @@ import { useAuthStore } from '@/features/auth/stores/auth.store'
 import TranslatableText from '@/shared/components/TranslatableText.vue'
 import PublicVacancyHeader from '../components/PublicVacancyHeader.vue'
 import PublicVacancyCompanyCard from '../components/PublicVacancyCompanyCard.vue'
+import { applyPublicVacancySeo, clearPublicVacancySeo } from '../utils/vacancySeo'
 
 interface VacancyWithCompany extends Vacancy {
   company?: Company
@@ -37,6 +38,7 @@ onMounted(async () => {
     } else {
       vacancy.value = await vacancyService.getPublicDetail(route.params.id as string)
     }
+    if (vacancy.value) applyPublicVacancySeo(vacancy.value, { noindex: isShareRoute.value })
   } catch {
     error.value = 'Failed to load vacancy details'
   } finally {
@@ -60,6 +62,8 @@ const showExternalLink = computed(() => {
 const showTranslationControls = computed(
   () => authStore.isAuthenticated && vacancy.value?.contentSource !== 'parsed',
 )
+
+onBeforeUnmount(clearPublicVacancySeo)
 </script>
 
 <template>

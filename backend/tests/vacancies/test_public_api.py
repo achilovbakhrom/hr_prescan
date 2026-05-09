@@ -1,3 +1,4 @@
+from django.test import override_settings
 from rest_framework.test import APIClient
 
 from apps.job_parser.models import ParsedVacancy, ParsedVacancySource
@@ -136,3 +137,37 @@ def test_public_parsed_vacancy_detail_returns_404_when_no_contact_or_source_url(
     response = APIClient().get(f"/api/public/vacancies/{parsed.id}/")
 
     assert response.status_code == 404
+
+
+@override_settings(FRONTEND_URL="https://prescreen-app.com")
+def test_public_vacancy_sitemap_lists_only_canonical_published_public_vacancies(company, hr_user):
+    public_vacancy = VacancyFactory(
+        company=company,
+        created_by=hr_user,
+        title="Public Role",
+        status=Vacancy.Status.PUBLISHED,
+        visibility=Vacancy.Visibility.PUBLIC,
+    )
+    private_vacancy = VacancyFactory(
+        company=company,
+        created_by=hr_user,
+        title="Private Role",
+        status=Vacancy.Status.PUBLISHED,
+        visibility=Vacancy.Visibility.PRIVATE,
+    )
+    draft_vacancy = VacancyFactory(
+        company=company,
+        created_by=hr_user,
+        title="Draft Role",
+        status=Vacancy.Status.DRAFT,
+        visibility=Vacancy.Visibility.PUBLIC,
+    )
+
+    response = APIClient().get("/api/public/vacancies/sitemap.xml")
+
+    assert response.status_code == 200
+    assert response["Content-Type"] == "application/xml"
+    content = response.content.decode()
+    assert f"https://prescreen-app.com/jobs/{public_vacancy.id}" in content
+    assert f"https://prescreen-app.com/jobs/{private_vacancy.id}" not in content
+    assert f"https://prescreen-app.com/jobs/{draft_vacancy.id}" not in content

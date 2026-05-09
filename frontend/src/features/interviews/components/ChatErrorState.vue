@@ -17,6 +17,10 @@ defineProps<{
 }>()
 
 const { t } = useI18n()
+
+function reloadPage(): void {
+  window.location.reload()
+}
 </script>
 
 <template>
@@ -94,7 +98,7 @@ const { t } = useI18n()
             {{ t('interviews.chatPage.somethingWentWrong') }}
           </h1>
           <p class="mb-5 text-sm text-[color:var(--color-text-secondary)]">{{ errorMessage }}</p>
-          <Button :label="t('errors.tryAgain')" icon="pi pi-refresh" @click="$router.go(0)" />
+          <Button :label="t('errors.tryAgain')" icon="pi pi-refresh" @click="reloadPage" />
         </template>
       </GlassCard>
     </div>

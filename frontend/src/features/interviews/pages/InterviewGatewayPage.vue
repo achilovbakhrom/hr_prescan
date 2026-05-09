@@ -32,6 +32,10 @@ const errorState = ref<'expired' | 'closed' | 'completed' | 'error' | null>(null
 const errorMessage = ref('')
 const interview = ref<InterviewDetail | null>(null)
 
+function reloadPage(): void {
+  window.location.reload()
+}
+
 onMounted(async () => {
   // Ensure a background is set for the gateway moment.
   if (themeStore.backgroundMode === 'off') {
@@ -175,7 +179,7 @@ onMounted(async () => {
           {{ t('interviews.gatewayPage.somethingWentWrong') }}
         </h1>
         <p class="mb-5 text-sm text-[color:var(--color-text-secondary)]">{{ errorMessage }}</p>
-        <Button :label="t('errors.tryAgain')" icon="pi pi-refresh" @click="$router.go(0)" />
+        <Button :label="t('errors.tryAgain')" icon="pi pi-refresh" @click="reloadPage" />
       </template>
     </GlassCard>
   </div>

@@ -7,7 +7,15 @@ export const publicSubscriptionRoutes: RouteRecordRaw[] = [
     path: '/pricing',
     name: ROUTE_NAMES.PRICING,
     component: () => import('./pages/PricingPage.vue'),
-    meta: { requiresAuth: false },
+    meta: {
+      requiresAuth: false,
+      seo: {
+        title: 'Pricing | PreScreen AI',
+        description:
+          'Choose a PreScreen AI plan for AI-powered candidate screening and hiring automation.',
+        path: '/pricing',
+      },
+    },
   },
 ]
 

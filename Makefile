@@ -45,7 +45,7 @@ setup: ## First-time setup: copy env, build images, start services, run migratio
 	docker compose exec django python manage.py collectstatic --noinput
 	@echo ""
 	@echo "🚀 HR PreScan is running!"
-	@echo "   Frontend:  http://localhost:5173"
+	@echo "   Frontend:  http://localhost:3000"
 	@echo "   Backend:   http://localhost:8000"
 	@echo "   API docs:  http://localhost:8000/api/health/"
 	@echo "   RabbitMQ:  http://localhost:15672 (guest/guest)"
@@ -100,15 +100,15 @@ dbshell: ## Open database shell
 
 lint: ## Run linters (backend + frontend)
 	cd backend && ruff check .
-	cd frontend && npm run lint:check
+	cd frontend && yarn lint:check
 
 format: ## Auto-format code (backend + frontend)
 	cd backend && ruff format . && ruff check --fix .
-	cd frontend && npm run format
+	cd frontend && yarn format
 
 typecheck: ## Run type checks (backend + frontend)
 	cd backend && mypy .
-	cd frontend && npm run typecheck
+	cd frontend && yarn typecheck
 
 # ─── Optional Service Stacks ─────────────────────────────────────────────────
 
@@ -143,7 +143,7 @@ reset-db: ## Reset database (destructive!)
 	@sleep 10
 	docker compose exec django python manage.py migrate --noinput
 
-# ─── Local Dev (native Django + Celery + Vite, infra in Docker) ─────────────
+# ─── Local Dev (native Django + Celery + Nuxt, infra in Docker) ─────────────
 
 VENV = $(CURDIR)/backend/.venv/bin
 LOCAL_PYTHON ?= $(shell command -v python3.13 || command -v python3.12 || command -v python3)
@@ -151,7 +151,7 @@ LOCAL_DOCKER_CONTEXT ?= desktop-linux
 LOCAL_COMPOSE_PROJECT_NAME ?= hr_prescan_local
 LOCAL_SERVICE_HOST ?= 127.0.0.1
 LOCAL_DJANGO_PORT ?= 8000
-LOCAL_FRONTEND_PORT ?= 5173
+LOCAL_FRONTEND_PORT ?= 3000
 LOCAL_POSTGRES_PORT ?= 35432
 LOCAL_REDIS_PORT ?= 36379
 LOCAL_RABBITMQ_PORT ?= 35672
@@ -213,7 +213,7 @@ local-setup: ## First-time local dev setup: venv, deps, infra, migrate
 	$(LOCAL_DOCKER_COMPOSE) up -d postgres redis rabbitmq minio livekit
 	@test -d backend/.venv || $(LOCAL_PYTHON) -m venv backend/.venv
 	$(VENV)/pip install -r backend/requirements.txt
-	cd frontend && npm install
+	cd frontend && yarn install
 	@echo "Waiting for Postgres to be ready..."
 	@until PGPASSWORD=$(LOCAL_POSTGRES_PASSWORD) psql -h $(LOCAL_POSTGRES_HOST) -p $(LOCAL_POSTGRES_PORT) -U $(LOCAL_POSTGRES_USER) -d $(LOCAL_POSTGRES_DB) -c "SELECT 1;" >/dev/null 2>&1; do sleep 1; done
 	$(MAKE) local-migrate
@@ -222,7 +222,7 @@ local-setup: ## First-time local dev setup: venv, deps, infra, migrate
 	@echo "  make local-all       # Start everything (backend + celery + frontend)"
 	@echo "  make local-backend-all  # Django + Celery worker + Celery beat (no frontend)"
 	@echo "  make local-backend   # Django only on :$(LOCAL_DJANGO_PORT)"
-	@echo "  make local-frontend  # Vite only on :$(LOCAL_FRONTEND_PORT)"
+	@echo "  make local-frontend  # Nuxt only on :$(LOCAL_FRONTEND_PORT)"
 
 local-infra: ensure-env ## Start only infra in Docker (stop app containers to free ports)
 	-@$(LOCAL_DOCKER_COMPOSE) stop django celery-worker celery-beat frontend nginx 2>/dev/null || true
@@ -237,8 +237,8 @@ local-celery: check-local-python ## Run Celery worker natively
 local-celery-beat: check-local-python ## Run Celery beat natively
 	cd backend && $(LOCAL_BACKEND_ENV) $(VENV)/python dev_autoreload.py $(VENV)/celery -A config beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
 
-local-frontend: ## Run Vite dev server natively
-	cd frontend && npm run dev -- --host 0.0.0.0 --port $(LOCAL_FRONTEND_PORT)
+local-frontend: ## Run Nuxt dev server natively
+	cd frontend && yarn dev --host 0.0.0.0 --port $(LOCAL_FRONTEND_PORT)
 
 local-backend-all: local-infra check-local-python check-local-postgres ## Start infra + Django + Celery + Telegram bots
 	@echo "Starting infra containers..."
@@ -274,12 +274,12 @@ local-all: local-infra check-local-python check-local-postgres ## Start infra + 
 	@cd backend && $(LOCAL_BACKEND_ENV) $(VENV)/python manage.py runserver 0.0.0.0:$(LOCAL_DJANGO_PORT) &
 	@echo "Starting Celery worker..."
 	@cd backend && $(LOCAL_BACKEND_ENV) $(VENV)/python dev_autoreload.py $(VENV)/celery -A config worker -l info --concurrency=2 &
-	@echo "Starting Vite dev server..."
-	@cd frontend && npm run dev -- --host 0.0.0.0 --port $(LOCAL_FRONTEND_PORT) &
+	@echo "Starting Nuxt dev server..."
+	@cd frontend && yarn dev --host 0.0.0.0 --port $(LOCAL_FRONTEND_PORT) &
 	@echo ""
 	@echo "All services started in background:"
 	@echo "  Django:   http://localhost:$(LOCAL_DJANGO_PORT)"
-	@echo "  Vite:     http://localhost:$(LOCAL_FRONTEND_PORT)"
+	@echo "  Nuxt:     http://localhost:$(LOCAL_FRONTEND_PORT)"
 	@echo "  RabbitMQ: http://localhost:$(LOCAL_RABBITMQ_MGMT_PORT)"
 	@echo "  MinIO:    http://localhost:$(LOCAL_MINIO_CONSOLE_PORT)"
 	@echo ""
@@ -319,6 +319,7 @@ local-stop: ## Stop everything (infra + background processes)
 	-@pkill -f "manage.py run_telegram_bot --role hr" 2>/dev/null || true
 	-@pkill -f "manage.py run_telegram_bot --role candidate" 2>/dev/null || true
 	-@pkill -f "vite" 2>/dev/null || true
+	-@pkill -f "nuxt" 2>/dev/null || true
 	$(LOCAL_DOCKER_COMPOSE) down
 	@echo "All stopped."
 
@@ -330,6 +331,7 @@ local-stop-all: ## Force-kill all local backend/frontend processes + stop Docker
 	-@pkill -9 -f "manage.py run_telegram_bot --role hr" 2>/dev/null && echo "  Telegram HR bot stopped" || true
 	-@pkill -9 -f "manage.py run_telegram_bot --role candidate" 2>/dev/null && echo "  Telegram candidate bot stopped" || true
 	-@pkill -9 -f "vite" 2>/dev/null && echo "  Vite stopped" || true
+	-@pkill -9 -f "nuxt" 2>/dev/null && echo "  Nuxt stopped" || true
 	-@pkill -9 -f "node.*frontend" 2>/dev/null && echo "  Node frontend stopped" || true
 	-@lsof -ti :$(LOCAL_DJANGO_PORT) | xargs kill -9 2>/dev/null && echo "  Port $(LOCAL_DJANGO_PORT) freed" || true
 	-@lsof -ti :$(LOCAL_FRONTEND_PORT) | xargs kill -9 2>/dev/null && echo "  Port $(LOCAL_FRONTEND_PORT) freed" || true
@@ -344,7 +346,7 @@ local-test-backend: ## Run backend tests (pytest)
 	cd backend && $(VENV)/python -m pytest tests/ -v --tb=short
 
 local-test-frontend: ## Run frontend unit tests (vitest)
-	cd frontend && npx vitest run --reporter=verbose
+	cd frontend && yarn vitest run --reporter=verbose
 
 local-test-e2e: ## Run all E2E tests (playwright) — app must be running
 	cd e2e && .venv/bin/python -m pytest -v

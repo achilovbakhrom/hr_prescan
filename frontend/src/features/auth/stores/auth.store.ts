@@ -19,6 +19,7 @@ import type {
 
 function syncPreferredLanguage(u: User | null): void {
   if (!u) return
+  if (typeof localStorage === 'undefined') return
   const stored = localStorage.getItem(LOCALE_STORAGE_KEY)
   if (isSupportedLocale(u.language)) {
     if (stored !== u.language) setLocale(u.language)
@@ -41,9 +42,11 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = computed(() => !!tokens.value?.access && !!user.value)
   const hasMultipleCompanies = computed(() => companies.value.length > 1)
 
-  window.addEventListener(AUTH_TOKENS_CHANGED_EVENT, () => {
-    tokens.value = loadTokens()
-  })
+  if (typeof window !== 'undefined') {
+    window.addEventListener(AUTH_TOKENS_CHANGED_EVENT, () => {
+      tokens.value = loadTokens()
+    })
+  }
 
   async function withLoading<T>(fn: () => Promise<T>): Promise<T> {
     loading.value = true

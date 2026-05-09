@@ -7,6 +7,7 @@ from apps.vacancies.apis import (
     ParseCompanyUrlApi,
     PublicVacancyDetailApi,
     PublicVacancyListApi,
+    PublicVacancySitemapApi,
     VacancyCriteriaDetailApi,
     VacancyCriteriaListCreateApi,
     VacancyDetailApi,
@@ -56,6 +57,7 @@ hr_urlpatterns = [
 # Public URLs — mounted at /api/public/vacancies/
 public_urlpatterns = [
     path("", PublicVacancyListApi.as_view(), name="public-vacancy-list"),
+    path("sitemap.xml", PublicVacancySitemapApi.as_view(), name="public-vacancy-sitemap"),
     path("<uuid:vacancy_id>/", PublicVacancyDetailApi.as_view(), name="public-vacancy-detail"),
     path("share/<uuid:share_token>/", PublicVacancyDetailApi.as_view(), name="public-vacancy-share"),
 ]

@@ -28,18 +28,41 @@ export const publicVacancyRoutes: RouteRecordRaw[] = [
     path: '/jobs',
     name: ROUTE_NAMES.JOB_BOARD,
     component: () => import('./pages/PublicJobBoardPage.vue'),
-    meta: { requiresAuth: false },
+    meta: {
+      requiresAuth: false,
+      seo: {
+        title: 'AI Screening Jobs | PreScreen AI',
+        description:
+          'Browse public vacancies that use PreScreen AI for fast, structured candidate screening.',
+        path: '/jobs',
+      },
+    },
   },
   {
     path: '/jobs/:id',
     name: ROUTE_NAMES.JOB_DETAIL,
     component: () => import('./pages/PublicVacancyDetailPage.vue'),
-    meta: { requiresAuth: false },
+    meta: {
+      requiresAuth: false,
+      seo: {
+        title: 'Job Details | PreScreen AI',
+        description: 'View vacancy details and apply through PreScreen AI.',
+      },
+    },
   },
   {
     path: '/jobs/share/:token',
     name: ROUTE_NAMES.JOB_SHARE,
     component: () => import('./pages/PublicVacancyDetailPage.vue'),
-    meta: { requiresAuth: false },
+    meta: {
+      requiresAuth: false,
+      seo: {
+        title: 'Shared Job | PreScreen AI',
+        description: 'View a shared vacancy on PreScreen AI.',
+        path: '/jobs',
+        noindex: true,
+        robots: 'noindex, follow',
+      },
+    },
   },
 ]

@@ -2,6 +2,9 @@ User-agent: *
 Allow: /
 Allow: /jobs
 Allow: /pricing
+Allow: /privacy
+Allow: /terms
+Allow: /api/public/vacancies/sitemap.xml
 
 Disallow: /dashboard
 Disallow: /vacancies
@@ -11,7 +14,22 @@ Disallow: /notifications
 Disallow: /settings
 Disallow: /subscription
 Disallow: /admin
+Disallow: /api
 Disallow: /team
 Disallow: /my-applications
+Disallow: /my-interview
+Disallow: /company
+Disallow: /companies
+Disallow: /cv-builder
+Disallow: /my-cvs
+Disallow: /cv/
+Disallow: /login
+Disallow: /register
+Disallow: /verify-email
+Disallow: /choose-role
+Disallow: /company-setup
+Disallow: /interview/
+Disallow: /jobs/share/
+Disallow: /jobs/*/apply
 
-Sitemap: https://hrprescan.com/sitemap.xml
+Sitemap: https://prescreen-app.com/sitemap.xml

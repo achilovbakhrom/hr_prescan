@@ -2,35 +2,36 @@
 
 ## 1. Docker Compose Services (Full List)
 
-### Application Services (10)
+### Application Services (11)
 
 | # | Service | Image | Ports | Role |
 |---|---------|-------|-------|------|
-| 1 | Nginx (Vue.js) | Custom | 80, 443 | Frontend SPA + reverse proxy |
-| 2 | Django API | Custom | 8000 | Backend REST API |
-| 3 | PostgreSQL | postgres:16 | 5432 | Primary database |
-| 4 | Redis | redis:7 | 6379 | Cache, sessions, SSE |
-| 5 | RabbitMQ | rabbitmq:3-management | 5672, 15672 | Message broker |
-| 6 | Celery Worker | Same as Django | — | Async task execution |
-| 7 | Celery Beat | Same as Django | — | Scheduled tasks |
-| 8 | LiveKit Server | livekit/livekit-server | 7880, 7881 | WebRTC video rooms |
-| 9 | LiveKit Agent | Custom | — | AI interviewer |
-| 10 | MinIO | minio/minio | 9000, 9001 | S3-compatible storage |
+| 1 | Nginx | nginx:1.27-alpine | 80, 443 | TLS termination + reverse proxy |
+| 2 | Nuxt Frontend | Custom Node image | 3000 | SSR frontend and client assets |
+| 3 | Django API | Custom | 8000 | Backend REST API |
+| 4 | PostgreSQL | postgres:16 | 5432 | Primary database |
+| 5 | Redis | redis:7 | 6379 | Cache, sessions, SSE |
+| 6 | RabbitMQ | rabbitmq:3-management | 5672, 15672 | Message broker |
+| 7 | Celery Worker | Same as Django | — | Async task execution |
+| 8 | Celery Beat | Same as Django | — | Scheduled tasks |
+| 9 | LiveKit Server | livekit/livekit-server | 7880, 7881 | WebRTC video rooms |
+| 10 | LiveKit Agent | Custom | — | AI interviewer |
+| 11 | MinIO | minio/minio | 9000, 9001 | S3-compatible storage |
 
 ### Infrastructure & Monitoring Services (8)
 
 | # | Service | Image | Ports | Role |
 |---|---------|-------|-------|------|
-| 11 | Portainer | portainer/portainer-ce | 9443 | Container management UI |
-| 12 | pgAdmin | dpage/pgadmin4 | 5050 | PostgreSQL admin UI |
-| 13 | RedisInsight | redis/redisinsight | 5540 | Redis management UI |
-| 14 | RabbitMQ Management | (built into rabbitmq image) | 15672 | RabbitMQ admin UI |
-| 15 | Grafana | grafana/grafana | 3000 | Metrics dashboards, alerting |
-| 16 | Prometheus | prom/prometheus | 9090 | Metrics collection |
-| 17 | Jaeger | jaegertracing/all-in-one | 16686, 4317 | Distributed tracing (OpenTelemetry) |
-| 18 | Loki | grafana/loki | 3100 | Log aggregation |
+| 12 | Portainer | portainer/portainer-ce | 9443 | Container management UI |
+| 13 | pgAdmin | dpage/pgadmin4 | 5050 | PostgreSQL admin UI |
+| 14 | RedisInsight | redis/redisinsight | 5540 | Redis management UI |
+| 15 | RabbitMQ Management | (built into rabbitmq image) | 15672 | RabbitMQ admin UI |
+| 16 | Grafana | grafana/grafana | 3000 | Metrics dashboards, alerting |
+| 17 | Prometheus | prom/prometheus | 9090 | Metrics collection |
+| 18 | Jaeger | jaegertracing/all-in-one | 16686, 4317 | Distributed tracing (OpenTelemetry) |
+| 19 | Loki | grafana/loki | 3100 | Log aggregation |
 
-**Total: 18 services**
+**Total: 19 services**
 
 ---
 
@@ -234,15 +235,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
-      - run: cd frontend && npm ci
+          cache: 'yarn'
+          cache-dependency-path: frontend/yarn.lock
+      - run: cd frontend && yarn install --frozen-lockfile
       - name: ESLint
-        run: cd frontend && npm run lint
+        run: cd frontend && yarn lint:check
       - name: Prettier format check
-        run: cd frontend && npx prettier --check "src/**/*.{ts,vue,json,css,scss}"
+        run: cd frontend && yarn format:check
       - name: TypeScript type check
-        run: cd frontend && npx vue-tsc --noEmit
+        run: cd frontend && yarn typecheck
 
   # Uncomment when tests are added post-MVP:
   # backend-test:
@@ -552,7 +553,7 @@ redisinsight:
 # docker-compose.prod.yml — define networks
 
 networks:
-  frontend:        # Nginx, Django
+  frontend:        # Nginx, Nuxt frontend, Django
   backend:         # Django, PostgreSQL, Redis, RabbitMQ, Celery, MinIO
   livekit:         # LiveKit Server, LiveKit Agent
   monitoring:      # Grafana, Prometheus, Jaeger, Loki
@@ -560,6 +561,7 @@ networks:
 
 # Service network assignments:
 # Nginx:          frontend
+# Nuxt frontend:  frontend
 # Django:         frontend, backend
 # PostgreSQL:     backend
 # Redis:          backend
@@ -584,7 +586,7 @@ Only these ports should be publicly accessible:
 | Port | Service | Purpose |
 |------|---------|---------|
 | 80 | Nginx | HTTP → redirect to HTTPS |
-| 443 | Nginx | HTTPS (frontend + API) |
+| 443 | Nginx | HTTPS (Nuxt frontend + API) |
 | 7880 | LiveKit | WebRTC signaling |
 | 7881 | LiveKit | WebRTC media (UDP) |
 

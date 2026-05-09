@@ -175,7 +175,7 @@ jobs:
       - name: Rolling update — frontend & nginx
         run: |
           IMAGE_TAG=${{ env.DEV_IMAGE_TAG }} \
-            docker compose $CF up -d --no-deps --wait nginx
+            docker compose $CF up -d --no-deps --wait frontend nginx
 
       - name: Rolling update — livekit-agent
         run: |
@@ -205,7 +205,7 @@ jobs:
           # at least previous containers come back up.
           IMAGE_TAG=dev timeout 120 \
             docker compose $CF up -d --no-deps --timeout 30 \
-              django celery-worker celery-beat nginx livekit-agent \
+              django celery-worker celery-beat frontend nginx livekit-agent \
             || echo "[ROLLBACK] compose up timed out or partially failed — leaving state as-is"
           echo "[ROLLBACK] Done."
           exit 1

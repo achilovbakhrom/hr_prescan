@@ -11,6 +11,7 @@ from apps.vacancies.apis.questions import (
     VacancyQuestionDetailApi,
     VacancyQuestionListCreateApi,
 )
+from apps.vacancies.apis.sitemap import PublicVacancySitemapApi
 from apps.vacancies.apis.vacancy_actions import (
     ParseCompanyFileApi,
     ParseCompanyUrlApi,
@@ -32,6 +33,7 @@ __all__ = [
     "ParseCompanyUrlApi",
     "PublicVacancyDetailApi",
     "PublicVacancyListApi",
+    "PublicVacancySitemapApi",
     "VacancyCriteriaDetailApi",
     "VacancyCriteriaListCreateApi",
     "VacancyDetailApi",

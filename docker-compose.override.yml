@@ -8,17 +8,17 @@ services:
       - prod-only
     # Disabled in dev — use frontend service instead
 
-  # Frontend dev server (Vite)
+  # Frontend dev server (Nuxt)
   frontend:
     build:
       context: ./frontend
-      target: build
-    command: npm run dev -- --host 0.0.0.0
+      target: deps
+    command: yarn dev --host 0.0.0.0
     volumes:
       - ./frontend:/app
       - /app/node_modules
     ports:
-      - "${LOCAL_FRONTEND_PORT:-5173}:5173"
+      - "${LOCAL_FRONTEND_PORT:-3000}:3000"
     env_file:
       - ./frontend/.env
     networks:
