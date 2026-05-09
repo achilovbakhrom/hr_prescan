@@ -2,6 +2,7 @@ from rest_framework import serializers, status
 from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.utils.urls import remove_query_param, replace_query_param
 from rest_framework.views import APIView
 
 from apps.common.messages import MSG_VACANCY_NOT_FOUND
@@ -110,21 +111,27 @@ def _get_paginated_public_vacancies(*, request: Request, filters: dict, vacancie
     internal_qs = vacancies.order_by("-created_at")
     parsed_qs = _get_filtered_public_parsed_vacancies(filters=filters).order_by("-created_at")
     internal_count = internal_qs.count()
-    total_count = internal_count + parsed_qs.count()
 
     paginator = StandardPagination()
-    paginator.paginate_queryset(range(total_count), request)
     page_size = paginator.get_page_size(request) or paginator.page_size
-    page_number = paginator.page.number
+    page_number = int(request.query_params.get(paginator.page_query_param, 1))
     start = (page_number - 1) * page_size
     end = start + page_size
 
-    internal_items = list(internal_qs[start:end])
+    internal_items = []
+    if start < internal_count:
+        internal_items = list(internal_qs[start : min(end, internal_count)])
+
+    remaining = page_size - len(internal_items)
     parsed_items = []
-    if end > internal_count:
+    has_next = end < internal_count
+    if remaining > 0:
         parsed_start = max(start - internal_count, 0)
-        parsed_end = end - internal_count
-        parsed_items = list(parsed_qs[parsed_start:parsed_end])
+        parsed_page = list(parsed_qs[parsed_start : parsed_start + remaining + 1])
+        parsed_items = parsed_page[:remaining]
+        has_next = len(parsed_page) > remaining
+    elif end == internal_count:
+        has_next = parsed_qs.exists()
 
     serialized_items = []
     for item in [*internal_items, *parsed_items]:
@@ -135,7 +142,24 @@ def _get_paginated_public_vacancies(*, request: Request, filters: dict, vacancie
         else:
             serialized_items.append(PublicParsedVacancyListOutputSerializer(item).data)
 
-    return paginator.get_paginated_response(serialized_items)
+    loaded_count = start + len(serialized_items)
+    count = loaded_count + 1 if has_next else loaded_count
+    return Response(
+        {
+            "count": count,
+            "next": _page_url(request=request, page_number=page_number + 1) if has_next else None,
+            "previous": _page_url(request=request, page_number=page_number - 1) if page_number > 1 else None,
+            "results": serialized_items,
+        },
+        status=status.HTTP_200_OK,
+    )
+
+
+def _page_url(*, request: Request, page_number: int) -> str:
+    url = request.build_absolute_uri()
+    if page_number <= 1:
+        return remove_query_param(url, StandardPagination.page_query_param)
+    return replace_query_param(url, StandardPagination.page_query_param, page_number)
 
 
 def _get_filtered_public_parsed_vacancies(*, filters: dict):
