@@ -3,7 +3,7 @@
 from django.conf import settings
 from google import genai
 
-LANGUAGE_NAMES = {"en": "English", "ru": "Russian", "uz": "Uzbek"}
+from apps.common.language import LANGUAGE_NAMES
 
 SESSION_COMPLETE_ADVANCE = "[SESSION_ADVANCE]"
 SESSION_COMPLETE_REJECT = "[SESSION_REJECT]"

@@ -7,12 +7,11 @@ from google import genai
 from google.genai import types
 
 from apps.common.exceptions import ApplicationError
+from apps.common.language import LANGUAGE_NAMES
 from apps.common.messages import MSG_AI_QUESTIONS_FAILED
 from apps.vacancies.models import InterviewQuestion, ScreeningStep, Vacancy
 
 logger = logging.getLogger(__name__)
-
-LANGUAGE_NAMES = {"en": "English", "ru": "Russian", "uz": "Uzbek"}
 
 
 def _language_instruction(lang_code: str) -> str:

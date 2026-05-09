@@ -71,6 +71,7 @@ export function useVacancyForm(
     companyId: 1,
     companyInfo: 1,
     prescanningPrompt: 2,
+    prescanningLanguage: 2,
     interviewEnabled: 3,
     interviewMode: 3,
     interviewDuration: 3,
@@ -131,7 +132,7 @@ export function useVacancyForm(
     visibility.value = d.visibility ?? 'public'
     cvRequired.value = d.cvRequired ?? false
     prescanningPrompt.value = d.prescanningPrompt ?? ''
-    prescanningLanguage.value = d.prescanningLanguage ?? 'en'
+    prescanningLanguage.value = d.prescanningLanguage ?? getLocale()
     interviewEnabled.value = d.interviewEnabled ?? false
     interviewMode.value = d.interviewMode ?? 'chat'
     interviewDuration.value = d.interviewDuration ?? 30

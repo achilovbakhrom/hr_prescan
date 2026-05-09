@@ -3,6 +3,7 @@ import uuid
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
+from apps.common.language import LANGUAGE_CHOICES
 from apps.common.models import BaseModel
 
 
@@ -72,7 +73,7 @@ class Interview(BaseModel):
     ai_summary = models.TextField(blank=True)
     language = models.CharField(
         max_length=10,
-        choices=[("en", "English"), ("ru", "Russian"), ("uz", "Uzbek")],
+        choices=LANGUAGE_CHOICES,
         default="en",
     )
     ai_summary_translations = models.JSONField(default=dict, blank=True)

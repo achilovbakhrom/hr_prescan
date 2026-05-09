@@ -12,7 +12,7 @@ HR PreScan is a multi-tenant SaaS platform that automates the full candidate scr
 The AI agent evaluates candidates at each step and decides whether to advance them to the next stage or reject them. HR can also manually move candidates between stages at any time. The platform handles the screening pipeline; HR retains full control over final decisions.
 
 **Platform:** Web application (mobile versions planned for later)
-**Languages:** English and Russian (initial release)
+**Languages:** English, Russian, Uzbek, Kazakh, Turkish, Arabic, Spanish, French, and German for the web app, public translation, and AI screening language selection. Telegram bot interface copy currently remains English/Russian/Uzbek, while Telegram prescreening follows the vacancy's selected screening language.
 **Tech Stack:** Django (backend) + Vue.js (frontend), deployed via Docker Compose with zero-downtime strategy
 
 ---
@@ -266,7 +266,8 @@ Candidates can apply via two surfaces: the **web app** (public job board) and th
 - The public landing page exposes visible Telegram CTAs for both surfaces:
   - a candidate-bot CTA for job seekers
   - an HR-bot CTA for recruiters evaluating the Telegram workflow
-- For authenticated users, the web header language switcher persists the selected locale to `User.language` through `PATCH /api/auth/me/`; future web sessions and bot replies use that stored preference.
+- The web app supports `en`, `ru`, `uz`, `kk`, `tr`, `ar`, `es`, `fr`, and `de`. If a visitor has not selected a language yet, the web app uses the browser language (`navigator.languages` / `Accept-Language`) before falling back to English; once selected, the locale is stored in `hr_prescan_locale`.
+- For authenticated users, the web header language switcher persists the selected locale to `User.language` through `PATCH /api/auth/me/`; future web sessions and AI screening defaults use that stored preference.
 - The public HR-bot CTA is usable:
   - new HR users can start directly in Telegram; `/start` creates a Telegram-first admin placeholder account, requires them to pick a language (en / ru / uz), then requires them to create a company before using vacancy, candidate, interview, team, dashboard, or subscription commands
   - selecting a language in the HR bot writes the same `User.language` field used by the web app; if the Telegram workspace is later merged into a web account, that selected language follows the merged account
@@ -323,7 +324,7 @@ The candidate bot lets a candidate browse entry points, apply, and complete pres
 - Candidate dashboards include applications bound by candidate user ID and applications matching the candidate email, so merged Telegram applications remain visible even if their original placeholder email differs from the web email.
 - Candidate "My Applications" list/detail responses expose CV match, prescanning, and interview scores. The primary displayed score is the overall screening score from prescanning/interview when available; CV match is shown separately and only acts as a fallback before screening results exist.
 - Bot UI is **button-driven** wherever possible (Telegram inline keyboards) — free-text replies outside structured steps are routed to the candidate AI agent.
-- Bot-created users are seeded from `message.from.language_code` (en / ru / uz), then bot strings use the stored `User.language`. Authenticated web users can change the same field from the header language switcher; HR and candidate Telegram bot UIs also expose a language picker that updates `User.language` for future bot replies.
+- Bot-created users are seeded from `message.from.language_code` when it matches a supported bot locale (en / ru / uz), then bot strings use the stored `User.language`. Authenticated web users can change the same field from the header language switcher; HR and candidate Telegram bot UIs also expose a language picker that updates `User.language` for future bot replies.
 - New Telegram candidate users must register in the bot before they can use vacancy, prescreening, CV, or assistant actions. Registration asks for a phone number first using Telegram's native contact-sharing button (manual phone entry is still accepted), then asks the candidate to choose the bot language (`en` / `ru` / `uz`). The selected language is persisted to `User.language` and drives future bot replies. If the user opened a vacancy/prescreening deep link first, the bot resumes that payload after required onboarding.
 - Candidate Telegram bot menus expose direct buttons for job search, prescreening, creating a CV with the candidate AI assistant, viewing saved CVs, uploading an existing CV file, downloading generated/uploaded CV files, and changing language.
 
@@ -355,7 +356,7 @@ Prescanning is the initial AI screening step. It is always enabled and always co
 - No time limit — the conversation continues until all questions are covered
 - AI decides when enough information has been gathered and wraps up naturally
 - A progress indicator shows approximate completion
-- Supported languages: English, Russian (candidate or HR selects)
+- Supported languages: English, Russian, Uzbek, Kazakh, Turkish, Arabic, Spanish, French, and German. HR selects the vacancy `prescanning_language`; new vacancy forms default it from the current web locale.
 
 **Question Generation:**
 - AI automatically generates prescanning questions based on:
@@ -400,7 +401,7 @@ Interview is the second, more rigorous AI screening step. HR enables it per vaca
 
 **Common to both interview modes:**
 - A progress indicator shows approximate completion
-- Supported languages: English, Russian (candidate or HR selects)
+- Supported languages: English, Russian, Uzbek, Kazakh, Turkish, Arabic, Spanish, French, and German. Interview sessions inherit the vacancy screening language unless explicitly changed by the screening workflow.
 
 **Question Generation:**
 - AI generates interview questions based on:
@@ -810,7 +811,7 @@ Archived → Applied (restore)
 ## 17. Future Considerations (Post-MVP)
 
 - Mobile applications (iOS, Android)
-- Additional languages beyond EN/RU
+- Additional Telegram bot UI translations beyond EN/RU/UZ
 - Integration with external ATS (Applicant Tracking Systems)
 - Integration with job boards (LinkedIn, Indeed, HH.ru)
 - Advanced analytics and reporting for companies

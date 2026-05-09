@@ -102,11 +102,17 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     # UI language — source of truth for AI assistants and default vacancy language.
     # Kept in sync with the frontend locale via PATCH /api/auth/me/, and seeded
-    # on first visit from IP-based GeoIP detection for anonymous users.
+    # on first visit from browser/GeoIP language detection for anonymous users.
     class Language(models.TextChoices):
         EN = "en", "English"
         RU = "ru", "Russian"
         UZ = "uz", "Uzbek"
+        KK = "kk", "Kazakh"
+        TR = "tr", "Turkish"
+        AR = "ar", "Arabic"
+        ES = "es", "Spanish"
+        FR = "fr", "French"
+        DE = "de", "German"
 
     language = models.CharField(
         max_length=5,

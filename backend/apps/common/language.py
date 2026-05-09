@@ -13,17 +13,41 @@ if TYPE_CHECKING:  # pragma: no cover
 
 logger = logging.getLogger(__name__)
 
-SUPPORTED_LANGUAGES = ("en", "ru", "uz")
+LANGUAGE_CHOICES = (
+    ("en", "English"),
+    ("ru", "Russian"),
+    ("uz", "Uzbek"),
+    ("kk", "Kazakh"),
+    ("tr", "Turkish"),
+    ("ar", "Arabic"),
+    ("es", "Spanish"),
+    ("fr", "French"),
+    ("de", "German"),
+)
+LANGUAGE_NAMES = dict(LANGUAGE_CHOICES)
+SUPPORTED_LANGUAGES = tuple(code for code, _name in LANGUAGE_CHOICES)
 DEFAULT_LANGUAGE = "en"
 
 COUNTRY_TO_LANGUAGE: dict[str, str] = {
     "UZ": "uz",
     "RU": "ru",
     "BY": "ru",
-    "KZ": "ru",
+    "KZ": "kk",
     "KG": "ru",
     "TJ": "ru",
     "UA": "ru",
+    "TR": "tr",
+    "SA": "ar",
+    "AE": "ar",
+    "EG": "ar",
+    "ES": "es",
+    "MX": "es",
+    "AR": "es",
+    "CO": "es",
+    "FR": "fr",
+    "DE": "de",
+    "AT": "de",
+    "CH": "de",
 }
 
 _reader: Reader | None = None

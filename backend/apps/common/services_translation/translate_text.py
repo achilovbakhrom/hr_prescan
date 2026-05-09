@@ -8,15 +8,10 @@ from google import genai
 from google.genai import types
 
 from apps.common.exceptions import ApplicationError
+from apps.common.language import LANGUAGE_NAMES
 from apps.common.services_translation.gemini import generate_translation_content
 
 logger = logging.getLogger(__name__)
-
-LANGUAGE_NAMES = {
-    "en": "English",
-    "ru": "Russian",
-    "uz": "Uzbek",
-}
 
 # (model_key, field_key) -> (app_label.ModelName, source_field, translations_field)
 # For JSON subfields (match_details.notes, cv_parsed_data.summary),

@@ -1,6 +1,7 @@
 import { apiClient } from '@/shared/api/client'
+import type { SupportedLocale } from '@/shared/i18n'
 
-export type UILocale = 'en' | 'ru' | 'uz'
+export type UILocale = SupportedLocale
 
 export interface Language {
   code: string

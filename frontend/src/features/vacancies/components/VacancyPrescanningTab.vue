@@ -2,6 +2,7 @@
 import { useI18n } from 'vue-i18n'
 import Textarea from 'primevue/textarea'
 import Dropdown from '@/shared/components/AppSelect.vue'
+import { PRESCANNING_LANGUAGE_OPTIONS } from '@/shared/i18n/supportedLocales'
 
 defineProps<{
   hasError: (field: string) => boolean
@@ -11,12 +12,6 @@ const prescanningPrompt = defineModel<string>('prescanningPrompt', { required: t
 const prescanningLanguage = defineModel<string>('prescanningLanguage', { required: true })
 
 const { t } = useI18n()
-
-const languageOptions = [
-  { label: 'English', value: 'en' },
-  { label: 'Русский', value: 'ru' },
-  { label: `O'zbekcha`, value: 'uz' },
-]
 </script>
 
 <template>
@@ -38,7 +33,7 @@ const languageOptions = [
       <p class="mb-2 text-xs text-gray-400">{{ t('vacancies.form.prescanningLanguageHint') }}</p>
       <Dropdown
         v-model="prescanningLanguage"
-        :options="languageOptions"
+        :options="PRESCANNING_LANGUAGE_OPTIONS"
         option-label="label"
         option-value="value"
         class="w-full sm:w-60"

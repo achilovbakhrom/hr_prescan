@@ -1,4 +1,5 @@
 import { apiClient } from './client'
+import type { SupportedLocale } from '@/shared/i18n'
 
 export interface TranslateResponse {
   translatedText: string
@@ -9,7 +10,7 @@ export async function translateContent(params: {
   model: string
   objectId: string
   field: string
-  targetLanguage: string
+  targetLanguage: SupportedLocale
   shareToken?: string
   /** Use `/translate/` (any auth) instead of `/hr/translate/` (HR-only). */
   scope?: 'hr' | 'public'
@@ -35,7 +36,7 @@ export async function batchTranslateItems(params: {
   vacancyId: string
   itemType: 'criteria' | 'questions'
   step: 'prescanning' | 'interview'
-  targetLanguage: string
+  targetLanguage: SupportedLocale
 }): Promise<BatchTranslateResponse> {
   const response = await apiClient.post<BatchTranslateResponse>('/hr/translate/batch/', params)
   return response.data

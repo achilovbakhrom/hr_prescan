@@ -6,6 +6,7 @@ import Button from 'primevue/button'
 import Dropdown from '@/shared/components/AppSelect.vue'
 import InputNumber from 'primevue/inputnumber'
 import Textarea from 'primevue/textarea'
+import { PRESCANNING_LANGUAGE_OPTIONS } from '@/shared/i18n/supportedLocales'
 import QuestionList from './QuestionList.vue'
 import CriteriaList from './CriteriaList.vue'
 import { useVacancyStore } from '../stores/vacancy.store'
@@ -39,12 +40,6 @@ const emit = defineEmits<{
 const { t } = useI18n()
 const toast = useToast()
 const vacancyStore = useVacancyStore()
-
-const languageOptions = [
-  { label: 'English', value: 'en' },
-  { label: 'Русский', value: 'ru' },
-  { label: `O'zbekcha`, value: 'uz' },
-]
 
 const interviewModeOptions = computed(() => [
   { label: t('vacancies.interviewMode.chat'), value: 'chat' as InterviewMode },
@@ -126,7 +121,7 @@ async function save(): Promise<void> {
         }}</label>
         <Dropdown
           v-model="language"
-          :options="languageOptions"
+          :options="PRESCANNING_LANGUAGE_OPTIONS"
           option-label="label"
           option-value="value"
           class="w-full sm:w-60"

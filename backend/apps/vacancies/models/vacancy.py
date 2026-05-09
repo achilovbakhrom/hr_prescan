@@ -4,6 +4,7 @@ from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchVectorField
 from django.db import models
 
+from apps.common.language import LANGUAGE_CHOICES
 from apps.common.models import BaseModel
 
 
@@ -95,7 +96,7 @@ class Vacancy(BaseModel):
     interview_prompt = models.TextField(blank=True, default="")  # Additional instructions for interview AI agent
     prescanning_language = models.CharField(
         max_length=10,
-        choices=[("en", "English"), ("ru", "Russian"), ("uz", "Uzbek")],
+        choices=LANGUAGE_CHOICES,
         default="en",
     )
     is_deleted = models.BooleanField(default=False)

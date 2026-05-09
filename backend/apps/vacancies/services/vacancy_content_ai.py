@@ -8,6 +8,7 @@ from google import genai
 from google.genai import types
 
 from apps.common.exceptions import ApplicationError
+from apps.common.language import LANGUAGE_NAMES
 from apps.common.messages import MSG_AI_VACANCY_CONTENT_FAILED
 from apps.vacancies.services.ai_json import (
     has_complete_vacancy_content,
@@ -17,8 +18,6 @@ from apps.vacancies.services.ai_json import (
 )
 
 logger = logging.getLogger(__name__)
-
-LANGUAGE_NAMES = {"en": "English", "ru": "Russian", "uz": "Uzbek"}
 MIN_ACCEPTABLE_SCORE = 8
 
 

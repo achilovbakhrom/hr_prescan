@@ -3,152 +3,156 @@ import type { WritableComputedRef } from 'vue'
 import en from './locales/en.json'
 import ru from './locales/ru.json'
 import uz from './locales/uz.json'
+import kk from './locales/kk.json'
+import tr from './locales/tr.json'
+import ar from './locales/ar.json'
+import es from './locales/es.json'
+import fr from './locales/fr.json'
+import de from './locales/de.json'
+import {
+  LOCALE_STORAGE_KEY,
+  SUPPORTED_LOCALES,
+  isSupportedLocale,
+  normalizeLocale,
+  type SupportedLocale,
+} from './supportedLocales'
 
 export type MessageSchema = typeof en
 
-const LOCALE_STORAGE_KEY = 'hr_prescan_locale'
-
-const datetimeFormats = {
-  en: {
-    short: {
-      year: 'numeric' as const,
-      month: 'short' as const,
-      day: 'numeric' as const,
-    },
-    long: {
-      year: 'numeric' as const,
-      month: 'long' as const,
-      day: 'numeric' as const,
-      hour: '2-digit' as const,
-      minute: '2-digit' as const,
-    },
+const dateFormat = {
+  short: {
+    year: 'numeric' as const,
+    month: 'short' as const,
+    day: 'numeric' as const,
   },
-  ru: {
-    short: {
-      year: 'numeric' as const,
-      month: 'short' as const,
-      day: 'numeric' as const,
-    },
-    long: {
-      year: 'numeric' as const,
-      month: 'long' as const,
-      day: 'numeric' as const,
-      hour: '2-digit' as const,
-      minute: '2-digit' as const,
-    },
-  },
-  uz: {
-    short: {
-      year: 'numeric' as const,
-      month: 'short' as const,
-      day: 'numeric' as const,
-    },
-    long: {
-      year: 'numeric' as const,
-      month: 'long' as const,
-      day: 'numeric' as const,
-      hour: '2-digit' as const,
-      minute: '2-digit' as const,
-    },
+  long: {
+    year: 'numeric' as const,
+    month: 'long' as const,
+    day: 'numeric' as const,
+    hour: '2-digit' as const,
+    minute: '2-digit' as const,
   },
 }
 
-const numberFormats = {
-  en: {
-    currency: {
-      style: 'currency' as const,
-      currency: 'USD',
-    },
-    decimal: {
-      style: 'decimal' as const,
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    },
-    percent: {
-      style: 'percent' as const,
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 1,
-    },
-  },
-  ru: {
-    currency: {
-      style: 'currency' as const,
-      currency: 'RUB',
-    },
-    decimal: {
-      style: 'decimal' as const,
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    },
-    percent: {
-      style: 'percent' as const,
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 1,
-    },
-  },
-  uz: {
-    currency: {
-      style: 'currency' as const,
-      currency: 'UZS',
-    },
-    decimal: {
-      style: 'decimal' as const,
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    },
-    percent: {
-      style: 'percent' as const,
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 1,
-    },
-  },
+const currencyByLocale: Record<SupportedLocale, string> = {
+  en: 'USD',
+  ru: 'RUB',
+  uz: 'UZS',
+  kk: 'KZT',
+  tr: 'TRY',
+  ar: 'USD',
+  es: 'EUR',
+  fr: 'EUR',
+  de: 'EUR',
 }
 
-function getDefaultLocale(): string {
-  const stored = localStorage.getItem(LOCALE_STORAGE_KEY)
-  if (stored === 'en' || stored === 'ru' || stored === 'uz') return stored
+const datetimeFormats = Object.fromEntries(
+  SUPPORTED_LOCALES.map((locale) => [locale, dateFormat]),
+) as Record<SupportedLocale, typeof dateFormat>
 
-  const browserLocale = navigator.language.split('-')[0]
-  if (browserLocale === 'ru') return 'ru'
-  if (browserLocale === 'uz') return 'uz'
+const numberFormats = Object.fromEntries(
+  SUPPORTED_LOCALES.map((locale) => [
+    locale,
+    {
+      currency: {
+        style: 'currency' as const,
+        currency: currencyByLocale[locale],
+      },
+      decimal: {
+        style: 'decimal' as const,
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+      },
+      percent: {
+        style: 'percent' as const,
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 1,
+      },
+    },
+  ]),
+) as unknown as Record<SupportedLocale, Record<string, Intl.NumberFormatOptions>>
 
+function getStoredLocale(): SupportedLocale | null {
+  if (typeof localStorage === 'undefined') return null
+  return normalizeLocale(localStorage.getItem(LOCALE_STORAGE_KEY))
+}
+
+export function getBrowserLocale(): SupportedLocale {
+  if (typeof navigator === 'undefined') return 'en'
+  const candidates = [...(navigator.languages ?? []), navigator.language]
+  for (const candidate of candidates) {
+    const locale = normalizeLocale(candidate)
+    if (locale) return locale
+  }
   return 'en'
 }
 
-export const i18n = createI18n<[MessageSchema], 'en' | 'ru' | 'uz'>({
+function getDefaultLocale(): SupportedLocale {
+  return getStoredLocale() ?? getBrowserLocale()
+}
+
+function applyDocumentLocale(locale: SupportedLocale): void {
+  if (typeof document === 'undefined') return
+  document.documentElement.lang = locale
+  document.documentElement.dir = locale === 'ar' ? 'rtl' : 'ltr'
+}
+
+export function getRequestLocale(): SupportedLocale {
+  return getDefaultLocale()
+}
+
+const initialLocale = getDefaultLocale()
+applyDocumentLocale(initialLocale)
+
+export const i18n = createI18n<[MessageSchema], SupportedLocale>({
   legacy: false,
-  locale: getDefaultLocale(),
+  locale: initialLocale,
   fallbackLocale: 'en',
   messages: {
     en,
     ru,
     uz,
+    kk,
+    tr,
+    ar,
+    es,
+    fr,
+    de,
   },
   datetimeFormats,
   numberFormats,
 })
 
-export function setLocale(locale: 'en' | 'ru' | 'uz'): void {
+export function setLocale(locale: SupportedLocale): void {
   // vue-i18n Composition mode exposes locale as a WritableComputedRef but types it as string
   ;(i18n.global.locale as unknown as WritableComputedRef<string>).value = locale
-  localStorage.setItem(LOCALE_STORAGE_KEY, locale)
-  document.documentElement.lang = locale
+  if (typeof localStorage !== 'undefined') localStorage.setItem(LOCALE_STORAGE_KEY, locale)
+  applyDocumentLocale(locale)
 }
 
-export function getLocale(): string {
+export function getLocale(): SupportedLocale {
   // vue-i18n Composition mode exposes locale as a WritableComputedRef but types it as string
-  return (i18n.global.locale as unknown as WritableComputedRef<string>).value ?? i18n.global.locale
+  const locale =
+    (i18n.global.locale as unknown as WritableComputedRef<string>).value ?? i18n.global.locale
+  return isSupportedLocale(locale) ? locale : 'en'
 }
 
 export async function detectAndApplyLocale(): Promise<void> {
-  if (localStorage.getItem(LOCALE_STORAGE_KEY)) return
+  if (getStoredLocale()) return
+  const browserLocale = getBrowserLocale()
+  ;(i18n.global.locale as unknown as WritableComputedRef<string>).value = browserLocale
+  applyDocumentLocale(browserLocale)
+
   try {
     const { detectLanguage } = await import('@/shared/services/language.service')
     const detected = await detectLanguage()
-    if (detected === 'en' || detected === 'ru' || detected === 'uz') {
-      setLocale(detected)
+    if (SUPPORTED_LOCALES.includes(detected)) {
+      ;(i18n.global.locale as unknown as WritableComputedRef<string>).value = detected
+      applyDocumentLocale(detected)
     }
   } catch (err) {
     console.warn('[i18n] language detection failed', err)
   }
 }
+
+export type { SupportedLocale }

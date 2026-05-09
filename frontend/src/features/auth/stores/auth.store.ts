@@ -1,7 +1,8 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { extractErrorMessage } from '@/shared/api/errors'
-import { setLocale } from '@/shared/i18n'
+import { setLocale, type SupportedLocale } from '@/shared/i18n'
+import { LOCALE_STORAGE_KEY, isSupportedLocale } from '@/shared/i18n/supportedLocales'
 import { saveUserLanguage } from '@/shared/services/language.service'
 import { redirectToLogin } from '@/shared/api/authRedirect'
 import { authService } from '../services/auth.service'
@@ -16,18 +17,15 @@ import type {
   RegisterRequest,
 } from '../types/auth.types'
 
-type UILocale = 'en' | 'ru' | 'uz'
-const isUILocale = (v: unknown): v is UILocale => v === 'en' || v === 'ru' || v === 'uz'
-
 function syncPreferredLanguage(u: User | null): void {
   if (!u) return
-  const stored = localStorage.getItem('hr_prescan_locale')
-  if (isUILocale(u.language)) {
+  const stored = localStorage.getItem(LOCALE_STORAGE_KEY)
+  if (isSupportedLocale(u.language)) {
     if (stored !== u.language) setLocale(u.language)
-  } else if (isUILocale(stored)) {
+  } else if (isSupportedLocale(stored)) {
     saveUserLanguage(stored)
       .then(() => {
-        u.language = stored
+        u.language = stored as SupportedLocale
       })
       .catch((err: unknown) => console.warn('[auth] back-fill language failed', err))
   }

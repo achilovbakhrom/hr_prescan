@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 
 from apps.accounts.models import CompanyMembership
 from apps.accounts.permissions import HasHRPermission, HRPermissions
+from apps.common.language import LANGUAGE_CHOICES
 from apps.common.messages import MSG_NOT_IN_COMPANY
 from apps.vacancies.models import Vacancy
 from apps.vacancies.selectors import get_user_vacancies
@@ -71,7 +72,7 @@ class VacancyListCreateApi(APIView):
         prescanning_prompt = serializers.CharField(required=False, allow_blank=True, default="")
         interview_prompt = serializers.CharField(required=False, allow_blank=True, default="")
         prescanning_language = serializers.ChoiceField(
-            choices=[("en", "English"), ("ru", "Russian"), ("uz", "Uzbek")],
+            choices=LANGUAGE_CHOICES,
             required=False,
             default="en",
         )

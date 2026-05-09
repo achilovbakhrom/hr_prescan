@@ -1,20 +1,10 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { setLocale, getLocale } from '@/shared/i18n'
+import { setLocale, getLocale, type SupportedLocale } from '@/shared/i18n'
+import { LOCALE_OPTIONS } from '@/shared/i18n/supportedLocales'
+import type { LocaleOption } from '@/shared/i18n/supportedLocales'
 
-export type SupportedLocale = 'en' | 'ru' | 'uz'
-
-export interface LocaleOption {
-  code: SupportedLocale
-  label: string
-  flag: string
-}
-
-export const LOCALE_OPTIONS: LocaleOption[] = [
-  { code: 'en', label: 'English', flag: '🇺🇸' },
-  { code: 'ru', label: 'Русский', flag: '🇷🇺' },
-  { code: 'uz', label: "O'zbekcha", flag: '🇺🇿' },
-]
+export type { SupportedLocale, LocaleOption } from '@/shared/i18n/supportedLocales'
 
 export function useLocale() {
   const { t, locale } = useI18n()
@@ -45,7 +35,7 @@ export function useLocale() {
   }
 
   function toggleLocale(): void {
-    const order: SupportedLocale[] = ['en', 'ru', 'uz']
+    const order = LOCALE_OPTIONS.map((option) => option.code)
     const idx = order.indexOf(currentLocale.value)
     const next = order[(idx + 1) % order.length]
     switchLocale(next)

@@ -1,5 +1,5 @@
 import { apiClient } from '@/shared/api/client'
-import type { CompanyMembership } from '@/shared/types/auth.types'
+import type { CompanyMembership, UserLanguage } from '@/shared/types/auth.types'
 import type {
   AcceptInvitationRequest,
   LoginRequest,
@@ -44,7 +44,7 @@ export const authService = {
     return response.data
   },
 
-  async updateMe(data: { language?: 'en' | 'ru' | 'uz' }): Promise<User> {
+  async updateMe(data: { language?: UserLanguage }): Promise<User> {
     const response = await apiClient.patch<User>('/auth/me/', data)
     return response.data
   },

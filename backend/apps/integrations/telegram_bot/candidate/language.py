@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from apps.accounts.models import User
+from apps.common.language import SUPPORTED_LANGUAGES as APP_SUPPORTED_LANGUAGES
 from apps.integrations.telegram_bot.i18n import DEFAULT_LANGUAGE, SUPPORTED_LANGUAGES, normalize_language
 
 
@@ -27,8 +28,8 @@ def user_language(*, user: User, fallback: str = DEFAULT_LANGUAGE) -> str:
 
 
 def set_user_language(*, user: User, language: str, fallback: str = DEFAULT_LANGUAGE) -> str:
-    lang = language if language in SUPPORTED_LANGUAGES else fallback
-    if lang not in SUPPORTED_LANGUAGES:
+    lang = language if language in APP_SUPPORTED_LANGUAGES else fallback
+    if lang not in APP_SUPPORTED_LANGUAGES:
         lang = DEFAULT_LANGUAGE
     if user.language != lang:
         user.language = lang

@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.permissions import HasHRPermission
+from apps.common.language import SUPPORTED_LANGUAGES
 from apps.common.services_translation import TRANSLATABLE_FIELDS, batch_translate_vacancy_items, translate_ai_content
 
 # Simple in-memory rate limiter: max 50 requests per user per hour
@@ -38,7 +39,7 @@ class TranslateInputSerializer(serializers.Serializer):
     model = serializers.CharField(max_length=50)
     object_id = serializers.UUIDField()
     field = serializers.CharField(max_length=50)
-    target_language = serializers.ChoiceField(choices=["en", "ru", "uz"])
+    target_language = serializers.ChoiceField(choices=SUPPORTED_LANGUAGES)
     share_token = serializers.UUIDField(required=False)
 
     def validate(self, attrs):
@@ -135,7 +136,7 @@ class BatchTranslateApi(APIView):
         vacancy_id = serializers.UUIDField()
         item_type = serializers.ChoiceField(choices=["criteria", "questions"])
         step = serializers.ChoiceField(choices=["prescanning", "interview"])
-        target_language = serializers.ChoiceField(choices=["en", "ru", "uz"])
+        target_language = serializers.ChoiceField(choices=SUPPORTED_LANGUAGES)
 
     def post(self, request: Request) -> Response:
         if not _check_rate_limit(_rate_limit_key(request)):

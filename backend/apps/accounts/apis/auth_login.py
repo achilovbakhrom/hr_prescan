@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from apps.accounts.models import User
 from apps.accounts.selectors import get_pending_invitations_for_email, get_user_by_email
 from apps.accounts.serializers import PendingInvitationOutputSerializer, UserOutputSerializer
 from apps.common.messages import (
@@ -121,7 +122,7 @@ class MeApi(APIView):
 
     class InputSerializer(serializers.Serializer):
         language = serializers.ChoiceField(
-            choices=[("en", "en"), ("ru", "ru"), ("uz", "uz")],
+            choices=User.Language.choices,
             required=False,
         )
 

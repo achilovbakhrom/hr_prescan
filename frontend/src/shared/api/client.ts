@@ -2,6 +2,7 @@ import axios, { AxiosHeaders, type AxiosResponse, type InternalAxiosRequestConfi
 import { redirectToLogin } from './authRedirect'
 import { clearTokens, loadTokens, saveTokens, type StoredAuthTokens } from './authTokens'
 import { convertKeysToCamelCase, convertKeysToSnakeCase } from './caseTransform'
+import { getRequestLocale } from '@/shared/i18n'
 
 interface RetryableRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean
@@ -63,8 +64,7 @@ apiClient.interceptors.response.use((response) => {
 
 apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   // Add locale header for server-side i18n
-  const locale = localStorage.getItem('hr_prescan_locale') || 'en'
-  config.headers['Accept-Language'] = locale
+  config.headers['Accept-Language'] = getRequestLocale()
 
   const tokens = loadTokens()
   if (tokens?.access) setAuthorizationHeader(config, tokens.access)
