@@ -175,7 +175,9 @@ jobs:
       - name: Rolling update — frontend & nginx
         run: |
           IMAGE_TAG=${{ env.DEV_IMAGE_TAG }} \
-            docker compose $CF up -d --no-deps --wait frontend nginx
+            docker compose $CF up -d --no-deps --wait frontend
+          IMAGE_TAG=${{ env.DEV_IMAGE_TAG }} \
+            docker compose $CF up -d --no-deps --force-recreate --wait nginx
 
       - name: Rolling update — livekit-agent
         run: |

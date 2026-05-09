@@ -192,7 +192,10 @@ jobs:
             "cd ${{ secrets.PROD_DEPLOY_PATH }} && \
              IMAGE_TAG=${{ github.sha }} \
                docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml \
-               up -d --no-deps --wait frontend nginx"
+               up -d --no-deps --wait frontend && \
+             IMAGE_TAG=${{ github.sha }} \
+               docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml \
+               up -d --no-deps --force-recreate --wait nginx"
 
       - name: Rolling update — livekit-agent
         run: |
