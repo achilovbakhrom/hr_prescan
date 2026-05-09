@@ -12,6 +12,7 @@ import LandingTelegramCtas from './LandingTelegramCtas.vue'
 import LandingCatMascot from './LandingCatMascot.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import { useThemeStore } from '@/shared/stores/theme.store'
+import { BILLING_ENABLED } from '@/shared/constants/billing'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -69,6 +70,7 @@ onMounted(() => {
             class="hero-stagger hero-stagger-4 flex flex-col items-center gap-3 sm:flex-row lg:justify-start"
           >
             <Button
+              v-if="BILLING_ENABLED"
               :label="t('landing.hero.cta')"
               icon="pi pi-arrow-right"
               icon-pos="right"
@@ -93,7 +95,10 @@ onMounted(() => {
             </button>
           </div>
 
-          <p class="hero-stagger hero-stagger-4 mt-4 text-sm text-[color:var(--color-text-muted)]">
+          <p
+            v-if="BILLING_ENABLED"
+            class="hero-stagger hero-stagger-4 mt-4 text-sm text-[color:var(--color-text-muted)]"
+          >
             {{ t('landing.promo.noCreditCard') }} · {{ t('landing.promo.freeTrial') }}
           </p>
 

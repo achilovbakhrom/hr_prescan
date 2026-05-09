@@ -8,13 +8,14 @@ import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import GlassCard from '@/shared/components/GlassCard.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
+import { BILLING_ENABLED } from '@/shared/constants/billing'
 
 const router = useRouter()
 const { t } = useI18n()
 </script>
 
 <template>
-  <section id="pricing" class="px-4 py-24 sm:px-6 md:py-32">
+  <section v-if="BILLING_ENABLED" id="pricing" class="px-4 py-24 sm:px-6 md:py-32">
     <div class="scroll-animate mx-auto max-w-3xl">
       <GlassCard accent="ai" class="cta-card">
         <div class="text-center sm:px-6 sm:py-6">

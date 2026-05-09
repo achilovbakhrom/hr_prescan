@@ -8,6 +8,7 @@ import GlassSurface from '@/shared/components/GlassSurface.vue'
 import AppLogo from '@/shared/components/AppLogo.vue'
 import LanguageSwitcher from '@/shared/components/LanguageSwitcher.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
+import { BILLING_ENABLED } from '@/shared/constants/billing'
 
 const { t } = useI18n()
 
@@ -57,7 +58,7 @@ function scrollTo(id: string): void {
                   {{ t('landing.howItWorks.title') }}
                 </button>
               </li>
-              <li>
+              <li v-if="BILLING_ENABLED">
                 <RouterLink
                   :to="{ name: ROUTE_NAMES.PRICING }"
                   class="text-sm text-[color:var(--color-text-secondary)] transition-colors hover:text-[color:var(--color-text-primary)]"
@@ -73,7 +74,7 @@ function scrollTo(id: string): void {
             <h4
               class="mb-4 text-xs font-semibold uppercase tracking-wider text-[color:var(--color-text-muted)]"
             >
-              {{ t('landing.hero.getStarted') }}
+              {{ BILLING_ENABLED ? t('landing.hero.getStarted') : t('nav.signIn') }}
             </h4>
             <ul class="space-y-2.5">
               <li>
@@ -84,7 +85,7 @@ function scrollTo(id: string): void {
                   {{ t('nav.signIn') }}
                 </RouterLink>
               </li>
-              <li>
+              <li v-if="BILLING_ENABLED">
                 <RouterLink
                   :to="{ name: ROUTE_NAMES.REGISTER }"
                   class="text-sm text-[color:var(--color-text-secondary)] transition-colors hover:text-[color:var(--color-text-primary)]"

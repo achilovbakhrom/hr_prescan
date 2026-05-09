@@ -12,6 +12,8 @@ import Menu from 'primevue/menu'
 import type { MenuItem } from 'primevue/menuitem'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
+import { BILLING_ENABLED } from '@/shared/constants/billing'
+import { loadTokens } from '@/shared/api/authTokens'
 import LanguageSwitcher from '@/shared/components/LanguageSwitcher.vue'
 import ThemeToggle from '@/shared/components/ThemeToggle.vue'
 import AppLogo from '@/shared/components/AppLogo.vue'
@@ -22,7 +24,9 @@ const authStore = useAuthStore()
 const { t } = useI18n()
 const mobileOpen = ref(false)
 const scrolled = ref(false)
+const authReady = ref(false)
 const userMenu = ref<InstanceType<typeof Menu> | null>(null)
+const showLoggedOutActions = computed(() => authReady.value && !authStore.isAuthenticated)
 
 const menuItems = computed<MenuItem[]>(() => [
   {
@@ -41,11 +45,11 @@ const menuItems = computed<MenuItem[]>(() => [
   },
 ])
 
-const navLinks = [
+const navLinks = computed(() => [
   { id: 'features', labelKey: 'landing.footer.features' },
   { id: 'how-it-works', labelKey: 'landing.howItWorks.title' },
-  { id: 'pricing', labelKey: 'landing.footer.pricing' },
-] as const
+  ...(BILLING_ENABLED ? [{ id: 'pricing', labelKey: 'landing.footer.pricing' }] : []),
+])
 
 function toggleUserMenu(event: Event): void {
   userMenu.value?.toggle(event)
@@ -60,9 +64,18 @@ function onScroll(): void {
   scrolled.value = window.scrollY > 16
 }
 
+async function hydrateAuthForPublicNav(): Promise<void> {
+  try {
+    if (!authStore.user && loadTokens()?.access) await authStore.initAuth()
+  } finally {
+    authReady.value = true
+  }
+}
+
 onMounted(() => {
   window.addEventListener('scroll', onScroll, { passive: true })
   onScroll()
+  void hydrateAuthForPublicNav()
 })
 onUnmounted(() => window.removeEventListener('scroll', onScroll))
 </script>
@@ -104,7 +117,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
               />
               <button
                 type="button"
-                class="flex items-center gap-2 rounded-md px-2 py-1 transition-colors duration-200 ease-ios hover:bg-[color:var(--color-surface-raised)]"
+                class="flex items-center gap-2 rounded-xl border border-[color:var(--color-border-soft)] bg-white/55 px-2.5 py-1.5 text-left transition-colors duration-200 ease-ios hover:bg-white/80 dark:bg-white/5 dark:hover:bg-white/10"
                 @click="toggleUserMenu"
               >
                 <div
@@ -113,14 +126,20 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
                   {{ authStore.user?.firstName?.charAt(0)
                   }}{{ authStore.user?.lastName?.charAt(0) }}
                 </div>
-                <span class="text-sm font-medium text-[color:var(--color-text-primary)]">
-                  {{ authStore.user?.firstName }}
+                <span class="flex min-w-0 flex-col leading-tight">
+                  <span class="text-sm font-medium text-[color:var(--color-text-primary)]">
+                    {{ authStore.user?.firstName }} {{ authStore.user?.lastName }}
+                  </span>
+                  <span class="max-w-40 truncate text-xs text-[color:var(--color-text-muted)]">
+                    {{ authStore.user?.email }}
+                  </span>
                 </span>
+                <i class="pi pi-chevron-down text-[10px] text-[color:var(--color-text-muted)]"></i>
               </button>
               <Menu ref="userMenu" :model="menuItems" :popup="true" />
             </div>
           </template>
-          <template v-else>
+          <template v-else-if="showLoggedOutActions">
             <div class="hidden md:flex md:items-center md:gap-2">
               <Button
                 :label="t('nav.signIn')"
@@ -130,6 +149,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
                 @click="router.push({ name: ROUTE_NAMES.LOGIN })"
               />
               <Button
+                v-if="BILLING_ENABLED"
                 :label="t('landing.hero.getStarted')"
                 size="small"
                 @click="router.push({ name: ROUTE_NAMES.REGISTER })"

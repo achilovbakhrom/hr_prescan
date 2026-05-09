@@ -16,7 +16,7 @@ export type BackgroundMode =
 
 const SCHEME_KEY = 'hr_prescan_color_scheme'
 const BG_KEY = 'hr_prescan_bg_mode'
-const DEFAULT_BACKGROUND_MODE: BackgroundMode = 'catgarden'
+const DEFAULT_BACKGROUND_MODE: BackgroundMode = 'mesh'
 
 const VALID_BG_MODES: readonly BackgroundMode[] = [
   'off',
