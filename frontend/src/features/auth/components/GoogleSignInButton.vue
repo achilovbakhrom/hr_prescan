@@ -74,7 +74,6 @@ onMounted(() => {
   darkMode.value = isDarkMode()
   themeObserver = new MutationObserver(() => {
     darkMode.value = isDarkMode()
-    renderGoogleButton()
   })
   themeObserver.observe(document.documentElement, {
     attributes: true,
