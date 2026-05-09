@@ -44,8 +44,8 @@ function readBackground(): BackgroundMode {
 }
 
 export const useThemeStore = defineStore('theme', () => {
-  const colorScheme = ref<ColorScheme>(readScheme())
-  const backgroundMode = ref<BackgroundMode>(readBackground())
+  const colorScheme = ref<ColorScheme>('light')
+  const backgroundMode = ref<BackgroundMode>(DEFAULT_BACKGROUND_MODE)
   const resolvedDark = computed(() => colorScheme.value === 'dark')
 
   function applyDarkClass(): void {
@@ -68,6 +68,13 @@ export const useThemeStore = defineStore('theme', () => {
     if (typeof localStorage !== 'undefined') localStorage.setItem(BG_KEY, mode)
   }
 
+  function hydratePreferences(): void {
+    if (typeof localStorage === 'undefined') return
+    colorScheme.value = readScheme()
+    backgroundMode.value = readBackground()
+    applyDarkClass()
+  }
+
   watch(resolvedDark, applyDarkClass, { immediate: true })
 
   return {
@@ -77,5 +84,6 @@ export const useThemeStore = defineStore('theme', () => {
     setColorScheme,
     cycleColorScheme,
     setBackgroundMode,
+    hydratePreferences,
   }
 })
