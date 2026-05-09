@@ -7,12 +7,14 @@
       <CookieConsent />
       <AIAssistantDrawer />
     </ClientOnly>
+    <AppPreloader />
   </div>
 </template>
 
 <script setup lang="ts">
 import CookieConsent from '@/shared/components/CookieConsent.vue'
 import AIAssistantDrawer from '@/shared/components/AIAssistantDrawer.vue'
+import AppPreloader from '@/shared/components/AppPreloader.vue'
 </script>
 
 <style>
