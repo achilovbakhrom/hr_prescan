@@ -1,9 +1,13 @@
 <template>
-  <NuxtPage />
-  <ClientOnly>
-    <CookieConsent />
-    <AIAssistantDrawer />
-  </ClientOnly>
+  <div>
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
+    <ClientOnly>
+      <CookieConsent />
+      <AIAssistantDrawer />
+    </ClientOnly>
+  </div>
 </template>
 
 <script setup lang="ts">
