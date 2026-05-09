@@ -2,14 +2,20 @@ import { ROUTE_NAMES } from '@/shared/constants/routes'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
 
 export default defineNuxtRouteMiddleware(async (to) => {
-  if (import.meta.server) return
+  const requiresAuth = to.meta.requiresAuth !== false
+
+  if (import.meta.server) {
+    if (requiresAuth) {
+      return navigateTo({ name: ROUTE_NAMES.LOGIN, query: { redirect: to.fullPath } })
+    }
+    return
+  }
 
   const authStore = useAuthStore()
   if (!authStore.user && authStore.tokens) {
     await authStore.initAuth()
   }
 
-  const requiresAuth = to.meta.requiresAuth !== false
   if (requiresAuth && !authStore.isAuthenticated) {
     return navigateTo({ name: ROUTE_NAMES.LOGIN, query: { redirect: to.fullPath } })
   }
