@@ -21,6 +21,7 @@ export function usePublicJobSearch() {
 
   let searchTimeout: ReturnType<typeof setTimeout> | null = null
   let requestToken = 0
+  let activeController: AbortController | null = null
 
   const hasMore = computed(() => jobs.value.length < total.value)
   const jobCount = computed(() => total.value || jobs.value.length)
@@ -43,6 +44,7 @@ export function usePublicJobSearch() {
 
   onBeforeUnmount(() => {
     if (searchTimeout) clearTimeout(searchTimeout)
+    activeController?.abort()
   })
 
   async function fetchJobs(): Promise<void> {
@@ -51,23 +53,31 @@ export function usePublicJobSearch() {
       searchTimeout = null
     }
     const token = ++requestToken
+    activeController?.abort()
+    const controller = new AbortController()
+    activeController = controller
     loading.value = true
     page.value = 0
     try {
-      const response = await vacancyService.getPublicListPage({
-        ...filters(),
-        page: 1,
-        pageSize: PAGE_SIZE,
-      })
+      const response = await vacancyService.getPublicListPage(
+        {
+          ...filters(),
+          page: 1,
+          pageSize: PAGE_SIZE,
+        },
+        controller.signal,
+      )
       if (token !== requestToken) return
       jobs.value = response.results
       total.value = response.count
       page.value = 1
-    } catch {
+    } catch (error) {
+      if (isCanceledRequest(error)) return
       if (token !== requestToken) return
       jobs.value = []
       total.value = 0
     } finally {
+      if (activeController === controller) activeController = null
       if (token === requestToken) loading.value = false
     }
   }
@@ -75,20 +85,28 @@ export function usePublicJobSearch() {
   async function loadMore(): Promise<void> {
     if (loading.value || loadingMore.value || !hasMore.value) return
     const token = requestToken
+    const controller = new AbortController()
+    activeController = controller
     loadingMore.value = true
     try {
       const nextPage = page.value + 1
-      const response = await vacancyService.getPublicListPage({
-        ...filters(),
-        page: nextPage,
-        pageSize: PAGE_SIZE,
-      })
+      const response = await vacancyService.getPublicListPage(
+        {
+          ...filters(),
+          page: nextPage,
+          pageSize: PAGE_SIZE,
+        },
+        controller.signal,
+      )
       if (token !== requestToken) return
       jobs.value = [...jobs.value, ...response.results]
       total.value = response.count
       page.value = nextPage
+    } catch (error) {
+      if (!isCanceledRequest(error)) throw error
     } finally {
-      if (token === requestToken) loadingMore.value = false
+      if (activeController === controller) activeController = null
+      loadingMore.value = false
     }
   }
 
@@ -128,6 +146,15 @@ export function usePublicJobSearch() {
       salaryMin: salaryMin.value ?? undefined,
       salaryMax: salaryMax.value ?? undefined,
     }
+  }
+
+  function isCanceledRequest(error: unknown): boolean {
+    return (
+      typeof error === 'object' &&
+      error !== null &&
+      'code' in error &&
+      (error as { code?: unknown }).code === 'ERR_CANCELED'
+    )
   }
 
   return {
