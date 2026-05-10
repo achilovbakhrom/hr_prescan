@@ -5,7 +5,7 @@ import logging
 import os
 import time
 
-from livekit.agents import llm
+from livekit.agents import llm, tokenize, tts as agents_tts
 from livekit.agents.pipeline import AgentTranscriptionOptions, VoicePipelineAgent
 from livekit.plugins import deepgram, elevenlabs, google, silero
 from livekit.plugins.elevenlabs import Voice, VoiceSettings
@@ -57,9 +57,26 @@ def _deepgram_language(language: str) -> str:
     return language if language in supported_languages else "multi"
 
 
-def _deepgram_tts(model: str):
+def _deepgram_tts(model: str, *, use_streaming: bool):
     logger.info("Using Deepgram TTS provider with model %s.", model)
-    return deepgram.TTS(model=model, api_key=DEEPGRAM_API_KEY or None)
+    provider = deepgram.TTS(
+        model=model,
+        api_key=DEEPGRAM_API_KEY or None,
+        use_streaming=use_streaming,
+    )
+    if use_streaming:
+        return provider
+    return agents_tts.StreamAdapter(
+        tts=provider,
+        sentence_tokenizer=tokenize.basic.SentenceTokenizer(),
+    )
+
+
+def _deepgram_tts_for_language(language: str):
+    model = DEEPGRAM_TTS_MODELS_BY_LANGUAGE.get(language)
+    if model:
+        return _deepgram_tts(model, use_streaming=False)
+    return _deepgram_tts(DEEPGRAM_TTS_MODEL, use_streaming=True)
 
 
 def _elevenlabs_tts(language: str):
@@ -85,23 +102,31 @@ def _elevenlabs_tts(language: str):
 
 def _build_tts(language: str):
     if TTS_PROVIDER == "deepgram":
-        return _deepgram_tts(DEEPGRAM_TTS_MODEL)
+        return _deepgram_tts_for_language(language)
 
     if TTS_PROVIDER == "elevenlabs":
-        return _elevenlabs_tts(language)
+        return agents_tts.FallbackAdapter(
+            [_elevenlabs_tts(language), _deepgram_tts_for_language(language)],
+            max_retry_per_tts=0,
+            attempt_timeout=6.0,
+        )
 
     if TTS_PROVIDER != "auto":
         logger.warning("Unknown TTS_PROVIDER=%s. Using automatic TTS selection.", TTS_PROVIDER)
 
     deepgram_model = DEEPGRAM_TTS_MODELS_BY_LANGUAGE.get(language)
     if deepgram_model:
-        return _deepgram_tts(deepgram_model)
+        return _deepgram_tts_for_language(language)
 
     if ELEVENLABS_API_KEY:
-        return _elevenlabs_tts(language)
+        return agents_tts.FallbackAdapter(
+            [_elevenlabs_tts(language), _deepgram_tts_for_language(language)],
+            max_retry_per_tts=0,
+            attempt_timeout=6.0,
+        )
 
     logger.warning("No ElevenLabs API key for %s TTS. Falling back to Deepgram English TTS.", language)
-    return _deepgram_tts(DEEPGRAM_TTS_MODEL)
+    return _deepgram_tts_for_language(language)
 
 
 async def create_interview_agent(ctx) -> VoicePipelineAgent:

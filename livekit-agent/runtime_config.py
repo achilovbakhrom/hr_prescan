@@ -28,7 +28,7 @@ INTERRUPT_MIN_WORDS = env_int("LIVEKIT_INTERRUPT_MIN_WORDS", 2)
 PREEMPTIVE_SYNTHESIS = env_bool("LIVEKIT_PREEMPTIVE_SYNTHESIS", False)
 
 TTS_PROVIDER = (os.environ.get("TTS_PROVIDER") or "auto").strip().lower()
-DEEPGRAM_TTS_MODEL = os.environ.get("DEEPGRAM_TTS_MODEL") or "aura-2-thalia-en"
+DEEPGRAM_TTS_MODEL = os.environ.get("DEEPGRAM_TTS_MODEL") or "aura-asteria-en"
 ELEVENLABS_MODEL = os.environ.get("ELEVENLABS_MODEL") or "eleven_flash_v2_5"
 ELEVENLABS_EXTENDED_MODEL = os.environ.get("ELEVENLABS_EXTENDED_MODEL") or "eleven_v3"
 ELEVENLABS_STABILITY = env_float("ELEVENLABS_STABILITY", 0.48)
