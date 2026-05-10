@@ -7,6 +7,13 @@ import httpx
 
 BACKEND_API_URL = os.environ.get("BACKEND_API_URL", "http://django:8000")
 INTERNAL_API_KEY = os.environ.get("INTERNAL_API_KEY", "")
+INTERNAL_HEADERS = {
+    "X-Internal-Key": INTERNAL_API_KEY,
+    # Django production redirects plain HTTP unless the original request is
+    # marked secure. Internal Docker traffic is HTTP, but trusted service-to-
+    # service calls should not be upgraded to https://django:8000.
+    "X-Forwarded-Proto": "https",
+}
 
 
 @dataclass
@@ -34,7 +41,7 @@ async def fetch_interview_context(*, room_name: str) -> InterviewContext:
     async with httpx.AsyncClient(timeout=30.0) as client:
         response = await client.get(
             f"{BACKEND_API_URL}/api/internal/interviews/{interview_id}/context/",
-            headers={"X-Internal-Key": INTERNAL_API_KEY},
+            headers=INTERNAL_HEADERS,
         )
         response.raise_for_status()
         data = response.json()

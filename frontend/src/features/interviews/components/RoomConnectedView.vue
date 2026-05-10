@@ -120,11 +120,12 @@ const { t } = useI18n()
           class="absolute bottom-2 left-2 flex items-center gap-1.5 rounded-md bg-black/60 px-2 py-0.5 font-mono text-[11px] text-white backdrop-blur-sm"
         >
           <span>{{ t('interviews.roomPage.you') }}</span>
-          <i
+          <span
             v-if="isMuted"
-            class="pi pi-microphone-slash text-[color:var(--color-danger)]"
+            aria-hidden="true"
+            class="pi pi-microphone media-icon-muted text-white"
             style="font-size: 0.65rem"
-          ></i>
+          ></span>
         </div>
       </div>
     </div>
@@ -144,7 +145,11 @@ const { t } = useI18n()
         :title="isMuted ? t('interviews.roomPage.unmute') : t('interviews.roomPage.mute')"
         @click="emit('toggleMute')"
       >
-        <i :class="isMuted ? 'pi pi-microphone-slash' : 'pi pi-microphone'" class="text-base"></i>
+        <span
+          aria-hidden="true"
+          class="pi pi-microphone text-base"
+          :class="{ 'media-icon-muted': isMuted }"
+        ></span>
       </button>
 
       <button
@@ -175,3 +180,21 @@ const { t } = useI18n()
     </GlassSurface>
   </div>
 </template>
+
+<style scoped>
+.media-icon-muted {
+  position: relative;
+}
+
+.media-icon-muted::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1.1em;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+  content: '';
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+</style>

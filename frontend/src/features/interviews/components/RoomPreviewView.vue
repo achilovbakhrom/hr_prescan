@@ -78,7 +78,11 @@ const { t } = useI18n()
           "
           @click="emit('toggleMic')"
         >
-          <i :class="isMuted ? 'pi pi-microphone-slash' : 'pi pi-microphone'" class="text-base"></i>
+          <span
+            aria-hidden="true"
+            class="pi pi-microphone text-base"
+            :class="{ 'media-icon-muted': isMuted }"
+          ></span>
         </button>
         <button
           class="flex h-10 w-10 items-center justify-center rounded-full transition-colors"
@@ -155,3 +159,21 @@ const { t } = useI18n()
     </GlassCard>
   </div>
 </template>
+
+<style scoped>
+.media-icon-muted {
+  position: relative;
+}
+
+.media-icon-muted::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1.1em;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+  content: '';
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+</style>

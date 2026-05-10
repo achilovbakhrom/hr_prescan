@@ -12,6 +12,10 @@ logger = logging.getLogger("interview-agent")
 
 BACKEND_API_URL = os.environ.get("BACKEND_API_URL", "http://django:8000")
 INTERNAL_API_KEY = os.environ.get("INTERNAL_API_KEY", "")
+INTERNAL_HEADERS = {
+    "X-Internal-Key": INTERNAL_API_KEY,
+    "X-Forwarded-Proto": "https",
+}
 
 # Flag type constant for CV inconsistency (mirrors integrity.py and the model)
 FLAG_CV_INCONSISTENCY = "cv_inconsistency"
@@ -248,7 +252,7 @@ async def _send_results_to_backend(
     async with httpx.AsyncClient(timeout=30.0) as client:
         response = await client.post(
             f"{BACKEND_API_URL}/api/internal/interviews/{interview_id}/results/",
-            headers={"X-Internal-Key": INTERNAL_API_KEY},
+            headers=INTERNAL_HEADERS,
             json={
                 "overall_score": evaluation["overall_score"],
                 "ai_summary": evaluation["summary"],
