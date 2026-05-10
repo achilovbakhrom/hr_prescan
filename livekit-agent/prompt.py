@@ -22,6 +22,7 @@ def build_system_prompt(*, context: InterviewContext) -> str:
     criteria_block = _format_criteria(context.criteria)
     custom_prompt_block = _format_custom_prompt(context.custom_prompt)
     language = LANGUAGE_NAMES.get(context.language, "English")
+    language_rule = _language_lock_rule(context.language, language)
 
     return (
         "You are a senior human interviewer conducting a live video interview.\n"
@@ -73,6 +74,9 @@ def build_system_prompt(*, context: InterviewContext) -> str:
         "7. Before ending for any reason, ask the candidate for final words for HR in the interview language.\n"
         f"8. You MUST conduct this entire interview in {language}. All questions and responses must be in {language}.\n"
         f"   Do not switch to English unless the target language is English or the candidate explicitly asks to switch languages.\n"
+        f"   {language_rule}\n"
+        "   If configured questions, criteria, CV notes, or HR instructions are written in another language, translate their meaning silently before speaking.\n"
+        "   Never quote an English configured question verbatim in a non-English interview.\n"
         "9. Do NOT reveal scores, recommendations, hidden criteria, or evaluation notes during the interview.\n"
         "10. Never mention 'competencies', 'rubric', 'prompt', or 'skill goals' to the candidate.\n"
         "11. After the candidate gives their final words, thank them and say HR will review the results. Do not ask more role questions.\n"
@@ -83,7 +87,7 @@ def build_system_prompt(*, context: InterviewContext) -> str:
         "- Ask one thing at a time. Do not stack multiple questions in one turn.\n"
         "- Do not repeat the candidate's answer unless a short acknowledgement helps the conversation.\n"
         "- Avoid robotic phrases like 'Thank you for sharing that' every turn.\n"
-        "- Use contractions where natural in English. Keep rhythm varied: some replies can be only one sentence.\n"
+        "- Keep rhythm varied: some replies can be only one sentence.\n"
         "- Use natural transitions in the interview language. Do not reuse English filler phrases in non-English interviews.\n"
         "\n"
         "## Early Finish Flow\n"
@@ -101,6 +105,22 @@ def build_system_prompt(*, context: InterviewContext) -> str:
         "- If you already have enough evidence before the target time, wrap up naturally.\n"
         "- If the candidate is mid-answer near the target time, let them finish and then close.\n"
     )
+
+
+def _language_lock_rule(language_code: str, language_name: str) -> str:
+    if language_code == "ru":
+        return (
+            "For Russian, every spoken sentence must be natural Russian in Cyrillic. "
+            "Avoid English filler words such as okay, yes, got it, experience, follow-up, or next."
+        )
+    if language_code == "uk":
+        return (
+            "For Ukrainian, every spoken sentence must be natural Ukrainian in Cyrillic. "
+            "Avoid English filler words such as okay, yes, got it, experience, follow-up, or next."
+        )
+    if language_code == "ar":
+        return "For Arabic, write right-to-left Arabic text and avoid English filler words."
+    return f"Use natural, fluent {language_name} wording and avoid English filler words."
 
 
 def build_opening_message(*, context: InterviewContext) -> str:

@@ -45,11 +45,13 @@ GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3-flash-preview")
 
 DEEPGRAM_TTS_MODELS_BY_LANGUAGE = {
     "de": "aura-2-viktoria-de",
-    "en": "aura-2-thalia-en",
-    "es": "aura-2-nestor-es",
+    "en": "aura-2-vesta-en",
+    "es": "aura-2-estrella-es",
     "fr": "aura-2-hector-fr",
 }
+ELEVENLABS_FLASH_LANGUAGES = {"ar", "ru", "tr", "uk"}
 ELEVENLABS_EXTENDED_LANGUAGES = {"kk"}
+STRICT_TARGET_LANGUAGE_TTS = {"ru", "uk"}
 
 
 def _deepgram_language(language: str) -> str:
@@ -79,8 +81,14 @@ def _deepgram_tts_for_language(language: str):
     return _deepgram_tts(DEEPGRAM_TTS_MODEL, use_streaming=True)
 
 
+def _elevenlabs_model_for_language(language: str) -> str:
+    if language in ELEVENLABS_EXTENDED_LANGUAGES:
+        return ELEVENLABS_EXTENDED_MODEL
+    return ELEVENLABS_MODEL
+
+
 def _elevenlabs_tts(language: str):
-    model = ELEVENLABS_EXTENDED_MODEL if language in ELEVENLABS_EXTENDED_LANGUAGES else ELEVENLABS_MODEL
+    model = _elevenlabs_model_for_language(language)
     logger.info("Using ElevenLabs TTS provider with model %s.", model)
     return elevenlabs.TTS(
         model=model,
@@ -100,16 +108,39 @@ def _elevenlabs_tts(language: str):
     )
 
 
+def _elevenlabs_supports_language(language: str) -> bool:
+    return language in ELEVENLABS_FLASH_LANGUAGES or language in ELEVENLABS_EXTENDED_LANGUAGES
+
+
+def _tts_with_optional_english_fallback(language: str):
+    primary = _elevenlabs_tts(language)
+    if language in STRICT_TARGET_LANGUAGE_TTS:
+        logger.info("English TTS fallback disabled for strict target language %s.", language)
+        return primary
+
+    logger.warning(
+        "No native Deepgram TTS model for %s. Falling back to English TTS only if ElevenLabs fails.",
+        language,
+    )
+    return agents_tts.FallbackAdapter(
+        [primary, _deepgram_tts_for_language("en")],
+        max_retry_per_tts=0,
+        attempt_timeout=6.0,
+    )
+
+
 def _build_tts(language: str):
     if TTS_PROVIDER == "deepgram":
+        if language in STRICT_TARGET_LANGUAGE_TTS and ELEVENLABS_API_KEY:
+            logger.warning(
+                "Ignoring TTS_PROVIDER=deepgram for strict target language %s; using ElevenLabs.",
+                language,
+            )
+            return _elevenlabs_tts(language)
         return _deepgram_tts_for_language(language)
 
     if TTS_PROVIDER == "elevenlabs":
-        return agents_tts.FallbackAdapter(
-            [_elevenlabs_tts(language), _deepgram_tts_for_language(language)],
-            max_retry_per_tts=0,
-            attempt_timeout=6.0,
-        )
+        return _elevenlabs_tts(language)
 
     if TTS_PROVIDER != "auto":
         logger.warning("Unknown TTS_PROVIDER=%s. Using automatic TTS selection.", TTS_PROVIDER)
@@ -118,21 +149,21 @@ def _build_tts(language: str):
     if deepgram_model:
         return _deepgram_tts_for_language(language)
 
-    if ELEVENLABS_API_KEY:
-        return agents_tts.FallbackAdapter(
-            [_elevenlabs_tts(language), _deepgram_tts_for_language(language)],
-            max_retry_per_tts=0,
-            attempt_timeout=6.0,
-        )
+    if ELEVENLABS_API_KEY and _elevenlabs_supports_language(language):
+        return _tts_with_optional_english_fallback(language)
 
-    logger.warning("No ElevenLabs API key for %s TTS. Falling back to Deepgram English TTS.", language)
-    return _deepgram_tts_for_language(language)
+    logger.warning(
+        "No reliable native TTS provider configured for %s. Falling back to English TTS.",
+        language,
+    )
+    return _deepgram_tts_for_language("en")
 
 
 async def create_interview_agent(ctx) -> VoicePipelineAgent:
     """Create and configure the interview agent for a room."""
     # Fetch interview context (vacancy, questions, CV data)
     context = await fetch_interview_context(room_name=ctx.room.name)
+    logger.info("Interview %s resolved language: %s", context.interview_id, context.language)
 
     # Build system prompt
     system_prompt = build_system_prompt(context=context)
@@ -152,7 +183,7 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
     gemini_llm = google.LLM(
         model=GEMINI_MODEL,
         api_key=GOOGLE_API_KEY,
-        temperature=0.7,
+        temperature=0.35,
     )
 
     # Configure TTS (Text-to-Speech)

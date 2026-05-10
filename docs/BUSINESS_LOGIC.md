@@ -12,7 +12,7 @@ HR PreScan is a multi-tenant SaaS platform that automates the full candidate scr
 The AI agent evaluates candidates at each step and decides whether to advance them to the next stage or reject them. HR can also manually move candidates between stages at any time. The platform handles the screening pipeline; HR retains full control over final decisions.
 
 **Platform:** Web application (mobile versions planned for later)
-**Languages:** English, Russian, Uzbek, Kazakh, Turkish, Arabic, Spanish, French, German, and Ukrainian for the web app, public translation, and AI screening language selection. Telegram bot interface copy currently remains English/Russian/Uzbek, while Telegram prescreening follows the vacancy's selected screening language. Deeper interview sessions may use a runtime language fallback when voice quality is not acceptable; currently Uzbek interview sessions run in Russian.
+**Languages:** English, Russian, Uzbek, Kazakh, Turkish, Arabic, Spanish, French, German, and Ukrainian for the web app, public translation, and AI screening language selection. Telegram bot interface copy currently remains English/Russian/Uzbek, while Telegram prescreening follows the vacancy's selected screening language. Deeper video interview sessions use a voice-provider policy: native Deepgram voices for English, Spanish, French, and German; ElevenLabs multilingual voices for Russian, Ukrainian, Turkish, Arabic, and Kazakh; Uzbek interview sessions currently run in Russian until native Uzbek voice quality is acceptable.
 **Tech Stack:** Django (backend) + Nuxt/Vue.js (frontend), deployed via Docker Compose with zero-downtime strategy
 
 ---
@@ -409,7 +409,7 @@ Interview is the second, more rigorous AI screening step. HR enables it per vaca
 
 **Common to both interview modes:**
 - A progress indicator shows approximate completion
-- Supported languages: English, Russian, Uzbek, Kazakh, Turkish, Arabic, Spanish, French, German, and Ukrainian. Interview sessions inherit the vacancy screening language unless explicitly changed by the screening workflow or by the interview runtime language policy. Because Uzbek TTS quality is not acceptable for the live interviewer, Uzbek interview sessions run in Russian. Prescanning remains in Uzbek when Uzbek is selected.
+- Supported languages: English, Russian, Uzbek, Kazakh, Turkish, Arabic, Spanish, French, German, and Ukrainian. Interview sessions inherit the vacancy screening language unless explicitly changed by the screening workflow or by the interview runtime language policy. Video interviews use native Deepgram TTS for English, Spanish, French, and German, ElevenLabs multilingual TTS for Russian, Ukrainian, Turkish, Arabic, and Kazakh, and Russian fallback for Uzbek because native Uzbek TTS quality is not acceptable for the live interviewer. Russian and Ukrainian video interviews must not fall back to English speech; if the multilingual TTS provider is unavailable, the provider error should be surfaced instead of continuing in English. Prescanning remains in Uzbek when Uzbek is selected.
 - The interview agent should speak in concise, natural language. If the candidate refuses to continue, says the role/profession is not relevant, or clearly does not fit the role after clarification, the agent ends the interview kindly instead of continuing to probe. Before any normal or early finish, the agent asks for the candidate's final words for HR.
 
 **Question Generation:**
