@@ -21,6 +21,7 @@ from runtime_config import (
     DEEPGRAM_ENDPOINTING_MS,
     DEEPGRAM_MODEL,
     DEEPGRAM_TTS_MODEL,
+    ELEVENLABS_EXTENDED_MODEL,
     ELEVENLABS_MODEL,
     ELEVENLABS_SIMILARITY_BOOST,
     ELEVENLABS_SPEED,
@@ -42,28 +43,30 @@ ELEVENLABS_API_KEY = os.environ.get("ELEVENLABS_API_KEY", "")
 GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY", "")
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3-flash-preview")
 
+DEEPGRAM_TTS_MODELS_BY_LANGUAGE = {
+    "de": "aura-2-viktoria-de",
+    "en": "aura-2-thalia-en",
+    "es": "aura-2-nestor-es",
+    "fr": "aura-2-hector-fr",
+}
+ELEVENLABS_EXTENDED_LANGUAGES = {"kk"}
+
 
 def _deepgram_language(language: str) -> str:
     supported_languages = {"de", "en", "es", "fr", "ru", "uk"}
     return language if language in supported_languages else "multi"
 
 
-def _deepgram_tts():
-    logger.info("Using Deepgram TTS provider with model %s.", DEEPGRAM_TTS_MODEL)
-    return deepgram.TTS(model=DEEPGRAM_TTS_MODEL, api_key=DEEPGRAM_API_KEY or None)
+def _deepgram_tts(model: str):
+    logger.info("Using Deepgram TTS provider with model %s.", model)
+    return deepgram.TTS(model=model, api_key=DEEPGRAM_API_KEY or None)
 
 
-def _build_tts():
-    if TTS_PROVIDER == "deepgram":
-        return _deepgram_tts()
-
-    if TTS_PROVIDER != "elevenlabs":
-        logger.warning("Unknown TTS_PROVIDER=%s. Falling back to Deepgram TTS.", TTS_PROVIDER)
-        return _deepgram_tts()
-
-    logger.info("Using ElevenLabs TTS provider with model %s.", ELEVENLABS_MODEL)
+def _elevenlabs_tts(language: str):
+    model = ELEVENLABS_EXTENDED_MODEL if language in ELEVENLABS_EXTENDED_LANGUAGES else ELEVENLABS_MODEL
+    logger.info("Using ElevenLabs TTS provider with model %s.", model)
     return elevenlabs.TTS(
-        model=ELEVENLABS_MODEL,
+        model=model,
         api_key=ELEVENLABS_API_KEY,
         voice=Voice(
             id=ELEVENLABS_VOICE_ID,
@@ -78,6 +81,27 @@ def _build_tts():
             ),
         ),
     )
+
+
+def _build_tts(language: str):
+    if TTS_PROVIDER == "deepgram":
+        return _deepgram_tts(DEEPGRAM_TTS_MODEL)
+
+    if TTS_PROVIDER == "elevenlabs":
+        return _elevenlabs_tts(language)
+
+    if TTS_PROVIDER != "auto":
+        logger.warning("Unknown TTS_PROVIDER=%s. Using automatic TTS selection.", TTS_PROVIDER)
+
+    deepgram_model = DEEPGRAM_TTS_MODELS_BY_LANGUAGE.get(language)
+    if deepgram_model:
+        return _deepgram_tts(deepgram_model)
+
+    if ELEVENLABS_API_KEY:
+        return _elevenlabs_tts(language)
+
+    logger.warning("No ElevenLabs API key for %s TTS. Falling back to Deepgram English TTS.", language)
+    return _deepgram_tts(DEEPGRAM_TTS_MODEL)
 
 
 async def create_interview_agent(ctx) -> VoicePipelineAgent:
@@ -107,7 +131,7 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
     )
 
     # Configure TTS (Text-to-Speech)
-    tts = _build_tts()
+    tts = _build_tts(context.language)
 
     control = ConversationControl()
 
