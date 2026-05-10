@@ -46,6 +46,7 @@ class VacancyListOutputSerializer(serializers.ModelSerializer):
     criteria_count = serializers.IntegerField(read_only=True)
     questions_count = serializers.IntegerField(read_only=True)
     candidates_total = serializers.IntegerField(read_only=True, default=0)
+    can_change_interview_mode = serializers.SerializerMethodField()
     candidates_interviewed = serializers.IntegerField(read_only=True, default=0)
     candidates_shortlisted = serializers.IntegerField(read_only=True, default=0)
     candidates_rejected = serializers.IntegerField(read_only=True, default=0)
@@ -74,6 +75,7 @@ class VacancyListOutputSerializer(serializers.ModelSerializer):
             "criteria_count",
             "questions_count",
             "candidates_total",
+            "can_change_interview_mode",
             "candidates_interviewed",
             "candidates_shortlisted",
             "candidates_rejected",
@@ -87,6 +89,12 @@ class VacancyListOutputSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    def get_can_change_interview_mode(self, obj) -> bool:
+        candidates_total = getattr(obj, "candidates_total", None)
+        if candidates_total is not None:
+            return candidates_total == 0
+        return not obj.applications.filter(is_deleted=False).exists()
+
 
 class VacancyDetailOutputSerializer(serializers.ModelSerializer):
     """Full vacancy detail with nested criteria and questions."""
@@ -97,12 +105,16 @@ class VacancyDetailOutputSerializer(serializers.ModelSerializer):
     created_by_email = serializers.EmailField(source="created_by.email", read_only=True)
     candidates_total = serializers.SerializerMethodField()
     candidates_shortlisted = serializers.SerializerMethodField()
+    can_change_interview_mode = serializers.SerializerMethodField()
 
     def get_candidates_total(self, obj) -> int:
         return obj.applications.filter(is_deleted=False).count()
 
     def get_candidates_shortlisted(self, obj) -> int:
         return obj.applications.filter(is_deleted=False, status="shortlisted").count()
+
+    def get_can_change_interview_mode(self, obj) -> bool:
+        return not obj.applications.filter(is_deleted=False).exists()
 
     class Meta:
         model = Vacancy
@@ -137,6 +149,7 @@ class VacancyDetailOutputSerializer(serializers.ModelSerializer):
             "criteria",
             "questions",
             "candidates_total",
+            "can_change_interview_mode",
             "candidates_shortlisted",
             "created_by_email",
             "created_at",

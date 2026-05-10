@@ -68,7 +68,11 @@ const canDelete = computed(
 )
 
 /** Lock the interview-step toggle once active applications exist. */
-const interviewLocked = computed(() => (props.vacancy.candidatesTotal ?? 0) > 0)
+const interviewLocked = computed(
+  () =>
+    props.vacancy.canChangeInterviewMode === false ||
+    (props.vacancy.canChangeInterviewMode == null && (props.vacancy.candidatesTotal ?? 0) > 0),
+)
 
 function confirmDelete(): void {
   confirm.require({

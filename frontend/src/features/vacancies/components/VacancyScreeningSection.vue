@@ -56,7 +56,11 @@ const prompt = ref(
 const interviewMode = ref<InterviewMode>(props.vacancy.interviewMode || 'chat')
 const interviewDuration = ref<number>(props.vacancy.interviewDuration || 30)
 const saving = ref(false)
-const interviewLocked = computed(() => (props.vacancy.candidatesTotal ?? 0) > 0)
+const interviewLocked = computed(
+  () =>
+    props.vacancy.canChangeInterviewMode === false ||
+    (props.vacancy.canChangeInterviewMode == null && (props.vacancy.candidatesTotal ?? 0) > 0),
+)
 
 watch(
   () => props.vacancy,

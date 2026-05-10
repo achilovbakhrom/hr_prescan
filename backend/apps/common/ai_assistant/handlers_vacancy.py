@@ -111,13 +111,30 @@ def handle_update_vacancy(*, user, params):
 
 
 def handle_publish_vacancy(*, user, params):
+    from apps.common.ai_assistant.handlers_vacancy_generation import ensure_vacancy_screening_setup
+    from apps.vacancies.models import ScreeningStep
     from apps.vacancies.services import publish_vacancy
 
     vacancy = resolve_vacancy(user=user, title=params.get("vacancy_title", ""))
+    prescreen_criteria, prescreen_questions = ensure_vacancy_screening_setup(
+        vacancy=vacancy,
+        step=ScreeningStep.PRESCANNING,
+    )
+    interview_criteria = []
+    interview_questions = []
+    if vacancy.interview_enabled:
+        interview_criteria, interview_questions = ensure_vacancy_screening_setup(
+            vacancy=vacancy,
+            step=ScreeningStep.INTERVIEW,
+        )
     vacancy = publish_vacancy(vacancy=vacancy)
+    generated_total = (
+        len(prescreen_criteria) + len(prescreen_questions) + len(interview_criteria) + len(interview_questions)
+    )
+    setup_note = f" Generated {generated_total} missing setup item(s) first." if generated_total else ""
     return {
         "success": True,
-        "message": f"Vacancy '{vacancy.title}' is now published.",
+        "message": f"Vacancy '{vacancy.title}' is now published.{setup_note}",
         "data": {"id": str(vacancy.id), "title": vacancy.title, "status": vacancy.status},
         "action": "publish_vacancy",
     }

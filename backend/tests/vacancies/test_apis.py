@@ -125,6 +125,21 @@ def test_update_interview_mode_with_applications_returns_400():
     assert "Cannot change interview mode" in response.data["detail"]
 
 
+def test_vacancy_detail_exposes_interview_mode_change_lock():
+    user, vacancy = _member_vacancy_in_second_company()
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    unlocked_response = client.get(f"/api/hr/vacancies/{vacancy.id}/")
+    ApplicationFactory(vacancy=vacancy)
+    locked_response = client.get(f"/api/hr/vacancies/{vacancy.id}/")
+
+    assert unlocked_response.status_code == 200
+    assert unlocked_response.data["can_change_interview_mode"] is True
+    assert locked_response.status_code == 200
+    assert locked_response.data["can_change_interview_mode"] is False
+
+
 def test_generate_and_regenerate_buttons_use_all_user_company_memberships():
     user, vacancy = _member_vacancy_in_second_company()
     VacancyCriteria.objects.create(
@@ -167,6 +182,75 @@ def test_generate_and_regenerate_buttons_use_all_user_company_memberships():
     questions_mock.assert_called_once_with(vacancy=vacancy, step=ScreeningStep.PRESCANNING)
     assert regenerate_response.status_code == 202
     keywords_mock.assert_called_once_with(str(vacancy.id))
+
+
+def test_ai_assistant_generate_questions_creates_missing_criteria():
+    from apps.common.ai_assistant.handlers_vacancy_generation import handle_generate_questions
+
+    user, vacancy = _member_vacancy_in_second_company()
+
+    def create_criteria(*, vacancy, step):
+        return [
+            VacancyCriteria.objects.create(
+                vacancy=vacancy,
+                name="Production Debugging",
+                weight=3,
+                order=1,
+                step=step,
+            )
+        ]
+
+    def create_question(*, vacancy, step):
+        return [
+            InterviewQuestion.objects.create(
+                vacancy=vacancy,
+                text="Walk me through a production debugging case.",
+                category="Hard Skill",
+                step=step,
+                order=1,
+            )
+        ]
+
+    with (
+        patch("apps.vacancies.services.generate_vacancy_criteria", side_effect=create_criteria) as criteria_mock,
+        patch("apps.vacancies.services.generate_interview_questions", side_effect=create_question) as questions_mock,
+    ):
+        result = handle_generate_questions(
+            user=user,
+            params={"vacancy_title": vacancy.title, "step": ScreeningStep.INTERVIEW},
+        )
+
+    assert result["success"] is True
+    assert result["data"]["criteria"][0]["name"] == "Production Debugging"
+    assert result["data"]["questions"][0]["category"] == "Hard Skill"
+    criteria_mock.assert_called_once_with(vacancy=vacancy, step=ScreeningStep.INTERVIEW)
+    questions_mock.assert_called_once_with(vacancy=vacancy, step=ScreeningStep.INTERVIEW)
+
+
+def test_ai_assistant_publish_generates_missing_prescanning_questions():
+    from apps.common.ai_assistant.handlers_vacancy import handle_publish_vacancy
+
+    user, vacancy = _member_vacancy_in_second_company()
+    create_default_criteria(vacancy=vacancy, step=ScreeningStep.PRESCANNING)
+
+    def create_question(*, vacancy, step):
+        return [
+            InterviewQuestion.objects.create(
+                vacancy=vacancy,
+                text="Why are you interested in this role?",
+                category="Motivation",
+                step=step,
+                order=1,
+            )
+        ]
+
+    with patch("apps.vacancies.services.generate_interview_questions", side_effect=create_question) as questions_mock:
+        result = handle_publish_vacancy(user=user, params={"vacancy_title": vacancy.title})
+
+    vacancy.refresh_from_db()
+    assert result["success"] is True
+    assert vacancy.status == Vacancy.Status.PUBLISHED
+    questions_mock.assert_called_once_with(vacancy=vacancy, step=ScreeningStep.PRESCANNING)
 
 
 def test_generate_questions_passes_interview_step_to_generator():

@@ -30,6 +30,7 @@ export interface Vacancy {
   criteriaCount: number
   questionsCount: number
   candidatesTotal: number
+  canChangeInterviewMode?: boolean
   candidatesInterviewed: number
   candidatesShortlisted: number
   candidatesRejected: number

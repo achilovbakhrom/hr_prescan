@@ -250,7 +250,7 @@ export function useInterviewRoom(token: () => string) {
     }
     liveTranscript.value = Array.from(transcriptById.values())
       .sort((a, b) => a.receivedAt - b.receivedAt)
-      .slice(-5)
+      .slice(-6)
   }
 
   function startTimer(): void {

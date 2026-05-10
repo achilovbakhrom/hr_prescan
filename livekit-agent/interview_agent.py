@@ -17,15 +17,21 @@ from integrity import IntegrityMonitor
 from prompt import build_opening_message, build_system_prompt
 from room_lifecycle import shutdown_after_final_response
 from runtime_config import (
+    DEEPGRAM_API_KEY,
     DEEPGRAM_ENDPOINTING_MS,
     DEEPGRAM_MODEL,
+    DEEPGRAM_TTS_MODEL,
     ELEVENLABS_MODEL,
     ELEVENLABS_SIMILARITY_BOOST,
     ELEVENLABS_SPEED,
     ELEVENLABS_STABILITY,
     ELEVENLABS_STYLE,
+    INTERRUPT_MIN_WORDS,
+    INTERRUPT_SPEECH_DURATION,
     MAX_ENDPOINTING_DELAY,
     MIN_ENDPOINTING_DELAY,
+    PREEMPTIVE_SYNTHESIS,
+    TTS_PROVIDER,
 )
 from speech_utils import speech_text
 
@@ -37,34 +43,26 @@ GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY", "")
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3-flash-preview")
 
 
-async def create_interview_agent(ctx) -> VoicePipelineAgent:
-    """Create and configure the interview agent for a room."""
-    # Fetch interview context (vacancy, questions, CV data)
-    context = await fetch_interview_context(room_name=ctx.room.name)
+def _deepgram_language(language: str) -> str:
+    supported_languages = {"de", "en", "es", "fr", "ru", "uk"}
+    return language if language in supported_languages else "multi"
 
-    # Build system prompt
-    system_prompt = build_system_prompt(context=context)
-    chat_ctx = llm.ChatContext().append(role="system", text=system_prompt)
 
-    # Configure STT (Speech-to-Text)
-    stt = deepgram.STT(
-        model=DEEPGRAM_MODEL,
-        language="multi",  # EN/RU code-switching support
-        interim_results=True,
-        punctuate=True,
-        no_delay=True,
-        endpointing_ms=DEEPGRAM_ENDPOINTING_MS,
-    )
+def _deepgram_tts():
+    logger.info("Using Deepgram TTS provider with model %s.", DEEPGRAM_TTS_MODEL)
+    return deepgram.TTS(model=DEEPGRAM_TTS_MODEL, api_key=DEEPGRAM_API_KEY or None)
 
-    # Configure LLM
-    gemini_llm = google.LLM(
-        model=GEMINI_MODEL,
-        api_key=GOOGLE_API_KEY,
-        temperature=0.7,
-    )
 
-    # Configure TTS (Text-to-Speech)
-    tts = elevenlabs.TTS(
+def _build_tts():
+    if TTS_PROVIDER == "deepgram":
+        return _deepgram_tts()
+
+    if TTS_PROVIDER != "elevenlabs":
+        logger.warning("Unknown TTS_PROVIDER=%s. Falling back to Deepgram TTS.", TTS_PROVIDER)
+        return _deepgram_tts()
+
+    logger.info("Using ElevenLabs TTS provider with model %s.", ELEVENLABS_MODEL)
+    return elevenlabs.TTS(
         model=ELEVENLABS_MODEL,
         api_key=ELEVENLABS_API_KEY,
         voice=Voice(
@@ -80,6 +78,36 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
             ),
         ),
     )
+
+
+async def create_interview_agent(ctx) -> VoicePipelineAgent:
+    """Create and configure the interview agent for a room."""
+    # Fetch interview context (vacancy, questions, CV data)
+    context = await fetch_interview_context(room_name=ctx.room.name)
+
+    # Build system prompt
+    system_prompt = build_system_prompt(context=context)
+    chat_ctx = llm.ChatContext().append(role="system", text=system_prompt)
+
+    # Configure STT (Speech-to-Text)
+    stt = deepgram.STT(
+        model=DEEPGRAM_MODEL,
+        language=_deepgram_language(context.language),
+        interim_results=True,
+        punctuate=True,
+        no_delay=True,
+        endpointing_ms=DEEPGRAM_ENDPOINTING_MS,
+    )
+
+    # Configure LLM
+    gemini_llm = google.LLM(
+        model=GEMINI_MODEL,
+        api_key=GOOGLE_API_KEY,
+        temperature=0.7,
+    )
+
+    # Configure TTS (Text-to-Speech)
+    tts = _build_tts()
 
     control = ConversationControl()
 
@@ -98,9 +126,11 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
         tts=tts,
         chat_ctx=chat_ctx,
         allow_interruptions=True,
+        interrupt_speech_duration=INTERRUPT_SPEECH_DURATION,
+        interrupt_min_words=INTERRUPT_MIN_WORDS,
         min_endpointing_delay=MIN_ENDPOINTING_DELAY,
         max_endpointing_delay=MAX_ENDPOINTING_DELAY,
-        preemptive_synthesis=True,
+        preemptive_synthesis=PREEMPTIVE_SYNTHESIS,
         transcription=AgentTranscriptionOptions(
             user_transcription=True,
             agent_transcription=True,

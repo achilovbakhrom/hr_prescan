@@ -81,7 +81,8 @@ def update_vacancy(*, vacancy: Vacancy, data: dict) -> Vacancy:
     }
 
     # Guard: interview_mode cannot be changed once applications exist
-    if "interview_mode" in data and data["interview_mode"] != vacancy.interview_mode and vacancy.applications.exists():
+    has_applications = vacancy.applications.filter(is_deleted=False).exists()
+    if "interview_mode" in data and data["interview_mode"] != vacancy.interview_mode and has_applications:
         raise ApplicationError(str(MSG_CANNOT_CHANGE_MODE))
 
     update_fields: list[str] = []
