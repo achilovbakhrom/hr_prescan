@@ -7,6 +7,7 @@ import type {
   Vacancy,
   VacancyDetail,
   VacancyStatus,
+  StepType,
   CreateVacancyRequest,
   UpdateVacancyRequest,
 } from '../types/vacancy.types'
@@ -119,11 +120,14 @@ export const useVacancyStore = defineStore('vacancy', () => {
     }
   }
 
-  async function generateQuestions(vacancyId: string): Promise<void> {
+  async function generateQuestions(
+    vacancyId: string,
+    step: StepType = 'prescanning',
+  ): Promise<void> {
     loading.value = true
     error.value = null
     try {
-      const questions = await vacancyService.generateQuestions(vacancyId)
+      const questions = await vacancyService.generateQuestions(vacancyId, step)
       if (currentVacancy.value?.id === vacancyId) {
         currentVacancy.value.questions.push(...questions)
         currentVacancy.value.questionsCount += questions.length

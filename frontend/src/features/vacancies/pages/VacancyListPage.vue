@@ -25,8 +25,7 @@ const confirm = useConfirm()
 
 type TabKey = 'active' | 'archived'
 const activeTab = ref<TabKey>('active')
-const saved = localStorage.getItem('vacancy_status_filter')
-const statusFilter = ref<string | null>(saved && saved !== 'null' ? saved : null)
+const statusFilter = ref<string | null>(null)
 const sortOrder = ref<'newest' | 'oldest'>('newest')
 
 const statusOptions = computed(() => [
@@ -62,7 +61,11 @@ const archivedCount = computed(
   () => vacancyStore.vacancies.filter((v) => v.status === 'archived').length,
 )
 
-onMounted(() => vacancyStore.fetchVacancies())
+onMounted(() => {
+  const saved = localStorage.getItem('vacancy_status_filter')
+  statusFilter.value = saved && saved !== 'null' ? saved : null
+  vacancyStore.fetchVacancies()
+})
 
 function onStatusChange(): void {
   localStorage.setItem('vacancy_status_filter', String(statusFilter.value))

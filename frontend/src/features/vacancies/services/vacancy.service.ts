@@ -5,6 +5,7 @@ import type {
   VacancyStatus,
   VacancyCriteria,
   InterviewQuestion,
+  StepType,
   CreateVacancyRequest,
   UpdateVacancyRequest,
   GenerateVacancyContentRequest,
@@ -145,9 +146,13 @@ export const vacancyService = {
     return response.data.companyInfo
   },
 
-  async generateQuestions(vacancyId: string): Promise<InterviewQuestion[]> {
+  async generateQuestions(
+    vacancyId: string,
+    step: StepType = 'prescanning',
+  ): Promise<InterviewQuestion[]> {
     const response = await apiClient.post<InterviewQuestion[]>(
       `/hr/vacancies/${vacancyId}/questions/generate/`,
+      { step },
     )
     return response.data
   },

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import Toast from 'primevue/toast'
 import AppNavbar from '@/shared/components/AppNavbar.vue'
 import AppSidebar from '@/shared/components/AppSidebar.vue'
@@ -9,9 +9,9 @@ import PageShell from '@/shared/components/PageShell.vue'
 const sidebarCollapsed = ref(false)
 const mobileNavOpen = ref(false)
 
-if (import.meta.client) {
+onMounted(() => {
   sidebarCollapsed.value = localStorage.getItem('sidebar_collapsed') === 'true'
-}
+})
 
 function toggleDesktopSidebar(): void {
   sidebarCollapsed.value = !sidebarCollapsed.value

@@ -137,8 +137,36 @@ def test_generate_and_regenerate_buttons_use_all_user_company_memberships():
         regenerate_response = client.post(f"/api/hr/vacancies/{vacancy.id}/regenerate-keywords/")
 
     assert generate_response.status_code == 201
+    questions_mock.assert_called_once_with(vacancy=vacancy, step=ScreeningStep.PRESCANNING)
     assert regenerate_response.status_code == 202
     keywords_mock.assert_called_once_with(str(vacancy.id))
+
+
+def test_generate_questions_passes_interview_step_to_generator():
+    user, vacancy = _member_vacancy_in_second_company()
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    with patch("apps.vacancies.apis.questions.generate_interview_questions") as questions_mock:
+        questions_mock.return_value = [
+            InterviewQuestion.objects.create(
+                vacancy=vacancy,
+                text="Walk me through a production debugging case.",
+                category="Hard Skill",
+                step=ScreeningStep.INTERVIEW,
+                order=1,
+            )
+        ]
+
+        response = client.post(
+            f"/api/hr/vacancies/{vacancy.id}/questions/generate/",
+            {"step": "interview"},
+            format="json",
+        )
+
+    assert response.status_code == 201
+    assert response.data[0]["step"] == ScreeningStep.INTERVIEW
+    questions_mock.assert_called_once_with(vacancy=vacancy, step=ScreeningStep.INTERVIEW)
 
 
 def test_generate_vacancy_content_requires_manage_vacancies_permission():
