@@ -827,6 +827,14 @@
       "notProvided": "Nicht bereitgestellt",
       "combinedScore": "Kombinierte Punktzahl"
     },
+    "screeningLinks": {
+      "title": "Screening-Links",
+      "prescanning": "Vorscreening",
+      "interview": "Interview",
+      "interviewLockedHint": "Wird nach Abschluss des Vorscreenings geöffnet.",
+      "notPrepared": "Der Interview-Link ist noch nicht vorbereitet.",
+      "open": "Öffnen"
+    },
     "cvData": {
       "file": "CV Datei",
       "clickToDownload": "Klicken Sie zum Herunterladen",

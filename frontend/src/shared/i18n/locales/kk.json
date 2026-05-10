@@ -827,6 +827,14 @@
       "notProvided": "Берілмеген",
       "combinedScore": "Біріктірілген ұпай"
     },
+    "screeningLinks": {
+      "title": "Скрининг сілтемелері",
+      "prescanning": "Алдын ала тексеру",
+      "interview": "Сұхбат",
+      "interviewLockedHint": "Алдын ала тексеру аяқталғаннан кейін ашылады.",
+      "notPrepared": "Сұхбат сілтемесі әлі дайын емес.",
+      "open": "Ашу"
+    },
     "cvData": {
       "file": "CV Файл",
       "clickToDownload": "Жүктеп алу үшін басыңыз",

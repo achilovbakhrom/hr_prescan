@@ -834,6 +834,14 @@
       "notProvided": "Не указано",
       "combinedScore": "Комбинированный балл"
     },
+    "screeningLinks": {
+      "title": "Ссылки скрининга",
+      "prescanning": "Прескрининг",
+      "interview": "Интервью",
+      "interviewLockedHint": "Откроется после завершения прескрининга.",
+      "notPrepared": "Ссылка на интервью ещё не подготовлена.",
+      "open": "Открыть"
+    },
     "cvData": {
       "file": "Файл резюме",
       "clickToDownload": "Нажмите для скачивания",

@@ -827,6 +827,14 @@
       "notProvided": "غير متوفر",
       "combinedScore": "النتيجة المجمعة"
     },
+    "screeningLinks": {
+      "title": "روابط الفحص",
+      "prescanning": "الفحص الأولي",
+      "interview": "المقابلة",
+      "interviewLockedHint": "يفتح بعد اكتمال الفحص الأولي.",
+      "notPrepared": "رابط المقابلة غير جاهز بعد.",
+      "open": "فتح"
+    },
     "cvData": {
       "file": "CV الملف",
       "clickToDownload": "انقر للتنزيل",

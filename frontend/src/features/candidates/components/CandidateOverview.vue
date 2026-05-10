@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ApplicationStatusBadge from './ApplicationStatusBadge.vue'
+import CandidateScreeningLinks from './CandidateScreeningLinks.vue'
 import TranslatableText from '@/shared/components/TranslatableText.vue'
 import { calculateOverallScore, normalizeScreeningScore } from '../utils/score'
 import type { ApplicationDetail } from '../types/candidate.types'
@@ -86,6 +87,12 @@ const recommendation = computed(() => {
         </p>
       </div>
     </div>
+
+    <CandidateScreeningLinks
+      :prescan-token="props.candidate.prescanToken"
+      :interview-token="props.candidate.interviewToken"
+      :interview-enabled="props.candidate.interviewEnabled"
+    />
 
     <!-- CV Processing indicator -->
     <div

@@ -827,6 +827,14 @@
       "notProvided": "Taqdim etilmagan",
       "combinedScore": "Umumiy ball"
     },
+    "screeningLinks": {
+      "title": "Skrining havolalari",
+      "prescanning": "Oldindan tekshiruv",
+      "interview": "Intervyu",
+      "interviewLockedHint": "Oldindan tekshiruv tugagandan keyin ochiladi.",
+      "notPrepared": "Intervyu havolasi hali tayyorlanmagan.",
+      "open": "Ochish"
+    },
     "cvData": {
       "file": "CV fayl",
       "clickToDownload": "Yuklab olish uchun bosing",

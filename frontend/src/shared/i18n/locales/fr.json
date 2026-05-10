@@ -827,6 +827,14 @@
       "notProvided": "Non fourni",
       "combinedScore": "Note combinée"
     },
+    "screeningLinks": {
+      "title": "Liens de sélection",
+      "prescanning": "Présélection",
+      "interview": "Entretien",
+      "interviewLockedHint": "S'ouvre après la fin de la présélection.",
+      "notPrepared": "Le lien d'entretien n'est pas encore préparé.",
+      "open": "Ouvrir"
+    },
     "cvData": {
       "file": "Fichier CV",
       "clickToDownload": "Cliquez pour télécharger",

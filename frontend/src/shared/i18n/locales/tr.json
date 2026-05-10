@@ -827,6 +827,14 @@
       "notProvided": "Sağlanmadı",
       "combinedScore": "Birleşik puan"
     },
+    "screeningLinks": {
+      "title": "Tarama bağlantıları",
+      "prescanning": "Ön tarama",
+      "interview": "Mülakat",
+      "interviewLockedHint": "Ön tarama tamamlandıktan sonra açılır.",
+      "notPrepared": "Mülakat bağlantısı henüz hazırlanmadı.",
+      "open": "Aç"
+    },
     "cvData": {
       "file": "CV Dosya",
       "clickToDownload": "İndirmek için tıklayın",

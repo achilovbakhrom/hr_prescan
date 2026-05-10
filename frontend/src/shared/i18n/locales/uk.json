@@ -827,6 +827,14 @@
       "notProvided": "Не передбачено",
       "combinedScore": "Комбінована оцінка"
     },
+    "screeningLinks": {
+      "title": "Посилання скринінгу",
+      "prescanning": "Прескринінг",
+      "interview": "Інтерв'ю",
+      "interviewLockedHint": "Відкриється після завершення прескринінгу.",
+      "notPrepared": "Посилання на інтерв'ю ще не підготовлене.",
+      "open": "Відкрити"
+    },
     "cvData": {
       "file": "Файл CV",
       "clickToDownload": "Натисніть, щоб завантажити",
