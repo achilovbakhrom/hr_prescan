@@ -73,7 +73,7 @@ export function useInterviewDevices(previewVideoEl: Ref<HTMLVideoElement | null>
   function explainMediaError(kind: 'camera' | 'microphone', err: unknown): string {
     const name = err instanceof DOMException ? err.name : ''
     if (name === 'NotAllowedError' || name === 'SecurityError') {
-      return `${kind === 'camera' ? 'Camera' : 'Microphone'} permission is blocked. Allow access in your browser settings and try again.`
+      return `${kind === 'camera' ? 'Camera' : 'Microphone'} permission is blocked. Click the browser lock icon near the address bar, allow ${kind}, then try again.`
     }
     if (name === 'NotFoundError' || name === 'OverconstrainedError') {
       return `No working ${kind} was found. Select another device and try again.`
@@ -112,19 +112,12 @@ export function useInterviewDevices(previewVideoEl: Ref<HTMLVideoElement | null>
 
     stopPreview()
     await enumerateDevices()
-    const [videoTrack, audioTrack] = await Promise.all([
-      requestTrack('video'),
-      requestTrack('audio'),
-    ])
+    const audioTrack = await requestTrack('audio')
     const stream = new MediaStream()
-    if (videoTrack) stream.addTrack(videoTrack)
     if (audioTrack) stream.addTrack(audioTrack)
     previewStream.value = stream
-    isCameraOff.value = !videoTrack || isCameraOff.value
+    isCameraOff.value = true
     isMuted.value = !audioTrack || isMuted.value
-    stream.getVideoTracks().forEach((track) => {
-      track.enabled = !isCameraOff.value
-    })
     stream.getAudioTracks().forEach((track) => {
       track.enabled = !isMuted.value
     })
@@ -141,8 +134,7 @@ export function useInterviewDevices(previewVideoEl: Ref<HTMLVideoElement | null>
 
   async function selectVideoDevice(deviceId: string): Promise<void> {
     selectedVideoDeviceId.value = deviceId
-    isCameraOff.value = false
-    await startPreview()
+    await enablePreviewCamera()
   }
 
   function togglePreviewMic(): void {
@@ -153,8 +145,30 @@ export function useInterviewDevices(previewVideoEl: Ref<HTMLVideoElement | null>
     })
   }
 
-  function togglePreviewCamera(): void {
-    if (!previewStream.value?.getVideoTracks().length) return
+  async function enablePreviewCamera(): Promise<void> {
+    if (!previewStream.value) return
+    deviceError.value = null
+    previewStream.value.getVideoTracks().forEach((track) => track.stop())
+    const existingVideoTracks = previewStream.value.getVideoTracks()
+    existingVideoTracks.forEach((track) => previewStream.value?.removeTrack(track))
+    const videoTrack = await requestTrack('video')
+    if (!videoTrack) {
+      isCameraOff.value = true
+      return
+    }
+    previewStream.value.addTrack(videoTrack)
+    isCameraOff.value = false
+    await enumerateDevices()
+    await nextTick()
+    if (previewVideoEl.value) previewVideoEl.value.srcObject = previewStream.value
+  }
+
+  async function togglePreviewCamera(): Promise<void> {
+    if (!previewStream.value) return
+    if (!previewStream.value.getVideoTracks().length) {
+      await enablePreviewCamera()
+      return
+    }
     isCameraOff.value = !isCameraOff.value
     previewStream.value.getVideoTracks().forEach((track) => {
       track.enabled = !isCameraOff.value

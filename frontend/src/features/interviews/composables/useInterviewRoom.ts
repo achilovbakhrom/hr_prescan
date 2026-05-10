@@ -150,10 +150,14 @@ export function useInterviewRoom(token: () => string) {
     devices.isMuted.value = !devices.isMuted.value
     room.localParticipant.setMicrophoneEnabled(!devices.isMuted.value)
   }
-  function toggleCamera(): void {
+  async function toggleCamera(): Promise<void> {
     if (!room) return
     devices.isCameraOff.value = !devices.isCameraOff.value
-    room.localParticipant.setCameraEnabled(!devices.isCameraOff.value)
+    try {
+      await room.localParticipant.setCameraEnabled(!devices.isCameraOff.value)
+    } catch {
+      devices.isCameraOff.value = true
+    }
   }
   function leaveInterview(): void {
     disconnect()
