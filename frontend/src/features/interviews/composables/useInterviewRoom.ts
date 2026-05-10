@@ -4,16 +4,27 @@ import {
   Room,
   RoomEvent,
   Track,
+  type Participant,
   type RemoteTrack,
   type RemoteTrackPublication,
   type RemoteParticipant,
   type LocalTrackPublication,
+  type TrackPublication,
+  type TranscriptionSegment,
 } from 'livekit-client'
 import { interviewService } from '../services/interview.service'
 import { useInterviewDevices } from './useInterviewDevices'
 import type { InterviewDetail } from '../types/interview.types'
 
 export type ConnectionState = 'idle' | 'preview' | 'connecting' | 'connected' | 'error' | 'ended'
+export interface LiveTranscriptLine {
+  id: string
+  speaker: string
+  text: string
+  final: boolean
+  receivedAt: number
+}
+
 const LIVEKIT_URL = import.meta.env.VITE_LIVEKIT_URL as string | undefined
 
 export function useInterviewRoom(token: () => string) {
@@ -31,9 +42,16 @@ export function useInterviewRoom(token: () => string) {
   const hasRemoteVideo = ref(false)
   const audioPlaybackBlocked = ref(false)
   const remoteParticipantName = ref('AI Interviewer')
+  const localAudioLevel = ref(0)
+  const remoteAudioLevel = ref(0)
+  const localIsSpeaking = ref(false)
+  const remoteIsSpeaking = ref(false)
+  const liveTranscript = ref<LiveTranscriptLine[]>([])
   const devices = useInterviewDevices(previewVideoEl)
   let timerInterval: ReturnType<typeof setInterval> | null = null
+  let volumeInterval: ReturnType<typeof setInterval> | null = null
   let room: Room | null = null
+  const transcriptById = new Map<string, LiveTranscriptLine>()
 
   const formattedTime = computed(() => {
     const m = Math.floor(elapsedTime.value / 60),
@@ -131,6 +149,64 @@ export function useInterviewRoom(token: () => string) {
   function handleParticipantConnected(p: RemoteParticipant): void {
     remoteParticipantName.value = p.name || p.identity || 'AI Interviewer'
   }
+
+  function updateAudioLevels(): void {
+    if (!room) return
+    localAudioLevel.value = room.localParticipant.audioLevel || 0
+    localIsSpeaking.value = room.localParticipant.isSpeaking
+    let loudestRemote = 0
+    let remoteSpeaking = false
+    room.remoteParticipants.forEach((participant) => {
+      loudestRemote = Math.max(loudestRemote, participant.audioLevel || 0)
+      remoteSpeaking = remoteSpeaking || participant.isSpeaking
+      if (participant.isSpeaking) {
+        remoteParticipantName.value = participant.name || participant.identity || 'AI Interviewer'
+      }
+    })
+    remoteAudioLevel.value = loudestRemote
+    remoteIsSpeaking.value = remoteSpeaking
+  }
+
+  function startVolumeMeter(): void {
+    stopVolumeMeter()
+    updateAudioLevels()
+    volumeInterval = setInterval(updateAudioLevels, 120)
+  }
+
+  function stopVolumeMeter(): void {
+    if (volumeInterval) {
+      clearInterval(volumeInterval)
+      volumeInterval = null
+    }
+    localAudioLevel.value = 0
+    remoteAudioLevel.value = 0
+    localIsSpeaking.value = false
+    remoteIsSpeaking.value = false
+  }
+
+  function handleTranscriptionReceived(
+    segments: TranscriptionSegment[],
+    participant?: Participant,
+    _publication?: TrackPublication,
+  ): void {
+    for (const segment of segments) {
+      if (!segment.text.trim()) continue
+      const speaker = participant?.isLocal
+        ? 'You'
+        : participant?.name || participant?.identity || 'AI Interviewer'
+      transcriptById.set(segment.id, {
+        id: segment.id,
+        speaker,
+        text: segment.text,
+        final: segment.final,
+        receivedAt: segment.lastReceivedTime || Date.now(),
+      })
+    }
+    liveTranscript.value = Array.from(transcriptById.values())
+      .sort((a, b) => a.receivedAt - b.receivedAt)
+      .slice(-5)
+  }
+
   function startTimer(): void {
     elapsedTime.value = 0
     timerInterval = setInterval(() => {
@@ -146,6 +222,7 @@ export function useInterviewRoom(token: () => string) {
   function handleDisconnected(): void {
     connectionState.value = 'ended'
     stopTimer()
+    stopVolumeMeter()
   }
   function disconnect(): void {
     if (room) {
@@ -155,7 +232,10 @@ export function useInterviewRoom(token: () => string) {
     detachLocalVideo()
     hasRemoteVideo.value = false
     audioPlaybackBlocked.value = false
+    transcriptById.clear()
+    liveTranscript.value = []
     stopTimer()
+    stopVolumeMeter()
   }
 
   async function joinRoom(): Promise<void> {
@@ -182,6 +262,8 @@ export function useInterviewRoom(token: () => string) {
       })
       room.on(RoomEvent.ParticipantConnected, handleParticipantConnected)
       room.on(RoomEvent.Disconnected, handleDisconnected)
+      room.on(RoomEvent.ActiveSpeakersChanged, updateAudioLevels)
+      room.on(RoomEvent.TranscriptionReceived, handleTranscriptionReceived)
       await room.connect(LIVEKIT_URL, interview.value.candidateToken)
       await enableRoomAudio()
       await devices.publishLocalMedia(room.localParticipant)
@@ -191,6 +273,7 @@ export function useInterviewRoom(token: () => string) {
       attachExistingRemoteTracks()
       await enableRoomAudio()
       startTimer()
+      startVolumeMeter()
     } catch (err: unknown) {
       errorMessage.value = `Connection failed: ${err instanceof Error ? err.message : 'Failed to connect'}`
       connectionState.value = 'error'
@@ -274,6 +357,11 @@ export function useInterviewRoom(token: () => string) {
     hasRequiredDevices: devices.hasRequiredDevices,
     hasRemoteVideo,
     remoteParticipantName,
+    localAudioLevel,
+    remoteAudioLevel,
+    localIsSpeaking,
+    remoteIsSpeaking,
+    liveTranscript,
     formattedTime,
     canJoin,
     getInitials,

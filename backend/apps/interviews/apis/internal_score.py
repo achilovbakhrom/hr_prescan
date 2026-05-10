@@ -8,6 +8,7 @@ They should only be reachable from within the Docker network.
 import logging
 from uuid import UUID
 
+from django.db import transaction
 from rest_framework import serializers, status
 from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
@@ -83,46 +84,47 @@ class InternalInterviewResultsApi(APIView):
         serializer.is_valid(raise_exception=True)
         validated = serializer.validated_data
 
-        # Complete the session (prescanning or interview)
-        complete_session(
-            interview=interview,
-            overall_score=validated["overall_score"],
-            ai_summary=validated["ai_summary"],
-            transcript=validated["transcript"],
-            ai_decision=validated.get("ai_decision", "advance"),
-        )
-
-        # Save per-criteria scores
-        scores_data = [
-            {
-                "criteria_id": str(s["criteria_id"]),
-                "score": s["score"],
-                "ai_notes": s.get("notes", ""),
-            }
-            for s in validated["scores"]
-        ]
-        save_interview_scores(interview=interview, scores=scores_data)
-
-        # Save integrity flags (if any were collected during the interview)
-        flags_data = validated.get("integrity_flags", [])
-        if flags_data:
-            create_integrity_flags(
-                interview_id=interview.id,
-                flags_data=[
-                    {
-                        "flag_type": f["flag_type"],
-                        "severity": f["severity"],
-                        "description": f["description"],
-                        "timestamp_seconds": f.get("timestamp_seconds"),
-                    }
-                    for f in flags_data
-                ],
+        with transaction.atomic():
+            # Complete the session (prescanning or interview)
+            complete_session(
+                interview=interview,
+                overall_score=validated["overall_score"],
+                ai_summary=validated["ai_summary"],
+                transcript=validated["transcript"],
+                ai_decision=validated.get("ai_decision", "advance"),
             )
-            logger.info(
-                "Saved %d integrity flags for interview %s.",
-                len(flags_data),
-                interview_id,
-            )
+
+            # Save per-criteria scores
+            scores_data = [
+                {
+                    "criteria_id": str(s["criteria_id"]),
+                    "score": s["score"],
+                    "ai_notes": s.get("notes", ""),
+                }
+                for s in validated["scores"]
+            ]
+            save_interview_scores(interview=interview, scores=scores_data)
+
+            # Save integrity flags (if any were collected during the interview)
+            flags_data = validated.get("integrity_flags", [])
+            if flags_data:
+                create_integrity_flags(
+                    interview_id=interview.id,
+                    flags_data=[
+                        {
+                            "flag_type": f["flag_type"],
+                            "severity": f["severity"],
+                            "description": f["description"],
+                            "timestamp_seconds": f.get("timestamp_seconds"),
+                        }
+                        for f in flags_data
+                    ],
+                )
+                logger.info(
+                    "Saved %d integrity flags for interview %s.",
+                    len(flags_data),
+                    interview_id,
+                )
 
         logger.info(
             "Interview %s results saved. Overall score: %s",

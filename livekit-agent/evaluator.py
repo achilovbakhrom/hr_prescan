@@ -63,7 +63,11 @@ async def evaluate_interview(
         ),
     )
 
-    evaluation = json.loads(response.text)
+    evaluation = _normalise_evaluation(
+        raw_text=response.text,
+        criteria=criteria,
+        transcript=transcript,
+    )
 
     # -- Step 2: CV consistency check --
     cv_flags = await _check_cv_consistency(
@@ -214,6 +218,9 @@ def _build_evaluation_prompt(
         "configured criteria, and vacancy requirements. Ignore protected characteristics such as "
         "accent, age, gender, nationality, disability, religion, or family status.\n"
         "Use recommendation='reject' when the candidate should not advance, even if they have some relevant experience.\n"
+        "If the candidate refused the interview, said this is the wrong role/profession, or the interview ended early "
+        "because the candidate was clearly below the role bar, score the role-relevant criteria from the available "
+        "evidence and normally recommend reject. A candidate below roughly 50% of the expected bar should not advance.\n"
         "\n"
         "## Criteria\n"
         f"{criteria_text}\n"
@@ -235,6 +242,86 @@ def _build_evaluation_prompt(
         "  ]\n"
         "}\n"
     )
+
+
+def _normalise_evaluation(
+    *,
+    raw_text: str,
+    criteria: list[dict],
+    transcript: list[dict],
+) -> dict:
+    """Return backend-safe evaluation JSON even when the model output is thin."""
+    try:
+        parsed = json.loads(raw_text)
+    except json.JSONDecodeError:
+        logger.exception(
+            "Interview evaluation returned malformed JSON: %s", raw_text[:500]
+        )
+        parsed = {}
+
+    raw_scores = parsed.get("scores", [])
+    if not isinstance(raw_scores, list):
+        raw_scores = []
+
+    scores_by_id = {
+        str(score.get("criteria_id")): score
+        for score in raw_scores
+        if isinstance(score, dict) and score.get("criteria_id")
+    }
+
+    normalised_scores = []
+    for criterion in criteria:
+        criteria_id = str(criterion["id"])
+        model_score = scores_by_id.get(criteria_id, {})
+        normalised_scores.append(
+            {
+                "criteria_id": criteria_id,
+                "score": _clamp_score(model_score.get("score")),
+                "notes": str(
+                    model_score.get("notes")
+                    or "No strong role-relevant evidence was provided for this criterion."
+                )[:2000],
+            }
+        )
+
+    if normalised_scores:
+        fallback_overall = sum(item["score"] for item in normalised_scores) / len(
+            normalised_scores
+        )
+    else:
+        fallback_overall = 1.0 if transcript else 0.0
+
+    overall_score = _clamp_overall(parsed.get("overall_score"), fallback_overall)
+    recommendation = str(parsed.get("recommendation") or "").strip().lower()
+    if recommendation not in {"advance", "reject"}:
+        recommendation = "reject" if overall_score < 5 else "advance"
+
+    summary = str(parsed.get("summary") or "").strip()
+    if not summary:
+        summary = "Evaluation completed from the available interview transcript."
+
+    return {
+        "overall_score": overall_score,
+        "summary": summary[:4000],
+        "recommendation": recommendation,
+        "scores": normalised_scores,
+    }
+
+
+def _clamp_score(value) -> int:
+    try:
+        score = int(round(float(value)))
+    except (TypeError, ValueError):
+        score = 1
+    return max(1, min(10, score))
+
+
+def _clamp_overall(value, fallback: float) -> float:
+    try:
+        score = float(value)
+    except (TypeError, ValueError):
+        score = fallback
+    return round(max(1.0, min(10.0, score)), 2)
 
 
 # ---------------------------------------------------------------------------

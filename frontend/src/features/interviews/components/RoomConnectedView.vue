@@ -8,6 +8,9 @@
  */
 import { useI18n } from 'vue-i18n'
 import GlassSurface from '@/shared/components/GlassSurface.vue'
+import LiveTranscriptOverlay from './LiveTranscriptOverlay.vue'
+import VoiceLevelMeter from './VoiceLevelMeter.vue'
+import type { LiveTranscriptLine } from '../composables/useInterviewRoom'
 import type { InterviewDetail } from '../types/interview.types'
 
 defineProps<{
@@ -17,6 +20,11 @@ defineProps<{
   audioPlaybackBlocked: boolean
   hasRemoteVideo: boolean
   remoteParticipantName: string
+  localAudioLevel: number
+  remoteAudioLevel: number
+  localIsSpeaking: boolean
+  remoteIsSpeaking: boolean
+  liveTranscript: LiveTranscriptLine[]
   formattedTime: string
   getInitials: (name: string) => string
 }>()
@@ -69,7 +77,8 @@ const { t } = useI18n()
     <div class="flex flex-1 flex-col items-center justify-center gap-3 px-3 pb-24 pt-3 md:flex-row">
       <!-- Remote participant -->
       <div
-        class="relative flex h-full min-h-[40vh] flex-1 items-center justify-center overflow-hidden rounded-lg bg-black/80 ring-1 ring-[color:var(--color-border-glass)]"
+        class="remote-stage relative flex h-full min-h-[40vh] flex-1 items-center justify-center overflow-hidden rounded-lg bg-black/85 ring-1 ring-white/10 transition duration-300"
+        :class="{ 'remote-stage--speaking': remoteIsSpeaking }"
       >
         <video
           v-show="hasRemoteVideo"
@@ -80,22 +89,25 @@ const { t } = useI18n()
         ></video>
         <audio ref="remoteAudioEl" autoplay></audio>
 
-        <div v-if="!hasRemoteVideo" class="flex flex-col items-center gap-3">
+        <div v-if="!hasRemoteVideo" class="flex flex-col items-center gap-4">
           <div
-            class="flex h-24 w-24 items-center justify-center rounded-full bg-[color:var(--color-accent-ai)] text-3xl font-medium text-white"
+            class="ai-avatar relative flex h-28 w-28 items-center justify-center rounded-full bg-[color:var(--color-accent-ai)] text-3xl font-medium text-white"
+            :class="{ 'ai-avatar--speaking': remoteIsSpeaking }"
           >
+            <span class="ai-avatar__ring"></span>
             {{ getInitials(remoteParticipantName) }}
           </div>
-          <span class="text-sm text-[color:var(--color-text-secondary)]">
-            {{ remoteParticipantName }}
-          </span>
+          <div class="flex flex-col items-center gap-2">
+            <span class="text-sm text-white/76">{{ remoteParticipantName }}</span>
+            <VoiceLevelMeter :level="remoteAudioLevel" :speaking="remoteIsSpeaking" />
+          </div>
         </div>
 
         <div
-          v-if="hasRemoteVideo"
-          class="absolute bottom-3 left-3 rounded-md bg-black/60 px-2.5 py-1 font-mono text-xs text-white backdrop-blur-sm"
+          class="absolute bottom-3 left-3 flex items-center gap-2 rounded-md bg-black/60 px-2.5 py-1 font-mono text-xs text-white backdrop-blur-sm"
         >
-          {{ remoteParticipantName }}
+          <span>{{ remoteParticipantName }}</span>
+          <VoiceLevelMeter :level="remoteAudioLevel" :speaking="remoteIsSpeaking" compact />
         </div>
       </div>
 
@@ -119,9 +131,15 @@ const { t } = useI18n()
           </div>
         </div>
         <div
-          class="absolute bottom-2 left-2 flex items-center gap-1.5 rounded-md bg-black/60 px-2 py-0.5 font-mono text-[11px] text-white backdrop-blur-sm"
+          class="absolute bottom-2 left-2 flex items-center gap-2 rounded-md bg-black/60 px-2 py-0.5 font-mono text-[11px] text-white backdrop-blur-sm"
         >
           <span>{{ t('interviews.roomPage.you') }}</span>
+          <VoiceLevelMeter
+            :level="localAudioLevel"
+            :speaking="localIsSpeaking"
+            :muted="isMuted"
+            compact
+          />
           <span
             v-if="isMuted"
             aria-hidden="true"
@@ -131,6 +149,8 @@ const { t } = useI18n()
         </div>
       </div>
     </div>
+
+    <LiveTranscriptOverlay :lines="liveTranscript" />
 
     <button
       v-if="audioPlaybackBlocked"
@@ -193,6 +213,45 @@ const { t } = useI18n()
 </template>
 
 <style scoped>
+.remote-stage::before {
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(circle at 45% 38%, rgba(54, 211, 153, 0.16), transparent 28%),
+    radial-gradient(circle at 55% 62%, rgba(99, 102, 241, 0.18), transparent 32%);
+  content: '';
+  opacity: 0.35;
+  transition: opacity 220ms ease;
+}
+
+.remote-stage--speaking {
+  box-shadow:
+    0 0 0 1px rgba(57, 229, 140, 0.38),
+    0 22px 80px rgba(57, 229, 140, 0.16);
+}
+
+.remote-stage--speaking::before {
+  opacity: 0.72;
+  animation: ambient-speak 1.4s ease-in-out infinite alternate;
+}
+
+.ai-avatar {
+  box-shadow: 0 18px 64px rgba(99, 102, 241, 0.28);
+}
+
+.ai-avatar__ring {
+  position: absolute;
+  inset: -10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  opacity: 0.8;
+}
+
+.ai-avatar--speaking .ai-avatar__ring {
+  border-color: rgba(57, 229, 140, 0.72);
+  animation: avatar-ring 900ms ease-out infinite;
+}
+
 .media-icon-muted {
   position: relative;
 }
@@ -207,5 +266,25 @@ const { t } = useI18n()
   background: currentColor;
   content: '';
   transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+@keyframes ambient-speak {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes avatar-ring {
+  from {
+    opacity: 0.9;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.2);
+  }
 }
 </style>

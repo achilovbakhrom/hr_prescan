@@ -109,6 +109,7 @@ def save_interview_scores(
         interview: The interview to save scores for.
         scores: List of dicts with keys: criteria_id, score, ai_notes.
     """
+    InterviewScore.objects.filter(interview=interview).delete()
     score_objects = []
     for score_data in scores:
         score_obj = InterviewScore.objects.create(

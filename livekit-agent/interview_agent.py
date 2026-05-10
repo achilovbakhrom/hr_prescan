@@ -5,10 +5,11 @@ import os
 import time
 
 from livekit.agents import llm
-from livekit.agents.pipeline import VoicePipelineAgent
+from livekit.agents.pipeline import AgentTranscriptionOptions, VoicePipelineAgent
 from livekit.plugins import deepgram, elevenlabs, google, silero
 from livekit.plugins.elevenlabs import Voice, VoiceSettings
 
+from conversation_control import ConversationControl
 from context import fetch_interview_context
 from evaluator import evaluate_interview
 from integrity import IntegrityMonitor
@@ -35,6 +36,8 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
     stt = deepgram.STT(
         model="nova-2",
         language="multi",  # EN/RU code-switching support
+        interim_results=True,
+        endpointing_ms=120,
     )
 
     # Configure LLM
@@ -62,12 +65,32 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
         ),
     )
 
+    control = ConversationControl()
+
+    async def _before_llm_cb(agent: VoicePipelineAgent, chat_ctx: llm.ChatContext):
+        instruction = control.instruction()
+        if instruction:
+            chat_ctx.messages.append(
+                llm.ChatMessage.create(role="system", text=instruction)
+            )
+        return agent.llm.chat(chat_ctx=chat_ctx, fnc_ctx=agent.fnc_ctx)
+
     agent = VoicePipelineAgent(
         vad=silero.VAD.load(),
         stt=stt,
         llm=gemini_llm,
         tts=tts,
         chat_ctx=chat_ctx,
+        allow_interruptions=False,
+        min_endpointing_delay=0.2,
+        max_endpointing_delay=1.5,
+        preemptive_synthesis=True,
+        transcription=AgentTranscriptionOptions(
+            user_transcription=True,
+            agent_transcription=True,
+            agent_transcription_speed=1.1,
+        ),
+        before_llm_cb=_before_llm_cb,
     )
     agent.hr_prescan_opening_message = build_opening_message(context=context)
 
@@ -80,6 +103,9 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
     @agent.on("user_speech_committed")
     def _on_user_speech(message) -> None:
         text = _speech_text(message)
+        if not text:
+            return
+        control.record_candidate(text)
         transcript.append({"speaker": "candidate", "text": text})
         # Feed transcript into integrity monitor for audio anomaly detection
         monitor.add_transcript_entry(speaker="candidate", text=text)
@@ -87,6 +113,9 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
     @agent.on("agent_speech_committed")
     def _on_agent_speech(message) -> None:
         text = _speech_text(message)
+        if not text:
+            return
+        control.record_interviewer(text)
         transcript.append({"speaker": "interviewer", "text": text})
         monitor.add_transcript_entry(speaker="interviewer", text=text)
 

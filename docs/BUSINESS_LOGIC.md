@@ -236,6 +236,7 @@ Each vacancy has a two-step AI screening pipeline. HR configures each step durin
 - Each step has its own independent set of scores — a candidate will have prescanning scores and (if applicable) interview scores
 - CV upload is optional (configurable per vacancy). AI uses CV context in both prescanning and interview if available
 - The AI agent decides whether to advance or reject candidates after each step. HR can override at any time.
+- In Meet interviews, the AI agent may finish early when the candidate asks to stop, confirms the role/profession is wrong, or answers clearly below roughly 50% of the expected role bar after enough role-relevant evidence. The agent must ask for final words before closing and must not resume normal interview questions after that flow starts.
 - If a vacancy has the interview step enabled, the platform prepares the candidate's interview session and web link when the application is created. HR can copy or open both the prescanning link and the prepared interview link from the candidate detail overview. The interview link remains locked until the candidate completes prescanning and is advanced. Candidates cannot skip prescanning by opening the interview link early.
 - Interview agent prompts should be reviewed with a model-based prompt evaluation rubric before major prompt changes are released. The review checks candidate experience, role specificity, evaluation rigor, fairness, safety, completion control, and language control.
 
