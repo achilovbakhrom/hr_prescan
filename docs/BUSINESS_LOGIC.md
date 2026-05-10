@@ -400,7 +400,7 @@ Interview is the second, more rigorous AI screening step. HR enables it per vaca
 - Microphone permission is required. Camera is recommended for integrity checks but is not mandatory; candidates can join a Meet interview with audio only if camera access fails or no camera is available.
 - Candidate sees a device-check preview before joining the room
 - Interview duration is configurable by HR per vacancy
-- When the time limit is reached, AI wraps up the conversation
+- The configured duration is an approximate pacing target, not a hard cutoff. As the target time approaches, the AI should ask shorter follow-ups and move toward a natural close.
 - Full integrity monitoring (face detection, gaze tracking, audio anomaly detection)
 - Interview is recorded
 
@@ -437,7 +437,7 @@ Interview is the second, more rigorous AI screening step. HR enables it per vaca
 4. AI agent greets the candidate and explains the process
 5. AI asks interview questions one by one, listens to responses
 6. AI can ask follow-up questions, present cases, or probe deeper
-7. Interview concludes when all questions are covered, time limit is reached, or the early-finish rule applies
+7. Interview concludes when all key questions are covered, the agent has enough evidence, the target duration is approaching, or the early-finish rule applies
 8. AI asks for final words, thanks the candidate, and ends the session
 9. Candidate sees a "Thank you" screen
 

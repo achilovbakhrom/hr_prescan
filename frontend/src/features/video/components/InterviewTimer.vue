@@ -15,7 +15,7 @@ const formattedTime = computed(() => {
 })
 
 const durationFormatted = computed(() => {
-  return `${String(props.durationMinutes).padStart(2, '0')}:00`
+  return `~${String(props.durationMinutes).padStart(2, '0')}:00`
 })
 
 const isWarning = computed(() => {
