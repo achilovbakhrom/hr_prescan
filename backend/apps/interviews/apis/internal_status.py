@@ -15,6 +15,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.common.language import resolve_interview_language
 from apps.common.messages import MSG_INTERVIEW_NOT_FOUND, MSG_INVALID_INTERNAL_KEY
 from apps.interviews.models import Interview
 
@@ -99,6 +100,10 @@ class InternalInterviewContextApi(APIView):
         elif step == "interview":
             custom_prompt = vacancy.interview_prompt or ""
 
+        language = interview.language
+        if interview.session_type == Interview.SessionType.INTERVIEW:
+            language = resolve_interview_language(language)
+
         data = {
             "interview_id": str(interview.id),
             "session_type": interview.session_type,
@@ -107,7 +112,7 @@ class InternalInterviewContextApi(APIView):
             "company_name": company.name,
             "duration_minutes": interview.duration_minutes,
             "cv_summary": interview.application.cv_parsed_text or "No CV data available.",
-            "language": interview.language,
+            "language": language,
             "questions": questions,
             "criteria": criteria,
             "custom_prompt": custom_prompt,

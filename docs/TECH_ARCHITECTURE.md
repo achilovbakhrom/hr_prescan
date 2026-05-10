@@ -277,7 +277,7 @@ vacancies
 ├── location, location_type (remote | onsite | hybrid)
 ├── visibility (public | private), share_token
 ├── status (draft | active | paused | closed)
-├── interview_duration_minutes, interview_language (en | ru)
+├── interview_duration_minutes, interview_language (supports app languages; runtime fallback maps uz -> ru)
 └── created_at, updated_at
 
 vacancy_criteria

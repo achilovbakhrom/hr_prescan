@@ -23,16 +23,17 @@ defineProps<{
 <style scoped>
 .live-transcript {
   position: absolute;
-  right: 16px;
+  left: 50%;
   bottom: 96px;
   z-index: 15;
   display: flex;
-  width: min(420px, calc(100vw - 32px));
+  width: min(680px, calc(100vw - 32px));
   max-height: 168px;
   flex-direction: column;
   gap: 8px;
   overflow: hidden;
   pointer-events: none;
+  transform: translateX(-50%);
 }
 
 .live-transcript__line {
@@ -77,10 +78,10 @@ defineProps<{
 
 @media (max-width: 768px) {
   .live-transcript {
-    right: 12px;
+    right: auto;
     bottom: 92px;
-    left: 12px;
-    width: auto;
+    left: 50%;
+    width: calc(100vw - 24px);
     max-height: 126px;
   }
 }

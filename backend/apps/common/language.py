@@ -28,6 +28,9 @@ LANGUAGE_CHOICES = (
 LANGUAGE_NAMES = dict(LANGUAGE_CHOICES)
 SUPPORTED_LANGUAGES = tuple(code for code, _name in LANGUAGE_CHOICES)
 DEFAULT_LANGUAGE = "en"
+INTERVIEW_LANGUAGE_FALLBACKS: dict[str, str] = {
+    "uz": "ru",
+}
 
 COUNTRY_TO_LANGUAGE: dict[str, str] = {
     "UZ": "uz",
@@ -115,3 +118,9 @@ def detect_language(request: Request) -> str:
             return pref
 
     return _from_accept_language(request) or _from_ip(request) or DEFAULT_LANGUAGE
+
+
+def resolve_interview_language(language: str | None) -> str:
+    """Return the supported runtime language for deeper interview sessions."""
+    selected_language = language or DEFAULT_LANGUAGE
+    return INTERVIEW_LANGUAGE_FALLBACKS.get(selected_language, selected_language)

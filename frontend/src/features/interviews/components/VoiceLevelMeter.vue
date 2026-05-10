@@ -1,12 +1,19 @@
 <script setup lang="ts">
-defineProps<{
+import { computed } from 'vue'
+
+const props = defineProps<{
   level: number
   speaking: boolean
   muted?: boolean
   compact?: boolean
 }>()
 
-const bars = [0.18, 0.34, 0.5, 0.66, 0.82]
+const bars = [0.06, 0.14, 0.24, 0.38, 0.55]
+const meterLevel = computed(() =>
+  props.muted
+    ? 0
+    : Math.max(0, Math.min(1, props.speaking ? Math.max(props.level, 0.18) : props.level)),
+)
 </script>
 
 <template>
@@ -23,7 +30,7 @@ const bars = [0.18, 0.34, 0.5, 0.66, 0.82]
       v-for="(threshold, index) in bars"
       :key="threshold"
       class="voice-meter__bar"
-      :class="{ 'voice-meter__bar--active': !muted && level >= threshold }"
+      :class="{ 'voice-meter__bar--active': meterLevel >= threshold }"
       :style="{ '--delay': `${index * 45}ms` }"
     ></span>
   </div>

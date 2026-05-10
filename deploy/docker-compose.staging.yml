@@ -35,6 +35,8 @@ services:
 
   django:
     image: ghcr.io/${GITHUB_REPOSITORY}/backend:${IMAGE_TAG:-dev}
+    environment:
+      - ALLOW_INTERVIEW_WITHOUT_PRESCREENING=true
     deploy:
       resources:
         limits:

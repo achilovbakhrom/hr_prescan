@@ -14,6 +14,9 @@ INTERNAL_HEADERS = {
     # service calls should not be upgraded to https://django:8000.
     "X-Forwarded-Proto": "https",
 }
+INTERVIEW_LANGUAGE_FALLBACKS = {
+    "uz": "ru",
+}
 
 
 @dataclass
@@ -54,8 +57,13 @@ async def fetch_interview_context(*, room_name: str) -> InterviewContext:
         company_name=data["company_name"],
         duration_minutes=data["duration_minutes"],
         cv_summary=data.get("cv_summary", "No CV data available."),
-        language=data.get("language", "en"),
+        language=_resolve_interview_language(data.get("language", "en")),
         questions=data.get("questions", []),
         criteria=data.get("criteria", []),
         custom_prompt=data.get("custom_prompt", ""),
     )
+
+
+def _resolve_interview_language(language: str | None) -> str:
+    selected_language = language or "en"
+    return INTERVIEW_LANGUAGE_FALLBACKS.get(selected_language, selected_language)

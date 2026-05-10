@@ -140,6 +140,18 @@ class TestCreateInterviewSession:
         assert session.screening_mode == vacancy.interview_mode
         assert session.status == Interview.Status.PENDING
 
+    def test_create_interview_session_falls_back_from_uzbek_to_russian(self, vacancy):
+        vacancy.interview_enabled = True
+        vacancy.prescanning_language = "uz"
+        vacancy.save(update_fields=["interview_enabled", "prescanning_language"])
+
+        app = ApplicationFactory(vacancy=vacancy, status=Application.Status.PRESCANNED)
+
+        session = create_interview_session(application=app)
+
+        assert session is not None
+        assert session.language == "ru"
+
     def test_create_interview_session_reuses_existing_pending_session(self, vacancy):
         vacancy.interview_enabled = True
         vacancy.save(update_fields=["interview_enabled"])

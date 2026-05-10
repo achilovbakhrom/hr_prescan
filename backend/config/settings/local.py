@@ -6,6 +6,8 @@ from config.settings.base import *
 
 DEBUG = True
 
+ALLOW_INTERVIEW_WITHOUT_PRESCREENING = True
+
 ALLOWED_HOSTS = ["*"]
 
 # CORS — allow everything in development

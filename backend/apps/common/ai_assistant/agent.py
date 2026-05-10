@@ -114,7 +114,16 @@ def process_ai_command(*, user, message, context=None):
 
 def _is_failure(action):
     result = action.get("result", {})
+    if result.get("action") == "clarify":
+        return False
     return bool(result.get("error")) or result.get("success") is False
+
+
+def _clean_error_message(value):
+    text = str(value or "").strip()
+    if text.lower() == "has no translation":
+        return "Translation is not available for that content yet."
+    return text or "failed"
 
 
 def _suppress_stale_failures(actions_taken):
@@ -153,10 +162,10 @@ def _build_final_response(*, gpt_message, actions_taken):
         for a in effective_actions:
             err = a.get("result", {}).get("error")
             if err:
-                error_details.append(f"- {a['tool']}: {err}")
+                error_details.append(f"- {a['tool']}: {_clean_error_message(err)}")
             elif a.get("result", {}).get("success") is False:
                 err_msg = a.get("result", {}).get("message", "failed")
-                error_details.append(f"- {a['tool']}: {err_msg}")
+                error_details.append(f"- {a['tool']}: {_clean_error_message(err_msg)}")
         if error_details:
             message += "\n\n\u26a0\ufe0f Some actions encountered errors:\n" + "\n".join(error_details)
 

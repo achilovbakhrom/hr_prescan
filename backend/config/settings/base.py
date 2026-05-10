@@ -17,6 +17,11 @@ SECRET_KEY = os.environ.get(
     "django-insecure-change-me-in-production",
 )
 
+ALLOW_INTERVIEW_WITHOUT_PRESCREENING = os.environ.get(
+    "ALLOW_INTERVIEW_WITHOUT_PRESCREENING",
+    "false",
+).lower() == "true"
+
 # Application definition
 INSTALLED_APPS = [
     "django.contrib.admin",

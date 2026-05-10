@@ -104,6 +104,8 @@ services:
       # E2E test hooks — only enable on dev. Exposes /auth/debug/* endpoints
       # used by the Playwright suite to bypass real OAuth. Must be "false" in prod.
       - ALLOW_E2E_HOOKS=${ALLOW_E2E_HOOKS:-false}
+      # Dev/testing-only interview gate bypass. Must remain false in prod.
+      - ALLOW_INTERVIEW_WITHOUT_PRESCREENING=${ALLOW_INTERVIEW_WITHOUT_PRESCREENING:-false}
       # Outbound email suppression — comma-separated domain list. Any recipient
       # whose email ends in one of these domains is dropped silently. Used on
       # dev to block test-account spam. Leave empty in prod.

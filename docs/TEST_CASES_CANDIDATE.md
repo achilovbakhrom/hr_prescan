@@ -107,6 +107,7 @@ Comprehensive test cases covering every candidate-facing flow in the platform.
 | 4.4.2 | P1 | Chat in Russian | Vacancy has `prescanning_language=ru` | AI conducts interview in Russian |
 | 4.4.3 | P1 | Chat in Uzbek | Vacancy has `prescanning_language=uz` | AI conducts interview in Uzbek |
 | 4.4.4 | P2 | Candidate responds in wrong language | Respond in English when interview is in Russian | AI handles gracefully, may prompt in correct language |
+| 4.4.5 | P1 | Interview fallback for Uzbek | Vacancy has `prescanning_language=uz` and interview is enabled | Prescanning stays Uzbek; interview session runs in Russian |
 
 ### 4.5 CV Context
 

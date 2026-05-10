@@ -12,7 +12,7 @@ HR PreScan is a multi-tenant SaaS platform that automates the full candidate scr
 The AI agent evaluates candidates at each step and decides whether to advance them to the next stage or reject them. HR can also manually move candidates between stages at any time. The platform handles the screening pipeline; HR retains full control over final decisions.
 
 **Platform:** Web application (mobile versions planned for later)
-**Languages:** English, Russian, Uzbek, Kazakh, Turkish, Arabic, Spanish, French, German, and Ukrainian for the web app, public translation, and AI screening language selection. Telegram bot interface copy currently remains English/Russian/Uzbek, while Telegram prescreening follows the vacancy's selected screening language.
+**Languages:** English, Russian, Uzbek, Kazakh, Turkish, Arabic, Spanish, French, German, and Ukrainian for the web app, public translation, and AI screening language selection. Telegram bot interface copy currently remains English/Russian/Uzbek, while Telegram prescreening follows the vacancy's selected screening language. Deeper interview sessions may use a runtime language fallback when voice quality is not acceptable; currently Uzbek interview sessions run in Russian.
 **Tech Stack:** Django (backend) + Nuxt/Vue.js (frontend), deployed via Docker Compose with zero-downtime strategy
 
 ---
@@ -237,7 +237,7 @@ Each vacancy has a two-step AI screening pipeline. HR configures each step durin
 - CV upload is optional (configurable per vacancy). AI uses CV context in both prescanning and interview if available
 - The AI agent decides whether to advance or reject candidates after each step. HR can override at any time.
 - In Meet interviews, the AI agent may finish early when the candidate asks to stop, confirms the role/profession is wrong, or answers clearly below roughly 50% of the expected role bar after enough role-relevant evidence. The agent must ask for final words before closing and must not resume normal interview questions after that flow starts.
-- If a vacancy has the interview step enabled, the platform prepares the candidate's interview session and web link when the application is created. HR can copy or open both the prescanning link and the prepared interview link from the candidate detail overview. The interview link remains locked until the candidate completes prescanning and is advanced. Candidates cannot skip prescanning by opening the interview link early.
+- If a vacancy has the interview step enabled, the platform prepares the candidate's interview session and web link when the application is created. HR can copy or open both the prescanning link and the prepared interview link from the candidate detail overview. In production, the interview link remains locked until the candidate completes prescanning and is advanced. Candidates cannot skip prescanning by opening the interview link early. Non-production environments may enable a testing-only bypass so QA can open prepared interview links without completing prescanning first.
 - Interview agent prompts should be reviewed with a model-based prompt evaluation rubric before major prompt changes are released. The review checks candidate experience, role specificity, evaluation rigor, fairness, safety, completion control, and language control.
 
 ---
@@ -407,7 +407,7 @@ Interview is the second, more rigorous AI screening step. HR enables it per vaca
 
 **Common to both interview modes:**
 - A progress indicator shows approximate completion
-- Supported languages: English, Russian, Uzbek, Kazakh, Turkish, Arabic, Spanish, French, German, and Ukrainian. Interview sessions inherit the vacancy screening language unless explicitly changed by the screening workflow.
+- Supported languages: English, Russian, Uzbek, Kazakh, Turkish, Arabic, Spanish, French, German, and Ukrainian. Interview sessions inherit the vacancy screening language unless explicitly changed by the screening workflow or by the interview runtime language policy. Because Uzbek TTS quality is not acceptable for the live interviewer, Uzbek interview sessions run in Russian. Prescanning remains in Uzbek when Uzbek is selected.
 - The interview agent should speak in concise, natural language. If the candidate refuses to continue, says the role/profession is not relevant, or clearly does not fit the role after clarification, the agent ends the interview kindly instead of continuing to probe. Before any normal or early finish, the agent asks for the candidate's final words for HR.
 
 **Question Generation:**

@@ -21,6 +21,21 @@ class TestPublicInterviewApi:
         assert response.status_code == 400
         assert "after prescanning" in response.data["detail"]
 
+    @override_settings(ALLOW_INTERVIEW_WITHOUT_PRESCREENING=True)
+    def test_dev_bypass_allows_interview_before_prescanning_is_completed(self, vacancy):
+        app = ApplicationFactory(vacancy=vacancy, status=Application.Status.APPLIED)
+        interview = InterviewFactory(
+            application=app,
+            session_type=Interview.SessionType.INTERVIEW,
+            screening_mode=Interview.ScreeningMode.CHAT,
+            status=Interview.Status.PENDING,
+        )
+
+        response = APIClient().get(f"/api/public/interview/{interview.interview_token}/")
+
+        assert response.status_code == 200
+        assert response.data["id"] == str(interview.id)
+
 
 class TestInternalInterviewApi:
     @override_settings(INTERNAL_API_KEY="test-internal-key")
@@ -42,3 +57,23 @@ class TestInternalInterviewApi:
         assert response.status_code == 200
         assert response.data["interview_id"] == str(interview.id)
         assert response.data["vacancy_title"] == vacancy.title
+
+    @override_settings(INTERNAL_API_KEY="test-internal-key")
+    def test_agent_context_falls_back_from_uzbek_to_russian(self, vacancy):
+        app = ApplicationFactory(vacancy=vacancy, status=Application.Status.PRESCANNED)
+        interview = InterviewFactory(
+            application=app,
+            session_type=Interview.SessionType.INTERVIEW,
+            screening_mode=Interview.ScreeningMode.MEET,
+            status=Interview.Status.IN_PROGRESS,
+            language="uz",
+        )
+
+        response = APIClient().get(
+            f"/api/internal/interviews/{interview.id}/context/",
+            HTTP_X_INTERNAL_KEY="test-internal-key",
+            HTTP_X_FORWARDED_PROTO="https",
+        )
+
+        assert response.status_code == 200
+        assert response.data["language"] == "ru"

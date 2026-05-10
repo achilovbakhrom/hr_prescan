@@ -3,6 +3,7 @@ from unittest.mock import patch
 
 from apps.applications.models import Application
 from apps.interviews.chat_service.evaluation_prompt import derive_ai_decision_from_evaluation
+from apps.interviews.chat_service.prompts import build_system_prompt
 from apps.interviews.models import Interview
 from apps.interviews.services import (
     cancel_interview,
@@ -30,6 +31,20 @@ class TestStartSession:
 
         assert started.status == Interview.Status.IN_PROGRESS
         assert started.started_at is not None
+
+    def test_interview_chat_prompt_falls_back_from_uzbek_to_russian(self, vacancy):
+        app = ApplicationFactory(vacancy=vacancy, status=Application.Status.PRESCANNED)
+        session = InterviewFactory(
+            application=app,
+            session_type=Interview.SessionType.INTERVIEW,
+            screening_mode=Interview.ScreeningMode.CHAT,
+            status=Interview.Status.PENDING,
+            language="uz",
+        )
+
+        prompt = build_system_prompt(session)
+
+        assert "You MUST respond ONLY in Russian" in prompt
 
 
 class TestCompleteSession:
@@ -200,3 +215,17 @@ class TestResetInterview:
         new_session = reset_interview(interview=old_session)
 
         assert new_session.livekit_room_name == f"interview-{new_session.id}"
+
+    def test_reset_interview_preserves_runtime_language_policy(self, vacancy):
+        app = ApplicationFactory(vacancy=vacancy, status=Application.Status.PRESCANNED)
+        old_session = InterviewFactory(
+            application=app,
+            session_type=Interview.SessionType.INTERVIEW,
+            screening_mode=Interview.ScreeningMode.MEET,
+            status=Interview.Status.IN_PROGRESS,
+            language="uz",
+        )
+
+        new_session = reset_interview(interview=old_session)
+
+        assert new_session.language == "ru"

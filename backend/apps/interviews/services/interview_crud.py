@@ -6,6 +6,7 @@ from django.utils import timezone
 
 from apps.applications.models import Application
 from apps.common.exceptions import ApplicationError
+from apps.common.language import resolve_interview_language
 from apps.common.messages import (
     MSG_CANNOT_CANCEL_SESSION,
     MSG_CANNOT_START_SESSION,
@@ -109,7 +110,11 @@ def reset_interview(*, interview: Interview) -> Interview:
         "screening_mode": interview.screening_mode,
         "interview_token": uuid.uuid4(),
         "status": Interview.Status.PENDING,
+        "language": interview.language,
+        "channel": interview.channel,
     }
+    if interview.session_type == Interview.SessionType.INTERVIEW:
+        session_kwargs["language"] = resolve_interview_language(interview.language)
     if interview.screening_mode == Interview.ScreeningMode.MEET:
         session_kwargs["duration_minutes"] = application.vacancy.interview_duration
 

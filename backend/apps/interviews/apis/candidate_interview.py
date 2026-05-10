@@ -1,3 +1,4 @@
+from django.conf import settings
 from rest_framework import serializers, status
 from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
@@ -24,6 +25,8 @@ from apps.interviews.services import generate_candidate_token, start_interview
 
 def _interview_step_is_available(interview: Interview) -> bool:
     if interview.session_type != Interview.SessionType.INTERVIEW:
+        return True
+    if settings.ALLOW_INTERVIEW_WITHOUT_PRESCREENING:
         return True
     return interview.application.status in (Application.Status.PRESCANNED, Application.Status.INTERVIEWED)
 

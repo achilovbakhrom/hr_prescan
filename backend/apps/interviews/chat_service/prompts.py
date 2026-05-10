@@ -1,5 +1,6 @@
 """System prompt construction for AI chat screening sessions."""
 
+from apps.common.language import resolve_interview_language
 from apps.interviews.chat_service._constants import (
     SESSION_COMPLETE_ADVANCE,
     SESSION_COMPLETE_REJECT,
@@ -18,9 +19,11 @@ def _effective_language(interview: Interview) -> str:
          — used for anonymous candidates).
     """
     candidate = interview.application.candidate if interview.application_id else None
-    if candidate and getattr(candidate, "language", ""):
-        return candidate.language
-    return interview.language or "en"
+    language = candidate.language if candidate and getattr(candidate, "language", "") else interview.language or "en"
+
+    if interview.session_type == Interview.SessionType.INTERVIEW:
+        return resolve_interview_language(language)
+    return language
 
 
 def build_system_prompt(interview: Interview) -> str:

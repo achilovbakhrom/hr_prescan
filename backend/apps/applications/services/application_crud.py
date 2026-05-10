@@ -15,6 +15,7 @@ from apps.applications.services.profile_cv_snapshot import (
     build_candidate_profile_cv_snapshot,
 )
 from apps.common.exceptions import ApplicationError
+from apps.common.language import resolve_interview_language
 from apps.common.messages import (
     MSG_ALREADY_APPLIED,
     MSG_CV_REQUIRED,
@@ -166,7 +167,7 @@ def create_interview_session(*, application: Application) -> Interview | None:
         "session_type": Interview.SessionType.INTERVIEW,
         "screening_mode": vacancy.interview_mode,
         "status": Interview.Status.PENDING,
-        "language": vacancy.prescanning_language,
+        "language": resolve_interview_language(vacancy.prescanning_language),
     }
     if vacancy.interview_mode == Interview.ScreeningMode.MEET:
         interview_kwargs["duration_minutes"] = vacancy.interview_duration

@@ -26,6 +26,12 @@ export interface LiveTranscriptLine {
 }
 
 const LIVEKIT_URL = import.meta.env.VITE_LIVEKIT_URL as string | undefined
+const AUDIO_SPEAKING_THRESHOLD = 0.015
+
+function normalizeAudioLevel(level: number | undefined): number {
+  const raw = Math.max(0, level ?? 0)
+  return Math.min(1, raw * 8)
+}
 
 export function useInterviewRoom(token: () => string) {
   const router = useRouter()
@@ -152,18 +158,23 @@ export function useInterviewRoom(token: () => string) {
 
   function updateAudioLevels(): void {
     if (!room) return
-    localAudioLevel.value = room.localParticipant.audioLevel || 0
-    localIsSpeaking.value = room.localParticipant.isSpeaking
+    const localRawLevel = room.localParticipant.audioLevel || 0
+    localAudioLevel.value = normalizeAudioLevel(localRawLevel)
+    localIsSpeaking.value =
+      room.localParticipant.isSpeaking || localRawLevel > AUDIO_SPEAKING_THRESHOLD
     let loudestRemote = 0
     let remoteSpeaking = false
     room.remoteParticipants.forEach((participant) => {
-      loudestRemote = Math.max(loudestRemote, participant.audioLevel || 0)
-      remoteSpeaking = remoteSpeaking || participant.isSpeaking
-      if (participant.isSpeaking) {
+      const remoteRawLevel = participant.audioLevel || 0
+      loudestRemote = Math.max(loudestRemote, remoteRawLevel)
+      const participantSpeaking =
+        participant.isSpeaking || remoteRawLevel > AUDIO_SPEAKING_THRESHOLD
+      remoteSpeaking = remoteSpeaking || participantSpeaking
+      if (participantSpeaking) {
         remoteParticipantName.value = participant.name || participant.identity || 'AI Interviewer'
       }
     })
-    remoteAudioLevel.value = loudestRemote
+    remoteAudioLevel.value = normalizeAudioLevel(loudestRemote)
     remoteIsSpeaking.value = remoteSpeaking
   }
 
