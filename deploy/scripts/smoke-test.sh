@@ -198,6 +198,12 @@ if [[ "${BASE_URL}" == https://* ]]; then
     else
         fail "CSP does not allow a LiveKit WebSocket endpoint"
     fi
+
+    if echo "${CSP}" | grep -qi "https://.*livekit\\.cloud"; then
+        pass "CSP allows LiveKit Cloud HTTPS API"
+    else
+        fail "CSP does not allow LiveKit Cloud HTTPS API"
+    fi
 else
     info "=== Check 9: Skipped (not HTTPS) ==="
 fi
