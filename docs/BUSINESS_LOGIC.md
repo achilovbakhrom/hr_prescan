@@ -397,7 +397,7 @@ Interview is the second, more rigorous AI screening step. HR enables it per vaca
 **Setup — Meet mode:**
 - Conducted in a video room (similar to Google Meet) via LiveKit
 - AI agent appears as the interviewer in the room
-- Camera and microphone permissions are required
+- Microphone permission is required. Camera is recommended for integrity checks but is not mandatory; candidates can join a Meet interview with audio only if camera access fails or no camera is available.
 - Candidate sees a device-check preview before joining the room
 - Interview duration is configurable by HR per vacancy
 - When the time limit is reached, AI wraps up the conversation

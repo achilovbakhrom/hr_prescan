@@ -15,8 +15,7 @@ export function useInterviewDevices(previewVideoEl: Ref<HTMLVideoElement | null>
   const isCameraOff = ref(false)
 
   const hasPreviewAudio = computed(() => Boolean(previewStream.value?.getAudioTracks().length))
-  const hasPreviewVideo = computed(() => Boolean(previewStream.value?.getVideoTracks().length))
-  const hasRequiredDevices = computed(() => hasPreviewAudio.value && hasPreviewVideo.value)
+  const hasRequiredDevices = computed(() => hasPreviewAudio.value)
 
   function mapDevice(device: globalThis.MediaDeviceInfo, index: number): AppMediaDeviceInfo {
     const fallback =
@@ -82,7 +81,7 @@ export function useInterviewDevices(previewVideoEl: Ref<HTMLVideoElement | null>
     if (kind === 'microphone') {
       return 'Microphone could not be started. If you use AirPods, reconnect them or choose the built-in microphone.'
     }
-    return 'Camera could not be started. Close other apps using the camera, then try again.'
+    return 'Camera could not be started. You can still join with microphone only, or close other apps using the camera and try again.'
   }
 
   async function requestTrack(kind: 'audio' | 'video'): Promise<MediaStreamTrack | null> {
@@ -163,10 +162,15 @@ export function useInterviewDevices(previewVideoEl: Ref<HTMLVideoElement | null>
   }
 
   async function publishLocalMedia(participant: LocalParticipant): Promise<void> {
-    await participant.setCameraEnabled(true, liveKitVideoOptions())
     await participant.setMicrophoneEnabled(true, liveKitAudioOptions())
+    if (!isCameraOff.value) {
+      try {
+        await participant.setCameraEnabled(true, liveKitVideoOptions())
+      } catch {
+        isCameraOff.value = true
+      }
+    }
     if (isMuted.value) await participant.setMicrophoneEnabled(false)
-    if (isCameraOff.value) await participant.setCameraEnabled(false)
   }
 
   return {
