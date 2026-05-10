@@ -88,20 +88,14 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
         transcript.append({"speaker": "interviewer", "text": text})
         monitor.add_transcript_entry(speaker="interviewer", text=text)
 
-    @agent.on("agent_started")
-    def _on_started() -> None:
-        """Start integrity monitoring when the interview begins."""
-        monitor.start()
-        logger.info("Integrity monitoring started for interview %s.", context.interview_id)
-
-    @agent.on("agent_stopped")
-    async def _on_stopped() -> None:
-        """Triggered when the interview ends — stop monitoring, evaluate, send results."""
+    async def _on_shutdown(reason: str = "") -> None:
+        """Stop monitoring, evaluate, and send results when the LiveKit job ends."""
         # Stop integrity monitor and collect flags
         integrity_flags = await monitor.stop()
         logger.info(
-            "Integrity monitoring stopped for interview %s. Flags: %d",
+            "Integrity monitoring stopped for interview %s. Reason: %s. Flags: %d",
             context.interview_id,
+            reason or "unknown",
             len(integrity_flags),
         )
 
@@ -127,5 +121,9 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
             logger.exception(
                 "Failed to evaluate interview %s.", context.interview_id,
             )
+
+    ctx.add_shutdown_callback(_on_shutdown)
+    monitor.start()
+    logger.info("Integrity monitoring started for interview %s.", context.interview_id)
 
     return agent
