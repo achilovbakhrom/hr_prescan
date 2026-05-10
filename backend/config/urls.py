@@ -123,6 +123,7 @@ urlpatterns = [
     path("api/candidate/", include((application_candidate_urlpatterns, "candidate"))),
     path("api/candidate/", include((interview_candidate_urlpatterns, "candidate-interviews"))),
     path("api/candidate/", include((notification_candidate_urlpatterns, "candidate-messages"))),
+    path("api/internal/interviews/", include("apps.interviews.urls_internal")),
     # Subscriptions
     path("api/subscriptions/", include((subscription_public_urlpatterns, "subscriptions"))),
     path("api/hr/subscription/", include((subscription_hr_urlpatterns, "hr-subscription"))),
