@@ -1,5 +1,6 @@
 """VoicePipelineAgent configuration for AI interviews."""
 
+import asyncio
 import logging
 import os
 import time
@@ -14,6 +15,19 @@ from context import fetch_interview_context
 from evaluator import evaluate_interview
 from integrity import IntegrityMonitor
 from prompt import build_opening_message, build_system_prompt
+from room_lifecycle import shutdown_after_final_response
+from runtime_config import (
+    DEEPGRAM_ENDPOINTING_MS,
+    DEEPGRAM_MODEL,
+    ELEVENLABS_MODEL,
+    ELEVENLABS_SIMILARITY_BOOST,
+    ELEVENLABS_SPEED,
+    ELEVENLABS_STABILITY,
+    ELEVENLABS_STYLE,
+    MAX_ENDPOINTING_DELAY,
+    MIN_ENDPOINTING_DELAY,
+)
+from speech_utils import speech_text
 
 logger = logging.getLogger("interview-agent")
 
@@ -34,10 +48,12 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
 
     # Configure STT (Speech-to-Text)
     stt = deepgram.STT(
-        model="nova-2",
+        model=DEEPGRAM_MODEL,
         language="multi",  # EN/RU code-switching support
         interim_results=True,
-        endpointing_ms=120,
+        punctuate=True,
+        no_delay=True,
+        endpointing_ms=DEEPGRAM_ENDPOINTING_MS,
     )
 
     # Configure LLM
@@ -49,17 +65,17 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
 
     # Configure TTS (Text-to-Speech)
     tts = elevenlabs.TTS(
-        model="eleven_flash_v2_5",
+        model=ELEVENLABS_MODEL,
         api_key=ELEVENLABS_API_KEY,
         voice=Voice(
             id=ELEVENLABS_VOICE_ID,
             name="Interviewer",
             category="premade",
             settings=VoiceSettings(
-                stability=0.71,
-                similarity_boost=0.5,
-                style=0.0,
-                speed=1.0,
+                stability=ELEVENLABS_STABILITY,
+                similarity_boost=ELEVENLABS_SIMILARITY_BOOST,
+                style=ELEVENLABS_STYLE,
+                speed=ELEVENLABS_SPEED,
                 use_speaker_boost=True,
             ),
         ),
@@ -81,9 +97,9 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
         llm=gemini_llm,
         tts=tts,
         chat_ctx=chat_ctx,
-        allow_interruptions=False,
-        min_endpointing_delay=0.2,
-        max_endpointing_delay=1.5,
+        allow_interruptions=True,
+        min_endpointing_delay=MIN_ENDPOINTING_DELAY,
+        max_endpointing_delay=MAX_ENDPOINTING_DELAY,
         preemptive_synthesis=True,
         transcription=AgentTranscriptionOptions(
             user_transcription=True,
@@ -99,10 +115,17 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
 
     # Initialise integrity monitor
     monitor = IntegrityMonitor(interview_start_time=time.time())
+    shutdown_task: asyncio.Task | None = None
+
+    def _schedule_shutdown() -> None:
+        nonlocal shutdown_task
+        if shutdown_task and not shutdown_task.done():
+            return
+        shutdown_task = asyncio.create_task(shutdown_after_final_response(ctx, agent))
 
     @agent.on("user_speech_committed")
     def _on_user_speech(message) -> None:
-        text = _speech_text(message)
+        text = speech_text(message)
         if not text:
             return
         control.record_candidate(text)
@@ -112,12 +135,14 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
 
     @agent.on("agent_speech_committed")
     def _on_agent_speech(message) -> None:
-        text = _speech_text(message)
+        text = speech_text(message)
         if not text:
             return
         control.record_interviewer(text)
         transcript.append({"speaker": "interviewer", "text": text})
         monitor.add_transcript_entry(speaker="interviewer", text=text)
+        if control.should_shutdown_after_interviewer():
+            _schedule_shutdown()
 
     async def _on_shutdown(reason: str = "") -> None:
         """Stop monitoring, evaluate, and send results when the LiveKit job ends."""
@@ -161,27 +186,3 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
     logger.info("Integrity monitoring started for interview %s.", context.interview_id)
 
     return agent
-
-
-def _speech_text(message) -> str:
-    """Extract plain text from LiveKit speech events across SDK versions."""
-    if isinstance(message, str):
-        return message.strip()
-
-    for attr in ("text", "content"):
-        value = getattr(message, attr, None)
-        if isinstance(value, str):
-            return value.strip()
-        if isinstance(value, list):
-            parts = []
-            for item in value:
-                if isinstance(item, str):
-                    parts.append(item)
-                else:
-                    item_text = getattr(item, "text", None)
-                    if isinstance(item_text, str):
-                        parts.append(item_text)
-            if parts:
-                return " ".join(part.strip() for part in parts if part.strip())
-
-    return str(message).strip()

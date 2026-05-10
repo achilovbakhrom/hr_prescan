@@ -17,7 +17,7 @@ async def entrypoint(ctx) -> None:
     agent.start(ctx.room)
     opening_message = getattr(agent, "hr_prescan_opening_message", "")
     if opening_message:
-        await agent.say(opening_message, allow_interruptions=False)
+        await agent.say(opening_message, allow_interruptions=True)
 
 
 if __name__ == "__main__":

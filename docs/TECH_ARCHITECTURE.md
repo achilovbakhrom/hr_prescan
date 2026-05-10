@@ -173,7 +173,7 @@ agent = VoicePipelineAgent(
         model="nova-3",
         language="multi",           # EN↔RU code-switching
         interim_results=True,
-        endpointing=300,            # ms silence before finalizing
+        endpointing=50,             # ms silence before finalizing
     ),
     llm=GoogleLLM(
         model="gemini-3-flash-preview",
@@ -183,6 +183,9 @@ agent = VoicePipelineAgent(
         model="eleven_flash_v2_5",
         voice="...",                # Selected interviewer voice
     ),
+    allow_interruptions=True,
+    min_endpointing_delay=0.05,
+    max_endpointing_delay=0.6,
 )
 ```
 

@@ -12,13 +12,14 @@ const props = defineProps<{
   candidateId: string
   candidateName: string
   candidateEmail: string
-  vacancyId: string
   currentStatus: ApplicationStatus
   loading: boolean
+  interviewEnabled?: boolean
 }>()
 
 const emit = defineEmits<{
   statusChange: [status: ApplicationStatus]
+  resetScreening: [sessionType: 'prescanning' | 'interview']
 }>()
 
 const { t } = useI18n()
@@ -125,6 +126,27 @@ function handleStatusChange(event: { value: ApplicationStatus }): void {
     accept: () => emit('statusChange', status),
   })
 }
+
+function confirmResetScreening(sessionType: 'prescanning' | 'interview'): void {
+  const isPrescanning = sessionType === 'prescanning'
+  confirm.require({
+    message: t(
+      isPrescanning
+        ? 'candidates.dialogs.msgClearPrescanning'
+        : 'candidates.dialogs.msgClearInterview',
+      { name: props.candidateName },
+    ),
+    header: t(
+      isPrescanning
+        ? 'candidates.dialogs.clearPrescanningHeader'
+        : 'candidates.dialogs.clearInterviewHeader',
+    ),
+    icon: 'pi pi-refresh',
+    acceptLabel: t('candidates.dialogs.yesClearSession'),
+    rejectLabel: t('common.cancel'),
+    accept: () => emit('resetScreening', sessionType),
+  })
+}
 </script>
 
 <template>
@@ -136,6 +158,25 @@ function handleStatusChange(event: { value: ApplicationStatus }): void {
       severity="secondary"
       outlined
       @click="showEmailDialog = true"
+    />
+    <Button
+      :label="t('candidates.actions.clearPrescanning')"
+      icon="pi pi-refresh"
+      size="small"
+      severity="secondary"
+      outlined
+      :disabled="props.loading"
+      @click="confirmResetScreening('prescanning')"
+    />
+    <Button
+      v-if="props.interviewEnabled"
+      :label="t('candidates.actions.clearInterview')"
+      icon="pi pi-refresh"
+      size="small"
+      severity="secondary"
+      outlined
+      :disabled="props.loading"
+      @click="confirmResetScreening('interview')"
     />
     <Dropdown
       :model-value="null"

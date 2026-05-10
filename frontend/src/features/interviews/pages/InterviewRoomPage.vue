@@ -18,6 +18,7 @@ import GlassCard from '@/shared/components/GlassCard.vue'
 import { useThemeStore } from '@/shared/stores/theme.store'
 import { useInterviewRoom } from '../composables/useInterviewRoom'
 import RoomIdleView from '../components/RoomIdleView.vue'
+import RoomLoadingState from '../components/RoomLoadingState.vue'
 import RoomPreviewView from '../components/RoomPreviewView.vue'
 import RoomConnectedView from '../components/RoomConnectedView.vue'
 
@@ -45,7 +46,7 @@ onMounted(() => {
 
     <!-- Loading -->
     <div v-if="room.loading.value" class="relative z-0 flex flex-1 items-center justify-center">
-      <i class="pi pi-spinner pi-spin text-4xl text-[color:var(--color-text-muted)]"></i>
+      <RoomLoadingState :label="t('interviews.detailPage.loading')" logo />
     </div>
 
     <!-- Fetch error -->
@@ -96,14 +97,9 @@ onMounted(() => {
       <!-- CONNECTING -->
       <div
         v-else-if="room.connectionState.value === 'connecting'"
-        class="relative z-0 flex flex-1 items-center justify-center"
+        class="relative z-0 flex flex-1 items-center justify-center px-6"
       >
-        <div class="text-center">
-          <i class="pi pi-spinner pi-spin mb-4 text-5xl text-[color:var(--color-accent)]"></i>
-          <p class="text-lg text-[color:var(--color-text-primary)]">
-            {{ t('interviews.roomPage.joiningInterview') }}
-          </p>
-        </div>
+        <RoomLoadingState :label="t('interviews.roomPage.joiningInterview')" />
       </div>
 
       <!-- ERROR -->

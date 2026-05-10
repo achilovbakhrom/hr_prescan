@@ -36,6 +36,7 @@ The AI agent evaluates candidates at each step and decides whether to advance th
 - Filters and sorts candidates by AI scores
 - Manages candidate pipeline per vacancy
 - Can manually move candidates between pipeline stages
+- Can clear a candidate's prescanning or interview results and recreate fresh pending links for retesting
 
 ### 2.3 Candidate
 - Can browse public vacancies or access private vacancies via direct link

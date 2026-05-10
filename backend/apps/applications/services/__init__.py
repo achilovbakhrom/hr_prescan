@@ -20,6 +20,7 @@ from apps.applications.services.s3_utils import (
     generate_cv_download_url,
     upload_cv_to_s3,
 )
+from apps.applications.services.screening_reset import reset_application_screening
 from apps.applications.services.status_transitions import STATUS_TRANSITIONS, update_application_status
 
 # Backward-compatible alias for the old private name
@@ -43,6 +44,7 @@ __all__ = [
     "generate_cv_download_url",
     "get_candidate_platform_cv",
     "process_cv_text",
+    "reset_application_screening",
     "soft_delete_applications",
     "submit_application",
     "update_application_status",

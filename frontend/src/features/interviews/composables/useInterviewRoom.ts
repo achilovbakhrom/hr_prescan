@@ -56,6 +56,7 @@ export function useInterviewRoom(token: () => string) {
   const devices = useInterviewDevices(previewVideoEl)
   let timerInterval: ReturnType<typeof setInterval> | null = null
   let volumeInterval: ReturnType<typeof setInterval> | null = null
+  let statusPollInterval: ReturnType<typeof setInterval> | null = null
   let room: Room | null = null
   const transcriptById = new Map<string, LiveTranscriptLine>()
 
@@ -156,6 +157,16 @@ export function useInterviewRoom(token: () => string) {
     remoteParticipantName.value = p.name || p.identity || 'AI Interviewer'
   }
 
+  function finishRoom(): void {
+    disconnect()
+    connectionState.value = 'ended'
+  }
+
+  function handleParticipantDisconnected(p: RemoteParticipant): void {
+    remoteParticipantName.value = p.name || p.identity || remoteParticipantName.value
+    if (connectionState.value === 'connected') finishRoom()
+  }
+
   function updateAudioLevels(): void {
     if (!room) return
     const localRawLevel = room.localParticipant.audioLevel || 0
@@ -193,6 +204,30 @@ export function useInterviewRoom(token: () => string) {
     remoteAudioLevel.value = 0
     localIsSpeaking.value = false
     remoteIsSpeaking.value = false
+  }
+
+  function stopStatusPolling(): void {
+    if (statusPollInterval) {
+      clearInterval(statusPollInterval)
+      statusPollInterval = null
+    }
+  }
+
+  async function refreshInterviewStatus(): Promise<void> {
+    try {
+      const latest = await interviewService.getInterviewByToken(token())
+      interview.value = { ...interview.value, ...latest } as InterviewDetail
+      if (['completed', 'cancelled', 'expired'].includes(latest.status)) {
+        finishRoom()
+      }
+    } catch {
+      // Keep the LiveKit room active during short API/network interruptions.
+    }
+  }
+
+  function startStatusPolling(): void {
+    stopStatusPolling()
+    statusPollInterval = setInterval(() => void refreshInterviewStatus(), 3000)
   }
 
   function handleTranscriptionReceived(
@@ -234,6 +269,7 @@ export function useInterviewRoom(token: () => string) {
     connectionState.value = 'ended'
     stopTimer()
     stopVolumeMeter()
+    stopStatusPolling()
   }
   function disconnect(): void {
     if (room) {
@@ -247,6 +283,7 @@ export function useInterviewRoom(token: () => string) {
     liveTranscript.value = []
     stopTimer()
     stopVolumeMeter()
+    stopStatusPolling()
   }
 
   async function joinRoom(): Promise<void> {
@@ -272,6 +309,7 @@ export function useInterviewRoom(token: () => string) {
         audioPlaybackBlocked.value = !room?.canPlaybackAudio
       })
       room.on(RoomEvent.ParticipantConnected, handleParticipantConnected)
+      room.on(RoomEvent.ParticipantDisconnected, handleParticipantDisconnected)
       room.on(RoomEvent.Disconnected, handleDisconnected)
       room.on(RoomEvent.ActiveSpeakersChanged, updateAudioLevels)
       room.on(RoomEvent.TranscriptionReceived, handleTranscriptionReceived)
@@ -285,6 +323,7 @@ export function useInterviewRoom(token: () => string) {
       await enableRoomAudio()
       startTimer()
       startVolumeMeter()
+      startStatusPolling()
     } catch (err: unknown) {
       errorMessage.value = `Connection failed: ${err instanceof Error ? err.message : 'Failed to connect'}`
       connectionState.value = 'error'
@@ -320,8 +359,7 @@ export function useInterviewRoom(token: () => string) {
     }
   }
   function leaveInterview(): void {
-    disconnect()
-    connectionState.value = 'ended'
+    finishRoom()
   }
 
   onMounted(async () => {

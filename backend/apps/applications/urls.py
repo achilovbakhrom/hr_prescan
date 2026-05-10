@@ -7,6 +7,7 @@ from apps.applications.apis import (
     HRApplicationDetailApi,
     HRApplicationListApi,
     HRApplicationNotesApi,
+    HRApplicationScreeningResetApi,
     HRApplicationStatusApi,
     HRBatchMoveApi,
     HRBulkStatusApi,
@@ -84,6 +85,11 @@ hr_candidate_urlpatterns = [
         "<uuid:application_id>/notes/",
         HRApplicationNotesApi.as_view(),
         name="hr-application-notes",
+    ),
+    path(
+        "<uuid:application_id>/screening/<str:session_type>/reset/",
+        HRApplicationScreeningResetApi.as_view(),
+        name="hr-application-screening-reset",
     ),
     path(
         "<uuid:application_id>/cv-download/",

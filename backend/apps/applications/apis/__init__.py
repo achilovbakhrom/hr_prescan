@@ -15,6 +15,7 @@ from apps.applications.apis.hr_list import (
     HRApplicationListApi,
     HRCvDownloadApi,
 )
+from apps.applications.apis.hr_screening_reset import HRApplicationScreeningResetApi
 from apps.applications.apis.public import SubmitApplicationApi
 
 __all__ = [
@@ -24,6 +25,7 @@ __all__ = [
     "HRApplicationDetailApi",
     "HRApplicationListApi",
     "HRApplicationNotesApi",
+    "HRApplicationScreeningResetApi",
     "HRApplicationStatusApi",
     "HRBatchMoveApi",
     "HRBulkStatusApi",

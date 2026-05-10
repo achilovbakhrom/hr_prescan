@@ -9,6 +9,7 @@ import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import GlassCard from '@/shared/components/GlassCard.vue'
+import { extractErrorMessage } from '@/shared/api/errors'
 import { useCandidateStore } from '../stores/candidate.store'
 import { useInterviewData } from '../composables/useInterviewData'
 import CandidateActions from '../components/CandidateActions.vue'
@@ -85,6 +86,22 @@ async function handleDownloadCv(): Promise<void> {
     window.open(candidate.value.cvFile, '_blank')
   }
 }
+async function handleResetScreening(sessionType: 'prescanning' | 'interview'): Promise<void> {
+  if (!candidate.value) return
+  candidateStore.loading = true
+  candidateStore.error = null
+  try {
+    candidateStore.currentCandidate = await candidateService.resetScreening(
+      candidateId.value,
+      sessionType,
+    )
+    await fetchInterviewData(candidateId.value, candidate.value?.interviewEnabled ?? false)
+  } catch (err: unknown) {
+    candidateStore.error = extractErrorMessage(err)
+  } finally {
+    candidateStore.loading = false
+  }
+}
 </script>
 
 <template>
@@ -124,10 +141,11 @@ async function handleDownloadCv(): Promise<void> {
           :candidate-id="candidate.id"
           :candidate-name="candidate.candidateName"
           :candidate-email="candidate.candidateEmail"
-          :vacancy-id="candidate.vacancyId"
           :current-status="candidate.status"
           :loading="candidateStore.loading"
+          :interview-enabled="candidate.interviewEnabled"
           @status-change="handleStatusChange"
+          @reset-screening="handleResetScreening"
         />
       </GlassCard>
 

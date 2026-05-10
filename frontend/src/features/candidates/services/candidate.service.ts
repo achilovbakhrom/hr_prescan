@@ -90,6 +90,16 @@ export const candidateService = {
     return response.data
   },
 
+  async resetScreening(
+    id: string,
+    sessionType: 'prescanning' | 'interview',
+  ): Promise<ApplicationDetail> {
+    const response = await apiClient.post<ApplicationDetail>(
+      `/hr/candidates/${id}/screening/${sessionType}/reset/`,
+    )
+    return response.data
+  },
+
   // Messaging
   async getMessages(candidateId: string): Promise<Message[]> {
     const response = await apiClient.get<Message[]>(`/hr/candidates/${candidateId}/messages/`)
