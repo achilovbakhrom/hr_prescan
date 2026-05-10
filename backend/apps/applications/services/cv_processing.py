@@ -96,7 +96,6 @@ def analyze_cv_with_ai(*, application_id: UUID) -> None:
             ),
         ],
         config=types.GenerateContentConfig(
-            thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
             system_instruction=(
                 "You are a CV/resume parser. Extract structured data from the CV text. "
                 "Write the summary and all descriptions in the SAME language as the CV content. "
@@ -163,7 +162,6 @@ def calculate_match_score(*, application_id: UUID) -> None:
             ),
         ],
         config=types.GenerateContentConfig(
-            thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
             system_instruction=(
                 "You are an HR matching expert. Compare a candidate's CV against a job vacancy "
                 "and provide a match score. "

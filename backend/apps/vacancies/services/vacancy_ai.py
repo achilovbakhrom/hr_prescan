@@ -59,7 +59,6 @@ def generate_interview_questions(*, vacancy: Vacancy, step: str = ScreeningStep.
                 ),
             ],
             config=types.GenerateContentConfig(
-                thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
                 system_instruction=(
                     f"You are an expert HR interviewer. {step_instruction}\n\n"
                     f"{language_instruction}\n\n"
@@ -128,7 +127,6 @@ def generate_vacancy_keywords(*, vacancy: Vacancy) -> list[str]:
             ),
         ],
         config=types.GenerateContentConfig(
-            thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
             system_instruction=(
                 "Generate 20-30 search keywords for this job vacancy. "
                 "Include ALL of these categories:\n"

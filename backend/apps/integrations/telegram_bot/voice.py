@@ -46,9 +46,7 @@ def transcribe_voice(*, client: TelegramClient, file_id: str) -> str | None:
                 types.Part.from_bytes(data=audio_bytes, mime_type="audio/ogg"),
                 _TRANSCRIBE_PROMPT,
             ],
-            config=types.GenerateContentConfig(
-                thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
-            ),
+            config=types.GenerateContentConfig(),
         )
         return (response.text or "").strip()
     except Exception as exc:

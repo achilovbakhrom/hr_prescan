@@ -139,7 +139,6 @@ def _generate_company_info_with_ai(*, text: str, source_label: str = "document")
                 ),
             ],
             config=types.GenerateContentConfig(
-                thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
                 system_instruction=(
                     "You are an AI assistant helping HR managers prepare company descriptions "
                     "for AI-powered candidate interviews. Given the content extracted from a "

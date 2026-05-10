@@ -27,7 +27,6 @@ def evaluate_interview_prompt(*, interview: Interview) -> dict:
             )
         ],
         config=types.GenerateContentConfig(
-            thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
             system_instruction="You are a strict prompt quality evaluator for HR interview agents.",
             max_output_tokens=1800,
             temperature=0.2,

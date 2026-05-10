@@ -40,7 +40,6 @@ def generate_greeting(interview: Interview) -> str:
             ),
         ],
         config=types.GenerateContentConfig(
-            thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
             system_instruction=system_prompt,
             max_output_tokens=300,
             temperature=0.7,
@@ -75,7 +74,6 @@ def _get_ai_response_and_update_history(interview: Interview, candidate_entry: d
         model=settings.GEMINI_MODEL,
         contents=gemini_contents,
         config=types.GenerateContentConfig(
-            thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
             system_instruction=system_prompt,
             max_output_tokens=400,
             temperature=0.7,

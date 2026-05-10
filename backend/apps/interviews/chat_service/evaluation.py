@@ -76,7 +76,6 @@ def evaluate_chat_interview(interview: Interview, *, ai_decision: str = "advance
             ),
         ],
         config=types.GenerateContentConfig(
-            thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
             system_instruction="You are an expert HR evaluator. Respond only with valid JSON.",
             max_output_tokens=1500,
             temperature=0.3,

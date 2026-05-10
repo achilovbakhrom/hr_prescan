@@ -66,7 +66,6 @@ def _generate_content(*, client: genai.Client, context: dict[str, Any]) -> dict[
         model=settings.GEMINI_MODEL,
         contents=[_content_payload(context)],
         config=types.GenerateContentConfig(
-            thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
             system_instruction=_generation_instruction(),
             temperature=0.6,
             response_mime_type="application/json",
@@ -90,7 +89,6 @@ def _grade_content(
             )
         ],
         config=types.GenerateContentConfig(
-            thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
             system_instruction=_grading_instruction(),
             temperature=0.1,
             response_mime_type="application/json",
@@ -122,7 +120,6 @@ def _revise_content(
             )
         ],
         config=types.GenerateContentConfig(
-            thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
             system_instruction=_revision_instruction(),
             temperature=0.4,
             response_mime_type="application/json",

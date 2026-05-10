@@ -26,8 +26,10 @@ class InterviewContext:
     duration_minutes: int
     cv_summary: str
     language: str = "en"
-    questions: list[dict] = field(default_factory=list)   # [{text, category}]
-    criteria: list[dict] = field(default_factory=list)     # [{id, name, description, weight}]
+    questions: list[dict] = field(default_factory=list)  # [{text, category}]
+    criteria: list[dict] = field(
+        default_factory=list
+    )  # [{id, name, description, weight}]
     custom_prompt: str = ""
 
 

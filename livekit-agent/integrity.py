@@ -9,7 +9,7 @@ import json
 import logging
 import os
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from google import genai
 from google.genai import types
@@ -188,7 +188,6 @@ class IntegrityMonitor:
                     prompt,
                 ],
                 config=types.GenerateContentConfig(
-                    thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
                     response_mime_type="application/json",
                     max_output_tokens=200,
                     temperature=0,
@@ -222,7 +221,9 @@ class IntegrityMonitor:
                     timestamp_seconds=timestamp_seconds,
                 )
 
-            if result.get("face_present", True) and not result.get("gaze_on_screen", True):
+            if result.get("face_present", True) and not result.get(
+                "gaze_on_screen", True
+            ):
                 self._add_flag(
                     flag_type=FLAG_GAZE_DEVIATION,
                     severity=SEVERITY_LOW,

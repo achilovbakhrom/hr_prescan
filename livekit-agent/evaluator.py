@@ -48,7 +48,9 @@ async def evaluate_interview(
     client = genai.Client(api_key=os.environ.get("GOOGLE_API_KEY", ""))
 
     # -- Step 1: Score the interview --
-    prompt = _build_evaluation_prompt(transcript=transcript, criteria=criteria, language=language)
+    prompt = _build_evaluation_prompt(
+        transcript=transcript, criteria=criteria, language=language
+    )
 
     response = await client.aio.models.generate_content(
         model=os.environ.get("GEMINI_MODEL", "gemini-3-flash-preview"),
@@ -56,7 +58,6 @@ async def evaluate_interview(
             types.Content(role="user", parts=[types.Part(text=prompt)]),
         ],
         config=types.GenerateContentConfig(
-            thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
             response_mime_type="application/json",
             temperature=0.3,
         ),
@@ -93,6 +94,7 @@ async def evaluate_interview(
 # ---------------------------------------------------------------------------
 # CV consistency check
 # ---------------------------------------------------------------------------
+
 
 async def _check_cv_consistency(
     *,
@@ -144,7 +146,6 @@ async def _check_cv_consistency(
                 types.Content(role="user", parts=[types.Part(text=prompt)]),
             ],
             config=types.GenerateContentConfig(
-                thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
                 response_mime_type="application/json",
                 temperature=0.2,
             ),
@@ -173,9 +174,7 @@ async def _check_cv_consistency(
                 )
 
         if flags:
-            logger.warning(
-                "CV consistency check found %d inconsistencies.", len(flags)
-            )
+            logger.warning("CV consistency check found %d inconsistencies.", len(flags))
         else:
             logger.info("CV consistency check passed — no inconsistencies found.")
 
@@ -189,6 +188,7 @@ async def _check_cv_consistency(
 # ---------------------------------------------------------------------------
 # Prompt builders
 # ---------------------------------------------------------------------------
+
 
 def _build_evaluation_prompt(
     *,
@@ -241,6 +241,7 @@ def _build_evaluation_prompt(
 # Backend communication
 # ---------------------------------------------------------------------------
 
+
 async def _send_results_to_backend(
     *,
     interview_id: str,
@@ -267,6 +268,12 @@ async def _send_results_to_backend(
 
 def _decision_from_evaluation(evaluation: dict) -> str:
     recommendation = str(evaluation.get("recommendation") or "").strip().lower()
-    if recommendation in {"reject", "rejected", "do_not_advance", "do not advance", "no"}:
+    if recommendation in {
+        "reject",
+        "rejected",
+        "do_not_advance",
+        "do not advance",
+        "no",
+    }:
         return "reject"
     return "advance"

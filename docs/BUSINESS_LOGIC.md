@@ -407,6 +407,7 @@ Interview is the second, more rigorous AI screening step. HR enables it per vaca
 **Common to both interview modes:**
 - A progress indicator shows approximate completion
 - Supported languages: English, Russian, Uzbek, Kazakh, Turkish, Arabic, Spanish, French, German, and Ukrainian. Interview sessions inherit the vacancy screening language unless explicitly changed by the screening workflow.
+- The interview agent should speak in concise, natural language. If the candidate refuses to continue, says the role/profession is not relevant, or clearly does not fit the role after clarification, the agent ends the interview kindly instead of continuing to probe. Before any normal or early finish, the agent asks for the candidate's final words for HR.
 
 **Question Generation:**
 - AI generates interview questions based on:
@@ -425,8 +426,8 @@ Interview is the second, more rigorous AI screening step. HR enables it per vaca
 3. AI greeting message appears
 4. AI asks interview questions one by one; candidate types responses
 5. AI can ask follow-up questions, present cases, or probe deeper
-6. Interview concludes when AI determines it has gathered enough information
-7. AI thanks the candidate and ends the session
+6. Interview concludes when AI determines it has gathered enough information or the early-finish rule applies
+7. AI asks for final words, thanks the candidate, and ends the session
 8. Candidate sees a "Thank you" screen
 
 **Interview Flow — Meet mode:**
@@ -436,8 +437,8 @@ Interview is the second, more rigorous AI screening step. HR enables it per vaca
 4. AI agent greets the candidate and explains the process
 5. AI asks interview questions one by one, listens to responses
 6. AI can ask follow-up questions, present cases, or probe deeper
-7. Interview concludes when all questions are covered or time limit is reached
-8. AI thanks the candidate and ends the session
+7. Interview concludes when all questions are covered, time limit is reached, or the early-finish rule applies
+8. AI asks for final words, thanks the candidate, and ends the session
 9. Candidate sees a "Thank you" screen
 
 **After interview completion:**

@@ -78,13 +78,15 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
     monitor = IntegrityMonitor(interview_start_time=time.time())
 
     @agent.on("user_speech_committed")
-    def _on_user_speech(text: str) -> None:
+    def _on_user_speech(message) -> None:
+        text = _speech_text(message)
         transcript.append({"speaker": "candidate", "text": text})
         # Feed transcript into integrity monitor for audio anomaly detection
         monitor.add_transcript_entry(speaker="candidate", text=text)
 
     @agent.on("agent_speech_committed")
-    def _on_agent_speech(text: str) -> None:
+    def _on_agent_speech(message) -> None:
+        text = _speech_text(message)
         transcript.append({"speaker": "interviewer", "text": text})
         monitor.add_transcript_entry(speaker="interviewer", text=text)
 
@@ -100,7 +102,9 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
         )
 
         if not transcript:
-            logger.warning("Interview %s ended with empty transcript.", context.interview_id)
+            logger.warning(
+                "Interview %s ended with empty transcript.", context.interview_id
+            )
             return
 
         logger.info(
@@ -119,7 +123,8 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
             )
         except Exception:
             logger.exception(
-                "Failed to evaluate interview %s.", context.interview_id,
+                "Failed to evaluate interview %s.",
+                context.interview_id,
             )
 
     ctx.add_shutdown_callback(_on_shutdown)
@@ -127,3 +132,27 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
     logger.info("Integrity monitoring started for interview %s.", context.interview_id)
 
     return agent
+
+
+def _speech_text(message) -> str:
+    """Extract plain text from LiveKit speech events across SDK versions."""
+    if isinstance(message, str):
+        return message.strip()
+
+    for attr in ("text", "content"):
+        value = getattr(message, attr, None)
+        if isinstance(value, str):
+            return value.strip()
+        if isinstance(value, list):
+            parts = []
+            for item in value:
+                if isinstance(item, str):
+                    parts.append(item)
+                else:
+                    item_text = getattr(item, "text", None)
+                    if isinstance(item_text, str):
+                        parts.append(item_text)
+            if parts:
+                return " ".join(part.strip() for part in parts if part.strip())
+
+    return str(message).strip()

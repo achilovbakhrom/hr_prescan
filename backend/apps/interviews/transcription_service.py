@@ -67,9 +67,7 @@ def transcribe_audio(*, file_bytes: bytes, filename: str = "audio.webm") -> str:
                 "Transcribe this audio accurately. The speaker may use Russian, English, "
                 "or a mix. Return only the transcription text, nothing else.",
             ],
-            config=types.GenerateContentConfig(
-                thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
-            ),
+            config=types.GenerateContentConfig(),
         )
     except Exception as e:
         logger.error("Gemini transcription failed: %s", e)

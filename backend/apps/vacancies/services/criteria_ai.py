@@ -63,7 +63,6 @@ def generate_vacancy_criteria(*, vacancy: Vacancy, step: str = ScreeningStep.PRE
                 ),
             ],
             config=types.GenerateContentConfig(
-                thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
                 system_instruction=(
                     f"You are an expert HR assessment designer. {step_instruction}\n\n"
                     f"{language_instruction}\n\n"
