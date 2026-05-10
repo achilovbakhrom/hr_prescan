@@ -12,6 +12,11 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return
   }
 
+  const nuxtApp = useNuxtApp()
+  if (nuxtApp.isHydrating && nuxtApp.payload.serverRendered) {
+    return
+  }
+
   const authStore = useAuthStore()
   if (!authStore.user && authStore.tokens) {
     await authStore.initAuth()
