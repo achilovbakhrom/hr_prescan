@@ -56,6 +56,7 @@ const prompt = ref(
 const interviewMode = ref<InterviewMode>(props.vacancy.interviewMode || 'chat')
 const interviewDuration = ref<number>(props.vacancy.interviewDuration || 30)
 const saving = ref(false)
+const interviewLocked = computed(() => (props.vacancy.candidatesTotal ?? 0) > 0)
 
 watch(
   () => props.vacancy,
@@ -78,7 +79,7 @@ const dirty = computed(() => {
   }
   return (
     prompt.value !== (props.vacancy.interviewPrompt || '') ||
-    interviewMode.value !== (props.vacancy.interviewMode || 'chat') ||
+    (!interviewLocked.value && interviewMode.value !== (props.vacancy.interviewMode || 'chat')) ||
     interviewDuration.value !== (props.vacancy.interviewDuration || 30)
   )
 })
@@ -91,13 +92,15 @@ async function save(): Promise<void> {
         ? { prescanningLanguage: language.value, prescanningPrompt: prompt.value }
         : {
             interviewPrompt: prompt.value,
-            interviewMode: interviewMode.value,
-            interviewDuration: interviewDuration.value,
+            interviewDuration: interviewDuration.value ?? 30,
           }
+    if (props.step === 'interview' && !interviewLocked.value) {
+      payload.interviewMode = interviewMode.value
+    }
     await vacancyStore.updateVacancy(props.vacancy.id, payload)
     toast.add({ severity: 'success', summary: t('common.saved'), life: 2500 })
   } catch {
-    toast.add({ severity: 'error', summary: t('common.error'), life: 4000 })
+    toast.add({ severity: 'error', summary: vacancyStore.error || t('common.error'), life: 4000 })
   } finally {
     saving.value = false
   }
@@ -138,8 +141,12 @@ async function save(): Promise<void> {
             :options="interviewModeOptions"
             option-label="label"
             option-value="value"
+            :disabled="interviewLocked"
             class="w-full"
           />
+          <p v-if="interviewLocked" class="mt-1 text-xs text-[color:var(--color-warning)]">
+            {{ t('vacancies.settings.interviewLocked', 'Locked — applications already received') }}
+          </p>
         </div>
         <div v-if="interviewMode === 'meet'">
           <label class="mb-1 block text-xs font-medium text-gray-600">{{

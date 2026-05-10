@@ -127,10 +127,12 @@ export const useVacancyStore = defineStore('vacancy', () => {
     loading.value = true
     error.value = null
     try {
-      const questions = await vacancyService.generateQuestions(vacancyId, step)
+      const generated = await vacancyService.generateQuestions(vacancyId, step)
       if (currentVacancy.value?.id === vacancyId) {
-        currentVacancy.value.questions.push(...questions)
-        currentVacancy.value.questionsCount += questions.length
+        currentVacancy.value.questions.push(...generated.questions)
+        currentVacancy.value.criteria.push(...generated.criteria)
+        currentVacancy.value.questionsCount += generated.questions.length
+        currentVacancy.value.criteriaCount += generated.criteria.length
       }
     } catch (err: unknown) {
       handleError(err)

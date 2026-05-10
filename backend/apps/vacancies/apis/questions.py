@@ -7,11 +7,15 @@ from apps.accounts.permissions import HasHRPermission, HRPermissions
 from apps.common.messages import MSG_QUESTION_NOT_FOUND, MSG_VACANCY_NOT_FOUND
 from apps.vacancies.models import ScreeningStep
 from apps.vacancies.selectors import get_user_vacancy_by_id, get_vacancy_questions
-from apps.vacancies.serializers import InterviewQuestionOutputSerializer
+from apps.vacancies.serializers import (
+    InterviewQuestionOutputSerializer,
+    VacancyCriteriaOutputSerializer,
+)
 from apps.vacancies.services import (
     add_interview_question,
     delete_interview_question,
     generate_interview_questions,
+    generate_vacancy_criteria,
     update_interview_question,
 )
 
@@ -108,7 +112,7 @@ class VacancyQuestionDetailApi(APIView):
 
 
 class GenerateQuestionsApi(APIView):
-    """POST /api/hr/vacancies/{id}/questions/generate/ — AI-generate questions."""
+    """POST /api/hr/vacancies/{id}/questions/generate/ — AI-generate setup."""
 
     permission_classes = [HasHRPermission]
     hr_permission = HRPermissions.MANAGE_VACANCIES
@@ -129,8 +133,14 @@ class GenerateQuestionsApi(APIView):
         serializer.is_valid(raise_exception=True)
 
         step = serializer.validated_data.get("step", ScreeningStep.PRESCANNING)
+        criteria = []
+        if not vacancy.criteria.filter(step=step).exists():
+            criteria = generate_vacancy_criteria(vacancy=vacancy, step=step)
         questions = generate_interview_questions(vacancy=vacancy, step=step)
         return Response(
-            InterviewQuestionOutputSerializer(questions, many=True).data,
+            {
+                "questions": InterviewQuestionOutputSerializer(questions, many=True).data,
+                "criteria": VacancyCriteriaOutputSerializer(criteria, many=True).data,
+            },
             status=status.HTTP_201_CREATED,
         )

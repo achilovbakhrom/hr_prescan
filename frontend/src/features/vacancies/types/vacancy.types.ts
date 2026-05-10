@@ -53,6 +53,11 @@ export interface InterviewQuestion {
   translations: Record<string, string>
 }
 
+export interface GenerateQuestionsResponse {
+  questions: InterviewQuestion[]
+  criteria: VacancyCriteria[]
+}
+
 export interface CreateVacancyRequest {
   title: string
   description: string

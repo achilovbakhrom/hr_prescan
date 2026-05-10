@@ -131,6 +131,7 @@ HR provides the following information:
 - **AI-generated vacancy content** — the Basic Info form can generate candidate-facing description, requirements, and responsibilities from the title and optional context. Generated content is AI-graded for relevance, specificity, formatting, compliance, and unsupported claims; low-scoring drafts are revised once before being returned to HR.
 - **AI assistant input** — HR can paste long job descriptions into the AI assistant for vacancy creation; recent chat history may be shortened for model context, but the current pasted vacancy text is preserved up to the request limit.
 - **AI assistant publication setup** — after creating a vacancy draft, the AI assistant asks whether it should generate prescanning questions and role-specific evaluation criteria/competencies itself. If HR agrees (for example, says "generate yourself"), it generates both and can publish the vacancy in the same flow.
+- **AI screening setup generation** — when HR uses the screening "Generate with AI" action for a step, the platform creates missing evaluation criteria for that step before generating questions, so generated questions are aligned to the scoring criteria.
 - **Required Skills** — key skills and qualifications needed
 - **Salary Range** — min/max salary is optional. If both min and max are empty, the vacancy salary is treated as negotiable and should remain visible in public listings as "Negotiable".
 - **Location** — optional remote, onsite, or hybrid context (with city/country if applicable)

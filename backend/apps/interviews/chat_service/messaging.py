@@ -16,6 +16,9 @@ from apps.interviews.models import Interview
 
 logger = logging.getLogger(__name__)
 
+GREETING_MAX_OUTPUT_TOKENS = 500
+REPLY_MAX_OUTPUT_TOKENS = 900
+
 
 def generate_greeting(interview: Interview) -> str:
     """Generate the AI's opening message for a chat session."""
@@ -41,7 +44,7 @@ def generate_greeting(interview: Interview) -> str:
         ],
         config=types.GenerateContentConfig(
             system_instruction=system_prompt,
-            max_output_tokens=300,
+            max_output_tokens=GREETING_MAX_OUTPUT_TOKENS,
             temperature=0.7,
         ),
     )
@@ -75,7 +78,7 @@ def _get_ai_response_and_update_history(interview: Interview, candidate_entry: d
         contents=gemini_contents,
         config=types.GenerateContentConfig(
             system_instruction=system_prompt,
-            max_output_tokens=400,
+            max_output_tokens=REPLY_MAX_OUTPUT_TOKENS,
             temperature=0.7,
         ),
     )

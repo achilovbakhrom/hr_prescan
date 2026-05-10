@@ -87,7 +87,10 @@ class VacancyDetailApi(APIView):
         serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        vacancy = update_vacancy(vacancy=vacancy, data=serializer.validated_data)
+        try:
+            vacancy = update_vacancy(vacancy=vacancy, data=serializer.validated_data)
+        except ApplicationError as e:
+            return Response({"detail": e.message}, status=status.HTTP_400_BAD_REQUEST)
         return Response(VacancyDetailOutputSerializer(vacancy).data, status=status.HTTP_200_OK)
 
     def delete(self, request: Request, vacancy_id: str) -> Response:

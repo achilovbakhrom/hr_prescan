@@ -5,7 +5,13 @@ from rest_framework.test import APIClient
 from apps.accounts.permissions import HRPermissions
 from apps.vacancies.models import InterviewQuestion, ScreeningStep, Vacancy, VacancyCriteria
 from apps.vacancies.services import create_default_criteria
-from tests.factories import CompanyFactory, CompanyMembershipFactory, UserFactory, VacancyFactory
+from tests.factories import (
+    ApplicationFactory,
+    CompanyFactory,
+    CompanyMembershipFactory,
+    UserFactory,
+    VacancyFactory,
+)
 
 
 def _member_vacancy_in_second_company():
@@ -103,6 +109,22 @@ def test_question_buttons_use_all_user_company_memberships():
     assert any(item["id"] == question_id for item in list_response.data)
 
 
+def test_update_interview_mode_with_applications_returns_400():
+    user, vacancy = _member_vacancy_in_second_company()
+    ApplicationFactory(vacancy=vacancy)
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    response = client.put(
+        f"/api/hr/vacancies/{vacancy.id}/",
+        {"interview_mode": Vacancy.InterviewMode.MEET},
+        format="json",
+    )
+
+    assert response.status_code == 400
+    assert "Cannot change interview mode" in response.data["detail"]
+
+
 def test_generate_and_regenerate_buttons_use_all_user_company_memberships():
     user, vacancy = _member_vacancy_in_second_company()
     VacancyCriteria.objects.create(
@@ -116,9 +138,11 @@ def test_generate_and_regenerate_buttons_use_all_user_company_memberships():
     client.force_authenticate(user=user)
 
     with (
+        patch("apps.vacancies.apis.questions.generate_vacancy_criteria") as criteria_mock,
         patch("apps.vacancies.apis.questions.generate_interview_questions") as questions_mock,
         patch("apps.vacancies.tasks.generate_keywords_task.delay") as keywords_mock,
     ):
+        criteria_mock.return_value = []
         questions_mock.return_value = [
             InterviewQuestion.objects.create(
                 vacancy=vacancy,
@@ -137,6 +161,9 @@ def test_generate_and_regenerate_buttons_use_all_user_company_memberships():
         regenerate_response = client.post(f"/api/hr/vacancies/{vacancy.id}/regenerate-keywords/")
 
     assert generate_response.status_code == 201
+    assert generate_response.data["criteria"] == []
+    assert generate_response.data["questions"][0]["step"] == ScreeningStep.PRESCANNING
+    criteria_mock.assert_not_called()
     questions_mock.assert_called_once_with(vacancy=vacancy, step=ScreeningStep.PRESCANNING)
     assert regenerate_response.status_code == 202
     keywords_mock.assert_called_once_with(str(vacancy.id))
@@ -147,7 +174,19 @@ def test_generate_questions_passes_interview_step_to_generator():
     client = APIClient()
     client.force_authenticate(user=user)
 
-    with patch("apps.vacancies.apis.questions.generate_interview_questions") as questions_mock:
+    with (
+        patch("apps.vacancies.apis.questions.generate_vacancy_criteria") as criteria_mock,
+        patch("apps.vacancies.apis.questions.generate_interview_questions") as questions_mock,
+    ):
+        criteria_mock.return_value = [
+            VacancyCriteria.objects.create(
+                vacancy=vacancy,
+                name="Production Debugging",
+                weight=3,
+                order=1,
+                step=ScreeningStep.INTERVIEW,
+            )
+        ]
         questions_mock.return_value = [
             InterviewQuestion.objects.create(
                 vacancy=vacancy,
@@ -165,7 +204,9 @@ def test_generate_questions_passes_interview_step_to_generator():
         )
 
     assert response.status_code == 201
-    assert response.data[0]["step"] == ScreeningStep.INTERVIEW
+    assert response.data["criteria"][0]["step"] == ScreeningStep.INTERVIEW
+    assert response.data["questions"][0]["step"] == ScreeningStep.INTERVIEW
+    criteria_mock.assert_called_once_with(vacancy=vacancy, step=ScreeningStep.INTERVIEW)
     questions_mock.assert_called_once_with(vacancy=vacancy, step=ScreeningStep.INTERVIEW)
 
 

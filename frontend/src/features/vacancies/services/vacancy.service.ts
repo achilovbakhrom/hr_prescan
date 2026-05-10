@@ -5,6 +5,7 @@ import type {
   VacancyStatus,
   VacancyCriteria,
   InterviewQuestion,
+  GenerateQuestionsResponse,
   StepType,
   CreateVacancyRequest,
   UpdateVacancyRequest,
@@ -149,8 +150,8 @@ export const vacancyService = {
   async generateQuestions(
     vacancyId: string,
     step: StepType = 'prescanning',
-  ): Promise<InterviewQuestion[]> {
-    const response = await apiClient.post<InterviewQuestion[]>(
+  ): Promise<GenerateQuestionsResponse> {
+    const response = await apiClient.post<GenerateQuestionsResponse>(
       `/hr/vacancies/${vacancyId}/questions/generate/`,
       { step },
     )
