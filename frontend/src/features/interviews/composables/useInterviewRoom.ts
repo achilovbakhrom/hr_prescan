@@ -10,6 +10,7 @@ import {
   type LocalTrackPublication,
 } from 'livekit-client'
 import { interviewService } from '../services/interview.service'
+import { useInterviewDevices } from './useInterviewDevices'
 import type { InterviewDetail } from '../types/interview.types'
 
 export type ConnectionState = 'idle' | 'preview' | 'connecting' | 'connected' | 'error' | 'ended'
@@ -26,12 +27,10 @@ export function useInterviewRoom(token: () => string) {
   const localVideoEl = ref<HTMLVideoElement | null>(null)
   const remoteVideoEl = ref<HTMLVideoElement | null>(null)
   const remoteAudioEl = ref<HTMLAudioElement | null>(null)
-  const isMuted = ref(false)
-  const isCameraOff = ref(false)
   const elapsedTime = ref(0)
   const hasRemoteVideo = ref(false)
   const remoteParticipantName = ref('AI Interviewer')
-  const previewStream = ref<MediaStream | null>(null)
+  const devices = useInterviewDevices(previewVideoEl)
   let timerInterval: ReturnType<typeof setInterval> | null = null
   let room: Room | null = null
 
@@ -56,36 +55,11 @@ export function useInterviewRoom(token: () => string) {
 
   async function startPreview(): Promise<void> {
     connectionState.value = 'preview'
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      previewStream.value = stream
-      await nextTick()
-      if (previewVideoEl.value) previewVideoEl.value.srcObject = stream
-    } catch {
-      errorMessage.value = 'Could not access camera or microphone. Please check your permissions.'
-      connectionState.value = 'error'
-    }
-  }
-  function stopPreview(): void {
-    previewStream.value?.getTracks().forEach((t) => t.stop())
-    previewStream.value = null
-  }
-  function togglePreviewMic(): void {
-    if (!previewStream.value) return
-    isMuted.value = !isMuted.value
-    previewStream.value.getAudioTracks().forEach((t) => {
-      t.enabled = !isMuted.value
-    })
-  }
-  function togglePreviewCamera(): void {
-    if (!previewStream.value) return
-    isCameraOff.value = !isCameraOff.value
-    previewStream.value.getVideoTracks().forEach((t) => {
-      t.enabled = !isCameraOff.value
-    })
+    await nextTick()
+    await devices.startPreview()
   }
   function cancelPreview(): void {
-    stopPreview()
+    devices.stopPreview()
     connectionState.value = 'idle'
   }
 
@@ -133,7 +107,7 @@ export function useInterviewRoom(token: () => string) {
   }
 
   async function joinRoom(): Promise<void> {
-    stopPreview()
+    devices.stopPreview()
     if (!LIVEKIT_URL) {
       errorMessage.value = 'LiveKit server URL is not configured.'
       connectionState.value = 'error'
@@ -152,9 +126,7 @@ export function useInterviewRoom(token: () => string) {
       room.on(RoomEvent.ParticipantConnected, handleParticipantConnected)
       room.on(RoomEvent.Disconnected, handleDisconnected)
       await room.connect(LIVEKIT_URL, interview.value.candidateToken)
-      await room.localParticipant.enableCameraAndMicrophone()
-      if (isMuted.value) await room.localParticipant.setMicrophoneEnabled(false)
-      if (isCameraOff.value) await room.localParticipant.setCameraEnabled(false)
+      await devices.publishLocalMedia(room.localParticipant)
       await nextTick()
       room.localParticipant.videoTrackPublications.forEach((pub: LocalTrackPublication) => {
         if (pub.track && localVideoEl.value) pub.track.attach(localVideoEl.value)
@@ -175,13 +147,13 @@ export function useInterviewRoom(token: () => string) {
   }
   function toggleMute(): void {
     if (!room) return
-    isMuted.value = !isMuted.value
-    room.localParticipant.setMicrophoneEnabled(!isMuted.value)
+    devices.isMuted.value = !devices.isMuted.value
+    room.localParticipant.setMicrophoneEnabled(!devices.isMuted.value)
   }
   function toggleCamera(): void {
     if (!room) return
-    isCameraOff.value = !isCameraOff.value
-    room.localParticipant.setCameraEnabled(!isCameraOff.value)
+    devices.isCameraOff.value = !devices.isCameraOff.value
+    room.localParticipant.setCameraEnabled(!devices.isCameraOff.value)
   }
   function leaveInterview(): void {
     disconnect()
@@ -207,7 +179,7 @@ export function useInterviewRoom(token: () => string) {
     }
   })
   onBeforeUnmount(() => {
-    stopPreview()
+    devices.stopPreview()
     disconnect()
   })
 
@@ -221,18 +193,26 @@ export function useInterviewRoom(token: () => string) {
     localVideoEl,
     remoteVideoEl,
     remoteAudioEl,
-    isMuted,
-    isCameraOff,
+    isMuted: devices.isMuted,
+    isCameraOff: devices.isCameraOff,
+    audioDevices: devices.audioDevices,
+    videoDevices: devices.videoDevices,
+    selectedAudioDeviceId: devices.selectedAudioDeviceId,
+    selectedVideoDeviceId: devices.selectedVideoDeviceId,
+    deviceError: devices.deviceError,
+    hasRequiredDevices: devices.hasRequiredDevices,
     hasRemoteVideo,
     remoteParticipantName,
     formattedTime,
     canJoin,
     getInitials,
     startPreview,
-    stopPreview,
+    stopPreview: devices.stopPreview,
     cancelPreview,
-    togglePreviewMic,
-    togglePreviewCamera,
+    togglePreviewMic: devices.togglePreviewMic,
+    togglePreviewCamera: devices.togglePreviewCamera,
+    selectAudioDevice: devices.selectAudioDevice,
+    selectVideoDevice: devices.selectVideoDevice,
     joinRoom,
     toggleMute,
     toggleCamera,

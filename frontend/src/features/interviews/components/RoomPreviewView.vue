@@ -9,18 +9,28 @@ import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import GlassCard from '@/shared/components/GlassCard.vue'
 import GlassSurface from '@/shared/components/GlassSurface.vue'
+import AppSelect from '@/shared/components/AppSelect.vue'
 import type { InterviewDetail } from '../types/interview.types'
+import type { MediaDeviceInfo } from '@/features/video/types/video.types'
 
 defineProps<{
   interview: InterviewDetail
   isMuted: boolean
   isCameraOff: boolean
+  audioDevices: MediaDeviceInfo[]
+  videoDevices: MediaDeviceInfo[]
+  selectedAudioDeviceId: string
+  selectedVideoDeviceId: string
+  deviceError: string | null
+  hasRequiredDevices: boolean
   getInitials: (name: string) => string
 }>()
 
 const emit = defineEmits<{
   toggleMic: []
   toggleCamera: []
+  selectAudioDevice: [deviceId: string]
+  selectVideoDevice: [deviceId: string]
   joinRoom: []
   cancel: []
 }>()
@@ -92,11 +102,48 @@ const { t } = useI18n()
       <p class="mb-6 text-sm text-[color:var(--color-text-secondary)]">
         {{ interview.vacancyTitle }}
       </p>
+      <div class="mb-4 space-y-3 text-left">
+        <div>
+          <label class="mb-1 block text-xs font-medium text-[color:var(--color-text-muted)]">
+            {{ t('interviews.preCheck.camera') }}
+          </label>
+          <AppSelect
+            :model-value="selectedVideoDeviceId"
+            :options="videoDevices"
+            option-label="label"
+            option-value="deviceId"
+            class="w-full"
+            :disabled="!videoDevices.length"
+            @update:model-value="emit('selectVideoDevice', String($event ?? ''))"
+          />
+        </div>
+        <div>
+          <label class="mb-1 block text-xs font-medium text-[color:var(--color-text-muted)]">
+            {{ t('interviews.preCheck.microphone') }}
+          </label>
+          <AppSelect
+            :model-value="selectedAudioDeviceId"
+            :options="audioDevices"
+            option-label="label"
+            option-value="deviceId"
+            class="w-full"
+            :disabled="!audioDevices.length"
+            @update:model-value="emit('selectAudioDevice', String($event ?? ''))"
+          />
+        </div>
+      </div>
+      <p
+        v-if="deviceError"
+        class="mb-4 rounded-md border border-[color:var(--color-warning)]/40 bg-[color:var(--color-warning)]/10 px-3 py-2 text-left text-xs text-[color:var(--color-warning)]"
+      >
+        {{ deviceError }}
+      </p>
       <Button
         :label="t('interviews.roomPage.joinNow')"
         icon="pi pi-video"
         class="w-full"
         size="large"
+        :disabled="!hasRequiredDevices"
         @click="emit('joinRoom')"
       />
       <button
