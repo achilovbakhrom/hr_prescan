@@ -18,6 +18,7 @@ import VacancyPrescanningTab from './VacancyPrescanningTab.vue'
 import VacancyInterviewTab from './VacancyInterviewTab.vue'
 import VacancySettingsTab from './VacancySettingsTab.vue'
 import CreateCompanyDialog from './CreateCompanyDialog.vue'
+import VacancyScreeningIntro from './VacancyScreeningIntro.vue'
 
 const props = defineProps<{
   initialData?: Partial<CreateVacancyRequest>
@@ -111,6 +112,7 @@ async function handleGenerateBasicInfo(): Promise<void> {
     <Message v-if="errorMessage" severity="error" class="mb-4">
       {{ errorMessage }}
     </Message>
+    <VacancyScreeningIntro />
 
     <TabView v-model:activeIndex="form.activeTab.value">
       <TabPanel value="0" :header="t('vacancies.form.basicInfo')">

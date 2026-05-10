@@ -14,6 +14,9 @@ export interface Application {
   vacancyTitle: string
   telegramCode?: number | null
   prescanToken?: string | null
+  interviewToken?: string | null
+  interviewEnabled?: boolean
+  interviewMode?: string
   candidateName: string
   candidateEmail: string
   candidatePhone: string

@@ -14,6 +14,12 @@ const { t } = useI18n()
 const router = useRouter()
 const vacancyStore = useVacancyStore()
 
+const setupNotes = [
+  { icon: 'pi pi-filter', key: 'vacancies.createNotes.filters' },
+  { icon: 'pi pi-sparkles', key: 'vacancies.createNotes.ai' },
+  { icon: 'pi pi-link', key: 'vacancies.createNotes.link' },
+]
+
 async function handleSave(data: CreateVacancyRequest): Promise<void> {
   try {
     const vacancy = await vacancyStore.createVacancy(data)
@@ -29,16 +35,32 @@ async function handleSave(data: CreateVacancyRequest): Promise<void> {
 
 <template>
   <div class="mx-auto max-w-4xl space-y-4">
-    <div class="flex items-center gap-3">
+    <div class="flex items-start gap-3">
       <button
         class="text-[color:var(--color-text-muted)] transition-colors hover:text-[color:var(--color-text-primary)]"
         @click="router.back()"
       >
         <i class="pi pi-arrow-left text-lg"></i>
       </button>
-      <h1 class="text-xl font-bold text-[color:var(--color-text-primary)] md:text-2xl">
-        {{ t('vacancies.createTitle') }}
-      </h1>
+      <div>
+        <h1 class="text-xl font-bold text-[color:var(--color-text-primary)] md:text-2xl">
+          {{ t('vacancies.createTitle') }}
+        </h1>
+        <p class="mt-1 max-w-2xl text-sm text-[color:var(--color-text-secondary)]">
+          {{ t('vacancies.createSubtitle') }}
+        </p>
+      </div>
+    </div>
+
+    <div class="grid gap-3 md:grid-cols-3">
+      <div
+        v-for="note in setupNotes"
+        :key="note.key"
+        class="rounded-2xl border border-[color:var(--color-border-glass)] bg-white/60 p-4 text-sm shadow-sm backdrop-blur-xl dark:bg-white/5"
+      >
+        <i :class="note.icon" class="text-[color:var(--color-accent-ai)]"></i>
+        <p class="mt-2 text-[color:var(--color-text-secondary)]">{{ t(note.key) }}</p>
+      </div>
     </div>
 
     <GlassCard>

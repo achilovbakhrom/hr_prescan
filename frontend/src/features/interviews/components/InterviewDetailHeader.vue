@@ -29,7 +29,9 @@ const router = useRouter()
 
 const isScheduled = computed(() => props.interview.status === 'pending')
 const isInProgress = computed(() => props.interview.status === 'in_progress')
-const roomUrl = computed(() => `${window.location.origin}/interview/${props.interview.id}/room`)
+const roomUrl = computed(
+  () => `${window.location.origin}/interview/${props.interview.interviewToken}/room`,
+)
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleString()
@@ -68,7 +70,7 @@ function formatDate(dateStr: string): string {
           icon="pi pi-external-link"
           size="small"
           severity="info"
-          @click="router.push(`/interview/${interview.id}/room`)"
+          @click="router.push(`/interview/${interview.interviewToken}/room`)"
         />
         <Button
           v-if="isScheduled"

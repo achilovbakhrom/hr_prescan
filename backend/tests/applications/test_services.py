@@ -40,6 +40,24 @@ class TestSubmitApplication:
         # The returned token should match
         assert result["prescan_token"] == str(session.interview_token)
 
+    def test_submit_application_prepares_interview_session_when_enabled(self, vacancy):
+        vacancy.interview_enabled = True
+        vacancy.interview_mode = Interview.ScreeningMode.MEET
+        vacancy.save(update_fields=["interview_enabled", "interview_mode"])
+
+        result = submit_application(
+            vacancy_id=vacancy.id,
+            candidate_name="Jane Doe",
+            candidate_email="jane-enabled@example.com",
+        )
+
+        app = result["application"]
+        interview_session = app.sessions.get(session_type=Interview.SessionType.INTERVIEW)
+        assert interview_session.status == Interview.Status.PENDING
+        assert interview_session.screening_mode == Interview.ScreeningMode.MEET
+        assert interview_session.livekit_room_name == f"interview-{interview_session.id}"
+        assert result["interview_token"] == str(interview_session.interview_token)
+
     def test_submit_application_duplicate_email_fails(self, vacancy):
         """Submitting the same email to the same vacancy raises an error."""
         submit_application(
@@ -121,6 +139,17 @@ class TestCreateInterviewSession:
         assert session.session_type == Interview.SessionType.INTERVIEW
         assert session.screening_mode == vacancy.interview_mode
         assert session.status == Interview.Status.PENDING
+
+    def test_create_interview_session_reuses_existing_pending_session(self, vacancy):
+        vacancy.interview_enabled = True
+        vacancy.save(update_fields=["interview_enabled"])
+
+        app = ApplicationFactory(vacancy=vacancy, status=Application.Status.PRESCANNED)
+        first = create_interview_session(application=app)
+        second = create_interview_session(application=app)
+
+        assert second == first
+        assert app.sessions.filter(session_type=Interview.SessionType.INTERVIEW).count() == 1
 
     def test_create_interview_session_when_disabled(self, vacancy):
         """Returns None if vacancy.interview_enabled is False."""

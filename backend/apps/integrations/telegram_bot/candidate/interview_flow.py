@@ -35,6 +35,10 @@ def start_bot_interview(
     from apps.interviews.models import Interview
     from apps.interviews.services import start_interview
 
+    if interview.session_type != Interview.SessionType.PRESCANNING:
+        client.send_message(chat_id=chat_id, text=t("candidate.ps_continue_on_web", lang=lang))
+        return
+
     if interview.status == Interview.Status.PENDING:
         interview.channel = Interview.Channel.TELEGRAM
         interview.save(update_fields=["channel", "updated_at"])
@@ -79,6 +83,11 @@ def handle_interview_answer(
         ).get(id=interview_id)
     except (Interview.DoesNotExist, Exception):
         client.send_message(chat_id=chat_id, text=t("common.error_generic", lang=lang))
+        return
+
+    if interview.session_type != Interview.SessionType.PRESCANNING:
+        client.send_message(chat_id=chat_id, text=t("candidate.ps_continue_on_web", lang=lang))
+        clear_session(role=ROLE_CANDIDATE, telegram_id=user.telegram_id)
         return
 
     if interview.status != Interview.Status.IN_PROGRESS:

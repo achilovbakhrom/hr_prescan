@@ -78,6 +78,12 @@ services:
       - S3_SECRET_KEY=${S3_SECRET_KEY}
       - MINIO_ENDPOINT=${MINIO_ENDPOINT}
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
+      - LIVEKIT_URL=${LIVEKIT_URL:-ws://livekit:7880}
+      - LIVEKIT_API_KEY=${LIVEKIT_API_KEY}
+      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-3-flash-preview}
+      - INTERNAL_API_KEY=${INTERNAL_API_KEY}
       # Derived from DOMAIN so email links (verify, invite, interview) point
       # at the same host the server is running on. No separate env var needed.
       - FRONTEND_URL=https://${DOMAIN}
@@ -211,6 +217,8 @@ services:
       - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
       - RABBITMQ_URL=amqp://${RABBITMQ_USER}:${RABBITMQ_PASS}@rabbitmq:5672//
       - FRONTEND_URL=https://${DOMAIN}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-3-flash-preview}
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
       - OTEL_SERVICE_NAME=hr-prescan-celery
       - TELEGRAM_HR_BOT_TOKEN=${TELEGRAM_HR_BOT_TOKEN}
@@ -291,7 +299,7 @@ services:
   livekit-agent:
     image: ghcr.io/${GITHUB_REPOSITORY}/livekit-agent:${IMAGE_TAG:-latest}
     environment:
-      - LIVEKIT_URL=ws://livekit:7880
+      - LIVEKIT_URL=${LIVEKIT_URL:-ws://livekit:7880}
       - LIVEKIT_API_KEY=${LIVEKIT_API_KEY}
       - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET}
       - DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY}

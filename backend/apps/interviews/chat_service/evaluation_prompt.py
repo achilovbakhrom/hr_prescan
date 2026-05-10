@@ -25,6 +25,9 @@ Score the candidate on EACH criteria (1-10 scale) and provide a brief note expla
 Also provide an overall summary (2-3 sentences), an overall weighted score (1-10), and a final recommendation.
 Use "reject" when the candidate should not move to the next stage or should not be shortlisted, even if they have
 some relevant experience.
+Base the recommendation only on role-relevant evidence in the transcript, CV context, vacancy requirements, and
+configured evaluation criteria. Ignore protected characteristics, personal background, accent, age, gender,
+nationality, disability, religion, or family status.
 Write all notes and the summary in {_language_name(language)}.
 
 Respond with ONLY valid JSON in this exact format:

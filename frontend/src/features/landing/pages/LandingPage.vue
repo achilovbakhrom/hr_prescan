@@ -13,6 +13,7 @@ import { useScrollAnimation } from '../composables/useScrollAnimation'
 import LandingNav from '../components/LandingNav.vue'
 import LandingHero from '../components/LandingHero.vue'
 import LandingStats from '../components/LandingStats.vue'
+import LandingIntroVideo from '../components/LandingIntroVideo.vue'
 import LandingFeatures from '../components/LandingFeatures.vue'
 import LandingPipeline from '../components/LandingPipeline.vue'
 import LandingCta from '../components/LandingCta.vue'
@@ -44,6 +45,7 @@ useScrollAnimation()
     <main class="relative z-0 bg-transparent pb-24 md:pb-12">
       <LandingHero />
       <LandingStats />
+      <LandingIntroVideo />
       <LandingFeatures />
       <LandingPipeline />
       <LandingCta />

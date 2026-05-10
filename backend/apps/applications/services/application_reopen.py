@@ -76,4 +76,8 @@ def reopen_application(
         language=application.vacancy.prescanning_language,
         channel=channel,
     )
+    if application.vacancy.interview_enabled:
+        from apps.applications.services.application_crud import create_interview_session
+
+        create_interview_session(application=application)
     return application, prescan_session

@@ -21,6 +21,7 @@ class InterviewContext:
     language: str = "en"
     questions: list[dict] = field(default_factory=list)   # [{text, category}]
     criteria: list[dict] = field(default_factory=list)     # [{id, name, description, weight}]
+    custom_prompt: str = ""
 
 
 async def fetch_interview_context(*, room_name: str) -> InterviewContext:
@@ -47,4 +48,5 @@ async def fetch_interview_context(*, room_name: str) -> InterviewContext:
         language=data.get("language", "en"),
         questions=data.get("questions", []),
         criteria=data.get("criteria", []),
+        custom_prompt=data.get("custom_prompt", ""),
     )

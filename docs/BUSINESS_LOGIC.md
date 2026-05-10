@@ -230,11 +230,14 @@ Each vacancy has a two-step AI screening pipeline. HR configures each step durin
 
 - Prescanning mode is always chat and cannot be changed
 - Interview mode (chat or meet) is set per vacancy and cannot be changed after the vacancy has active applications
+- The optional interview step is web-only. Telegram supports vacancy discovery, application, CV handling, and prescanning, but candidates must use the web link for the deeper interview step.
 - Both steps produce the same scoring output format: per-criteria scores (1-10), overall weighted score, AI summary, transcript
 - Meet mode (interview step only) additionally produces a video recording and integrity flags
 - Each step has its own independent set of scores — a candidate will have prescanning scores and (if applicable) interview scores
 - CV upload is optional (configurable per vacancy). AI uses CV context in both prescanning and interview if available
 - The AI agent decides whether to advance or reject candidates after each step. HR can override at any time.
+- If a vacancy has the interview step enabled, the platform prepares the candidate's interview session and web link when the application is created. That link remains locked until the candidate completes prescanning and is advanced. Candidates cannot skip prescanning by opening the interview link early.
+- Interview agent prompts should be reviewed with a model-based prompt evaluation rubric before major prompt changes are released. The review checks candidate experience, role specificity, evaluation rigor, fairness, safety, completion control, and language control.
 
 ---
 
@@ -248,6 +251,7 @@ Candidates can apply via two surfaces: the **web app** (public job board) and th
 2. Candidate fills in personal details. No account is required. The standard web form collects name, email, and optional phone; assistant-led unauthenticated prescreening must ask for a general HR contact method instead of requiring email-only contact.
 3. Candidate uploads CV/resume (optional but recommended; PDF, DOCX supported). If an authenticated candidate does not upload a CV for this application, the application automatically reuses the candidate's platform resume data. If the candidate also has a generated platform CV PDF, the active saved CV file is attached, falling back to the latest saved CV with a file.
 4. System creates the application and simultaneously creates a prescanning session with a unique link
+   - If the vacancy has the interview step enabled, the system also prepares a separate web interview session/link, but the interview cannot be started until prescanning is completed and the candidate advances.
    - If the candidate already has an active application for the same vacancy and email, the submission is blocked as a duplicate.
    - If the previous application for that vacancy and email is Archived or was cleared from archive, the same application row is reopened as a fresh Applied application, old active sessions are cancelled, scoring/notes are reset, and a new prescanning session is created.
 5. Candidate sees a post-apply screen with two options:
@@ -257,7 +261,7 @@ Candidates can apply via two surfaces: the **web app** (public job board) and th
 6. The prescanning link remains valid until: (a) the vacancy is archived, or (b) the prescanning is completed
 7. Candidate receives a confirmation email with: application acknowledgment, prescanning link, vacancy details, and instructions
 8. After prescanning completes, AI evaluates and decides:
-   - **Advance** — if interview step is enabled, a new interview session is created with a unique link (sent to the candidate via email). If interview step is disabled, the candidate is moved directly to shortlisted.
+   - **Advance** — if interview step is enabled, the prepared interview session/link becomes available to the candidate on the web. If interview step is disabled, the candidate is moved directly to shortlisted.
    - **Reject** — candidate is moved to rejected status
 9. If advanced to interview, candidate receives an interview link and completes the interview (chat or meet, depending on vacancy configuration)
 10. After interview completes, AI evaluates and decides to shortlist or reject the candidate

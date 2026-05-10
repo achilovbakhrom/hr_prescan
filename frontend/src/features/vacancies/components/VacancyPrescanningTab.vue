@@ -24,6 +24,9 @@ const { t } = useI18n()
         }}</span>
       </div>
       <p class="mt-2 text-sm text-gray-600">{{ t('vacancies.form.prescanningHint') }}</p>
+      <p class="mt-2 text-sm font-medium text-teal-800">
+        <i class="pi pi-link mr-1 text-xs"></i>{{ t('vacancies.form.prescanningLinkHint') }}
+      </p>
     </div>
 
     <div>

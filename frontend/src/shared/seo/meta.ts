@@ -1,9 +1,9 @@
 import { getLocale } from '@/shared/i18n'
 
 const DEFAULT_SITE_URL = 'https://prescreen-app.com'
-const DEFAULT_TITLE = 'PreScreen AI - AI-Powered Candidate Screening'
+const DEFAULT_TITLE = 'PreScreen AI - Strict AI Candidate Prescreening'
 const DEFAULT_DESCRIPTION =
-  'Screen candidates automatically with AI interviews, vacancy prescreening, and multilingual hiring workflows.'
+  'Add strict dynamic candidate filters, automate prescreening interviews, and let candidates complete screening by link without authentication.'
 const DEFAULT_IMAGE_PATH = '/og-image.png'
 
 export interface SeoMetaInput {

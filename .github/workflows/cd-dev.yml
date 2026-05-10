@@ -57,7 +57,7 @@ jobs:
             ${{ env.IMAGE_PREFIX }}/frontend:dev
           build-args: |
             VITE_API_URL=https://dev.prescreen-app.com/api
-            VITE_LIVEKIT_URL=wss://dev.prescreen-app.com/ws/
+            VITE_LIVEKIT_URL=wss://hr-prescreen-7ujjdb9w.livekit.cloud
             VITE_GOOGLE_CLIENT_ID=64156241192-ul3jng69g72u46vadaf8h4kt1jpahbpm.apps.googleusercontent.com
             VITE_TELEGRAM_BOT_USERNAME=candidate_preview_ai_dev_bot
             VITE_TELEGRAM_BOT_ID=8640891941

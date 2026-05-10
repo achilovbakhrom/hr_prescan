@@ -15,12 +15,14 @@ from apps.interviews.services.interview_scoring import (
     create_integrity_flags,
     save_interview_scores,
 )
+from apps.interviews.services.prompt_evaluation import evaluate_interview_prompt
 
 __all__ = [
     "add_integrity_flag",
     "cancel_interview",
     "complete_session",
     "create_integrity_flags",
+    "evaluate_interview_prompt",
     "expire_interviews_for_vacancy",
     "generate_candidate_token",
     "generate_observer_token",

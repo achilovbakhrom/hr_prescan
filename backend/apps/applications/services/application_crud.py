@@ -105,6 +105,9 @@ def submit_application(
         channel=channel,
     )
 
+    if vacancy.interview_enabled:
+        create_interview_session(application=application)
+
     return _submission_result(application=application, prescan_session=prescan_session)
 
 
@@ -122,10 +125,18 @@ def _enqueue_cv_processing(*, application: Application, cv_file_path: str, snaps
 
 
 def _submission_result(*, application: Application, prescan_session: Interview) -> dict:
+    interview_session = (
+        application.sessions.filter(session_type=Interview.SessionType.INTERVIEW)
+        .exclude(status=Interview.Status.CANCELLED)
+        .order_by("-created_at")
+        .first()
+    )
     return {
         "application": application,
         "prescan_session": prescan_session,
         "prescan_token": str(prescan_session.interview_token),
+        "interview_session": interview_session,
+        "interview_token": str(interview_session.interview_token) if interview_session else None,
     }
 
 
@@ -139,6 +150,17 @@ def create_interview_session(*, application: Application) -> Interview | None:
     if not vacancy.interview_enabled:
         return None
 
+    existing = (
+        application.sessions.filter(
+            session_type=Interview.SessionType.INTERVIEW,
+        )
+        .exclude(status=Interview.Status.CANCELLED)
+        .order_by("-created_at")
+        .first()
+    )
+    if existing is not None:
+        return existing
+
     interview_kwargs: dict = {
         "application": application,
         "session_type": Interview.SessionType.INTERVIEW,
@@ -148,6 +170,9 @@ def create_interview_session(*, application: Application) -> Interview | None:
     }
     if vacancy.interview_mode == Interview.ScreeningMode.MEET:
         interview_kwargs["duration_minutes"] = vacancy.interview_duration
-        interview_kwargs["livekit_room_name"] = f"interview-{application.id}"
 
-    return Interview.objects.create(**interview_kwargs)
+    interview = Interview.objects.create(**interview_kwargs)
+    if vacancy.interview_mode == Interview.ScreeningMode.MEET:
+        interview.livekit_room_name = f"interview-{interview.id}"
+        interview.save(update_fields=["livekit_room_name", "updated_at"])
+    return interview

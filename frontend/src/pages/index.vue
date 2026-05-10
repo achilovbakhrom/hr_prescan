@@ -7,9 +7,9 @@ definePageMeta({
   layout: false,
   requiresAuth: false,
   seo: {
-    title: 'PreScreen AI - AI-Powered Candidate Screening',
+    title: 'PreScreen AI - Strict AI Candidate Prescreening',
     description:
-      'Automate candidate prescreening with AI interviews, multilingual vacancy workflows, and structured hiring insights.',
+      'Add strict dynamic candidate filters, automate prescreening interviews, and let candidates complete screening by link without authentication.',
     path: '/',
   },
 })

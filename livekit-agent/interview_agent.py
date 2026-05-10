@@ -11,7 +11,7 @@ from livekit.plugins import deepgram, elevenlabs, google, silero
 from context import fetch_interview_context
 from evaluator import evaluate_interview
 from integrity import IntegrityMonitor
-from prompt import build_system_prompt
+from prompt import build_opening_message, build_system_prompt
 
 logger = logging.getLogger("interview-agent")
 
@@ -53,6 +53,7 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
         tts=tts,
         chat_ctx=chat_ctx,
     )
+    agent.hr_prescan_opening_message = build_opening_message(context=context)
 
     # Collect transcript entries during the interview
     transcript: list[dict] = []

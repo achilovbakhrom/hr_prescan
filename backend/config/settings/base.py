@@ -332,6 +332,9 @@ GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY", "")
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3-flash-preview")
 GEMINI_TRANSLATION_MODEL = os.environ.get("GEMINI_TRANSLATION_MODEL", GEMINI_MODEL)
 
+# Internal service-to-service API
+INTERNAL_API_KEY = os.environ.get("INTERNAL_API_KEY", "")
+
 # Telegram bots
 # Two separate bots: one for HRs (manage vacancies, candidates, etc.) and one
 # for candidates (browse jobs, apply, take prescan interview). Each needs its

@@ -187,3 +187,16 @@ class TestResetInterview:
         assert new_session.session_type == Interview.SessionType.PRESCANNING
         assert new_session.interview_token != old_token
         assert new_session.id != old_session.id
+
+    def test_reset_meet_session_uses_interview_id_room_name(self, vacancy):
+        app = ApplicationFactory(vacancy=vacancy, status=Application.Status.PRESCANNED)
+        old_session = InterviewFactory(
+            application=app,
+            session_type=Interview.SessionType.INTERVIEW,
+            screening_mode=Interview.ScreeningMode.MEET,
+            status=Interview.Status.IN_PROGRESS,
+        )
+
+        new_session = reset_interview(interview=old_session)
+
+        assert new_session.livekit_room_name == f"interview-{new_session.id}"

@@ -47,7 +47,12 @@ def parse_prescreen_token(*, payload: str) -> UUID | None:
 
 
 def get_prescreen_interview(*, payload: str):
+    from apps.interviews.models import Interview
+
     token = parse_prescreen_token(payload=payload)
     if token is None:
         return None
-    return get_interview_by_token(interview_token=token)
+    interview = get_interview_by_token(interview_token=token)
+    if interview and interview.session_type != Interview.SessionType.PRESCANNING:
+        return None
+    return interview

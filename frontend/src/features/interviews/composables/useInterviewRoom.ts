@@ -139,16 +139,13 @@ export function useInterviewRoom(token: () => string) {
       connectionState.value = 'error'
       return
     }
-    if (!interview.value?.candidateToken) {
-      errorMessage.value = 'No interview token available. Please try again.'
-      connectionState.value = 'error'
-      return
-    }
     connectionState.value = 'connecting'
     errorMessage.value = null
     try {
-      if (interview.value.status === 'pending')
-        interview.value = await interviewService.startInterview(token())
+      interview.value = await interviewService.getRoomJoinInfo(token())
+      if (!interview.value.candidateToken) {
+        throw new Error('No interview token available. Please try again.')
+      }
       room = new Room()
       room.on(RoomEvent.TrackSubscribed, handleTrackSubscribed)
       room.on(RoomEvent.TrackUnsubscribed, handleTrackUnsubscribed)

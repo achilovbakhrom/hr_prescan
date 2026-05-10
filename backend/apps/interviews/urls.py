@@ -88,7 +88,7 @@ hr_interview_urlpatterns = [
 # Public URLs — mounted at /api/public/
 public_urlpatterns = [
     path(
-        "interview/<uuid:interview_id>/join/",
+        "interview/<uuid:token>/join/",
         InterviewRoomJoinApi.as_view(),
         name="interview-room-join",
     ),

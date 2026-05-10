@@ -59,8 +59,8 @@ export const interviewService = {
     return response.data
   },
 
-  async getRoomJoinInfo(id: string): Promise<InterviewDetail> {
-    const response = await apiClient.get<InterviewDetail>(`/public/interview/${id}/join`)
+  async getRoomJoinInfo(token: string): Promise<InterviewDetail> {
+    const response = await apiClient.get<InterviewDetail>(`/public/interview/${token}/join`)
     return response.data
   },
 

@@ -4,6 +4,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.applications.models import Application
 from apps.common.exceptions import ApplicationError
 from apps.common.messages import (
     MSG_INTERVIEW_NOT_FOUND,
@@ -11,7 +12,6 @@ from apps.common.messages import (
 )
 from apps.interviews.models import Interview
 from apps.interviews.selectors import (
-    get_interview_by_id,
     get_interview_by_token,
     get_interview_for_candidate,
 )
@@ -22,13 +22,20 @@ from apps.interviews.serializers import (
 from apps.interviews.services import generate_candidate_token, start_interview
 
 
+def _interview_step_is_available(interview: Interview) -> bool:
+    if interview.session_type != Interview.SessionType.INTERVIEW:
+        return True
+    return interview.application.status in (Application.Status.PRESCANNED, Application.Status.INTERVIEWED)
+
+
+def _not_ready_response() -> Response:
+    return Response(
+        {"detail": "The interview link is prepared, but it opens only after prescanning is completed."},
+        status=status.HTTP_400_BAD_REQUEST,
+    )
+
+
 class CandidateInterviewApi(APIView):
-    """GET /api/candidate/interview/{interview_id}/
-
-    Returns room link and token for joining the interview.
-    Token-based access (AllowAny -- real auth via token in later phase).
-    """
-
     permission_classes = [AllowAny]
 
     class InputSerializer(serializers.Serializer):
@@ -57,21 +64,20 @@ class CandidateInterviewApi(APIView):
 
 
 class InterviewRoomJoinApi(APIView):
-    """GET /api/public/interview/{interview_id}/join/
-
-    Returns LiveKit room info and a fresh candidate token.
-    The interview UUID acts as the access credential (unguessable).
-    Accepts PENDING and IN_PROGRESS statuses. If PENDING, checks vacancy is not closed.
-    """
-
     permission_classes = [AllowAny]
 
-    def get(self, request: Request, interview_id: str) -> Response:
-        interview = get_interview_by_id(interview_id=interview_id)
+    def get(self, request: Request, token: str) -> Response:
+        interview = get_interview_by_token(interview_token=token)
         if interview is None:
             return Response(
                 {"detail": str(MSG_INTERVIEW_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
+            )
+
+        if interview.screening_mode != Interview.ScreeningMode.MEET:
+            return Response(
+                {"detail": "Video room is only available for meet-mode interviews."},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         if interview.status not in (
@@ -83,7 +89,9 @@ class InterviewRoomJoinApi(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # If interview is still pending, check vacancy is not archived
+        if not _interview_step_is_available(interview):
+            return _not_ready_response()
+
         if interview.status == Interview.Status.PENDING:
             vacancy = interview.application.vacancy
             if vacancy.status == "archived":
@@ -91,6 +99,17 @@ class InterviewRoomJoinApi(APIView):
                     {"detail": str(MSG_VACANCY_NOT_ACCEPTING_INTERVIEWS)},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+            try:
+                interview = start_interview(interview=interview)
+            except ApplicationError as e:
+                return Response(
+                    {"detail": e.message},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        if not interview.livekit_room_name:
+            interview.livekit_room_name = f"interview-{interview.id}"
+            interview.save(update_fields=["livekit_room_name", "updated_at"])
 
         try:
             token = generate_candidate_token(interview=interview)
@@ -117,11 +136,6 @@ class InterviewRoomJoinApi(APIView):
 
 
 class PublicInterviewApi(APIView):
-    """GET /api/public/interview/{token}/
-
-    Returns interview info by interview_token. AllowAny access.
-    """
-
     permission_classes = [AllowAny]
 
     def get(self, request: Request, token: str) -> Response:
@@ -131,6 +145,8 @@ class PublicInterviewApi(APIView):
                 {"detail": str(MSG_INTERVIEW_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
+        if not _interview_step_is_available(interview):
+            return _not_ready_response()
 
         return Response(
             PublicInterviewOutputSerializer(interview).data,
@@ -139,12 +155,6 @@ class PublicInterviewApi(APIView):
 
 
 class StartInterviewApi(APIView):
-    """POST /api/public/interview/{token}/start/
-
-    Starts an interview: transitions PENDING -> IN_PROGRESS.
-    Sets started_at to now. AllowAny access.
-    """
-
     permission_classes = [AllowAny]
 
     def post(self, request: Request, token: str) -> Response:
@@ -154,6 +164,9 @@ class StartInterviewApi(APIView):
                 {"detail": str(MSG_INTERVIEW_NOT_FOUND)},
                 status=status.HTTP_404_NOT_FOUND,
             )
+
+        if not _interview_step_is_available(interview):
+            return _not_ready_response()
 
         try:
             interview = start_interview(interview=interview)

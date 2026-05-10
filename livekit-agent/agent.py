@@ -1,6 +1,5 @@
 """LiveKit AI Interview Agent — entry point."""
 
-import asyncio
 import logging
 
 from livekit.agents import WorkerOptions, cli
@@ -15,6 +14,9 @@ async def entrypoint(ctx) -> None:
     logger.info("Agent joining room: %s", ctx.room.name)
     agent = await create_interview_agent(ctx)
     agent.start(ctx.room)
+    opening_message = getattr(agent, "hr_prescan_opening_message", "")
+    if opening_message:
+        await agent.say(opening_message, allow_interruptions=True)
 
 
 if __name__ == "__main__":

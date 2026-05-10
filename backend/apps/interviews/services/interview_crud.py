@@ -112,9 +112,11 @@ def reset_interview(*, interview: Interview) -> Interview:
     }
     if interview.screening_mode == Interview.ScreeningMode.MEET:
         session_kwargs["duration_minutes"] = application.vacancy.interview_duration
-        session_kwargs["livekit_room_name"] = f"interview-{application.id}"
 
     new_session = Interview.objects.create(**session_kwargs)
+    if interview.screening_mode == Interview.ScreeningMode.MEET:
+        new_session.livekit_room_name = f"interview-{new_session.id}"
+        new_session.save(update_fields=["livekit_room_name", "updated_at"])
 
     # Revert application status based on session type
     if interview.session_type == Interview.SessionType.PRESCANNING:

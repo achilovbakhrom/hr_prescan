@@ -206,6 +206,10 @@ def _build_evaluation_prompt(
     return (
         "Evaluate this interview transcript. Score each criterion from 1-10.\n"
         f"Write all notes and the summary in {lang_name}.\n"
+        "Base the evaluation only on role-relevant evidence from the transcript, CV context, "
+        "configured criteria, and vacancy requirements. Ignore protected characteristics such as "
+        "accent, age, gender, nationality, disability, religion, or family status.\n"
+        "Use recommendation='reject' when the candidate should not advance, even if they have some relevant experience.\n"
         "\n"
         "## Criteria\n"
         f"{criteria_text}\n"
@@ -217,6 +221,7 @@ def _build_evaluation_prompt(
         "{\n"
         '  "overall_score": <float 1-10>,\n'
         '  "summary": "<brief evaluation summary>",\n'
+        '  "recommendation": "advance|reject",\n'
         '  "scores": [\n'
         "    {\n"
         '      "criteria_id": "<uuid>",\n'
@@ -247,9 +252,17 @@ async def _send_results_to_backend(
             json={
                 "overall_score": evaluation["overall_score"],
                 "ai_summary": evaluation["summary"],
+                "ai_decision": _decision_from_evaluation(evaluation),
                 "transcript": transcript,
                 "scores": evaluation["scores"],
                 "integrity_flags": integrity_flags,
             },
         )
         response.raise_for_status()
+
+
+def _decision_from_evaluation(evaluation: dict) -> str:
+    recommendation = str(evaluation.get("recommendation") or "").strip().lower()
+    if recommendation in {"reject", "rejected", "do_not_advance", "do not advance", "no"}:
+        return "reject"
+    return "advance"

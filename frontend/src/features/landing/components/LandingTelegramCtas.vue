@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { ROUTE_NAMES } from '@/shared/constants/routes'
 import { appConfigService, type PublicAppConfig } from '@/shared/services/app-config.service'
 import { buildCandidateTelegramBotUrl, buildHrTelegramBotUrl } from '@/shared/utils/telegram'
 
@@ -15,15 +16,18 @@ onMounted(async () => {
   }
 })
 
-const telegramLinks = computed(() =>
-  [
+const telegramLinks = computed(() => {
+  const candidateHref = buildCandidateTelegramBotUrl(
+    undefined,
+    undefined,
+    publicConfig.value?.telegramCandidateBotUsername,
+  )
+  const hrHref = buildHrTelegramBotUrl(publicConfig.value?.telegramHrBotUsername)
+
+  return [
     {
       key: 'candidate',
-      href: buildCandidateTelegramBotUrl(
-        undefined,
-        undefined,
-        publicConfig.value?.telegramCandidateBotUsername,
-      ),
+      href: candidateHref,
       icon: 'pi pi-user',
       title: t('landing.hero.telegramCandidateTitle'),
       hint: t('landing.hero.telegramCandidateHint'),
@@ -31,19 +35,18 @@ const telegramLinks = computed(() =>
     },
     {
       key: 'hr',
-      href: buildHrTelegramBotUrl(publicConfig.value?.telegramHrBotUsername),
+      href: hrHref && hrHref !== candidateHref ? hrHref : '',
       icon: 'pi pi-briefcase',
       title: t('landing.hero.telegramHrTitle'),
       hint: t('landing.hero.telegramHrHint'),
       action: t('landing.hero.openHrTelegram'),
     },
-  ].filter((item) => item.href),
-)
+  ].filter((item) => item.href)
+})
 </script>
 
 <template>
   <div
-    v-if="telegramLinks.length"
     class="bg-glass-1 border-glass shadow-glass hero-stagger hero-stagger-4 mt-5 rounded-[28px] p-3 backdrop-blur-xl sm:p-4"
   >
     <div class="flex items-center gap-2 px-2 pb-3">
@@ -54,7 +57,7 @@ const telegramLinks = computed(() =>
       </span>
       <div class="min-w-0">
         <p class="text-sm font-semibold text-[color:var(--color-text-primary)]">
-          {{ t('telegram.title') }}
+          {{ t('landing.hero.quickAccessTitle') }}
         </p>
       </div>
     </div>
@@ -91,6 +94,34 @@ const telegramLinks = computed(() =>
           <i class="pi pi-arrow-up-right text-[10px]"></i>
         </span>
       </a>
+
+      <RouterLink
+        :to="{ name: ROUTE_NAMES.JOB_BOARD }"
+        class="group flex flex-col gap-3 rounded-[22px] border border-[color:var(--color-border-glass)] bg-white/58 px-4 py-3 text-left shadow-[0_10px_28px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-px hover:border-[color:color-mix(in_srgb,var(--color-accent)_28%,var(--color-border-glass))] hover:shadow-[0_16px_32px_rgba(15,23,42,0.1)] dark:bg-white/6 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
+      >
+        <div class="flex min-w-0 items-start gap-3">
+          <span
+            class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[color:var(--color-accent-soft)] text-[color:var(--color-accent)]"
+          >
+            <i class="pi pi-list-check text-sm"></i>
+          </span>
+          <div class="min-w-0">
+            <p class="text-sm font-semibold text-[color:var(--color-text-primary)]">
+              {{ t('landing.hero.publicJobsTitle') }}
+            </p>
+            <p class="mt-1 text-xs leading-relaxed text-[color:var(--color-text-muted)]">
+              {{ t('landing.hero.publicJobsHint') }}
+            </p>
+          </div>
+        </div>
+
+        <span
+          class="inline-flex self-start shrink-0 items-center gap-2 rounded-full bg-[color:var(--color-accent-soft)] px-3 py-2 text-xs font-semibold text-[color:var(--color-accent)] transition-colors group-hover:bg-[color:var(--color-accent)] group-hover:text-white sm:self-center"
+        >
+          {{ t('landing.hero.openPublicJobs') }}
+          <i class="pi pi-arrow-right text-[10px]"></i>
+        </span>
+      </RouterLink>
     </div>
   </div>
 </template>

@@ -22,14 +22,14 @@ const showCatMascot = computed(() => isMounted.value && themeStore.backgroundMod
 const heroHighlights = computed(() => [
   { icon: 'pi pi-bolt', label: '24/7', caption: t('landing.stats.available') },
   {
-    icon: 'pi pi-video',
-    label: t('landing.features.aiInterviews'),
-    caption: t('landing.features.aiInterviewsDesc'),
+    icon: 'pi pi-filter',
+    label: t('landing.features.strictFilters'),
+    caption: t('landing.features.strictFiltersDesc'),
   },
   {
-    icon: 'pi pi-chart-line',
-    label: t('landing.features.smartScoring'),
-    caption: t('landing.features.smartScoringDesc'),
+    icon: 'pi pi-link',
+    label: t('landing.features.noLoginLink'),
+    caption: t('landing.features.noLoginLinkDesc'),
   },
 ])
 
@@ -78,21 +78,20 @@ onMounted(() => {
               class="w-full sm:w-auto"
               @click="router.push({ name: ROUTE_NAMES.REGISTER })"
             />
-            <button
-              type="button"
+            <a
+              href="#how-it-works"
               class="group flex w-full cursor-pointer items-center justify-center gap-2.5 rounded-full border border-[color:var(--color-border-glass)] bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(255,255,255,0.68))] px-5 py-3 text-sm font-semibold text-[color:var(--color-text-primary)] shadow-[0_14px_36px_rgba(15,23,42,0.08)] backdrop-blur-xl transition-all hover:-translate-y-px hover:border-[color:color-mix(in_srgb,var(--color-accent)_30%,var(--color-border-glass))] hover:shadow-[0_18px_42px_rgba(15,23,42,0.12)] dark:bg-[linear-gradient(180deg,rgba(15,23,42,0.72),rgba(15,23,42,0.58))] sm:w-auto"
-              @click="router.push({ name: ROUTE_NAMES.JOB_BOARD })"
             >
               <span
                 class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[color:var(--color-accent-soft)] text-[color:var(--color-accent)] transition-colors group-hover:bg-[color:var(--color-accent)] group-hover:text-white"
               >
-                <i class="pi pi-briefcase text-xs"></i>
+                <i class="pi pi-filter text-xs"></i>
               </span>
-              <span>{{ t('landing.hero.browseJobs') }}</span>
+              <span>{{ t('landing.hero.seeFlow') }}</span>
               <i
                 class="pi pi-arrow-up-right text-[11px] text-[color:var(--color-text-muted)] transition-all group-hover:-translate-y-px group-hover:translate-x-px group-hover:text-[color:var(--color-text-primary)]"
               ></i>
-            </button>
+            </a>
           </div>
 
           <p
