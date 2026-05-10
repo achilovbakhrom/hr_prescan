@@ -196,6 +196,8 @@ export function useInterviewDevices(previewVideoEl: Ref<HTMLVideoElement | null>
     isMuted,
     isCameraOff,
     hasRequiredDevices,
+    liveKitAudioOptions,
+    liveKitVideoOptions,
     startPreview,
     stopPreview,
     togglePreviewMic,

@@ -145,12 +145,14 @@ onMounted(() => {
         :interview="room.interview.value"
         :is-muted="room.isMuted.value"
         :is-camera-off="room.isCameraOff.value"
+        :audio-playback-blocked="room.audioPlaybackBlocked.value"
         :has-remote-video="room.hasRemoteVideo.value"
         :remote-participant-name="room.remoteParticipantName.value"
         :formatted-time="room.formattedTime.value"
         :get-initials="room.getInitials"
         @toggle-mute="room.toggleMute"
         @toggle-camera="room.toggleCamera"
+        @enable-audio="room.enableRoomAudio"
         @leave="room.leaveInterview"
       />
 

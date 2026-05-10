@@ -1131,6 +1131,7 @@
       "mute": "Mute",
       "turnOnCamera": "Turn on camera",
       "turnOffCamera": "Turn off camera",
+      "enableAudio": "Enable audio",
       "leaveInterview": "Leave interview",
       "leave": "Leave",
       "duration": "Duration:",

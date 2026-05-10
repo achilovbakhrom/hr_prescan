@@ -7,6 +7,7 @@ import time
 from livekit.agents import llm
 from livekit.agents.pipeline import VoicePipelineAgent
 from livekit.plugins import deepgram, elevenlabs, google, silero
+from livekit.plugins.elevenlabs import Voice, VoiceSettings
 
 from context import fetch_interview_context
 from evaluator import evaluate_interview
@@ -16,6 +17,8 @@ from prompt import build_opening_message, build_system_prompt
 logger = logging.getLogger("interview-agent")
 
 ELEVENLABS_VOICE_ID = os.environ.get("ELEVENLABS_VOICE_ID", "21m00Tcm4TlvDq8ikWAM")
+ELEVENLABS_API_KEY = os.environ.get("ELEVENLABS_API_KEY", "")
+GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY", "")
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3-flash-preview")
 
 
@@ -37,13 +40,26 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
     # Configure LLM
     gemini_llm = google.LLM(
         model=GEMINI_MODEL,
+        api_key=GOOGLE_API_KEY,
         temperature=0.7,
     )
 
     # Configure TTS (Text-to-Speech)
     tts = elevenlabs.TTS(
         model="eleven_flash_v2_5",
-        voice_id=ELEVENLABS_VOICE_ID,
+        api_key=ELEVENLABS_API_KEY,
+        voice=Voice(
+            id=ELEVENLABS_VOICE_ID,
+            name="Interviewer",
+            category="premade",
+            settings=VoiceSettings(
+                stability=0.71,
+                similarity_boost=0.5,
+                style=0.0,
+                speed=1.0,
+                use_speaker_boost=True,
+            ),
+        ),
     )
 
     agent = VoicePipelineAgent(

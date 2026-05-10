@@ -14,6 +14,7 @@ defineProps<{
   interview: InterviewDetail
   isMuted: boolean
   isCameraOff: boolean
+  audioPlaybackBlocked: boolean
   hasRemoteVideo: boolean
   remoteParticipantName: string
   formattedTime: string
@@ -23,6 +24,7 @@ defineProps<{
 const emit = defineEmits<{
   toggleMute: []
   toggleCamera: []
+  enableAudio: []
   leave: []
 }>()
 
@@ -129,6 +131,15 @@ const { t } = useI18n()
         </div>
       </div>
     </div>
+
+    <button
+      v-if="audioPlaybackBlocked"
+      class="absolute bottom-24 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2 rounded-full bg-[color:var(--color-warning)] px-4 py-2 text-sm font-medium text-black shadow-glass-float transition hover:brightness-95"
+      @click="emit('enableAudio')"
+    >
+      <i class="pi pi-volume-up text-base"></i>
+      <span>{{ t('interviews.roomPage.enableAudio') }}</span>
+    </button>
 
     <!-- Bottom floating control pill -->
     <GlassSurface

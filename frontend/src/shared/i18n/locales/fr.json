@@ -1124,6 +1124,7 @@
       "mute": "Muet",
       "turnOnCamera": "Allumer la caméra",
       "turnOffCamera": "Éteindre la caméra",
+      "enableAudio": "Activer l'audio",
       "leaveInterview": "Quitter l'entretien",
       "leave": "Partir",
       "duration": "Durée :",
