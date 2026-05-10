@@ -180,6 +180,24 @@ if [[ "${BASE_URL}" == https://* ]]; then
     else
         fail "X-Frame-Options header missing"
     fi
+
+    PERMISSIONS_POLICY=$(echo "${HEADERS}" | awk 'BEGIN{IGNORECASE=1} /^permissions-policy:/ {print}')
+    if echo "${PERMISSIONS_POLICY}" | grep -qi "camera=()"; then
+        fail "Permissions-Policy disables camera access"
+    elif echo "${PERMISSIONS_POLICY}" | grep -qi "microphone=()"; then
+        fail "Permissions-Policy disables microphone access"
+    else
+        pass "Permissions-Policy allows interview media prompts"
+    fi
+
+    CSP=$(echo "${HEADERS}" | awk 'BEGIN{IGNORECASE=1} /^content-security-policy:/ {print}')
+    if echo "${CSP}" | grep -qi "wss://.*livekit\\.cloud"; then
+        pass "CSP allows LiveKit Cloud WebSocket"
+    elif echo "${CSP}" | grep -qi "wss://$(echo "${BASE_URL#https://}" | sed 's/[.[\*^$()+?{}|]/\\&/g')"; then
+        pass "CSP allows same-domain LiveKit WebSocket"
+    else
+        fail "CSP does not allow a LiveKit WebSocket endpoint"
+    fi
 else
     info "=== Check 9: Skipped (not HTTPS) ==="
 fi
