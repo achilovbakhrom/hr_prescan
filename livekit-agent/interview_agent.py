@@ -17,6 +17,7 @@ from integrity import IntegrityMonitor
 from prompt import build_opening_message, build_system_prompt
 from room_lifecycle import shutdown_after_final_response
 from runtime_config import (
+    ALLOW_CROSS_LANGUAGE_TTS_FALLBACK,
     DEEPGRAM_API_KEY,
     DEEPGRAM_ENDPOINTING_MS,
     DEEPGRAM_MODEL,
@@ -51,7 +52,6 @@ DEEPGRAM_TTS_MODELS_BY_LANGUAGE = {
 }
 ELEVENLABS_FLASH_LANGUAGES = {"ar", "ru", "tr", "uk"}
 ELEVENLABS_EXTENDED_LANGUAGES = {"kk"}
-STRICT_TARGET_LANGUAGE_TTS = {"ru", "uk"}
 
 
 def _deepgram_language(language: str) -> str:
@@ -114,12 +114,12 @@ def _elevenlabs_supports_language(language: str) -> bool:
 
 def _tts_with_optional_english_fallback(language: str):
     primary = _elevenlabs_tts(language)
-    if language in STRICT_TARGET_LANGUAGE_TTS:
-        logger.info("English TTS fallback disabled for strict target language %s.", language)
+    if not ALLOW_CROSS_LANGUAGE_TTS_FALLBACK:
+        logger.info("Cross-language TTS fallback disabled for %s.", language)
         return primary
 
     logger.warning(
-        "No native Deepgram TTS model for %s. Falling back to English TTS only if ElevenLabs fails.",
+        "No native Deepgram TTS model for %s. Falling back to English voice only if ElevenLabs fails.",
         language,
     )
     return agents_tts.FallbackAdapter(
@@ -131,12 +131,6 @@ def _tts_with_optional_english_fallback(language: str):
 
 def _build_tts(language: str):
     if TTS_PROVIDER == "deepgram":
-        if language in STRICT_TARGET_LANGUAGE_TTS and ELEVENLABS_API_KEY:
-            logger.warning(
-                "Ignoring TTS_PROVIDER=deepgram for strict target language %s; using ElevenLabs.",
-                language,
-            )
-            return _elevenlabs_tts(language)
         return _deepgram_tts_for_language(language)
 
     if TTS_PROVIDER == "elevenlabs":
