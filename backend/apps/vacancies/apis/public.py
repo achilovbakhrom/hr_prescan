@@ -20,6 +20,8 @@ from apps.job_parser.services.contact_detection import parsed_vacancy_is_publicl
 from apps.vacancies.selectors import get_public_vacancies, get_vacancy_by_id, get_vacancy_by_share_token
 from apps.vacancies.serializers import PublicVacancyDetailOutputSerializer, PublicVacancyListOutputSerializer
 
+LEGACY_PUBLIC_LIST_LIMIT = 100
+
 
 class PublicVacancyListApi(APIView):
     """GET /api/public/vacancies/ — public job board."""
@@ -49,11 +51,13 @@ class PublicVacancyListApi(APIView):
         if pagination_requested:
             return _get_paginated_public_vacancies(request=request, filters=filters, vacancies=vacancies)
 
-        internal_qs = vacancies.order_by("-created_at")
+        internal_qs = vacancies.order_by("-created_at")[:LEGACY_PUBLIC_LIST_LIMIT]
         items = _with_apply_flag(PublicVacancyListOutputSerializer(internal_qs, many=True).data, can_apply=True)
 
         if filters.get("is_remote") is not True and filters.get("experience_level") in (None, "middle"):
-            parsed_vacancies = _get_filtered_public_parsed_vacancies(filters=filters).order_by("-created_at")
+            parsed_vacancies = _get_filtered_public_parsed_vacancies(filters=filters).order_by("-created_at")[
+                :LEGACY_PUBLIC_LIST_LIMIT
+            ]
             items.extend(PublicParsedVacancyListOutputSerializer(parsed_vacancies, many=True).data)
 
         return Response(items, status=status.HTTP_200_OK)

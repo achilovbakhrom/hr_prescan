@@ -104,7 +104,7 @@ fi
 # 4. API returns 401 for unauthenticated request
 # ---------------------------------------------------------------------------
 info "=== Check 4: API requires authentication ==="
-check "API auth enforcement" "${BASE_URL}/api/vacancies/" "401"
+check "API auth enforcement" "${BASE_URL}/api/hr/vacancies/" "401"
 
 # ---------------------------------------------------------------------------
 # 5. Auth endpoint returns 400 for empty POST (not 500)
