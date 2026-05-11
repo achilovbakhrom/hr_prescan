@@ -43,6 +43,10 @@ ELEVENLABS_DEFAULT_VOICE_ID = os.environ.get(
     "ELEVENLABS_VOICE_ID_DEFAULT",
     os.environ.get("ELEVENLABS_VOICE_ID", "EXAVITQu4vr4xnSDxMaL"),
 )
+ELEVENLABS_FALLBACK_VOICE_ID = os.environ.get(
+    "ELEVENLABS_VOICE_ID_FALLBACK",
+    "EXAVITQu4vr4xnSDxMaL",
+)
 ELEVENLABS_API_KEY = os.environ.get("ELEVENLABS_API_KEY", "")
 GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY", "")
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3-flash-preview")
@@ -121,19 +125,27 @@ def _elevenlabs_voice_id_for_language(language: str) -> str:
     return ELEVENLABS_DEFAULT_VOICE_ID
 
 
-def _elevenlabs_tts(language: str):
+def _masked_voice_id(voice_id: str) -> str:
+    if len(voice_id) <= 8:
+        return "configured"
+    return f"{voice_id[:4]}...{voice_id[-4:]}"
+
+
+def _elevenlabs_tts(language: str, *, voice_id: str | None = None, label: str = "language-specific"):
     model = _elevenlabs_model_for_language(language)
-    voice_id = _elevenlabs_voice_id_for_language(language)
+    selected_voice_id = voice_id or _elevenlabs_voice_id_for_language(language)
     logger.info(
-        "Using ElevenLabs TTS provider with model %s and language-specific voice for %s.",
+        "Using ElevenLabs TTS provider with model %s and %s voice %s for %s.",
         model,
+        label,
+        _masked_voice_id(selected_voice_id),
         language,
     )
     return elevenlabs.TTS(
         model=model,
         api_key=ELEVENLABS_API_KEY,
         voice=Voice(
-            id=voice_id,
+            id=selected_voice_id,
             name="Interviewer",
             category="premade",
             settings=VoiceSettings(
@@ -157,12 +169,17 @@ def _tts_with_optional_english_fallback(language: str):
         logger.info("Cross-language TTS fallback disabled for %s.", language)
         return primary
 
+    fallback_voice = _elevenlabs_tts(
+        language,
+        voice_id=ELEVENLABS_FALLBACK_VOICE_ID,
+        label="premade recovery",
+    )
     logger.warning(
-        "No native Deepgram TTS model for %s. Falling back to English voice only if ElevenLabs fails.",
+        "No native Deepgram TTS model for %s. Falling back to ElevenLabs premade voice only if the configured voice fails.",
         language,
     )
     return agents_tts.FallbackAdapter(
-        [primary, _deepgram_tts_for_language("en")],
+        [primary, fallback_voice],
         max_retry_per_tts=0,
         attempt_timeout=6.0,
     )
