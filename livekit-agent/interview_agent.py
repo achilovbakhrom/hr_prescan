@@ -39,7 +39,10 @@ from speech_utils import speech_text
 
 logger = logging.getLogger("interview-agent")
 
-ELEVENLABS_VOICE_ID = os.environ.get("ELEVENLABS_VOICE_ID", "EXAVITQu4vr4xnSDxMaL")
+ELEVENLABS_DEFAULT_VOICE_ID = os.environ.get(
+    "ELEVENLABS_VOICE_ID_DEFAULT",
+    os.environ.get("ELEVENLABS_VOICE_ID", "EXAVITQu4vr4xnSDxMaL"),
+)
 ELEVENLABS_API_KEY = os.environ.get("ELEVENLABS_API_KEY", "")
 GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY", "")
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3-flash-preview")
@@ -52,6 +55,18 @@ DEEPGRAM_TTS_MODELS_BY_LANGUAGE = {
 }
 ELEVENLABS_FLASH_LANGUAGES = {"ar", "ru", "tr", "uk"}
 ELEVENLABS_EXTENDED_LANGUAGES = {"kk"}
+ELEVENLABS_VOICE_IDS_BY_LANGUAGE = {
+    "ar": os.environ.get("ELEVENLABS_VOICE_ID_AR", ""),
+    "kk": os.environ.get("ELEVENLABS_VOICE_ID_KK", ""),
+    "ru": os.environ.get("ELEVENLABS_VOICE_ID_RU", ""),
+    "tr": os.environ.get("ELEVENLABS_VOICE_ID_TR", ""),
+    "uk": os.environ.get("ELEVENLABS_VOICE_ID_UK", ""),
+    "uz": os.environ.get("ELEVENLABS_VOICE_ID_UZ", ""),
+}
+ELEVENLABS_VOICE_LANGUAGE_FALLBACKS = {
+    "kk": "ru",
+    "uz": "ru",
+}
 
 
 def _deepgram_language(language: str) -> str:
@@ -87,14 +102,38 @@ def _elevenlabs_model_for_language(language: str) -> str:
     return ELEVENLABS_MODEL
 
 
+def _elevenlabs_voice_id_for_language(language: str) -> str:
+    voice_id = ELEVENLABS_VOICE_IDS_BY_LANGUAGE.get(language)
+    if voice_id:
+        return voice_id
+
+    fallback_language = ELEVENLABS_VOICE_LANGUAGE_FALLBACKS.get(language)
+    if fallback_language:
+        fallback_voice_id = ELEVENLABS_VOICE_IDS_BY_LANGUAGE.get(fallback_language)
+        if fallback_voice_id:
+            logger.info(
+                "Using ElevenLabs %s voice for %s interview.",
+                fallback_language,
+                language,
+            )
+            return fallback_voice_id
+
+    return ELEVENLABS_DEFAULT_VOICE_ID
+
+
 def _elevenlabs_tts(language: str):
     model = _elevenlabs_model_for_language(language)
-    logger.info("Using ElevenLabs TTS provider with model %s.", model)
+    voice_id = _elevenlabs_voice_id_for_language(language)
+    logger.info(
+        "Using ElevenLabs TTS provider with model %s and language-specific voice for %s.",
+        model,
+        language,
+    )
     return elevenlabs.TTS(
         model=model,
         api_key=ELEVENLABS_API_KEY,
         voice=Voice(
-            id=ELEVENLABS_VOICE_ID,
+            id=voice_id,
             name="Interviewer",
             category="premade",
             settings=VoiceSettings(
