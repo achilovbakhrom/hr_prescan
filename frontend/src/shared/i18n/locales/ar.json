@@ -834,6 +834,14 @@
       "notProvided": "غير متوفر",
       "combinedScore": "النتيجة المجمعة"
     },
+    "analysisDetails": {
+      "title": "التحليل التفصيلي بالذكاء الاصطناعي",
+      "positive": "نقاط إيجابية",
+      "nonePositive": "لم يتم تحديد نقاط إيجابية واضحة بعد.",
+      "negative": "نقاط سلبية",
+      "noneNegative": "لم يتم تحديد مخاوف كبيرة بعد.",
+      "conclusion": "الخلاصة"
+    },
     "screeningLinks": {
       "title": "روابط الفحص",
       "prescanning": "الفحص الأولي",

@@ -834,6 +834,14 @@
       "notProvided": "Nicht bereitgestellt",
       "combinedScore": "Kombinierte Punktzahl"
     },
+    "analysisDetails": {
+      "title": "Detaillierte KI-Analyse",
+      "positive": "Positive Aspekte",
+      "nonePositive": "Es wurden noch keine klaren positiven Punkte angegeben.",
+      "negative": "Negative Aspekte",
+      "noneNegative": "Es wurden noch keine größeren Bedenken angegeben.",
+      "conclusion": "Fazit"
+    },
     "screeningLinks": {
       "title": "Screening-Links",
       "prescanning": "Vorscreening",

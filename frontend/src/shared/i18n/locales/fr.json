@@ -834,6 +834,14 @@
       "notProvided": "Non fourni",
       "combinedScore": "Note combinée"
     },
+    "analysisDetails": {
+      "title": "Analyse IA détaillée",
+      "positive": "Points positifs",
+      "nonePositive": "Aucun point positif clair n'est encore indiqué.",
+      "negative": "Points négatifs",
+      "noneNegative": "Aucun point de vigilance majeur n'est encore indiqué.",
+      "conclusion": "Conclusion"
+    },
     "screeningLinks": {
       "title": "Liens de sélection",
       "prescanning": "Présélection",

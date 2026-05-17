@@ -834,6 +834,14 @@
       "notProvided": "Берілмеген",
       "combinedScore": "Біріктірілген ұпай"
     },
+    "analysisDetails": {
+      "title": "AI толық талдауы",
+      "positive": "Оң тұстар",
+      "nonePositive": "Айқын оң тұстар әлі көрсетілмеген.",
+      "negative": "Қауіп аймақтары",
+      "noneNegative": "Маңызды қауіптер әлі көрсетілмеген.",
+      "conclusion": "Қорытынды"
+    },
     "screeningLinks": {
       "title": "Скрининг сілтемелері",
       "prescanning": "Алдын ала тексеру",

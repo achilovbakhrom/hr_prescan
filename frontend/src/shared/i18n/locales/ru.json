@@ -841,6 +841,14 @@
       "notProvided": "Не указано",
       "combinedScore": "Комбинированный балл"
     },
+    "analysisDetails": {
+      "title": "Подробный ИИ-анализ",
+      "positive": "Положительные моменты",
+      "nonePositive": "Явные сильные стороны пока не указаны.",
+      "negative": "Зоны риска",
+      "noneNegative": "Серьёзные риски пока не указаны.",
+      "conclusion": "Заключение"
+    },
     "screeningLinks": {
       "title": "Ссылки скрининга",
       "prescanning": "Прескрининг",

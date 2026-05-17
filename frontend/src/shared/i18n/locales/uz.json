@@ -834,6 +834,14 @@
       "notProvided": "Taqdim etilmagan",
       "combinedScore": "Umumiy ball"
     },
+    "analysisDetails": {
+      "title": "Batafsil AI tahlili",
+      "positive": "Ijobiy jihatlar",
+      "nonePositive": "Aniq ijobiy jihatlar hali ko'rsatilmagan.",
+      "negative": "Salbiy jihatlar",
+      "noneNegative": "Jiddiy xavotirlar hali ko'rsatilmagan.",
+      "conclusion": "Xulosa"
+    },
     "screeningLinks": {
       "title": "Skrining havolalari",
       "prescanning": "Oldindan tekshiruv",

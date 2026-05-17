@@ -834,6 +834,14 @@
       "notProvided": "Sağlanmadı",
       "combinedScore": "Birleşik puan"
     },
+    "analysisDetails": {
+      "title": "Ayrıntılı AI analizi",
+      "positive": "Olumlu noktalar",
+      "nonePositive": "Henüz net olumlu nokta belirtilmedi.",
+      "negative": "Riskli noktalar",
+      "noneNegative": "Henüz önemli bir endişe belirtilmedi.",
+      "conclusion": "Sonuç"
+    },
     "screeningLinks": {
       "title": "Tarama bağlantıları",
       "prescanning": "Ön tarama",

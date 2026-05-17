@@ -834,6 +834,14 @@
       "notProvided": "Не передбачено",
       "combinedScore": "Комбінована оцінка"
     },
+    "analysisDetails": {
+      "title": "Детальний ШІ-аналіз",
+      "positive": "Позитивні моменти",
+      "nonePositive": "Чіткі сильні сторони поки не вказані.",
+      "negative": "Зони ризику",
+      "noneNegative": "Серйозні ризики поки не вказані.",
+      "conclusion": "Висновок"
+    },
     "screeningLinks": {
       "title": "Посилання скринінгу",
       "prescanning": "Прескринінг",

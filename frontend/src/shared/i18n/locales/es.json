@@ -834,6 +834,14 @@
       "notProvided": "No proporcionado",
       "combinedScore": "Puntuación combinada"
     },
+    "analysisDetails": {
+      "title": "Análisis detallado de IA",
+      "positive": "Aspectos positivos",
+      "nonePositive": "Aún no se han indicado aspectos positivos claros.",
+      "negative": "Aspectos negativos",
+      "noneNegative": "Aún no se han indicado preocupaciones importantes.",
+      "conclusion": "Conclusión"
+    },
     "screeningLinks": {
       "title": "Enlaces de evaluación",
       "prescanning": "Preevaluación",

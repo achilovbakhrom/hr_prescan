@@ -841,6 +841,14 @@
       "notProvided": "Not provided",
       "combinedScore": "Combined score"
     },
+    "analysisDetails": {
+      "title": "Detailed AI analysis",
+      "positive": "Positive moments",
+      "nonePositive": "No clear positives listed yet.",
+      "negative": "Negative moments",
+      "noneNegative": "No major concerns listed yet.",
+      "conclusion": "Conclusion"
+    },
     "screeningLinks": {
       "title": "Screening links",
       "prescanning": "Prescanning",
