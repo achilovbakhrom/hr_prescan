@@ -22,10 +22,10 @@ from apps.applications.urls import (
     hr_vacancy_urlpatterns as application_hr_vacancy_urlpatterns,
 )
 from apps.applications.urls import (
-    public_urlpatterns as application_public_urlpatterns,
+    public_review_urlpatterns as application_public_review_urlpatterns,
 )
 from apps.applications.urls import (
-    public_review_urlpatterns as application_public_review_urlpatterns,
+    public_urlpatterns as application_public_urlpatterns,
 )
 from apps.common.apis import HRDashboardApi
 from apps.common.apis_ai import AIAssistantApi
