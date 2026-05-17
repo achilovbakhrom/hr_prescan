@@ -1,5 +1,12 @@
 from apps.common.ai_assistant.agent import _build_final_response as build_hr_response
+from apps.common.ai_assistant.tools import execute_tool
 from apps.common.candidate_ai_assistant.agent import _build_final_response as build_candidate_response
+from apps.vacancies.models import Vacancy
+from tests.factories import (
+    ApplicationFactory,
+    CompanyMembershipFactory,
+    VacancyFactory,
+)
 
 
 def test_hr_assistant_clarification_is_not_reported_as_action_error():
@@ -19,6 +26,93 @@ def test_hr_assistant_clarification_is_not_reported_as_action_error():
 
     assert response["success"] is True
     assert response["message"] == "Which company should I use?"
+
+
+def test_hr_assistant_vacancy_ambiguity_is_not_reported_as_action_error():
+    response = build_hr_response(
+        gpt_message="Which Senior React Developer vacancy should I use: published or archived?",
+        actions_taken=[
+            {
+                "tool": "list_candidates",
+                "result": {
+                    "success": False,
+                    "action": "clarify",
+                    "message": "Multiple vacancies match.",
+                },
+            }
+        ],
+    )
+
+    assert response["success"] is True
+    assert response["message"] == "Which Senior React Developer vacancy should I use: published or archived?"
+
+
+def test_list_candidates_duplicate_vacancy_title_returns_clarification(company, hr_user):
+    CompanyMembershipFactory(user=hr_user, company=company, role=hr_user.role)
+    published = VacancyFactory(
+        company=company,
+        created_by=hr_user,
+        title="Senior React Developer",
+        status=Vacancy.Status.PUBLISHED,
+    )
+    archived = VacancyFactory(
+        company=company,
+        created_by=hr_user,
+        title="Senior React Developer",
+        status=Vacancy.Status.ARCHIVED,
+    )
+    ApplicationFactory(vacancy=published)
+    ApplicationFactory(vacancy=published)
+    ApplicationFactory(vacancy=archived)
+
+    result = execute_tool(
+        user=hr_user,
+        name="list_candidates",
+        args={"vacancy_title": "Senior React Developer"},
+    )
+
+    assert result["success"] is False
+    assert result["action"] == "clarify"
+    assert result["code"] == "ambiguous_vacancy"
+    assert "published" in result["message"]
+    assert "archived" in result["message"]
+    assert "error" not in result
+    choices = result["data"]["choices"]
+    assert {choice["status"] for choice in choices} == {
+        Vacancy.Status.PUBLISHED,
+        Vacancy.Status.ARCHIVED,
+    }
+    assert sorted(choice["candidates_total"] for choice in choices) == [1, 2]
+
+
+def test_list_candidates_can_disambiguate_duplicate_vacancy_title_by_status(company, hr_user):
+    CompanyMembershipFactory(user=hr_user, company=company, role=hr_user.role)
+    published = VacancyFactory(
+        company=company,
+        created_by=hr_user,
+        title="Senior React Developer",
+        status=Vacancy.Status.PUBLISHED,
+    )
+    VacancyFactory(
+        company=company,
+        created_by=hr_user,
+        title="Senior React Developer",
+        status=Vacancy.Status.ARCHIVED,
+    )
+    ApplicationFactory(vacancy=published, candidate_name="Alex React")
+
+    result = execute_tool(
+        user=hr_user,
+        name="list_candidates",
+        args={
+            "vacancy_title": "Senior React Developer",
+            "vacancy_status": Vacancy.Status.PUBLISHED,
+        },
+    )
+
+    assert result["success"] is True
+    assert result["action"] == "list_candidates"
+    assert result["data"][0]["name"] == "Alex React"
 
 
 def test_hr_assistant_sanitizes_raw_translation_error():

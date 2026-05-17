@@ -10,6 +10,15 @@ CANDIDATE_TOOL_DEFINITIONS = [
                 "type": "object",
                 "properties": {
                     "vacancy_title": {"type": "string"},
+                    "vacancy_status": {
+                        "type": "string",
+                        "description": "Optional vacancy lifecycle status to disambiguate duplicate vacancy titles.",
+                        "enum": ["draft", "published", "paused", "archived"],
+                    },
+                    "company_name": {
+                        "type": "string",
+                        "description": "Optional company name to disambiguate duplicate vacancy titles.",
+                    },
                     "status": {
                         "type": "string",
                         "enum": [

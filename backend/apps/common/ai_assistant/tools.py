@@ -132,6 +132,14 @@ def execute_tool(*, user, name, args):
     try:
         return handler(user=user, params=args)
     except ApplicationError as e:
+        if e.extra.get("action") == "clarify":
+            return {
+                "success": False,
+                "action": "clarify",
+                "message": e.message,
+                "data": e.extra.get("data", {}),
+                "code": e.extra.get("code", "clarify"),
+            }
         return {"error": str(e.message)}
     except Exception as e:
         logger.error("AI tool %s error: %s", name, e)

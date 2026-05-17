@@ -6,7 +6,12 @@ from apps.common.ai_assistant.resolvers import resolve_application, resolve_vaca
 def handle_list_candidates(*, user, params):
     from apps.applications.selectors import get_vacancy_applications
 
-    vacancy = resolve_vacancy(user=user, title=params.get("vacancy_title", ""))
+    vacancy = resolve_vacancy(
+        user=user,
+        title=params.get("vacancy_title", ""),
+        status=params.get("vacancy_status"),
+        company_name=params.get("company_name"),
+    )
     applications = get_vacancy_applications(vacancy=vacancy, status=params.get("status"))
     data = [
         {
