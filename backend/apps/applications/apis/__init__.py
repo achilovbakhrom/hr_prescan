@@ -10,6 +10,10 @@ from apps.applications.apis.hr_actions import (
     HRSoftDeleteApi,
 )
 from apps.applications.apis.hr_all import HRAllCandidatesListApi
+from apps.applications.apis.hr_candidate_base import (
+    HRCandidateBaseDetailApi,
+    HRCandidateBaseListApi,
+)
 from apps.applications.apis.hr_list import (
     HRApplicationDetailApi,
     HRApplicationListApi,
@@ -32,6 +36,8 @@ __all__ = [
     "HRApplicationStatusApi",
     "HRBatchMoveApi",
     "HRBulkStatusApi",
+    "HRCandidateBaseDetailApi",
+    "HRCandidateBaseListApi",
     "HRCvDownloadApi",
     "HRSoftDeleteApi",
     "PublicCandidateReviewApi",

@@ -5,7 +5,7 @@
     </NuxtLayout>
     <ClientOnly>
       <CookieConsent />
-      <AIAssistantDrawer />
+      <AIAssistantDialog />
     </ClientOnly>
     <AppPreloader />
   </div>
@@ -13,7 +13,7 @@
 
 <script setup lang="ts">
 import CookieConsent from '@/shared/components/CookieConsent.vue'
-import AIAssistantDrawer from '@/shared/components/AIAssistantDrawer.vue'
+import AIAssistantDialog from '@/shared/components/AIAssistantDialog.vue'
 import AppPreloader from '@/shared/components/AppPreloader.vue'
 </script>
 

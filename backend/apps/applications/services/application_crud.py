@@ -78,6 +78,7 @@ def submit_application(
         )
         snapshot_applied = apply_candidate_profile_cv_snapshot(application=application, snapshot=profile_snapshot)
         _enqueue_cv_processing(application=application, cv_file_path=cv_file_path, snapshot_applied=snapshot_applied)
+        _sync_candidate_base(application=application)
         return _submission_result(application=application, prescan_session=prescan_session)
 
     try:
@@ -109,6 +110,7 @@ def submit_application(
     if vacancy.interview_enabled:
         create_interview_session(application=application)
 
+    _sync_candidate_base(application=application)
     return _submission_result(application=application, prescan_session=prescan_session)
 
 
@@ -123,6 +125,14 @@ def _enqueue_cv_processing(*, application: Application, cv_file_path: str, snaps
         transaction.on_commit(lambda: process_cv.delay(str(application.id)))
     else:
         transaction.on_commit(lambda: calculate_cv_match.delay(str(application.id)))
+
+
+def _sync_candidate_base(*, application: Application) -> None:
+    from django.db import transaction
+
+    from apps.applications.services.candidate_base import sync_hr_candidate_for_application
+
+    transaction.on_commit(lambda: sync_hr_candidate_for_application(application=application))
 
 
 def _submission_result(*, application: Application, prescan_session: Interview) -> dict:

@@ -9,6 +9,10 @@ from apps.applications.services.bulk_operations import (
     bulk_update_status,
     soft_delete_applications,
 )
+from apps.applications.services.candidate_base import (
+    normalize_candidate_email,
+    sync_hr_candidate_for_application,
+)
 from apps.applications.services.cv_processing import (
     analyze_cv_with_ai,
     calculate_match_score,
@@ -42,11 +46,13 @@ __all__ = [
     "create_interview_session",
     "generate_cv_download_url",
     "get_candidate_platform_cv",
+    "normalize_candidate_email",
     "process_cv_text",
     "reset_application_screening",
     "rotate_hiring_manager_token",
     "soft_delete_applications",
     "submit_application",
+    "sync_hr_candidate_for_application",
     "update_application_status",
     "upload_cv_to_s3",
 ]

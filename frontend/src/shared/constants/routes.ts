@@ -24,6 +24,8 @@ export const ROUTE_NAMES = {
   VACANCY_CANDIDATES: 'vacancy-candidates',
   CANDIDATE_LIST: 'candidate-list',
   CANDIDATE_DETAIL: 'candidate-detail',
+  CANDIDATE_BASE: 'candidate-base',
+  CANDIDATE_BASE_DETAIL: 'candidate-base-detail',
   CANDIDATE_REVIEW_SHARE: 'candidate-review-share',
   INTERVIEW_LIST: 'interview-list',
   INTERVIEW_DETAIL: 'interview-detail',

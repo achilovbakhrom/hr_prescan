@@ -12,6 +12,8 @@ from apps.applications.apis import (
     HRApplicationStatusApi,
     HRBatchMoveApi,
     HRBulkStatusApi,
+    HRCandidateBaseDetailApi,
+    HRCandidateBaseListApi,
     HRCvDownloadApi,
     HRSoftDeleteApi,
     PublicCandidateReviewApi,
@@ -111,5 +113,18 @@ hr_candidate_urlpatterns = [
         "<uuid:application_id>/cv-download/",
         HRCvDownloadApi.as_view(),
         name="hr-cv-download",
+    ),
+]
+
+hr_candidate_base_urlpatterns = [
+    path(
+        "",
+        HRCandidateBaseListApi.as_view(),
+        name="hr-candidate-base-list",
+    ),
+    path(
+        "<uuid:candidate_id>/",
+        HRCandidateBaseDetailApi.as_view(),
+        name="hr-candidate-base-detail",
     ),
 ]

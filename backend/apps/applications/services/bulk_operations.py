@@ -6,6 +6,7 @@ from django.db.models import Q
 from apps.accounts.models import User
 from apps.accounts.selectors import get_user_live_company_ids
 from apps.applications.models import Application
+from apps.applications.services.candidate_base import sync_hr_candidate_for_application
 from apps.applications.services.status_transitions import STATUS_TRANSITIONS
 from apps.common.exceptions import ApplicationError
 from apps.common.messages import MSG_STATUS_TRANSITION_INVALID
@@ -38,6 +39,7 @@ def bulk_update_status(
 
         application.status = status
         application.save(update_fields=["status", "updated_at"])
+        sync_hr_candidate_for_application(application=application)
 
         notify_status_changed(application=application)
         updated += 1
@@ -126,7 +128,11 @@ def bulk_move_by_filter(
         cutoff = tz.now() - timedelta(days=days_since_applied)
         qs = qs.filter(created_at__lt=cutoff)
 
+    applications = list(qs)
     count = qs.update(status=to_status)
+    for application in applications:
+        application.status = to_status
+        sync_hr_candidate_for_application(application=application)
     return count
 
 
@@ -138,6 +144,7 @@ def add_hr_note(*, application: Application, note: str) -> Application:
         application.hr_notes = note
 
     application.save(update_fields=["hr_notes", "updated_at"])
+    sync_hr_candidate_for_application(application=application)
     return application
 
 

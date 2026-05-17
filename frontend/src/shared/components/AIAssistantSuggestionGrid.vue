@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import AIAssistantSuggestionCard from './AIAssistantSuggestionCard.vue'
 
 const props = defineProps<{
   isCandidate: boolean
@@ -15,24 +16,32 @@ const { t } = useI18n()
 const hrSuggestions = computed(() => [
   {
     icon: 'pi pi-users',
+    accent: 'blue',
+    featured: true,
     title: t('aiAssistant.suggestions.findCandidates.title'),
     description: t('aiAssistant.suggestions.findCandidates.description'),
     prompt: t('aiAssistant.suggestions.findCandidates.prompt'),
   },
   {
     icon: 'pi pi-briefcase',
+    accent: 'emerald',
+    featured: true,
     title: t('aiAssistant.suggestions.vacancies.title'),
     description: t('aiAssistant.suggestions.vacancies.description'),
     prompt: t('aiAssistant.suggestions.vacancies.prompt'),
   },
   {
     icon: 'pi pi-chart-line',
+    accent: 'amber',
+    featured: true,
     title: t('aiAssistant.suggestions.analytics.title'),
     description: t('aiAssistant.suggestions.analytics.description'),
     prompt: t('aiAssistant.suggestions.analytics.prompt'),
   },
   {
     icon: 'pi pi-send',
+    accent: 'rose',
+    featured: false,
     title: t('aiAssistant.suggestions.followUp.title'),
     description: t('aiAssistant.suggestions.followUp.description'),
     prompt: t('aiAssistant.suggestions.followUp.prompt'),
@@ -42,18 +51,24 @@ const hrSuggestions = computed(() => [
 const candidateSuggestions = computed(() => [
   {
     icon: 'pi pi-search',
+    accent: 'blue',
+    featured: true,
     title: t('aiAssistant.suggestions.searchJobs.title'),
     description: t('aiAssistant.suggestions.searchJobs.description'),
     prompt: t('aiAssistant.suggestions.searchJobs.prompt'),
   },
   {
     icon: 'pi pi-file-edit',
+    accent: 'emerald',
+    featured: true,
     title: t('aiAssistant.suggestions.improveCv.title'),
     description: t('aiAssistant.suggestions.improveCv.description'),
     prompt: t('aiAssistant.suggestions.improveCv.prompt'),
   },
   {
     icon: 'pi pi-list-check',
+    accent: 'amber',
+    featured: false,
     title: t('aiAssistant.suggestions.applications.title'),
     description: t('aiAssistant.suggestions.applications.description'),
     prompt: t('aiAssistant.suggestions.applications.prompt'),
@@ -61,32 +76,21 @@ const candidateSuggestions = computed(() => [
 ])
 
 const suggestions = computed(() =>
-  props.isCandidate ? candidateSuggestions.value : hrSuggestions.value,
+  (props.isCandidate ? candidateSuggestions.value : hrSuggestions.value).map((item) => ({
+    ...item,
+    tooltip: `${item.description} ${item.prompt}`,
+  })),
 )
 </script>
 
 <template>
-  <div class="grid gap-2">
-    <button
+  <div class="grid gap-3">
+    <AIAssistantSuggestionCard
       v-for="item in suggestions"
       :key="item.title"
-      type="button"
-      class="group flex min-h-[76px] w-full items-start gap-3 rounded-lg border border-[color:var(--color-border-soft)] bg-[color:var(--color-surface-raised)] p-3 text-left transition-colors hover:border-[color:var(--color-accent)] hover:bg-[color:var(--color-accent-soft)]"
-      @click="emit('send', item.prompt)"
-    >
-      <span
-        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-[color:var(--color-surface-sunken)] text-[color:var(--color-accent)]"
-      >
-        <i :class="item.icon" class="text-sm"></i>
-      </span>
-      <span class="min-w-0">
-        <span class="block text-sm font-semibold text-[color:var(--color-text-primary)]">
-          {{ item.title }}
-        </span>
-        <span class="mt-0.5 block text-xs leading-5 text-[color:var(--color-text-secondary)]">
-          {{ item.description }}
-        </span>
-      </span>
-    </button>
+      :item="item"
+      :featured-label="t('aiAssistant.featuredLabel')"
+      @send="emit('send', $event)"
+    />
   </div>
 </template>

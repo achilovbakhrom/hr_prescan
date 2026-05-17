@@ -2,6 +2,9 @@ import { apiClient } from '@/shared/api/client'
 import type {
   Application,
   ApplicationDetail,
+  HRCandidateRecord,
+  HRCandidateRecordDetail,
+  HRCandidateRecordUpdate,
   ApplicationStatus,
   SubmitApplicationRequest,
 } from '../types/candidate.types'
@@ -140,6 +143,34 @@ export const candidateService = {
   async getCandidateDetail(id: string): Promise<ApplicationDetail> {
     const response = await apiClient.get<ApplicationDetail>(`/hr/candidates/${id}/`)
     return response.data
+  },
+
+  async getCandidateBase(params?: {
+    search?: string
+    ordering?: string
+  }): Promise<HRCandidateRecord[]> {
+    const response = await apiClient.get<HRCandidateRecord[]>('/hr/candidate-base/', { params })
+    return response.data
+  },
+
+  async getCandidateBaseDetail(id: string): Promise<HRCandidateRecordDetail> {
+    const response = await apiClient.get<HRCandidateRecordDetail>(`/hr/candidate-base/${id}/`)
+    return response.data
+  },
+
+  async updateCandidateBase(
+    id: string,
+    data: HRCandidateRecordUpdate,
+  ): Promise<HRCandidateRecordDetail> {
+    const response = await apiClient.patch<HRCandidateRecordDetail>(
+      `/hr/candidate-base/${id}/`,
+      data,
+    )
+    return response.data
+  },
+
+  async deleteCandidateBase(id: string): Promise<void> {
+    await apiClient.delete(`/hr/candidate-base/${id}/`)
   },
 
   async updateCandidateStatus(id: string, status: ApplicationStatus): Promise<Application> {

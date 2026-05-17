@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from apps.applications.models import Application, ApplicationEvent, HiringManagerFeedback
+from apps.applications.models import Application, ApplicationEvent, HiringManagerFeedback, HRCandidate
 
 
 class HiringManagerFeedbackInline(admin.TabularInline):
@@ -59,3 +59,12 @@ class ApplicationEventAdmin(admin.ModelAdmin):
     list_filter = ["event_type"]
     search_fields = ["actor_name", "message", "application__candidate_name"]
     readonly_fields = ["id", "created_at", "updated_at"]
+
+
+@admin.register(HRCandidate)
+class HRCandidateAdmin(admin.ModelAdmin):
+    list_display = ["candidate_name", "candidate_email", "account_owner", "last_activity_at"]
+    list_filter = ["is_deleted"]
+    search_fields = ["candidate_name", "candidate_email", "candidate_phone", "account_owner__email"]
+    readonly_fields = ["id", "created_at", "updated_at", "first_seen_at", "last_activity_at"]
+    raw_id_fields = ["account_owner", "candidate", "latest_application"]

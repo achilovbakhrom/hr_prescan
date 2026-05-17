@@ -38,9 +38,7 @@ const { t } = useI18n()
           <i class="pi pi-users text-[color:var(--color-accent)]"></i>
           <span>{{ t('dashboard.ai.placeholder') }}</span>
         </span>
-        <span class="font-mono text-[10px] text-[color:var(--color-text-muted)]" aria-hidden="true"
-          >⌘K</span
-        >
+        <i class="pi pi-arrow-right text-xs text-[color:var(--color-text-muted)]"></i>
       </button>
       <button
         type="button"

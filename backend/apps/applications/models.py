@@ -123,3 +123,52 @@ class ApplicationEvent(BaseModel):
 
     def __str__(self) -> str:
         return f"{self.event_type} for {self.application_id}"
+
+
+class HRCandidate(BaseModel):
+    """Deduplicated candidate record for an HR account."""
+
+    account_owner = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.CASCADE,
+        related_name="hr_candidates",
+    )
+    candidate = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="hr_candidate_records",
+    )
+    candidate_name = models.CharField(max_length=255)
+    candidate_email = models.EmailField()
+    candidate_email_normalized = models.CharField(max_length=254)
+    candidate_phone = models.CharField(max_length=50, blank=True, default="")
+    latest_application = models.ForeignKey(
+        Application,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+    )
+    notes = models.TextField(blank=True, default="")
+    first_seen_at = models.DateTimeField()
+    last_activity_at = models.DateTimeField()
+    is_deleted = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["-last_activity_at"]
+        indexes = [
+            models.Index(fields=["account_owner", "candidate_email_normalized"]),
+            models.Index(fields=["account_owner", "last_activity_at"]),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["account_owner", "candidate_email_normalized"],
+                condition=models.Q(is_deleted=False),
+                name="unique_active_hr_candidate_email_per_account",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.candidate_name} ({self.candidate_email})"

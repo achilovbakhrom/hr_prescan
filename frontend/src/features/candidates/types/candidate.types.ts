@@ -67,3 +67,34 @@ export interface SubmitApplicationRequest {
   cvFile?: File
   cvId?: string
 }
+
+export interface HRCandidateRecord {
+  id: string
+  candidateName: string
+  candidateEmail: string
+  candidatePhone: string
+  applicationCount: number
+  latestApplicationId: string | null
+  latestVacancyId: string | null
+  latestVacancyTitle: string
+  latestCompanyName: string
+  latestStatus: Application['status'] | ''
+  latestMatchScore: number | string | null
+  latestPrescanningScore: number | null
+  latestInterviewScore: number | null
+  firstSeenAt: string
+  lastActivityAt: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface HRCandidateRecordDetail extends HRCandidateRecord {
+  notes: string
+  applications: Application[]
+}
+
+export interface HRCandidateRecordUpdate {
+  candidateName?: string
+  candidatePhone?: string
+  notes?: string
+}

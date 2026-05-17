@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
 import CookieConsent from '@/shared/components/CookieConsent.vue'
-import AIAssistantDrawer from '@/shared/components/AIAssistantDrawer.vue'
+import AIAssistantDialog from '@/shared/components/AIAssistantDialog.vue'
 import { useThemeStore } from '@/shared/stores/theme.store'
 
 // Initialise theme store early so the `.dark` class is applied before any
@@ -22,7 +22,7 @@ useThemeStore()
 <template>
   <RouterView />
   <CookieConsent />
-  <AIAssistantDrawer />
+  <AIAssistantDialog />
 </template>
 
 <style>

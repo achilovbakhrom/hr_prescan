@@ -78,6 +78,9 @@ def complete_session(
             application.status = Application.Status.SHORTLISTED
 
     application.save(update_fields=["status", "updated_at"])
+    from apps.applications.services.candidate_base import sync_hr_candidate_for_application
+
+    sync_hr_candidate_for_application(application=application)
 
     # Notify HR team via Telegram (non-blocking, fire-and-forget)
     try:

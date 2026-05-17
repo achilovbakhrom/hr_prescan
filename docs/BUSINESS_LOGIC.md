@@ -540,6 +540,16 @@ Candidates are managed within the vacancy detail page via two views:
 - Hiring managers can submit feedback from the shared review link: reviewer name, optional role/team, recommendation (advance/maybe/reject), optional 1-5 rating, and comment. HR sees submitted hiring-manager feedback in the candidate Notes tab alongside internal HR notes.
 - Share-link rotations and hiring-manager feedback submissions create candidate collaboration activity events visible to HR for auditability.
 
+### 9.3.1 HR Candidate Base
+
+- Every candidate who applies to a vacancy is automatically saved into a deduplicated HR candidate base for the vacancy company's account owner.
+- Deduplication is by normalized email address within the HR account. If the same candidate applies again to any vacancy in the same account, the existing candidate-base record is updated instead of creating a duplicate.
+- Candidate-base records are visible only when the HR user has access to at least one non-deleted company where that candidate has a non-deleted application.
+- The candidate-base list is separate from the application pipeline list. The pipeline remains one row per application/vacancy; the candidate base is one row per person.
+- Each candidate-base detail page shows the candidate's editable base contact fields, HR base notes, and all visible vacancy applications: vacancy, status, CV match score, prescanning score, interview score, and dates.
+- The latest candidate-base result points to the newest visible application and reflects the latest application status and screening scores. When the candidate applies again, completes screening, or HR changes status/notes, the candidate-base activity timestamp and latest result are refreshed.
+- Deleting a candidate-base record hides it from the base without deleting historical applications. If the same email applies again later, the record is recreated/reactivated.
+
 ### 9.4 HR Actions (Individual)
 
 Per-candidate actions available from the detail page or table row menu:

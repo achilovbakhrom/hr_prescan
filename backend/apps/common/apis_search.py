@@ -7,7 +7,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.permissions import HasHRPermission
+from apps.accounts.selectors import get_user_live_company_ids
 from apps.applications.models import Application
+from apps.applications.selectors_candidate_base import get_hr_candidates_filtered
 from apps.common.messages import MSG_NOT_IN_COMPANY
 from apps.vacancies.models import Vacancy
 
@@ -55,24 +57,29 @@ class HRGlobalSearchApi(APIView):
             for v in vacancies
         ]
 
-        applications = (
-            Application.objects.filter(vacancy__company=company, is_deleted=False)
-            .filter(
-                Q(candidate_name__icontains=q) | Q(candidate_email__icontains=q),
+        company_ids = get_user_live_company_ids(user=request.user)
+        candidates = get_hr_candidates_filtered(user=request.user, search=q)[:RESULT_LIMIT]
+        candidate_results = []
+        for candidate in candidates:
+            latest_application = (
+                Application.objects.filter(
+                    vacancy__company_id__in=company_ids,
+                    candidate_email__iexact=candidate.candidate_email_normalized,
+                    is_deleted=False,
+                )
+                .select_related("vacancy")
+                .order_by("-created_at")
+                .first()
             )
-            .select_related("vacancy")
-            .order_by("-created_at")[:RESULT_LIMIT]
-        )
-        candidate_results = [
-            {
-                "id": str(a.id),
-                "candidate_name": a.candidate_name,
-                "candidate_email": a.candidate_email,
-                "status": a.status,
-                "vacancy_title": a.vacancy.title,
-            }
-            for a in applications
-        ]
+            candidate_results.append(
+                {
+                    "id": str(candidate.id),
+                    "candidate_name": candidate.candidate_name,
+                    "candidate_email": candidate.candidate_email,
+                    "status": latest_application.status if latest_application else "",
+                    "vacancy_title": latest_application.vacancy.title if latest_application else "",
+                }
+            )
 
         return Response(
             {"vacancies": vacancy_results, "candidates": candidate_results},

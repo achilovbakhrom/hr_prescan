@@ -146,7 +146,7 @@ function handleMenuToggle(): void {
           /></template>
         </Button>
 
-        <AIAssistantEntryButton @click="aiAssistant.toggle()" />
+        <AIAssistantEntryButton @click="aiAssistant.open()" />
 
         <ThemeToggle />
         <LanguageSwitcher />

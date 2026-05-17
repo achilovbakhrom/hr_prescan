@@ -16,6 +16,9 @@ from apps.applications.urls import (
     candidate_urlpatterns as application_candidate_urlpatterns,
 )
 from apps.applications.urls import (
+    hr_candidate_base_urlpatterns as application_hr_candidate_base_urlpatterns,
+)
+from apps.applications.urls import (
     hr_candidate_urlpatterns as application_hr_candidate_urlpatterns,
 )
 from apps.applications.urls import (
@@ -97,6 +100,7 @@ urlpatterns = [
     path("api/hr/job-parser/", include((job_parser_hr_urlpatterns, "hr-job-parser"))),
     path("api/hr/vacancies/", include((application_hr_vacancy_urlpatterns, "hr-applications"))),
     path("api/hr/candidates/", include((application_hr_candidate_urlpatterns, "hr-candidates"))),
+    path("api/hr/candidate-base/", include((application_hr_candidate_base_urlpatterns, "hr-candidate-base"))),
     path("api/hr/candidates/", include((interview_hr_candidate_urlpatterns, "hr-interview-schedule"))),
     path("api/hr/candidates/", include((notification_hr_candidate_urlpatterns, "hr-messaging"))),
     path("api/hr/candidates/", include((notification_hr_bulk_urlpatterns, "hr-bulk-actions"))),

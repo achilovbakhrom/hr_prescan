@@ -11,7 +11,11 @@ from apps.applications.apis import (
     HRAllCandidatesListApi,
     HRApplicationDetailApi,
     HRApplicationListApi,
+    HRCandidateBaseDetailApi,
+    HRCandidateBaseListApi,
 )
+from apps.applications.models import HRCandidate
+from apps.applications.services import sync_hr_candidate_for_application
 from apps.interviews.apis import HRApplicationInterviewApi
 from apps.interviews.models import Interview
 from apps.notifications.apis import HRMessageListApi, SendCandidateEmailApi
@@ -69,6 +73,82 @@ def test_all_candidates_api_includes_all_user_membership_companies():
 
     assert response.status_code == status.HTTP_200_OK
     assert [item["id"] for item in response.data] == [str(application.id)]
+
+
+def test_candidate_base_deduplicates_candidates_by_email_for_account():
+    user, second_company = _hr_user_with_two_companies()
+    first_vacancy = VacancyFactory(company=user.company, created_by=user, title="Backend Engineer")
+    second_vacancy = VacancyFactory(company=second_company, created_by=user, title="Platform Engineer")
+    first_application = ApplicationFactory(
+        vacancy=first_vacancy,
+        candidate_name="Jane Candidate",
+        candidate_email="Jane@Example.com",
+    )
+    second_application = ApplicationFactory(
+        vacancy=second_vacancy,
+        candidate_name="Jane Candidate",
+        candidate_email="jane@example.com",
+    )
+    sync_hr_candidate_for_application(application=first_application)
+    sync_hr_candidate_for_application(application=second_application)
+    factory = APIRequestFactory()
+    request = factory.get("/api/hr/candidate-base/", {"search": "Platform"})
+    force_authenticate(request, user=user)
+
+    response = HRCandidateBaseListApi.as_view()(request)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert len(response.data) == 1
+    assert response.data[0]["candidate_email"] == "jane@example.com"
+    assert response.data[0]["application_count"] == 2
+    assert response.data[0]["latest_vacancy_title"] == "Platform Engineer"
+
+
+def test_candidate_base_detail_returns_visible_application_history():
+    user, second_company = _hr_user_with_two_companies()
+    vacancy = VacancyFactory(company=second_company, created_by=user)
+    application = ApplicationFactory(
+        vacancy=vacancy,
+        candidate_name="Jane Candidate",
+        candidate_email="jane@example.com",
+    )
+    candidate = sync_hr_candidate_for_application(application=application)
+    factory = APIRequestFactory()
+    request = factory.get(f"/api/hr/candidate-base/{candidate.id}/")
+    force_authenticate(request, user=user)
+
+    response = HRCandidateBaseDetailApi.as_view()(request, candidate_id=str(candidate.id))
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data["id"] == str(candidate.id)
+    assert [item["id"] for item in response.data["applications"]] == [str(application.id)]
+
+
+def test_candidate_base_patch_and_delete():
+    user, second_company = _hr_user_with_two_companies()
+    vacancy = VacancyFactory(company=second_company, created_by=user)
+    application = ApplicationFactory(vacancy=vacancy, candidate_email="jane@example.com")
+    candidate = sync_hr_candidate_for_application(application=application)
+    factory = APIRequestFactory()
+    patch_request = factory.patch(
+        f"/api/hr/candidate-base/{candidate.id}/",
+        {"candidate_name": "Jane Updated", "notes": "Known strong candidate"},
+        format="json",
+    )
+    force_authenticate(patch_request, user=user)
+
+    patch_response = HRCandidateBaseDetailApi.as_view()(patch_request, candidate_id=str(candidate.id))
+
+    assert patch_response.status_code == status.HTTP_200_OK
+    assert patch_response.data["candidate_name"] == "Jane Updated"
+    assert patch_response.data["notes"] == "Known strong candidate"
+
+    delete_request = factory.delete(f"/api/hr/candidate-base/{candidate.id}/")
+    force_authenticate(delete_request, user=user)
+    delete_response = HRCandidateBaseDetailApi.as_view()(delete_request, candidate_id=str(candidate.id))
+
+    assert delete_response.status_code == status.HTTP_204_NO_CONTENT
+    assert HRCandidate.objects.get(id=candidate.id).is_deleted is True
 
 
 def test_candidate_detail_api_uses_user_memberships():

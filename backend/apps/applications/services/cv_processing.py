@@ -186,4 +186,7 @@ def calculate_match_score(*, application_id: UUID) -> None:
     notes = match_data.get("notes", "")
     application.match_notes_translations = {detected_lang: notes} if notes else {}
     application.save(update_fields=["match_score", "match_details", "match_notes_translations", "updated_at"])
+    from apps.applications.services.candidate_base import sync_hr_candidate_for_application
+
+    sync_hr_candidate_for_application(application=application)
     logger.info("calculate_match_score: score=%.1f for application %s", application.match_score, application_id)

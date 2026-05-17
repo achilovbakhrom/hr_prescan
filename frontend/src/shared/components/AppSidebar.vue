@@ -4,8 +4,6 @@ import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { USER_ROLES } from '@/shared/constants/roles'
-import { useAIAssistant } from '@/shared/composables/useAIAssistant'
-import AIAssistantEntryButton from '@/shared/components/AIAssistantEntryButton.vue'
 import type { HRPermission, UserRole } from '@/shared/types/auth.types'
 
 interface NavItem {
@@ -28,7 +26,6 @@ defineProps<{
 const route = useRoute()
 const authStore = useAuthStore()
 const { t } = useI18n()
-const aiAssistant = useAIAssistant()
 
 function hasPermission(permission?: HRPermission): boolean {
   if (!permission) return true
@@ -60,8 +57,15 @@ const sections = computed<NavSection[]>(() => [
         permission: 'manage_vacancies',
       },
       {
-        label: t('nav.allCandidates'),
+        label: t('nav.candidateBase', 'Candidate base'),
         icon: 'pi pi-users',
+        to: '/candidate-base',
+        roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
+        permission: 'manage_candidates',
+      },
+      {
+        label: t('nav.allCandidates'),
+        icon: 'pi pi-list',
         to: '/candidates',
         roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
         permission: 'manage_candidates',
@@ -186,14 +190,5 @@ function isActive(path: string): boolean {
         </ul>
       </template>
     </nav>
-
-    <!-- AI Assistant button -->
-    <div class="border-t border-gray-100 dark:border-gray-800 px-2 py-3">
-      <AIAssistantEntryButton
-        variant="sidebar"
-        :collapsed="collapsed"
-        @click="aiAssistant.toggle()"
-      />
-    </div>
   </aside>
 </template>

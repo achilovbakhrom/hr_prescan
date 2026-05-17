@@ -54,6 +54,9 @@ def update_application_status(*, application: Application, status: str, updated_
 
     application.status = status
     application.save(update_fields=["status", "updated_at"])
+    from apps.applications.services.candidate_base import sync_hr_candidate_for_application
+
+    sync_hr_candidate_for_application(application=application)
     return application
 
 

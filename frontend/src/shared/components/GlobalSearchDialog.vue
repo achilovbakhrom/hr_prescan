@@ -55,7 +55,7 @@ function gotoVacancy(id: string): void {
 
 function gotoCandidate(id: string): void {
   visible.value = false
-  router.push({ name: ROUTE_NAMES.CANDIDATE_DETAIL, params: { id } })
+  router.push({ name: ROUTE_NAMES.CANDIDATE_BASE_DETAIL, params: { id } })
 }
 
 const hasResults = () => results.value.vacancies.length + results.value.candidates.length > 0
