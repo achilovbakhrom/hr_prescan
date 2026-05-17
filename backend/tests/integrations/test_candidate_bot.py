@@ -17,6 +17,10 @@ from apps.integrations.telegram_bot.candidate.menus import (
     CB_JOB_SEARCH,
     CB_PS_CV_SELECT_PREFIX,
 )
+from apps.integrations.telegram_bot.candidate.prescreening_vacancies import (
+    CB_PS_CODE_ENTRY,
+    CB_PS_VACANCY_PREFIX,
+)
 from apps.integrations.telegram_bot.candidate.states import (
     SK_NAME,
     SK_PHONE,
@@ -444,6 +448,38 @@ class TestCandidateAssistantButtons:
 
 
 class TestPrescreeningLanguageAndCv:
+    def test_prescreening_button_shows_vacancy_picker_instead_of_code_prompt(self, vacancy):
+        _create_onboarded_candidate(language=User.Language.EN)
+
+        with (
+            patch("apps.integrations.telegram_bot.client.requests.post") as post_mock,
+            patch("apps.integrations.telegram_bot.client.requests.get"),
+        ):
+            post_mock.return_value.json.return_value = {"ok": True, "result": {}}
+            handle_update(_make_callback_update("cand:ps:start"))
+
+        sent_text = " ".join(str(call.kwargs.get("json", {}).get("text", "")) for call in post_mock.call_args_list)
+        markups = [call.kwargs.get("json", {}).get("reply_markup", {}) for call in post_mock.call_args_list]
+        assert "Choose a vacancy" in sent_text
+        assert "6-digit" not in sent_text
+        assert any(f"{CB_PS_VACANCY_PREFIX}{vacancy.id}" in str(markup) for markup in markups)
+        assert any(CB_PS_CODE_ENTRY in str(markup) for markup in markups)
+
+    def test_prescreening_vacancy_button_starts_confirm_name_step(self, vacancy):
+        _create_onboarded_candidate(language=User.Language.EN)
+
+        with (
+            patch("apps.integrations.telegram_bot.client.requests.post") as post_mock,
+            patch("apps.integrations.telegram_bot.client.requests.get"),
+        ):
+            post_mock.return_value.json.return_value = {"ok": True, "result": {}}
+            handle_update(_make_callback_update(f"{CB_PS_VACANCY_PREFIX}{vacancy.id}"))
+
+        session = get_session(role=ROLE_CANDIDATE, telegram_id=TG_USER["id"])
+        sent_text = " ".join(str(call.kwargs.get("json", {}).get("text", "")) for call in post_mock.call_args_list)
+        assert session.get(SK_VACANCY_ID) == str(vacancy.id)
+        assert "Your name" in sent_text
+
     def test_vacancy_code_switches_bot_ui_to_prescreening_language(self, vacancy):
         vacancy.prescanning_language = User.Language.RU
         vacancy.save(update_fields=["prescanning_language"])

@@ -26,8 +26,14 @@ from apps.integrations.telegram_bot.candidate.prescreening_steps import (
     go_to_cv_step,
     handle_new_name,
     handle_new_phone,
-    handle_vacancy_code,
     start_interview_submission,
+)
+from apps.integrations.telegram_bot.candidate.prescreening_vacancies import (
+    CB_PS_CODE_ENTRY,
+    CB_PS_VACANCY_PREFIX,
+    handle_vacancy_code,
+    handle_vacancy_selection,
+    send_vacancy_picker,
 )
 from apps.integrations.telegram_bot.candidate.states import (
     SK_CV_FILENAME,
@@ -46,8 +52,20 @@ logger = logging.getLogger(__name__)
 
 def handle_prescreening_callback(*, client, chat_id: int, user, data: str, session: dict, lang: str) -> None:
     if data == CB_PS_START:
+        send_vacancy_picker(client=client, chat_id=chat_id, lang=lang)
+
+    elif data == CB_PS_CODE_ENTRY:
         update_session(role=ROLE_CANDIDATE, telegram_id=user.telegram_id, state=STATE_PS_CODE)
         client.send_message(chat_id=chat_id, text=t("candidate.ps_ask_code", lang=lang))
+
+    elif data.startswith(CB_PS_VACANCY_PREFIX):
+        handle_vacancy_selection(
+            client=client,
+            chat_id=chat_id,
+            user=user,
+            vacancy_id=data.removeprefix(CB_PS_VACANCY_PREFIX),
+            lang=lang,
+        )
 
     elif data == CB_PS_NAME_CONFIRM:
         go_to_confirm_phone(client=client, chat_id=chat_id, user=user, session=session, lang=lang)

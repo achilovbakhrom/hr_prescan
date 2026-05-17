@@ -9,6 +9,7 @@ from apps.accounts.models import User
 from apps.integrations.models import TelegramLinkCode
 from apps.integrations.telegram_bot.client import TelegramClient
 from apps.integrations.telegram_bot.hr.i18n import text as hr_text
+from apps.integrations.telegram_bot.hr.menus import main_menu_keyboard
 from apps.integrations.telegram_bot.hr.onboarding import is_hr_placeholder, merge_hr_placeholder
 from apps.integrations.telegram_bot.keyboards import button, inline_keyboard
 
@@ -149,6 +150,7 @@ def _try_deep_link(
     client.send_message(
         chat_id=chat_id,
         text=hr_text("connected", user=user, email=user.email, company=f" ({company_name})" if company_name else ""),
+        reply_markup=main_menu_keyboard(user=user),
     )
 
 

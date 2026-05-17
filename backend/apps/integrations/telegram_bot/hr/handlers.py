@@ -1,35 +1,35 @@
 """HR bot update handler.
 
 Routes incoming Telegram updates to the existing LangChain assistant
-(``apps.common.ai_assistant.process_ai_command``). The HR bot is currently
-free-text driven; PR3 will add an inline-keyboard menu layer on top of this.
+(``apps.common.ai_assistant.process_ai_command``) through text, voice, and
+button shortcuts.
 """
 
 from __future__ import annotations
 
-import logging
-
 from apps.integrations.telegram_bot.bots import ROLE_HR, get_client
+from apps.integrations.telegram_bot.hr.assistant import route_to_assistant
+from apps.integrations.telegram_bot.hr.callbacks import handle_callback
 from apps.integrations.telegram_bot.hr.i18n import text as hr_text
 from apps.integrations.telegram_bot.hr.linking import get_hr_bot_user
+from apps.integrations.telegram_bot.hr.menus import (
+    main_menu_keyboard,
+    send_main_menu,
+)
 from apps.integrations.telegram_bot.hr.onboarding_flow import (
     ensure_onboarding_ready,
     handle_company_name_reply,
-    handle_onboarding_callback,
-    is_onboarding_callback,
     send_language_picker,
 )
 from apps.integrations.telegram_bot.i18n import normalize_language
 from apps.integrations.telegram_bot.voice import transcribe_voice
-
-logger = logging.getLogger(__name__)
 
 
 def handle_update(update_data: dict) -> None:
     """Process an incoming Telegram update for the HR bot."""
     callback = update_data.get("callback_query")
     if callback:
-        _handle_callback(callback=callback)
+        handle_callback(callback=callback)
         return
 
     message = update_data.get("message", {})
@@ -116,70 +116,17 @@ def handle_update(update_data: dict) -> None:
         send_language_picker(client=client, chat_id=chat_id)
         return
 
+    if text in ("/menu", "/start_menu"):
+        send_main_menu(client=client, chat_id=chat_id, user=user)
+        return
+
     if handle_company_name_reply(client=client, chat_id=chat_id, user=user, text=text):
         return
 
     if not ensure_onboarding_ready(client=client, chat_id=chat_id, user=user, text=text):
         return
 
-    _route_to_assistant(client=client, chat_id=chat_id, user=user, text=text)
-
-
-def _route_to_assistant(*, client, chat_id, user, text: str) -> None:
-    """Hand a free-text message to the LangChain HR assistant."""
-    from apps.common.ai_assistant import process_ai_command
-    from apps.integrations.telegram_bot.hr.history import (
-        get_hr_context,
-        save_hr_history,
-    )
-
-    context = get_hr_context(telegram_id=user.telegram_id, text=text)
-    result = process_ai_command(user=user, message=text, context=context)
-    response_text = result.get("message", "Something went wrong.")
-
-    save_hr_history(
-        telegram_id=user.telegram_id,
-        user_msg=text,
-        bot_msg=response_text,
-    )
-    client.send_message(chat_id=chat_id, text=response_text, parse_mode="Markdown")
-
-
-def _handle_callback(*, callback: dict) -> None:
-    client = get_client(role=ROLE_HR)
-    callback_id = callback.get("id")
-    try:
-        _process_callback(client=client, callback=callback)
-    finally:
-        if callback_id:
-            client.answer_callback_query(callback_query_id=callback_id)
-
-
-def _process_callback(*, client, callback: dict) -> None:
-    data = callback.get("data", "")
-    chat_id = callback.get("message", {}).get("chat", {}).get("id")
-    sender = callback.get("from", {})
-    telegram_id = sender.get("id")
-    if not chat_id or not telegram_id:
-        return
-
-    if is_onboarding_callback(data=data):
-        handle_onboarding_callback(client=client, chat_id=chat_id, telegram_id=telegram_id, data=data)
-        return
-
-    from apps.integrations.telegram_bot.hr.deep_link import handle_link_callback, is_link_callback
-
-    if is_link_callback(data=data):
-        handle_link_callback(
-            client=client,
-            chat_id=chat_id,
-            telegram_id=telegram_id,
-            telegram_username=sender.get("username", ""),
-            data=data,
-        )
-        return
-
-    logger.debug("Unhandled HR callback: %r", data)
+    route_to_assistant(client=client, chat_id=chat_id, user=user, text=text)
 
 
 def _handle_help(*, client, chat_id) -> None:
@@ -190,4 +137,5 @@ def _handle_help(*, client, chat_id) -> None:
     client.send_message(
         chat_id=chat_id,
         text=hr_text("help", user=user),
+        reply_markup=main_menu_keyboard(user=user),
     )

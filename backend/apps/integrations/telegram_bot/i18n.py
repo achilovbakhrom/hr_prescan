@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from apps.integrations.telegram_bot.i18n_buttons import _STRINGS_BUTTONS
 from apps.integrations.telegram_bot.i18n_ext import _STRINGS_EXT
 
 SUPPORTED_LANGUAGES = ("en", "ru", "uz")
@@ -69,15 +70,15 @@ _STRINGS: dict[str, dict[str, str]] = {
     "candidate.cv_required_prompt": {
         "en": (
             "📎 This vacancy requires a CV.\n\n"
-            "Please send me your CV as a PDF or DOCX document, then tap *Apply* again."
+            "Please send me your CV as a PDF or DOCX document. I will continue the application automatically."
         ),
         "ru": (
             "📎 Для этой вакансии требуется резюме.\n\n"
-            "Пожалуйста, отправьте резюме в формате PDF или DOCX, затем снова нажмите *Откликнуться*."
+            "Пожалуйста, отправьте резюме в формате PDF или DOCX. Я продолжу отклик автоматически."
         ),
         "uz": (
             "📎 Ushbu vakansiya uchun rezyume talab qilinadi.\n\n"
-            "Iltimos, rezyumeingizni PDF yoki DOCX shaklida yuboring va keyin yana *Ariza yuborish* tugmasini bosing."
+            "Iltimos, rezyumeingizni PDF yoki DOCX shaklida yuboring. Arizani avtomatik davom ettiraman."
         ),
     },
     "candidate.cv_uploaded": {
@@ -151,6 +152,7 @@ _STRINGS: dict[str, dict[str, str]] = {
         "uz": "Telefon raqami saqlandi. Endi bot tilini tanlang.",
     },
     **_STRINGS_EXT,
+    **_STRINGS_BUTTONS,
 }
 
 

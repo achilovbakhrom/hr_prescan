@@ -11,20 +11,14 @@ from uuid import UUID
 
 from apps.common.exceptions import ApplicationError
 from apps.integrations.telegram_bot.bots import ROLE_CANDIDATE
-from apps.integrations.telegram_bot.candidate.language import set_user_language
-from apps.integrations.telegram_bot.candidate.menus import (
-    confirm_name_keyboard,
-    confirm_phone_keyboard,
-)
+from apps.integrations.telegram_bot.candidate.menus import confirm_phone_keyboard
 from apps.integrations.telegram_bot.candidate.states import (
     SK_CV_FILENAME,
     SK_CV_PATH,
-    SK_LANG,
     SK_NAME,
     SK_PHONE,
     SK_VACANCY_ID,
     STATE_PS_CHANGE_PHONE,
-    STATE_PS_CONFIRM_NAME,
     STATE_PS_CONFIRM_PHONE,
 )
 from apps.integrations.telegram_bot.i18n import t
@@ -34,50 +28,6 @@ logger = logging.getLogger(__name__)
 
 _CONTACT_MIN_LENGTH = 3
 _CONTACT_MAX_LENGTH = 50
-
-
-def handle_vacancy_code(*, client, chat_id: int, user, text: str, lang: str) -> None:
-    from apps.vacancies.models import Vacancy
-
-    text = text.strip()
-    if not text.isdigit() or len(text) != 6:
-        client.send_message(chat_id=chat_id, text=t("candidate.ps_code_invalid", lang=lang))
-        return
-
-    vacancy = (
-        Vacancy.objects.filter(
-            telegram_code=int(text),
-            is_deleted=False,
-            status=Vacancy.Status.PUBLISHED,
-        )
-        .select_related("company")
-        .first()
-    )
-
-    if not vacancy:
-        client.send_message(chat_id=chat_id, text=t("candidate.ps_code_not_found", lang=lang, code=text))
-        return
-
-    lang = _apply_prescreening_language(user=user, language=vacancy.prescanning_language, fallback=lang)
-    name = user.full_name or ""
-    update_session(
-        role=ROLE_CANDIDATE,
-        telegram_id=user.telegram_id,
-        state=STATE_PS_CONFIRM_NAME,
-        **{SK_VACANCY_ID: str(vacancy.id), SK_NAME: name, SK_LANG: lang},
-    )
-    client.send_message(
-        chat_id=chat_id,
-        text=t(
-            "candidate.ps_confirm_name",
-            lang=lang,
-            title=_md_escape(vacancy.title),
-            company=_md_escape(vacancy.company.name),
-            name=_md_escape(name),
-        ),
-        reply_markup=confirm_name_keyboard(lang=lang),
-        parse_mode="Markdown",
-    )
 
 
 def handle_new_name(*, client, chat_id: int, user, text: str, session: dict, lang: str) -> None:
@@ -177,10 +127,6 @@ def start_interview_submission(*, client, chat_id: int, user, session: dict, lan
         vacancy_title=vacancy.title if vacancy else "",
         lang=lang,
     )
-
-
-def _apply_prescreening_language(*, user, language: str, fallback: str) -> str:
-    return set_user_language(user=user, language=language, fallback=fallback)
 
 
 def _md_escape(text: str) -> str:

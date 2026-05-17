@@ -315,10 +315,11 @@ The candidate bot lets a candidate browse entry points, apply, and complete pres
    - Otherwise the bot calls the same `submit_application` service the web flow uses (`apps/applications/services/application_crud.py`). The resulting `Application` is bound to the candidate `User`, so HR sees it identically to web applications.
 7. Bot confirms with "✅ Application submitted!" and tells the candidate they'll be DM'd when there's news.
 8. Candidate can complete prescanning inside Telegram in two ways:
-   - start from the bot menu using the 6-digit vacancy code
+   - start from the bot menu, choose a public vacancy from inline buttons, and continue without typing vacancy IDs/codes
+   - use the "I have a code" fallback when HR shared only a 6-digit vacancy code
    - open a `ps_<prescan_token>` deep link from the web flow and continue the same prescanning session in Telegram
 9. Prescanning inside Telegram is chat-based:
-   - when the candidate enters a vacancy code or opens an exact prescreening deep link, the bot UI switches to the vacancy/interview `prescanning_language` so the Telegram flow matches the language selected in the web app
+   - when the candidate selects a vacancy, enters a fallback vacancy code, or opens an exact prescreening deep link, the bot UI switches to the vacancy/interview `prescanning_language` so the Telegram flow matches the language selected in the web app
    - if the candidate has no saved contact, the bot asks for any contact HR can use (phone, email, Telegram, WhatsApp, etc.) instead of requiring email-only or phone-only contact
    - during the CV step, saved platform CVs are offered first (active CV first), and the candidate can either select one of them or upload a new file; optional CV steps can still be skipped
    - Telegram uses the same conversational AI chat engine as web prescanning; vacancy questions are competencies for the AI to assess, not a rigid numbered questionnaire.
@@ -332,6 +333,7 @@ The candidate bot lets a candidate browse entry points, apply, and complete pres
 - Candidate dashboards include applications bound by candidate user ID and applications matching the candidate email, so merged Telegram applications remain visible even if their original placeholder email differs from the web email.
 - Candidate "My Applications" list/detail responses expose CV match, prescanning, and interview scores. The primary displayed score is the overall screening score from prescanning/interview when available; CV match is shown separately and only acts as a fallback before screening results exist.
 - Bot UI is **button-driven** wherever possible (Telegram inline keyboards) — free-text replies outside structured steps are routed to the candidate AI agent.
+- The HR Telegram bot exposes button shortcuts for dashboard, vacancies, vacancy creation, candidates, interviews, team, subscription, and language. Those buttons route clear natural-language prompts to the HR AI assistant, so recruiters do not need to memorize commands or internal IDs.
 - Bot-created users are seeded from `message.from.language_code` when it matches a supported bot locale (en / ru / uz), then bot strings use the stored `User.language`. Authenticated web users can change the same field from the header language switcher; HR and candidate Telegram bot UIs also expose a language picker that updates `User.language` for future bot replies.
 - New Telegram candidate users must register in the bot before they can use vacancy, prescreening, CV, or assistant actions. Registration asks for a phone number first using Telegram's native contact-sharing button (manual phone entry is still accepted), then asks the candidate to choose the bot language (`en` / `ru` / `uz`). The selected language is persisted to `User.language` and drives future bot replies. If the user opened a vacancy/prescreening deep link first, the bot resumes that payload after required onboarding.
 - Candidate Telegram bot menus expose direct buttons for job search, prescreening, creating a CV with the candidate AI assistant, viewing saved CVs, uploading an existing CV file, downloading generated/uploaded CV files, and changing language.

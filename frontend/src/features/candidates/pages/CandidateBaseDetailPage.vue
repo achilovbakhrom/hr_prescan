@@ -7,9 +7,9 @@ import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
-import Tag from 'primevue/tag'
 import GlassCard from '@/shared/components/GlassCard.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
+import ApplicationStatusBadge from '../components/ApplicationStatusBadge.vue'
 import { useCandidateBaseStore } from '../stores/candidateBase.store'
 import type { Application } from '../types/candidate.types'
 
@@ -147,7 +147,7 @@ onMounted(fetchRecord)
             <Column field="vacancyTitle" :header="t('nav.vacancies')" style="min-width: 220px" />
             <Column :header="t('common.status')" style="width: 130px">
               <template #body="{ data }">
-                <Tag :value="t(`candidates.status.${data.status}`)" />
+                <ApplicationStatusBadge :status="data.status" />
               </template>
             </Column>
             <Column :header="t('candidates.overallScore')" style="width: 120px">

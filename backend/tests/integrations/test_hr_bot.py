@@ -10,6 +10,7 @@ from apps.accounts.models import Company, CompanyMembership, User
 from apps.integrations.models import TelegramLinkCode
 from apps.integrations.telegram_bot.bots import ROLE_HR
 from apps.integrations.telegram_bot.hr.handlers import handle_update
+from apps.integrations.telegram_bot.hr.menus import CB_CMD_PREFIX
 from apps.integrations.telegram_bot.hr.onboarding import get_or_create_hr_bot_user
 from apps.integrations.telegram_bot.sessions import clear_session
 from apps.vacancies.models import Vacancy
@@ -189,6 +190,7 @@ class TestHRLanguageSettings:
 
         markups = [call.kwargs.get("json", {}).get("reply_markup", {}) for call in post_mock.call_args_list]
         assert any("hr:lang:menu" in str(markup) for markup in markups)
+        assert any(f"{CB_CMD_PREFIX}vacancies" in str(markup) for markup in markups)
 
     def test_language_callback_updates_stored_language(self):
         user, _company, _vacancy = _create_telegram_workspace(language=User.Language.EN)
@@ -204,3 +206,36 @@ class TestHRLanguageSettings:
         sent_text = " ".join(str(call.kwargs.get("json", {}).get("text", "")) for call in post_mock.call_args_list)
         assert user.language == User.Language.RU
         assert "Язык сохранён" in sent_text
+
+
+class TestHRMenuButtons:
+    def test_help_exposes_hr_action_buttons(self):
+        _create_telegram_workspace(language=User.Language.EN)
+
+        with (
+            patch("apps.integrations.telegram_bot.client.requests.post") as post_mock,
+            patch("apps.integrations.telegram_bot.client.requests.get"),
+        ):
+            post_mock.return_value.json.return_value = {"ok": True, "result": {}}
+            handle_update(_make_message_update("/help"))
+
+        markups = [call.kwargs.get("json", {}).get("reply_markup", {}) for call in post_mock.call_args_list]
+        assert any(f"{CB_CMD_PREFIX}dashboard" in str(markup) for markup in markups)
+        assert any(f"{CB_CMD_PREFIX}create_vacancy" in str(markup) for markup in markups)
+
+    def test_action_button_routes_clear_prompt_to_assistant(self):
+        _create_telegram_workspace(language=User.Language.EN)
+
+        with (
+            patch("apps.integrations.telegram_bot.client.requests.post") as post_mock,
+            patch("apps.integrations.telegram_bot.client.requests.get"),
+            patch(
+                "apps.common.ai_assistant.process_ai_command",
+                return_value={"message": "Vacancy list"},
+            ) as assistant_mock,
+        ):
+            post_mock.return_value.json.return_value = {"ok": True, "result": {}}
+            handle_update(_make_callback_update(f"{CB_CMD_PREFIX}vacancies"))
+
+        assistant_mock.assert_called_once()
+        assert assistant_mock.call_args.kwargs["message"] == "Show my vacancies with statuses and candidate counts."
