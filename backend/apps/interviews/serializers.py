@@ -19,6 +19,7 @@ class InterviewScoreOutputSerializer(serializers.ModelSerializer):
             "score",
             "ai_notes",
             "ai_notes_translations",
+            "evidence",
         ]
         read_only_fields = fields
 
@@ -103,6 +104,7 @@ class InterviewDetailOutputSerializer(serializers.ModelSerializer):
             "overall_score",
             "ai_summary",
             "ai_summary_translations",
+            "decision_support",
             "language",
             "scores",
             "integrity_flags",

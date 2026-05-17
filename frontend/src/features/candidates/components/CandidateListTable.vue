@@ -8,6 +8,7 @@ import { useI18n } from 'vue-i18n'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import ApplicationStatusBadge from './ApplicationStatusBadge.vue'
+import FeedbackSummaryBadge from './FeedbackSummaryBadge.vue'
 import type { Application } from '../types/candidate.types'
 
 defineProps<{
@@ -91,7 +92,10 @@ function scoreClasses(score: number): string {
       </Column>
       <Column :header="t('common.status')">
         <template #body="{ data }">
-          <ApplicationStatusBadge :status="(data as Application).status" />
+          <div class="flex flex-wrap items-center gap-1.5">
+            <ApplicationStatusBadge :status="(data as Application).status" />
+            <FeedbackSummaryBadge :summary="(data as Application).feedbackSummary" />
+          </div>
         </template>
       </Column>
       <Column :header="t('candidates.matchScore')" sortable sort-field="matchScore">

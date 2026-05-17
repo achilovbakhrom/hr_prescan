@@ -6,6 +6,7 @@ import type {
   SubmitApplicationRequest,
 } from '../types/candidate.types'
 import type { Message } from '../types/message.types'
+import type { DecisionSupport } from '@/shared/types/interview.types'
 
 interface SendEmailPayload {
   subject: string
@@ -16,6 +17,69 @@ interface ScheduleInterviewPayload {
   dateTime: string
   interviewerName: string
   meetingLink?: string
+}
+
+export interface PublicCandidateReviewSession {
+  id: string
+  sessionType: 'prescanning' | 'interview'
+  screeningMode: 'chat' | 'meet'
+  status: string
+  overallScore: number | null
+  aiSummary: string
+  aiSummaryTranslations: Record<string, string>
+  decisionSupport: DecisionSupport
+  transcript: Array<{ speaker?: string; role?: string; text: string; timestamp?: number | string }>
+  chatHistory: Array<{ role: 'ai' | 'candidate'; text: string; timestamp?: string | number }>
+  recordingPath: string
+  scores: Array<{
+    id: string
+    criteria: string
+    criteriaName: string
+    criteriaTranslations?: Record<string, string>
+    score: number
+    aiNotes: string
+    aiNotesTranslations: Record<string, string>
+    evidence?: Array<{
+      quote: string
+      timestamp?: number | null
+      speaker?: string
+      line?: number | null
+    }>
+  }>
+  createdAt: string
+  completedAt: string | null
+}
+
+export interface PublicCandidateReview {
+  candidate: {
+    id: string
+    candidateName: string
+    candidateEmail: string
+    vacancyTitle: string
+    companyName: string
+    status: ApplicationStatus
+    matchScore: number | null
+    createdAt: string
+  }
+  sessions: PublicCandidateReviewSession[]
+}
+
+export interface HiringManagerFeedback {
+  id: string
+  reviewerName: string
+  reviewerRole: string
+  recommendation: 'advance' | 'maybe' | 'reject'
+  rating: number | null
+  comment: string
+  createdAt: string
+}
+
+export interface SubmitHiringManagerFeedbackPayload {
+  reviewerName: string
+  reviewerRole?: string
+  recommendation: 'advance' | 'maybe' | 'reject'
+  rating?: number | null
+  comment?: string
 }
 
 export const candidateService = {
@@ -185,6 +249,31 @@ export const candidateService = {
     const response = await apiClient.post<{ deleted: number }>('/hr/candidates/soft-delete/', {
       application_ids: applicationIds,
     })
+    return response.data
+  },
+
+  async rotateHiringManagerToken(candidateId: string): Promise<{ hiringManagerToken: string }> {
+    const response = await apiClient.post<{ hiringManagerToken: string }>(
+      `/hr/candidates/${candidateId}/share-token/rotate/`,
+    )
+    return response.data
+  },
+
+  async getPublicCandidateReview(token: string): Promise<PublicCandidateReview> {
+    const response = await apiClient.get<PublicCandidateReview>(
+      `/public/candidates/review/${token}/`,
+    )
+    return response.data
+  },
+
+  async submitHiringManagerFeedback(
+    token: string,
+    payload: SubmitHiringManagerFeedbackPayload,
+  ): Promise<HiringManagerFeedback> {
+    const response = await apiClient.post<HiringManagerFeedback>(
+      `/public/candidates/review/${token}/`,
+      payload,
+    )
     return response.data
   },
 }

@@ -115,7 +115,10 @@ async def _check_cv_consistency(
         return []
 
     transcript_text = "\n".join(
-        f"[{entry['speaker']}]: {entry['text']}" for entry in transcript
+        f"[{index}] [{entry['speaker']}]"
+        f"{' ' + str(entry.get('timestamp')) + 's' if entry.get('timestamp') is not None else ''}: "
+        f"{entry['text']}"
+        for index, entry in enumerate(transcript)
     )
 
     prompt = (
@@ -202,7 +205,10 @@ def _build_evaluation_prompt(
 ) -> str:
     """Build the LLM prompt for post-interview evaluation."""
     transcript_text = "\n".join(
-        f"[{entry['speaker']}]: {entry['text']}" for entry in transcript
+        f"[{index}] [{entry['speaker']}]"
+        f"{' ' + str(entry.get('timestamp')) + 's' if entry.get('timestamp') is not None else ''}: "
+        f"{entry['text']}"
+        for index, entry in enumerate(transcript)
     )
     criteria_text = "\n".join(
         f"- {c['name']} (ID: {c['id']}, weight: {c['weight']}): {c.get('description', '')}"
@@ -231,13 +237,15 @@ def _build_evaluation_prompt(
         "## Output Format (JSON)\n"
         "{\n"
         '  "overall_score": <float 1-10>,\n'
-        '  "summary": "<brief evaluation summary>",\n'
+        '  "summary": "<structured summary with sections: Recommendation, Strengths, Risks, Next step>",\n'
+        '  "decision_support": {"recommendation": "<recommendation>", "strengths": ["<strength>"], "risks": ["<risk>"], "next_step": "<next step>"},\n'
         '  "recommendation": "advance|reject",\n'
         '  "scores": [\n'
         "    {\n"
         '      "criteria_id": "<uuid>",\n'
         '      "score": <int 1-10>,\n'
-        '      "notes": "<explanation for this score>"\n'
+        '      "notes": "<explanation for this score with concrete transcript evidence>",\n'
+        '      "evidence": [{"line": <transcript line number>, "speaker": "<speaker>", "timestamp": <seconds|null>, "quote": "<short exact quote>"}]\n'
         "    }\n"
         "  ]\n"
         "}\n"
@@ -281,6 +289,7 @@ def _normalise_evaluation(
                     model_score.get("notes")
                     or "No strong role-relevant evidence was provided for this criterion."
                 )[:2000],
+                "evidence": _normalise_evidence(model_score.get("evidence"), transcript),
             }
         )
 
@@ -303,6 +312,7 @@ def _normalise_evaluation(
     return {
         "overall_score": overall_score,
         "summary": summary[:4000],
+        "decision_support": _normalise_decision_support(parsed.get("decision_support")),
         "recommendation": recommendation,
         "scores": normalised_scores,
     }
@@ -322,6 +332,47 @@ def _clamp_overall(value, fallback: float) -> float:
     except (TypeError, ValueError):
         score = fallback
     return round(max(1.0, min(10.0, score)), 2)
+
+
+def _normalise_evidence(value, transcript: list[dict]) -> list[dict]:
+    if not isinstance(value, list):
+        return []
+
+    evidence = []
+    for item in value[:5]:
+        if not isinstance(item, dict):
+            continue
+        try:
+            line = int(item.get("line"))
+        except (TypeError, ValueError):
+            line = None
+        entry = transcript[line] if line is not None and 0 <= line < len(transcript) else {}
+        evidence.append(
+            {
+                "line": line,
+                "speaker": str(item.get("speaker") or entry.get("speaker") or ""),
+                "timestamp": item.get("timestamp", entry.get("timestamp")),
+                "quote": str(item.get("quote") or entry.get("text") or "")[:500],
+            }
+        )
+    return evidence
+
+
+def _normalise_decision_support(value) -> dict:
+    if not isinstance(value, dict):
+        return {}
+    return {
+        "recommendation": str(value.get("recommendation") or "")[:500],
+        "strengths": _string_list(value.get("strengths")),
+        "risks": _string_list(value.get("risks")),
+        "next_step": str(value.get("next_step") or value.get("nextStep") or "")[:1000],
+    }
+
+
+def _string_list(value) -> list[str]:
+    if not isinstance(value, list):
+        return []
+    return [str(item)[:500] for item in value[:5] if str(item).strip()]
 
 
 # ---------------------------------------------------------------------------
@@ -344,6 +395,7 @@ async def _send_results_to_backend(
             json={
                 "overall_score": evaluation["overall_score"],
                 "ai_summary": evaluation["summary"],
+                "decision_support": evaluation.get("decision_support", {}),
                 "ai_decision": _decision_from_evaluation(evaluation),
                 "transcript": transcript,
                 "scores": evaluation["scores"],

@@ -34,6 +34,12 @@ export const hrCandidateRoutes: RouteRecordRaw[] = [
 
 export const publicApplicationRoutes: RouteRecordRaw[] = [
   {
+    path: '/candidate-review/:token',
+    name: ROUTE_NAMES.CANDIDATE_REVIEW_SHARE,
+    component: () => import('./pages/PublicCandidateReviewPage.vue'),
+    meta: { requiresAuth: false },
+  },
+  {
     path: '/jobs/:vacancyId/apply',
     name: ROUTE_NAMES.JOB_APPLY,
     component: () => import('./pages/ApplicationFormPage.vue'),

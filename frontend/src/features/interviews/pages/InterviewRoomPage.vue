@@ -46,7 +46,7 @@ onMounted(() => {
 
     <!-- Loading -->
     <div v-if="room.loading.value" class="relative z-0 flex flex-1 items-center justify-center">
-      <RoomLoadingState :label="t('interviews.detailPage.loading')" logo />
+      <RoomLoadingState :label="t('common.loading')" logo />
     </div>
 
     <!-- Fetch error -->

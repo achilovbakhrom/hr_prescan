@@ -402,6 +402,7 @@ Interview is the second, more rigorous AI screening step. HR enables it per vaca
 - AI agent appears as the interviewer in the room
 - Microphone permission is required. Camera is recommended for integrity checks but is not mandatory; candidates can join a Meet interview with audio only if camera access fails or no camera is available.
 - Candidate sees a device-check preview before joining the room
+- The live room UI prioritizes the active AI/candidate conversation: large main stage, pinned self-view, compact top status bar, centered microphone/camera/leave controls, speaking indicators, and live transcript overlay.
 - Interview duration is configurable by HR per vacancy
 - The configured duration is an approximate pacing target, not a hard cutoff. As the target time approaches, the AI should ask shorter follow-ups and move toward a natural close.
 - Full integrity monitoring (face detection, gaze tracking, audio anomaly detection)
@@ -481,6 +482,7 @@ Each step (prescanning and interview) produces its own independent set of scores
 **Additional output for Meet mode (interview step only):**
 - Interview recording (video)
 - Integrity flags (see Section 15)
+- Timestamped voice conversation transcript visible in HR candidate review, using the same Conversation view as chat-mode sessions. When a recording exists, transcript timestamps should allow HR to jump to the matching point in the recording.
 
 ---
 
@@ -503,6 +505,7 @@ Each step (prescanning and interview) produces its own independent set of scores
 - List of active vacancies with candidate counts
 - Recent screening results (prescanning + interview)
 - Key metrics (total applicants, prescreenings completed, interviews completed, average scores)
+- Analytics shows per-vacancy performance: applications, candidates reaching interview-or-later stages, hires, hire rate, rejection rate, and average CV match score.
 
 ### 9.2 Candidate Pipeline per Vacancy
 
@@ -513,25 +516,28 @@ Candidates are managed within the vacancy detail page via two views:
 **Kanban Board View:**
 - Columns: Applied, Prescanned, Interviewed (if interview enabled), Shortlisted, Hired, Rejected, Archived
 - Drag-and-drop to move candidates between columns (with confirmation)
-- Each card shows: name, email, date, overall score ring, individual score badges (CV %, Prescan /10, Interview /10)
+- Each card shows: name, email, date, overall score ring, individual score badges (CV %, Prescan /10, Interview /10), and hiring-manager feedback count/rating when feedback exists
 - **Overall score** is a weighted combination: CV 20% + Prescanning 30% + Interview 50% (adapts when scores are missing)
 - **Column three-dot menu** with batch actions per column (see 9.5)
 
 **Table View:**
-- Columns: Candidate (name + email), Status, Overall score, CV match, Prescan score, Interview score (if enabled), Applied date, Actions
+- Columns: Candidate (name + email), Status, hiring-manager feedback summary, Overall score, CV match, Prescan score, Interview score (if enabled), Applied date, Actions
 - Checkbox selection for bulk operations (shortlist, hire, reject, archive, reset)
 - Per-row three-dot menu with context-aware status changes
 - Filtering by status, sorting by date/score
-- Search by name or email
+- Smart search by candidate name/email/phone, vacancy title where available, CV filename, HR notes, and hiring-manager feedback reviewer/comment text
 
 ### 9.3 Candidate Detail View
 - Personal information
 - CV viewer (inline PDF/DOCX preview)
 - CV match score with breakdown
 - **Prescanning results:** scores with AI notes per category, transcript
-- **Interview results** (if applicable): scores with AI notes per category, transcript, recording playback (Meet mode only)
+- **Interview results** (if applicable): persisted structured decision support (`recommendation`, `strengths`, `risks`, `next_step`), AI summary, scores with AI notes per category, persisted transcript evidence snippets per criterion, searchable transcript/conversation history for both chat and Meet modes, score-to-transcript evidence lookup, exportable transcript, recording playback with timestamp jumps (Meet mode only)
 - HR can add their own notes
 - HR can manually move the candidate to any pipeline status via status dropdown
+- HR can copy or rotate a read-only hiring manager review link for a candidate. Rotating the link changes the application share token and revokes old shared URLs. The shared view exposes candidate/vacancy context, AI screening summaries, scores, evidence snippets, transcripts, exports, and recording playback where available, but does not expose HR-only notes or candidate session tokens.
+- Hiring managers can submit feedback from the shared review link: reviewer name, optional role/team, recommendation (advance/maybe/reject), optional 1-5 rating, and comment. HR sees submitted hiring-manager feedback in the candidate Notes tab alongside internal HR notes.
+- Share-link rotations and hiring-manager feedback submissions create candidate collaboration activity events visible to HR for auditability.
 
 ### 9.4 HR Actions (Individual)
 

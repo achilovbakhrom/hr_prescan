@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { calculateOverallScore } from '../utils/score'
+import FeedbackSummaryBadge from './FeedbackSummaryBadge.vue'
 import type { Application } from '../types/candidate.types'
 import type { ColumnDef } from './KanbanColumn.vue'
 
@@ -104,6 +105,9 @@ function onDragStart(event: DragEvent): void {
     <div class="mt-2 flex items-center text-xs text-gray-400">
       <i class="pi pi-calendar mr-1" style="font-size: 9px"></i>
       {{ formatDate(candidate.createdAt) }}
+      <span class="ml-auto">
+        <FeedbackSummaryBadge :summary="candidate.feedbackSummary" />
+      </span>
     </div>
 
     <!-- Bottom: individual score badges -->

@@ -25,9 +25,18 @@ export interface Application {
   matchScore: number | null
   prescanningScore: number | null
   interviewScore: number | null
+  feedbackSummary?: FeedbackSummary
   status: ApplicationStatus
   createdAt: string
   updatedAt: string
   /** Company name returned by some API endpoints */
   companyName?: string | null
+}
+
+export interface FeedbackSummary {
+  total: number
+  advance: number
+  maybe: number
+  reject: number
+  avgRating: number | null
 }

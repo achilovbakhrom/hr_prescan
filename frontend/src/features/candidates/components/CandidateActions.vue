@@ -6,6 +6,8 @@ import Dropdown from '@/shared/components/AppSelect.vue'
 import ConfirmDialog from 'primevue/confirmdialog'
 import { useConfirm } from 'primevue/useconfirm'
 import type { ApplicationStatus } from '../types/candidate.types'
+import CandidateResetButtons from './CandidateResetButtons.vue'
+import CandidateShareReviewButton from './CandidateShareReviewButton.vue'
 import SendEmailDialog from './SendEmailDialog.vue'
 
 const props = defineProps<{
@@ -15,11 +17,13 @@ const props = defineProps<{
   currentStatus: ApplicationStatus
   loading: boolean
   interviewEnabled?: boolean
+  hiringManagerToken?: string
 }>()
 
 const emit = defineEmits<{
   statusChange: [status: ApplicationStatus]
   resetScreening: [sessionType: 'prescanning' | 'interview']
+  shareTokenRotated: [token: string]
 }>()
 
 const { t } = useI18n()
@@ -126,27 +130,6 @@ function handleStatusChange(event: { value: ApplicationStatus }): void {
     accept: () => emit('statusChange', status),
   })
 }
-
-function confirmResetScreening(sessionType: 'prescanning' | 'interview'): void {
-  const isPrescanning = sessionType === 'prescanning'
-  confirm.require({
-    message: t(
-      isPrescanning
-        ? 'candidates.dialogs.msgClearPrescanning'
-        : 'candidates.dialogs.msgClearInterview',
-      { name: props.candidateName },
-    ),
-    header: t(
-      isPrescanning
-        ? 'candidates.dialogs.clearPrescanningHeader'
-        : 'candidates.dialogs.clearInterviewHeader',
-    ),
-    icon: 'pi pi-refresh',
-    acceptLabel: t('candidates.dialogs.yesClearSession'),
-    rejectLabel: t('common.cancel'),
-    accept: () => emit('resetScreening', sessionType),
-  })
-}
 </script>
 
 <template>
@@ -159,24 +142,17 @@ function confirmResetScreening(sessionType: 'prescanning' | 'interview'): void {
       outlined
       @click="showEmailDialog = true"
     />
-    <Button
-      :label="t('candidates.actions.clearPrescanning')"
-      icon="pi pi-refresh"
-      size="small"
-      severity="secondary"
-      outlined
-      :disabled="props.loading"
-      @click="confirmResetScreening('prescanning')"
+    <CandidateShareReviewButton
+      v-if="props.hiringManagerToken"
+      :candidate-id="props.candidateId"
+      :token="props.hiringManagerToken"
+      @rotated="emit('shareTokenRotated', $event)"
     />
-    <Button
-      v-if="props.interviewEnabled"
-      :label="t('candidates.actions.clearInterview')"
-      icon="pi pi-refresh"
-      size="small"
-      severity="secondary"
-      outlined
-      :disabled="props.loading"
-      @click="confirmResetScreening('interview')"
+    <CandidateResetButtons
+      :candidate-name="props.candidateName"
+      :interview-enabled="props.interviewEnabled"
+      :loading="props.loading"
+      @reset-screening="emit('resetScreening', $event)"
     />
     <Dropdown
       :model-value="null"

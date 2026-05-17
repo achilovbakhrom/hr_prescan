@@ -22,7 +22,9 @@ def build_eval_prompt(vacancy, criteria_json: str, transcript_text: str, step_la
 
 ## Your Task
 Score the candidate on EACH criteria (1-10 scale) and provide a brief note explaining each score.
-Also provide an overall summary (2-3 sentences), an overall weighted score (1-10), and a final recommendation.
+For every score, include evidence snippets from the transcript when available.
+Also provide a structured decision_support object with recommendation, strengths, risks, and next_step, an overall
+weighted score (1-10), and a final recommendation.
 Use "reject" when the candidate should not move to the next stage or should not be shortlisted, even if they have
 some relevant experience.
 Base the recommendation only on role-relevant evidence in the transcript, CV context, vacancy requirements, and
@@ -33,11 +35,22 @@ Write all notes and the summary in {_language_name(language)}.
 Respond with ONLY valid JSON in this exact format:
 {{
   "scores": [
-    {{"criteria_id": "<uuid>", "score": 8, "notes": "Brief explanation"}},
+    {{
+      "criteria_id": "<uuid>",
+      "score": 8,
+      "notes": "Brief explanation with transcript evidence",
+      "evidence": [{{"quote": "Short exact quote", "speaker": "candidate", "timestamp": null, "line": null}}]
+    }},
     ...
   ],
   "overall_score": 7.5,
   "summary": "Overall assessment of the candidate in 2-3 sentences.",
+  "decision_support": {{
+    "recommendation": "Recommended for next step",
+    "strengths": ["Evidence-based strength"],
+    "risks": ["Evidence-based risk"],
+    "next_step": "Suggested HR action"
+  }},
   "recommendation": "advance"
 }}"""
 

@@ -7,7 +7,6 @@
  */
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
-import GlassCard from '@/shared/components/GlassCard.vue'
 import GlassSurface from '@/shared/components/GlassSurface.vue'
 import AppSelect from '@/shared/components/AppSelect.vue'
 import type { InterviewDetail } from '../types/interview.types'
@@ -41,12 +40,9 @@ const { t } = useI18n()
 </script>
 
 <template>
-  <div class="flex flex-1 flex-col items-center justify-center gap-6 p-6 md:flex-row md:gap-8">
-    <!-- Preview video -->
-    <div
-      class="relative w-full max-w-xl overflow-hidden rounded-lg bg-black/80 ring-1 ring-[color:var(--color-border-glass)]"
-    >
-      <div class="aspect-video">
+  <div class="room-preview">
+    <div class="room-preview__video">
+      <div class="room-preview__frame">
         <video
           v-show="!isCameraOff"
           ref="previewVideoEl"
@@ -55,20 +51,14 @@ const { t } = useI18n()
           muted
           class="h-full w-full object-cover"
         ></video>
-        <div v-if="isCameraOff" class="flex h-full w-full items-center justify-center">
-          <div
-            class="flex h-24 w-24 items-center justify-center rounded-full bg-[color:var(--color-accent-ai)] text-3xl font-medium text-white"
-          >
+        <div v-if="isCameraOff" class="room-preview__avatar-wrap">
+          <div class="room-preview__avatar">
             {{ interview.candidateName ? getInitials(interview.candidateName) : '?' }}
           </div>
         </div>
       </div>
 
-      <!-- Preview controls: floating glass pill -->
-      <GlassSurface
-        level="float"
-        class="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2 !rounded-full p-2"
-      >
+      <GlassSurface level="float" class="room-preview__controls flex gap-2 !rounded-full p-2">
         <button
           class="flex h-10 w-10 items-center justify-center rounded-full transition-colors"
           :class="
@@ -98,17 +88,16 @@ const { t } = useI18n()
       </GlassSurface>
     </div>
 
-    <!-- Join panel -->
-    <GlassCard class="w-full max-w-xs shrink-0 text-center md:w-72">
-      <h2 class="mb-1 text-xl font-semibold text-[color:var(--color-text-primary)]">
+    <aside class="room-preview__panel">
+      <h2 class="mb-1 text-xl font-semibold text-white">
         {{ t('interviews.roomPage.readyToJoin') }}
       </h2>
-      <p class="mb-6 text-sm text-[color:var(--color-text-secondary)]">
+      <p class="mb-6 text-sm text-white/68">
         {{ interview.vacancyTitle }}
       </p>
       <div class="mb-4 space-y-3 text-left">
-        <div>
-          <label class="mb-1 block text-xs font-medium text-[color:var(--color-text-muted)]">
+        <div class="room-preview__field">
+          <label class="mb-1 block text-xs font-semibold text-white/58">
             {{ t('interviews.preCheck.camera') }}
           </label>
           <AppSelect
@@ -121,8 +110,8 @@ const { t } = useI18n()
             @update:model-value="emit('selectVideoDevice', String($event ?? ''))"
           />
         </div>
-        <div>
-          <label class="mb-1 block text-xs font-medium text-[color:var(--color-text-muted)]">
+        <div class="room-preview__field">
+          <label class="mb-1 block text-xs font-semibold text-white/58">
             {{ t('interviews.preCheck.microphone') }}
           </label>
           <AppSelect
@@ -150,13 +139,10 @@ const { t } = useI18n()
         :disabled="!hasRequiredDevices"
         @click="emit('joinRoom')"
       />
-      <button
-        class="mt-3 text-sm text-[color:var(--color-text-muted)] hover:text-[color:var(--color-text-primary)]"
-        @click="emit('cancel')"
-      >
+      <button class="mt-3 w-full text-sm text-white/58 hover:text-white" @click="emit('cancel')">
         {{ t('interviews.roomPage.goBack') }}
       </button>
-    </GlassCard>
+    </aside>
   </div>
 </template>
 
@@ -176,4 +162,8 @@ const { t } = useI18n()
   content: '';
   transform: translate(-50%, -50%) rotate(-45deg);
 }
+</style>
+
+<style>
+@import './RoomPreviewView.css';
 </style>

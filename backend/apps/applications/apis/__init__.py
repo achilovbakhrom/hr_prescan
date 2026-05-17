@@ -16,7 +16,9 @@ from apps.applications.apis.hr_list import (
     HRCvDownloadApi,
 )
 from apps.applications.apis.hr_screening_reset import HRApplicationScreeningResetApi
+from apps.applications.apis.hr_share import HRApplicationShareTokenRotateApi
 from apps.applications.apis.public import SubmitApplicationApi
+from apps.applications.apis.public_review import PublicCandidateReviewApi
 
 __all__ = [
     "CandidateApplicationDetailApi",
@@ -26,10 +28,12 @@ __all__ = [
     "HRApplicationListApi",
     "HRApplicationNotesApi",
     "HRApplicationScreeningResetApi",
+    "HRApplicationShareTokenRotateApi",
     "HRApplicationStatusApi",
     "HRBatchMoveApi",
     "HRBulkStatusApi",
     "HRCvDownloadApi",
     "HRSoftDeleteApi",
+    "PublicCandidateReviewApi",
     "SubmitApplicationApi",
 ]

@@ -16,6 +16,7 @@ def complete_session(
     overall_score: Decimal,
     ai_summary: str,
     ai_summary_translations: dict | None = None,
+    decision_support: dict | None = None,
     transcript: list,
     recording_path: str = "",
     ai_decision: str = "advance",
@@ -34,6 +35,7 @@ def complete_session(
     interview.completed_at = timezone.now()
     interview.overall_score = overall_score
     interview.ai_summary = ai_summary
+    interview.decision_support = decision_support or {}
     interview.transcript = transcript
     interview.recording_path = recording_path
 
@@ -42,6 +44,7 @@ def complete_session(
         "completed_at",
         "overall_score",
         "ai_summary",
+        "decision_support",
         "transcript",
         "recording_path",
         "updated_at",
@@ -107,7 +110,7 @@ def save_interview_scores(
 
     Args:
         interview: The interview to save scores for.
-        scores: List of dicts with keys: criteria_id, score, ai_notes.
+        scores: List of dicts with keys: criteria_id, score, ai_notes, evidence.
     """
     InterviewScore.objects.filter(interview=interview).delete()
     score_objects = []
@@ -117,6 +120,7 @@ def save_interview_scores(
             criteria_id=score_data["criteria_id"],
             score=score_data["score"],
             ai_notes=score_data.get("ai_notes", ""),
+            evidence=score_data.get("evidence", []),
         )
         score_objects.append(score_obj)
     return score_objects

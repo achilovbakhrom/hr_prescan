@@ -9,11 +9,28 @@ export type IntegritySeverity = 'low' | 'medium' | 'high'
 export interface InterviewScore {
   id: string
   criteriaId: string
+  criteria?: string
   criteriaName: string
   criteriaTranslations?: Record<string, string>
   score: number
   aiNotes: string
   aiNotesTranslations: Record<string, string>
+  evidence?: InterviewEvidence[]
+}
+
+export interface InterviewEvidence {
+  line?: number | null
+  speaker?: string
+  timestamp?: number | null
+  quote: string
+}
+
+export interface DecisionSupport {
+  recommendation?: string
+  strengths?: string[]
+  risks?: string[]
+  nextStep?: string
+  next_step?: string
 }
 
 export interface IntegrityFlag {

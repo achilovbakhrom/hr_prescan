@@ -110,6 +110,8 @@ const hasInterview = computed(() => props.candidate.interviewEnabled ?? false)
           <HRNotesPanel
             :notes="candidate.hrNotes"
             :loading="loading"
+            :hiring-manager-feedback="candidate.hiringManagerFeedback || []"
+            :events="candidate.events || []"
             @save="emit('saveNotes', $event)"
           />
         </GlassCard>

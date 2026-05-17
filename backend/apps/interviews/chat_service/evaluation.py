@@ -123,6 +123,7 @@ def _save_scores_and_complete(
                 score=score_val,
                 ai_notes=score_data.get("notes", ""),
                 ai_notes_translations={lang: score_data.get("notes", "")},
+                evidence=score_data.get("evidence", []),
             )
         )
 
@@ -143,6 +144,7 @@ def _save_scores_and_complete(
         overall_score=overall_decimal,
         ai_summary=summary,
         ai_summary_translations=interview.ai_summary_translations,
+        decision_support=result.get("decision_support", {}),
         transcript=interview.chat_history or [],
         ai_decision=final_decision,
     )

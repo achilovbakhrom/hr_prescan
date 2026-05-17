@@ -102,6 +102,12 @@ async function handleResetScreening(sessionType: 'prescanning' | 'interview'): P
     candidateStore.loading = false
   }
 }
+
+function handleShareTokenRotated(token: string): void {
+  if (candidateStore.currentCandidate) {
+    candidateStore.currentCandidate.hiringManagerToken = token
+  }
+}
 </script>
 
 <template>
@@ -144,8 +150,10 @@ async function handleResetScreening(sessionType: 'prescanning' | 'interview'): P
           :current-status="candidate.status"
           :loading="candidateStore.loading"
           :interview-enabled="candidate.interviewEnabled"
+          :hiring-manager-token="candidate.hiringManagerToken"
           @status-change="handleStatusChange"
           @reset-screening="handleResetScreening"
+          @share-token-rotated="handleShareTokenRotated"
         />
       </GlassCard>
 

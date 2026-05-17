@@ -24,6 +24,9 @@ from apps.applications.urls import (
 from apps.applications.urls import (
     public_urlpatterns as application_public_urlpatterns,
 )
+from apps.applications.urls import (
+    public_review_urlpatterns as application_public_review_urlpatterns,
+)
 from apps.common.apis import HRDashboardApi
 from apps.common.apis_ai import AIAssistantApi
 from apps.common.apis_app_config import PublicAppConfigApi
@@ -116,6 +119,7 @@ urlpatterns = [
     path("api/cv/<str:token>/", PublicCvViewApi.as_view(), name="public-cv-view"),
     path("api/public/vacancies/", include((vacancy_public_urlpatterns, "public-vacancies"))),
     path("api/public/vacancies/", include((application_public_urlpatterns, "public-applications"))),
+    path("api/public/", include((application_public_review_urlpatterns, "public-application-reviews"))),
     path("api/public/", include((interview_public_urlpatterns, "public-interviews"))),
     path("api/candidate/ai-assistant/", CandidateAIAssistantApi.as_view(), name="candidate-ai-assistant"),
     path("api/candidate/dashboard/", CandidateDashboardApi.as_view(), name="candidate-dashboard"),

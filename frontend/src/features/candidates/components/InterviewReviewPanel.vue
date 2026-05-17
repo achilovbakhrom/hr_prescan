@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { computed, nextTick, ref, onMounted } from 'vue'
 import { apiClient } from '@/shared/api/client'
 import { candidateService } from '../services/candidate.service'
+import InterviewConversationSection from './InterviewConversationSection.vue'
+import InterviewRecordingSection from './InterviewRecordingSection.vue'
+import InterviewReviewToolbar from './InterviewReviewToolbar.vue'
 import InterviewScoresSection from './InterviewScoresSection.vue'
-import VoiceMessageBubble from '@/features/interviews/components/VoiceMessageBubble.vue'
+import { exportTranscriptDoc, exportTranscriptTxt } from '../utils/interviewExport'
+import type { DecisionSupport } from '@/shared/types/interview.types'
 
 const props = defineProps<{
   candidateId: string
@@ -14,10 +17,16 @@ const props = defineProps<{
 interface ChatMessage {
   role: 'ai' | 'candidate'
   text: string
-  timestamp: string
+  timestamp?: string | number | null
   messageType?: 'text' | 'voice'
   audioUrl?: string
   duration?: number
+}
+interface TranscriptEntry {
+  speaker?: string
+  role?: string
+  text: string
+  timestamp?: number | string
 }
 interface InterviewScore {
   id: string
@@ -34,21 +43,35 @@ interface InterviewData {
   overallScore: number | null
   aiSummary: string
   aiSummaryTranslations: Record<string, string>
+  decisionSupport?: DecisionSupport
   chatHistory: ChatMessage[]
+  transcript: TranscriptEntry[]
+  recordingPath?: string
   scores: InterviewScore[]
   createdAt: string
 }
 
-const { t } = useI18n()
-
 const interview = ref<InterviewData | null>(null)
 const loading = ref(false)
 const error = ref('')
-const activeSection = ref<'conversation' | 'scores'>('scores')
+const activeSection = ref<'conversation' | 'recording' | 'scores'>('scores')
 const audioBlobUrls = ref<Record<number, string>>({})
+const conversationSearch = ref('')
+const recordingSection = ref<InstanceType<typeof InterviewRecordingSection> | null>(null)
 
-function formatTime(ts: string): string {
-  return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+const conversationMessages = computed<ChatMessage[]>(() => {
+  if (!interview.value) return []
+  if (interview.value.chatHistory?.length) return interview.value.chatHistory
+  return (interview.value.transcript || []).map((entry) => ({
+    role: isAiSpeaker(entry) ? 'ai' : 'candidate',
+    text: entry.text,
+    timestamp: entry.timestamp,
+  }))
+})
+
+function isAiSpeaker(entry: TranscriptEntry): boolean {
+  const speaker = (entry.speaker || entry.role || '').toLowerCase()
+  return speaker === 'ai' || speaker === 'interviewer'
 }
 
 async function loadAudioBlob(messageIndex: number): Promise<void> {
@@ -64,6 +87,23 @@ async function loadAudioBlob(messageIndex: number): Promise<void> {
   }
 }
 
+function handleFindEvidence(query: string): void {
+  conversationSearch.value = query
+  activeSection.value = 'conversation'
+}
+
+async function handleSeekRecording(seconds: number): Promise<void> {
+  activeSection.value = 'recording'
+  await nextTick()
+  recordingSection.value?.seekTo(seconds)
+}
+
+function handleExport(format: 'doc' | 'txt'): void {
+  if (!interview.value) return
+  if (format === 'doc') exportTranscriptDoc(interview.value, conversationMessages.value)
+  else exportTranscriptTxt(interview.value, conversationMessages.value)
+}
+
 onMounted(async () => {
   loading.value = true
   try {
@@ -72,19 +112,16 @@ onMounted(async () => {
       props.sessionType,
     )) as unknown as InterviewData
     interview.value = data
-    if (data.chatHistory)
+    if (data.chatHistory) {
       data.chatHistory.forEach((msg: ChatMessage, idx: number) => {
         if (msg.messageType === 'voice') loadAudioBlob(idx)
       })
+    }
   } catch {
     error.value = 'Interview data not available yet.'
   } finally {
     loading.value = false
   }
-})
-
-onBeforeUnmount(() => {
-  Object.values(audioBlobUrls.value).forEach((url) => URL.revokeObjectURL(url))
 })
 </script>
 
@@ -96,37 +133,19 @@ onBeforeUnmount(() => {
     <div v-else-if="error" class="py-8 text-center text-sm text-gray-400">{{ error }}</div>
 
     <template v-else-if="interview">
-      <div class="mb-4 flex gap-2">
-        <button
-          class="rounded-lg px-4 py-2 text-sm font-medium transition-colors"
-          :class="
-            activeSection === 'scores'
-              ? 'bg-blue-600 text-white'
-              : 'bg-gray-100 text-gray-600 dark:text-gray-400 hover:bg-gray-200'
-          "
-          @click="activeSection = 'scores'"
-        >
-          {{ t('interviews.scores') }}
-        </button>
-        <button
-          class="rounded-lg px-4 py-2 text-sm font-medium transition-colors"
-          :class="
-            activeSection === 'conversation'
-              ? 'bg-blue-600 text-white'
-              : 'bg-gray-100 text-gray-600 dark:text-gray-400 hover:bg-gray-200'
-          "
-          @click="activeSection = 'conversation'"
-        >
-          {{ t('interviews.conversation') }} ({{ interview.chatHistory?.length || 0 }}
-          {{ t('interviews.messages') }})
-        </button>
-      </div>
+      <InterviewReviewToolbar
+        v-model:active-section="activeSection"
+        :conversation-count="conversationMessages.length"
+        :has-recording="Boolean(interview.recordingPath)"
+        @export="handleExport"
+      />
 
       <InterviewScoresSection
         v-if="activeSection === 'scores'"
         :overall-score="interview.overallScore"
         :ai-summary="interview.aiSummary"
         :ai-summary-translations="interview.aiSummaryTranslations"
+        :decision-support="interview.decisionSupport"
         :interview-id="interview.id"
         :scores="interview.scores"
         @update:ai-summary-translations="
@@ -134,49 +153,23 @@ onBeforeUnmount(() => {
             if (interview) interview.aiSummaryTranslations = tr
           }
         "
+        @find-evidence="handleFindEvidence"
       />
 
-      <div v-if="activeSection === 'conversation'" class="space-y-3">
-        <div v-if="!interview.chatHistory?.length" class="py-4 text-center text-sm text-gray-400">
-          {{ t('interviews.noConversation') }}
-        </div>
-        <div
-          v-for="(msg, idx) in interview.chatHistory"
-          :key="idx"
-          class="flex gap-3"
-          :class="msg.role === 'ai' ? '' : 'flex-row-reverse'"
-        >
-          <div
-            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
-            :class="msg.role === 'ai' ? 'bg-blue-500' : 'bg-gray-500'"
-          >
-            {{ msg.role === 'ai' ? 'AI' : 'C' }}
-          </div>
-          <div
-            class="max-w-[75%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed"
-            :class="
-              msg.role === 'ai'
-                ? 'rounded-tl-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800'
-                : 'rounded-tr-md bg-blue-600 dark:bg-blue-700 text-white'
-            "
-          >
-            <template v-if="msg.messageType === 'voice'">
-              <div class="mb-1 flex items-center gap-1 text-[10px] opacity-70">
-                <i class="pi pi-microphone"></i> {{ t('interviews.voiceMessage') }}
-              </div>
-              <VoiceMessageBubble
-                :audio-url="audioBlobUrls[idx] || ''"
-                :duration="msg.duration || 0"
-                :transcript="msg.text"
-              />
-            </template>
-            <template v-else
-              ><p class="whitespace-pre-wrap">{{ msg.text }}</p></template
-            >
-            <p class="mt-1 text-[10px] opacity-50">{{ formatTime(msg.timestamp) }}</p>
-          </div>
-        </div>
-      </div>
+      <InterviewConversationSection
+        v-if="activeSection === 'conversation'"
+        :messages="conversationMessages"
+        :audio-blob-urls="audioBlobUrls"
+        :can-seek-recording="Boolean(interview.recordingPath)"
+        v-model:search-query="conversationSearch"
+        @seek-recording="handleSeekRecording"
+      />
+
+      <InterviewRecordingSection
+        v-if="activeSection === 'recording' && interview.recordingPath"
+        ref="recordingSection"
+        :recording-url="interview.recordingPath"
+      />
     </template>
   </div>
 </template>

@@ -8,11 +8,13 @@ from apps.applications.apis import (
     HRApplicationListApi,
     HRApplicationNotesApi,
     HRApplicationScreeningResetApi,
+    HRApplicationShareTokenRotateApi,
     HRApplicationStatusApi,
     HRBatchMoveApi,
     HRBulkStatusApi,
     HRCvDownloadApi,
     HRSoftDeleteApi,
+    PublicCandidateReviewApi,
     SubmitApplicationApi,
 )
 
@@ -22,6 +24,15 @@ public_urlpatterns = [
         "<uuid:vacancy_id>/apply/",
         SubmitApplicationApi.as_view(),
         name="submit-application",
+    ),
+]
+
+# Public review URLs — mounted at /api/public/
+public_review_urlpatterns = [
+    path(
+        "candidates/review/<uuid:token>/",
+        PublicCandidateReviewApi.as_view(),
+        name="public-candidate-review",
     ),
 ]
 
@@ -90,6 +101,11 @@ hr_candidate_urlpatterns = [
         "<uuid:application_id>/screening/<str:session_type>/reset/",
         HRApplicationScreeningResetApi.as_view(),
         name="hr-application-screening-reset",
+    ),
+    path(
+        "<uuid:application_id>/share-token/rotate/",
+        HRApplicationShareTokenRotateApi.as_view(),
+        name="hr-application-share-token-rotate",
     ),
     path(
         "<uuid:application_id>/cv-download/",

@@ -9,6 +9,22 @@ from apps.applications.models import Application
 from apps.vacancies.models import Vacancy
 
 
+def _candidate_search_q(search: str, *, include_vacancy: bool = False) -> Q:
+    query = (
+        Q(candidate_name__icontains=search)
+        | Q(candidate_email__icontains=search)
+        | Q(candidate_phone__icontains=search)
+        | Q(cv_original_filename__icontains=search)
+        | Q(hr_notes__icontains=search)
+        | Q(hiring_manager_feedback__reviewer_name__icontains=search)
+        | Q(hiring_manager_feedback__reviewer_role__icontains=search)
+        | Q(hiring_manager_feedback__comment__icontains=search)
+    )
+    if include_vacancy:
+        query |= Q(vacancy__title__icontains=search)
+    return query
+
+
 def get_vacancy_applications(
     *,
     vacancy: Vacancy,
@@ -55,7 +71,7 @@ def get_vacancy_applications_filtered(
     qs = (
         Application.objects.filter(vacancy=vacancy, is_deleted=False)
         .select_related("candidate")
-        .prefetch_related("sessions")
+        .prefetch_related("sessions", "hiring_manager_feedback")
     )
 
     if status:
@@ -68,7 +84,7 @@ def get_vacancy_applications_filtered(
         qs = qs.filter(match_score__lte=max_score)
 
     if search:
-        qs = qs.filter(Q(candidate_name__icontains=search) | Q(candidate_email__icontains=search))
+        qs = qs.filter(_candidate_search_q(search)).distinct()
 
     return qs.order_by(ordering)
 
@@ -101,7 +117,7 @@ def get_user_applications_filtered(
             is_deleted=False,
         )
         .select_related("candidate", "vacancy", "vacancy__company")
-        .prefetch_related("sessions")
+        .prefetch_related("sessions", "hiring_manager_feedback")
     )
 
     if vacancy_id:
@@ -113,11 +129,7 @@ def get_user_applications_filtered(
     if max_score is not None:
         qs = qs.filter(match_score__lte=max_score)
     if search:
-        qs = qs.filter(
-            Q(candidate_name__icontains=search)
-            | Q(candidate_email__icontains=search)
-            | Q(vacancy__title__icontains=search)
-        )
+        qs = qs.filter(_candidate_search_q(search, include_vacancy=True)).distinct()
 
     return qs.order_by(ordering)
 

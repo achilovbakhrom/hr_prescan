@@ -71,6 +71,7 @@ class Interview(BaseModel):
         blank=True,
     )
     ai_summary = models.TextField(blank=True)
+    decision_support = models.JSONField(default=dict, blank=True)
     language = models.CharField(
         max_length=10,
         choices=LANGUAGE_CHOICES,
@@ -108,6 +109,7 @@ class InterviewScore(BaseModel):
     )
     ai_notes = models.TextField(blank=True)
     ai_notes_translations = models.JSONField(default=dict, blank=True)
+    evidence = models.JSONField(default=list, blank=True)
 
     class Meta:
         unique_together = ["interview", "criteria"]

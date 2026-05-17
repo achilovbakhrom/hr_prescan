@@ -32,6 +32,7 @@ class _InterviewScoreInputSerializer(serializers.Serializer):
     criteria_id = serializers.UUIDField()
     score = serializers.IntegerField(min_value=1, max_value=10)
     notes = serializers.CharField(required=False, default="", allow_blank=True)
+    evidence = serializers.ListField(child=serializers.DictField(), required=False, default=list)
 
 
 class _IntegrityFlagInputSerializer(serializers.Serializer):
@@ -44,6 +45,7 @@ class _IntegrityFlagInputSerializer(serializers.Serializer):
 class _InterviewResultsInputSerializer(serializers.Serializer):
     overall_score = serializers.DecimalField(max_digits=4, decimal_places=2)
     ai_summary = serializers.CharField()
+    decision_support = serializers.DictField(required=False, default=dict)
     ai_decision = serializers.ChoiceField(
         choices=["advance", "reject"],
         required=False,
@@ -90,6 +92,7 @@ class InternalInterviewResultsApi(APIView):
                 interview=interview,
                 overall_score=validated["overall_score"],
                 ai_summary=validated["ai_summary"],
+                decision_support=validated.get("decision_support", {}),
                 transcript=validated["transcript"],
                 ai_decision=validated.get("ai_decision", "advance"),
             )
@@ -100,6 +103,7 @@ class InternalInterviewResultsApi(APIView):
                     "criteria_id": str(s["criteria_id"]),
                     "score": s["score"],
                     "ai_notes": s.get("notes", ""),
+                    "evidence": s.get("evidence", []),
                 }
                 for s in validated["scores"]
             ]

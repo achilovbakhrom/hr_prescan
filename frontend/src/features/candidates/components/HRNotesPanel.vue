@@ -3,10 +3,15 @@ import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Textarea from 'primevue/textarea'
 import Button from 'primevue/button'
+import ApplicationEventList from './ApplicationEventList.vue'
+import HiringManagerFeedbackList from './HiringManagerFeedbackList.vue'
+import type { ApplicationEvent, HiringManagerFeedback } from '../types/candidate.types'
 
 const props = defineProps<{
   notes: string
   loading: boolean
+  hiringManagerFeedback?: HiringManagerFeedback[]
+  events?: ApplicationEvent[]
 }>()
 
 const emit = defineEmits<{
@@ -31,6 +36,10 @@ function handleSave(): void {
 
 <template>
   <div class="space-y-3">
+    <ApplicationEventList :events="events || []" />
+    <div class="border-t border-gray-200 pt-3 dark:border-gray-700"></div>
+    <HiringManagerFeedbackList :feedback="hiringManagerFeedback || []" />
+    <div class="border-t border-gray-200 pt-3 dark:border-gray-700"></div>
     <h3 class="text-sm font-semibold text-gray-600">{{ t('candidates.notes') }}</h3>
     <Textarea
       v-model="localNotes"

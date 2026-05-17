@@ -4,17 +4,22 @@ import { useI18n } from 'vue-i18n'
 import ProgressBar from 'primevue/progressbar'
 import TranslatableText from '@/shared/components/TranslatableText.vue'
 import { getLocale } from '@/shared/i18n'
+import type { DecisionSupport } from '@/shared/types/interview.types'
+import InterviewSummarySections from './InterviewSummarySections.vue'
+import { buildEvidenceQuery } from '../utils/interviewEvidence'
 
 defineProps<{
   overallScore: number | null
   aiSummary: string
   aiSummaryTranslations: Record<string, string>
+  decisionSupport?: DecisionSupport
   interviewId: string
   scores: InterviewScore[]
 }>()
 
 const emit = defineEmits<{
   'update:aiSummaryTranslations': [tr: Record<string, string>]
+  findEvidence: [query: string]
 }>()
 
 const { t } = useI18n()
@@ -27,6 +32,12 @@ interface InterviewScore {
   score: number
   aiNotes: string
   aiNotesTranslations: Record<string, string>
+  evidence?: Array<{
+    quote: string
+    timestamp?: number | null
+    speaker?: string
+    line?: number | null
+  }>
 }
 
 const currentLocale = computed(() => getLocale())
@@ -50,6 +61,16 @@ function scoreBg(score: number): string {
   if (score >= 6) return 'bg-blue-500'
   if (score >= 4) return 'bg-yellow-500'
   return 'bg-red-500'
+}
+
+function handleFindEvidence(score: InterviewScore): void {
+  const query =
+    score.evidence?.find((item) => item.quote)?.quote ||
+    buildEvidenceQuery({
+      criteriaName: getLocalizedCriteriaName(score),
+      aiNotes: score.aiNotes,
+    })
+  if (query) emit('findEvidence', query)
 }
 </script>
 
@@ -76,6 +97,13 @@ function scoreBg(score: number): string {
         </div>
       </div>
     </div>
+
+    <InterviewSummarySections
+      v-if="scores?.length"
+      :overall-score="overallScore"
+      :scores="scores"
+      :decision-support="decisionSupport"
+    />
 
     <div
       v-if="aiSummary"
@@ -107,13 +135,23 @@ function scoreBg(score: number): string {
         :key="score.id"
         class="rounded-lg border border-gray-200 dark:border-gray-700 p-3"
       >
-        <div class="mb-1.5 flex items-center justify-between">
+        <div class="mb-1.5 flex items-center justify-between gap-3">
           <span class="text-sm font-medium text-gray-700">{{
             getLocalizedCriteriaName(score)
           }}</span>
-          <span class="text-sm font-bold" :class="scoreColor(score.score)"
-            >{{ score.score }}/10</span
-          >
+          <div class="flex shrink-0 items-center gap-2">
+            <button
+              class="rounded-md px-2 py-1 text-xs font-medium text-blue-600 transition-colors hover:bg-blue-50"
+              type="button"
+              @click="handleFindEvidence(score)"
+            >
+              <i class="pi pi-search mr-1"></i>
+              {{ t('interviews.findEvidence', 'Evidence') }}
+            </button>
+            <span class="text-sm font-bold" :class="scoreColor(score.score)"
+              >{{ score.score }}/10</span
+            >
+          </div>
         </div>
         <ProgressBar :value="score.score * 10" :show-value="false" style="height: 6px" />
         <TranslatableText
@@ -129,6 +167,18 @@ function scoreBg(score: number): string {
             ><p class="mt-1.5 text-xs text-gray-500">{{ text }}</p></template
           >
         </TranslatableText>
+        <div v-if="score.evidence?.length" class="mt-3 space-y-1.5">
+          <button
+            v-for="item in score.evidence"
+            :key="`${item.line ?? item.quote}-${item.timestamp ?? ''}`"
+            class="block w-full rounded-md bg-blue-50 px-2.5 py-2 text-left text-xs text-blue-900 transition-colors hover:bg-blue-100"
+            type="button"
+            @click="emit('findEvidence', item.quote)"
+          >
+            <span class="font-semibold">{{ t('interviews.evidence', 'Evidence') }}:</span>
+            {{ item.quote }}
+          </button>
+        </div>
       </div>
     </div>
 

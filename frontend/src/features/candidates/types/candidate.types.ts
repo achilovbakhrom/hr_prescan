@@ -16,6 +16,28 @@ export interface ApplicationDetail extends Application {
   interviewEnabled?: boolean
   interviewMode?: string
   companyName?: string
+  hiringManagerToken?: string
+  hiringManagerFeedback?: HiringManagerFeedback[]
+  events?: ApplicationEvent[]
+}
+
+export interface HiringManagerFeedback {
+  id: string
+  reviewerName: string
+  reviewerRole: string
+  recommendation: 'advance' | 'maybe' | 'reject'
+  rating: number | null
+  comment: string
+  createdAt: string
+}
+
+export interface ApplicationEvent {
+  id: string
+  eventType: 'share_link_rotated' | 'hiring_manager_feedback'
+  actorName: string
+  message: string
+  metadata: Record<string, unknown>
+  createdAt: string
 }
 
 export interface CvParsedData {

@@ -1,0 +1,106 @@
+.room-shell {
+  position: relative;
+  display: flex;
+  min-height: 100%;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+  background: #111318;
+  color: white;
+}
+
+.room-shell__ambient {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 26%),
+    radial-gradient(circle at 20% 12%, rgba(59, 130, 246, 0.18), transparent 34%),
+    radial-gradient(circle at 82% 24%, rgba(20, 184, 166, 0.14), transparent 34%);
+  pointer-events: none;
+}
+
+.room-shell__top {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  left: 16px;
+  z-index: 30;
+}
+
+.room-shell__stage {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  min-height: 0;
+  flex: 1;
+  padding: 76px 16px 104px;
+}
+
+.room-shell__remote {
+  min-height: min(72vh, 720px);
+}
+
+.room-shell__self {
+  position: absolute;
+  right: 28px;
+  bottom: 124px;
+  z-index: 25;
+  width: min(260px, 30vw);
+  aspect-ratio: 16 / 10;
+}
+
+.room-shell__audio {
+  position: absolute;
+  bottom: 104px;
+  left: 50%;
+  z-index: 35;
+  display: flex;
+  translate: -50% 0;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--color-warning);
+  padding: 10px 16px;
+  color: #111318;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.32);
+}
+
+.room-shell__controls {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  z-index: 40;
+  translate: -50% 0;
+}
+
+@media (max-width: 768px) {
+  .room-shell__top {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+  }
+
+  .room-shell__stage {
+    padding: 72px 10px 108px;
+  }
+
+  .room-shell__remote {
+    min-height: calc(100vh - 190px);
+    border-radius: 14px;
+  }
+
+  .room-shell__self {
+    right: 18px;
+    bottom: 118px;
+    width: min(164px, 42vw);
+  }
+
+  .room-shell__audio {
+    bottom: 96px;
+    width: calc(100vw - 32px);
+    justify-content: center;
+  }
+}

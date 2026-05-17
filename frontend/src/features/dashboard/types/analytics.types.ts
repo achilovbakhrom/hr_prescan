@@ -12,6 +12,11 @@ export interface VacancyPerformance {
   id: string
   title: string
   appCount: number
+  interviewedCount: number
+  hiredCount: number
+  rejectedCount: number
+  hireRate: number
+  rejectionRate: number
   avgScore: number | null
 }
 

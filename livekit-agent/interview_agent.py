@@ -274,7 +274,8 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
     transcript: list[dict] = []
 
     # Initialise integrity monitor
-    monitor = IntegrityMonitor(interview_start_time=time.time())
+    interview_start_time = time.time()
+    monitor = IntegrityMonitor(interview_start_time=interview_start_time)
     shutdown_task: asyncio.Task | None = None
 
     def _schedule_shutdown() -> None:
@@ -289,7 +290,13 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
         if not text:
             return
         control.record_candidate(text)
-        transcript.append({"speaker": "candidate", "text": text})
+        transcript.append(
+            {
+                "speaker": "candidate",
+                "text": text,
+                "timestamp": round(time.time() - interview_start_time, 2),
+            }
+        )
         # Feed transcript into integrity monitor for audio anomaly detection
         monitor.add_transcript_entry(speaker="candidate", text=text)
 
@@ -299,7 +306,13 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
         if not text:
             return
         control.record_interviewer(text)
-        transcript.append({"speaker": "interviewer", "text": text})
+        transcript.append(
+            {
+                "speaker": "interviewer",
+                "text": text,
+                "timestamp": round(time.time() - interview_start_time, 2),
+            }
+        )
         monitor.add_transcript_entry(speaker="interviewer", text=text)
         if control.should_shutdown_after_interviewer():
             _schedule_shutdown()

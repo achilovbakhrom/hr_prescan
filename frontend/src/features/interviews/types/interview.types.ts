@@ -7,7 +7,7 @@ export type {
 } from '@/shared/types/interview.types'
 
 // Import shared types needed by feature-specific interfaces
-import type { InterviewScore, IntegrityFlag } from '@/shared/types/interview.types'
+import type { DecisionSupport, InterviewScore, IntegrityFlag } from '@/shared/types/interview.types'
 
 export type InterviewStatus = 'pending' | 'in_progress' | 'completed' | 'cancelled' | 'expired'
 
@@ -51,6 +51,7 @@ export interface InterviewDetail extends Interview {
   chatHistory: ChatMessage[]
   aiSummary: string
   aiSummaryTranslations: Record<string, string>
+  decisionSupport?: DecisionSupport
   language: string
   scores: InterviewScore[]
   integrityFlags: IntegrityFlag[]

@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 
 from apps.common.models import BaseModel
@@ -58,6 +60,7 @@ class Application(BaseModel):
     )
     is_deleted = models.BooleanField(default=False)  # soft delete (cleared from archive)
     hr_notes = models.TextField(blank=True, default="")
+    hiring_manager_token = models.UUIDField(unique=True, default=uuid.uuid4)
 
     class Meta:
         ordering = ["-created_at"]
@@ -70,3 +73,53 @@ class Application(BaseModel):
 
     def __str__(self) -> str:
         return f"{self.candidate_name} -> {self.vacancy.title}"
+
+
+class HiringManagerFeedback(BaseModel):
+    """Feedback submitted from a read-only candidate review link."""
+
+    class Recommendation(models.TextChoices):
+        ADVANCE = "advance", "Advance"
+        MAYBE = "maybe", "Maybe"
+        REJECT = "reject", "Reject"
+
+    application = models.ForeignKey(
+        Application,
+        on_delete=models.CASCADE,
+        related_name="hiring_manager_feedback",
+    )
+    reviewer_name = models.CharField(max_length=255)
+    reviewer_role = models.CharField(max_length=255, blank=True, default="")
+    recommendation = models.CharField(max_length=20, choices=Recommendation.choices)
+    rating = models.IntegerField(null=True, blank=True)
+    comment = models.TextField(blank=True, default="")
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"{self.reviewer_name} feedback for {self.application_id}"
+
+
+class ApplicationEvent(BaseModel):
+    """Audit event for candidate collaboration actions."""
+
+    class EventType(models.TextChoices):
+        SHARE_LINK_ROTATED = "share_link_rotated", "Share Link Rotated"
+        HIRING_MANAGER_FEEDBACK = "hiring_manager_feedback", "Hiring Manager Feedback"
+
+    application = models.ForeignKey(
+        Application,
+        on_delete=models.CASCADE,
+        related_name="events",
+    )
+    event_type = models.CharField(max_length=50, choices=EventType.choices)
+    actor_name = models.CharField(max_length=255, blank=True, default="")
+    message = models.TextField(blank=True, default="")
+    metadata = models.JSONField(default=dict, blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"{self.event_type} for {self.application_id}"
