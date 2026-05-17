@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="application",
             name="hiring_manager_token",
-            field=models.UUIDField(default=uuid.uuid4, null=True, unique=True),
+            field=models.UUIDField(null=True),
         ),
         migrations.RunPython(populate_hiring_manager_tokens, migrations.RunPython.noop),
         migrations.AlterField(
