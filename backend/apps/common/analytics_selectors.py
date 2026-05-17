@@ -71,9 +71,7 @@ def _get_vacancy_performance(vacancies):
     )
     for vacancy in performance:
         app_count = vacancy["app_count"] or 0
-        vacancy["avg_score"] = (
-            round(float(vacancy["avg_score"]), 1) if vacancy["avg_score"] is not None else None
-        )
+        vacancy["avg_score"] = round(float(vacancy["avg_score"]), 1) if vacancy["avg_score"] is not None else None
         vacancy["hire_rate"] = round(vacancy["hired_count"] / app_count * 100) if app_count else 0
         vacancy["rejection_rate"] = round(vacancy["rejected_count"] / app_count * 100) if app_count else 0
     return performance
@@ -88,9 +86,7 @@ def _get_interview_insights(interviews):
     return {
         "total": total_interviews,
         "completed": completed_interviews,
-        "completion_rate": (
-            round(completed_interviews / total_interviews * 100) if total_interviews > 0 else 0
-        ),
+        "completion_rate": (round(completed_interviews / total_interviews * 100) if total_interviews > 0 else 0),
         "average_score": round(float(avg_score), 1) if avg_score else None,
     }
 
@@ -146,9 +142,7 @@ def _get_process_metrics(*, vacancies, applications, interviews):
             updated_at__lt=now - timedelta(days=7),
         ).count(),
         "average_decision_days": (
-            round(avg_decision_duration.total_seconds() / 86400, 1)
-            if avg_decision_duration
-            else None
+            round(avg_decision_duration.total_seconds() / 86400, 1) if avg_decision_duration else None
         ),
     }
 
