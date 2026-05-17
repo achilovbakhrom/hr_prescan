@@ -99,7 +99,8 @@
     "myApplications": "Meine Bewerbungen",
     "cvBuilder": "CV Builder",
     "myCvs": "Meine CVs",
-    "hrAnalytics": "Analytik"
+    "hrAnalytics": "Analytik",
+    "candidateBase": "Kandidatenpool"
   },
   "validation": {
     "required": "Dieses Feld ist erforderlich",
@@ -418,6 +419,15 @@
     "vacancyPerformance": "Top-Stellenangebote nach Bewerbungen",
     "noData": "Noch keine Bewerbungsdaten",
     "noVacancies": "Noch keine offenen Stellen veröffentlicht",
+    "processHealth": "Prozessstatus",
+    "activeVacancies": "Aktive Stellen",
+    "pendingInterviews": "Ausstehende Interviews",
+    "staleApplications": "Unbearbeitete Bewerbungen",
+    "avgDecisionDays": "Durchschn. Entscheidungszeit",
+    "days": "Tage",
+    "statusBreakdown": "Kandidaten nach Status",
+    "scoreDistribution": "CV-Score-Verteilung",
+    "noScoreData": "Noch keine bewerteten Kandidaten",
     "funnel": {
       "applied": "Angewendet",
       "prescanned": "Vorgescannt",
@@ -430,6 +440,12 @@
       "vacancy": "Stellenangebot",
       "applications": "Anwendungen",
       "avgScore": "Durchschn. Punktzahl"
+    },
+    "scoreBuckets": {
+      "low": "0-39 Niedrig",
+      "medium": "40-59 Mittel",
+      "good": "60-79 Gut",
+      "strong": "80-100 Stark"
     }
   },
   "vacancies": {
@@ -667,7 +683,9 @@
       "newest": "Das Neueste zuerst",
       "oldest": "Älteste zuerst",
       "highestScore": "Höchste Punktzahl",
-      "lowestScore": "Niedrigste Punktzahl"
+      "lowestScore": "Niedrigste Punktzahl",
+      "nameAsc": "Name A-Z",
+      "nameDesc": "Name Z-A"
     },
     "overview": "Übersicht",
     "cv": "CV",
@@ -939,7 +957,10 @@
     "selected": "{count} ausgewählt",
     "bulkActions": "Massenaktionen",
     "noMatchingCandidates": "Keine Kandidaten mit Übereinstimmung mit „{query}“",
-    "noCandidatesApplied": "Es haben sich noch keine Kandidaten beworben"
+    "noCandidatesApplied": "Es haben sich noch keine Kandidaten beworben",
+    "candidateBase": {
+      "applications": "Bewerbungen"
+    }
   },
   "interviews": {
     "title": "Interviews",
@@ -1502,6 +1523,11 @@
         "title": "Kandidaten finden",
         "description": "Bewerber für eine Stelle suchen, filtern oder vormerken.",
         "prompt": "Zeige Kandidaten mit den höchsten Interviewwerten"
+      },
+      "createVacancy": {
+        "title": "Stelle erstellen",
+        "description": "Neue Rolle, Anforderungen, Screening-Kriterien und AI-Interview-Setup entwerfen.",
+        "prompt": "Hilf mir, Schritt für Schritt eine neue Stelle zu erstellen"
       },
       "vacancies": {
         "title": "Mit Stellen arbeiten",

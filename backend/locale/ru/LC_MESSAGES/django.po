@@ -157,10 +157,6 @@ msgid "You have already applied to this vacancy."
 msgstr "Вы уже подали заявку на эту вакансию."
 
 #: apps/common/messages.py
-msgid "Cannot change interview mode after applications have been submitted."
-msgstr "Невозможно изменить режим интервью после подачи заявок."
-
-#: apps/common/messages.py
 msgid "Only draft or paused vacancies can be published."
 msgstr "Публиковать можно только черновые или приостановленные вакансии."
 
@@ -249,8 +245,8 @@ msgid "Cannot start interview with status '{status}'."
 msgstr "Невозможно начать интервью со статусом '{status}'."
 
 #: apps/common/messages.py
-msgid "This session is not a chat-mode session."
-msgstr "Эта сессия не является чат-сессией."
+msgid "This session is not a prescanning chat session."
+msgstr "Эта сессия не является чат-сессией прескрининга."
 
 #: apps/common/messages.py
 msgid "This session is not currently in progress."
@@ -297,16 +293,16 @@ msgid "No session found for this application."
 msgstr "Сессия для этой заявки не найдена."
 
 #: apps/common/messages.py
-msgid "Chat is only available for chat-mode interviews."
-msgstr "Чат доступен только для интервью в режиме чата."
+msgid "Chat is only available for prescanning sessions."
+msgstr "Чат доступен только для сессий прескрининга."
 
 #: apps/common/messages.py
-msgid "Chat history is only available for chat-mode interviews."
-msgstr "История чата доступна только для интервью в режиме чата."
+msgid "Chat history is only available for prescanning sessions."
+msgstr "История чата доступна только для сессий прескрининга."
 
 #: apps/common/messages.py
-msgid "Voice messages are only available for chat-mode interviews."
-msgstr "Голосовые сообщения доступны только для интервью в режиме чата."
+msgid "Voice messages are only available for prescanning chat sessions."
+msgstr "Голосовые сообщения доступны только для чат-сессий прескрининга."
 
 #: apps/common/messages.py
 msgid "This vacancy is no longer accepting interviews."

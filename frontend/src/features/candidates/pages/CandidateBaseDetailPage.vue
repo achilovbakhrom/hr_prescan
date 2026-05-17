@@ -111,19 +111,19 @@ onMounted(fetchRecord)
           </div>
           <div>
             <label class="mb-1 block text-xs font-medium text-[color:var(--color-text-muted)]">
-              {{ t('admin.users.email', 'Email') }}
+              {{ t('candidates.application.email') }}
             </label>
             <InputText :model-value="record.candidateEmail" class="w-full" disabled />
           </div>
           <div>
             <label class="mb-1 block text-xs font-medium text-[color:var(--color-text-muted)]">
-              {{ t('settings.profile.phone', 'Phone') }}
+              {{ t('candidates.application.phone') }}
             </label>
             <InputText v-model="candidatePhone" class="w-full" />
           </div>
           <div>
             <label class="mb-1 block text-xs font-medium text-[color:var(--color-text-muted)]">
-              {{ t('candidates.notes', 'Notes') }}
+              {{ t('candidates.notes') }}
             </label>
             <Textarea v-model="notes" class="w-full" rows="5" auto-resize />
           </div>

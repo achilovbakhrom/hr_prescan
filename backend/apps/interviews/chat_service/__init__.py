@@ -3,7 +3,7 @@ AI chat screening service — handles conversation with candidates via Gemini.
 
 Supports two session types:
 - Prescanning: lighter, quicker initial screening (always chat mode)
-- Interview: tougher, domain-specific evaluation (chat or meet mode)
+- Interview: tougher, domain-specific evaluation (Meet/video mode)
 
 Responsibilities:
 - Build system prompt from vacancy + CV + questions (filtered by step)

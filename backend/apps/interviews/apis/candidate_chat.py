@@ -16,8 +16,8 @@ from apps.interviews.selectors import get_interview_by_token
 class ChatMessageApi(APIView):
     """POST /api/public/interview/{token}/chat/
 
-    Sends a candidate message in chat mode.
-    Only works for chat-mode interviews that are IN_PROGRESS.
+    Sends a candidate message in prescanning chat mode.
+    Only works for prescanning sessions that are IN_PROGRESS.
     AllowAny access.
     """
 
@@ -34,7 +34,10 @@ class ChatMessageApi(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        if interview.screening_mode != Interview.ScreeningMode.CHAT:
+        if (
+            interview.screening_mode != Interview.ScreeningMode.CHAT
+            or interview.session_type != Interview.SessionType.PRESCANNING
+        ):
             return Response(
                 {"detail": str(MSG_CHAT_ONLY)},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -79,7 +82,7 @@ class ChatMessageApi(APIView):
 class ChatHistoryApi(APIView):
     """GET /api/public/interview/{token}/chat/history/
 
-    Returns the full chat history for a chat-mode interview. AllowAny access.
+    Returns the full chat history for a prescanning chat session. AllowAny access.
     """
 
     permission_classes = [AllowAny]
@@ -92,7 +95,10 @@ class ChatHistoryApi(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        if interview.screening_mode != Interview.ScreeningMode.CHAT:
+        if (
+            interview.screening_mode != Interview.ScreeningMode.CHAT
+            or interview.session_type != Interview.SessionType.PRESCANNING
+        ):
             return Response(
                 {"detail": str(MSG_CHAT_HISTORY_ONLY)},
                 status=status.HTTP_400_BAD_REQUEST,

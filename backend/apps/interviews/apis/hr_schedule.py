@@ -18,6 +18,7 @@ from apps.common.messages import (
     MSG_NO_AUDIO_FILE,
     MSG_NOT_IN_COMPANY,
 )
+from apps.interviews.models import Interview
 from apps.interviews.selectors import get_interview_by_id
 from apps.interviews.serializers import InterviewDetailOutputSerializer
 from apps.interviews.services import (
@@ -150,6 +151,14 @@ class HRVoiceMessageAudioApi(APIView):
         if interview is None:
             return Response(
                 {"detail": str(MSG_INTERVIEW_NOT_FOUND)},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        if (
+            interview.screening_mode != Interview.ScreeningMode.CHAT
+            or interview.session_type != Interview.SessionType.PRESCANNING
+        ):
+            return Response(
+                {"detail": str(MSG_NO_AUDIO_FILE)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 

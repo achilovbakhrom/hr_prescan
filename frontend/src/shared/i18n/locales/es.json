@@ -99,7 +99,8 @@
     "myApplications": "Mis aplicaciones",
     "cvBuilder": "CV Constructor",
     "myCvs": "Mis CVs",
-    "hrAnalytics": "Analítica"
+    "hrAnalytics": "Analítica",
+    "candidateBase": "Base de candidatos"
   },
   "validation": {
     "required": "Este campo es obligatorio",
@@ -418,6 +419,15 @@
     "vacancyPerformance": "Principales vacantes por aplicaciones",
     "noData": "Aún no hay datos de la aplicación",
     "noVacancies": "Aún no hay vacantes publicadas",
+    "processHealth": "Estado del proceso",
+    "activeVacancies": "Vacantes activas",
+    "pendingInterviews": "Entrevistas pendientes",
+    "staleApplications": "Solicitudes sin movimiento",
+    "avgDecisionDays": "Tiempo medio de decisión",
+    "days": "días",
+    "statusBreakdown": "Candidatos por estado",
+    "scoreDistribution": "Distribución de puntuación CV",
+    "noScoreData": "Aún no hay candidatos puntuados",
     "funnel": {
       "applied": "Aplicado",
       "prescanned": "preescaneado",
@@ -430,6 +440,12 @@
       "vacancy": "vacante",
       "applications": "Aplicaciones",
       "avgScore": "Promedio Puntuación"
+    },
+    "scoreBuckets": {
+      "low": "0-39 Bajo",
+      "medium": "40-59 Medio",
+      "good": "60-79 Bueno",
+      "strong": "80-100 Fuerte"
     }
   },
   "vacancies": {
@@ -667,7 +683,9 @@
       "newest": "Lo más nuevo primero",
       "oldest": "El más viejo primero",
       "highestScore": "Puntuación más alta",
-      "lowestScore": "Puntuación más baja"
+      "lowestScore": "Puntuación más baja",
+      "nameAsc": "Nombre A-Z",
+      "nameDesc": "Nombre Z-A"
     },
     "overview": "Descripción general",
     "cv": "CV",
@@ -939,7 +957,10 @@
     "selected": "{count} seleccionado",
     "bulkActions": "Acciones masivas",
     "noMatchingCandidates": "No hay candidatos que coincidan con \"{query}\"",
-    "noCandidatesApplied": "Aún no se han presentado candidatos"
+    "noCandidatesApplied": "Aún no se han presentado candidatos",
+    "candidateBase": {
+      "applications": "Postulaciones"
+    }
   },
   "interviews": {
     "title": "Entrevistas",
@@ -1502,6 +1523,11 @@
         "title": "Encontrar candidatos",
         "description": "Buscar, filtrar o preseleccionar candidatos para una vacante.",
         "prompt": "Muestra los candidatos con las mejores puntuaciones de entrevista"
+      },
+      "createVacancy": {
+        "title": "Crear vacante",
+        "description": "Redactar un nuevo puesto, requisitos, criterios de selección y configuración de entrevista AI.",
+        "prompt": "Ayúdame a crear una nueva vacante paso a paso"
       },
       "vacancies": {
         "title": "Trabajar con vacantes",

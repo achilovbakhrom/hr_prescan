@@ -57,7 +57,7 @@ const sections = computed<NavSection[]>(() => [
         permission: 'manage_vacancies',
       },
       {
-        label: t('nav.candidateBase', 'Candidate base'),
+        label: t('nav.candidateBase'),
         icon: 'pi pi-users',
         to: '/candidate-base',
         roles: [USER_ROLES.ADMIN, USER_ROLES.HR],

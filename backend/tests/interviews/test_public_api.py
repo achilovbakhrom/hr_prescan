@@ -12,7 +12,7 @@ class TestPublicInterviewApi:
         interview = InterviewFactory(
             application=app,
             session_type=Interview.SessionType.INTERVIEW,
-            screening_mode=Interview.ScreeningMode.CHAT,
+            screening_mode=Interview.ScreeningMode.MEET,
             status=Interview.Status.PENDING,
         )
 
@@ -27,7 +27,7 @@ class TestPublicInterviewApi:
         interview = InterviewFactory(
             application=app,
             session_type=Interview.SessionType.INTERVIEW,
-            screening_mode=Interview.ScreeningMode.CHAT,
+            screening_mode=Interview.ScreeningMode.MEET,
             status=Interview.Status.PENDING,
         )
 

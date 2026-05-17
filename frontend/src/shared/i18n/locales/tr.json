@@ -99,7 +99,8 @@
     "myApplications": "Uygulamalarım",
     "cvBuilder": "CV Oluşturucu",
     "myCvs": "Benim CV'lerim",
-    "hrAnalytics": "Analitik"
+    "hrAnalytics": "Analitik",
+    "candidateBase": "Aday havuzu"
   },
   "validation": {
     "required": "Bu alan zorunludur",
@@ -418,6 +419,15 @@
     "vacancyPerformance": "Başvurulara Göre En İyi Açık Pozisyonlar",
     "noData": "Henüz uygulama verisi yok",
     "noVacancies": "Henüz yayınlanmış açık pozisyon yok",
+    "processHealth": "Süreç Durumu",
+    "activeVacancies": "Aktif Pozisyonlar",
+    "pendingInterviews": "Bekleyen Görüşmeler",
+    "staleApplications": "Bekleyen Başvurular",
+    "avgDecisionDays": "Ort. Karar Süresi",
+    "days": "gün",
+    "statusBreakdown": "Aday Durum Dağılımı",
+    "scoreDistribution": "CV Puan Dağılımı",
+    "noScoreData": "Henüz puanlanmış aday yok",
     "funnel": {
       "applied": "Uygulandı",
       "prescanned": "Ön taramalı",
@@ -430,6 +440,12 @@
       "vacancy": "Boş yer",
       "applications": "Uygulamalar",
       "avgScore": "Ortalama Puan"
+    },
+    "scoreBuckets": {
+      "low": "0-39 Düşük",
+      "medium": "40-59 Orta",
+      "good": "60-79 İyi",
+      "strong": "80-100 Güçlü"
     }
   },
   "vacancies": {
@@ -667,7 +683,9 @@
       "newest": "Önce en yeni",
       "oldest": "Önce en eski",
       "highestScore": "En yüksek puan",
-      "lowestScore": "En düşük puan"
+      "lowestScore": "En düşük puan",
+      "nameAsc": "Ad A-Z",
+      "nameDesc": "Ad Z-A"
     },
     "overview": "Genel Bakış",
     "cv": "CV",
@@ -939,7 +957,10 @@
     "selected": "{count} seçildi",
     "bulkActions": "Toplu İşlemler",
     "noMatchingCandidates": "\"{query}\" ile eşleşen aday yok",
-    "noCandidatesApplied": "Henüz aday başvurusu yapılmadı"
+    "noCandidatesApplied": "Henüz aday başvurusu yapılmadı",
+    "candidateBase": {
+      "applications": "Başvurular"
+    }
   },
   "interviews": {
     "title": "Röportajlar",
@@ -1502,6 +1523,11 @@
         "title": "Aday bul",
         "description": "Bir ilan için adayları ara, filtrele veya kısa listeye al.",
         "prompt": "En yüksek görüşme puanına sahip adayları göster"
+      },
+      "createVacancy": {
+        "title": "Pozisyon oluştur",
+        "description": "Yeni rolü, gereksinimleri, eleme kriterlerini ve AI görüşme ayarını hazırlayın.",
+        "prompt": "Yeni bir pozisyonu adım adım oluşturmama yardım et"
       },
       "vacancies": {
         "title": "İlanlarla çalış",

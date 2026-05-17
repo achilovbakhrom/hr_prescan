@@ -26,7 +26,8 @@ const intro = computed(() =>
 
 const inputText = ref('')
 const messagesContainer = ref<HTMLElement | null>(null)
-
+let pageScrollLocked = false
+let previousBodyOverflow = ''
 function scrollToBottom() {
   nextTick(() => {
     if (messagesContainer.value)
@@ -37,6 +38,7 @@ function scrollToBottom() {
 watch(() => messages.value.length, scrollToBottom)
 watch(isOpen, (open) => {
   if (open) scrollToBottom()
+  setPageScrollLocked(open)
 })
 
 async function handleSend() {
@@ -57,11 +59,26 @@ function handleGlobalKeydown(e: KeyboardEvent) {
   if (e.key === 'Escape' && isOpen.value) close()
 }
 
+function setPageScrollLocked(locked: boolean): void {
+  if (typeof document === 'undefined') return
+  if (locked && !pageScrollLocked) {
+    previousBodyOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    pageScrollLocked = true
+  }
+  if (!locked && pageScrollLocked) {
+    document.body.style.overflow = previousBodyOverflow
+    pageScrollLocked = false
+  }
+}
+
 onMounted(() => {
   window.addEventListener('keydown', handleGlobalKeydown)
+  setPageScrollLocked(isOpen.value)
 })
 onUnmounted(() => {
   window.removeEventListener('keydown', handleGlobalKeydown)
+  setPageScrollLocked(false)
 })
 </script>
 
@@ -80,7 +97,9 @@ onUnmounted(() => {
       role="dialog"
       aria-modal="true"
       :aria-label="title"
-      class="fixed inset-x-3 top-4 z-50 mx-auto flex max-h-[calc(100vh-2rem)] max-w-5xl flex-col overflow-hidden rounded-2xl border border-white/80 bg-white shadow-[0_30px_90px_rgba(15,23,42,0.3)] dark:border-slate-700 dark:bg-slate-950 sm:top-8"
+      class="fixed inset-x-3 top-4 z-50 mx-auto flex max-h-[calc(100vh-2rem)] max-w-5xl flex-col overflow-hidden overscroll-contain rounded-2xl border border-white/80 bg-white shadow-[0_30px_90px_rgba(15,23,42,0.3)] dark:border-slate-700 dark:bg-slate-950 sm:top-8"
+      @wheel.stop
+      @touchmove.stop
     >
       <AIAssistantDialogHeader
         :title="title"
@@ -105,7 +124,10 @@ onUnmounted(() => {
         </aside>
 
         <main class="flex min-h-[420px] min-w-0 flex-col">
-          <div ref="messagesContainer" class="min-h-0 flex-1 overflow-y-auto p-4 sm:p-5">
+          <div
+            ref="messagesContainer"
+            class="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-5"
+          >
             <div
               v-if="messages.length === 0"
               class="flex h-full min-h-[260px] flex-col items-center justify-center rounded-2xl border border-dashed border-cyan-200 bg-white px-5 py-8 text-center dark:border-cyan-900 dark:bg-slate-900"

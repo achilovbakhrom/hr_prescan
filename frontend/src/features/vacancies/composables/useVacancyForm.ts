@@ -32,7 +32,7 @@ export function useVacancyForm(
   const prescanningPrompt = ref(initialData()?.prescanningPrompt ?? '')
   const prescanningLanguage = ref(initialData()?.prescanningLanguage ?? getLocale())
   const interviewEnabled = ref(initialData()?.interviewEnabled ?? false)
-  const interviewMode = ref<InterviewMode>(initialData()?.interviewMode ?? 'chat')
+  const interviewMode = ref<InterviewMode>('meet')
   const interviewDuration = ref(initialData()?.interviewDuration ?? 30)
   const interviewPrompt = ref(initialData()?.interviewPrompt ?? '')
   const companyInfo = ref(initialData()?.companyInfo ?? '')
@@ -134,7 +134,7 @@ export function useVacancyForm(
     prescanningPrompt.value = d.prescanningPrompt ?? ''
     prescanningLanguage.value = d.prescanningLanguage ?? getLocale()
     interviewEnabled.value = d.interviewEnabled ?? false
-    interviewMode.value = d.interviewMode ?? 'chat'
+    interviewMode.value = 'meet'
     interviewDuration.value = d.interviewDuration ?? 30
     interviewPrompt.value = d.interviewPrompt ?? ''
     companyInfo.value = d.companyInfo ?? ''

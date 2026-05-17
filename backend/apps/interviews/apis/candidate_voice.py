@@ -24,7 +24,7 @@ from apps.interviews.selectors import get_interview_by_token
 
 
 class VoiceChatMessageApi(APIView):
-    """POST /api/public/interview/{token}/chat/voice/ — send voice message."""
+    """POST /api/public/interview/{token}/chat/voice/ — send prescanning voice message."""
 
     permission_classes = [AllowAny]
     parser_classes = [MultiPartParser, FormParser]
@@ -39,7 +39,10 @@ class VoiceChatMessageApi(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        if interview.screening_mode != Interview.ScreeningMode.CHAT:
+        if (
+            interview.screening_mode != Interview.ScreeningMode.CHAT
+            or interview.session_type != Interview.SessionType.PRESCANNING
+        ):
             return Response(
                 {"detail": str(MSG_VOICE_ONLY)},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -115,7 +118,7 @@ class VoiceChatMessageApi(APIView):
 
 
 class VoiceMessageAudioApi(APIView):
-    """GET /api/public/interview/{token}/chat/voice/{message_index}/audio/ — stream voice audio."""
+    """GET /api/public/interview/{token}/chat/voice/{message_index}/audio/ — stream prescanning voice audio."""
 
     permission_classes = [AllowAny]
 
@@ -124,6 +127,14 @@ class VoiceMessageAudioApi(APIView):
         if interview is None:
             return Response(
                 {"detail": str(MSG_INTERVIEW_NOT_FOUND)},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        if (
+            interview.screening_mode != Interview.ScreeningMode.CHAT
+            or interview.session_type != Interview.SessionType.PRESCANNING
+        ):
+            return Response(
+                {"detail": str(MSG_NO_AUDIO_FILE)},
                 status=status.HTTP_404_NOT_FOUND,
             )
 

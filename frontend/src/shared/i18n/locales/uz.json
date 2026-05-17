@@ -99,7 +99,8 @@
     "myApplications": "Mening arizalarim",
     "cvBuilder": "CV yaratish",
     "myCvs": "Mening CV larim",
-    "hrAnalytics": "Analitika"
+    "hrAnalytics": "Analitika",
+    "candidateBase": "Nomzodlar bazasi"
   },
   "validation": {
     "required": "Bu maydon majburiy",
@@ -418,6 +419,15 @@
     "vacancyPerformance": "Arizalar bo'yicha eng yaxshi vakansiyalar",
     "noData": "Hozircha ariza ma'lumotlari yo'q",
     "noVacancies": "Hozircha nashr etilgan vakansiyalar yo'q",
+    "processHealth": "Jarayon holati",
+    "activeVacancies": "Faol vakansiyalar",
+    "pendingInterviews": "Kutilayotgan intervyular",
+    "staleApplications": "Harakatsiz arizalar",
+    "avgDecisionDays": "O‘rtacha qaror vaqti",
+    "days": "kun",
+    "statusBreakdown": "Nomzodlar statusi bo‘yicha taqsimot",
+    "scoreDistribution": "CV ballari taqsimoti",
+    "noScoreData": "Hali baholangan nomzodlar yo‘q",
     "funnel": {
       "applied": "Ariza topshirgan",
       "prescanned": "Oldindan tekshirilgan",
@@ -430,6 +440,12 @@
       "vacancy": "Vakansiya",
       "applications": "Arizalar",
       "avgScore": "O'rtacha ball"
+    },
+    "scoreBuckets": {
+      "low": "0-39 Past",
+      "medium": "40-59 O‘rta",
+      "good": "60-79 Yaxshi",
+      "strong": "80-100 Kuchli"
     }
   },
   "vacancies": {
@@ -667,7 +683,9 @@
       "newest": "Eng yangilari",
       "oldest": "Eng eskilari",
       "highestScore": "Eng yuqori ball",
-      "lowestScore": "Eng past ball"
+      "lowestScore": "Eng past ball",
+      "nameAsc": "Ism A-Z",
+      "nameDesc": "Ism Z-A"
     },
     "overview": "Umumiy ko'rinish",
     "cv": "CV",
@@ -939,7 +957,10 @@
     "selected": "{count} tanlangan",
     "bulkActions": "Ommaviy amallar",
     "noMatchingCandidates": "\"{query}\" ga mos nomzodlar topilmadi",
-    "noCandidatesApplied": "Hozircha hech kim ariza topshirmagan"
+    "noCandidatesApplied": "Hozircha hech kim ariza topshirmagan",
+    "candidateBase": {
+      "applications": "Arizalar"
+    }
   },
   "interviews": {
     "title": "Intervyular",
@@ -1502,6 +1523,11 @@
         "title": "Nomzodlarni topish",
         "description": "Vakansiya bo'yicha qidirish, filtrlash yoki shortlist qilish.",
         "prompt": "Eng yuqori intervyu balliga ega nomzodlarni ko'rsat"
+      },
+      "createVacancy": {
+        "title": "Vakansiya yaratish",
+        "description": "Yangi rol, talablar, screening mezonlari va AI intervyu sozlamasini tayyorlash.",
+        "prompt": "Yangi vakansiyani bosqichma-bosqich yaratishga yordam ber"
       },
       "vacancies": {
         "title": "Vakansiyalar bilan ishlash",

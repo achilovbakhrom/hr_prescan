@@ -58,7 +58,7 @@ class Interview(BaseModel):
     livekit_room_name = models.CharField(max_length=255, blank=True)
     candidate_token = models.CharField(max_length=500, blank=True)
 
-    # Chat mode
+    # Prescanning chat mode
     chat_history = models.JSONField(default=list)  # [{role, text, timestamp}]
 
     # Results (populated after interview)

@@ -26,6 +26,5 @@ export const getVisibilityOptions = (t: (key: string) => string) => [
 ]
 
 export const getInterviewModeOptions = (t: (key: string) => string) => [
-  { label: t('vacancies.interviewMode.chat'), value: 'chat' },
   { label: t('vacancies.interviewMode.meet'), value: 'meet' },
 ]

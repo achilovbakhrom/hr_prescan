@@ -32,12 +32,12 @@ class TestStartSession:
         assert started.status == Interview.Status.IN_PROGRESS
         assert started.started_at is not None
 
-    def test_interview_chat_prompt_falls_back_from_uzbek_to_russian(self, vacancy):
+    def test_interview_meet_prompt_falls_back_from_uzbek_to_russian(self, vacancy):
         app = ApplicationFactory(vacancy=vacancy, status=Application.Status.PRESCANNED)
         session = InterviewFactory(
             application=app,
             session_type=Interview.SessionType.INTERVIEW,
-            screening_mode=Interview.ScreeningMode.CHAT,
+            screening_mode=Interview.ScreeningMode.MEET,
             status=Interview.Status.PENDING,
             language="uz",
         )

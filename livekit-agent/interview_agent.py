@@ -57,6 +57,7 @@ DEEPGRAM_TTS_MODELS_BY_LANGUAGE = {
     "es": "aura-2-estrella-es",
     "fr": "aura-2-hector-fr",
 }
+DEEPGRAM_STT_LANGUAGES = {"ar", "de", "en", "es", "fr", "ru", "uk"}
 ELEVENLABS_FLASH_LANGUAGES = {"ar", "ru", "tr", "uk"}
 ELEVENLABS_EXTENDED_LANGUAGES = {"kk"}
 ELEVENLABS_VOICE_IDS_BY_LANGUAGE = {
@@ -74,8 +75,7 @@ ELEVENLABS_VOICE_LANGUAGE_FALLBACKS = {
 
 
 def _deepgram_language(language: str) -> str:
-    supported_languages = {"de", "en", "es", "fr", "ru", "uk"}
-    return language if language in supported_languages else "multi"
+    return language if language in DEEPGRAM_STT_LANGUAGES else "multi"
 
 
 def _deepgram_tts(model: str, *, use_streaming: bool):
@@ -122,6 +122,12 @@ def _elevenlabs_voice_id_for_language(language: str) -> str:
             )
             return fallback_voice_id
 
+    if _elevenlabs_supports_language(language):
+        logger.warning(
+            "No ElevenLabs voice ID configured for %s. Using default voice %s.",
+            language,
+            _masked_voice_id(ELEVENLABS_DEFAULT_VOICE_ID),
+        )
     return ELEVENLABS_DEFAULT_VOICE_ID
 
 
@@ -220,9 +226,15 @@ async def create_interview_agent(ctx) -> VoicePipelineAgent:
     chat_ctx = llm.ChatContext().append(role="system", text=system_prompt)
 
     # Configure STT (Speech-to-Text)
+    stt_language = _deepgram_language(context.language)
+    logger.info(
+        "Using Deepgram STT provider with model %s and language %s.",
+        DEEPGRAM_MODEL,
+        stt_language,
+    )
     stt = deepgram.STT(
         model=DEEPGRAM_MODEL,
-        language=_deepgram_language(context.language),
+        language=stt_language,
         interim_results=True,
         punctuate=True,
         no_delay=True,

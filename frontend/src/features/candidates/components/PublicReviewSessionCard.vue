@@ -18,7 +18,9 @@ const conversationSearch = ref('')
 const recordingSection = ref<InstanceType<typeof InterviewRecordingSection> | null>(null)
 
 const conversationMessages = computed(() => {
-  if (props.session.chatHistory?.length) return props.session.chatHistory
+  if (props.session.sessionType === 'prescanning' && props.session.chatHistory?.length) {
+    return props.session.chatHistory
+  }
   return (props.session.transcript || []).map((entry) => ({
     role: isAiSpeaker(entry) ? ('ai' as const) : ('candidate' as const),
     text: entry.text,

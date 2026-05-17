@@ -2,7 +2,7 @@ export type VacancyStatus = 'draft' | 'published' | 'paused' | 'archived'
 export type VacancyVisibility = 'public' | 'private'
 export type EmploymentType = 'full_time' | 'part_time' | 'contract' | 'internship'
 export type ExperienceLevel = 'junior' | 'middle' | 'senior' | 'lead' | 'director'
-export type InterviewMode = 'chat' | 'meet'
+export type InterviewMode = 'meet'
 
 export interface Vacancy {
   id: string

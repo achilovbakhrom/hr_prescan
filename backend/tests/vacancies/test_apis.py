@@ -109,20 +109,19 @@ def test_question_buttons_use_all_user_company_memberships():
     assert any(item["id"] == question_id for item in list_response.data)
 
 
-def test_update_interview_mode_with_applications_returns_400():
+def test_update_chat_interview_mode_returns_400():
     user, vacancy = _member_vacancy_in_second_company()
-    ApplicationFactory(vacancy=vacancy)
     client = APIClient()
     client.force_authenticate(user=user)
 
     response = client.put(
         f"/api/hr/vacancies/{vacancy.id}/",
-        {"interview_mode": Vacancy.InterviewMode.MEET},
+        {"interview_mode": "chat"},
         format="json",
     )
 
     assert response.status_code == 400
-    assert "Cannot change interview mode" in response.data["detail"]
+    assert "interview_mode" in response.data
 
 
 def test_vacancy_detail_exposes_interview_mode_change_lock():

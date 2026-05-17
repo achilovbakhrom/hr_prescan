@@ -22,7 +22,6 @@ class Vacancy(BaseModel):
         PRIVATE = "private", "Private"
 
     class InterviewMode(models.TextChoices):
-        CHAT = "chat", "Chat"
         MEET = "meet", "Meet"
 
     class EmploymentType(models.TextChoices):
@@ -86,10 +85,10 @@ class Vacancy(BaseModel):
     interview_mode = models.CharField(
         max_length=10,
         choices=InterviewMode.choices,
-        default=InterviewMode.CHAT,
+        default=InterviewMode.MEET,
     )
     interview_enabled = models.BooleanField(default=False)
-    interview_duration = models.IntegerField(default=30)  # Meet mode only
+    interview_duration = models.IntegerField(default=30)  # Meet/video interview pacing target
     cv_required = models.BooleanField(default=False)
     company_info = models.TextField(blank=True, default="")  # Optional company description for AI interview intro
     prescanning_prompt = models.TextField(blank=True, default="")  # Additional instructions for prescanning AI agent

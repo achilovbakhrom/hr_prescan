@@ -1,11 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import Dropdown from '@/shared/components/AppSelect.vue'
 import InputNumber from 'primevue/inputnumber'
 import Textarea from 'primevue/textarea'
 import ToggleSwitch from 'primevue/toggleswitch'
-import { getInterviewModeOptions } from '../constants/formOptions'
 import type { InterviewMode } from '../types/vacancy.types'
 
 defineProps<{
@@ -18,7 +15,7 @@ const interviewDuration = defineModel<number>('interviewDuration', { required: t
 const interviewPrompt = defineModel<string>('interviewPrompt', { required: true })
 
 const { t } = useI18n()
-const interviewModeOptions = computed(() => getInterviewModeOptions(t))
+interviewMode.value = 'meet'
 </script>
 
 <template>
@@ -44,19 +41,14 @@ const interviewModeOptions = computed(() => getInterviewModeOptions(t))
           <label class="mb-1 block text-sm font-medium">{{
             t('vacancies.form.interviewMode')
           }}</label>
-          <Dropdown
-            v-model="interviewMode"
-            :options="interviewModeOptions"
-            option-label="label"
-            option-value="value"
-            class="w-full"
-            :invalid="hasError('interviewMode')"
-          />
+          <div class="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm">
+            {{ t('vacancies.interviewMode.meet') }}
+          </div>
           <small v-if="hasError('interviewMode')" class="text-red-500">{{
             fieldError('interviewMode')
           }}</small>
         </div>
-        <div v-if="interviewMode === 'meet'">
+        <div>
           <label class="mb-1 block text-sm font-medium">{{
             t('vacancies.form.interviewDuration')
           }}</label>

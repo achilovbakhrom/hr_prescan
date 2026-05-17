@@ -99,7 +99,8 @@
     "myApplications": "Мої програми",
     "cvBuilder": "Конструктор CV",
     "myCvs": "Мої резюме",
-    "hrAnalytics": "Аналітика"
+    "hrAnalytics": "Аналітика",
+    "candidateBase": "База кандидатів"
   },
   "validation": {
     "required": "Це поле є обов'язковим для заповнення",
@@ -418,6 +419,15 @@
     "vacancyPerformance": "Топ вакансій за заявками",
     "noData": "Даних про заявку ще немає",
     "noVacancies": "Ще немає опублікованих вакансій",
+    "processHealth": "Стан процесу",
+    "activeVacancies": "Активні вакансії",
+    "pendingInterviews": "Очікують інтервʼю",
+    "staleApplications": "Заявки без руху",
+    "avgDecisionDays": "Середній час рішення",
+    "days": "дн.",
+    "statusBreakdown": "Розподіл кандидатів за статусами",
+    "scoreDistribution": "Розподіл CV-оцінок",
+    "noScoreData": "Кандидатів з оцінкою ще немає",
     "funnel": {
       "applied": "Прикладний",
       "prescanned": "Попередньо відскановані",
@@ -430,6 +440,12 @@
       "vacancy": "Вакансія",
       "applications": "Додатки",
       "avgScore": "Середнє Оцінка"
+    },
+    "scoreBuckets": {
+      "low": "0-39 Низький",
+      "medium": "40-59 Середній",
+      "good": "60-79 Добрий",
+      "strong": "80-100 Сильний"
     }
   },
   "vacancies": {
@@ -667,7 +683,9 @@
       "newest": "Спочатку найновіші",
       "oldest": "Спочатку найстаріші",
       "highestScore": "Найвищий бал",
-      "lowestScore": "Найнижчий бал"
+      "lowestScore": "Найнижчий бал",
+      "nameAsc": "Імʼя А-Я",
+      "nameDesc": "Імʼя Я-А"
     },
     "overview": "Огляд",
     "cv": "CV",
@@ -939,7 +957,10 @@
     "selected": "Вибрано {count}",
     "bulkActions": "Масові дії",
     "noMatchingCandidates": "Немає кандидатів, які відповідають \"{query}\"",
-    "noCandidatesApplied": "Жоден кандидат ще не подав заявки"
+    "noCandidatesApplied": "Жоден кандидат ще не подав заявки",
+    "candidateBase": {
+      "applications": "Заявки"
+    }
   },
   "interviews": {
     "title": "Інтерв'ю",
@@ -1502,6 +1523,11 @@
         "title": "Знайти кандидатів",
         "description": "Пошук, фільтри або шорт-лист для вакансії.",
         "prompt": "Покажи кандидатів з найвищими балами співбесіди"
+      },
+      "createVacancy": {
+        "title": "Створити вакансію",
+        "description": "Підготуйте нову роль, вимоги, критерії відбору та налаштування AI-інтервʼю.",
+        "prompt": "Допоможи покроково створити нову вакансію"
       },
       "vacancies": {
         "title": "Робота з вакансіями",

@@ -99,7 +99,8 @@
     "myApplications": "Менің қолданбаларым",
     "cvBuilder": "CV Құрастырушы",
     "myCvs": "Менің CVтерім",
-    "hrAnalytics": "Аналитика"
+    "hrAnalytics": "Аналитика",
+    "candidateBase": "Кандидаттар базасы"
   },
   "validation": {
     "required": "Бұл өріс қажет",
@@ -418,6 +419,15 @@
     "vacancyPerformance": "Өтініштер бойынша үздік бос орындар",
     "noData": "Қолданба деректері әлі жоқ",
     "noVacancies": "Әзірге жарияланған бос орындар жоқ",
+    "processHealth": "Процесс жағдайы",
+    "activeVacancies": "Белсенді бос орындар",
+    "pendingInterviews": "Күтіліп тұрған сұхбаттар",
+    "staleApplications": "Қозғалыссыз өтінімдер",
+    "avgDecisionDays": "Орташа шешім уақыты",
+    "days": "күн",
+    "statusBreakdown": "Кандидаттар статусы бойынша бөлу",
+    "scoreDistribution": "CV ұпайларының таралуы",
+    "noScoreData": "Әзірге бағаланған кандидаттар жоқ",
     "funnel": {
       "applied": "Қолданылған",
       "prescanned": "Алдын ала сканерленген",
@@ -430,6 +440,12 @@
       "vacancy": "Бос орын",
       "applications": "Қолданбалар",
       "avgScore": "Орт. Ұпай"
+    },
+    "scoreBuckets": {
+      "low": "0-39 Төмен",
+      "medium": "40-59 Орташа",
+      "good": "60-79 Жақсы",
+      "strong": "80-100 Күшті"
     }
   },
   "vacancies": {
@@ -667,7 +683,9 @@
       "newest": "Ең жаңасы бірінші",
       "oldest": "Ең ескі",
       "highestScore": "Ең жоғары ұпай",
-      "lowestScore": "Ең төменгі ұпай"
+      "lowestScore": "Ең төменгі ұпай",
+      "nameAsc": "Аты A-Z",
+      "nameDesc": "Аты Z-A"
     },
     "overview": "Шолу",
     "cv": "CV",
@@ -939,7 +957,10 @@
     "selected": "{count} таңдалды",
     "bulkActions": "Жаппай әрекеттер",
     "noMatchingCandidates": "\"{query}\" сәйкес келетін үміткерлер жоқ",
-    "noCandidatesApplied": "Әзірге үміткерлер өтініш берген жоқ"
+    "noCandidatesApplied": "Әзірге үміткерлер өтініш берген жоқ",
+    "candidateBase": {
+      "applications": "Өтінімдер"
+    }
   },
   "interviews": {
     "title": "Сұхбаттар",
@@ -1502,6 +1523,11 @@
         "title": "Кандидаттарды табу",
         "description": "Вакансия бойынша іздеу, сүзу немесе shortlist жасау.",
         "prompt": "Сұхбат ұпайы ең жоғары кандидаттарды көрсет"
+      },
+      "createVacancy": {
+        "title": "Бос орын жасау",
+        "description": "Жаңа рөлді, талаптарды, скрининг критерийлерін және AI сұхбат баптауын дайындау.",
+        "prompt": "Жаңа бос орынды қадам-қадаммен жасауға көмектес"
       },
       "vacancies": {
         "title": "Вакансиялармен жұмыс",

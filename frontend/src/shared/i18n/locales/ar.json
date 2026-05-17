@@ -99,7 +99,8 @@
     "myApplications": "تطبيقاتي",
     "cvBuilder": "CV منشئ",
     "myCvs": "CVs الخاص بي",
-    "hrAnalytics": "التحليلات"
+    "hrAnalytics": "التحليلات",
+    "candidateBase": "قاعدة المرشحين"
   },
   "validation": {
     "required": "هذا الحقل مطلوب",
@@ -418,6 +419,15 @@
     "vacancyPerformance": "أعلى الوظائف الشاغرة حسب التطبيقات",
     "noData": "لا توجد بيانات التطبيق حتى الآن",
     "noVacancies": "لم يتم نشر أي وظائف شاغرة حتى الآن",
+    "processHealth": "حالة العملية",
+    "activeVacancies": "الوظائف النشطة",
+    "pendingInterviews": "المقابلات المعلقة",
+    "staleApplications": "الطلبات غير المتحركة",
+    "avgDecisionDays": "متوسط وقت القرار",
+    "days": "أيام",
+    "statusBreakdown": "توزيع المرشحين حسب الحالة",
+    "scoreDistribution": "توزيع درجات السيرة الذاتية",
+    "noScoreData": "لا يوجد مرشحون مقيّمون بعد",
     "funnel": {
       "applied": "مطبق",
       "prescanned": "تم فحصها مسبقًا",
@@ -430,6 +440,12 @@
       "vacancy": "شاغر",
       "applications": "التطبيقات",
       "avgScore": "متوسط النتيجة"
+    },
+    "scoreBuckets": {
+      "low": "0-39 منخفض",
+      "medium": "40-59 متوسط",
+      "good": "60-79 جيد",
+      "strong": "80-100 قوي"
     }
   },
   "vacancies": {
@@ -667,7 +683,9 @@
       "newest": "الأحدث أولاً",
       "oldest": "الأقدم أولاً",
       "highestScore": "أعلى الدرجات",
-      "lowestScore": "أدنى درجة"
+      "lowestScore": "أدنى درجة",
+      "nameAsc": "الاسم أ-ي",
+      "nameDesc": "الاسم ي-أ"
     },
     "overview": "نظرة عامة",
     "cv": "CV",
@@ -939,7 +957,10 @@
     "selected": "تم تحديد {count}",
     "bulkActions": "الإجراءات السائبة",
     "noMatchingCandidates": "لا يوجد مرشحون مطابقون لـ \"{query}\"",
-    "noCandidatesApplied": "لم يتقدم أي مرشح بعد"
+    "noCandidatesApplied": "لم يتقدم أي مرشح بعد",
+    "candidateBase": {
+      "applications": "الطلبات"
+    }
   },
   "interviews": {
     "title": "مقابلات",
@@ -1502,6 +1523,11 @@
         "title": "العثور على مرشحين",
         "description": "البحث أو التصفية أو إعداد قائمة مختصرة لوظيفة.",
         "prompt": "اعرض المرشحين أصحاب أعلى درجات المقابلة"
+      },
+      "createVacancy": {
+        "title": "إنشاء وظيفة شاغرة",
+        "description": "إعداد دور جديد ومتطلبات ومعايير فحص وإعداد مقابلة AI.",
+        "prompt": "ساعدني في إنشاء وظيفة شاغرة جديدة خطوة بخطوة"
       },
       "vacancies": {
         "title": "إدارة الوظائف",

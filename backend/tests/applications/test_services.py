@@ -137,7 +137,7 @@ class TestCreateInterviewSession:
 
         assert session is not None
         assert session.session_type == Interview.SessionType.INTERVIEW
-        assert session.screening_mode == vacancy.interview_mode
+        assert session.screening_mode == Interview.ScreeningMode.MEET
         assert session.status == Interview.Status.PENDING
 
     def test_create_interview_session_falls_back_from_uzbek_to_russian(self, vacancy):

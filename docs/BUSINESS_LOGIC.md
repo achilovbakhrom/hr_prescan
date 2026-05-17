@@ -2,17 +2,17 @@
 
 ## 1. Overview
 
-HR PreScan is a multi-tenant SaaS platform that automates the full candidate screening pipeline using AI-powered conversations via text chat or video. When a vacancy receives hundreds of applicants, manually screening each one is time-consuming and inconsistent.
+HR PreScan is a multi-tenant SaaS platform that automates the full candidate screening pipeline using AI-powered prescanning chat and video interviews. When a vacancy receives hundreds of applicants, manually screening each one is time-consuming and inconsistent.
 
 **The platform provides a two-step AI screening pipeline:**
 
 1. **Prescanning** — an initial AI conversation (always via chat) that quickly filters candidates based on general fit, soft skills, and basic qualifications. Every vacancy has prescanning enabled by default.
-2. **Interview** — an optional, more rigorous AI conversation (chat or meet/video) with tougher, domain-specific questions. HR enables this per vacancy by configuring interview questions and criteria.
+2. **Interview** — an optional, more rigorous AI video conversation with tougher, domain-specific questions. HR enables this per vacancy by configuring interview questions and criteria.
 
 The AI agent evaluates candidates at each step and decides whether to advance them to the next stage or reject them. HR can also manually move candidates between stages at any time. The platform handles the screening pipeline; HR retains full control over final decisions.
 
 **Platform:** Web application (mobile versions planned for later)
-**Languages:** English, Russian, Uzbek, Kazakh, Turkish, Arabic, Spanish, French, German, and Ukrainian for the web app, public translation, and AI screening language selection. Telegram bot interface copy currently remains English/Russian/Uzbek, while Telegram prescreening follows the vacancy's selected screening language. Deeper video interview sessions use a voice-provider policy: native Deepgram voices for English, Spanish, French, and German; per-language ElevenLabs multilingual voices for Russian, Ukrainian, Turkish, Arabic, and Kazakh; Uzbek interview sessions currently run in Russian until native Uzbek voice quality is acceptable. If a configured ElevenLabs voice is blocked or unavailable, the agent falls back to an API-usable ElevenLabs premade recovery voice before allowing silence; the spoken text must remain in the vacancy's resolved interview language.
+**Languages:** English, Russian, Uzbek, Kazakh, Turkish, Arabic, Spanish, French, German, and Ukrainian for the web app, public translation, and AI screening language selection. Telegram bot interface copy currently remains English/Russian/Uzbek, while Telegram prescreening follows the vacancy's selected screening language. Deeper video interview sessions use a voice-provider policy: native Deepgram speech recognition for supported interview languages including Arabic; native Deepgram voices for English, Spanish, French, and German; per-language ElevenLabs multilingual voices for Russian, Ukrainian, Turkish, Arabic, and Kazakh; Uzbek interview sessions currently run in Russian until native Uzbek voice quality is acceptable. If a configured ElevenLabs voice is blocked or unavailable, the agent falls back to an API-usable ElevenLabs premade recovery voice before allowing silence; the spoken text must remain in the vacancy's resolved interview language.
 **Tech Stack:** Django (backend) + Nuxt/Vue.js (frontend), deployed via Docker Compose with zero-downtime strategy
 
 ---
@@ -31,7 +31,7 @@ The AI agent evaluates candidates at each step and decides whether to advance th
 - Belongs to a company (multi-tenant)
 - Creates and manages vacancies
 - Configures prescanning setup per vacancy (questions, criteria, additional prompt for AI agent)
-- Optionally configures interview step per vacancy (questions, criteria, mode, additional prompt for AI agent)
+- Optionally configures interview step per vacancy (questions, criteria, duration, additional prompt for AI agent)
 - Reviews candidate scores from both prescanning and interview stages
 - Filters and sorts candidates by AI scores
 - Manages candidate pipeline per vacancy
@@ -45,7 +45,7 @@ The AI agent evaluates candidates at each step and decides whether to advance th
 - Uploads CV/resume (optional but recommended)
 - Builds and exports a CV through the candidate AI assistant (single chat surface — no separate "AI Generate CV" / "AI Chat" buttons on the CV builder). If the candidate provides a date of birth in the CV profile, they must be at least 14 years old.
 - Completes AI prescanning (always via chat) after applying
-- If advanced by AI, completes AI interview (chat or meet, depending on vacancy configuration)
+- If advanced by AI, completes AI interview in a Meet/video room
 - Can start prescanning immediately after applying or return later via the link
 - Receives notifications about application status
 - Upon registration, previous applications and sessions are automatically linked to the account via email or phone number
@@ -83,7 +83,7 @@ The AI agent evaluates candidates at each step and decides whether to advance th
 - 1 active vacancy
 - 10 AI sessions (prescanning + interviews) per month
 - 1 HR user
-- Prescanning only (no interview step, no Meet mode)
+- Prescanning only (no interview step)
 - 100 MB storage (CVs only, no recordings)
 - Community support
 - HR PreScan branding on public vacancy pages
@@ -92,7 +92,7 @@ The AI agent evaluates candidates at each step and decides whether to advance th
 - 10 active vacancies
 - 200 AI sessions per month
 - 5 HR users
-- Full pipeline: prescanning + interview step with Chat or Meet mode
+- Full pipeline: prescanning + Meet/video interview step
 - 10 GB storage (CVs + interview recordings)
 - Email support
 - No HR PreScan branding
@@ -103,7 +103,7 @@ The AI agent evaluates candidates at each step and decides whether to advance th
 - Unlimited active vacancies
 - Unlimited AI sessions
 - Unlimited HR users
-- Full pipeline: prescanning + interview step with Chat or Meet mode
+- Full pipeline: prescanning + Meet/video interview step
 - 100 GB storage (expandable)
 - Priority support + dedicated account manager
 - SSO / SAML integration
@@ -216,25 +216,23 @@ Each vacancy has a two-step AI screening pipeline. HR configures each step durin
 
 #### 5.4.2 Interview (optional, enabled per vacancy)
 
-- **Mode:** Chat or Meet — HR chooses per vacancy at creation time
+- **Mode:** Meet/video only
 - **Purpose:** Deeper, more rigorous AI evaluation for candidates who passed prescanning
 - **To enable:** HR must configure questions and evaluation criteria for the interview step
 - **Configuration:**
   - Questions — own set of literal candidate-facing questions, separate from prescanning questions; tougher and more domain-specific
   - Evaluation criteria — own set, separate from prescanning criteria
   - Additional prompt — free-text field for HR instructions (e.g., "Be strict about technical knowledge", "Test system design thinking")
-  - Mode — Chat or Meet
-  - Duration — configurable (Meet mode only)
-- **Chat mode** — same as prescanning chat, but with interview-specific questions and tougher AI behavior
-- **Meet mode** — AI converses with the candidate via a video call on LiveKit. Full integrity monitoring (face detection, gaze tracking, audio anomaly detection). Interview is recorded. Suitable for mid-to-senior roles or positions requiring presentation skills.
+  - Duration — configurable pacing target
+- AI converses with the candidate via a video call on LiveKit. Full integrity monitoring (face detection, gaze tracking, audio anomaly detection). Interview is recorded. Suitable for mid-to-senior roles or positions requiring presentation skills.
 
 #### 5.4.3 Pipeline Rules
 
 - Prescanning mode is always chat and cannot be changed
-- Interview mode (chat or meet) is set per vacancy and cannot be changed after the vacancy has active applications
+- Interview mode is always Meet/video. Chat interviews are no longer supported, and legacy chat interview history is cleared during migration.
 - The optional interview step is web-only. Telegram supports vacancy discovery, application, CV handling, and prescanning, but candidates must use the web link for the deeper interview step.
 - Both steps produce the same scoring output format: per-criteria scores (1-10), overall weighted score, AI summary, transcript, and structured decision support
-- Meet mode (interview step only) additionally produces a video recording and integrity flags
+- The interview step additionally produces a video recording and integrity flags
 - Each step has its own independent set of scores — a candidate will have prescanning scores and (if applicable) interview scores
 - CV upload is optional (configurable per vacancy). AI uses CV context in both prescanning and interview if available
 - The AI agent decides whether to advance or reject candidates after each step. HR can override at any time.
@@ -266,7 +264,7 @@ Candidates can apply via two surfaces: the **web app** (public job board) and th
 8. After prescanning completes, AI evaluates and decides:
    - **Advance** — if interview step is enabled, the prepared interview session/link becomes available to the candidate on the web. If interview step is disabled, the candidate is moved directly to shortlisted.
    - **Reject** — candidate is moved to rejected status
-9. If advanced to interview, candidate receives an interview link and completes the interview (chat or meet, depending on vacancy configuration)
+9. If advanced to interview, candidate receives an interview link and completes the Meet/video interview
 10. After interview completes, AI evaluates and decides to shortlist or reject the candidate
 
 #### Candidate-facing Telegram shortcuts
@@ -394,12 +392,7 @@ Prescanning is the initial AI screening step. It is always enabled and always co
 
 Interview is the second, more rigorous AI screening step. HR enables it per vacancy by configuring interview questions and criteria. The interview AI agent is tougher and more domain-specific than prescanning.
 
-**Setup — Chat mode:**
-- Same technical setup as prescanning chat (browser-based text messaging)
-- Uses interview-specific questions and criteria (separate from prescanning)
-- AI agent behavior is tougher and more probing
-
-**Setup — Meet mode:**
+**Setup — Meet/video interview:**
 - Conducted in a video room (similar to Google Meet) via LiveKit
 - AI agent appears as the interviewer in the room
 - Microphone permission is required. Camera is recommended for integrity checks but is not mandatory; candidates can join a Meet interview with audio only if camera access fails or no camera is available.
@@ -410,7 +403,7 @@ Interview is the second, more rigorous AI screening step. HR enables it per vaca
 - Full integrity monitoring (face detection, gaze tracking, audio anomaly detection)
 - Interview is recorded
 
-**Common to both interview modes:**
+**Interview setup:**
 - A progress indicator shows approximate completion
 - Supported languages: English, Russian, Uzbek, Kazakh, Turkish, Arabic, Spanish, French, German, and Ukrainian. Interview sessions inherit the vacancy screening language unless explicitly changed by the screening workflow or by the interview runtime language policy. Video interviews use native Deepgram TTS for English, Spanish, French, and German, per-language ElevenLabs multilingual TTS for Russian, Ukrainian, Turkish, Arabic, and Kazakh, and Russian voice fallback for Uzbek and Kazakh when dedicated voices are not configured. If a configured ElevenLabs voice is blocked, unavailable, or out of quota, the agent uses an API-usable ElevenLabs premade recovery voice instead of switching to a different-language provider. Prompt language control must keep the actual interview text in the vacancy's resolved language. Prescanning remains in Uzbek when Uzbek is selected.
 - The interview agent should speak in concise, natural language. If the candidate refuses to continue, says the role/profession is not relevant, or clearly does not fit the role after clarification, the agent ends the interview kindly instead of continuing to probe. Before any normal or early finish, the agent asks for the candidate's final words for HR.
@@ -426,17 +419,7 @@ Interview is the second, more rigorous AI screening step. HR enables it per vaca
 - **AI autonomy:** The AI agent may ask additional questions, present practical cases, or challenge the candidate's claims. The agent is expected to be more demanding than during prescanning.
 - **Additional prompt:** HR can provide a free-text prompt with extra instructions for the interview AI agent (e.g., "Be strict about technical knowledge", "Test system design thinking", "Present a real-world scenario"). This prompt is separate from the prescanning prompt.
 
-**Interview Flow — Chat mode:**
-1. Candidate receives an interview link after being advanced from prescanning
-2. Candidate opens the interview link
-3. AI greeting message appears
-4. AI asks interview questions one by one; candidate types responses
-5. AI can ask follow-up questions, present cases, or probe deeper
-6. Interview concludes when AI determines it has gathered enough information or the early-finish rule applies
-7. AI asks for final words, thanks the candidate, and ends the session
-8. Candidate sees a "Thank you" screen
-
-**Interview Flow — Meet mode:**
+**Interview Flow — Meet/video:**
 1. Candidate receives an interview link after being advanced from prescanning
 2. Candidate opens the link and sees a device-check preview (camera, microphone)
 3. Candidate clicks "Join Interview"
@@ -485,7 +468,7 @@ Each step (prescanning and interview) produces its own independent set of scores
 **Additional output for Meet mode (interview step only):**
 - Interview recording (video)
 - Integrity flags (see Section 15)
-- Timestamped voice conversation transcript visible in HR candidate review, using the same Conversation view as chat-mode sessions. When a recording exists, transcript timestamps should allow HR to jump to the matching point in the recording.
+- Timestamped voice conversation transcript visible in HR candidate review, using the same Conversation view as prescanning chat sessions. When a recording exists, transcript timestamps should allow HR to jump to the matching point in the recording.
 
 ---
 
@@ -508,7 +491,11 @@ Each step (prescanning and interview) produces its own independent set of scores
 - List of active vacancies with candidate counts
 - Recent screening results (prescanning + interview)
 - Key metrics (total applicants, prescreenings completed, interviews completed, average scores)
-- Analytics shows per-vacancy performance across every non-deleted company the HR user can access: applications, candidates reaching interview-or-later stages, hires, hire rate, rejection rate, and average CV match score.
+- Analytics shows company-wide hiring health across every non-deleted company the HR user can access:
+  applications and interviews totals, interview completion rate, average interview score, funnel counts,
+  candidate status breakdown, CV score distribution, active vacancies, pending interviews, stale
+  applications, average decision time, and per-vacancy performance with applications, candidates
+  reaching interview-or-later stages, hires, hire rate, rejection rate, and average CV match score.
 
 ### 9.2 Candidate Pipeline per Vacancy
 
@@ -687,7 +674,7 @@ Archived → Applied (restore)
 ### 13.1 Anonymous Access & Account Binding
 - Candidates can apply to vacancies and complete prescanning/interviews without creating an account
 - Session links contain a UUID token that serves as an unguessable credential, granting access to that specific session only
-- Chat mode sessions use the session token for resumption — candidate can close the browser and reopen the link to continue
+- Prescanning chat sessions use the session token for resumption — candidate can close the browser and reopen the link to continue
 - Account creation is suggested after the final screening step completion (on the "Thank you" screen and in the confirmation email)
 - When a candidate creates an account, the system automatically binds their previous applications and sessions:
   - **Email binding:** matches existing applications where `candidate_email` equals the registered email (case-insensitive)
@@ -739,7 +726,7 @@ Archived → Applied (restore)
 1. After onboarding, the system guides the HR to create their first vacancy
 2. A brief tutorial/wizard walks through vacancy creation steps
 3. HR configures prescanning (questions, criteria, additional prompt)
-4. HR optionally enables and configures interview step (questions, criteria, mode, additional prompt)
+4. HR optionally enables and configures interview step (questions, criteria, duration, additional prompt)
 5. Once published, the vacancy is live and ready to receive candidates
 
 ---
@@ -759,12 +746,12 @@ Archived → Applied (restore)
 - **Eye tracking / gaze detection** — AI monitors if the candidate is frequently looking away from the screen (possible sign of reading from notes). This is logged as a note, not an automatic disqualification
 - **Audio anomaly detection** — AI detects if another voice is heard or if the candidate appears to be receiving prompts from someone else
 
-### 15.3 Content-Based Cheating Detection (all chat and meet sessions)
+### 15.3 Content-Based Cheating Detection (prescanning chat and Meet/video sessions)
 
 - **Response consistency** — AI cross-references answers with CV claims (if CV was uploaded). Inconsistencies are flagged (e.g., claims 5 years of React experience but can't answer basic questions)
 - **Scripted answer detection** — AI analyzes response patterns. If answers sound overly rehearsed or read aloud (unnatural pacing, no pauses), it's noted
 - **AI-generated answer detection** — if candidate appears to be using ChatGPT or similar tools, this is flagged
-- **Response timing analysis (Chat mode)** — suspiciously fast or slow replies may indicate copy-paste from external tools or AI-generated answers
+- **Response timing analysis (prescanning chat)** — suspiciously fast or slow replies may indicate copy-paste from external tools or AI-generated answers
 - **Cross-step consistency** — AI can compare prescanning answers with interview answers to detect inconsistencies
 
 ### 15.4 Integrity Report
@@ -776,7 +763,7 @@ Archived → Applied (restore)
   - "Candidate looked away from screen frequently (12 times)" (Meet mode interview only)
   - "Second person briefly detected at 04:23" (Meet mode interview only)
   - "CV states 5 years Python experience but struggled with basic questions" (any step)
-  - "Multiple responses appeared copy-pasted (avg response time: 2 seconds for 200+ word answers)" (Chat mode)
+  - "Multiple responses appeared copy-pasted (avg response time: 2 seconds for 200+ word answers)" (prescanning chat)
   - "Candidate's interview answers contradict prescanning responses about team management experience" (cross-step)
 
 ---
@@ -789,7 +776,7 @@ Archived → Applied (restore)
 - If the candidate reconnects within the window, the session resumes from where it left off
 - If the candidate does not reconnect, the session is completed with partial data and a note indicating disconnection
 
-### 16.2 Browser Close Mid-Chat (Chat mode — prescanning or interview)
+### 16.2 Browser Close Mid-Chat (prescanning only)
 - Chat history is persisted server-side
 - Candidate reopens the session link and sees their full conversation history
 - The session continues from where it left off
@@ -812,14 +799,14 @@ Archived → Applied (restore)
 - The session status remains "pending" so the candidate can try again later
 
 ### 16.6 Concurrent Sessions
-- Each candidate's session gets its own independent context (chat thread or video room)
+- Each candidate's session gets its own independent context (prescanning chat thread or video room)
 - Multiple candidates can be in prescanning or interview simultaneously for the same vacancy
 - No scheduling conflicts since there is no scheduling
 - System may enforce per-vacancy concurrency limits to prevent overload (configurable)
 
 ### 16.7 Link Sharing Prevention
 - **Meet mode (interview):** LiveKit room token is bound to the candidate. Room has max 2 participants (candidate + AI agent). If someone else tries to join with the same link while the session is active, they see "Session is already in use."
-- **Chat mode (prescanning or interview):** session token is unique per application. If a session is already active from another browser, the new session takes over (last-writer-wins) to handle legitimate tab switches
+- **Prescanning chat:** session token is unique per application. If a session is already active from another browser, the new session takes over (last-writer-wins) to handle legitimate tab switches
 
 ### 16.8 CV Processing Timing
 - CV parsing is asynchronous (Celery task). If the candidate starts prescanning before CV processing completes:
@@ -845,7 +832,7 @@ Archived → Applied (restore)
 - Integration with job boards (LinkedIn, Indeed, HH.ru)
 - Advanced analytics and reporting for companies
 - Voice-only interview mode (audio without video)
-- Code editor integration for technical chat interviews/prescreening
+- Code editor integration for technical prescreening or video interviews
 - Candidate feedback on AI screening experience
 - Automated reference checking
 - Skill assessment tests (coding challenges, personality tests)

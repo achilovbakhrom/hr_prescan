@@ -10,12 +10,7 @@ import { PRESCANNING_LANGUAGE_OPTIONS } from '@/shared/i18n/supportedLocales'
 import QuestionList from './QuestionList.vue'
 import CriteriaList from './CriteriaList.vue'
 import { useVacancyStore } from '../stores/vacancy.store'
-import type {
-  InterviewMode,
-  InterviewQuestion,
-  VacancyCriteria,
-  VacancyDetail,
-} from '../types/vacancy.types'
+import type { InterviewQuestion, VacancyCriteria, VacancyDetail } from '../types/vacancy.types'
 
 const props = defineProps<{
   vacancy: VacancyDetail
@@ -41,11 +36,6 @@ const { t } = useI18n()
 const toast = useToast()
 const vacancyStore = useVacancyStore()
 
-const interviewModeOptions = computed(() => [
-  { label: t('vacancies.interviewMode.chat'), value: 'chat' as InterviewMode },
-  { label: t('vacancies.interviewMode.meet'), value: 'meet' as InterviewMode },
-])
-
 // Local form state mirroring vacancy fields for this step
 const language = ref(props.vacancy.prescanningLanguage || 'en')
 const prompt = ref(
@@ -53,7 +43,6 @@ const prompt = ref(
     ? props.vacancy.prescanningPrompt || ''
     : props.vacancy.interviewPrompt || '',
 )
-const interviewMode = ref<InterviewMode>(props.vacancy.interviewMode || 'chat')
 const interviewDuration = ref<number>(props.vacancy.interviewDuration || 30)
 const saving = ref(false)
 const interviewLocked = computed(
@@ -68,7 +57,6 @@ watch(
     language.value = v.prescanningLanguage || 'en'
     prompt.value =
       props.step === 'prescanning' ? v.prescanningPrompt || '' : v.interviewPrompt || ''
-    interviewMode.value = v.interviewMode || 'chat'
     interviewDuration.value = v.interviewDuration || 30
   },
   { deep: true },
@@ -83,7 +71,6 @@ const dirty = computed(() => {
   }
   return (
     prompt.value !== (props.vacancy.interviewPrompt || '') ||
-    (!interviewLocked.value && interviewMode.value !== (props.vacancy.interviewMode || 'chat')) ||
     interviewDuration.value !== (props.vacancy.interviewDuration || 30)
   )
 })
@@ -99,7 +86,7 @@ async function save(): Promise<void> {
             interviewDuration: interviewDuration.value ?? 30,
           }
     if (props.step === 'interview' && !interviewLocked.value) {
-      payload.interviewMode = interviewMode.value
+      payload.interviewMode = 'meet'
     }
     await vacancyStore.updateVacancy(props.vacancy.id, payload)
     toast.add({ severity: 'success', summary: t('common.saved'), life: 2500 })
@@ -140,19 +127,14 @@ async function save(): Promise<void> {
           <label class="mb-1 block text-xs font-medium text-gray-600">{{
             t('vacancies.form.interviewMode')
           }}</label>
-          <Dropdown
-            v-model="interviewMode"
-            :options="interviewModeOptions"
-            option-label="label"
-            option-value="value"
-            :disabled="interviewLocked"
-            class="w-full"
-          />
+          <div class="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm">
+            {{ t('vacancies.interviewMode.meet') }}
+          </div>
           <p v-if="interviewLocked" class="mt-1 text-xs text-[color:var(--color-warning)]">
             {{ t('vacancies.settings.interviewLocked', 'Locked — applications already received') }}
           </p>
         </div>
-        <div v-if="interviewMode === 'meet'">
+        <div>
           <label class="mb-1 block text-xs font-medium text-gray-600">{{
             t('vacancies.form.interviewDuration')
           }}</label>

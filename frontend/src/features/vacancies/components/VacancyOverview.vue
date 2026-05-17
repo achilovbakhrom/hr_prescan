@@ -109,15 +109,9 @@ function formatSalary(): string {
       </div>
       <div v-if="vacancy.interviewEnabled">
         <p class="text-sm text-gray-500">{{ t('vacancies.form.interviewMode') }}</p>
-        <p class="font-medium">
-          {{
-            vacancy.interviewMode === 'meet'
-              ? t('vacancies.interviewMode.meet')
-              : t('vacancies.interviewMode.chat')
-          }}
-        </p>
+        <p class="font-medium">{{ t('vacancies.interviewMode.meet') }}</p>
       </div>
-      <div v-if="vacancy.interviewEnabled && vacancy.interviewMode === 'meet'">
+      <div v-if="vacancy.interviewEnabled">
         <p class="text-sm text-gray-500">{{ t('vacancies.form.interviewDuration') }}</p>
         <p class="font-medium">{{ vacancy.interviewDuration }} min</p>
       </div>

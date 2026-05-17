@@ -99,7 +99,8 @@
     "myApplications": "My Applications",
     "cvBuilder": "CV Builder",
     "myCvs": "My CVs",
-    "hrAnalytics": "Analytics"
+    "hrAnalytics": "Analytics",
+    "candidateBase": "Candidate Base"
   },
   "validation": {
     "required": "This field is required",
@@ -253,8 +254,8 @@
       "subtitle": "Our intelligent agents handle the entire screening pipeline — from first contact to final score.",
       "aiPrescanning": "Intelligent Prescreening",
       "aiPrescanningDesc": "Every candidate is automatically screened through AI chat against your must-have filters, criteria, and role-specific questions.",
-      "aiInterviews": "AI Voice & Chat Interviews",
-      "aiInterviewsDesc": "Our AI agent conducts natural conversations via text chat or video call, available 24/7 in multiple languages.",
+      "aiInterviews": "AI Video Interviews",
+      "aiInterviewsDesc": "Our AI agent conducts natural video interview conversations, available 24/7 in multiple languages.",
       "twoStep": "Two-Step Screening",
       "twoStepDesc": "Quick prescanning chat followed by an in-depth AI interview. Filter candidates efficiently.",
       "analytics": "Smart Analytics",
@@ -283,7 +284,7 @@
       "step2": "Share one link",
       "step2Desc": "Candidates apply and pass prescreening without authentication.",
       "step3": "AI interviews",
-      "step3Desc": "Qualified candidates continue to stricter chat or video interviews.",
+      "step3Desc": "Qualified candidates continue to stricter video interviews.",
       "step4": "Review & Hire",
       "step4Desc": "Review AI scores, watch recordings, and make informed hiring decisions."
     },
@@ -340,7 +341,7 @@
       "step2": "AI Prescanning",
       "step2Desc": "Link-based chat screening with no candidate login",
       "step3": "AI Interview",
-      "step3Desc": "Stricter follow-up via chat or video",
+      "step3Desc": "Stricter follow-up via video interview",
       "step4": "HR Reviews Scores",
       "step4Desc": "Compare candidates with AI insights",
       "step5": "Hire",
@@ -425,6 +426,15 @@
     "vacancyPerformance": "Top Vacancies by Applications",
     "noData": "No application data yet",
     "noVacancies": "No published vacancies yet",
+    "processHealth": "Process Health",
+    "activeVacancies": "Active Vacancies",
+    "pendingInterviews": "Pending Interviews",
+    "staleApplications": "Stale Applications",
+    "avgDecisionDays": "Avg. Decision Time",
+    "days": "days",
+    "statusBreakdown": "Candidate Status Breakdown",
+    "scoreDistribution": "CV Score Distribution",
+    "noScoreData": "No scored candidates yet",
     "funnel": {
       "applied": "Applied",
       "prescanned": "Prescanned",
@@ -437,6 +447,12 @@
       "vacancy": "Vacancy",
       "applications": "Applications",
       "avgScore": "Avg. Score"
+    },
+    "scoreBuckets": {
+      "low": "0-39 Low",
+      "medium": "40-59 Medium",
+      "good": "60-79 Good",
+      "strong": "80-100 Strong"
     }
   },
   "vacancies": {
@@ -674,7 +690,9 @@
       "newest": "Newest first",
       "oldest": "Oldest first",
       "highestScore": "Highest score",
-      "lowestScore": "Lowest score"
+      "lowestScore": "Lowest score",
+      "nameAsc": "Name A-Z",
+      "nameDesc": "Name Z-A"
     },
     "overview": "Overview",
     "cv": "CV",
@@ -946,7 +964,10 @@
     "selected": "{count} selected",
     "bulkActions": "Bulk Actions",
     "noMatchingCandidates": "No candidates matching \"{query}\"",
-    "noCandidatesApplied": "No candidates have applied yet"
+    "noCandidatesApplied": "No candidates have applied yet",
+    "candidateBase": {
+      "applications": "Applications"
+    }
   },
   "interviews": {
     "title": "Interviews",
@@ -1509,6 +1530,11 @@
         "title": "Find candidates",
         "description": "Search, filter, or shortlist applicants for a vacancy.",
         "prompt": "Show candidates with the highest interview scores"
+      },
+      "createVacancy": {
+        "title": "Create vacancy",
+        "description": "Draft a new role, requirements, screening criteria, and AI interview setup.",
+        "prompt": "Help me create a new vacancy step by step"
       },
       "vacancies": {
         "title": "Work with vacancies",

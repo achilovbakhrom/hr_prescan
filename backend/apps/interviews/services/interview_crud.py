@@ -46,6 +46,11 @@ def start_interview(*, interview: Interview) -> Interview:
 
     if interview.status != Interview.Status.PENDING:
         raise ApplicationError(str(MSG_CANNOT_START_SESSION).format(status=interview.status))
+    if (
+        interview.session_type == Interview.SessionType.INTERVIEW
+        and interview.screening_mode == Interview.ScreeningMode.CHAT
+    ):
+        raise ApplicationError("Chat interviews are no longer supported.")
 
     interview.status = Interview.Status.IN_PROGRESS
     interview.started_at = timezone.now()
@@ -107,7 +112,11 @@ def reset_interview(*, interview: Interview) -> Interview:
     session_kwargs: dict = {
         "application": application,
         "session_type": interview.session_type,
-        "screening_mode": interview.screening_mode,
+        "screening_mode": (
+            Interview.ScreeningMode.MEET
+            if interview.session_type == Interview.SessionType.INTERVIEW
+            else interview.screening_mode
+        ),
         "interview_token": uuid.uuid4(),
         "status": Interview.Status.PENDING,
         "language": interview.language,
@@ -115,11 +124,11 @@ def reset_interview(*, interview: Interview) -> Interview:
     }
     if interview.session_type == Interview.SessionType.INTERVIEW:
         session_kwargs["language"] = resolve_interview_language(interview.language)
-    if interview.screening_mode == Interview.ScreeningMode.MEET:
+    if session_kwargs["screening_mode"] == Interview.ScreeningMode.MEET:
         session_kwargs["duration_minutes"] = application.vacancy.interview_duration
 
     new_session = Interview.objects.create(**session_kwargs)
-    if interview.screening_mode == Interview.ScreeningMode.MEET:
+    if new_session.screening_mode == Interview.ScreeningMode.MEET:
         new_session.livekit_room_name = f"interview-{new_session.id}"
         new_session.save(update_fields=["livekit_room_name", "updated_at"])
 

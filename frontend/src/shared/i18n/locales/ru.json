@@ -99,7 +99,8 @@
     "myApplications": "Мои заявки",
     "cvBuilder": "Конструктор CV",
     "myCvs": "Мои CV",
-    "hrAnalytics": "Аналитика"
+    "hrAnalytics": "Аналитика",
+    "candidateBase": "База кандидатов"
   },
   "validation": {
     "required": "Это поле обязательно",
@@ -425,6 +426,15 @@
     "vacancyPerformance": "Топ вакансий по заявкам",
     "noData": "Данных о заявках пока нет",
     "noVacancies": "Опубликованных вакансий пока нет",
+    "processHealth": "Состояние процесса",
+    "activeVacancies": "Активные вакансии",
+    "pendingInterviews": "Ожидают интервью",
+    "staleApplications": "Заявки без движения",
+    "avgDecisionDays": "Среднее время решения",
+    "days": "дн.",
+    "statusBreakdown": "Разбивка кандидатов по статусам",
+    "scoreDistribution": "Распределение CV-оценок",
+    "noScoreData": "Кандидатов с оценкой пока нет",
     "funnel": {
       "applied": "Подали заявку",
       "prescanned": "Прескрининг",
@@ -437,6 +447,12 @@
       "vacancy": "Вакансия",
       "applications": "Заявки",
       "avgScore": "Средний балл"
+    },
+    "scoreBuckets": {
+      "low": "0-39 Низкий",
+      "medium": "40-59 Средний",
+      "good": "60-79 Хороший",
+      "strong": "80-100 Сильный"
     }
   },
   "vacancies": {
@@ -674,7 +690,9 @@
       "newest": "Сначала новые",
       "oldest": "Сначала старые",
       "highestScore": "По убыванию баллов",
-      "lowestScore": "По возрастанию баллов"
+      "lowestScore": "По возрастанию баллов",
+      "nameAsc": "Имя А-Я",
+      "nameDesc": "Имя Я-А"
     },
     "overview": "Обзор",
     "cv": "Резюме",
@@ -946,7 +964,10 @@
     "selected": "{count} выбрано",
     "bulkActions": "Массовые действия",
     "noMatchingCandidates": "Нет кандидатов по запросу «{query}»",
-    "noCandidatesApplied": "Кандидатов пока не поступало"
+    "noCandidatesApplied": "Кандидатов пока не поступало",
+    "candidateBase": {
+      "applications": "Заявки"
+    }
   },
   "interviews": {
     "title": "Собеседования",
@@ -1509,6 +1530,11 @@
         "title": "Найти кандидатов",
         "description": "Поиск, фильтры и шорт-лист по нужной вакансии.",
         "prompt": "Покажи кандидатов с самыми высокими баллами интервью"
+      },
+      "createVacancy": {
+        "title": "Создать вакансию",
+        "description": "Подготовьте новую роль, требования, критерии отбора и настройку AI-интервью.",
+        "prompt": "Помоги пошагово создать новую вакансию"
       },
       "vacancies": {
         "title": "Работа с вакансиями",

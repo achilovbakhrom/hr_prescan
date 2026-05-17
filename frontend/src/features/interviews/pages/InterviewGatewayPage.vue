@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * InterviewGatewayPage — candidate lands here via email link and is
- * routed to the right screening mode (chat or room).
+ * routed to the right session surface (prescanning chat or interview room).
  *
  * T13 redesign: full-bleed ambient background + centered glass card with
  * the Prism glyph as a glow. The page is standalone (no PublicLayout)
@@ -64,7 +64,7 @@ onMounted(async () => {
       return
     }
 
-    if (data.screeningMode === 'chat') {
+    if (data.sessionType === 'prescanning') {
       router.replace({ name: ROUTE_NAMES.CHAT_INTERVIEW, params: { token } })
     } else {
       router.replace({ name: ROUTE_NAMES.INTERVIEW_ROOM, params: { token } })

@@ -175,15 +175,13 @@ def create_interview_session(*, application: Application) -> Interview | None:
     interview_kwargs: dict = {
         "application": application,
         "session_type": Interview.SessionType.INTERVIEW,
-        "screening_mode": vacancy.interview_mode,
+        "screening_mode": Interview.ScreeningMode.MEET,
         "status": Interview.Status.PENDING,
         "language": resolve_interview_language(vacancy.prescanning_language),
+        "duration_minutes": vacancy.interview_duration,
     }
-    if vacancy.interview_mode == Interview.ScreeningMode.MEET:
-        interview_kwargs["duration_minutes"] = vacancy.interview_duration
 
     interview = Interview.objects.create(**interview_kwargs)
-    if vacancy.interview_mode == Interview.ScreeningMode.MEET:
-        interview.livekit_room_name = f"interview-{interview.id}"
-        interview.save(update_fields=["livekit_room_name", "updated_at"])
+    interview.livekit_room_name = f"interview-{interview.id}"
+    interview.save(update_fields=["livekit_room_name", "updated_at"])
     return interview

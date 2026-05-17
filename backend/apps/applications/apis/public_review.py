@@ -23,6 +23,10 @@ def _score_payload(score) -> dict:
 
 
 def _session_payload(session: Interview) -> dict:
+    is_prescanning_chat = (
+        session.session_type == Interview.SessionType.PRESCANNING
+        and session.screening_mode == Interview.ScreeningMode.CHAT
+    )
     return {
         "id": str(session.id),
         "session_type": session.session_type,
@@ -33,7 +37,7 @@ def _session_payload(session: Interview) -> dict:
         "ai_summary_translations": session.ai_summary_translations,
         "decision_support": session.decision_support,
         "transcript": session.transcript,
-        "chat_history": session.chat_history,
+        "chat_history": session.chat_history if is_prescanning_chat else [],
         "recording_path": session.recording_path,
         "scores": [_score_payload(score) for score in session.scores.all()],
         "created_at": session.created_at,

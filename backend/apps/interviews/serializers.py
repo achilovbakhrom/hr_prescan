@@ -81,6 +81,7 @@ class InterviewDetailOutputSerializer(serializers.ModelSerializer):
     vacancy_title = serializers.SerializerMethodField()
     scores = InterviewScoreOutputSerializer(many=True, read_only=True)
     integrity_flags = IntegrityFlagOutputSerializer(many=True, read_only=True)
+    chat_history = serializers.SerializerMethodField()
 
     class Meta:
         model = Interview
@@ -122,12 +123,18 @@ class InterviewDetailOutputSerializer(serializers.ModelSerializer):
     def get_vacancy_title(self, obj: Interview) -> str:
         return obj.application.vacancy.title
 
+    def get_chat_history(self, obj: Interview) -> list:
+        if obj.session_type != Interview.SessionType.PRESCANNING:
+            return []
+        return obj.chat_history or []
+
 
 class CandidateInterviewOutputSerializer(serializers.ModelSerializer):
     """Limited view for candidates — room link, screening mode, no scores."""
 
     vacancy_title = serializers.SerializerMethodField()
     company_name = serializers.SerializerMethodField()
+    chat_history = serializers.SerializerMethodField()
 
     class Meta:
         model = Interview
@@ -154,12 +161,18 @@ class CandidateInterviewOutputSerializer(serializers.ModelSerializer):
     def get_company_name(self, obj: Interview) -> str:
         return obj.application.vacancy.company.name
 
+    def get_chat_history(self, obj: Interview) -> list:
+        if obj.session_type != Interview.SessionType.PRESCANNING:
+            return []
+        return obj.chat_history or []
+
 
 class PublicInterviewOutputSerializer(serializers.ModelSerializer):
     """Public view for session accessed by token — minimal info."""
 
     vacancy_title = serializers.SerializerMethodField()
     company_name = serializers.SerializerMethodField()
+    chat_history = serializers.SerializerMethodField()
 
     class Meta:
         model = Interview
@@ -182,3 +195,8 @@ class PublicInterviewOutputSerializer(serializers.ModelSerializer):
 
     def get_company_name(self, obj: Interview) -> str:
         return obj.application.vacancy.company.name
+
+    def get_chat_history(self, obj: Interview) -> list:
+        if obj.session_type != Interview.SessionType.PRESCANNING:
+            return []
+        return obj.chat_history or []

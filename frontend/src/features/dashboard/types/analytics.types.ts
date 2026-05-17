@@ -1,3 +1,5 @@
+import type { ApplicationStatus } from '@/shared/types/candidate.types'
+
 export interface HiringFunnel {
   applied: number
   prescanned: number
@@ -27,8 +29,29 @@ export interface InterviewInsights {
   averageScore: number | string | null
 }
 
+export interface StatusBreakdownItem {
+  status: ApplicationStatus
+  count: number
+  percentage: number
+}
+
+export interface ScoreDistributionBucket {
+  bucket: 'low' | 'medium' | 'good' | 'strong'
+  count: number
+}
+
+export interface ProcessMetrics {
+  activeVacancies: number
+  pendingInterviews: number
+  staleApplications: number
+  averageDecisionDays: number | string | null
+}
+
 export interface CompanyAnalytics {
   funnel: HiringFunnel
   vacancyPerformance: VacancyPerformance[]
   interviewInsights: InterviewInsights
+  statusBreakdown: StatusBreakdownItem[]
+  scoreDistribution: ScoreDistributionBucket[]
+  processMetrics: ProcessMetrics
 }

@@ -63,7 +63,7 @@ class VacancyListCreateApi(APIView):
         interview_mode = serializers.ChoiceField(
             choices=Vacancy.InterviewMode.choices,
             required=False,
-            default=Vacancy.InterviewMode.CHAT,
+            default=Vacancy.InterviewMode.MEET,
         )
         interview_enabled = serializers.BooleanField(required=False, default=False)
         cv_required = serializers.BooleanField(required=False, default=False)

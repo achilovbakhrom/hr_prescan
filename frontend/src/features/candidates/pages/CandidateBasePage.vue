@@ -21,10 +21,10 @@ const ordering = ref('-last_activity_at')
 let searchTimeout: ReturnType<typeof setTimeout> | null = null
 
 const orderingOptions = computed(() => [
-  { label: t('candidates.ordering.newest', 'Newest first'), value: '-last_activity_at' },
-  { label: t('candidates.ordering.oldest', 'Oldest first'), value: 'last_activity_at' },
-  { label: t('candidates.ordering.nameAsc', 'Name A-Z'), value: 'candidate_name' },
-  { label: t('candidates.ordering.nameDesc', 'Name Z-A'), value: '-candidate_name' },
+  { label: t('candidates.ordering.newest'), value: '-last_activity_at' },
+  { label: t('candidates.ordering.oldest'), value: 'last_activity_at' },
+  { label: t('candidates.ordering.nameAsc'), value: 'candidate_name' },
+  { label: t('candidates.ordering.nameDesc'), value: '-candidate_name' },
 ])
 
 function fetchCandidates(): void {
@@ -62,7 +62,7 @@ onMounted(fetchCandidates)
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div>
         <h1 class="text-xl font-bold text-[color:var(--color-text-primary)] md:text-2xl">
-          {{ t('nav.candidateBase', 'Candidate base') }}
+          {{ t('nav.candidateBase') }}
         </h1>
         <p class="mt-0.5 text-sm text-[color:var(--color-text-muted)]">
           {{ candidateStore.candidates.length }} {{ t('nav.candidates').toLowerCase() }}
@@ -118,10 +118,10 @@ onMounted(fetchCandidates)
         <Column :header="t('candidates.overallScore')" style="width: 120px">
           <template #body="{ data }">{{ scoreLabel(data.latestMatchScore) }}</template>
         </Column>
-        <Column :header="t('nav.allCandidates')" style="width: 110px">
+        <Column :header="t('candidates.candidateBase.applications')" style="width: 110px">
           <template #body="{ data }">{{ data.applicationCount }}</template>
         </Column>
-        <Column :header="t('common.updatedAt', 'Updated')" style="width: 150px">
+        <Column :header="t('common.updatedAt')" style="width: 150px">
           <template #body="{ data }">{{ formatDate(data.lastActivityAt) }}</template>
         </Column>
         <Column header="" style="width: 90px">
@@ -130,7 +130,7 @@ onMounted(fetchCandidates)
               icon="pi pi-arrow-right"
               text
               rounded
-              :aria-label="t('common.view', 'View')"
+              :aria-label="t('common.view')"
               @click.stop="openCandidate(data)"
             />
           </template>

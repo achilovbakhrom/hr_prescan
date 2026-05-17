@@ -5,7 +5,6 @@ from django.db import transaction
 from apps.accounts.models import Company, User
 from apps.common.exceptions import ApplicationError
 from apps.common.messages import (
-    MSG_CANNOT_CHANGE_MODE,
     MSG_NO_INTERVIEW_CRITERIA,
     MSG_NO_INTERVIEW_QUESTIONS,
     MSG_NO_PRESCANNING_CRITERIA,
@@ -31,6 +30,7 @@ def create_vacancy(
     **kwargs: object,
 ) -> Vacancy:
     """Create a vacancy with default evaluation criteria."""
+    kwargs["interview_mode"] = Vacancy.InterviewMode.MEET
     # Default prescanning_language to the creator's current UI language
     # unless the caller explicitly provided one.
     if "prescanning_language" not in kwargs and getattr(created_by, "language", None):
@@ -52,10 +52,7 @@ def create_vacancy(
 
 
 def update_vacancy(*, vacancy: Vacancy, data: dict) -> Vacancy:
-    """Update allowed vacancy fields.
-
-    interview_mode can only be changed if the vacancy has no applications.
-    """
+    """Update allowed vacancy fields."""
     allowed_fields = {
         "title",
         "description",
@@ -80,10 +77,8 @@ def update_vacancy(*, vacancy: Vacancy, data: dict) -> Vacancy:
         "prescanning_language",
     }
 
-    # Guard: interview_mode cannot be changed once applications exist
-    has_applications = vacancy.applications.filter(is_deleted=False).exists()
-    if "interview_mode" in data and data["interview_mode"] != vacancy.interview_mode and has_applications:
-        raise ApplicationError(str(MSG_CANNOT_CHANGE_MODE))
+    if "interview_mode" in data:
+        data["interview_mode"] = Vacancy.InterviewMode.MEET
 
     update_fields: list[str] = []
 

@@ -40,6 +40,8 @@ interface InterviewScore {
 interface InterviewData {
   id: string
   status: string
+  sessionType: 'prescanning' | 'interview'
+  screeningMode: 'chat' | 'meet'
   overallScore: number | null
   aiSummary: string
   aiSummaryTranslations: Record<string, string>
@@ -61,7 +63,9 @@ const recordingSection = ref<InstanceType<typeof InterviewRecordingSection> | nu
 
 const conversationMessages = computed<ChatMessage[]>(() => {
   if (!interview.value) return []
-  if (interview.value.chatHistory?.length) return interview.value.chatHistory
+  if (interview.value.sessionType === 'prescanning' && interview.value.chatHistory?.length) {
+    return interview.value.chatHistory
+  }
   return (interview.value.transcript || []).map((entry) => ({
     role: isAiSpeaker(entry) ? 'ai' : 'candidate',
     text: entry.text,
@@ -112,7 +116,7 @@ onMounted(async () => {
       props.sessionType,
     )) as unknown as InterviewData
     interview.value = data
-    if (data.chatHistory) {
+    if (data.sessionType === 'prescanning' && data.chatHistory) {
       data.chatHistory.forEach((msg: ChatMessage, idx: number) => {
         if (msg.messageType === 'voice') loadAudioBlob(idx)
       })
