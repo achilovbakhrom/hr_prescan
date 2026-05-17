@@ -1,22 +1,23 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
-import Menu from 'primevue/menu'
 import Badge from 'primevue/badge'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { authService } from '@/features/auth/services/auth.service'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
+import { USER_ROLES } from '@/shared/constants/roles'
 import NotificationBell from '@/features/notifications/components/NotificationBell.vue'
 import LanguageSwitcher from '@/shared/components/LanguageSwitcher.vue'
 import ThemeToggle from '@/shared/components/ThemeToggle.vue'
 import CompanySwitcher from './CompanySwitcher.vue'
 import GlobalSearchDialog from './GlobalSearchDialog.vue'
 import AppLogo from './AppLogo.vue'
+import AIAssistantEntryButton from './AIAssistantEntryButton.vue'
+import AppNavbarUserMenu from './AppNavbarUserMenu.vue'
 import { useNotificationPolling } from '@/features/notifications/composables/useNotificationPolling'
 import { useAIAssistant } from '@/shared/composables/useAIAssistant'
-import type { MenuItem } from 'primevue/menuitem'
 
 defineProps<{ sidebarCollapsed: boolean }>()
 const emit = defineEmits<{ toggleSidebar: []; toggleMobileNav: [] }>()
@@ -24,15 +25,23 @@ const emit = defineEmits<{ toggleSidebar: []; toggleMobileNav: [] }>()
 const router = useRouter()
 const authStore = useAuthStore()
 const { t } = useI18n()
-const userMenu = ref<InstanceType<typeof Menu> | null>(null)
 const pendingInvitationsCount = ref(0)
 const showSearch = ref(false)
+const canUseGlobalSearch = computed(
+  () =>
+    Boolean(authStore.user?.company) &&
+    (authStore.user?.role === USER_ROLES.ADMIN || authStore.user?.role === USER_ROLES.HR),
+)
+
+watch(canUseGlobalSearch, (allowed) => {
+  if (!allowed) showSearch.value = false
+})
 
 useNotificationPolling()
 const aiAssistant = useAIAssistant()
 
 function onKeydown(e: KeyboardEvent): void {
-  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+  if (canUseGlobalSearch.value && (e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
     e.preventDefault()
     showSearch.value = true
   }
@@ -51,26 +60,6 @@ onBeforeUnmount(() => {
   window.removeEventListener('keydown', onKeydown)
 })
 
-const menuItems = computed<MenuItem[]>(() => [
-  {
-    label: t('nav.profile'),
-    icon: 'pi pi-user',
-    command: () => router.push({ name: ROUTE_NAMES.PROFILE }),
-  },
-  { separator: true },
-  {
-    label: t('nav.logout'),
-    icon: 'pi pi-sign-out',
-    command: async () => {
-      await authStore.logout()
-      await router.push({ name: ROUTE_NAMES.LOGIN })
-    },
-  },
-])
-
-function toggleUserMenu(event: Event): void {
-  userMenu.value?.toggle(event)
-}
 function handleMenuToggle(): void {
   if (globalThis.innerWidth >= 1024) {
     emit('toggleSidebar')
@@ -115,6 +104,7 @@ function handleMenuToggle(): void {
 
       <div class="flex items-center gap-2 sm:gap-3">
         <button
+          v-if="canUseGlobalSearch"
           type="button"
           class="hidden items-center gap-2 rounded-2xl border border-white/70 bg-white/70 px-3 py-2 text-xs text-gray-500 transition-colors hover:bg-white dark:border-white/10 dark:bg-gray-900/70 dark:text-gray-400 dark:hover:bg-gray-900 sm:flex"
           :title="t('common.searchPlaceholder')"
@@ -128,6 +118,7 @@ function handleMenuToggle(): void {
           >
         </button>
         <button
+          v-if="canUseGlobalSearch"
           type="button"
           class="rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-white/80 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-900 dark:hover:text-gray-200 sm:hidden"
           :aria-label="t('common.searchPlaceholder')"
@@ -155,44 +146,15 @@ function handleMenuToggle(): void {
           /></template>
         </Button>
 
-        <button
-          type="button"
-          class="hidden items-center gap-2 rounded-full bg-gradient-to-r from-violet-500 to-indigo-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-all hover:shadow-md hover:brightness-110 active:scale-95 sm:flex"
-          @click="aiAssistant.toggle()"
-        >
-          <i class="pi pi-sparkles text-[10px]"></i>
-          <span>{{ t('aiAssistant.title') }}</span>
-        </button>
+        <AIAssistantEntryButton @click="aiAssistant.toggle()" />
 
         <ThemeToggle />
         <LanguageSwitcher />
         <NotificationBell />
-
-        <button
-          type="button"
-          class="flex items-center gap-2 rounded-xl px-2 py-1 transition-colors hover:bg-white/80 dark:hover:bg-gray-900"
-          :aria-label="t('common.aria.userMenu')"
-          aria-haspopup="true"
-          @click="toggleUserMenu"
-        >
-          <div
-            class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-medium text-blue-700 dark:bg-blue-950"
-          >
-            {{ authStore.user?.firstName?.charAt(0) ?? ''
-            }}{{ authStore.user?.lastName?.charAt(0) ?? '' }}
-          </div>
-          <span class="hidden text-sm font-medium text-gray-700 dark:text-gray-300 sm:inline"
-            >{{ authStore.user?.firstName }} {{ authStore.user?.lastName }}</span
-          >
-          <i
-            class="pi pi-chevron-down hidden text-xs text-gray-400 dark:text-gray-500 sm:inline"
-          ></i>
-        </button>
-
-        <Menu ref="userMenu" :model="menuItems" :popup="true" />
+        <AppNavbarUserMenu />
       </div>
     </div>
 
-    <GlobalSearchDialog v-model:visible="showSearch" />
+    <GlobalSearchDialog v-if="canUseGlobalSearch" v-model:visible="showSearch" />
   </header>
 </template>

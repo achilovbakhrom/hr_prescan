@@ -17,12 +17,11 @@ const { t } = useI18n()
 <template>
   <GlassCard accent="ai" class="relative overflow-hidden">
     <div class="relative z-10 flex flex-col gap-3">
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-3">
         <AppLogo variant="glyph" size="sm" :linked="false" />
-        <span
-          class="font-mono text-[10px] font-semibold uppercase tracking-widest text-[color:var(--color-accent-ai)]"
-          >{{ t('aiAssistant.title') }}</span
-        >
+        <span class="text-xs font-semibold uppercase text-[color:var(--color-accent)]">
+          {{ t('aiAssistant.openLabel') }}
+        </span>
       </div>
       <h3 class="text-base font-semibold text-[color:var(--color-text-primary)]">
         {{ t('dashboard.ai.title') }}
@@ -36,12 +35,19 @@ const { t } = useI18n()
         @click="$emit('open')"
       >
         <span class="flex items-center gap-2">
-          <i class="pi pi-sparkles text-[color:var(--color-accent-ai)]"></i>
+          <i class="pi pi-users text-[color:var(--color-accent)]"></i>
           <span>{{ t('dashboard.ai.placeholder') }}</span>
         </span>
         <span class="font-mono text-[10px] text-[color:var(--color-text-muted)]" aria-hidden="true"
           >⌘K</span
         >
+      </button>
+      <button
+        type="button"
+        class="rounded-[--radius-sm] bg-[color:var(--color-accent)] px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-[color:var(--color-accent-hover)]"
+        @click="$emit('open')"
+      >
+        {{ t('aiAssistant.openCta') }}
       </button>
     </div>
   </GlassCard>

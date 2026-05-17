@@ -1468,6 +1468,19 @@
   "aiAssistant": {
     "title": "AI Asistente",
     "subtitle": "Previsualización AI",
+    "openLabel": "Preguntar al asistente AI",
+    "openShortLabel": "Preguntar a AI",
+    "openHint": "Candidatos, vacantes, analítica",
+    "openCta": "Abrir asistente",
+    "hrTitle": "Asistente de reclutamiento",
+    "hrSubtitle": "Pregunta sobre candidatos, vacantes, resultados de entrevistas y analítica de contratación.",
+    "candidateTitle": "Asistente de búsqueda de empleo",
+    "candidateSubtitle": "Ayuda con empleos, CV, solicitudes y preparación de entrevistas.",
+    "startTitle": "Elige una tarea o escribe tu solicitud",
+    "startHint": "Úsalo para tareas de reclutamiento: encontrar candidatos, comparar resultados, redactar mensajes o abrir la página correcta.",
+    "startHintCandidate": "Úsalo para encontrar empleos, mejorar tu CV, revisar solicitudes o preparar entrevistas.",
+    "shortcutHint": "Pulsa Ctrl+K / Cmd+K para abrir o cerrar",
+    "tryAsking": "Solicitudes frecuentes de RR. HH.",
     "placeholder": "Pregúntame cualquier cosa...",
     "welcome": "¿Cómo puedo ayudarte?",
     "welcomeHint": "Puedo gestionar vacantes, candidatos, entrevistas, empresas y más. Pregúntale en lenguaje natural.",
@@ -1482,6 +1495,43 @@
       "listVacancies": "Listar mis vacantes",
       "dashboardStats": "Mostrar estadísticas del panel",
       "help": "Ayuda"
+    },
+    "suggestions": {
+      "findCandidates": {
+        "title": "Encontrar candidatos",
+        "description": "Buscar, filtrar o preseleccionar candidatos para una vacante.",
+        "prompt": "Muestra los candidatos con las mejores puntuaciones de entrevista"
+      },
+      "vacancies": {
+        "title": "Trabajar con vacantes",
+        "description": "Crear, actualizar, publicar o revisar la configuración.",
+        "prompt": "Lista mis vacantes activas y muestra cuáles necesitan atención"
+      },
+      "analytics": {
+        "title": "Analizar embudo de contratación",
+        "description": "Revisar conversión, etapas débiles y métricas del proceso.",
+        "prompt": "Muestra la analítica del embudo y dónde se pierden candidatos"
+      },
+      "followUp": {
+        "title": "Redactar seguimiento",
+        "description": "Preparar emails para candidatos o notas para hiring managers.",
+        "prompt": "Redacta un mensaje breve de seguimiento para un candidato preseleccionado"
+      },
+      "searchJobs": {
+        "title": "Encontrar empleos",
+        "description": "Buscar vacantes adecuadas y abrir detalles.",
+        "prompt": "Encuentra empleos que coincidan con mi perfil"
+      },
+      "improveCv": {
+        "title": "Mejorar CV",
+        "description": "Revisar texto, habilidades y experiencia.",
+        "prompt": "Ayúdame a mejorar el resumen de mi CV"
+      },
+      "applications": {
+        "title": "Revisar solicitudes",
+        "description": "Ver estados y próximos pasos de tus solicitudes.",
+        "prompt": "Muestra mis solicitudes y sus estados actuales"
+      }
     }
   },
   "cvBuilder": {

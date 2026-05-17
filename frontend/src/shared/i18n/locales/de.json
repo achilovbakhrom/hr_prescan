@@ -1468,6 +1468,19 @@
   "aiAssistant": {
     "title": "AI Assistent",
     "subtitle": "PreScreen-KI",
+    "openLabel": "KI-Assistent fragen",
+    "openShortLabel": "KI fragen",
+    "openHint": "Kandidaten, Stellen, Analytics",
+    "openCta": "Assistent öffnen",
+    "hrTitle": "Recruiting-Assistent",
+    "hrSubtitle": "Fragen Sie zu Kandidaten, Stellen, Interviewergebnissen und Recruiting-Analytics.",
+    "candidateTitle": "Jobsuche-Assistent",
+    "candidateSubtitle": "Hilfe bei Jobs, CV, Bewerbungen und Interviewvorbereitung.",
+    "startTitle": "Aufgabe wählen oder Anfrage schreiben",
+    "startHint": "Nutzen Sie ihn für Recruiting-Arbeit: Kandidaten finden, Ergebnisse vergleichen, Nachrichten erstellen oder Seiten öffnen.",
+    "startHintCandidate": "Nutzen Sie ihn, um Jobs zu finden, den CV zu verbessern, Bewerbungen zu prüfen oder Interviews vorzubereiten.",
+    "shortcutHint": "Ctrl+K / Cmd+K zum Öffnen oder Schließen",
+    "tryAsking": "Häufige HR-Anfragen",
     "placeholder": "Fragen Sie mich etwas...",
     "welcome": "Wie kann ich Ihnen helfen?",
     "welcomeHint": "Ich kann offene Stellen, Kandidaten, Interviews, Unternehmen und mehr verwalten. Fragen Sie einfach in natürlicher Sprache.",
@@ -1482,6 +1495,43 @@
       "listVacancies": "Listen Sie meine offenen Stellen auf",
       "dashboardStats": "Dashboard-Statistiken anzeigen",
       "help": "Hilfe"
+    },
+    "suggestions": {
+      "findCandidates": {
+        "title": "Kandidaten finden",
+        "description": "Bewerber für eine Stelle suchen, filtern oder vormerken.",
+        "prompt": "Zeige Kandidaten mit den höchsten Interviewwerten"
+      },
+      "vacancies": {
+        "title": "Mit Stellen arbeiten",
+        "description": "Stellen erstellen, aktualisieren, veröffentlichen oder prüfen.",
+        "prompt": "Liste meine aktiven Stellen und zeige, welche Aufmerksamkeit brauchen"
+      },
+      "analytics": {
+        "title": "Hiring-Funnel analysieren",
+        "description": "Conversion, schwache Schritte und Prozessmetriken prüfen.",
+        "prompt": "Zeige Hiring-Funnel-Analytics und wo Kandidaten abspringen"
+      },
+      "followUp": {
+        "title": "Follow-up entwerfen",
+        "description": "Kandidaten-E-Mails oder Notizen für Hiring Manager vorbereiten.",
+        "prompt": "Entwirf eine kurze Follow-up-Nachricht für einen Kandidaten auf der Shortlist"
+      },
+      "searchJobs": {
+        "title": "Jobs finden",
+        "description": "Passende Stellen suchen und Details öffnen.",
+        "prompt": "Finde Jobs, die zu meinem Profil passen"
+      },
+      "improveCv": {
+        "title": "CV verbessern",
+        "description": "Text, Fähigkeiten und Erfahrung prüfen.",
+        "prompt": "Hilf mir, meine CV-Zusammenfassung zu verbessern"
+      },
+      "applications": {
+        "title": "Bewerbungen prüfen",
+        "description": "Status und nächste Schritte ansehen.",
+        "prompt": "Zeige meine Bewerbungen und ihre aktuellen Status"
+      }
     }
   },
   "cvBuilder": {

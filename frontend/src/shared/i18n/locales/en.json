@@ -1475,6 +1475,19 @@
   "aiAssistant": {
     "title": "AI Assistant",
     "subtitle": "PreScreen AI",
+    "openLabel": "Ask AI assistant",
+    "openShortLabel": "Ask AI",
+    "openHint": "Candidates, vacancies, analytics",
+    "openCta": "Open assistant",
+    "hrTitle": "HR work assistant",
+    "hrSubtitle": "Ask about candidates, vacancies, interview results, and hiring analytics.",
+    "candidateTitle": "Job search assistant",
+    "candidateSubtitle": "Get help with jobs, your CV, applications, and interview preparation.",
+    "startTitle": "Choose a task or type your request",
+    "startHint": "Use the assistant for practical recruiting work: find candidates, compare results, draft messages, or open the right page.",
+    "startHintCandidate": "Use the assistant to find jobs, improve your CV, review applications, or prepare for interviews.",
+    "shortcutHint": "Press Ctrl+K / Cmd+K to open or close",
+    "tryAsking": "Common HR requests",
     "placeholder": "Ask me anything...",
     "welcome": "How can I help you?",
     "welcomeHint": "I can manage vacancies, candidates, interviews, companies, and more. Just ask in natural language.",
@@ -1489,6 +1502,43 @@
       "listVacancies": "List my vacancies",
       "dashboardStats": "Show dashboard stats",
       "help": "Help"
+    },
+    "suggestions": {
+      "findCandidates": {
+        "title": "Find candidates",
+        "description": "Search, filter, or shortlist applicants for a vacancy.",
+        "prompt": "Show candidates with the highest interview scores"
+      },
+      "vacancies": {
+        "title": "Work with vacancies",
+        "description": "Create, update, publish, or review vacancy setup.",
+        "prompt": "List my active vacancies and show which need attention"
+      },
+      "analytics": {
+        "title": "Analyze hiring funnel",
+        "description": "Review conversion, weak stages, and process metrics.",
+        "prompt": "Show hiring funnel analytics and where candidates drop off"
+      },
+      "followUp": {
+        "title": "Draft follow-up",
+        "description": "Prepare candidate emails or hiring manager notes.",
+        "prompt": "Draft a short follow-up message for a shortlisted candidate"
+      },
+      "searchJobs": {
+        "title": "Find jobs",
+        "description": "Search matching vacancies and open job details.",
+        "prompt": "Find jobs that match my profile"
+      },
+      "improveCv": {
+        "title": "Improve CV",
+        "description": "Review profile text, skills, and experience wording.",
+        "prompt": "Help improve my CV summary"
+      },
+      "applications": {
+        "title": "Check applications",
+        "description": "Review statuses and next steps for your applications.",
+        "prompt": "Show my applications and their current statuses"
+      }
     }
   },
   "cvBuilder": {

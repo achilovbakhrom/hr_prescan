@@ -1468,6 +1468,19 @@
   "aiAssistant": {
     "title": "Assistant IA",
     "subtitle": "Pré-écran AI",
+    "openLabel": "Demander à l'assistant IA",
+    "openShortLabel": "Demander à l'IA",
+    "openHint": "Candidats, offres, analytique",
+    "openCta": "Ouvrir l'assistant",
+    "hrTitle": "Assistant de recrutement",
+    "hrSubtitle": "Posez des questions sur les candidats, les offres, les résultats d'entretien et l'analytique.",
+    "candidateTitle": "Assistant de recherche d'emploi",
+    "candidateSubtitle": "Aide pour les offres, le CV, les candidatures et la préparation aux entretiens.",
+    "startTitle": "Choisissez une tâche ou écrivez votre demande",
+    "startHint": "Utilisez-le pour le recrutement: trouver des candidats, comparer des résultats, rédiger des messages ou ouvrir la bonne page.",
+    "startHintCandidate": "Utilisez-le pour trouver des offres, améliorer votre CV, suivre vos candidatures ou préparer un entretien.",
+    "shortcutHint": "Ctrl+K / Cmd+K pour ouvrir ou fermer",
+    "tryAsking": "Demandes RH fréquentes",
     "placeholder": "Demandez-moi n'importe quoi...",
     "welcome": "Comment puis-je vous aider ?",
     "welcomeHint": "Je peux gérer les postes vacants, les candidats, les entretiens, les entreprises, etc. Demandez simplement en langage naturel.",
@@ -1482,6 +1495,43 @@
       "listVacancies": "Lister mes postes vacants",
       "dashboardStats": "Afficher les statistiques du tableau de bord",
       "help": "Aide"
+    },
+    "suggestions": {
+      "findCandidates": {
+        "title": "Trouver des candidats",
+        "description": "Rechercher, filtrer ou présélectionner des candidats.",
+        "prompt": "Montre les candidats avec les meilleurs scores d'entretien"
+      },
+      "vacancies": {
+        "title": "Gérer les offres",
+        "description": "Créer, mettre à jour, publier ou vérifier la configuration.",
+        "prompt": "Liste mes offres actives et montre celles qui nécessitent une attention"
+      },
+      "analytics": {
+        "title": "Analyser le tunnel de recrutement",
+        "description": "Voir la conversion, les étapes faibles et les métriques.",
+        "prompt": "Montre l'analyse du tunnel de recrutement et où les candidats abandonnent"
+      },
+      "followUp": {
+        "title": "Rédiger un suivi",
+        "description": "Préparer des emails candidats ou notes pour managers.",
+        "prompt": "Rédige un court message de suivi pour un candidat présélectionné"
+      },
+      "searchJobs": {
+        "title": "Trouver des emplois",
+        "description": "Rechercher des offres pertinentes et ouvrir les détails.",
+        "prompt": "Trouve des offres qui correspondent à mon profil"
+      },
+      "improveCv": {
+        "title": "Améliorer le CV",
+        "description": "Revoir le texte, les compétences et l'expérience.",
+        "prompt": "Aide-moi à améliorer le résumé de mon CV"
+      },
+      "applications": {
+        "title": "Vérifier les candidatures",
+        "description": "Voir les statuts et les prochaines étapes.",
+        "prompt": "Montre mes candidatures et leurs statuts actuels"
+      }
     }
   },
   "cvBuilder": {

@@ -1468,6 +1468,19 @@
   "aiAssistant": {
     "title": "AI yordamchi",
     "subtitle": "PreScreen AI",
+    "openLabel": "AI yordamchidan so'rash",
+    "openShortLabel": "AI dan so'rash",
+    "openHint": "Nomzodlar, vakansiyalar, tahlil",
+    "openCta": "Yordamchini ochish",
+    "hrTitle": "Rekruter yordamchisi",
+    "hrSubtitle": "Nomzodlar, vakansiyalar, intervyu natijalari va yollash tahlili haqida so'rang.",
+    "candidateTitle": "Ish qidirish yordamchisi",
+    "candidateSubtitle": "Vakansiyalar, CV, arizalar va intervyuga tayyorgarlikda yordam beradi.",
+    "startTitle": "Vazifani tanlang yoki so'rovingizni yozing",
+    "startHint": "Rekruting ishlari uchun foydalaning: nomzod topish, natijalarni solishtirish, xabar tayyorlash yoki kerakli sahifani ochish.",
+    "startHintCandidate": "Vakansiya topish, CV ni yaxshilash, arizalarni ko'rish yoki intervyuga tayyorlanish uchun foydalaning.",
+    "shortcutHint": "Ochish yoki yopish: Ctrl+K / Cmd+K",
+    "tryAsking": "Ko'p ishlatiladigan HR so'rovlari",
     "placeholder": "Menga istalgan savolni bering...",
     "welcome": "Qanday yordam bera olaman?",
     "welcomeHint": "Men vakansiyalar, nomzodlar, intervyular, kompaniyalar va boshqalarni boshqarishim mumkin. Oddiy tilda so'rang.",
@@ -1482,6 +1495,43 @@
       "listVacancies": "Vakansiyalarimni ko'rsatish",
       "dashboardStats": "Statistikani ko'rsatish",
       "help": "Yordam"
+    },
+    "suggestions": {
+      "findCandidates": {
+        "title": "Nomzodlarni topish",
+        "description": "Vakansiya bo'yicha qidirish, filtrlash yoki shortlist qilish.",
+        "prompt": "Eng yuqori intervyu balliga ega nomzodlarni ko'rsat"
+      },
+      "vacancies": {
+        "title": "Vakansiyalar bilan ishlash",
+        "description": "Yaratish, yangilash, e'lon qilish yoki sozlamalarni tekshirish.",
+        "prompt": "Aktiv vakansiyalarimni ko'rsat va qaysilariga e'tibor kerakligini ayt"
+      },
+      "analytics": {
+        "title": "Yollash voronkasini tahlil qilish",
+        "description": "Konversiya, zaif bosqichlar va jarayon metrikalari.",
+        "prompt": "Yollash voronkasi tahlilini va nomzodlar qayerda yo'qolishini ko'rsat"
+      },
+      "followUp": {
+        "title": "Xabar tayyorlash",
+        "description": "Nomzodlarga email yoki hiring manager uchun izohlar.",
+        "prompt": "Shortlistdagi nomzod uchun qisqa follow-up xabar tayyorla"
+      },
+      "searchJobs": {
+        "title": "Ish topish",
+        "description": "Mos vakansiyalarni qidirish va tafsilotlarni ochish.",
+        "prompt": "Profilimga mos vakansiyalarni top"
+      },
+      "improveCv": {
+        "title": "CV ni yaxshilash",
+        "description": "Matn, ko'nikmalar va tajriba tavsifini ko'rib chiqish.",
+        "prompt": "CV dagi qisqa xulosamni yaxshilashga yordam ber"
+      },
+      "applications": {
+        "title": "Arizalarni tekshirish",
+        "description": "Arizalar statusi va keyingi qadamlarni ko'rish.",
+        "prompt": "Arizalarim va ularning hozirgi statuslarini ko'rsat"
+      }
     }
   },
   "cvBuilder": {

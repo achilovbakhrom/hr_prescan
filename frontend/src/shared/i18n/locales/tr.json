@@ -1468,6 +1468,19 @@
   "aiAssistant": {
     "title": "AI Asistan",
     "subtitle": "Ön Ekran AI",
+    "openLabel": "AI asistana sor",
+    "openShortLabel": "AI'a sor",
+    "openHint": "Adaylar, ilanlar, analiz",
+    "openCta": "Asistanı aç",
+    "hrTitle": "İşe alım asistanı",
+    "hrSubtitle": "Adaylar, ilanlar, görüşme sonuçları ve işe alım analitiği hakkında sorun.",
+    "candidateTitle": "İş arama asistanı",
+    "candidateSubtitle": "İşler, CV, başvurular ve görüşme hazırlığında yardımcı olur.",
+    "startTitle": "Bir görev seçin veya isteğinizi yazın",
+    "startHint": "Aday bulma, sonuç karşılaştırma, mesaj taslağı veya doğru sayfayı açma için kullanın.",
+    "startHintCandidate": "İş bulmak, CV'yi iyileştirmek, başvuruları kontrol etmek veya görüşmeye hazırlanmak için kullanın.",
+    "shortcutHint": "Açmak veya kapatmak için Ctrl+K / Cmd+K",
+    "tryAsking": "Sık HR istekleri",
     "placeholder": "Bana bir şey sor...",
     "welcome": "Size nasıl yardımcı olabilirim?",
     "welcomeHint": "Açık pozisyonları, adayları, görüşmeleri, şirketleri ve daha fazlasını yönetebilirim. Sadece doğal dilde sor.",
@@ -1482,6 +1495,43 @@
       "listVacancies": "Açık pozisyonlarımı listele",
       "dashboardStats": "Kontrol paneli istatistiklerini göster",
       "help": "Yardım"
+    },
+    "suggestions": {
+      "findCandidates": {
+        "title": "Aday bul",
+        "description": "Bir ilan için adayları ara, filtrele veya kısa listeye al.",
+        "prompt": "En yüksek görüşme puanına sahip adayları göster"
+      },
+      "vacancies": {
+        "title": "İlanlarla çalış",
+        "description": "İlan oluştur, güncelle, yayınla veya ayarları kontrol et.",
+        "prompt": "Aktif ilanlarımı listele ve hangileri dikkat istiyor göster"
+      },
+      "analytics": {
+        "title": "İşe alım hunisini analiz et",
+        "description": "Dönüşüm, zayıf aşamalar ve süreç metrikleri.",
+        "prompt": "İşe alım hunisi analizini ve adayların nerede kaybolduğunu göster"
+      },
+      "followUp": {
+        "title": "Takip mesajı hazırla",
+        "description": "Aday e-postaları veya hiring manager notları hazırla.",
+        "prompt": "Kısa listedeki aday için kısa bir takip mesajı hazırla"
+      },
+      "searchJobs": {
+        "title": "İş bul",
+        "description": "Uygun ilanları ara ve detayları aç.",
+        "prompt": "Profilime uygun işleri bul"
+      },
+      "improveCv": {
+        "title": "CV'yi iyileştir",
+        "description": "Metin, beceriler ve deneyim anlatımını gözden geçir.",
+        "prompt": "CV özetimi iyileştirmeme yardım et"
+      },
+      "applications": {
+        "title": "Başvuruları kontrol et",
+        "description": "Başvuru durumları ve sonraki adımları gör.",
+        "prompt": "Başvurularımı ve mevcut durumlarını göster"
+      }
     }
   },
   "cvBuilder": {
