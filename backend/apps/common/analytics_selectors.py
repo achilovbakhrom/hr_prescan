@@ -80,9 +80,7 @@ def _get_interview_insights(interviews):
     return {
         "total": total_interviews,
         "completed": completed_interviews,
-        "completion_rate": (
-            round(completed_interviews / total_interviews * 100) if total_interviews > 0 else 0
-        ),
+        "completion_rate": (round(completed_interviews / total_interviews * 100) if total_interviews > 0 else 0),
         "average_score": round(float(avg_score), 1) if avg_score else None,
     }
 

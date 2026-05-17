@@ -63,11 +63,7 @@ class PublicCandidateReviewApi(APIView):
         if application is None:
             return Response({"detail": "Candidate review not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        sessions = [
-            session
-            for session in application.sessions.all()
-            if session.status != Interview.Status.CANCELLED
-        ]
+        sessions = [session for session in application.sessions.all() if session.status != Interview.Status.CANCELLED]
         sessions.sort(key=lambda session: session.created_at, reverse=True)
 
         return Response(
