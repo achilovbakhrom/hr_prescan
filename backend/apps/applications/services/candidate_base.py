@@ -29,9 +29,7 @@ def sync_hr_candidate_for_application(*, application: Application) -> HRCandidat
         return None
 
     application = (
-        Application.objects.select_related("candidate", "vacancy", "vacancy__company")
-        .filter(id=application.id)
-        .first()
+        Application.objects.select_related("candidate", "vacancy", "vacancy__company").filter(id=application.id).first()
     )
     if application is None:
         return None
