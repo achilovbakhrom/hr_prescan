@@ -1,10 +1,4 @@
 <script setup lang="ts">
-/**
- * CandidateListPage — HR-facing list, redesigned with glass primitives.
- * Preserves tenant scoping (store already filters by active company via
- * CompanySwitcher) and the kanban/table toggle.
- * Spec: docs/design/spec.md §9 Candidates.
- */
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
@@ -15,15 +9,19 @@ import { useCandidateStore } from '../stores/candidate.store'
 import CandidateKanban from '../components/CandidateKanban.vue'
 import CandidateListTable from '../components/CandidateListTable.vue'
 import CandidateListToolbar from '../components/CandidateListToolbar.vue'
+import CandidateViewModeToggle from '../components/CandidateViewModeToggle.vue'
 import { useKanbanBatchActions } from '../composables/useKanbanBatchActions'
+import { useVacancyStore } from '@/features/vacancies/stores/vacancy.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { Application, ApplicationStatus } from '../types/candidate.types'
+import type { Vacancy } from '@/features/vacancies/types/vacancy.types'
 
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const confirm = useConfirm()
 const candidateStore = useCandidateStore()
+const vacancyStore = useVacancyStore()
 const vacancyId = computed(() => (route.params.vacancyId as string) || '')
 const isAllCandidates = computed(() => !vacancyId.value)
 
@@ -31,6 +29,7 @@ const viewMode = ref<'kanban' | 'table'>('kanban')
 const statusFilter = ref<string | undefined>(undefined)
 const orderingFilter = ref<string>('-created_at')
 const searchQuery = ref('')
+const selectedVacancy = ref<Vacancy | null>(null)
 const selectedCandidates = ref<Application[]>([])
 let searchTimeout: ReturnType<typeof setTimeout> | null = null
 
@@ -50,19 +49,24 @@ const orderingOptions = computed(() => [
   { label: t('candidates.ordering.highestScore'), value: '-match_score' },
   { label: t('candidates.ordering.lowestScore'), value: 'match_score' },
 ])
+const vacancyOptions = computed(() => vacancyStore.vacancies.filter((v) => v.status !== 'archived'))
 
 function fetchCandidates(): void {
   const params = {
     status: statusFilter.value,
     ordering: orderingFilter.value,
     search: searchQuery.value || undefined,
+    vacancyId: isAllCandidates.value ? selectedVacancy.value?.id : undefined,
   }
   if (isAllCandidates.value) candidateStore.fetchAllCandidates(params)
   else candidateStore.fetchVacancyCandidates(vacancyId.value, params)
 }
 
-onMounted(fetchCandidates)
-watch([statusFilter, orderingFilter], fetchCandidates)
+onMounted(() => {
+  fetchCandidates()
+  if (isAllCandidates.value) vacancyStore.fetchVacancies()
+})
+watch([statusFilter, orderingFilter, selectedVacancy], fetchCandidates)
 
 function onSearchInput(): void {
   if (searchTimeout) clearTimeout(searchTimeout)
@@ -123,33 +127,7 @@ function handleKanbanStatusChange(candidateId: string, status: ApplicationStatus
           </p>
         </div>
       </div>
-      <div
-        class="inline-flex rounded-md bg-[color:var(--color-surface-sunken)] p-0.5"
-        role="tablist"
-      >
-        <button
-          class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
-          :class="
-            viewMode === 'kanban'
-              ? 'bg-[color:var(--color-surface-raised)] text-[color:var(--color-text-primary)] shadow-sm'
-              : 'text-[color:var(--color-text-muted)] hover:text-[color:var(--color-text-primary)]'
-          "
-          @click="viewMode = 'kanban'"
-        >
-          <i class="pi pi-th-large mr-1.5"></i>{{ t('candidates.kanban') }}
-        </button>
-        <button
-          class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
-          :class="
-            viewMode === 'table'
-              ? 'bg-[color:var(--color-surface-raised)] text-[color:var(--color-text-primary)] shadow-sm'
-              : 'text-[color:var(--color-text-muted)] hover:text-[color:var(--color-text-primary)]'
-          "
-          @click="viewMode = 'table'"
-        >
-          <i class="pi pi-list mr-1.5"></i>{{ t('candidates.table') }}
-        </button>
-      </div>
+      <CandidateViewModeToggle v-model="viewMode" />
     </div>
 
     <p
@@ -166,7 +144,11 @@ function handleKanbanStatusChange(candidateId: string, status: ApplicationStatus
       :status-options="statusOptions"
       :ordering-options="orderingOptions"
       :show-filters="viewMode === 'table'"
+      :show-vacancy-filter="isAllCandidates"
+      :vacancy-filter="selectedVacancy"
+      :vacancy-options="vacancyOptions"
       @search-input="onSearchInput"
+      @update:vacancy-filter="selectedVacancy = $event"
     />
 
     <GlassCard v-if="viewMode === 'table'" class="!p-0 overflow-hidden">

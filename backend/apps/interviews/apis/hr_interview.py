@@ -92,6 +92,7 @@ class HRInterviewListApi(APIView):
             choices=Interview.Status.choices,
             required=False,
         )
+        vacancy_id = serializers.UUIDField(required=False)
 
     def get(self, request: Request) -> Response:
         if not get_user_live_company_ids(user=request.user):
@@ -106,6 +107,7 @@ class HRInterviewListApi(APIView):
         interviews = get_user_interviews(
             user=request.user,
             status=filter_serializer.validated_data.get("status"),
+            vacancy_id=filter_serializer.validated_data.get("vacancy_id"),
         )
 
         return Response(

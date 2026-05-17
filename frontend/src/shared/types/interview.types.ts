@@ -29,6 +29,11 @@ export interface DecisionSupport {
   recommendation?: string
   strengths?: string[]
   risks?: string[]
+  positiveMoments?: string[]
+  positive_moments?: string[]
+  negativeMoments?: string[]
+  negative_moments?: string[]
+  conclusion?: string
   nextStep?: string
   next_step?: string
 }

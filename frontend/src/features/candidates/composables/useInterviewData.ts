@@ -1,5 +1,15 @@
 import { ref } from 'vue'
 import { candidateService } from '../services/candidate.service'
+import type { DecisionSupport } from '@/shared/types/interview.types'
+
+export interface CandidateAnalysisSession {
+  id: string
+  sessionType: 'prescanning' | 'interview'
+  overallScore: number | null
+  aiSummary: string
+  aiSummaryTranslations: Record<string, string>
+  decisionSupport?: DecisionSupport
+}
 
 export function useInterviewData() {
   const prescanningScore = ref<number | null>(null)
@@ -7,23 +17,24 @@ export function useInterviewData() {
   const aiSummary = ref<string | null>(null)
   const aiSummaryTranslations = ref<Record<string, string>>({})
   const aiSummaryInterviewId = ref<string | null>(null)
+  const analysisSessions = ref<CandidateAnalysisSession[]>([])
 
   async function fetchInterviewData(candidateId: string, hasInterview: boolean): Promise<void> {
-    // Fetch prescanning interview data
+    analysisSessions.value = []
     try {
       const data = (await candidateService.getCandidateInterview(
         candidateId,
         'prescanning',
       )) as Record<string, unknown>
       prescanningScore.value = (data.overallScore as number) ?? null
-      aiSummary.value = (data.aiSummary as string) ?? null
+      addAnalysisSession(data, 'prescanning')
+      aiSummary.value = (data.aiSummary as string) || null
       aiSummaryTranslations.value = (data.aiSummaryTranslations as Record<string, string>) ?? {}
       aiSummaryInterviewId.value = (data.id as string) ?? null
     } catch {
       // no prescanning interview yet
     }
 
-    // Fetch interview data if interview is enabled
     if (hasInterview) {
       try {
         const data = (await candidateService.getCandidateInterview(
@@ -31,7 +42,8 @@ export function useInterviewData() {
           'interview',
         )) as Record<string, unknown>
         interviewScore.value = (data.overallScore as number) ?? null
-        if (!aiSummary.value) {
+        addAnalysisSession(data, 'interview')
+        if (data.aiSummary) {
           aiSummary.value = (data.aiSummary as string) ?? null
           aiSummaryTranslations.value = (data.aiSummaryTranslations as Record<string, string>) ?? {}
           aiSummaryInterviewId.value = (data.id as string) ?? null
@@ -42,12 +54,27 @@ export function useInterviewData() {
     }
   }
 
+  function addAnalysisSession(
+    data: Record<string, unknown>,
+    sessionType: CandidateAnalysisSession['sessionType'],
+  ): void {
+    analysisSessions.value.push({
+      id: String(data.id ?? ''),
+      sessionType,
+      overallScore: (data.overallScore as number) ?? null,
+      aiSummary: String(data.aiSummary ?? ''),
+      aiSummaryTranslations: (data.aiSummaryTranslations as Record<string, string>) ?? {},
+      decisionSupport: data.decisionSupport as DecisionSupport | undefined,
+    })
+  }
+
   return {
     prescanningScore,
     interviewScore,
     aiSummary,
     aiSummaryTranslations,
     aiSummaryInterviewId,
+    analysisSessions,
     fetchInterviewData,
   }
 }

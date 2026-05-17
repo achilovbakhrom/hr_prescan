@@ -1,6 +1,9 @@
+from uuid import UUID
+
 from django.db.models import Avg, Count, Q
 
-from apps.accounts.models import Company
+from apps.accounts.models import Company, User
+from apps.accounts.selectors import get_user_live_company_ids
 from apps.applications.models import Application
 from apps.interviews.models import Interview
 from apps.vacancies.models import Vacancy
@@ -66,6 +69,7 @@ def _get_vacancy_performance(vacancies):
     )
     for vacancy in performance:
         app_count = vacancy["app_count"] or 0
+        vacancy["avg_score"] = round(float(vacancy["avg_score"]), 1) if vacancy["avg_score"] is not None else None
         vacancy["hire_rate"] = round(vacancy["hired_count"] / app_count * 100) if app_count else 0
         vacancy["rejection_rate"] = round(vacancy["rejected_count"] / app_count * 100) if app_count else 0
     return performance
@@ -87,9 +91,19 @@ def _get_interview_insights(interviews):
 
 def get_company_analytics(*, company: Company) -> dict:
     """Return company-level hiring analytics."""
-    vacancies = Vacancy.objects.filter(company=company)
-    applications = Application.objects.filter(vacancy__company=company, is_deleted=False)
-    interviews = Interview.objects.filter(application__vacancy__company=company)
+    return get_companies_analytics(company_ids=[company.id])
+
+
+def get_user_analytics(*, user: User) -> dict:
+    """Return hiring analytics across every live company the HR user can access."""
+    return get_companies_analytics(company_ids=get_user_live_company_ids(user=user))
+
+
+def get_companies_analytics(*, company_ids: list[UUID]) -> dict:
+    """Return hiring analytics scoped to a set of company IDs."""
+    vacancies = Vacancy.objects.filter(company_id__in=company_ids)
+    applications = Application.objects.filter(vacancy__company_id__in=company_ids, is_deleted=False)
+    interviews = Interview.objects.filter(application__vacancy__company_id__in=company_ids)
     return {
         "funnel": _get_hiring_funnel(applications),
         "vacancy_performance": _get_vacancy_performance(vacancies),

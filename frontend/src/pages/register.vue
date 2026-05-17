@@ -3,7 +3,7 @@ import { onMounted, ref } from 'vue'
 import RegisterPage from '@/features/auth/pages/RegisterPage.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 
-definePageMeta({ name: ROUTE_NAMES.REGISTER, layout: 'public', requiresAuth: false })
+definePageMeta({ name: ROUTE_NAMES.REGISTER, layout: 'auth', requiresAuth: false })
 
 const ready = ref(false)
 

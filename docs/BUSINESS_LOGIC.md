@@ -233,7 +233,7 @@ Each vacancy has a two-step AI screening pipeline. HR configures each step durin
 - Prescanning mode is always chat and cannot be changed
 - Interview mode (chat or meet) is set per vacancy and cannot be changed after the vacancy has active applications
 - The optional interview step is web-only. Telegram supports vacancy discovery, application, CV handling, and prescanning, but candidates must use the web link for the deeper interview step.
-- Both steps produce the same scoring output format: per-criteria scores (1-10), overall weighted score, AI summary, transcript
+- Both steps produce the same scoring output format: per-criteria scores (1-10), overall weighted score, AI summary, transcript, and structured decision support
 - Meet mode (interview step only) additionally produces a video recording and integrity flags
 - Each step has its own independent set of scores — a candidate will have prescanning scores and (if applicable) interview scores
 - CV upload is optional (configurable per vacancy). AI uses CV context in both prescanning and interview if available
@@ -475,6 +475,7 @@ Each step (prescanning and interview) produces its own independent set of scores
 - Score for each category (1-10)
 - Overall weighted score
 - Brief AI summary/notes per category explaining the score
+- Structured HR-facing decision support: recommendation, strengths, risks, positive moments, negative moments, conclusion, and next step
 - CV match score (from CV analysis, if CV was uploaded) — shared across steps
 - Conversation transcript
 - AI decision: advance / shortlist / reject
@@ -505,7 +506,7 @@ Each step (prescanning and interview) produces its own independent set of scores
 - List of active vacancies with candidate counts
 - Recent screening results (prescanning + interview)
 - Key metrics (total applicants, prescreenings completed, interviews completed, average scores)
-- Analytics shows per-vacancy performance: applications, candidates reaching interview-or-later stages, hires, hire rate, rejection rate, and average CV match score.
+- Analytics shows per-vacancy performance across every non-deleted company the HR user can access: applications, candidates reaching interview-or-later stages, hires, hire rate, rejection rate, and average CV match score.
 
 ### 9.2 Candidate Pipeline per Vacancy
 
@@ -531,8 +532,8 @@ Candidates are managed within the vacancy detail page via two views:
 - Personal information
 - CV viewer (inline PDF/DOCX preview)
 - CV match score with breakdown
-- **Prescanning results:** scores with AI notes per category, transcript
-- **Interview results** (if applicable): persisted structured decision support (`recommendation`, `strengths`, `risks`, `next_step`), AI summary, scores with AI notes per category, persisted transcript evidence snippets per criterion, searchable transcript/conversation history for both chat and Meet modes, score-to-transcript evidence lookup, exportable transcript, recording playback with timestamp jumps (Meet mode only)
+- **Prescanning results:** scores with AI notes per category, AI summary, structured decision support (`recommendation`, `strengths`, `risks`, `positive_moments`, `negative_moments`, `conclusion`, `next_step`), transcript
+- **Interview results** (if applicable): persisted structured decision support (`recommendation`, `strengths`, `risks`, `positive_moments`, `negative_moments`, `conclusion`, `next_step`), AI summary, scores with AI notes per category, persisted transcript evidence snippets per criterion, searchable transcript/conversation history for both chat and Meet modes, score-to-transcript evidence lookup, exportable transcript, recording playback with timestamp jumps (Meet mode only)
 - HR can add their own notes
 - HR can manually move the candidate to any pipeline status via status dropdown
 - HR can copy or rotate a read-only hiring manager review link for a candidate. Rotating the link changes the application share token and revokes old shared URLs. The shared view exposes candidate/vacancy context, AI screening summaries, scores, evidence snippets, transcripts, exports, and recording playback where available, but does not expose HR-only notes or candidate session tokens.

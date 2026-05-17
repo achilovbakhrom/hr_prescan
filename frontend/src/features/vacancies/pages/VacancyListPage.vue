@@ -9,11 +9,12 @@ import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import Button from 'primevue/button'
-import Dropdown from '@/shared/components/AppSelect.vue'
 import ConfirmDialog from 'primevue/confirmdialog'
 import { useConfirm } from 'primevue/useconfirm'
 import GlassSurface from '@/shared/components/GlassSurface.vue'
 import VacancyListTable from '../components/VacancyListTable.vue'
+import VacancyListToolbar from '../components/VacancyListToolbar.vue'
+import VacancyTableView from '../components/VacancyTableView.vue'
 import { useVacancyStore } from '../stores/vacancy.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { VacancyStatus } from '../types/vacancy.types'
@@ -25,6 +26,7 @@ const confirm = useConfirm()
 
 type TabKey = 'active' | 'archived'
 const activeTab = ref<TabKey>('active')
+const viewMode = ref<'grid' | 'table'>('grid')
 const statusFilter = ref<string | null>(null)
 const sortOrder = ref<'newest' | 'oldest'>('newest')
 
@@ -35,7 +37,7 @@ const statusOptions = computed(() => [
   { label: t('vacancies.status.paused'), value: 'paused' },
 ])
 
-const sortOptions = computed(() => [
+const sortOptions = computed<Array<{ label: string; value: 'newest' | 'oldest' }>>(() => [
   { label: t('candidates.ordering.newest'), value: 'newest' },
   { label: t('candidates.ordering.oldest'), value: 'oldest' },
 ])
@@ -118,57 +120,16 @@ async function handleStatusChange(_event: Event, id: string, status: VacancyStat
       class="flex flex-col gap-2 rounded-lg p-2 sm:flex-row sm:items-center sm:gap-3"
       level="1"
     >
-      <div
-        class="inline-flex rounded-md bg-[color:var(--color-surface-sunken)] p-0.5"
-        role="tablist"
-      >
-        <button
-          class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
-          :class="
-            activeTab === 'active'
-              ? 'bg-[color:var(--color-surface-raised)] text-[color:var(--color-text-primary)] shadow-sm'
-              : 'text-[color:var(--color-text-muted)] hover:text-[color:var(--color-text-primary)]'
-          "
-          role="tab"
-          :aria-selected="activeTab === 'active'"
-          @click="activeTab = 'active'"
-        >
-          {{ t('vacancies.active') }}
-          <span class="ml-1 text-xs text-[color:var(--color-text-muted)]">({{ activeCount }})</span>
-        </button>
-        <button
-          class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
-          :class="
-            activeTab === 'archived'
-              ? 'bg-[color:var(--color-surface-raised)] text-[color:var(--color-text-primary)] shadow-sm'
-              : 'text-[color:var(--color-text-muted)] hover:text-[color:var(--color-text-primary)]'
-          "
-          role="tab"
-          :aria-selected="activeTab === 'archived'"
-          @click="activeTab = 'archived'"
-        >
-          {{ t('vacancies.status.archived') }}
-          <span class="ml-1 text-xs text-[color:var(--color-text-muted)]"
-            >({{ archivedCount }})</span
-          >
-        </button>
-      </div>
-      <Dropdown
-        v-if="activeTab === 'active'"
-        v-model="statusFilter"
-        :options="statusOptions"
-        option-label="label"
-        option-value="value"
-        :placeholder="t('common.filter')"
-        class="w-full sm:w-44"
-        @change="onStatusChange"
-      />
-      <Dropdown
-        v-model="sortOrder"
-        :options="sortOptions"
-        option-label="label"
-        option-value="value"
-        class="w-full sm:w-40"
+      <VacancyListToolbar
+        v-model:active-tab="activeTab"
+        v-model:view-mode="viewMode"
+        v-model:status-filter="statusFilter"
+        v-model:sort-order="sortOrder"
+        :status-options="statusOptions"
+        :sort-options="sortOptions"
+        :active-count="activeCount"
+        :archived-count="archivedCount"
+        @status-change="onStatusChange"
       />
     </GlassSurface>
 
@@ -179,7 +140,16 @@ async function handleStatusChange(_event: Event, id: string, status: VacancyStat
       {{ vacancyStore.error }}
     </p>
 
+    <VacancyTableView
+      v-if="viewMode === 'table'"
+      :vacancies="filteredVacancies"
+      :loading="vacancyStore.loading"
+      @open="openDetail"
+      @delete="confirmDelete"
+      @status-change="handleStatusChange"
+    />
     <VacancyListTable
+      v-else
       :vacancies="filteredVacancies"
       :loading="vacancyStore.loading"
       @open="openDetail"

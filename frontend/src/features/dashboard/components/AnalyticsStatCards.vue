@@ -9,8 +9,8 @@ import DashboardStatsCard from './DashboardStatsCard.vue'
 defineProps<{
   totalApplications: number
   totalInterviews: number
-  completionRate: number
-  averageScore: number | null
+  completionRate: number | string
+  averageScore: number | string | null
 }>()
 
 const { t } = useI18n()

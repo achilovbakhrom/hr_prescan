@@ -1,10 +1,4 @@
 <script setup lang="ts">
-/**
- * HRAnalyticsPage — company-level analytics.
- * Sticky glass toolbar at top, glass cards around charts.
- * Chart containers are glass, charts themselves render solid
- * (charts need opaque background for legibility per spec §9).
- */
 import { computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import DataTable from 'primevue/datatable'
@@ -27,14 +21,26 @@ const funnel = computed(() => analyticsStore.analytics?.funnel)
 const vacancyPerformance = computed(() => analyticsStore.analytics?.vacancyPerformance ?? [])
 const insights = computed(() => analyticsStore.analytics?.interviewInsights)
 
-function formatScore(score: number | null): string {
-  if (score === null || score === undefined) return '-'
-  return score.toFixed(1)
+function numericValue(value: number | string | null | undefined): number | null {
+  if (value === null || value === undefined || value === '') return null
+  const numeric = Number(value)
+  return Number.isFinite(numeric) ? numeric : null
 }
 
-function formatPercent(value: number | null | undefined): string {
-  if (value === null || value === undefined) return '-'
-  return `${Math.round(value)}%`
+function formatScore(score: number | string | null): string {
+  const numeric = numericValue(score)
+  if (numeric === null) return '-'
+  return numeric.toFixed(1)
+}
+
+function formatPercent(value: number | string | null | undefined): string {
+  const numeric = numericValue(value)
+  if (numeric === null) return '-'
+  return `${Math.round(numeric)}%`
+}
+
+function progressValue(value: number | string | null | undefined): number {
+  return Math.round(numericValue(value) ?? 0)
 }
 </script>
 
@@ -164,7 +170,7 @@ function formatPercent(value: number | null | undefined): string {
                   <div class="flex items-center gap-2">
                     <ProgressBar
                       v-if="data.avgScore !== null"
-                      :value="Math.round(data.avgScore)"
+                      :value="progressValue(data.avgScore)"
                       :show-value="false"
                       style="width: 60px; height: 6px"
                     />

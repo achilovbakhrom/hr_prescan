@@ -238,7 +238,7 @@ def _build_evaluation_prompt(
         "{\n"
         '  "overall_score": <float 1-10>,\n'
         '  "summary": "<structured summary with sections: Recommendation, Strengths, Risks, Next step>",\n'
-        '  "decision_support": {"recommendation": "<recommendation>", "strengths": ["<strength>"], "risks": ["<risk>"], "next_step": "<next step>"},\n'
+        '  "decision_support": {"recommendation": "<recommendation>", "strengths": ["<strength>"], "risks": ["<risk>"], "positive_moments": ["<positive observation>"], "negative_moments": ["<concern or missing evidence>"], "conclusion": "<final HR conclusion>", "next_step": "<next step>"},\n'
         '  "recommendation": "advance|reject",\n'
         '  "scores": [\n'
         "    {\n"
@@ -289,7 +289,9 @@ def _normalise_evaluation(
                     model_score.get("notes")
                     or "No strong role-relevant evidence was provided for this criterion."
                 )[:2000],
-                "evidence": _normalise_evidence(model_score.get("evidence"), transcript),
+                "evidence": _normalise_evidence(
+                    model_score.get("evidence"), transcript
+                ),
             }
         )
 
@@ -346,7 +348,9 @@ def _normalise_evidence(value, transcript: list[dict]) -> list[dict]:
             line = int(item.get("line"))
         except (TypeError, ValueError):
             line = None
-        entry = transcript[line] if line is not None and 0 <= line < len(transcript) else {}
+        entry = (
+            transcript[line] if line is not None and 0 <= line < len(transcript) else {}
+        )
         evidence.append(
             {
                 "line": line,
@@ -365,6 +369,13 @@ def _normalise_decision_support(value) -> dict:
         "recommendation": str(value.get("recommendation") or "")[:500],
         "strengths": _string_list(value.get("strengths")),
         "risks": _string_list(value.get("risks")),
+        "positive_moments": _string_list(
+            value.get("positive_moments") or value.get("positiveMoments")
+        ),
+        "negative_moments": _string_list(
+            value.get("negative_moments") or value.get("negativeMoments")
+        ),
+        "conclusion": str(value.get("conclusion") or "")[:1000],
         "next_step": str(value.get("next_step") or value.get("nextStep") or "")[:1000],
     }
 

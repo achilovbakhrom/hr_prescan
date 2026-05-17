@@ -3,7 +3,7 @@ import type { ChatMessage, Interview, InterviewDetail } from '../types/interview
 
 export const interviewService = {
   // HR
-  async getInterviews(params?: { status?: string }): Promise<Interview[]> {
+  async getInterviews(params?: { status?: string; vacancyId?: string }): Promise<Interview[]> {
     const response = await apiClient.get<Interview[]>('/hr/interviews', {
       params,
     })

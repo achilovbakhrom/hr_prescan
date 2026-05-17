@@ -15,16 +15,16 @@ export interface VacancyPerformance {
   interviewedCount: number
   hiredCount: number
   rejectedCount: number
-  hireRate: number
-  rejectionRate: number
-  avgScore: number | null
+  hireRate: number | string
+  rejectionRate: number | string
+  avgScore: number | string | null
 }
 
 export interface InterviewInsights {
   total: number
   completed: number
   completionRate: number
-  averageScore: number | null
+  averageScore: number | string | null
 }
 
 export interface CompanyAnalytics {

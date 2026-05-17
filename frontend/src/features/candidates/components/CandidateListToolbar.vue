@@ -9,6 +9,8 @@ import InputText from 'primevue/inputtext'
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import GlassSurface from '@/shared/components/GlassSurface.vue'
+import VacancyAutocomplete from '@/features/vacancies/components/VacancyAutocomplete.vue'
+import type { Vacancy } from '@/features/vacancies/types/vacancy.types'
 
 interface Option {
   label: string
@@ -22,12 +24,16 @@ defineProps<{
   statusOptions: Option[]
   orderingOptions: Option[]
   showFilters: boolean
+  showVacancyFilter?: boolean
+  vacancyFilter?: Vacancy | null
+  vacancyOptions?: Vacancy[]
 }>()
 
 defineEmits<{
   'update:search': [value: string]
   'update:statusFilter': [value: string | undefined]
   'update:orderingFilter': [value: string]
+  'update:vacancyFilter': [value: Vacancy | null]
   searchInput: []
 }>()
 
@@ -46,6 +52,12 @@ const { t } = useI18n()
         @input="$emit('searchInput')"
       />
     </IconField>
+    <VacancyAutocomplete
+      v-if="showVacancyFilter"
+      :model-value="vacancyFilter || null"
+      :vacancies="vacancyOptions || []"
+      @update:model-value="$emit('update:vacancyFilter', $event)"
+    />
     <template v-if="showFilters">
       <Dropdown
         :model-value="statusFilter"

@@ -14,6 +14,7 @@ import MatchScoreView from './MatchScoreView.vue'
 import HRNotesPanel from './HRNotesPanel.vue'
 import InterviewReviewPanel from './InterviewReviewPanel.vue'
 import type { ApplicationDetail } from '../types/candidate.types'
+import type { CandidateAnalysisSession } from '../composables/useInterviewData'
 
 const props = defineProps<{
   candidate: ApplicationDetail
@@ -24,6 +25,7 @@ const props = defineProps<{
   aiSummary: string | null
   aiSummaryTranslations: Record<string, string>
   aiSummaryInterviewId: string | null
+  analysisSessions: CandidateAnalysisSession[]
 }>()
 
 const emit = defineEmits<{
@@ -54,6 +56,7 @@ const hasInterview = computed(() => props.candidate.interviewEnabled ?? false)
             :ai-summary="aiSummary"
             :ai-summary-translations="aiSummaryTranslations"
             :ai-summary-interview-id="aiSummaryInterviewId ?? undefined"
+            :analysis-sessions="analysisSessions"
             @update:ai-summary-translations="emit('update:aiSummaryTranslations', $event)"
           />
         </GlassCard>

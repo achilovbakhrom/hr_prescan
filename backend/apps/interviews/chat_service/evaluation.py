@@ -77,7 +77,7 @@ def evaluate_chat_interview(interview: Interview, *, ai_decision: str = "advance
         ],
         config=types.GenerateContentConfig(
             system_instruction="You are an expert HR evaluator. Respond only with valid JSON.",
-            max_output_tokens=1500,
+            max_output_tokens=2500,
             temperature=0.3,
             response_mime_type="application/json",
         ),
@@ -144,7 +144,7 @@ def _save_scores_and_complete(
         overall_score=overall_decimal,
         ai_summary=summary,
         ai_summary_translations=interview.ai_summary_translations,
-        decision_support=result.get("decision_support", {}),
+        decision_support=_normalise_decision_support(result.get("decision_support")),
         transcript=interview.chat_history or [],
         ai_decision=final_decision,
     )
@@ -157,3 +157,23 @@ def _save_scores_and_complete(
         final_decision,
         len(score_objects),
     )
+
+
+def _normalise_decision_support(value: object) -> dict:
+    if not isinstance(value, dict):
+        return {}
+    return {
+        "recommendation": str(value.get("recommendation") or "")[:500],
+        "strengths": _string_list(value.get("strengths")),
+        "risks": _string_list(value.get("risks")),
+        "positive_moments": _string_list(value.get("positive_moments") or value.get("positiveMoments")),
+        "negative_moments": _string_list(value.get("negative_moments") or value.get("negativeMoments")),
+        "conclusion": str(value.get("conclusion") or "")[:1000],
+        "next_step": str(value.get("next_step") or value.get("nextStep") or "")[:1000],
+    }
+
+
+def _string_list(value: object) -> list[str]:
+    if not isinstance(value, list):
+        return []
+    return [str(item)[:500] for item in value[:5] if str(item).strip()]

@@ -3,7 +3,7 @@ import { onMounted, ref } from 'vue'
 import LoginPage from '@/features/auth/pages/LoginPage.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 
-definePageMeta({ name: ROUTE_NAMES.LOGIN, layout: 'public', requiresAuth: false })
+definePageMeta({ name: ROUTE_NAMES.LOGIN, layout: 'auth', requiresAuth: false })
 
 const ready = ref(false)
 

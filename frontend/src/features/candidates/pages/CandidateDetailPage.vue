@@ -29,6 +29,7 @@ const {
   aiSummary,
   aiSummaryTranslations,
   aiSummaryInterviewId,
+  analysisSessions,
   fetchInterviewData,
 } = useInterviewData()
 
@@ -168,6 +169,7 @@ function handleShareTokenRotated(token: string): void {
             :ai-summary="aiSummary"
             :ai-summary-translations="aiSummaryTranslations"
             :ai-summary-interview-id="aiSummaryInterviewId"
+            :analysis-sessions="analysisSessions"
             @update:active-tab="activeTab = $event"
             @update:ai-summary-translations="aiSummaryTranslations = $event"
             @save-notes="handleSaveNotes"

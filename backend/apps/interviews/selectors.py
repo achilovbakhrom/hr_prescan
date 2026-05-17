@@ -11,6 +11,7 @@ def get_company_interviews(
     *,
     company: Company,
     status: str | None = None,
+    vacancy_id: UUID | None = None,
 ) -> QuerySet[Interview]:
     """Return interviews for a company, optionally filtered by status."""
     qs = Interview.objects.filter(application__vacancy__company=company).select_related(
@@ -20,6 +21,8 @@ def get_company_interviews(
     )
     if status:
         qs = qs.filter(status=status)
+    if vacancy_id:
+        qs = qs.filter(application__vacancy_id=vacancy_id)
     return qs
 
 
@@ -27,6 +30,7 @@ def get_user_interviews(
     *,
     user: User,
     status: str | None = None,
+    vacancy_id: UUID | None = None,
 ) -> QuerySet[Interview]:
     """Return interviews across every non-deleted company the user belongs to."""
     qs = Interview.objects.filter(
@@ -38,6 +42,8 @@ def get_user_interviews(
     )
     if status:
         qs = qs.filter(status=status)
+    if vacancy_id:
+        qs = qs.filter(application__vacancy_id=vacancy_id)
     return qs
 
 

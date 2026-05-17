@@ -11,7 +11,7 @@ export const useInterviewStore = defineStore('interview', () => {
   const loading = ref(false)
   const error = ref<string | null>(null)
 
-  async function fetchInterviews(params?: { status?: string }): Promise<void> {
+  async function fetchInterviews(params?: { status?: string; vacancyId?: string }): Promise<void> {
     loading.value = true
     error.value = null
     try {
