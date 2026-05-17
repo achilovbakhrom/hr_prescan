@@ -592,6 +592,7 @@
     "hired": "angeheuert",
     "noVacancies": "Noch keine offenen Stellen",
     "noVacanciesHint": "Erstellen Sie Ihr erstes Stellenangebot, um Bewerbungen zu erhalten",
+    "filterByVacancy": "Nach Stelle filtern",
     "noArchivedVacancies": "Keine archivierten Stellenangebote",
     "noArchivedVacanciesHint": "Hier werden archivierte Stellenangebote angezeigt",
     "shown": "{count} angezeigt",

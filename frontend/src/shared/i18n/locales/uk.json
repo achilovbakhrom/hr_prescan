@@ -592,6 +592,7 @@
     "hired": "найнятий",
     "noVacancies": "Вакансій ще немає",
     "noVacanciesHint": "Створіть свою першу вакансію, щоб почати отримувати заявки",
+    "filterByVacancy": "Фільтр за вакансією",
     "noArchivedVacancies": "Архівованих вакансій немає",
     "noArchivedVacanciesHint": "Тут з’являться архівні вакансії",
     "shown": "Показано {count}",

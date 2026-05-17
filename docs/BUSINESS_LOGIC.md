@@ -522,7 +522,7 @@ Candidates are managed within the vacancy detail page via two views:
 - CV viewer (inline PDF/DOCX preview)
 - CV match score with breakdown
 - **Prescanning results:** scores with AI notes per category, AI summary, structured decision support (`recommendation`, `strengths`, `risks`, `positive_moments`, `negative_moments`, `conclusion`, `next_step`), transcript
-- **Interview results** (if applicable): persisted structured decision support (`recommendation`, `strengths`, `risks`, `positive_moments`, `negative_moments`, `conclusion`, `next_step`), AI summary, scores with AI notes per category, persisted transcript evidence snippets per criterion, searchable transcript/conversation history for both chat and Meet modes, score-to-transcript evidence lookup, exportable transcript, recording playback with timestamp jumps (Meet mode only)
+- **Interview results** (if applicable): persisted structured decision support (`recommendation`, `strengths`, `risks`, `positive_moments`, `negative_moments`, `conclusion`, `next_step`), AI summary, scores with AI notes per category, persisted transcript evidence snippets per criterion, searchable Meet transcript, score-to-transcript evidence lookup, exportable transcript, recording playback with timestamp jumps
 - HR can add their own notes
 - HR can manually move the candidate to any pipeline status via status dropdown
 - HR can copy or rotate a read-only hiring manager review link for a candidate. Rotating the link changes the application share token and revokes old shared URLs. The shared view exposes candidate/vacancy context, AI screening summaries, scores, evidence snippets, transcripts, exports, and recording playback where available, but does not expose HR-only notes or candidate session tokens.
@@ -534,7 +534,7 @@ Candidates are managed within the vacancy detail page via two views:
 - Every candidate who applies to a vacancy is automatically saved into a deduplicated HR candidate base for the vacancy company's account owner.
 - Deduplication is by normalized email address within the HR account. If the same candidate applies again to any vacancy in the same account, the existing candidate-base record is updated instead of creating a duplicate.
 - Candidate-base records are visible only when the HR user has access to at least one non-deleted company where that candidate has a non-deleted application.
-- The candidate-base list is separate from the application pipeline list. The pipeline remains one row per application/vacancy; the candidate base is one row per person.
+- The HR Candidates page combines two tabs: the application pipeline list (one row/card per application/vacancy) and the deduplicated candidate base (one row per person).
 - Each candidate-base detail page shows the candidate's editable base contact fields, HR base notes, and all visible vacancy applications: vacancy, status, CV match score, prescanning score, interview score, and dates.
 - The latest candidate-base result points to the newest visible application and reflects the latest application status and screening scores. When the candidate applies again, completes screening, or HR changes status/notes, the candidate-base activity timestamp and latest result are refreshed.
 - Deleting a candidate-base record hides it from the base without deleting historical applications. If the same email applies again later, the record is recreated/reactivated.

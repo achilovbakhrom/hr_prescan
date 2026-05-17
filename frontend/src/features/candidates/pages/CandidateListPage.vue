@@ -6,10 +6,13 @@ import ConfirmDialog from 'primevue/confirmdialog'
 import { useConfirm } from 'primevue/useconfirm'
 import GlassCard from '@/shared/components/GlassCard.vue'
 import { useCandidateStore } from '../stores/candidate.store'
+import { useCandidateBaseStore } from '../stores/candidateBase.store'
 import CandidateKanban from '../components/CandidateKanban.vue'
+import CandidateBasePanel from '../components/CandidateBasePanel.vue'
+import CandidateHubTabs from '../components/CandidateHubTabs.vue'
+import CandidateListHeader from '../components/CandidateListHeader.vue'
 import CandidateListTable from '../components/CandidateListTable.vue'
 import CandidateListToolbar from '../components/CandidateListToolbar.vue'
-import CandidateViewModeToggle from '../components/CandidateViewModeToggle.vue'
 import { useKanbanBatchActions } from '../composables/useKanbanBatchActions'
 import { useVacancyStore } from '@/features/vacancies/stores/vacancy.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
@@ -21,6 +24,7 @@ const route = useRoute()
 const router = useRouter()
 const confirm = useConfirm()
 const candidateStore = useCandidateStore()
+const candidateBaseStore = useCandidateBaseStore()
 const vacancyStore = useVacancyStore()
 const vacancyId = computed(() => (route.params.vacancyId as string) || '')
 const isAllCandidates = computed(() => !vacancyId.value)
@@ -31,6 +35,7 @@ const orderingFilter = ref<string>('-created_at')
 const searchQuery = ref('')
 const selectedVacancy = ref<Vacancy | null>(null)
 const selectedCandidates = ref<Application[]>([])
+const activeSection = ref<'applications' | 'base'>('applications')
 let searchTimeout: ReturnType<typeof setTimeout> | null = null
 
 const statusOptions = computed(() => [
@@ -52,6 +57,7 @@ const orderingOptions = computed(() => [
 const vacancyOptions = computed(() => vacancyStore.vacancies.filter((v) => v.status !== 'archived'))
 
 function fetchCandidates(): void {
+  if (isAllCandidates.value && activeSection.value !== 'applications') return
   const params = {
     status: statusFilter.value,
     ordering: orderingFilter.value,
@@ -63,10 +69,19 @@ function fetchCandidates(): void {
 }
 
 onMounted(() => {
+  activeSection.value =
+    isAllCandidates.value && route.query.tab === 'base' ? 'base' : 'applications'
   fetchCandidates()
   if (isAllCandidates.value) vacancyStore.fetchVacancies()
 })
 watch([statusFilter, orderingFilter, selectedVacancy], fetchCandidates)
+watch(
+  () => route.query.tab,
+  (tab) => {
+    activeSection.value = isAllCandidates.value && tab === 'base' ? 'base' : 'applications'
+    fetchCandidates()
+  },
+)
 
 function onSearchInput(): void {
   if (searchTimeout) clearTimeout(searchTimeout)
@@ -81,6 +96,15 @@ const batchActions = useKanbanBatchActions(
 
 function viewDetail(candidate: Application): void {
   router.push({ name: ROUTE_NAMES.CANDIDATE_DETAIL, params: { id: candidate.id } })
+}
+
+function setActiveSection(section: 'applications' | 'base'): void {
+  activeSection.value = section
+  router.replace({
+    name: ROUTE_NAMES.CANDIDATE_LIST,
+    query: section === 'base' ? { tab: 'base' } : {},
+  })
+  if (section === 'applications') fetchCandidates()
 }
 
 function handleKanbanStatusChange(candidateId: string, status: ApplicationStatus): void {
@@ -109,26 +133,23 @@ function handleKanbanStatusChange(candidateId: string, status: ApplicationStatus
 
 <template>
   <div class="space-y-4">
-    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <div class="flex items-center gap-3">
-        <button
-          v-if="!isAllCandidates"
-          class="rounded-lg p-1.5 text-[color:var(--color-text-muted)] transition-colors hover:bg-[color:var(--color-surface-sunken)] hover:text-[color:var(--color-text-primary)]"
-          @click="router.back()"
-        >
-          <i class="pi pi-arrow-left"></i>
-        </button>
-        <div>
-          <h1 class="text-xl font-bold text-[color:var(--color-text-primary)] md:text-2xl">
-            {{ isAllCandidates ? t('nav.allCandidates') : t('candidates.pipeline') }}
-          </h1>
-          <p class="mt-0.5 text-sm text-[color:var(--color-text-muted)]">
-            {{ candidateStore.candidates.length }} {{ t('nav.candidates').toLowerCase() }}
-          </p>
-        </div>
-      </div>
-      <CandidateViewModeToggle v-model="viewMode" />
-    </div>
+    <CandidateListHeader
+      v-model:view-mode="viewMode"
+      :is-all-candidates="isAllCandidates"
+      :count="
+        activeSection === 'base'
+          ? candidateBaseStore.candidates.length
+          : candidateStore.candidates.length
+      "
+      :show-view-toggle="activeSection === 'applications'"
+      @back="router.back()"
+    />
+
+    <CandidateHubTabs
+      v-if="isAllCandidates"
+      :model-value="activeSection"
+      @update:model-value="setActiveSection"
+    />
 
     <p
       v-if="candidateStore.error"
@@ -138,6 +159,7 @@ function handleKanbanStatusChange(candidateId: string, status: ApplicationStatus
     </p>
 
     <CandidateListToolbar
+      v-if="activeSection === 'applications'"
       v-model:search="searchQuery"
       v-model:status-filter="statusFilter"
       v-model:ordering-filter="orderingFilter"
@@ -151,7 +173,9 @@ function handleKanbanStatusChange(candidateId: string, status: ApplicationStatus
       @update:vacancy-filter="selectedVacancy = $event"
     />
 
-    <GlassCard v-if="viewMode === 'table'" class="!p-0 overflow-hidden">
+    <CandidateBasePanel v-if="isAllCandidates && activeSection === 'base'" />
+
+    <GlassCard v-else-if="viewMode === 'table'" class="!p-0 overflow-hidden">
       <CandidateListTable
         v-model:selected-candidates="selectedCandidates"
         :candidates="candidateStore.candidates"

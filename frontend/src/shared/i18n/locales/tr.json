@@ -592,6 +592,7 @@
     "hired": "işe alındı",
     "noVacancies": "Henüz boş yer yok",
     "noVacanciesHint": "Başvuru almaya başlamak için ilk açık pozisyonunuzu oluşturun",
+    "filterByVacancy": "Pozisyona göre filtrele",
     "noArchivedVacancies": "Arşivlenmiş boş pozisyon yok",
     "noArchivedVacanciesHint": "Arşivlenmiş açık pozisyonlar burada görünecek",
     "shown": "{count} gösteriliyor",

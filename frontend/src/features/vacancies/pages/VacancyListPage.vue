@@ -5,7 +5,7 @@
  * Preserves one-directional state transitions (no archive/unarchive here).
  * Spec: docs/design/spec.md §9 Vacancies block.
  */
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import Button from 'primevue/button'
@@ -26,9 +26,10 @@ const confirm = useConfirm()
 
 type TabKey = 'active' | 'archived'
 const activeTab = ref<TabKey>('active')
-const viewMode = ref<'grid' | 'table'>('grid')
+const viewMode = ref<'grid' | 'table'>('table')
 const statusFilter = ref<string | null>(null)
 const sortOrder = ref<'newest' | 'oldest'>('newest')
+const VACANCY_VIEW_MODE_KEY = 'vacancy_view_mode'
 
 const statusOptions = computed(() => [
   { label: t('vacancies.allStatuses'), value: null },
@@ -65,8 +66,14 @@ const archivedCount = computed(
 
 onMounted(() => {
   const saved = localStorage.getItem('vacancy_status_filter')
+  const savedViewMode = localStorage.getItem(VACANCY_VIEW_MODE_KEY)
   statusFilter.value = saved && saved !== 'null' ? saved : null
+  viewMode.value = savedViewMode === 'grid' ? 'grid' : 'table'
   vacancyStore.fetchVacancies()
+})
+
+watch(viewMode, (value) => {
+  localStorage.setItem(VACANCY_VIEW_MODE_KEY, value)
 })
 
 function onStatusChange(): void {

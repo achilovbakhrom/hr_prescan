@@ -592,6 +592,7 @@
     "hired": "contratado",
     "noVacancies": "Aún no hay vacantes",
     "noVacanciesHint": "Crea tu primera vacante para comenzar a recibir solicitudes",
+    "filterByVacancy": "Filtrar por vacante",
     "noArchivedVacancies": "No hay vacantes archivadas",
     "noArchivedVacanciesHint": "Las vacantes archivadas aparecerán aquí",
     "shown": "{count} mostrado",

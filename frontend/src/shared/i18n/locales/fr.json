@@ -592,6 +592,7 @@
     "hired": "embauché",
     "noVacancies": "Pas encore de postes vacants",
     "noVacanciesHint": "Créez votre premier poste vacant pour commencer à recevoir des candidatures",
+    "filterByVacancy": "Filtrer par offre",
     "noArchivedVacancies": "Aucune offre d'emploi archivée",
     "noArchivedVacanciesHint": "Les postes vacants archivés apparaîtront ici",
     "shown": "{count} affiché",

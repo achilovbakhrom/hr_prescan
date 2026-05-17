@@ -599,6 +599,7 @@
     "hired": "hired",
     "noVacancies": "No vacancies yet",
     "noVacanciesHint": "Create your first vacancy to start receiving applications",
+    "filterByVacancy": "Filter by vacancy",
     "noArchivedVacancies": "No archived vacancies",
     "noArchivedVacanciesHint": "Archived vacancies will appear here",
     "shown": "{count} shown",

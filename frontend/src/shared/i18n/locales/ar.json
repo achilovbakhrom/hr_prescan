@@ -592,6 +592,7 @@
     "hired": "استأجرت",
     "noVacancies": "لا توجد وظائف شاغرة حتى الآن",
     "noVacanciesHint": "قم بإنشاء أول وظيفة شاغرة لك لبدء تلقي الطلبات",
+    "filterByVacancy": "التصفية حسب الوظيفة",
     "noArchivedVacancies": "لا توجد وظائف شاغرة مؤرشفة",
     "noArchivedVacanciesHint": "سوف تظهر الوظائف الشاغرة المؤرشفة هنا",
     "shown": "تم عرض {count}",

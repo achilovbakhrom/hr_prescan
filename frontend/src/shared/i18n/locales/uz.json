@@ -592,6 +592,7 @@
     "hired": "yollangan",
     "noVacancies": "Hozircha vakansiyalar yo'q",
     "noVacanciesHint": "Arizalarni qabul qilishni boshlash uchun birinchi vakansiyangizni yarating",
+    "filterByVacancy": "Vakansiya bo'yicha filtrlash",
     "noArchivedVacancies": "Arxivlangan vakansiyalar yo'q",
     "noArchivedVacanciesHint": "Arxivlangan vakansiyalar bu yerda ko'rinadi",
     "shown": "{count} ko'rsatilgan",

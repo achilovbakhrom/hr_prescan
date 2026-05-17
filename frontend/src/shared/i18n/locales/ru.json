@@ -599,6 +599,7 @@
     "hired": "наняты",
     "noVacancies": "Вакансий пока нет",
     "noVacanciesHint": "Создайте первую вакансию, чтобы начать получать заявки",
+    "filterByVacancy": "Фильтр по вакансии",
     "noArchivedVacancies": "Нет архивных вакансий",
     "noArchivedVacanciesHint": "Архивные вакансии появятся здесь",
     "shown": "{count} показано",

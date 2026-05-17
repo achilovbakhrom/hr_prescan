@@ -20,8 +20,7 @@ export const candidateRoutes: RouteRecordRaw[] = [
 export const hrCandidateRoutes: RouteRecordRaw[] = [
   {
     path: '/candidate-base',
-    name: ROUTE_NAMES.CANDIDATE_BASE,
-    component: () => import('./pages/CandidateBasePage.vue'),
+    redirect: { name: ROUTE_NAMES.CANDIDATE_LIST, query: { tab: 'base' } },
     meta: { requiresAuth: true, roles: [USER_ROLES.ADMIN, USER_ROLES.HR] },
   },
   {

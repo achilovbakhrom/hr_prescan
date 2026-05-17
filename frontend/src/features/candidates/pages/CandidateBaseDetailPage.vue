@@ -45,7 +45,7 @@ async function saveRecord(): Promise<void> {
 
 async function deleteRecord(): Promise<void> {
   await candidateStore.deleteCandidate(candidateId.value)
-  router.push({ name: ROUTE_NAMES.CANDIDATE_BASE })
+  router.push({ name: ROUTE_NAMES.CANDIDATE_LIST, query: { tab: 'base' } })
 }
 
 function openApplication(application: Application): void {
