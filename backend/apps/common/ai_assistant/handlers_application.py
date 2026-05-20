@@ -113,8 +113,7 @@ def handle_send_candidate_message(*, user, params):
     return {
         "success": True,
         "message": (
-            f"Message sent to {application.candidate_name} via "
-            f"{message.delivery_channel} ({message.delivery_status})."
+            f"Message sent to {application.candidate_name} via {message.delivery_channel} ({message.delivery_status})."
         ),
         "data": {
             "id": str(message.id),

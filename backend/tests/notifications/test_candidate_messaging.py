@@ -128,7 +128,9 @@ def test_hr_message_api_cannot_send_outside_company_scope():
     other_company = CompanyFactory()
     other_hr = UserFactory(company=other_company, role=User.Role.HR)
     candidate = UserFactory(company=None, role=User.Role.CANDIDATE)
-    application = ApplicationFactory(vacancy=VacancyFactory(company=other_company, created_by=other_hr), candidate=candidate)
+    application = ApplicationFactory(
+        vacancy=VacancyFactory(company=other_company, created_by=other_hr), candidate=candidate
+    )
     factory = APIRequestFactory()
     request = factory.post(
         f"/api/hr/candidates/{application.id}/messages/",
