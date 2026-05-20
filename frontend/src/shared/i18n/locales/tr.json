@@ -412,9 +412,9 @@
     "title": "Analitik",
     "subtitle": "Şirket düzeyinde işe alım analizleri ve öngörüleri",
     "totalApplications": "Toplam Başvurular",
-    "totalInterviews": "Toplam Röportaj",
+    "totalInterviews": "Toplam taramalar",
     "completionRate": "Tamamlanma Oranı",
-    "avgInterviewScore": "Ortalama Mülakat Puanı",
+    "avgInterviewScore": "Ortalama tarama puanı",
     "hiringFunnel": "İşe Alma Hunisi",
     "vacancyPerformance": "Başvurulara Göre En İyi Açık Pozisyonlar",
     "noData": "Henüz uygulama verisi yok",
@@ -1564,6 +1564,8 @@
   },
   "cvBuilder": {
     "title": "CV Oluşturucu",
+    "subtitle": "CV'nizi bölüm bölüm oluşturun.",
+    "sections": "Bölümler",
     "tabs": {
       "personal": "Kişisel Bilgiler",
       "experience": "Deneyim",

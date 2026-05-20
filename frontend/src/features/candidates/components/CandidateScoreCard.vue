@@ -18,6 +18,12 @@ const props = defineProps<{
 
 const { t } = useI18n()
 
+function formatScore(value: number | string | null | undefined): string {
+  const numeric = Number(value)
+  if (!Number.isFinite(numeric)) return '—'
+  return numeric.toFixed(1)
+}
+
 const displayScore = computed(() =>
   props.overallScore == null ? '—' : String(Math.round(props.overallScore)),
 )
@@ -73,7 +79,7 @@ const hasAnyScore = computed(
             t('candidates.prescanning')
           }}</span>
           <span class="font-mono text-sm font-semibold text-[color:var(--color-text-primary)]"
-            >{{ prescanningScore.toFixed(1) }}/10</span
+            >{{ formatScore(prescanningScore) }}/10</span
           >
         </div>
         <div
@@ -84,7 +90,7 @@ const hasAnyScore = computed(
             t('candidates.interview')
           }}</span>
           <span class="font-mono text-sm font-semibold text-[color:var(--color-text-primary)]"
-            >{{ interviewScore.toFixed(1) }}/10</span
+            >{{ formatScore(interviewScore) }}/10</span
           >
         </div>
       </div>

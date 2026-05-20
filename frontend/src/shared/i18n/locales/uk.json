@@ -412,9 +412,9 @@
     "title": "Аналітика",
     "subtitle": "Аналітика та розуміння найму на рівні компанії",
     "totalApplications": "Всього додатків",
-    "totalInterviews": "Всього інтерв'ю",
+    "totalInterviews": "Всього скринінгів",
     "completionRate": "Швидкість завершення",
-    "avgInterviewScore": "Середнє Оцінка співбесіди",
+    "avgInterviewScore": "Середній бал скринінгу",
     "hiringFunnel": "Воронка найму",
     "vacancyPerformance": "Топ вакансій за заявками",
     "noData": "Даних про заявку ще немає",
@@ -1564,6 +1564,8 @@
   },
   "cvBuilder": {
     "title": "Конструктор CV",
+    "subtitle": "Заповнюйте CV розділ за розділом.",
+    "sections": "Розділи",
     "tabs": {
       "personal": "Особиста інформація",
       "experience": "Досвід",

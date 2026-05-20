@@ -79,6 +79,9 @@ yarn-error.log*
 coverage/
 htmlcov/
 .coverage
+qa-*.png
+full-web-*.png
+candidate-direct-message-*.png
 
 # Static files (collected)
 staticfiles/

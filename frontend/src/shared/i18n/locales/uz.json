@@ -412,9 +412,9 @@
     "title": "Analitika",
     "subtitle": "Kompaniya darajasidagi yollash analitikasi va tushunchalar",
     "totalApplications": "Jami arizalar",
-    "totalInterviews": "Jami intervyular",
+    "totalInterviews": "Jami skrininglar",
     "completionRate": "Yakunlash darajasi",
-    "avgInterviewScore": "O'rtacha intervyu bali",
+    "avgInterviewScore": "O'rtacha skrining bali",
     "hiringFunnel": "Yollash voronkasi",
     "vacancyPerformance": "Arizalar bo'yicha eng yaxshi vakansiyalar",
     "noData": "Hozircha ariza ma'lumotlari yo'q",
@@ -1564,6 +1564,8 @@
   },
   "cvBuilder": {
     "title": "CV yaratish",
+    "subtitle": "CVingizni bo'limma-bo'lim yarating.",
+    "sections": "Bo'limlar",
     "tabs": {
       "personal": "Shaxsiy ma'lumot",
       "experience": "Tajriba",

@@ -419,9 +419,9 @@
     "title": "Аналитика",
     "subtitle": "Аналитика найма на уровне компании",
     "totalApplications": "Всего заявок",
-    "totalInterviews": "Всего собеседований",
+    "totalInterviews": "Всего скринингов",
     "completionRate": "Процент завершения",
-    "avgInterviewScore": "Средний балл собеседования",
+    "avgInterviewScore": "Средний балл скрининга",
     "hiringFunnel": "Воронка найма",
     "vacancyPerformance": "Топ вакансий по заявкам",
     "noData": "Данных о заявках пока нет",
@@ -1571,6 +1571,8 @@
   },
   "cvBuilder": {
     "title": "Конструктор CV",
+    "subtitle": "Заполняйте CV раздел за разделом.",
+    "sections": "Разделы",
     "tabs": {
       "personal": "Личные данные",
       "experience": "Опыт работы",

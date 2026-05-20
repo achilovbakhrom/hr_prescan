@@ -412,9 +412,9 @@
     "title": "Analítica",
     "subtitle": "Análisis e información sobre contratación a nivel de empresa",
     "totalApplications": "Aplicaciones totales",
-    "totalInterviews": "Entrevistas totales",
+    "totalInterviews": "Cribados totales",
     "completionRate": "Tasa de finalización",
-    "avgInterviewScore": "Promedio Puntuación de la entrevista",
+    "avgInterviewScore": "Puntuación media de cribado",
     "hiringFunnel": "Embudo de contratación",
     "vacancyPerformance": "Principales vacantes por aplicaciones",
     "noData": "Aún no hay datos de la aplicación",
@@ -1564,6 +1564,8 @@
   },
   "cvBuilder": {
     "title": "CV Constructor",
+    "subtitle": "Crea tu CV sección por sección.",
+    "sections": "Secciones",
     "tabs": {
       "personal": "Información personal",
       "experience": "Experiencia",

@@ -412,9 +412,9 @@
     "title": "Аналитика",
     "subtitle": "Компания деңгейіндегі жалдау аналитикасы мен түсініктері",
     "totalApplications": "Жалпы қолданбалар",
-    "totalInterviews": "Жалпы сұхбаттар",
+    "totalInterviews": "Жалпы скринингтер",
     "completionRate": "Аяқтау жылдамдығы",
-    "avgInterviewScore": "Орт. Сұхбат ұпайы",
+    "avgInterviewScore": "Орташа скрининг ұпайы",
     "hiringFunnel": "Шұңқырды жалдау",
     "vacancyPerformance": "Өтініштер бойынша үздік бос орындар",
     "noData": "Қолданба деректері әлі жоқ",
@@ -1564,6 +1564,8 @@
   },
   "cvBuilder": {
     "title": "CV Құрастырушы",
+    "subtitle": "CV-ді бөлім-бөліммен құрастырыңыз.",
+    "sections": "Бөлімдер",
     "tabs": {
       "personal": "Жеке ақпарат",
       "experience": "Тәжірибе",

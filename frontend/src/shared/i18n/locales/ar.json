@@ -412,9 +412,9 @@
     "title": "التحليلات",
     "subtitle": "تحليلات ورؤى التوظيف على مستوى الشركة",
     "totalApplications": "إجمالي التطبيقات",
-    "totalInterviews": "إجمالي المقابلات",
+    "totalInterviews": "إجمالي عمليات الفرز",
     "completionRate": "معدل الإنجاز",
-    "avgInterviewScore": "متوسط نتيجة المقابلة",
+    "avgInterviewScore": "متوسط نتيجة الفرز",
     "hiringFunnel": "قمع التوظيف",
     "vacancyPerformance": "أعلى الوظائف الشاغرة حسب التطبيقات",
     "noData": "لا توجد بيانات التطبيق حتى الآن",
@@ -1564,6 +1564,8 @@
   },
   "cvBuilder": {
     "title": "CV منشئ",
+    "subtitle": "أنشئ سيرتك الذاتية قسمًا تلو الآخر.",
+    "sections": "الأقسام",
     "tabs": {
       "personal": "المعلومات الشخصية",
       "experience": "الخبرة",

@@ -419,9 +419,9 @@
     "title": "Analytics",
     "subtitle": "Company-level hiring analytics and insights",
     "totalApplications": "Total Applications",
-    "totalInterviews": "Total Interviews",
+    "totalInterviews": "Total Screenings",
     "completionRate": "Completion Rate",
-    "avgInterviewScore": "Avg. Interview Score",
+    "avgInterviewScore": "Avg. Screening Score",
     "hiringFunnel": "Hiring Funnel",
     "vacancyPerformance": "Top Vacancies by Applications",
     "noData": "No application data yet",
@@ -1571,6 +1571,8 @@
   },
   "cvBuilder": {
     "title": "CV Builder",
+    "subtitle": "Craft your CV section by section.",
+    "sections": "Sections",
     "tabs": {
       "personal": "Personal Info",
       "experience": "Experience",

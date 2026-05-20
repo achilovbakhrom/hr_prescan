@@ -412,9 +412,9 @@
     "title": "Analyse",
     "subtitle": "Analyses et informations sur le recrutement au niveau de l'entreprise",
     "totalApplications": "Total des demandes",
-    "totalInterviews": "Total des entretiens",
+    "totalInterviews": "Total des screenings",
     "completionRate": "Taux d'achèvement",
-    "avgInterviewScore": "Moy. Score de l'entretien",
+    "avgInterviewScore": "Score moyen de screening",
     "hiringFunnel": "Entonnoir de recrutement",
     "vacancyPerformance": "Principaux postes vacants par candidature",
     "noData": "Aucune donnée d'application pour l'instant",
@@ -1564,6 +1564,8 @@
   },
   "cvBuilder": {
     "title": "CV Constructeur",
+    "subtitle": "Construisez votre CV section par section.",
+    "sections": "Sections",
     "tabs": {
       "personal": "Informations personnelles",
       "experience": "Expérience",

@@ -412,9 +412,9 @@
     "title": "Analytik",
     "subtitle": "Einstellungsanalysen und Erkenntnisse auf Unternehmensebene",
     "totalApplications": "Gesamtzahl der Bewerbungen",
-    "totalInterviews": "Gesamtzahl der Interviews",
+    "totalInterviews": "Screenings gesamt",
     "completionRate": "Abschlussrate",
-    "avgInterviewScore": "Durchschn. Interviewergebnis",
+    "avgInterviewScore": "Durchschn. Screening-Ergebnis",
     "hiringFunnel": "Einstellungstrichter",
     "vacancyPerformance": "Top-Stellenangebote nach Bewerbungen",
     "noData": "Noch keine Bewerbungsdaten",
@@ -1564,6 +1564,8 @@
   },
   "cvBuilder": {
     "title": "CV Builder",
+    "subtitle": "Erstellen Sie Ihren CV Abschnitt für Abschnitt.",
+    "sections": "Abschnitte",
     "tabs": {
       "personal": "Persönliche Informationen",
       "experience": "Erfahrung",
