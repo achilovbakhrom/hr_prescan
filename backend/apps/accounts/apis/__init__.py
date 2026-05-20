@@ -15,6 +15,12 @@ from apps.accounts.apis.auth_register import (
     RegisterApi,
     VerifyEmailApi,
 )
+from apps.accounts.apis.account_modes import (
+    AccountModesApi,
+    CreateCandidateSpaceApi,
+    CreateHrSpaceApi,
+    SwitchAccountModeApi,
+)
 from apps.accounts.apis.candidate_certifications import (
     CertificationDetailApi,
     CertificationListCreateApi,
@@ -71,6 +77,7 @@ from apps.accounts.apis.user_companies import (
 __all__ = [
     "AcceptCompanyInvitationApi",
     "AcceptInvitationApi",
+    "AccountModesApi",
     "CandidateCVActivateApi",
     "CandidateCVDetailApi",
     "CandidateCVListCreateApi",
@@ -84,6 +91,8 @@ __all__ = [
     "CheckInvitationApi",
     "CompleteCompanySetupApi",
     "CompleteOnboardingApi",
+    "CreateCandidateSpaceApi",
+    "CreateHrSpaceApi",
     "CvGeneratePdfApi",
     "CvImproveSectionApi",
     "CvParseApi",
@@ -101,6 +110,7 @@ __all__ = [
     "PublicCvViewApi",
     "RegisterApi",
     "SwitchCompanyApi",
+    "SwitchAccountModeApi",
     "SwitchToPersonalApi",
     "TeamListApi",
     "TeamMemberDetailApi",

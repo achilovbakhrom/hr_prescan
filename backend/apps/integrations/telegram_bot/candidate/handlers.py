@@ -9,7 +9,7 @@ from apps.integrations.telegram_bot.candidate.assistant import route_to_assistan
 from apps.integrations.telegram_bot.candidate.auth import get_or_create_candidate_user
 from apps.integrations.telegram_bot.candidate.callbacks import handle_callback
 from apps.integrations.telegram_bot.candidate.language import telegram_language, user_language
-from apps.integrations.telegram_bot.candidate.menus import send_main_menu
+from apps.integrations.telegram_bot.candidate.menus import main_menu_keyboard, send_main_menu
 from apps.integrations.telegram_bot.candidate.start import handle_account_link_start, handle_start_command
 from apps.integrations.telegram_bot.candidate.states import STATE_CV_UPLOAD, STATE_PS_CV, STATE_PS_INTERVIEW
 from apps.integrations.telegram_bot.candidate.uploads import handle_document
@@ -164,6 +164,14 @@ def _handle_text(*, client, chat_id: int, user, text: str, session: dict, lang: 
         from apps.integrations.telegram_bot.candidate.registration import prompt_registration
 
         prompt_registration(client=client, chat_id=chat_id, user=user, lang=lang)
+        return
+
+    if not session.get("ai_mode"):
+        client.send_message(
+            chat_id=chat_id,
+            text=t("candidate.free_text_blocked", lang=lang),
+            reply_markup=main_menu_keyboard(lang=lang),
+        )
         return
 
     route_to_assistant(client=client, chat_id=chat_id, user=user, text=text, lang=lang)

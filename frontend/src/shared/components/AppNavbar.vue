@@ -12,6 +12,7 @@ import NotificationBell from '@/features/notifications/components/NotificationBe
 import LanguageSwitcher from '@/shared/components/LanguageSwitcher.vue'
 import ThemeToggle from '@/shared/components/ThemeToggle.vue'
 import CompanySwitcher from './CompanySwitcher.vue'
+import AccountModeSwitcher from './AccountModeSwitcher.vue'
 import GlobalSearchDialog from './GlobalSearchDialog.vue'
 import AppLogo from './AppLogo.vue'
 import AIAssistantEntryButton from './AIAssistantEntryButton.vue'
@@ -30,6 +31,7 @@ const showSearch = ref(false)
 const canUseGlobalSearch = computed(
   () =>
     Boolean(authStore.user?.company) &&
+    authStore.activeMode === 'hr' &&
     (authStore.user?.role === USER_ROLES.ADMIN || authStore.user?.role === USER_ROLES.HR),
 )
 
@@ -100,6 +102,7 @@ function handleMenuToggle(): void {
           ></i>
         </a>
         <CompanySwitcher class="min-w-0" />
+        <AccountModeSwitcher />
       </div>
 
       <div class="flex items-center gap-2 sm:gap-3">

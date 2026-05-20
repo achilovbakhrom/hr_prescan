@@ -4,7 +4,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.accounts.models import User
+from apps.accounts.models import CandidateProfile, User
 from apps.accounts.permissions import HasHRPermission
 from apps.integrations.telegram_bot.bots import (
     ROLE_CANDIDATE,
@@ -115,7 +115,9 @@ class HRTelegramUnlinkApi(TelegramUnlinkApi):
 
 
 def _telegram_bot_for_user(user: User) -> tuple[str, str]:
-    if user.role == User.Role.CANDIDATE:
+    if getattr(user, "active_mode", user.role) == User.ActiveMode.CANDIDATE or (
+        user.role == User.Role.CANDIDATE or CandidateProfile.objects.filter(user=user).exists()
+    ):
         username = getattr(settings, "TELEGRAM_CANDIDATE_BOT_USERNAME", "")
         return username.strip().lstrip("@"), "link_"
     if user.role in (User.Role.ADMIN, User.Role.HR):

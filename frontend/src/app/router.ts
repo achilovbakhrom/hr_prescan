@@ -123,7 +123,7 @@ router.beforeEach(async (to) => {
   if (
     authStore.isAuthenticated &&
     authStore.user?.onboardingCompleted === true &&
-    authStore.user.role === 'hr' &&
+    authStore.activeMode === 'hr' &&
     !authStore.user.company &&
     to.name !== ROUTE_NAMES.COMPANY_SETUP
   ) {
@@ -132,7 +132,8 @@ router.beforeEach(async (to) => {
 
   const allowedRoles = to.meta.roles
   if (allowedRoles && authStore.user) {
-    if (!allowedRoles.includes(authStore.user.role)) {
+    const routeMode = authStore.activeMode === 'hr' ? authStore.user.role : 'candidate'
+    if (!allowedRoles.includes(routeMode)) {
       return { name: ROUTE_NAMES.FORBIDDEN }
     }
   }

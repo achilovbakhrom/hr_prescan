@@ -99,6 +99,7 @@ def complete_onboarding(*, user: User, role: str = User.Role.CANDIDATE) -> User:
     if role not in (User.Role.CANDIDATE, User.Role.HR):
         raise ApplicationError("Invalid role choice.")
     user.role = role
+    user.active_mode = User.ActiveMode.HR if role == User.Role.HR else User.ActiveMode.CANDIDATE
     user.onboarding_completed = True
-    user.save(update_fields=["role", "onboarding_completed", "updated_at"])
+    user.save(update_fields=["role", "active_mode", "onboarding_completed", "updated_at"])
     return user

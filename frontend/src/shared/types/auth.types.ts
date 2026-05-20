@@ -27,6 +27,7 @@ export interface User {
   lastName: string
   phone: string | null
   role: UserRole
+  activeMode: AccountMode
   hrPermissions: HRPermission[]
   company: Company | null
   accountOwnerName: string
@@ -39,6 +40,7 @@ export interface User {
 }
 
 export type UserRole = 'admin' | 'hr' | 'candidate'
+export type AccountMode = 'hr' | 'candidate'
 
 export interface Company {
   id: string
@@ -70,4 +72,13 @@ export interface CompanyMembership {
   hrPermissions: HRPermission[]
   isDefault?: boolean
   createdAt: string
+}
+
+export interface AccountModes {
+  currentMode: AccountMode
+  availableModes: AccountMode[]
+  canCreateHrSpace: boolean
+  canCreateCandidateSpace: boolean
+  defaultRedirect: string
+  user: User
 }

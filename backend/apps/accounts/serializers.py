@@ -51,6 +51,7 @@ class UserOutputSerializer(serializers.ModelSerializer):
             "full_name",
             "phone",
             "role",
+            "active_mode",
             "company",
             "account_owner_name",
             "is_account_owner",

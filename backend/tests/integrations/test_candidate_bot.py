@@ -14,6 +14,8 @@ from apps.integrations.telegram_bot.bots import ROLE_CANDIDATE
 from apps.integrations.telegram_bot.candidate.auth import get_or_create_candidate_user
 from apps.integrations.telegram_bot.candidate.handlers import handle_update
 from apps.integrations.telegram_bot.candidate.menus import (
+    CB_AI_EXIT,
+    CB_AI_START,
     CB_CV_ASSISTANT,
     CB_JOB_SEARCH,
     CB_MESSAGES,
@@ -477,6 +479,7 @@ class TestCandidateLanguageSettings:
         assert any(CB_JOB_SEARCH in str(markup) for markup in markups)
         assert any("cand:ps:start" in str(markup) for markup in markups)
         assert any(CB_CV_ASSISTANT in str(markup) for markup in markups)
+        assert any(CB_AI_START in str(markup) for markup in markups)
 
     def test_language_callback_updates_stored_language(self):
         _create_onboarded_candidate(language=User.Language.EN)
@@ -524,6 +527,59 @@ class TestCandidateLanguageSettings:
 
 
 class TestCandidateAssistantButtons:
+    def test_free_text_outside_ai_mode_shows_menu_without_assistant(self):
+        _create_onboarded_candidate()
+        with (
+            patch("apps.integrations.telegram_bot.client.requests.post") as post_mock,
+            patch("apps.integrations.telegram_bot.client.requests.get"),
+            patch(
+                "apps.integrations.telegram_bot.candidate.assistant.process_candidate_ai_command",
+            ) as assistant_mock,
+        ):
+            post_mock.return_value.json.return_value = {"ok": True, "result": {}}
+            handle_update(_make_message_update("find frontend jobs"))
+
+        assistant_mock.assert_not_called()
+        sent_text = " ".join(str(call.kwargs.get("json", {}).get("text", "")) for call in post_mock.call_args_list)
+        markups = [call.kwargs.get("json", {}).get("reply_markup", {}) for call in post_mock.call_args_list]
+        assert "AI mode" in sent_text
+        assert any(CB_AI_START in str(markup) for markup in markups)
+
+    def test_ai_mode_callback_enables_free_text_assistant(self):
+        _create_onboarded_candidate()
+        with (
+            patch("apps.integrations.telegram_bot.client.requests.post") as post_mock,
+            patch("apps.integrations.telegram_bot.client.requests.get"),
+            patch(
+                "apps.integrations.telegram_bot.candidate.assistant.process_candidate_ai_command",
+                return_value={"message": "Found jobs"},
+            ) as assistant_mock,
+        ):
+            post_mock.return_value.json.return_value = {"ok": True, "result": {}}
+            handle_update(_make_callback_update(CB_AI_START))
+            handle_update(_make_message_update("find frontend jobs"))
+
+        assistant_mock.assert_called_once()
+        assert assistant_mock.call_args.kwargs["message"] == "find frontend jobs"
+        assert get_session(role=ROLE_CANDIDATE, telegram_id=TG_USER["id"]).get("ai_mode") is True
+
+    def test_exit_ai_mode_blocks_free_text_again(self):
+        _create_onboarded_candidate()
+        with (
+            patch("apps.integrations.telegram_bot.client.requests.post") as post_mock,
+            patch("apps.integrations.telegram_bot.client.requests.get"),
+            patch(
+                "apps.integrations.telegram_bot.candidate.assistant.process_candidate_ai_command",
+            ) as assistant_mock,
+        ):
+            post_mock.return_value.json.return_value = {"ok": True, "result": {}}
+            handle_update(_make_callback_update(CB_AI_START))
+            handle_update(_make_callback_update(CB_AI_EXIT))
+            handle_update(_make_message_update("find frontend jobs"))
+
+        assistant_mock.assert_not_called()
+        assert get_session(role=ROLE_CANDIDATE, telegram_id=TG_USER["id"]).get("ai_mode") is False
+
     def test_search_jobs_button_routes_to_candidate_assistant(self):
         _create_onboarded_candidate()
         with (

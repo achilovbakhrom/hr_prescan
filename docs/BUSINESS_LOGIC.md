@@ -50,6 +50,13 @@ The AI agent evaluates candidates at each step and decides whether to advance th
 - Receives notifications about application status
 - Upon registration, previous applications and sessions are automatically linked to the account via email or phone number
 
+### 2.4 Account Modes
+- A single authenticated user can have both an HR space and a candidate space. `User.active_mode` controls the current web context separately from the user's HR/company role.
+- HR mode requires at least one live company membership. The web header shows the current mode, the company dropdown, and an option to switch to candidate mode or create a candidate space.
+- Candidate mode requires a candidate space (candidate role or candidate profile). The web header hides the HR company dropdown and shows only the account-mode switch.
+- Creating an HR space from a candidate account creates the required company and preserves the candidate space. Creating a candidate space from an HR account collects the required personal profile fields and switches into candidate mode.
+- HR permissions only apply while `active_mode=hr`; candidate profile and dashboard APIs only apply while `active_mode=candidate`.
+
 ---
 
 ## 3. Multi-Company Model (per account)
@@ -325,20 +332,20 @@ The candidate bot lets a candidate browse entry points, apply, and complete pres
    - answers can be text or voice
    - the bot stores progress and can resume an in-progress Telegram prescreening session from the same deep link
 10. Candidates can open **Messages** from the bot menu to view recent HR direct messages. Telegram-delivered HR messages remain stored in the platform inbox, so bot and web history use the same source of truth.
-11. Outside explicit prescanning states, free-text candidate messages are routed to the candidate AI assistant so the bot can help with job search, application status, and interview-prep style requests.
+11. Outside explicit prescanning states, free-text candidate messages are accepted by the candidate AI assistant only after the candidate taps **AI mode**. Otherwise the bot points the candidate back to the button menu.
 
 #### Notes & constraints
 
-- One Telegram identity can have one active candidate profile and one active HR/admin profile because the HR bot and candidate bot are separate surfaces. Within each surface, only one active same-role profile may own a Telegram identity. Bot-created placeholder candidate accounts can be merged into a later web candidate account only through a confirmed `link_<token>` flow.
+- One Telegram identity can have one active candidate profile and one active HR/admin profile because the HR bot and candidate bot are separate surfaces. A single web account may also hold both spaces; the candidate bot can use a user with a candidate profile even if their underlying web role is HR/admin. Within each surface, only one active same-role profile may own a Telegram identity. Bot-created placeholder candidate accounts can be merged into a later web candidate account only through a confirmed `link_<token>` flow.
 - If an already-linked Telegram identity opens an account-link deep link for another same-role real profile, the bot resumes the existing linked account and does not silently rebind the Telegram identity. Moving Telegram to another real profile requires an explicit unlink/relink action from account settings.
 - Candidate dashboards include applications bound by candidate user ID and applications matching the candidate email, so merged Telegram applications remain visible even if their original placeholder email differs from the web email.
 - Candidate "My Applications" list/detail responses expose CV match, prescanning, and interview scores. The primary displayed score is the overall screening score from prescanning/interview when available; CV match is shown separately and only acts as a fallback before screening results exist.
-- Bot UI is **button-driven** wherever possible (Telegram inline keyboards) — free-text replies outside structured steps are routed to the candidate AI agent.
-- The HR Telegram bot exposes button shortcuts for dashboard, vacancies, vacancy creation, candidates, sending candidate messages, interviews, team, subscription, and language. Those buttons route clear natural-language prompts to the HR AI assistant, so recruiters do not need to memorize commands or internal IDs.
+- Bot UI is **button-driven** wherever possible (Telegram inline keyboards). Free-text replies outside structured steps do not invoke AI unless the user has explicitly entered **AI mode**.
+- The HR Telegram bot exposes button shortcuts for dashboard, vacancies, vacancy creation, candidates, sending candidate messages, interviews, team, subscription, language, and AI mode. Feature buttons route clear natural-language prompts to the HR AI assistant, so recruiters do not need to memorize commands or internal IDs. Arbitrary recruiter text is ignored until AI mode is enabled.
 - The HR Telegram bot follows the same link safety rule as the candidate bot: a Telegram-first placeholder workspace may be merged into a confirmed web HR/admin account, but an already-linked real HR/admin account is resumed instead of being blocked by an unlink warning or silently rebound to another web user. Candidate links with the same Telegram identity do not block HR-bot linking, and HR links do not block candidate-bot linking.
 - Bot-created users are seeded from `message.from.language_code` when it matches a supported bot locale (en / ru / uz), then bot strings use the stored `User.language`. Authenticated web users can change the same field from the header language switcher; HR and candidate Telegram bot UIs also expose a language picker that updates `User.language` for future bot replies.
 - New Telegram candidate users must register in the bot before they can use vacancy, prescreening, CV, or assistant actions. Registration asks for a phone number first using Telegram's native contact-sharing button (manual phone entry is still accepted), then asks the candidate to choose the bot language (`en` / `ru` / `uz`). The selected language is persisted to `User.language` and drives future bot replies. If the user opened a vacancy/prescreening deep link first, the bot resumes that payload after required onboarding.
-- Candidate Telegram bot menus expose direct buttons for job search, prescreening, Messages, creating a CV with the candidate AI assistant, viewing saved CVs, uploading an existing CV file, downloading generated/uploaded CV files, and changing language.
+- Candidate Telegram bot menus expose direct buttons for job search, prescreening, Messages, creating a CV with the candidate AI assistant, viewing saved CVs, uploading an existing CV file, downloading generated/uploaded CV files, changing language, and AI mode.
 
 ---
 

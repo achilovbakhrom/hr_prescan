@@ -12,16 +12,20 @@ from apps.integrations.telegram_bot.candidate.auth import get_or_create_candidat
 from apps.integrations.telegram_bot.candidate.language import telegram_language, user_language
 from apps.integrations.telegram_bot.candidate.linking import handle_account_link_callback, is_account_link_callback
 from apps.integrations.telegram_bot.candidate.menus import (
+    CB_AI_EXIT,
+    CB_AI_START,
     CB_CV_ASSISTANT,
     CB_JOB_SEARCH,
     CB_MENU,
     CB_VAC_APPLY,
+    ai_mode_keyboard,
+    main_menu_keyboard,
     parse_callback,
     send_main_menu,
 )
 from apps.integrations.telegram_bot.candidate.messages import CB_MESSAGES, show_recent_messages
 from apps.integrations.telegram_bot.i18n import t
-from apps.integrations.telegram_bot.sessions import get_session
+from apps.integrations.telegram_bot.sessions import get_session, update_session
 
 
 def handle_callback(*, client, callback: dict) -> None:
@@ -75,6 +79,20 @@ def process_callback(*, client, callback: dict) -> None:
     action, arg = parse_callback(data=data)
     if action == CB_VAC_APPLY and arg:
         _confirm_apply(client=client, chat_id=chat_id, user=user, arg=arg, session=session, lang=lang)
+    elif action == CB_AI_START:
+        update_session(role=ROLE_CANDIDATE, telegram_id=telegram_id, ai_mode=True)
+        client.send_message(
+            chat_id=chat_id,
+            text=t("candidate.ai_mode_started", lang=lang),
+            reply_markup=ai_mode_keyboard(lang=lang),
+        )
+    elif action == CB_AI_EXIT:
+        update_session(role=ROLE_CANDIDATE, telegram_id=telegram_id, ai_mode=False)
+        client.send_message(
+            chat_id=chat_id,
+            text=t("candidate.ai_mode_stopped", lang=lang),
+            reply_markup=main_menu_keyboard(lang=lang),
+        )
     elif action == CB_JOB_SEARCH:
         _route_button_to_assistant(
             client=client,

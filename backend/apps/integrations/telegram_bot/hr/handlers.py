@@ -22,6 +22,7 @@ from apps.integrations.telegram_bot.hr.onboarding_flow import (
     send_language_picker,
 )
 from apps.integrations.telegram_bot.i18n import normalize_language
+from apps.integrations.telegram_bot.sessions import get_session
 from apps.integrations.telegram_bot.voice import transcribe_voice
 
 
@@ -124,6 +125,15 @@ def handle_update(update_data: dict) -> None:
         return
 
     if not ensure_onboarding_ready(client=client, chat_id=chat_id, user=user, text=text):
+        return
+
+    session = get_session(role=ROLE_HR, telegram_id=telegram_id)
+    if not session.get("ai_mode"):
+        client.send_message(
+            chat_id=chat_id,
+            text=hr_text("free_text_blocked", user=user),
+            reply_markup=main_menu_keyboard(user=user),
+        )
         return
 
     route_to_assistant(client=client, chat_id=chat_id, user=user, text=text)

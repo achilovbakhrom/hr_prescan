@@ -5,9 +5,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from django.db import IntegrityError, transaction
+from django.db.models import Q
 from django.utils import timezone
 
-from apps.accounts.models import User
+from apps.accounts.models import CandidateProfile, User
 from apps.integrations.models import TelegramLinkCode
 from apps.integrations.telegram_bot.candidate.merge import merge_candidate_accounts
 from apps.integrations.telegram_bot.i18n import t
@@ -40,7 +41,7 @@ def request_account_link(*, client, chat_id: int, telegram_id: int, payload: str
 
     token = payload.removeprefix(LINK_PAYLOAD_PREFIX)
     link = _get_valid_link(token=token)
-    if link is None or link.user.role != User.Role.CANDIDATE:
+    if link is None or not _has_candidate_space(user=link.user):
         client.send_message(chat_id=chat_id, text=t("candidate.link_invalid", lang=lang))
         return True
 
@@ -110,19 +111,14 @@ def confirm_account_link(*, token: str, telegram_id: int, telegram_username: str
     try:
         with transaction.atomic():
             link = _get_valid_link_for_update(token=token)
-            if link is None or link.user.role != User.Role.CANDIDATE:
+            if link is None or not _has_candidate_space(user=link.user):
                 return LinkResult(ok=False)
 
             target = link.user
-            existing = (
-                User.objects.select_for_update()
-                .filter(telegram_id=telegram_id, role=User.Role.CANDIDATE)
-                .exclude(id=target.id)
-                .first()
-            )
+            existing = _candidate_user_for_telegram_for_update(telegram_id=telegram_id, exclude_user_id=target.id)
             if existing is not None:
                 if not _is_mergeable_telegram_candidate(user=existing, telegram_id=telegram_id):
-                    if existing.role == User.Role.CANDIDATE:
+                    if _has_candidate_space(user=existing):
                         return LinkResult(ok=True, already_linked=True)
                     return LinkResult(ok=False, conflict=True)
                 merge_candidate_accounts(source=existing, target=target)
@@ -174,8 +170,36 @@ def _is_mergeable_telegram_candidate(*, user: User, telegram_id: int) -> bool:
     )
 
 
+def _has_candidate_space(*, user: User) -> bool:
+    return user.role == User.Role.CANDIDATE or CandidateProfile.objects.filter(user=user).exists()
+
+
+def _candidate_user_for_telegram_for_update(*, telegram_id: int, exclude_user_id) -> User | None:
+    existing = (
+        User.objects.select_for_update()
+        .filter(telegram_id=telegram_id, role=User.Role.CANDIDATE)
+        .exclude(id=exclude_user_id)
+        .first()
+    )
+    if existing is not None:
+        return existing
+    profile = (
+        CandidateProfile.objects.select_for_update()
+        .select_related("user")
+        .filter(user__telegram_id=telegram_id)
+        .exclude(user_id=exclude_user_id)
+        .first()
+    )
+    return profile.user if profile is not None else None
+
+
 def _link_language(*, link: TelegramLinkCode, telegram_id: int, fallback: str) -> str:
-    existing = User.objects.filter(telegram_id=telegram_id, role=User.Role.CANDIDATE).only("language").first()
+    existing = (
+        User.objects.filter(telegram_id=telegram_id)
+        .filter(Q(role=User.Role.CANDIDATE) | Q(candidate_profile__isnull=False))
+        .only("language")
+        .first()
+    )
     if existing is not None and existing.language:
         return existing.language
     return link.user.language or fallback

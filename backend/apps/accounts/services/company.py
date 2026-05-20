@@ -154,9 +154,10 @@ def complete_company_setup(
     )
 
     user.role = User.Role.ADMIN
+    user.active_mode = User.ActiveMode.HR
     user.company = company
     user.onboarding_completed = True
-    user.save(update_fields=["email", "role", "company", "onboarding_completed", "updated_at"])
+    user.save(update_fields=["email", "role", "active_mode", "company", "onboarding_completed", "updated_at"])
 
     _grant_trial_to_user(user)
 

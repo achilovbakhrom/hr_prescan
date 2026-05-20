@@ -32,6 +32,8 @@ def user_has_hr_permission(user, permission: str) -> bool:
     """
     if not user or not user.is_authenticated:
         return False
+    if getattr(user, "active_mode", user.role) != "hr":
+        return False
     if user.role == "admin":
         return True
     if user.role != "hr":
@@ -53,7 +55,10 @@ class HasHRPermission(BasePermission):
         required = getattr(view, "hr_permission", None)
         if required is None:
             # No specific permission required — just need to be admin or HR
-            return request.user.role in ("admin", "hr")
+            return getattr(request.user, "active_mode", request.user.role) == "hr" and request.user.role in (
+                "admin",
+                "hr",
+            )
         return user_has_hr_permission(request.user, required)
 
 
@@ -66,6 +71,7 @@ class IsAdmin(BasePermission):
             and request.user.is_authenticated
             and hasattr(request.user, "role")
             and request.user.role == "admin"
+            and getattr(request.user, "active_mode", "hr") == "hr"
         )
 
 
@@ -78,6 +84,7 @@ class IsHRManager(BasePermission):
             and request.user.is_authenticated
             and hasattr(request.user, "role")
             and request.user.role == "hr"
+            and getattr(request.user, "active_mode", "hr") == "hr"
         )
 
 
@@ -89,7 +96,7 @@ class IsCandidate(BasePermission):
             request.user
             and request.user.is_authenticated
             and hasattr(request.user, "role")
-            and request.user.role == "candidate"
+            and getattr(request.user, "active_mode", request.user.role) == "candidate"
         )
 
 

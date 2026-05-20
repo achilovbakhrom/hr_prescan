@@ -14,6 +14,11 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError("Email is required")
         email = self.normalize_email(email)
+        role = extra_fields.get("role", User.Role.CANDIDATE)
+        extra_fields.setdefault(
+            "active_mode",
+            User.ActiveMode.HR if role in (User.Role.ADMIN, User.Role.HR) else User.ActiveMode.CANDIDATE,
+        )
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
@@ -39,6 +44,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Role(models.TextChoices):
         ADMIN = "admin", "Admin"
         HR = "hr", "HR Manager"
+        CANDIDATE = "candidate", "Candidate"
+
+    class ActiveMode(models.TextChoices):
+        HR = "hr", "HR"
         CANDIDATE = "candidate", "Candidate"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -92,6 +101,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     # Onboarding -- False for new social auth users until they pick a role
     onboarding_completed = models.BooleanField(default=True)
+    active_mode = models.CharField(
+        max_length=20,
+        choices=ActiveMode.choices,
+        default=ActiveMode.CANDIDATE,
+    )
 
     # HR granular permissions (only applies when role="hr")
     # Admin role always has all permissions regardless of this field.

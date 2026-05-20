@@ -1,5 +1,10 @@
 import { apiClient } from '@/shared/api/client'
-import type { CompanyMembership, UserLanguage } from '@/shared/types/auth.types'
+import type {
+  AccountMode,
+  AccountModes,
+  CompanyMembership,
+  UserLanguage,
+} from '@/shared/types/auth.types'
 import type {
   AcceptInvitationRequest,
   LoginRequest,
@@ -111,6 +116,40 @@ export const authService = {
 
   async switchToPersonal(): Promise<User> {
     const response = await apiClient.post<User>('/auth/switch-personal')
+    return response.data
+  },
+
+  async getModes(): Promise<AccountModes> {
+    const response = await apiClient.get<AccountModes>('/auth/modes/')
+    return response.data
+  },
+
+  async switchMode(mode: AccountMode, companyId?: string): Promise<AccountModes> {
+    const response = await apiClient.post<AccountModes>('/auth/modes/switch/', { mode, companyId })
+    return response.data
+  },
+
+  async createHrSpace(data: {
+    companyName: string
+    industries: string[]
+    size: string
+    country: string
+    customIndustry?: string
+    website?: string
+    description?: string
+  }): Promise<AccountModes> {
+    const response = await apiClient.post<AccountModes>('/auth/modes/hr-space/', data)
+    return response.data
+  },
+
+  async createCandidateSpace(data: {
+    firstName: string
+    lastName: string
+    phone?: string
+    headline?: string
+    location?: string
+  }): Promise<AccountModes> {
+    const response = await apiClient.post<AccountModes>('/auth/modes/candidate-space/', data)
     return response.data
   },
 }

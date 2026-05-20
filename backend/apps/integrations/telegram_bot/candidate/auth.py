@@ -14,6 +14,7 @@ import secrets
 import string
 
 from django.db import IntegrityError, transaction
+from django.db.models import Q
 
 from apps.accounts.models import User
 
@@ -44,7 +45,7 @@ def get_or_create_candidate_user(
     if not isinstance(telegram_id, int) or telegram_id <= 0:
         raise ValueError(f"Invalid telegram_id: {telegram_id!r}")
 
-    user = User.objects.filter(telegram_id=telegram_id, role=User.Role.CANDIDATE).first()
+    user = _candidate_user_for_telegram(telegram_id=telegram_id)
     if user is not None:
         if telegram_username and user.telegram_username != telegram_username:
             user.telegram_username = telegram_username
@@ -77,7 +78,7 @@ def get_or_create_candidate_user(
                 ]
             )
     except IntegrityError:
-        existing = User.objects.filter(telegram_id=telegram_id, role=User.Role.CANDIDATE).first()
+        existing = _candidate_user_for_telegram(telegram_id=telegram_id)
         if existing is not None:
             return existing
         raise
@@ -92,6 +93,14 @@ def get_or_create_candidate_user(
         logger.warning("bind_existing_applications failed for tg_id=%s: %s", telegram_id, exc)
 
     return user
+
+
+def _candidate_user_for_telegram(*, telegram_id: int) -> User | None:
+    return (
+        User.objects.filter(telegram_id=telegram_id)
+        .filter(Q(role=User.Role.CANDIDATE) | Q(candidate_profile__isnull=False))
+        .first()
+    )
 
 
 def complete_registration(

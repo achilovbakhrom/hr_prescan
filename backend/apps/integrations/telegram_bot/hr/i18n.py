@@ -29,7 +29,7 @@ _MESSAGES = {
         "telegram_invalid": "Invalid Telegram account.",
         "connected": "Connected as {email}{company}\n\nYou can now manage your HR tasks here. Type /help to see what I can do.",
         "welcome_back": "Welcome back, {name}!\n\nType your request or /help to see what I can do.",
-        "menu": "Choose what you want to do, or type your request in plain language.",
+        "menu": "Choose what you want to do. Use AI mode for free-text requests.",
         "btn_dashboard": "Dashboard",
         "btn_vacancies": "Vacancies",
         "btn_create_vacancy": "Create vacancy",
@@ -39,6 +39,11 @@ _MESSAGES = {
         "btn_team": "Team",
         "btn_subscription": "Subscription",
         "btn_language": "Language",
+        "btn_ai_mode": "AI mode",
+        "btn_exit_ai": "Exit AI mode",
+        "ai_mode_started": "AI mode is on. Send your HR request in plain language.",
+        "ai_mode_stopped": "AI mode is off. Use the buttons below for common actions.",
+        "free_text_blocked": "Use the buttons below, or open AI mode before sending a free-text request.",
         "menu_prompt_dashboard": "Show my hiring dashboard and key metrics.",
         "menu_prompt_vacancies": "Show my vacancies with statuses and candidate counts.",
         "menu_prompt_create_vacancy": "Help me create a new vacancy step by step.",
@@ -63,7 +68,7 @@ _MESSAGES = {
             "*Dashboard* -- stats, summaries\n"
             "*Subscription* -- plan info, usage\n"
             "*Team* -- invite, manage members\n\n"
-            "Just describe what you need in natural language!\n"
+            "Tap AI mode to describe a custom request in natural language.\n"
             "You can also send voice messages."
         ),
     },
@@ -78,7 +83,7 @@ _MESSAGES = {
         "telegram_invalid": "Некорректный Telegram-аккаунт.",
         "connected": "Подключено как {email}{company}\n\nТеперь здесь можно управлять HR-задачами. Напишите /help, чтобы увидеть возможности.",
         "welcome_back": "С возвращением, {name}!\n\nНапишите запрос или /help, чтобы увидеть возможности.",
-        "menu": "Выберите действие или напишите задачу обычным текстом.",
+        "menu": "Выберите действие. Для свободного текста включите AI-режим.",
         "btn_dashboard": "Дашборд",
         "btn_vacancies": "Вакансии",
         "btn_create_vacancy": "Создать вакансию",
@@ -88,6 +93,11 @@ _MESSAGES = {
         "btn_team": "Команда",
         "btn_subscription": "Подписка",
         "btn_language": "Язык",
+        "btn_ai_mode": "AI-режим",
+        "btn_exit_ai": "Выйти из AI-режима",
+        "ai_mode_started": "AI-режим включён. Напишите HR-задачу обычным текстом.",
+        "ai_mode_stopped": "AI-режим выключен. Используйте кнопки ниже для основных действий.",
+        "free_text_blocked": "Используйте кнопки ниже или включите AI-режим перед свободным текстом.",
         "menu_prompt_dashboard": "Покажи дашборд найма и ключевые метрики.",
         "menu_prompt_vacancies": "Покажи мои вакансии со статусами и количеством кандидатов.",
         "menu_prompt_create_vacancy": "Помоги пошагово создать новую вакансию.",
@@ -112,7 +122,7 @@ _MESSAGES = {
             "*Дашбордом* -- статистика и сводки\n"
             "*Подпиской* -- план и лимиты\n"
             "*Командой* -- приглашения и управление участниками\n\n"
-            "Просто опишите задачу обычным языком.\n"
+            "Включите AI-режим, чтобы описать нестандартную задачу обычным языком.\n"
             "Можно также отправлять голосовые сообщения."
         ),
     },
@@ -127,7 +137,7 @@ _MESSAGES = {
         "telegram_invalid": "Telegram akkaunti noto'g'ri.",
         "connected": "{email}{company} sifatida ulandi\n\nEndi HR vazifalarni shu yerda boshqarishingiz mumkin. Imkoniyatlarni ko'rish uchun /help yuboring.",
         "welcome_back": "Qaytganingiz bilan, {name}!\n\nSo'rovingizni yozing yoki imkoniyatlarni ko'rish uchun /help yuboring.",
-        "menu": "Kerakli amalni tanlang yoki vazifani oddiy matnda yozing.",
+        "menu": "Kerakli amalni tanlang. Erkin matn uchun AI rejimini yoqing.",
         "btn_dashboard": "Dashboard",
         "btn_vacancies": "Vakansiyalar",
         "btn_create_vacancy": "Vakansiya yaratish",
@@ -137,6 +147,11 @@ _MESSAGES = {
         "btn_team": "Jamoa",
         "btn_subscription": "Obuna",
         "btn_language": "Til",
+        "btn_ai_mode": "AI rejimi",
+        "btn_exit_ai": "AI rejimidan chiqish",
+        "ai_mode_started": "AI rejimi yoqildi. HR so'rovingizni oddiy matnda yuboring.",
+        "ai_mode_stopped": "AI rejimi o'chirildi. Asosiy amallar uchun quyidagi tugmalardan foydalaning.",
+        "free_text_blocked": "Quyidagi tugmalardan foydalaning yoki erkin matn uchun AI rejimini yoqing.",
         "menu_prompt_dashboard": "Ishga olish dashboardi va asosiy metrikalarni ko'rsat.",
         "menu_prompt_vacancies": "Vakansiyalarimni statuslar va nomzodlar soni bilan ko'rsat.",
         "menu_prompt_create_vacancy": "Yangi vakansiyani bosqichma-bosqich yaratishga yordam ber.",
@@ -161,7 +176,7 @@ _MESSAGES = {
             "*Dashboard* -- statistika va xulosalar\n"
             "*Obuna* -- tarif va limitlar\n"
             "*Jamoa* -- taklif va boshqaruv\n\n"
-            "Kerakli vazifani oddiy tilda yozing.\n"
+            "Nostandart vazifani oddiy tilda yozish uchun AI rejimini yoqing.\n"
             "Ovozli xabar ham yuborishingiz mumkin."
         ),
     },

@@ -19,17 +19,18 @@ def switch_company(*, user: User, company_id: UUID) -> User:
 
     user.company = membership.company
     user.role = membership.role
+    user.active_mode = User.ActiveMode.HR
     user.hr_permissions = membership.hr_permissions
-    user.save(update_fields=["company", "role", "hr_permissions", "updated_at"])
+    user.save(update_fields=["company", "role", "active_mode", "hr_permissions", "updated_at"])
     return user
 
 
 def switch_to_personal(*, user: User) -> User:
     """Switch user back to personal/candidate context (no company)."""
     user.company = None
-    user.role = User.Role.CANDIDATE
+    user.active_mode = User.ActiveMode.CANDIDATE
     user.hr_permissions = []
-    user.save(update_fields=["company", "role", "hr_permissions", "updated_at"])
+    user.save(update_fields=["company", "active_mode", "hr_permissions", "updated_at"])
     return user
 
 

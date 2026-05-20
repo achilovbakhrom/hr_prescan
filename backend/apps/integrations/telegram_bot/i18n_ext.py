@@ -101,9 +101,9 @@ _STRINGS_EXT: dict[str, dict[str, str]] = {
     },
     # ----- main menu -----
     "candidate.main_menu": {
-        "en": "What would you like to do?\n\nYou can also ask me about jobs, your applications, or interview prep in plain text.",
-        "ru": "Что хотите сделать?\n\nВы также можете написать мне обычным текстом о вакансиях, откликах или подготовке к интервью.",
-        "uz": "Nima qilmoqchisiz?\n\nShuningdek, menga vakansiyalar, arizalar yoki suhbatga tayyorgarlik haqida oddiy matnda yozishingiz mumkin.",
+        "en": "What would you like to do?\n\nUse AI mode for free-text questions about jobs, applications, or interview prep.",
+        "ru": "Что хотите сделать?\n\nДля свободного текста о вакансиях, откликах или подготовке к интервью включите AI-режим.",
+        "uz": "Nima qilmoqchisiz?\n\nVakansiyalar, arizalar yoki suhbatga tayyorgarlik bo'yicha erkin matn uchun AI rejimini yoqing.",
     },
     "candidate.btn_prescreening": {
         "en": "🎯 Pass Prescreening",

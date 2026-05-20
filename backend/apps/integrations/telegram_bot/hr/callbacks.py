@@ -58,6 +58,7 @@ def process_callback(*, client, callback: dict) -> None:
         handle_menu_callback(
             client=client,
             chat_id=chat_id,
+            telegram_id=telegram_id,
             user=user,
             data=data,
             route_to_assistant=route_to_assistant,

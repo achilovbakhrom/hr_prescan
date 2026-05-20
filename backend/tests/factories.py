@@ -31,6 +31,9 @@ class UserFactory(DjangoModelFactory):
     last_name = factory.Faker("last_name")
     password = factory.django.Password("testpass123")
     role = User.Role.HR
+    active_mode = factory.LazyAttribute(
+        lambda obj: User.ActiveMode.HR if obj.role in (User.Role.ADMIN, User.Role.HR) else User.ActiveMode.CANDIDATE
+    )
     company = factory.SubFactory(CompanyFactory)
     is_active = True
     email_verified = True

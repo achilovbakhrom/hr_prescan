@@ -8,7 +8,7 @@ import { redirectToLogin } from '@/shared/api/authRedirect'
 import { authService } from '../services/auth.service'
 import { loadTokens, saveTokens, clearTokens } from './auth-tokens'
 import { AUTH_TOKENS_CHANGED_EVENT } from '@/shared/api/authTokens'
-import type { CompanyMembership } from '@/shared/types/auth.types'
+import type { AccountMode, AccountModes, CompanyMembership } from '@/shared/types/auth.types'
 import type {
   AcceptInvitationRequest,
   User,
@@ -36,11 +36,16 @@ export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
   const tokens = ref<AuthTokens | null>(loadTokens())
   const companies = ref<CompanyMembership[]>([])
+  const modes = ref<AccountModes | null>(null)
   const loading = ref(false)
   const error = ref<string | null>(null)
 
   const isAuthenticated = computed(() => !!tokens.value?.access && !!user.value)
   const hasMultipleCompanies = computed(() => companies.value.length > 1)
+  const activeMode = computed<AccountMode>(() => {
+    if (user.value?.activeMode) return user.value.activeMode
+    return user.value?.role === 'candidate' ? 'candidate' : 'hr'
+  })
 
   if (typeof window !== 'undefined') {
     window.addEventListener(AUTH_TOKENS_CHANGED_EVENT, () => {
@@ -149,15 +154,57 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function fetchModes(): Promise<void> {
+    if (!tokens.value?.access) return
+    try {
+      modes.value = await authService.getModes()
+      user.value = modes.value.user
+    } catch {
+      modes.value = null
+    }
+  }
+
+  function applyModes(result: AccountModes): void {
+    modes.value = result
+    user.value = result.user
+  }
+
+  async function switchMode(mode: AccountMode, companyId?: string): Promise<void> {
+    await withLoading(async () => {
+      applyModes(await authService.switchMode(mode, companyId))
+      await fetchCompanies()
+    })
+  }
+
+  async function createHrSpace(
+    data: Parameters<typeof authService.createHrSpace>[0],
+  ): Promise<void> {
+    await withLoading(async () => {
+      applyModes(await authService.createHrSpace(data))
+      await fetchCompanies()
+    })
+  }
+
+  async function createCandidateSpace(
+    data: Parameters<typeof authService.createCandidateSpace>[0],
+  ): Promise<void> {
+    await withLoading(async () => {
+      applyModes(await authService.createCandidateSpace(data))
+      await fetchCompanies()
+    })
+  }
+
   async function switchCompany(companyId: string): Promise<void> {
     await withLoading(async () => {
       user.value = await authService.switchCompany(companyId)
+      await fetchModes()
     })
   }
 
   async function switchToPersonal(): Promise<void> {
     await withLoading(async () => {
       user.value = await authService.switchToPersonal()
+      await fetchModes()
     })
   }
 
@@ -170,16 +217,19 @@ export const useAuthStore = defineStore('auth', () => {
     tokens.value = stored
     await fetchUser()
     if (user.value) await fetchCompanies()
+    if (user.value) await fetchModes()
   }
 
   return {
     user,
     tokens,
     companies,
+    modes,
     loading,
     error,
     isAuthenticated,
     hasMultipleCompanies,
+    activeMode,
     login,
     googleLogin,
     telegramLogin,
@@ -192,8 +242,12 @@ export const useAuthStore = defineStore('auth', () => {
     completeCompanySetup,
     fetchUser,
     fetchCompanies,
+    fetchModes,
     switchCompany,
     switchToPersonal,
+    switchMode,
+    createHrSpace,
+    createCandidateSpace,
     initAuth,
   }
 })

@@ -136,6 +136,31 @@ _STRINGS: dict[str, dict[str, str]] = {
         "ru": "✨ Создать резюме с AI",
         "uz": "✨ AI bilan CV yaratish",
     },
+    "candidate.btn_ai_mode": {
+        "en": "AI mode",
+        "ru": "AI-режим",
+        "uz": "AI rejimi",
+    },
+    "candidate.btn_exit_ai": {
+        "en": "Exit AI mode",
+        "ru": "Выйти из AI-режима",
+        "uz": "AI rejimidan chiqish",
+    },
+    "candidate.ai_mode_started": {
+        "en": "AI mode is on. Send your question or request in plain language.",
+        "ru": "AI-режим включён. Напишите вопрос или запрос обычным текстом.",
+        "uz": "AI rejimi yoqildi. Savol yoki so'rovingizni oddiy matnda yuboring.",
+    },
+    "candidate.ai_mode_stopped": {
+        "en": "AI mode is off. Use the buttons below for common actions.",
+        "ru": "AI-режим выключен. Используйте кнопки ниже для основных действий.",
+        "uz": "AI rejimi o'chirildi. Asosiy amallar uchun quyidagi tugmalardan foydalaning.",
+    },
+    "candidate.free_text_blocked": {
+        "en": "Use the buttons below, or open AI mode before sending free text.",
+        "ru": "Используйте кнопки ниже или включите AI-режим перед свободным текстом.",
+        "uz": "Quyidagi tugmalardan foydalaning yoki erkin matn uchun AI rejimini yoqing.",
+    },
     "candidate.ai_prompt_search_jobs": {
         "en": "Show me available jobs.",
         "ru": "Покажи мне доступные вакансии.",

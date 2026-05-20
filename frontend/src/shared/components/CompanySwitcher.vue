@@ -12,6 +12,7 @@ const router = useRouter()
 const authStore = useAuthStore()
 
 const activeCompanyId = computed(() => authStore.user?.company?.id ?? 'personal')
+const isHrMode = computed(() => authStore.activeMode === 'hr')
 
 // Show the account owner as a prefix only when the current user isn't the owner —
 // i.e., they're an invited member operating under someone else's account.
@@ -41,7 +42,7 @@ const companyOptions = computed(() => {
   return options
 })
 
-const showSwitcher = computed(() => companyOptions.value.length > 1)
+const showSwitcher = computed(() => isHrMode.value && companyOptions.value.length > 1)
 const activeCompanyOption = computed(
   () => companyOptions.value.find((option) => option.value === activeCompanyId.value) ?? null,
 )
@@ -102,7 +103,7 @@ async function handleCompanySwitch(value: string): Promise<void> {
     </Select>
   </div>
   <div
-    v-else-if="authStore.user?.company"
+    v-else-if="isHrMode && authStore.user?.company"
     class="hidden items-center gap-2 rounded-md bg-gray-100 dark:bg-gray-800 px-2 py-1 text-xs font-medium text-gray-600 dark:text-gray-400 sm:inline-flex"
   >
     <CompanyLogo

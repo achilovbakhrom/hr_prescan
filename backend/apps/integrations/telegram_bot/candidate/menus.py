@@ -19,6 +19,8 @@ CB_CV_LIST = "cand:cv:list"
 CB_CV_GENERATE = "cand:cv:generate"
 CB_CV_UPLOAD = "cand:cv:upload"
 CB_MESSAGES = "cand:messages"
+CB_AI_START = "cand:ai:start"
+CB_AI_EXIT = "cand:ai:exit"
 
 # Prescreening
 CB_PS_START = "cand:ps:start"
@@ -53,6 +55,7 @@ def main_menu_keyboard(*, lang: str) -> dict:
                 kb.button(text=t("candidate.btn_messages", lang=lang), callback_data=CB_MESSAGES),
             ],
             [
+                kb.button(text=t("candidate.btn_ai_mode", lang=lang), callback_data=CB_AI_START),
                 kb.button(
                     text=t("candidate.btn_language", lang=lang),
                     callback_data=CB_LANG,
@@ -60,6 +63,10 @@ def main_menu_keyboard(*, lang: str) -> dict:
             ],
         ]
     )
+
+
+def ai_mode_keyboard(*, lang: str) -> dict:
+    return kb.inline_keyboard([[kb.button(text=t("candidate.btn_exit_ai", lang=lang), callback_data=CB_AI_EXIT)]])
 
 
 def language_keyboard(*, lang: str) -> dict:
