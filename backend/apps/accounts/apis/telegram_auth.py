@@ -65,8 +65,8 @@ class TelegramAuthApi(APIView):
         last_name = data.get("last_name", "")
         username = data.get("username", "")
 
-        # Find user by telegram_id
-        user = User.objects.filter(telegram_id=telegram_id).first()
+        # Telegram Login is candidate-facing; HR bot links are scoped separately.
+        user = User.objects.filter(telegram_id=telegram_id, role=User.Role.CANDIDATE).first()
 
         if user is None:
             # Create new candidate user (no email — Telegram doesn't provide one)

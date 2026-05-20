@@ -121,8 +121,13 @@ def verify_email_link_code(
             )
             if existing is not None:
                 if not is_hr_placeholder(user=existing, telegram_id=telegram_id):
-                    return None, "This Telegram account is already linked to another user."
+                    cache.delete(EMAIL_LINK_CACHE_KEY.format(telegram_id=telegram_id))
+                    update_session(role=ROLE_HR, telegram_id=telegram_id, state="")
+                    return existing, ""
                 merge_hr_placeholder(source=existing, target=user)
+
+            if user.telegram_id and user.telegram_id != telegram_id:
+                return None, "This account is already linked to another Telegram account."
 
             user.telegram_id = telegram_id
             user.telegram_username = telegram_username

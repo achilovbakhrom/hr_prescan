@@ -22,6 +22,7 @@ class LinkResult:
     ok: bool
     merged: bool = False
     conflict: bool = False
+    already_linked: bool = False
 
 
 def is_account_link_payload(*, payload: str) -> bool:
@@ -89,8 +90,15 @@ def handle_account_link_callback(
 
     result = confirm_account_link(token=token, telegram_id=telegram_id, telegram_username=telegram_username)
     if result.ok:
-        key = "candidate.link_merged" if result.merged else "candidate.link_success"
+        if result.already_linked:
+            key = "candidate.link_already_connected_resume"
+        else:
+            key = "candidate.link_merged" if result.merged else "candidate.link_success"
         client.send_message(chat_id=chat_id, text=t(key, lang=lang))
+        if result.already_linked:
+            from apps.integrations.telegram_bot.candidate.menus import send_main_menu
+
+            send_main_menu(client=client, chat_id=chat_id, lang=lang)
     elif result.conflict:
         client.send_message(chat_id=chat_id, text=t("candidate.link_conflict", lang=lang))
     else:
@@ -106,9 +114,16 @@ def confirm_account_link(*, token: str, telegram_id: int, telegram_username: str
                 return LinkResult(ok=False)
 
             target = link.user
-            existing = User.objects.select_for_update().filter(telegram_id=telegram_id).exclude(id=target.id).first()
+            existing = (
+                User.objects.select_for_update()
+                .filter(telegram_id=telegram_id, role=User.Role.CANDIDATE)
+                .exclude(id=target.id)
+                .first()
+            )
             if existing is not None:
                 if not _is_mergeable_telegram_candidate(user=existing, telegram_id=telegram_id):
+                    if existing.role == User.Role.CANDIDATE:
+                        return LinkResult(ok=True, already_linked=True)
                     return LinkResult(ok=False, conflict=True)
                 merge_candidate_accounts(source=existing, target=target)
 
@@ -160,7 +175,7 @@ def _is_mergeable_telegram_candidate(*, user: User, telegram_id: int) -> bool:
 
 
 def _link_language(*, link: TelegramLinkCode, telegram_id: int, fallback: str) -> str:
-    existing = User.objects.filter(telegram_id=telegram_id).only("language").first()
+    existing = User.objects.filter(telegram_id=telegram_id, role=User.Role.CANDIDATE).only("language").first()
     if existing is not None and existing.language:
         return existing.language
     return link.user.language or fallback

@@ -133,6 +133,28 @@ class TestGetOrCreateCandidateUser:
         assert a.id == b.id
         assert User.objects.filter(telegram_id=TG_USER["id"]).count() == 1
 
+    def test_hr_account_with_same_telegram_does_not_block_candidate_bot(self):
+        hr = User.objects.create_user(
+            email="hr-same-telegram@example.com",
+            password="testpass123",
+            first_name="HR",
+            last_name="User",
+            role=User.Role.HR,
+            telegram_id=TG_USER["id"],
+        )
+
+        candidate = get_or_create_candidate_user(
+            telegram_id=TG_USER["id"],
+            telegram_username=TG_USER["username"],
+            first_name=TG_USER["first_name"],
+            last_name=TG_USER["last_name"],
+        )
+
+        assert candidate.role == User.Role.CANDIDATE
+        assert candidate.telegram_id == TG_USER["id"]
+        hr.refresh_from_db()
+        assert hr.telegram_id == TG_USER["id"]
+
 
 class TestStartCommand:
     def test_plain_start_creates_user_and_prompts_phone_registration(self):
@@ -382,7 +404,7 @@ class TestStartCommand:
         sent_text = " ".join(str(call.kwargs.get("json", {}).get("text", "")) for call in post_mock.call_args_list)
         assert "invalid or expired" in sent_text
 
-    def test_existing_linked_candidate_conflict_is_rejected(self, candidate_user):
+    def test_existing_linked_candidate_deep_link_resumes_existing_account(self, candidate_user):
         existing = User.objects.create_user(
             email="already-linked@example.com",
             password="testpass123",
@@ -407,7 +429,33 @@ class TestStartCommand:
         assert existing.telegram_id == TG_USER["id"]
         assert link.is_used is False
         sent_text = " ".join(str(call.kwargs.get("json", {}).get("text", "")) for call in post_mock.call_args_list)
-        assert "already connected" in sent_text
+        assert "Continuing with that account" in sent_text
+        assert "already connected to another profile" not in sent_text
+
+    def test_candidate_link_ignores_hr_account_with_same_telegram(self, candidate_user):
+        hr = User.objects.create_user(
+            email="hr-linked-same-telegram@example.com",
+            password="testpass123",
+            first_name="HR",
+            last_name="Linked",
+            role=User.Role.HR,
+            telegram_id=TG_USER["id"],
+        )
+        link = TelegramLinkCode.generate(user=candidate_user)
+
+        with (
+            patch("apps.integrations.telegram_bot.client.requests.post") as post_mock,
+            patch("apps.integrations.telegram_bot.client.requests.get"),
+        ):
+            post_mock.return_value.json.return_value = {"ok": True, "result": {}}
+            handle_update(_make_callback_update(f"cand:link:ok:{link.code}"))
+
+        candidate_user.refresh_from_db()
+        hr.refresh_from_db()
+        link.refresh_from_db()
+        assert candidate_user.telegram_id == TG_USER["id"]
+        assert hr.telegram_id == TG_USER["id"]
+        assert link.is_used is True
 
 
 class TestCandidateLanguageSettings:

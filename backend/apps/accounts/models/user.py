@@ -4,6 +4,7 @@ import uuid
 
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
+from django.db.models import Q
 
 
 class UserManager(BaseUserManager):
@@ -97,7 +98,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     hr_permissions = models.JSONField(default=list, blank=True)
 
     # Telegram integration
-    telegram_id = models.BigIntegerField(unique=True, null=True, blank=True)
+    telegram_id = models.BigIntegerField(null=True, blank=True)
     telegram_username = models.CharField(max_length=255, blank=True, default="")
 
     # UI language — source of truth for AI assistants and default vacancy language.
@@ -132,6 +133,18 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Meta:
         app_label = "accounts"
         ordering = ["-created_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["telegram_id"],
+                condition=Q(telegram_id__isnull=False, role__in=["admin", "hr"]),
+                name="unique_hr_admin_telegram_id",
+            ),
+            models.UniqueConstraint(
+                fields=["telegram_id"],
+                condition=Q(telegram_id__isnull=False, role="candidate"),
+                name="unique_candidate_telegram_id",
+            ),
+        ]
 
     def __str__(self) -> str:
         return self.email

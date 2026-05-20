@@ -91,6 +91,7 @@ def _try_deep_link(
     telegram_username: str,
     token: str,
 ) -> None:
+    resume_user: User | None = None
     try:
         with transaction.atomic():
             link = (
@@ -125,24 +126,38 @@ def _try_deep_link(
             )
             if existing is not None:
                 if not is_hr_placeholder(user=existing, telegram_id=telegram_id):
+                    resume_user = existing
+                else:
+                    merge_hr_placeholder(source=existing, target=user)
+
+            if resume_user is None:
+                if user.telegram_id and user.telegram_id != telegram_id:
+                    lang = _telegram_language(telegram_id=telegram_id)
                     client.send_message(
                         chat_id=chat_id,
-                        text=hr_text("link_conflict", user=existing),
+                        text=hr_text("link_conflict", lang=lang),
                     )
                     return
-                merge_hr_placeholder(source=existing, target=user)
 
-            user.telegram_id = telegram_id
-            user.telegram_username = telegram_username
-            user.save(update_fields=["telegram_id", "telegram_username", "updated_at"])
+                user.telegram_id = telegram_id
+                user.telegram_username = telegram_username
+                user.save(update_fields=["telegram_id", "telegram_username", "updated_at"])
 
-            link.is_used = True
-            link.save(update_fields=["is_used", "updated_at"])
+                link.is_used = True
+                link.save(update_fields=["is_used", "updated_at"])
     except IntegrityError:
         lang = _telegram_language(telegram_id=telegram_id)
         client.send_message(
             chat_id=chat_id,
             text=hr_text("link_conflict", lang=lang),
+        )
+        return
+
+    if resume_user is not None:
+        client.send_message(
+            chat_id=chat_id,
+            text=hr_text("already_connected_resume", user=resume_user, email=resume_user.email),
+            reply_markup=main_menu_keyboard(user=resume_user),
         )
         return
 

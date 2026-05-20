@@ -55,6 +55,11 @@ _STRINGS_EXT: dict[str, dict[str, str]] = {
         "ru": "✅ Telegram подключён. Данные вашего профиля из Telegram-бота объединены с этим профилем PreScreen AI.",
         "uz": "✅ Telegram ulandi. Telegram botdagi profil ma'lumotlaringiz ushbu PreScreen AI profiliga birlashtirildi.",
     },
+    "candidate.link_already_connected_resume": {
+        "en": "This Telegram account is already connected to your PreScreen AI profile.\n\nContinuing with that account.",
+        "ru": "Этот Telegram-аккаунт уже подключён к вашему профилю PreScreen AI.\n\nПродолжаю с этим аккаунтом.",
+        "uz": "Bu Telegram akkaunti PreScreen AI profilingizga allaqachon ulangan.\n\nShu akkaunt bilan davom etaman.",
+    },
     "candidate.link_confirm": {
         "en": (
             "Connect this Telegram account to {email}?\n\n"

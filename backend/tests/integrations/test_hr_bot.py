@@ -210,9 +210,36 @@ class TestHRDeepLinking:
         sent_text = " ".join(str(call.kwargs.get("json", {}).get("text", "")) for call in post_mock.call_args_list)
         assert "expired or is invalid" in sent_text
 
-    def test_existing_linked_hr_conflict_is_rejected(self, web_admin_with_company):
+    def test_candidate_account_with_same_telegram_does_not_block_hr_link(self, web_admin_with_company):
         web_admin, _web_company = web_admin_with_company
-        User.objects.create_user(
+        candidate = User.objects.create_user(
+            email="candidate-same-telegram@example.com",
+            password="testpass123",
+            first_name="Candidate",
+            last_name="Linked",
+            role=User.Role.CANDIDATE,
+            telegram_id=TG_USER["id"],
+            email_verified=True,
+        )
+        link = TelegramLinkCode.generate(user=web_admin)
+
+        with (
+            patch("apps.integrations.telegram_bot.client.requests.post") as post_mock,
+            patch("apps.integrations.telegram_bot.client.requests.get"),
+        ):
+            post_mock.return_value.json.return_value = {"ok": True, "result": {}}
+            handle_update(_make_callback_update(f"hr:link:ok:{link.code}"))
+
+        web_admin.refresh_from_db()
+        candidate.refresh_from_db()
+        link.refresh_from_db()
+        assert web_admin.telegram_id == TG_USER["id"]
+        assert candidate.telegram_id == TG_USER["id"]
+        assert link.is_used is True
+
+    def test_existing_linked_hr_deep_link_resumes_existing_account(self, web_admin_with_company):
+        web_admin, _web_company = web_admin_with_company
+        existing = User.objects.create_user(
             email="linked-hr@example.com",
             password="testpass123",
             first_name="Linked",
@@ -231,11 +258,14 @@ class TestHRDeepLinking:
             handle_update(_make_callback_update(f"hr:link:ok:{link.code}"))
 
         web_admin.refresh_from_db()
+        existing.refresh_from_db()
         link.refresh_from_db()
         assert web_admin.telegram_id is None
+        assert existing.telegram_id == TG_USER["id"]
         assert link.is_used is False
         sent_text = " ".join(str(call.kwargs.get("json", {}).get("text", "")) for call in post_mock.call_args_list)
-        assert "already linked" in sent_text
+        assert "Continuing with that account" in sent_text
+        assert "Please unlink it first" not in sent_text
 
 
 class TestHRLanguageSettings:

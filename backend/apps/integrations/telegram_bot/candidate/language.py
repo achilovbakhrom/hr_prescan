@@ -16,7 +16,7 @@ def telegram_language(*, telegram_id: int, lang_code: str | None) -> str:
 
 
 def stored_language_for_telegram(*, telegram_id: int, fallback: str = DEFAULT_LANGUAGE) -> str:
-    user = User.objects.filter(telegram_id=telegram_id).only("language").first()
+    user = User.objects.filter(telegram_id=telegram_id, role=User.Role.CANDIDATE).only("language").first()
     if user is None:
         return fallback if fallback in SUPPORTED_LANGUAGES else DEFAULT_LANGUAGE
     return user_language(user=user, fallback=fallback)

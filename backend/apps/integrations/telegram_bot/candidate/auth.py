@@ -44,7 +44,7 @@ def get_or_create_candidate_user(
     if not isinstance(telegram_id, int) or telegram_id <= 0:
         raise ValueError(f"Invalid telegram_id: {telegram_id!r}")
 
-    user = User.objects.filter(telegram_id=telegram_id).first()
+    user = User.objects.filter(telegram_id=telegram_id, role=User.Role.CANDIDATE).first()
     if user is not None:
         if telegram_username and user.telegram_username != telegram_username:
             user.telegram_username = telegram_username
@@ -77,7 +77,7 @@ def get_or_create_candidate_user(
                 ]
             )
     except IntegrityError:
-        existing = User.objects.filter(telegram_id=telegram_id).first()
+        existing = User.objects.filter(telegram_id=telegram_id, role=User.Role.CANDIDATE).first()
         if existing is not None:
             return existing
         raise
