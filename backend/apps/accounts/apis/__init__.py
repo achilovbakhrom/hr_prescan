@@ -1,3 +1,9 @@
+from apps.accounts.apis.account_modes import (
+    AccountModesApi,
+    CreateCandidateSpaceApi,
+    CreateHrSpaceApi,
+    SwitchAccountModeApi,
+)
 from apps.accounts.apis.auth_invitation import (
     AcceptCompanyInvitationApi,
     CheckInvitationApi,
@@ -14,12 +20,6 @@ from apps.accounts.apis.auth_login import (
 from apps.accounts.apis.auth_register import (
     RegisterApi,
     VerifyEmailApi,
-)
-from apps.accounts.apis.account_modes import (
-    AccountModesApi,
-    CreateCandidateSpaceApi,
-    CreateHrSpaceApi,
-    SwitchAccountModeApi,
 )
 from apps.accounts.apis.candidate_certifications import (
     CertificationDetailApi,
@@ -109,8 +109,8 @@ __all__ = [
     "ProfileCompletenessApi",
     "PublicCvViewApi",
     "RegisterApi",
-    "SwitchCompanyApi",
     "SwitchAccountModeApi",
+    "SwitchCompanyApi",
     "SwitchToPersonalApi",
     "TeamListApi",
     "TeamMemberDetailApi",
