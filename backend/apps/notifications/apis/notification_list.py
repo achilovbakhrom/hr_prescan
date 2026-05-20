@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from apps.accounts.permissions import HasHRPermission, HRPermissions
 from apps.applications.models import Application
 from apps.applications.selectors import get_application_by_id
+from apps.common.exceptions import ApplicationError
 from apps.notifications.models import Notification
 from apps.notifications.selectors import get_unread_count, get_user_notifications
 from apps.notifications.serializers import (
@@ -19,7 +20,7 @@ from apps.notifications.services import (
     mark_all_as_read,
     mark_as_read,
     mark_messages_as_read,
-    send_message,
+    send_candidate_message,
 )
 
 # ---------------------------------------------------------------------------
@@ -128,21 +129,20 @@ class HRMessageListApi(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        if application.candidate is None:
-            return Response(
-                {"detail": "Candidate does not have an account."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
         serializer = SendMessageInputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        message = send_message(
-            sender=request.user,
-            recipient=application.candidate,
-            content=serializer.validated_data["content"],
-            application=application,
-        )
+        try:
+            message = send_candidate_message(
+                sender=request.user,
+                application=application,
+                content=serializer.validated_data["content"],
+            )
+        except ApplicationError as exc:
+            return Response(
+                {"detail": exc.message, **exc.extra},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         data = MessageOutputSerializer(message).data
         return Response(data, status=status.HTTP_201_CREATED)

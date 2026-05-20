@@ -18,4 +18,19 @@ _STRINGS_BUTTONS: dict[str, dict[str, str]] = {
         "ru": "У меня есть код",
         "uz": "Menda kod bor",
     },
+    "candidate.btn_messages": {
+        "en": "Messages",
+        "ru": "Сообщения",
+        "uz": "Xabarlar",
+    },
+    "candidate.messages_title": {
+        "en": "Recent HR messages:",
+        "ru": "Последние сообщения от HR:",
+        "uz": "HRdan so'nggi xabarlar:",
+    },
+    "candidate.messages_empty": {
+        "en": "You do not have HR messages yet.",
+        "ru": "У вас пока нет сообщений от HR.",
+        "uz": "Hozircha HRdan xabarlar yo'q.",
+    },
 }

@@ -1,3 +1,7 @@
+from apps.notifications.services.candidate_messaging import (
+    NO_PLATFORM_INBOX_MESSAGE,
+    send_candidate_message,
+)
 from apps.notifications.services.notification_crud import (
     create_notification,
     get_message_thread,
@@ -14,6 +18,7 @@ from apps.notifications.services.notification_email import (
 )
 
 __all__ = [
+    "NO_PLATFORM_INBOX_MESSAGE",
     "create_notification",
     "get_message_thread",
     "mark_all_as_read",
@@ -23,5 +28,6 @@ __all__ = [
     "notify_interview_completed",
     "notify_interview_ready",
     "notify_status_changed",
+    "send_candidate_message",
     "send_message",
 ]

@@ -96,4 +96,23 @@ CANDIDATE_TOOL_DEFINITIONS = [
             },
         },
     },
+    {
+        "type": "function",
+        "function": {
+            "name": "send_candidate_message",
+            "description": "Send a direct platform message from HR to a candidate for an application",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "candidate_email_or_name": {"type": "string"},
+                    "vacancy_title": {
+                        "type": "string",
+                        "description": "Optional vacancy title used when a candidate has multiple applications.",
+                    },
+                    "message": {"type": "string"},
+                },
+                "required": ["candidate_email_or_name", "message"],
+            },
+        },
+    },
 ]

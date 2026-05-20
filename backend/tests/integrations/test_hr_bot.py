@@ -5,6 +5,7 @@ from __future__ import annotations
 from unittest.mock import patch
 
 import pytest
+from django.utils import timezone
 
 from apps.accounts.models import Company, CompanyMembership, User
 from apps.integrations.models import TelegramLinkCode
@@ -176,6 +177,66 @@ class TestHRDeepLinking:
         assert CompanyMembership.objects.get(user=web_admin, company=telegram_company).is_default is False
         assert web_admin.company == web_company
 
+    def test_expired_deep_link_is_rejected(self, web_admin_with_company):
+        web_admin, _web_company = web_admin_with_company
+        link = TelegramLinkCode.generate(user=web_admin)
+        link.expires_at = timezone.now() - timezone.timedelta(minutes=1)
+        link.save(update_fields=["expires_at"])
+
+        with (
+            patch("apps.integrations.telegram_bot.client.requests.post") as post_mock,
+            patch("apps.integrations.telegram_bot.client.requests.get"),
+        ):
+            post_mock.return_value.json.return_value = {"ok": True, "result": {}}
+            handle_update(_make_message_update(f"/start {link.code}"))
+
+        web_admin.refresh_from_db()
+        assert web_admin.telegram_id is None
+        sent_text = " ".join(str(call.kwargs.get("json", {}).get("text", "")) for call in post_mock.call_args_list)
+        assert "expired or is invalid" in sent_text
+
+    def test_candidate_role_deep_link_is_rejected_by_hr_bot(self, candidate_user):
+        link = TelegramLinkCode.generate(user=candidate_user)
+
+        with (
+            patch("apps.integrations.telegram_bot.client.requests.post") as post_mock,
+            patch("apps.integrations.telegram_bot.client.requests.get"),
+        ):
+            post_mock.return_value.json.return_value = {"ok": True, "result": {}}
+            handle_update(_make_message_update(f"/start {link.code}"))
+
+        candidate_user.refresh_from_db()
+        assert candidate_user.telegram_id is None
+        sent_text = " ".join(str(call.kwargs.get("json", {}).get("text", "")) for call in post_mock.call_args_list)
+        assert "expired or is invalid" in sent_text
+
+    def test_existing_linked_hr_conflict_is_rejected(self, web_admin_with_company):
+        web_admin, _web_company = web_admin_with_company
+        User.objects.create_user(
+            email="linked-hr@example.com",
+            password="testpass123",
+            first_name="Linked",
+            last_name="HR",
+            role=User.Role.HR,
+            telegram_id=TG_USER["id"],
+            email_verified=True,
+        )
+        link = TelegramLinkCode.generate(user=web_admin)
+
+        with (
+            patch("apps.integrations.telegram_bot.client.requests.post") as post_mock,
+            patch("apps.integrations.telegram_bot.client.requests.get"),
+        ):
+            post_mock.return_value.json.return_value = {"ok": True, "result": {}}
+            handle_update(_make_callback_update(f"hr:link:ok:{link.code}"))
+
+        web_admin.refresh_from_db()
+        link.refresh_from_db()
+        assert web_admin.telegram_id is None
+        assert link.is_used is False
+        sent_text = " ".join(str(call.kwargs.get("json", {}).get("text", "")) for call in post_mock.call_args_list)
+        assert "already linked" in sent_text
+
 
 class TestHRLanguageSettings:
     def test_start_for_existing_user_exposes_language_button(self):
@@ -239,3 +300,20 @@ class TestHRMenuButtons:
 
         assistant_mock.assert_called_once()
         assert assistant_mock.call_args.kwargs["message"] == "Show my vacancies with statuses and candidate counts."
+
+    def test_message_candidate_button_routes_to_assistant(self):
+        _create_telegram_workspace(language=User.Language.EN)
+
+        with (
+            patch("apps.integrations.telegram_bot.client.requests.post") as post_mock,
+            patch("apps.integrations.telegram_bot.client.requests.get"),
+            patch(
+                "apps.common.ai_assistant.process_ai_command",
+                return_value={"message": "Who should I message?"},
+            ) as assistant_mock,
+        ):
+            post_mock.return_value.json.return_value = {"ok": True, "result": {}}
+            handle_update(_make_callback_update(f"{CB_CMD_PREFIX}message_candidate"))
+
+        assistant_mock.assert_called_once()
+        assert "send a direct message to a candidate" in assistant_mock.call_args.kwargs["message"]

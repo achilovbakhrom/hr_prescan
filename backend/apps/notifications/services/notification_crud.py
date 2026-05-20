@@ -1,6 +1,7 @@
 import logging
 
 from django.db.models import QuerySet
+from django.utils import timezone
 
 from apps.accounts.models import User
 from apps.applications.models import Application
@@ -69,6 +70,9 @@ def send_message(
         recipient=recipient,
         application=application,
         content=content,
+        delivery_channel=Message.DeliveryChannel.WEB,
+        delivery_status=Message.DeliveryStatus.DELIVERED,
+        delivered_at=timezone.now(),
     )
 
 

@@ -33,16 +33,17 @@ class TelegramClient:
         *,
         chat_id: int | str,
         text: str,
-        parse_mode: str = "Markdown",
+        parse_mode: str | None = "Markdown",
         reply_markup: dict[str, Any] | None = None,
         disable_web_page_preview: bool = False,
     ) -> dict[str, Any]:
         payload: dict[str, Any] = {
             "chat_id": chat_id,
             "text": text,
-            "parse_mode": parse_mode,
             "disable_web_page_preview": disable_web_page_preview,
         }
+        if parse_mode:
+            payload["parse_mode"] = parse_mode
         if reply_markup is not None:
             payload["reply_markup"] = reply_markup
         return self._post("sendMessage", payload)
@@ -53,15 +54,16 @@ class TelegramClient:
         chat_id: int | str,
         message_id: int,
         text: str,
-        parse_mode: str = "Markdown",
+        parse_mode: str | None = "Markdown",
         reply_markup: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         payload: dict[str, Any] = {
             "chat_id": chat_id,
             "message_id": message_id,
             "text": text,
-            "parse_mode": parse_mode,
         }
+        if parse_mode:
+            payload["parse_mode"] = parse_mode
         if reply_markup is not None:
             payload["reply_markup"] = reply_markup
         return self._post("editMessageText", payload)

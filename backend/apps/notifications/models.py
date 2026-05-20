@@ -13,6 +13,7 @@ class Notification(BaseModel):
         INTERVIEW_REMINDER = "interview_reminder", "Interview Reminder"
         STATUS_CHANGED = "status_changed", "Status Changed"
         INVITATION_RECEIVED = "invitation_received", "Invitation Received"
+        DIRECT_MESSAGE = "direct_message", "Direct Message"
         SYSTEM = "system", "System"
 
     user = models.ForeignKey(
@@ -36,6 +37,15 @@ class Notification(BaseModel):
 class Message(BaseModel):
     """Direct message between HR and candidate."""
 
+    class DeliveryChannel(models.TextChoices):
+        WEB = "web", "Web"
+        TELEGRAM = "telegram", "Telegram"
+
+    class DeliveryStatus(models.TextChoices):
+        PENDING = "pending", "Pending"
+        DELIVERED = "delivered", "Delivered"
+        FAILED = "failed", "Failed"
+
     sender = models.ForeignKey(
         "accounts.User",
         on_delete=models.CASCADE,
@@ -55,6 +65,19 @@ class Message(BaseModel):
     )
     content = models.TextField()
     is_read = models.BooleanField(default=False)
+    delivery_channel = models.CharField(
+        max_length=20,
+        choices=DeliveryChannel.choices,
+        default=DeliveryChannel.WEB,
+    )
+    delivery_status = models.CharField(
+        max_length=20,
+        choices=DeliveryStatus.choices,
+        default=DeliveryStatus.PENDING,
+    )
+    delivered_at = models.DateTimeField(null=True, blank=True)
+    telegram_message_id = models.CharField(max_length=64, blank=True, default="")
+    delivery_failure_reason = models.TextField(blank=True, default="")
 
     class Meta:
         ordering = ["created_at"]

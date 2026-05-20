@@ -33,6 +33,7 @@ _MESSAGES = {
         "btn_vacancies": "Vacancies",
         "btn_create_vacancy": "Create vacancy",
         "btn_candidates": "Candidates",
+        "btn_message_candidate": "Message candidate",
         "btn_interviews": "Interviews",
         "btn_team": "Team",
         "btn_subscription": "Subscription",
@@ -41,6 +42,10 @@ _MESSAGES = {
         "menu_prompt_vacancies": "Show my vacancies with statuses and candidate counts.",
         "menu_prompt_create_vacancy": "Help me create a new vacancy step by step.",
         "menu_prompt_candidates": "Show my recent candidates and their screening statuses.",
+        "menu_prompt_message_candidate": (
+            "Help me send a direct message to a candidate. Ask for candidate email or name, "
+            "vacancy title if needed, and message text."
+        ),
         "menu_prompt_interviews": "Show upcoming and recent interviews.",
         "menu_prompt_team": "Show my HR team and available team actions.",
         "menu_prompt_subscription": "Show subscription plan, limits, and current usage.",
@@ -76,6 +81,7 @@ _MESSAGES = {
         "btn_vacancies": "Вакансии",
         "btn_create_vacancy": "Создать вакансию",
         "btn_candidates": "Кандидаты",
+        "btn_message_candidate": "Сообщение кандидату",
         "btn_interviews": "Интервью",
         "btn_team": "Команда",
         "btn_subscription": "Подписка",
@@ -84,6 +90,10 @@ _MESSAGES = {
         "menu_prompt_vacancies": "Покажи мои вакансии со статусами и количеством кандидатов.",
         "menu_prompt_create_vacancy": "Помоги пошагово создать новую вакансию.",
         "menu_prompt_candidates": "Покажи последних кандидатов и их статусы скрининга.",
+        "menu_prompt_message_candidate": (
+            "Помоги отправить прямое сообщение кандидату. Уточни email или имя кандидата, "
+            "вакансию при необходимости и текст сообщения."
+        ),
         "menu_prompt_interviews": "Покажи предстоящие и недавние интервью.",
         "menu_prompt_team": "Покажи мою HR-команду и доступные действия.",
         "menu_prompt_subscription": "Покажи тариф, лимиты и текущее использование.",
@@ -119,6 +129,7 @@ _MESSAGES = {
         "btn_vacancies": "Vakansiyalar",
         "btn_create_vacancy": "Vakansiya yaratish",
         "btn_candidates": "Nomzodlar",
+        "btn_message_candidate": "Nomzodga xabar",
         "btn_interviews": "Suhbatlar",
         "btn_team": "Jamoa",
         "btn_subscription": "Obuna",
@@ -127,6 +138,10 @@ _MESSAGES = {
         "menu_prompt_vacancies": "Vakansiyalarimni statuslar va nomzodlar soni bilan ko'rsat.",
         "menu_prompt_create_vacancy": "Yangi vakansiyani bosqichma-bosqich yaratishga yordam ber.",
         "menu_prompt_candidates": "So'nggi nomzodlar va ularning skrining statuslarini ko'rsat.",
+        "menu_prompt_message_candidate": (
+            "Nomzodga bevosita xabar yuborishga yordam ber. Nomzod emaili yoki ismini, "
+            "kerak bo'lsa vakansiyani va xabar matnini so'ra."
+        ),
         "menu_prompt_interviews": "Yaqinlashayotgan va so'nggi suhbatlarni ko'rsat.",
         "menu_prompt_team": "HR jamoam va mavjud amallarni ko'rsat.",
         "menu_prompt_subscription": "Tarif, limitlar va joriy foydalanishni ko'rsat.",

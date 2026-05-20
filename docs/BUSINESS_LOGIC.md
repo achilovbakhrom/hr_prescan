@@ -324,7 +324,8 @@ The candidate bot lets a candidate browse entry points, apply, and complete pres
    - Telegram uses the same conversational AI chat engine as web prescanning; vacancy questions are competencies for the AI to assess, not a rigid numbered questionnaire.
    - answers can be text or voice
    - the bot stores progress and can resume an in-progress Telegram prescreening session from the same deep link
-10. Outside explicit prescanning states, free-text candidate messages are routed to the candidate AI assistant so the bot can help with job search, application status, and interview-prep style requests.
+10. Candidates can open **Messages** from the bot menu to view recent HR direct messages. Telegram-delivered HR messages remain stored in the platform inbox, so bot and web history use the same source of truth.
+11. Outside explicit prescanning states, free-text candidate messages are routed to the candidate AI assistant so the bot can help with job search, application status, and interview-prep style requests.
 
 #### Notes & constraints
 
@@ -332,10 +333,10 @@ The candidate bot lets a candidate browse entry points, apply, and complete pres
 - Candidate dashboards include applications bound by candidate user ID and applications matching the candidate email, so merged Telegram applications remain visible even if their original placeholder email differs from the web email.
 - Candidate "My Applications" list/detail responses expose CV match, prescanning, and interview scores. The primary displayed score is the overall screening score from prescanning/interview when available; CV match is shown separately and only acts as a fallback before screening results exist.
 - Bot UI is **button-driven** wherever possible (Telegram inline keyboards) — free-text replies outside structured steps are routed to the candidate AI agent.
-- The HR Telegram bot exposes button shortcuts for dashboard, vacancies, vacancy creation, candidates, interviews, team, subscription, and language. Those buttons route clear natural-language prompts to the HR AI assistant, so recruiters do not need to memorize commands or internal IDs.
+- The HR Telegram bot exposes button shortcuts for dashboard, vacancies, vacancy creation, candidates, sending candidate messages, interviews, team, subscription, and language. Those buttons route clear natural-language prompts to the HR AI assistant, so recruiters do not need to memorize commands or internal IDs.
 - Bot-created users are seeded from `message.from.language_code` when it matches a supported bot locale (en / ru / uz), then bot strings use the stored `User.language`. Authenticated web users can change the same field from the header language switcher; HR and candidate Telegram bot UIs also expose a language picker that updates `User.language` for future bot replies.
 - New Telegram candidate users must register in the bot before they can use vacancy, prescreening, CV, or assistant actions. Registration asks for a phone number first using Telegram's native contact-sharing button (manual phone entry is still accepted), then asks the candidate to choose the bot language (`en` / `ru` / `uz`). The selected language is persisted to `User.language` and drives future bot replies. If the user opened a vacancy/prescreening deep link first, the bot resumes that payload after required onboarding.
-- Candidate Telegram bot menus expose direct buttons for job search, prescreening, creating a CV with the candidate AI assistant, viewing saved CVs, uploading an existing CV file, downloading generated/uploaded CV files, and changing language.
+- Candidate Telegram bot menus expose direct buttons for job search, prescreening, Messages, creating a CV with the candidate AI assistant, viewing saved CVs, uploading an existing CV file, downloading generated/uploaded CV files, and changing language.
 
 ---
 
@@ -608,6 +609,14 @@ All batch actions require confirmation before executing.
 - Bell icon with unread count
 - Notification types mirror email notifications
 - Click-to-navigate to relevant page
+
+### 10.3 HR-to-Candidate Direct Messages
+- HR direct messages are allowed only when an application is linked to a platform candidate account (`Application.candidate`). If the application has no platform inbox, the platform rejects the send and tells HR to use direct external contact.
+- Every HR-to-candidate direct message is stored as a platform `Message` row before delivery. The message records delivery channel, status, delivered timestamp, Telegram message id when available, and failure reason when delivery fails.
+- If the candidate account has a `telegram_id`, the platform creates the message and direct-message notification, then sends the content through the candidate Telegram bot without Markdown parsing user-authored text. Telegram delivery failures do not delete the stored message; the delivery status is marked failed.
+- If the candidate account has no Telegram link, the platform creates the message and a `DIRECT_MESSAGE` in-app notification for the candidate web inbox.
+- The HR web endpoint and HR Telegram assistant tool both use the same direct-message service, so web and bot history remain consistent.
+- The optional deeper AI video interview remains web-only. Telegram may link candidates back to the web interview when needed, but does not host the video interview itself.
 
 ---
 

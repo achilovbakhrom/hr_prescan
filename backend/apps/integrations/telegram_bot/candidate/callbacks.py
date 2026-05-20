@@ -19,6 +19,7 @@ from apps.integrations.telegram_bot.candidate.menus import (
     parse_callback,
     send_main_menu,
 )
+from apps.integrations.telegram_bot.candidate.messages import CB_MESSAGES, show_recent_messages
 from apps.integrations.telegram_bot.i18n import t
 from apps.integrations.telegram_bot.sessions import get_session
 
@@ -90,6 +91,8 @@ def process_callback(*, client, callback: dict) -> None:
             text=t("candidate.ai_prompt_create_cv", lang=lang),
             lang=lang,
         )
+    elif action == CB_MESSAGES:
+        show_recent_messages(client=client, chat_id=chat_id, user=user, lang=lang)
     elif action == CB_MENU:
         send_main_menu(client=client, chat_id=chat_id, lang=lang)
     elif data.startswith("cand:ps:"):

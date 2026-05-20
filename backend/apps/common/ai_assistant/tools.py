@@ -11,6 +11,7 @@ from apps.common.ai_assistant.handlers_application import (
     handle_add_candidate_note,
     handle_bulk_update_status,
     handle_list_candidates,
+    handle_send_candidate_message,
     handle_update_candidate_status,
 )
 from apps.common.ai_assistant.handlers_companies import (
@@ -99,6 +100,7 @@ TOOL_MAP = {
     "update_candidate_status": handle_update_candidate_status,
     "bulk_update_status": handle_bulk_update_status,
     "add_candidate_note": handle_add_candidate_note,
+    "send_candidate_message": handle_send_candidate_message,
     "list_interviews": handle_list_interviews,
     "cancel_interview": handle_cancel_interview,
     "reset_interview": handle_reset_interview,

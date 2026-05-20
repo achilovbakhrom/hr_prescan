@@ -22,6 +22,11 @@ class MessageOutputSerializer(serializers.Serializer):
     application_id = serializers.UUIDField(allow_null=True)
     content = serializers.CharField()
     is_read = serializers.BooleanField()
+    delivery_channel = serializers.CharField()
+    delivery_status = serializers.CharField()
+    delivered_at = serializers.DateTimeField(allow_null=True)
+    telegram_message_id = serializers.CharField()
+    delivery_failure_reason = serializers.CharField()
     created_at = serializers.DateTimeField()
 
     def get_sender_name(self, obj: Message) -> str:

@@ -5,6 +5,7 @@ from __future__ import annotations
 from unittest.mock import patch
 
 import pytest
+from django.utils import timezone
 
 from apps.accounts.models import CandidateCV, CandidateProfile, User
 from apps.applications.models import Application
@@ -15,6 +16,7 @@ from apps.integrations.telegram_bot.candidate.handlers import handle_update
 from apps.integrations.telegram_bot.candidate.menus import (
     CB_CV_ASSISTANT,
     CB_JOB_SEARCH,
+    CB_MESSAGES,
     CB_PS_CV_SELECT_PREFIX,
 )
 from apps.integrations.telegram_bot.candidate.prescreening_vacancies import (
@@ -31,6 +33,7 @@ from apps.integrations.telegram_bot.candidate.states import (
 )
 from apps.integrations.telegram_bot.sessions import clear_session, get_session, update_session
 from apps.interviews.models import Interview
+from apps.notifications.models import Message
 
 TG_USER = {
     "id": 12345678,
@@ -347,6 +350,65 @@ class TestStartCommand:
         assert application.candidate == candidate_user
         assert link.is_used is True
 
+    def test_expired_link_token_is_rejected(self, candidate_user):
+        link = TelegramLinkCode.generate(user=candidate_user)
+        link.expires_at = timezone.now() - timezone.timedelta(minutes=1)
+        link.save(update_fields=["expires_at"])
+
+        with (
+            patch("apps.integrations.telegram_bot.client.requests.post") as post_mock,
+            patch("apps.integrations.telegram_bot.client.requests.get"),
+        ):
+            post_mock.return_value.json.return_value = {"ok": True, "result": {}}
+            handle_update(_make_message_update(f"/start link_{link.code}"))
+
+        candidate_user.refresh_from_db()
+        assert candidate_user.telegram_id is None
+        sent_text = " ".join(str(call.kwargs.get("json", {}).get("text", "")) for call in post_mock.call_args_list)
+        assert "invalid or expired" in sent_text
+
+    def test_wrong_role_link_token_is_rejected(self, hr_user):
+        link = TelegramLinkCode.generate(user=hr_user)
+
+        with (
+            patch("apps.integrations.telegram_bot.client.requests.post") as post_mock,
+            patch("apps.integrations.telegram_bot.client.requests.get"),
+        ):
+            post_mock.return_value.json.return_value = {"ok": True, "result": {}}
+            handle_update(_make_message_update(f"/start link_{link.code}"))
+
+        hr_user.refresh_from_db()
+        assert hr_user.telegram_id is None
+        sent_text = " ".join(str(call.kwargs.get("json", {}).get("text", "")) for call in post_mock.call_args_list)
+        assert "invalid or expired" in sent_text
+
+    def test_existing_linked_candidate_conflict_is_rejected(self, candidate_user):
+        existing = User.objects.create_user(
+            email="already-linked@example.com",
+            password="testpass123",
+            first_name="Already",
+            last_name="Linked",
+            role=User.Role.CANDIDATE,
+            telegram_id=TG_USER["id"],
+        )
+        link = TelegramLinkCode.generate(user=candidate_user)
+
+        with (
+            patch("apps.integrations.telegram_bot.client.requests.post") as post_mock,
+            patch("apps.integrations.telegram_bot.client.requests.get"),
+        ):
+            post_mock.return_value.json.return_value = {"ok": True, "result": {}}
+            handle_update(_make_callback_update(f"cand:link:ok:{link.code}"))
+
+        candidate_user.refresh_from_db()
+        existing.refresh_from_db()
+        link.refresh_from_db()
+        assert candidate_user.telegram_id is None
+        assert existing.telegram_id == TG_USER["id"]
+        assert link.is_used is False
+        sent_text = " ".join(str(call.kwargs.get("json", {}).get("text", "")) for call in post_mock.call_args_list)
+        assert "already connected" in sent_text
+
 
 class TestCandidateLanguageSettings:
     def test_menu_exposes_candidate_action_buttons(self):
@@ -445,6 +507,33 @@ class TestCandidateAssistantButtons:
 
         assistant_mock.assert_called_once()
         assert assistant_mock.call_args.kwargs["message"] == "Help me create my CV."
+
+    def test_messages_button_lists_recent_hr_messages(self, vacancy):
+        candidate = _create_onboarded_candidate()
+        hr_user = vacancy.created_by
+        application = Application.objects.create(
+            vacancy=vacancy,
+            candidate=candidate,
+            candidate_name=candidate.full_name,
+            candidate_email=candidate.email,
+        )
+        Message.objects.create(
+            sender=hr_user,
+            recipient=candidate,
+            application=application,
+            content="Please review the next step: use *web* when ready.",
+        )
+
+        with (
+            patch("apps.integrations.telegram_bot.client.requests.post") as post_mock,
+            patch("apps.integrations.telegram_bot.client.requests.get"),
+        ):
+            post_mock.return_value.json.return_value = {"ok": True, "result": {}}
+            handle_update(_make_callback_update(CB_MESSAGES))
+
+        payload = next(call.kwargs["json"] for call in post_mock.call_args_list if "text" in call.kwargs["json"])
+        assert "Please review the next step" in payload["text"]
+        assert "parse_mode" not in payload
 
 
 class TestPrescreeningLanguageAndCv:

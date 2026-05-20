@@ -18,6 +18,7 @@ CB_CV_ASSISTANT = "cand:cv:assistant"
 CB_CV_LIST = "cand:cv:list"
 CB_CV_GENERATE = "cand:cv:generate"
 CB_CV_UPLOAD = "cand:cv:upload"
+CB_MESSAGES = "cand:messages"
 
 # Prescreening
 CB_PS_START = "cand:ps:start"
@@ -47,7 +48,10 @@ def main_menu_keyboard(*, lang: str) -> dict:
                 kb.button(text=t("candidate.btn_create_cv_ai", lang=lang), callback_data=CB_CV_ASSISTANT),
                 kb.button(text=t("candidate.btn_my_cvs", lang=lang), callback_data=CB_CV_LIST),
             ],
-            [kb.button(text=t("candidate.btn_cv_center", lang=lang), callback_data=CB_CV)],
+            [
+                kb.button(text=t("candidate.btn_cv_center", lang=lang), callback_data=CB_CV),
+                kb.button(text=t("candidate.btn_messages", lang=lang), callback_data=CB_MESSAGES),
+            ],
             [
                 kb.button(
                     text=t("candidate.btn_language", lang=lang),

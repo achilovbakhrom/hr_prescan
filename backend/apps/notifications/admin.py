@@ -13,7 +13,15 @@ class NotificationAdmin(admin.ModelAdmin):
 
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
-    list_display = ("sender", "recipient", "application", "is_read", "created_at")
-    list_filter = ("is_read", "created_at")
+    list_display = (
+        "sender",
+        "recipient",
+        "application",
+        "delivery_channel",
+        "delivery_status",
+        "is_read",
+        "created_at",
+    )
+    list_filter = ("delivery_channel", "delivery_status", "is_read", "created_at")
     search_fields = ("content", "sender__email", "recipient__email")
     readonly_fields = ("id", "created_at", "updated_at")

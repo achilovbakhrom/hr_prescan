@@ -16,6 +16,7 @@ PROMPTS = {
     "vacancies": "menu_prompt_vacancies",
     "create_vacancy": "menu_prompt_create_vacancy",
     "candidates": "menu_prompt_candidates",
+    "message_candidate": "menu_prompt_message_candidate",
     "interviews": "menu_prompt_interviews",
     "team": "menu_prompt_team",
     "subscription": "menu_prompt_subscription",
@@ -34,6 +35,12 @@ def main_menu_keyboard(*, user) -> dict:
             ],
             [
                 button(text=hr_text("btn_candidates", user=user), callback_data=f"{CB_CMD_PREFIX}candidates"),
+                button(
+                    text=hr_text("btn_message_candidate", user=user),
+                    callback_data=f"{CB_CMD_PREFIX}message_candidate",
+                ),
+            ],
+            [
                 button(text=hr_text("btn_interviews", user=user), callback_data=f"{CB_CMD_PREFIX}interviews"),
             ],
             [

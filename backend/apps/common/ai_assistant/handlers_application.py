@@ -95,3 +95,34 @@ def handle_add_candidate_note(*, user, params):
         "data": {"id": str(application.id), "name": application.candidate_name},
         "action": "add_candidate_note",
     }
+
+
+def handle_send_candidate_message(*, user, params):
+    from apps.notifications.services import send_candidate_message
+
+    application = resolve_application(
+        user=user,
+        candidate_email_or_name=params.get("candidate_email_or_name", ""),
+        vacancy_title=params.get("vacancy_title"),
+    )
+    message = send_candidate_message(
+        sender=user,
+        application=application,
+        content=params.get("message", ""),
+    )
+    return {
+        "success": True,
+        "message": (
+            f"Message sent to {application.candidate_name} via "
+            f"{message.delivery_channel} ({message.delivery_status})."
+        ),
+        "data": {
+            "id": str(message.id),
+            "application_id": str(application.id),
+            "candidate_name": application.candidate_name,
+            "delivery_channel": message.delivery_channel,
+            "delivery_status": message.delivery_status,
+            "delivery_failure_reason": message.delivery_failure_reason,
+        },
+        "action": "send_candidate_message",
+    }
