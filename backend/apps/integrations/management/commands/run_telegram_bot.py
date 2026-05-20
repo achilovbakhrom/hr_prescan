@@ -21,6 +21,7 @@ from apps.integrations.telegram_bot.bots import (
     get_bot_config,
     get_client,
 )
+from apps.integrations.telegram_bot.commands import commands_for_role
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +48,9 @@ class Command(BaseCommand):
 
         client = get_client(role=role)
         client.delete_webhook()
+        commands_result = client.set_my_commands(commands=commands_for_role(role=role))
+        if not commands_result.get("ok"):
+            raise CommandError(f"Failed to set {role} commands: {commands_result.get('description', 'Unknown error')}")
         self.stdout.write(self.style.SUCCESS(f"Webhook deleted. Starting {role} bot in polling mode..."))
 
         offset = 0

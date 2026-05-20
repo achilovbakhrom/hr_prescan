@@ -127,6 +127,9 @@ class TelegramClient:
             payload["secret_token"] = secret_token
         return self._post("setWebhook", payload)
 
+    def set_my_commands(self, *, commands: list[dict[str, str]]) -> dict[str, Any]:
+        return self._post("setMyCommands", {"commands": commands})
+
     def get_updates(self, *, offset: int, timeout: int = 30) -> dict[str, Any]:
         """Long-poll for new updates (used by the polling management command)."""
         try:

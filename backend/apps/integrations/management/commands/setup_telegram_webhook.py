@@ -13,6 +13,7 @@ from apps.integrations.telegram_bot.bots import (
     get_bot_config,
     get_client,
 )
+from apps.integrations.telegram_bot.commands import commands_for_role
 
 
 class Command(BaseCommand):
@@ -41,8 +42,13 @@ class Command(BaseCommand):
             raise CommandError(f"Telegram {role} bot token is not set. Set TELEGRAM_{role.upper()}_BOT_TOKEN in env.")
 
         client = get_client(role=role)
+        commands_result = client.set_my_commands(commands=commands_for_role(role=role))
+        if not commands_result.get("ok"):
+            raise CommandError(f"Failed to set {role} commands: {commands_result.get('description', 'Unknown error')}")
+
         result = client.set_webhook(url=url, secret_token=config.webhook_secret)
         if result.get("ok"):
+            self.stdout.write(self.style.SUCCESS(f"{role} commands set successfully."))
             self.stdout.write(self.style.SUCCESS(f"{role} webhook set successfully: {url}"))
             self.stdout.write(f"Description: {result.get('description', '')}")
         else:
