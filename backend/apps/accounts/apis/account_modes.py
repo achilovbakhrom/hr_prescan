@@ -116,9 +116,10 @@ class CreateHrSpaceApi(APIView):
         serializer.is_valid(raise_exception=True)
         try:
             with transaction.atomic():
-                if request.user.role == User.Role.CANDIDATE and not CandidateProfile.objects.filter(
-                    user=request.user
-                ).exists():
+                if (
+                    request.user.role == User.Role.CANDIDATE
+                    and not CandidateProfile.objects.filter(user=request.user).exists()
+                ):
                     get_or_create_candidate_profile(user=request.user)
                 data = serializer.validated_data
                 company = create_user_company(

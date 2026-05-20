@@ -59,7 +59,7 @@ def main_menu_keyboard(*, lang: str) -> dict:
                 kb.button(
                     text=t("candidate.btn_language", lang=lang),
                     callback_data=CB_LANG,
-                )
+                ),
             ],
         ]
     )
