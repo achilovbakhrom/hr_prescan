@@ -75,6 +75,7 @@
     "accountMode": {
       "hr": "HR",
       "candidate": "Кандидат",
+      "candidateShort": "К",
       "switchToHr": "Перейти в HR",
       "switchToCandidate": "Перейти в режим кандидата",
       "createHrSpace": "Створити HR-простір",

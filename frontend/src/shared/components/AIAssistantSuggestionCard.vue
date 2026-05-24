@@ -20,22 +20,26 @@ defineEmits<{
 <template>
   <button
     type="button"
-    class="ai-tool-card group relative flex min-h-[88px] w-full items-start gap-3 rounded-xl border bg-white p-3 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md dark:bg-slate-950"
+    class="ai-tool-card group relative flex min-h-0 w-full items-start gap-2 rounded-xl border bg-white p-2.5 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md dark:bg-slate-950 sm:min-h-[88px] sm:gap-3 sm:p-3"
     :class="[`ai-tool-card--${item.accent}`, item.featured ? 'ai-tool-card--featured' : '']"
     :title="item.tooltip"
     @click="$emit('send', item.prompt)"
   >
-    <span class="ai-tool-icon flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
-      <i :class="item.icon" class="text-sm"></i>
+    <span
+      class="ai-tool-icon flex h-8 w-8 shrink-0 items-center justify-center rounded-lg sm:h-10 sm:w-10 sm:rounded-xl"
+    >
+      <i :class="item.icon" class="text-xs sm:text-sm"></i>
     </span>
     <span class="min-w-0">
-      <span v-if="item.featured" class="ai-tool-badge">
+      <span v-if="item.featured" class="ai-tool-badge hidden sm:inline-flex">
         {{ featuredLabel }}
       </span>
-      <span class="block text-sm font-semibold text-[color:var(--color-text-primary)]">
+      <span class="block text-xs font-semibold text-[color:var(--color-text-primary)] sm:text-sm">
         {{ item.title }}
       </span>
-      <span class="mt-0.5 block text-xs leading-5 text-[color:var(--color-text-secondary)]">
+      <span
+        class="mt-0.5 hidden text-xs leading-5 text-[color:var(--color-text-secondary)] sm:block"
+      >
         {{ item.description }}
       </span>
     </span>
@@ -62,6 +66,7 @@ defineEmits<{
   line-height: 1rem;
 }
 .ai-tool-tooltip {
+  display: none;
   pointer-events: none;
   position: absolute;
   left: calc(100% + 0.75rem);
@@ -80,8 +85,13 @@ defineEmits<{
   box-shadow: 0 18px 40px rgba(15, 23, 42, 0.2);
   transition: opacity 0.15s ease;
 }
-.ai-tool-card:hover .ai-tool-tooltip {
-  opacity: 1;
+@media (min-width: 640px) {
+  .ai-tool-tooltip {
+    display: block;
+  }
+  .ai-tool-card:hover .ai-tool-tooltip {
+    opacity: 1;
+  }
 }
 .ai-tool-card--blue {
   border-color: rgb(191 219 254);

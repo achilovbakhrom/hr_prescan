@@ -75,6 +75,7 @@
     "accountMode": {
       "hr": "HR",
       "candidate": "Candidate",
+      "candidateShort": "C",
       "switchToHr": "Switch to HR",
       "switchToCandidate": "Switch to Candidate",
       "createHrSpace": "Create HR Space",

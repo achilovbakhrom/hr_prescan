@@ -75,6 +75,7 @@
     "accountMode": {
       "hr": "HR",
       "candidate": "Үміткер",
+      "candidateShort": "Ү",
       "switchToHr": "HR режиміне ауысу",
       "switchToCandidate": "Үміткер режиміне ауысу",
       "createHrSpace": "HR кеңістігін жасау",

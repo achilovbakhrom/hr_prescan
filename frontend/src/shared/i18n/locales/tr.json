@@ -75,6 +75,7 @@
     "accountMode": {
       "hr": "HR",
       "candidate": "Aday",
+      "candidateShort": "A",
       "switchToHr": "HR moduna geç",
       "switchToCandidate": "Aday moduna geç",
       "createHrSpace": "HR alanı oluştur",

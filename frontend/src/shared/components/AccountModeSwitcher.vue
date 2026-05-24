@@ -44,6 +44,9 @@ const targetAvailable = computed(() => availableModes.value.includes(targetMode.
 const targetLabelKey = computed(() =>
   targetMode.value === 'hr' ? 'common.accountMode.hr' : 'common.accountMode.candidate',
 )
+const compactTargetLabelKey = computed(() =>
+  targetMode.value === 'hr' ? 'common.accountMode.hr' : 'common.accountMode.candidateShort',
+)
 const actionLabel = computed(() =>
   targetMode.value === 'hr'
     ? t('common.accountMode.switchToHr')
@@ -106,7 +109,7 @@ async function createCandidateSpace(): Promise<void> {
   <div class="flex min-w-0">
     <button
       type="button"
-      class="inline-flex h-9 min-w-0 max-w-full items-center justify-center gap-2 rounded-xl border border-[color:var(--color-border-glass)] bg-white/78 px-3 text-xs font-semibold text-[color:var(--color-text-primary)] shadow-sm transition-colors hover:border-[color:color-mix(in_srgb,var(--color-accent)_35%,var(--color-border-glass))] hover:bg-white disabled:cursor-wait disabled:opacity-70 dark:bg-gray-900/70 dark:hover:bg-gray-900"
+      class="inline-flex h-9 min-w-0 max-w-full items-center justify-center gap-1.5 rounded-xl border border-[color:var(--color-border-glass)] bg-white/78 px-2.5 text-xs font-semibold text-[color:var(--color-text-primary)] shadow-sm transition-colors hover:border-[color:color-mix(in_srgb,var(--color-accent)_35%,var(--color-border-glass))] hover:bg-white disabled:cursor-wait disabled:opacity-70 dark:bg-gray-900/70 dark:hover:bg-gray-900 sm:gap-2 sm:px-3"
       :title="actionTitle"
       :aria-label="actionLabel"
       :disabled="authStore.loading"
@@ -116,7 +119,8 @@ async function createCandidateSpace(): Promise<void> {
         :class="targetMode === 'hr' ? 'pi pi-briefcase' : 'pi pi-user'"
         class="shrink-0 text-[12px] text-[color:var(--color-accent)]"
       ></i>
-      <span class="truncate">{{ actionLabel }}</span>
+      <span class="hidden truncate sm:inline">{{ actionLabel }}</span>
+      <span class="truncate sm:hidden">{{ t(compactTargetLabelKey) }}</span>
       <i
         v-if="authStore.loading"
         class="pi pi-spinner pi-spin shrink-0 text-[10px] text-[color:var(--color-text-muted)]"

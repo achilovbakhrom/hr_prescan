@@ -75,6 +75,7 @@
     "accountMode": {
       "hr": "HR",
       "candidate": "Kandidat",
+      "candidateShort": "K",
       "switchToHr": "Zu HR wechseln",
       "switchToCandidate": "Zum Kandidaten wechseln",
       "createHrSpace": "HR-Bereich erstellen",

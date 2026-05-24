@@ -17,23 +17,29 @@ const { t } = useI18n()
 
 <template>
   <header
-    class="border-b border-cyan-100 bg-[linear-gradient(135deg,#ecfeff_0%,#f0fdf4_46%,#fffbeb_100%)] px-4 py-4 dark:border-slate-800 dark:bg-[linear-gradient(135deg,#082f49_0%,#052e2b_54%,#422006_100%)] sm:px-6"
+    class="shrink-0 border-b border-cyan-100 bg-[linear-gradient(135deg,#ecfeff_0%,#f0fdf4_46%,#fffbeb_100%)] px-3 py-3 dark:border-slate-800 dark:bg-[linear-gradient(135deg,#082f49_0%,#052e2b_54%,#422006_100%)] sm:px-6 sm:py-4"
   >
-    <div class="flex items-start justify-between gap-4">
-      <div class="flex min-w-0 items-start gap-3">
+    <div class="flex items-start justify-between gap-2 sm:gap-4">
+      <div class="flex min-w-0 items-start gap-2 sm:gap-3">
         <span
-          class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-cyan-600 text-white shadow-lg shadow-cyan-600/25"
+          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-cyan-600 text-white shadow-lg shadow-cyan-600/25 sm:h-12 sm:w-12 sm:rounded-2xl"
         >
-          <i class="pi pi-comments text-lg"></i>
+          <i class="pi pi-comments text-sm sm:text-lg"></i>
         </span>
         <div class="min-w-0">
-          <p class="text-xs font-semibold uppercase text-cyan-700 dark:text-cyan-200">
+          <p
+            class="text-[10px] font-semibold uppercase text-cyan-700 dark:text-cyan-200 sm:text-xs"
+          >
             {{ t('aiAssistant.title') }}
           </p>
-          <h2 class="mt-1 text-xl font-semibold text-slate-950 dark:text-white">
+          <h2
+            class="mt-0.5 truncate text-base font-semibold text-slate-950 dark:text-white sm:mt-1 sm:text-xl"
+          >
             {{ title }}
           </h2>
-          <p class="mt-1 max-w-2xl text-sm leading-6 text-slate-700 dark:text-slate-200">
+          <p
+            class="mt-1 hidden max-w-2xl text-sm leading-6 text-slate-700 dark:text-slate-200 sm:block"
+          >
             {{ subtitle }}
           </p>
         </div>

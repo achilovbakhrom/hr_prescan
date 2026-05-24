@@ -75,6 +75,7 @@
     "accountMode": {
       "hr": "الموارد البشرية",
       "candidate": "المرشح",
+      "candidateShort": "م",
       "switchToHr": "التبديل إلى الموارد البشرية",
       "switchToCandidate": "التبديل إلى المرشح",
       "createHrSpace": "إنشاء مساحة الموارد البشرية",

@@ -75,6 +75,7 @@
     "accountMode": {
       "hr": "HR",
       "candidate": "Nomzod",
+      "candidateShort": "N",
       "switchToHr": "HR rejimiga o'tish",
       "switchToCandidate": "Nomzod rejimiga o'tish",
       "createHrSpace": "HR maydonini yaratish",
