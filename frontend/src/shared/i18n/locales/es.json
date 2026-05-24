@@ -71,7 +71,17 @@
       "loadingTable": "Cargando tabla",
       "loadingContent": "Cargando contenido"
     },
-    "customIndustryPlaceholder": "Ingrese el nombre de su industria"
+    "customIndustryPlaceholder": "Ingrese el nombre de su industria",
+    "accountMode": {
+      "hr": "RR. HH.",
+      "candidate": "Candidato",
+      "switchToHr": "Cambiar a RR. HH.",
+      "switchToCandidate": "Cambiar a candidato",
+      "createHrSpace": "Crear espacio de RR. HH.",
+      "createCandidateSpace": "Crear espacio de candidato",
+      "currentMode": "Modo actual: {mode}",
+      "unavailable": "El modo de cuenta no está disponible ahora"
+    }
   },
   "nav": {
     "dashboard": "Panel de control",

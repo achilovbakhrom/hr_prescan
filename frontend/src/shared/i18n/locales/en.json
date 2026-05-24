@@ -71,7 +71,17 @@
       "loadingTable": "Loading table",
       "loadingContent": "Loading content"
     },
-    "customIndustryPlaceholder": "Enter your industry name"
+    "customIndustryPlaceholder": "Enter your industry name",
+    "accountMode": {
+      "hr": "HR",
+      "candidate": "Candidate",
+      "switchToHr": "Switch to HR",
+      "switchToCandidate": "Switch to Candidate",
+      "createHrSpace": "Create HR Space",
+      "createCandidateSpace": "Create Candidate Space",
+      "currentMode": "Current mode: {mode}",
+      "unavailable": "Account mode is not available right now"
+    }
   },
   "nav": {
     "dashboard": "Dashboard",

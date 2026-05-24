@@ -71,7 +71,17 @@
       "loadingTable": "Jadval yuklanmoqda",
       "loadingContent": "Kontent yuklanmoqda"
     },
-    "customIndustryPlaceholder": "Sohangiz nomini kiriting"
+    "customIndustryPlaceholder": "Sohangiz nomini kiriting",
+    "accountMode": {
+      "hr": "HR",
+      "candidate": "Nomzod",
+      "switchToHr": "HR rejimiga o'tish",
+      "switchToCandidate": "Nomzod rejimiga o'tish",
+      "createHrSpace": "HR maydonini yaratish",
+      "createCandidateSpace": "Nomzod maydonini yaratish",
+      "currentMode": "Joriy rejim: {mode}",
+      "unavailable": "Account rejimi hozir mavjud emas"
+    }
   },
   "nav": {
     "dashboard": "Boshqaruv paneli",

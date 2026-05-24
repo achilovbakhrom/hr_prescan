@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { watch } from 'vue'
+import { computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
 import LanguageSwitcher from '@/shared/components/LanguageSwitcher.vue'
+import ThemeToggle from '@/shared/components/ThemeToggle.vue'
 import AppLogo from '@/shared/components/AppLogo.vue'
+import AccountModeSwitcher from './AccountModeSwitcher.vue'
+import CompanySwitcher from './CompanySwitcher.vue'
 import MobileNavItems from './MobileNavItems.vue'
 
 const props = defineProps<{
@@ -18,6 +21,11 @@ const emit = defineEmits<{
 const route = useRoute()
 const authStore = useAuthStore()
 const { t } = useI18n()
+const showCompanyContext = computed(
+  () =>
+    authStore.activeMode === 'hr' &&
+    (authStore.companies.length > 0 || Boolean(authStore.user?.company)),
+)
 
 watch(
   () => route.path,
@@ -55,7 +63,7 @@ watch(
     >
       <div
         v-if="open"
-        class="fixed inset-y-0 left-0 z-50 flex w-[80vw] max-w-72 flex-col bg-white dark:bg-gray-800 shadow-xl lg:hidden"
+        class="fixed inset-y-0 left-0 z-50 flex w-[86vw] max-w-80 flex-col bg-white shadow-xl dark:bg-gray-900 lg:hidden"
         role="dialog"
         aria-modal="true"
         :aria-label="t('common.aria.mobileNavigation')"
@@ -76,10 +84,21 @@ watch(
           </button>
         </div>
 
+        <div
+          v-if="authStore.user"
+          class="space-y-2 border-b border-gray-200 px-4 py-3 dark:border-gray-700"
+        >
+          <CompanySwitcher v-if="showCompanyContext" class="w-full" />
+          <AccountModeSwitcher class="w-full" />
+        </div>
+
         <MobileNavItems />
 
-        <div class="border-t border-gray-200 dark:border-gray-700 px-4 py-3">
+        <div
+          class="flex items-center justify-between border-t border-gray-200 px-4 py-3 dark:border-gray-700"
+        >
           <LanguageSwitcher />
+          <ThemeToggle />
         </div>
 
         <div v-if="authStore.user" class="border-t border-gray-200 dark:border-gray-700 px-4 py-3">
@@ -91,10 +110,12 @@ watch(
               }}{{ authStore.user.lastName?.charAt(0) ?? '' }}
             </div>
             <div class="min-w-0">
-              <p class="truncate text-sm font-medium text-gray-900">
+              <p class="truncate text-sm font-medium text-gray-900 dark:text-gray-100">
                 {{ authStore.user.firstName }} {{ authStore.user.lastName }}
               </p>
-              <p class="truncate text-xs text-gray-500">{{ authStore.user.email }}</p>
+              <p class="truncate text-xs text-gray-500 dark:text-gray-400">
+                {{ authStore.user.email }}
+              </p>
             </div>
           </div>
         </div>

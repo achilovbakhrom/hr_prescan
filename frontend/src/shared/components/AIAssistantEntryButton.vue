@@ -37,14 +37,14 @@ const tooltip = computed(() =>
     >
       <i class="pi pi-bolt text-sm"></i>
     </span>
-    <span class="hidden lg:block">
+    <span class="hidden 2xl:block">
       <span class="block leading-4">{{ label }}</span>
       <span class="block max-w-[180px] truncate text-[10px] font-normal text-cyan-50">
         {{ hint }}
       </span>
     </span>
-    <i class="pi pi-info-circle hidden text-xs text-cyan-50/90 xl:block"></i>
-    <span class="hidden sm:inline lg:hidden">
+    <i class="pi pi-info-circle hidden text-xs text-cyan-50/90 2xl:block"></i>
+    <span class="hidden sm:inline 2xl:hidden">
       {{ t('aiAssistant.openShortLabel') }}
     </span>
     <span

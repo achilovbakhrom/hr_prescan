@@ -43,6 +43,7 @@ const companyOptions = computed(() => {
 })
 
 const showSwitcher = computed(() => isHrMode.value && companyOptions.value.length > 1)
+const showStaticCompany = computed(() => isHrMode.value && Boolean(authStore.user?.company))
 const activeCompanyOption = computed(
   () => companyOptions.value.find((option) => option.value === activeCompanyId.value) ?? null,
 )
@@ -56,13 +57,14 @@ async function handleCompanySwitch(value: string): Promise<void> {
 </script>
 
 <template>
-  <div v-if="showSwitcher" class="hidden items-center gap-2 md:inline-flex">
+  <div v-if="showSwitcher || showStaticCompany" class="inline-flex min-w-0 items-center gap-2">
     <Select
+      v-if="showSwitcher"
       :model-value="activeCompanyId"
       :options="companyOptions"
       option-label="label"
       option-value="value"
-      class="max-w-56 min-w-44 text-xs"
+      class="w-full min-w-0 text-xs sm:min-w-44 lg:max-w-56"
       size="small"
       @update:model-value="handleCompanySwitch"
     >
@@ -101,17 +103,17 @@ async function handleCompanySwitch(value: string): Promise<void> {
         </div>
       </template>
     </Select>
-  </div>
-  <div
-    v-else-if="isHrMode && authStore.user?.company"
-    class="hidden items-center gap-2 rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400 md:inline-flex"
-  >
-    <CompanyLogo
-      :logo="authStore.user.company.logo"
-      :name="authStore.user.company.name"
-      size="xs"
-      rounded="md"
-    />
-    {{ authStore.user.company.name }}
+    <div
+      v-else-if="authStore.user?.company"
+      class="inline-flex min-w-0 items-center gap-2 rounded-xl border border-[color:var(--color-border-glass)] bg-white/72 px-2.5 py-1.5 text-xs font-medium text-[color:var(--color-text-secondary)] dark:bg-gray-900/70"
+    >
+      <CompanyLogo
+        :logo="authStore.user.company.logo"
+        :name="authStore.user.company.name"
+        size="xs"
+        rounded="md"
+      />
+      <span class="truncate">{{ authStore.user.company.name }}</span>
+    </div>
   </div>
 </template>

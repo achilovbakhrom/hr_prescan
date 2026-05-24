@@ -71,7 +71,17 @@
       "loadingTable": "Завантажувальний стіл",
       "loadingContent": "Завантаження вмісту"
     },
-    "customIndustryPlaceholder": "Введіть назву галузі"
+    "customIndustryPlaceholder": "Введіть назву галузі",
+    "accountMode": {
+      "hr": "HR",
+      "candidate": "Кандидат",
+      "switchToHr": "Перейти в HR",
+      "switchToCandidate": "Перейти в режим кандидата",
+      "createHrSpace": "Створити HR-простір",
+      "createCandidateSpace": "Створити простір кандидата",
+      "currentMode": "Поточний режим: {mode}",
+      "unavailable": "Режим акаунта зараз недоступний"
+    }
   },
   "nav": {
     "dashboard": "Приладова панель",

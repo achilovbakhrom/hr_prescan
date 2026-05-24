@@ -71,7 +71,17 @@
       "loadingTable": "Tableau de chargement",
       "loadingContent": "Chargement du contenu"
     },
-    "customIndustryPlaceholder": "Entrez le nom de votre secteur d'activité"
+    "customIndustryPlaceholder": "Entrez le nom de votre secteur d'activité",
+    "accountMode": {
+      "hr": "RH",
+      "candidate": "Candidat",
+      "switchToHr": "Passer en mode RH",
+      "switchToCandidate": "Passer en mode candidat",
+      "createHrSpace": "Créer un espace RH",
+      "createCandidateSpace": "Créer un espace candidat",
+      "currentMode": "Mode actuel : {mode}",
+      "unavailable": "Le mode de compte n'est pas disponible pour le moment"
+    }
   },
   "nav": {
     "dashboard": "Tableau de bord",

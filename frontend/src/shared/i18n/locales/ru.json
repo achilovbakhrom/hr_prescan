@@ -71,7 +71,17 @@
       "loadingTable": "Загрузка таблицы",
       "loadingContent": "Загрузка содержимого"
     },
-    "customIndustryPlaceholder": "Введите название отрасли"
+    "customIndustryPlaceholder": "Введите название отрасли",
+    "accountMode": {
+      "hr": "HR",
+      "candidate": "Кандидат",
+      "switchToHr": "Перейти в HR",
+      "switchToCandidate": "Перейти в кандидаты",
+      "createHrSpace": "Создать HR-пространство",
+      "createCandidateSpace": "Создать пространство кандидата",
+      "currentMode": "Текущий режим: {mode}",
+      "unavailable": "Режим аккаунта сейчас недоступен"
+    }
   },
   "nav": {
     "dashboard": "Панель управления",

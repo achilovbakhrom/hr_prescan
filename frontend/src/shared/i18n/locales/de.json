@@ -71,7 +71,17 @@
       "loadingTable": "Ladetisch",
       "loadingContent": "Inhalt wird geladen"
     },
-    "customIndustryPlaceholder": "Geben Sie Ihren Branchennamen ein"
+    "customIndustryPlaceholder": "Geben Sie Ihren Branchennamen ein",
+    "accountMode": {
+      "hr": "HR",
+      "candidate": "Kandidat",
+      "switchToHr": "Zu HR wechseln",
+      "switchToCandidate": "Zum Kandidaten wechseln",
+      "createHrSpace": "HR-Bereich erstellen",
+      "createCandidateSpace": "Kandidatenbereich erstellen",
+      "currentMode": "Aktueller Modus: {mode}",
+      "unavailable": "Kontomodus ist derzeit nicht verfügbar"
+    }
   },
   "nav": {
     "dashboard": "Armaturenbrett",

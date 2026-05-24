@@ -71,7 +71,17 @@
       "loadingTable": "Кесте жүктелуде",
       "loadingContent": "Мазмұн жүктелуде"
     },
-    "customIndustryPlaceholder": "Сала атауын енгізіңіз"
+    "customIndustryPlaceholder": "Сала атауын енгізіңіз",
+    "accountMode": {
+      "hr": "HR",
+      "candidate": "Үміткер",
+      "switchToHr": "HR режиміне ауысу",
+      "switchToCandidate": "Үміткер режиміне ауысу",
+      "createHrSpace": "HR кеңістігін жасау",
+      "createCandidateSpace": "Үміткер кеңістігін жасау",
+      "currentMode": "Ағымдағы режим: {mode}",
+      "unavailable": "Аккаунт режимі қазір қолжетімді емес"
+    }
   },
   "nav": {
     "dashboard": "Бақылау тақтасы",

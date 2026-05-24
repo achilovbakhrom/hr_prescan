@@ -71,7 +71,17 @@
       "loadingTable": "Tablo yükleniyor",
       "loadingContent": "İçerik yükleniyor"
     },
-    "customIndustryPlaceholder": "Sektör adınızı girin"
+    "customIndustryPlaceholder": "Sektör adınızı girin",
+    "accountMode": {
+      "hr": "HR",
+      "candidate": "Aday",
+      "switchToHr": "HR moduna geç",
+      "switchToCandidate": "Aday moduna geç",
+      "createHrSpace": "HR alanı oluştur",
+      "createCandidateSpace": "Aday alanı oluştur",
+      "currentMode": "Geçerli mod: {mode}",
+      "unavailable": "Hesap modu şu anda kullanılamıyor"
+    }
   },
   "nav": {
     "dashboard": "Kontrol Paneli",

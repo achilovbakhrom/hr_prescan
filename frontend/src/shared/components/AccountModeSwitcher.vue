@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import { useToast } from 'primevue/usetoast'
 import Button from 'primevue/button'
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
@@ -11,6 +13,8 @@ import type { AccountMode } from '@/shared/types/auth.types'
 
 const authStore = useAuthStore()
 const router = useRouter()
+const { t } = useI18n()
+const toast = useToast()
 
 const showHrDialog = ref(false)
 const showCandidateDialog = ref(false)
@@ -37,8 +41,20 @@ const canCreateHr = computed(() => authStore.modes?.canCreateHrSpace ?? false)
 const canCreateCandidate = computed(() => authStore.modes?.canCreateCandidateSpace ?? false)
 const targetMode = computed<AccountMode>(() => (currentMode.value === 'hr' ? 'candidate' : 'hr'))
 const targetAvailable = computed(() => availableModes.value.includes(targetMode.value))
-const label = computed(() => (currentMode.value === 'hr' ? 'HR' : 'Candidate'))
-const targetLabel = computed(() => (targetMode.value === 'hr' ? 'HR' : 'Candidate'))
+const targetLabelKey = computed(() =>
+  targetMode.value === 'hr' ? 'common.accountMode.hr' : 'common.accountMode.candidate',
+)
+const actionLabel = computed(() =>
+  targetMode.value === 'hr'
+    ? t('common.accountMode.switchToHr')
+    : t('common.accountMode.switchToCandidate'),
+)
+const currentModeLabel = computed(() =>
+  currentMode.value === 'hr' ? t('common.accountMode.hr') : t('common.accountMode.candidate'),
+)
+const actionTitle = computed(() =>
+  t('common.accountMode.currentMode', { mode: currentModeLabel.value }),
+)
 
 const sizeOptions = [
   { label: 'Small', value: 'small' },
@@ -52,15 +68,24 @@ async function goAfterSwitch(mode: AccountMode): Promise<void> {
 }
 
 async function switchMode(): Promise<void> {
+  if (!authStore.modes) await authStore.fetchModes()
+
+  const nextMode = targetMode.value
   if (targetAvailable.value) {
-    await authStore.switchMode(targetMode.value)
-    await goAfterSwitch(targetMode.value)
+    await authStore.switchMode(nextMode)
+    await goAfterSwitch(nextMode)
     return
   }
-  if (targetMode.value === 'hr' && canCreateHr.value) {
+  if (nextMode === 'hr' && canCreateHr.value) {
     showHrDialog.value = true
-  } else if (targetMode.value === 'candidate' && canCreateCandidate.value) {
+  } else if (nextMode === 'candidate' && canCreateCandidate.value) {
     showCandidateDialog.value = true
+  } else {
+    toast.add({
+      severity: 'warn',
+      summary: t('common.accountMode.unavailable'),
+      life: 3500,
+    })
   }
 }
 
@@ -78,104 +103,116 @@ async function createCandidateSpace(): Promise<void> {
 </script>
 
 <template>
-  <Button
-    severity="secondary"
-    outlined
-    size="small"
-    :icon="currentMode === 'hr' ? 'pi pi-briefcase' : 'pi pi-user'"
-    :label="label"
-    class="!hidden md:!inline-flex"
-    @click="switchMode"
-  />
-  <Button
-    severity="secondary"
-    outlined
-    size="small"
-    :icon="currentMode === 'hr' ? 'pi pi-briefcase' : 'pi pi-user'"
-    class="!hidden sm:!inline-flex md:!hidden"
-    :aria-label="label"
-    @click="switchMode"
-  />
+  <div class="flex min-w-0">
+    <button
+      type="button"
+      class="inline-flex h-9 min-w-0 max-w-full items-center justify-center gap-2 rounded-xl border border-[color:var(--color-border-glass)] bg-white/78 px-3 text-xs font-semibold text-[color:var(--color-text-primary)] shadow-sm transition-colors hover:border-[color:color-mix(in_srgb,var(--color-accent)_35%,var(--color-border-glass))] hover:bg-white disabled:cursor-wait disabled:opacity-70 dark:bg-gray-900/70 dark:hover:bg-gray-900"
+      :title="actionTitle"
+      :aria-label="actionLabel"
+      :disabled="authStore.loading"
+      @click="switchMode"
+    >
+      <i
+        :class="targetMode === 'hr' ? 'pi pi-briefcase' : 'pi pi-user'"
+        class="shrink-0 text-[12px] text-[color:var(--color-accent)]"
+      ></i>
+      <span class="truncate">{{ actionLabel }}</span>
+      <i
+        v-if="authStore.loading"
+        class="pi pi-spinner pi-spin shrink-0 text-[10px] text-[color:var(--color-text-muted)]"
+      ></i>
+    </button>
 
-  <Dialog
-    v-model:visible="showHrDialog"
-    modal
-    header="Create HR Space"
-    :style="{ width: 'min(92vw, 460px)' }"
-  >
-    <div class="space-y-3">
-      <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-        Company name
-        <InputText v-model="hrForm.companyName" class="mt-1 w-full" />
-      </label>
-      <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-        Company size
-        <Select
-          v-model="hrForm.size"
-          :options="sizeOptions"
-          option-label="label"
-          option-value="value"
-          class="mt-1 w-full"
+    <Dialog
+      v-model:visible="showHrDialog"
+      modal
+      :header="t('common.accountMode.createHrSpace')"
+      :style="{ width: 'min(92vw, 460px)' }"
+    >
+      <div class="space-y-3">
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
+          {{ t('auth.companySetup.companyName') }}
+          <InputText v-model="hrForm.companyName" class="mt-1 w-full" />
+        </label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
+          {{ t('auth.companySetup.size') }}
+          <Select
+            v-model="hrForm.size"
+            :options="sizeOptions"
+            option-label="label"
+            option-value="value"
+            class="mt-1 w-full"
+          />
+        </label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
+          {{ t('auth.companySetup.country') }}
+          <InputText v-model="hrForm.country" class="mt-1 w-full" />
+        </label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
+          {{ t('settings.company.website') }}
+          <InputText v-model="hrForm.website" class="mt-1 w-full" />
+        </label>
+      </div>
+      <template #footer>
+        <Button
+          :label="t('common.cancel')"
+          severity="secondary"
+          text
+          @click="showHrDialog = false"
         />
-      </label>
-      <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-        Country
-        <InputText v-model="hrForm.country" class="mt-1 w-full" />
-      </label>
-      <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-        Website
-        <InputText v-model="hrForm.website" class="mt-1 w-full" />
-      </label>
-    </div>
-    <template #footer>
-      <Button label="Cancel" severity="secondary" text @click="showHrDialog = false" />
-      <Button
-        label="Create"
-        icon="pi pi-check"
-        :loading="authStore.loading"
-        :disabled="!hrForm.companyName.trim() || !hrForm.country.trim()"
-        @click="createHrSpace"
-      />
-    </template>
-  </Dialog>
+        <Button
+          :label="t('common.create')"
+          icon="pi pi-check"
+          :loading="authStore.loading"
+          :disabled="!hrForm.companyName.trim() || !hrForm.country.trim()"
+          @click="createHrSpace"
+        />
+      </template>
+    </Dialog>
 
-  <Dialog
-    v-model:visible="showCandidateDialog"
-    modal
-    header="Create Candidate Space"
-    :style="{ width: 'min(92vw, 460px)' }"
-  >
-    <div class="space-y-3">
-      <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-        First name
-        <InputText v-model="candidateForm.firstName" class="mt-1 w-full" />
-      </label>
-      <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-        Last name
-        <InputText v-model="candidateForm.lastName" class="mt-1 w-full" />
-      </label>
-      <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-        Phone
-        <InputText v-model="candidateForm.phone" class="mt-1 w-full" />
-      </label>
-      <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-        Headline
-        <InputText v-model="candidateForm.headline" class="mt-1 w-full" />
-      </label>
-      <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-        Location
-        <InputText v-model="candidateForm.location" class="mt-1 w-full" />
-      </label>
-    </div>
-    <template #footer>
-      <Button label="Cancel" severity="secondary" text @click="showCandidateDialog = false" />
-      <Button
-        :label="`Create ${targetLabel}`"
-        icon="pi pi-check"
-        :loading="authStore.loading"
-        :disabled="!candidateForm.firstName.trim() || !candidateForm.lastName.trim()"
-        @click="createCandidateSpace"
-      />
-    </template>
-  </Dialog>
+    <Dialog
+      v-model:visible="showCandidateDialog"
+      modal
+      :header="t('common.accountMode.createCandidateSpace')"
+      :style="{ width: 'min(92vw, 460px)' }"
+    >
+      <div class="space-y-3">
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
+          {{ t('settings.profile.firstName') }}
+          <InputText v-model="candidateForm.firstName" class="mt-1 w-full" />
+        </label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
+          {{ t('settings.profile.lastName') }}
+          <InputText v-model="candidateForm.lastName" class="mt-1 w-full" />
+        </label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
+          {{ t('settings.profile.phone') }}
+          <InputText v-model="candidateForm.phone" class="mt-1 w-full" />
+        </label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
+          {{ t('cvBuilder.personal.headline') }}
+          <InputText v-model="candidateForm.headline" class="mt-1 w-full" />
+        </label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
+          {{ t('cvBuilder.personal.location') }}
+          <InputText v-model="candidateForm.location" class="mt-1 w-full" />
+        </label>
+      </div>
+      <template #footer>
+        <Button
+          :label="t('common.cancel')"
+          severity="secondary"
+          text
+          @click="showCandidateDialog = false"
+        />
+        <Button
+          :label="`${t('common.create')} ${t(targetLabelKey)}`"
+          icon="pi pi-check"
+          :loading="authStore.loading"
+          :disabled="!candidateForm.firstName.trim() || !candidateForm.lastName.trim()"
+          @click="createCandidateSpace"
+        />
+      </template>
+    </Dialog>
+  </div>
 </template>

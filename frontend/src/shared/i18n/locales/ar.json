@@ -71,7 +71,17 @@
       "loadingTable": "جدول التحميل",
       "loadingContent": "جارٍ تحميل المحتوى"
     },
-    "customIndustryPlaceholder": "أدخل اسم الصناعة الخاصة بك"
+    "customIndustryPlaceholder": "أدخل اسم الصناعة الخاصة بك",
+    "accountMode": {
+      "hr": "الموارد البشرية",
+      "candidate": "المرشح",
+      "switchToHr": "التبديل إلى الموارد البشرية",
+      "switchToCandidate": "التبديل إلى المرشح",
+      "createHrSpace": "إنشاء مساحة الموارد البشرية",
+      "createCandidateSpace": "إنشاء مساحة المرشح",
+      "currentMode": "الوضع الحالي: {mode}",
+      "unavailable": "وضع الحساب غير متاح الآن"
+    }
   },
   "nav": {
     "dashboard": "لوحة القيادة",
