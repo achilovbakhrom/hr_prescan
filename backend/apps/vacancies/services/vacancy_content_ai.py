@@ -16,6 +16,16 @@ from apps.vacancies.services.ai_json import (
     normalize_vacancy_content,
     require_complete_vacancy_content,
 )
+from apps.vacancies.services.vacancy_content_context import (
+    clean_generation_context,
+    merge_with_current_content,
+    response_payload,
+)
+from apps.vacancies.services.vacancy_content_prompts import (
+    generation_instruction,
+    grading_instruction,
+    revision_instruction,
+)
 
 logger = logging.getLogger(__name__)
 MIN_ACCEPTABLE_SCORE = 8
@@ -25,6 +35,9 @@ def generate_vacancy_content(
     *,
     title: str,
     language: str = "en",
+    description: str | None = None,
+    requirements: str | None = None,
+    responsibilities: str | None = None,
     employment_type: str | None = None,
     experience_level: str | None = None,
     skills: list[str] | None = None,
@@ -33,11 +46,18 @@ def generate_vacancy_content(
     salary_currency: str | None = None,
     location: str | None = None,
     is_remote: bool | None = None,
-) -> dict[str, str]:
-    """Generate candidate-facing vacancy copy and self-review it with AI."""
+    additional_instruction: str | None = None,
+    generation_context: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Generate or regenerate candidate-facing vacancy copy with short-lived context."""
     context = {
         "title": title.strip(),
         "language": LANGUAGE_NAMES.get(language, "English"),
+        "current_content": {
+            "description": (description or "").strip(),
+            "requirements": (requirements or "").strip(),
+            "responsibilities": (responsibilities or "").strip(),
+        },
         "employment_type": employment_type or "not specified",
         "experience_level": experience_level or "not specified",
         "skills": skills or [],
@@ -46,16 +66,20 @@ def generate_vacancy_content(
         "salary_currency": salary_currency or "USD",
         "location": location or "",
         "is_remote": is_remote,
+        "additional_instruction": (additional_instruction or "").strip(),
+        "generation_context": clean_generation_context(generation_context or {}),
     }
 
     try:
         client = genai.Client(api_key=settings.GOOGLE_API_KEY)
         draft = _generate_content(client=client, context=context)
+        draft = merge_with_current_content(draft, context["current_content"])
         grade = _grade_content(client=client, context=context, content=draft)
         if _score(grade) >= MIN_ACCEPTABLE_SCORE and has_complete_vacancy_content(draft):
-            return draft
+            return response_payload(content=draft, context=context)
         revised = _revise_content(client=client, context=context, content=draft, grade=grade)
-        return require_complete_vacancy_content(revised)
+        revised = merge_with_current_content(revised, context["current_content"])
+        return response_payload(content=require_complete_vacancy_content(revised), context=context)
     except Exception as exc:
         logger.exception("Failed to generate vacancy content for title %s", title)
         raise ApplicationError(str(MSG_AI_VACANCY_CONTENT_FAILED)) from exc
@@ -66,7 +90,7 @@ def _generate_content(*, client: genai.Client, context: dict[str, Any]) -> dict[
         model=settings.GEMINI_MODEL,
         contents=[_content_payload(context)],
         config=types.GenerateContentConfig(
-            system_instruction=_generation_instruction(),
+            system_instruction=generation_instruction(),
             temperature=0.6,
             response_mime_type="application/json",
         ),
@@ -89,7 +113,7 @@ def _grade_content(
             )
         ],
         config=types.GenerateContentConfig(
-            system_instruction=_grading_instruction(),
+            system_instruction=grading_instruction(),
             temperature=0.1,
             response_mime_type="application/json",
         ),
@@ -120,7 +144,7 @@ def _revise_content(
             )
         ],
         config=types.GenerateContentConfig(
-            system_instruction=_revision_instruction(),
+            system_instruction=revision_instruction(),
             temperature=0.4,
             response_mime_type="application/json",
         ),
@@ -129,6 +153,7 @@ def _revise_content(
 
 
 def _content_payload(context: dict[str, Any]) -> types.Content:
+    previous_turns = json.dumps(context["generation_context"].get("turns", []), ensure_ascii=False)
     return types.Content(
         role="user",
         parts=[
@@ -144,47 +169,14 @@ def _content_payload(context: dict[str, Any]) -> types.Content:
                     f"Salary currency: {context['salary_currency']}\n"
                     f"Location: {context['location'] or 'not specified'}\n"
                     f"Remote: {context['is_remote']}"
+                    f"\nCurrent description: {context['current_content']['description'] or 'empty'}"
+                    f"\nCurrent requirements: {context['current_content']['requirements'] or 'empty'}"
+                    f"\nCurrent responsibilities: {context['current_content']['responsibilities'] or 'empty'}"
+                    f"\nAdditional HR instruction: {context['additional_instruction'] or 'none'}"
+                    f"\nPrevious AI turns: {previous_turns}"
                 )
             )
         ],
-    )
-
-
-def _generation_instruction() -> str:
-    return (
-        "You are a senior HR copywriter creating candidate-facing vacancy content.\n"
-        "Generate practical, specific copy from the provided job title and optional context.\n"
-        "Do not invent company names, benefits, salary, location, tech stacks, "
-        "or requirements that were not provided.\n"
-        "Do not require age, gender, nationality, marital status, photos, "
-        "or other discriminatory/personal attributes.\n"
-        "If location is missing, do not mention location. If salary is missing, do not mention salary.\n"
-        "Write in the requested language only.\n\n"
-        "Return valid JSON with exactly these string fields:\n"
-        '- "description": simple safe HTML using only <p>, <ul>, <li>, and <strong>. 120-180 words.\n'
-        '- "requirements": 5-8 newline-separated bullet lines, each starting with "- ".\n'
-        '- "responsibilities": 5-8 newline-separated bullet lines, each starting with "- ".\n'
-        "Every field must be non-empty. Never return empty strings.\n"
-        "Keep the tone clear, direct, and credible. Avoid hype and buzzwords."
-    )
-
-
-def _grading_instruction() -> str:
-    return (
-        "You are a strict AI quality reviewer for HR vacancy content.\n"
-        "Grade the draft from 1 to 10 using these criteria: role relevance, practical specificity, completeness, "
-        "format correctness, candidate-facing clarity, neutrality/compliance, and no invented facts.\n"
-        "Penalize generic filler, unsupported claims, discriminatory wording, malformed JSON-like content, "
-        "and missing required sections.\n"
-        'Return JSON: {"score": 1-10, "notes": ["specific issue", "..."]}.'
-    )
-
-
-def _revision_instruction() -> str:
-    return (
-        "Revise the vacancy content using the reviewer notes.\n"
-        "Keep only facts supported by the original context. Preserve the required JSON fields and formatting.\n"
-        "Write in the requested language only. Every field must be non-empty. Return JSON only."
     )
 
 

@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { isAxiosError } from 'axios'
-import { computed, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useToast } from 'primevue/usetoast'
 import Button from 'primevue/button'
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
@@ -11,7 +9,7 @@ import type { FieldErrors } from '@/shared/api/errors'
 import type { Company } from '@/features/companies/types/company.types'
 import type { CreateVacancyRequest } from '../types/vacancy.types'
 import { useVacancyForm } from '../composables/useVacancyForm'
-import { vacancyService } from '../services/vacancy.service'
+import { useVacancyContentGeneration } from '../composables/useVacancyContentGeneration'
 import VacancyBasicInfoTab from './VacancyBasicInfoTab.vue'
 import VacancyCompanyTab from './VacancyCompanyTab.vue'
 import VacancyPrescanningTab from './VacancyPrescanningTab.vue'
@@ -19,6 +17,7 @@ import VacancyInterviewTab from './VacancyInterviewTab.vue'
 import VacancySettingsTab from './VacancySettingsTab.vue'
 import CreateCompanyDialog from './CreateCompanyDialog.vue'
 import VacancyScreeningIntro from './VacancyScreeningIntro.vue'
+import VacancyContentAiDialog from './VacancyContentAiDialog.vue'
 
 const props = defineProps<{
   initialData?: Partial<CreateVacancyRequest>
@@ -30,12 +29,12 @@ const props = defineProps<{
 const emit = defineEmits<{ save: [data: CreateVacancyRequest] }>()
 
 const { t } = useI18n()
-const toast = useToast()
 
 const form = useVacancyForm(
   () => props.initialData,
   () => props.fieldErrors,
 )
+const aiContent = useVacancyContentGeneration(form)
 
 watch(
   () => props.initialData,
@@ -45,15 +44,6 @@ watch(
 )
 
 const showCreateDialog = ref(false)
-const generatingBasicInfo = ref(false)
-const canGenerateBasicInfo = computed(() => form.title.value.trim().length >= 5)
-
-function generationErrorMessage(error: unknown): string {
-  if (isAxiosError<{ detail?: string }>(error)) {
-    return error.response?.data?.detail || t('vacancies.form.generateWithAIError')
-  }
-  return t('vacancies.form.generateWithAIError')
-}
 
 async function handleCompanyCreated(company: Company): Promise<void> {
   // Re-fetch memberships so the new company is in the dropdown with correct is_default state.
@@ -66,44 +56,6 @@ async function handleCompanyCreated(company: Company): Promise<void> {
 
 function handleSave(): void {
   emit('save', form.buildPayload())
-}
-
-async function handleGenerateBasicInfo(): Promise<void> {
-  if (!canGenerateBasicInfo.value || generatingBasicInfo.value) return
-  generatingBasicInfo.value = true
-  try {
-    const content = await vacancyService.generateContent({
-      title: form.title.value.trim(),
-      skills: form.skills.value,
-      salaryMin: form.salaryMin.value,
-      salaryMax: form.salaryMax.value,
-      salaryCurrency: form.salaryCurrency.value,
-      location: form.location.value || undefined,
-      isRemote: form.isRemote.value,
-      employmentType: form.employmentType.value,
-      experienceLevel: form.experienceLevel.value,
-    })
-    if (content.description) form.description.value = content.description
-    if (content.requirements) form.requirements.value = content.requirements
-    if (content.responsibilities) form.responsibilities.value = content.responsibilities
-    if (!content.description && !content.requirements && !content.responsibilities) {
-      throw new Error(t('vacancies.form.generateWithAIError'))
-    }
-    toast.add({
-      severity: 'success',
-      summary: t('vacancies.form.generateWithAISuccess'),
-      life: 2500,
-    })
-  } catch (error) {
-    toast.add({
-      severity: 'error',
-      summary: t('vacancies.form.generateWithAIError'),
-      detail: generationErrorMessage(error),
-      life: 4000,
-    })
-  } finally {
-    generatingBasicInfo.value = false
-  }
 }
 </script>
 
@@ -130,11 +82,12 @@ async function handleGenerateBasicInfo(): Promise<void> {
           v-model:employment-type="form.employmentType.value"
           v-model:experience-level="form.experienceLevel.value"
           :show-generate-ai="true"
-          :can-generate-ai="canGenerateBasicInfo"
-          :generating-ai="generatingBasicInfo"
+          :can-generate-ai="aiContent.canGenerate.value"
+          :generating-ai="aiContent.generating.value"
+          :has-generation-context="aiContent.hasContext.value"
           :has-error="form.hasError"
           :field-error="form.fieldError"
-          @generate-ai="handleGenerateBasicInfo"
+          @generate-ai="aiContent.visible.value = true"
         />
       </TabPanel>
 
@@ -188,6 +141,15 @@ async function handleGenerateBasicInfo(): Promise<void> {
       />
     </div>
   </form>
+
+  <VacancyContentAiDialog
+    v-model:visible="aiContent.visible.value"
+    v-model:instruction="aiContent.instruction.value"
+    :can-generate="aiContent.canGenerate.value"
+    :generating="aiContent.generating.value"
+    :has-context="aiContent.hasContext.value"
+    @generate="aiContent.generate"
+  />
 
   <CreateCompanyDialog v-model:visible="showCreateDialog" @created="handleCompanyCreated" />
 </template>

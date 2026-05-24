@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 const props = defineProps<{
   canGenerate: boolean
   generating: boolean
+  hasContext?: boolean
 }>()
 
 const emit = defineEmits<{ generate: [] }>()
@@ -15,7 +16,9 @@ const { t } = useI18n()
 <template>
   <Button
     type="button"
-    :label="t('vacancies.form.generateWithAI')"
+    :label="
+      props.hasContext ? t('vacancies.form.regenerateWithAI') : t('vacancies.form.generateWithAI')
+    "
     icon="pi pi-sparkles"
     size="small"
     :loading="props.generating"

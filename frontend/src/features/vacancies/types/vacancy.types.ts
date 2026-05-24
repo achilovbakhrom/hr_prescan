@@ -87,6 +87,9 @@ export type UpdateVacancyRequest = Partial<CreateVacancyRequest>
 
 export interface GenerateVacancyContentRequest {
   title: string
+  description?: string
+  requirements?: string
+  responsibilities?: string
   skills?: string[]
   salaryMin?: number | null
   salaryMax?: number | null
@@ -95,10 +98,26 @@ export interface GenerateVacancyContentRequest {
   isRemote?: boolean
   employmentType?: EmploymentType
   experienceLevel?: ExperienceLevel
+  additionalInstruction?: string
+  generationContext?: VacancyGenerationContext
 }
 
 export interface GeneratedVacancyContent {
   description: string
   requirements: string
   responsibilities: string
+  generationContext?: VacancyGenerationContext
+}
+
+export interface VacancyGenerationContext {
+  turns: VacancyGenerationTurn[]
+}
+
+export interface VacancyGenerationTurn {
+  instruction: string
+  content: {
+    description: string
+    requirements: string
+    responsibilities: string
+  }
 }

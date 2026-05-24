@@ -200,11 +200,10 @@ class TestGenerateVacancyContent:
 
             content = generate_vacancy_content(title="Backend Developer", language="en")
 
-        assert content == {
-            "description": "<p>Build backend APIs.</p>",
-            "requirements": "- Python",
-            "responsibilities": "- Build services",
-        }
+        assert content["description"] == "<p>Build backend APIs.</p>"
+        assert content["requirements"] == "- Python"
+        assert content["responsibilities"] == "- Build services"
+        assert content["generation_context"]["turns"][-1]["content"]["requirements"] == "- Python"
 
     def test_revises_empty_draft_even_with_high_grade(self):
         class DraftResponse:
@@ -228,6 +227,51 @@ class TestGenerateVacancyContent:
 
         assert content["description"] == "<p>Build backend APIs.</p>"
         assert client.models.generate_content.call_count == 3
+
+    def test_regeneration_uses_current_content_instruction_and_previous_context(self):
+        class DraftResponse:
+            text = (
+                '{"description": "<p>Expanded backend API role.</p>", '
+                '"requirements": "- Python\\n- Django", '
+                '"responsibilities": "- Build APIs\\n- Review code"}'
+            )
+
+        class GradeResponse:
+            text = '{"score": 9, "notes": []}'
+
+        previous_context = {
+            "turns": [
+                {
+                    "instruction": "First draft",
+                    "content": {
+                        "description": "<p>Old draft.</p>",
+                        "requirements": "- Python",
+                        "responsibilities": "- Build APIs",
+                    },
+                }
+            ]
+        }
+
+        with patch("apps.vacancies.services.vacancy_content_ai.genai.Client") as client_cls:
+            client = client_cls.return_value
+            client.models.generate_content.side_effect = [DraftResponse(), GradeResponse()]
+
+            content = generate_vacancy_content(
+                title="Backend Developer",
+                language="en",
+                description="<p>Current description.</p>",
+                requirements="- Current requirement",
+                responsibilities="- Current responsibility",
+                additional_instruction="Extend the description section",
+                generation_context=previous_context,
+            )
+
+        first_payload = client.models.generate_content.call_args_list[0].kwargs["contents"][0].parts[0].text
+        assert "Current description: <p>Current description.</p>" in first_payload
+        assert "Additional HR instruction: Extend the description section" in first_payload
+        assert "First draft" in first_payload
+        assert content["generation_context"]["turns"][0]["instruction"] == "First draft"
+        assert content["generation_context"]["turns"][-1]["instruction"] == "Extend the description section"
 
     def test_rejects_empty_final_content(self):
         class EmptyResponse:

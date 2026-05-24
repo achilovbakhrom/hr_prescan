@@ -3,6 +3,7 @@ from unittest.mock import patch
 from rest_framework.test import APIClient
 
 from apps.accounts.permissions import HRPermissions
+from apps.common.exceptions import ApplicationError
 from apps.vacancies.models import InterviewQuestion, ScreeningStep, Vacancy, VacancyCriteria
 from apps.vacancies.services import create_default_criteria
 from tests.factories import (
@@ -321,15 +322,47 @@ def test_generate_vacancy_content_returns_generated_fields():
             "description": "<p>Описание роли.</p>",
             "requirements": "- Python",
             "responsibilities": "- Разрабатывать сервисы",
+            "generation_context": {"turns": []},
         }
         response = client.post(
             "/api/hr/vacancies/generate-content/",
-            {"title": "Backend Developer", "location": ""},
+            {
+                "title": "Backend Developer",
+                "description": "<p>Old.</p>",
+                "requirements": "- Old requirement",
+                "responsibilities": "- Old responsibility",
+                "additional_instruction": "Regenerate requirements",
+                "generation_context": {"turns": [{"instruction": "First draft", "content": {}}]},
+                "location": "",
+            },
             format="json",
         )
 
     assert response.status_code == 200
     assert response.data["description"] == "<p>Описание роли.</p>"
+    assert "generation_context" in response.data
     generate_mock.assert_called_once()
     assert generate_mock.call_args.kwargs["language"] == "ru"
     assert generate_mock.call_args.kwargs["location"] == ""
+    assert generate_mock.call_args.kwargs["description"] == "<p>Old.</p>"
+    assert generate_mock.call_args.kwargs["additional_instruction"] == "Regenerate requirements"
+
+
+def test_generate_vacancy_content_ai_failure_returns_service_unavailable():
+    user = UserFactory(
+        role="hr",
+        hr_permissions=[HRPermissions.MANAGE_VACANCIES],
+    )
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    with patch("apps.vacancies.apis.vacancy_content.generate_vacancy_content") as generate_mock:
+        generate_mock.side_effect = ApplicationError("AI unavailable")
+        response = client.post(
+            "/api/hr/vacancies/generate-content/",
+            {"title": "Backend Developer"},
+            format="json",
+        )
+
+    assert response.status_code == 503
+    assert response.data["detail"] == "AI unavailable"

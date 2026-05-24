@@ -20,6 +20,7 @@ const props = defineProps<{
   showGenerateAi?: boolean
   canGenerateAi?: boolean
   generatingAi?: boolean
+  hasGenerationContext?: boolean
 }>()
 const emit = defineEmits<{ generateAi: [] }>()
 const title = defineModel<string>('title', { required: true })
@@ -61,6 +62,7 @@ const { t } = useI18n()
           v-if="props.showGenerateAi"
           :can-generate="Boolean(props.canGenerateAi)"
           :generating="Boolean(props.generatingAi)"
+          :has-context="Boolean(props.hasGenerationContext)"
           @generate="emit('generateAi')"
         />
       </div>

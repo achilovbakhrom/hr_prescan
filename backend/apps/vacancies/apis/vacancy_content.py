@@ -17,6 +17,9 @@ class GenerateVacancyContentApi(APIView):
 
     class InputSerializer(serializers.Serializer):
         title = serializers.CharField(max_length=255, min_length=5)
+        description = serializers.CharField(required=False, allow_blank=True, default="")
+        requirements = serializers.CharField(required=False, allow_blank=True, default="")
+        responsibilities = serializers.CharField(required=False, allow_blank=True, default="")
         employment_type = serializers.ChoiceField(
             choices=Vacancy.EmploymentType.choices,
             required=False,
@@ -33,6 +36,8 @@ class GenerateVacancyContentApi(APIView):
         salary_currency = serializers.CharField(max_length=3, required=False, default="USD")
         location = serializers.CharField(max_length=255, required=False, allow_blank=True, default="")
         is_remote = serializers.BooleanField(required=False, allow_null=True)
+        additional_instruction = serializers.CharField(required=False, allow_blank=True, default="")
+        generation_context = serializers.DictField(required=False, default=dict)
 
     def post(self, request: Request) -> Response:
         serializer = self.InputSerializer(data=request.data)
@@ -44,6 +49,6 @@ class GenerateVacancyContentApi(APIView):
                 **serializer.validated_data,
             )
         except ApplicationError as exc:
-            return Response({"detail": exc.message}, status=status.HTTP_502_BAD_GATEWAY)
+            return Response({"detail": exc.message}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
         return Response(content, status=status.HTTP_200_OK)
