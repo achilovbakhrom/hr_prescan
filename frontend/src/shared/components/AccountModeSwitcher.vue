@@ -84,7 +84,7 @@ async function createCandidateSpace(): Promise<void> {
     size="small"
     :icon="currentMode === 'hr' ? 'pi pi-briefcase' : 'pi pi-user'"
     :label="label"
-    class="!hidden sm:!inline-flex"
+    class="!hidden md:!inline-flex"
     @click="switchMode"
   />
   <Button
@@ -92,7 +92,7 @@ async function createCandidateSpace(): Promise<void> {
     outlined
     size="small"
     :icon="currentMode === 'hr' ? 'pi pi-briefcase' : 'pi pi-user'"
-    class="sm:!hidden"
+    class="!hidden sm:!inline-flex md:!hidden"
     :aria-label="label"
     @click="switchMode"
   />

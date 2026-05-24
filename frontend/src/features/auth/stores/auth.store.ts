@@ -2,13 +2,22 @@ import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { extractErrorMessage } from '@/shared/api/errors'
 import { setLocale, type SupportedLocale } from '@/shared/i18n'
-import { LOCALE_STORAGE_KEY, isSupportedLocale } from '@/shared/i18n/supportedLocales'
+import {
+  LOCALE_STORAGE_KEY,
+  isSupportedLocale,
+  normalizeLocale,
+} from '@/shared/i18n/supportedLocales'
 import { saveUserLanguage } from '@/shared/services/language.service'
 import { redirectToLogin } from '@/shared/api/authRedirect'
 import { authService } from '../services/auth.service'
 import { loadTokens, saveTokens, clearTokens } from './auth-tokens'
 import { AUTH_TOKENS_CHANGED_EVENT } from '@/shared/api/authTokens'
-import type { AccountMode, AccountModes, CompanyMembership } from '@/shared/types/auth.types'
+import type {
+  AccountMode,
+  AccountModes,
+  CompanyMembership,
+  UserRole,
+} from '@/shared/types/auth.types'
 import type {
   AcceptInvitationRequest,
   User,
@@ -20,15 +29,29 @@ import type {
 function syncPreferredLanguage(u: User | null): void {
   if (!u) return
   if (typeof localStorage === 'undefined') return
-  const stored = localStorage.getItem(LOCALE_STORAGE_KEY)
+  const stored = normalizeLocale(localStorage.getItem(LOCALE_STORAGE_KEY))
+  if (stored) {
+    if (stored !== u.language) {
+      saveUserLanguage(stored)
+        .then(() => {
+          u.language = stored
+        })
+        .catch((err: unknown) => console.warn('[auth] language sync failed', err))
+    }
+    setLocale(stored)
+    return
+  }
+
   if (isSupportedLocale(u.language)) {
-    if (stored !== u.language) setLocale(u.language)
-  } else if (isSupportedLocale(stored)) {
-    saveUserLanguage(stored)
+    setLocale(u.language)
+  } else {
+    const fallback: SupportedLocale = 'en'
+    setLocale(fallback)
+    saveUserLanguage(fallback)
       .then(() => {
-        u.language = stored as SupportedLocale
+        u.language = fallback
       })
-      .catch((err: unknown) => console.warn('[auth] back-fill language failed', err))
+      .catch((err: unknown) => console.warn('[auth] language fallback failed', err))
   }
 }
 
@@ -45,6 +68,11 @@ export const useAuthStore = defineStore('auth', () => {
   const activeMode = computed<AccountMode>(() => {
     if (user.value?.activeMode) return user.value.activeMode
     return user.value?.role === 'candidate' ? 'candidate' : 'hr'
+  })
+  const currentAccessRole = computed<UserRole | null>(() => {
+    if (!user.value) return null
+    if (activeMode.value === 'candidate') return 'candidate'
+    return user.value.role === 'candidate' ? 'candidate' : user.value.role
   })
 
   if (typeof window !== 'undefined') {
@@ -230,6 +258,7 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated,
     hasMultipleCompanies,
     activeMode,
+    currentAccessRole,
     login,
     googleLogin,
     telegramLogin,

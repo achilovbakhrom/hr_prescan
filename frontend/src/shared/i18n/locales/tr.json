@@ -127,7 +127,8 @@
       "accountDeactivated": "Hesap devre dışı bırakıldı",
       "orSignInWithEmail": "veya e-posta ile oturum açın",
       "emailInvalid": "Lütfen geçerli bir e-posta adresi girin.",
-      "passwordRequired": "Şifre gerekli."
+      "passwordRequired": "Şifre gerekli.",
+      "googleFailed": "Google ile oturum açılamadı. Lütfen tekrar deneyin."
     },
     "telegram": {
       "signIn": "Telegram ile oturum açın",
@@ -155,7 +156,9 @@
       "firstNameRequired": "Ad gereklidir.",
       "lastNameRequired": "Soyadı gerekli.",
       "emailInvalid": "Lütfen geçerli bir e-posta adresi girin.",
-      "orRegisterWithEmail": "veya e-postayla kaydolun"
+      "orRegisterWithEmail": "veya e-postayla kaydolun",
+      "registerFailed": "Kayıt başarısız oldu. Lütfen tekrar deneyin.",
+      "googleFailed": "Google ile oturum açılamadı. Lütfen tekrar deneyin."
     },
     "verifyEmail": {
       "title": "E-postanızı Doğrulayın",

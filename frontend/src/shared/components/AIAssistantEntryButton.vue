@@ -10,7 +10,7 @@ defineEmits<{
 const { t } = useI18n()
 const authStore = useAuthStore()
 
-const isCandidate = computed(() => authStore.user?.role === 'candidate')
+const isCandidate = computed(() => authStore.currentAccessRole === 'candidate')
 const label = computed(() =>
   isCandidate.value ? t('aiAssistant.candidateTitle') : t('aiAssistant.hrTitle'),
 )

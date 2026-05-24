@@ -6,8 +6,8 @@
     <ClientOnly>
       <CookieConsent />
       <AIAssistantDialog />
+      <AppPreloader />
     </ClientOnly>
-    <AppPreloader />
   </div>
 </template>
 

@@ -30,7 +30,7 @@ const candidateStore = useCandidateStore()
 const dashboardStore = useDashboardStore()
 const aiAssistant = useAIAssistant()
 
-const role = computed(() => authStore.user?.role)
+const role = computed(() => authStore.currentAccessRole)
 const greeting = computed(() => {
   const hour = new Date().getHours()
   if (hour < 12) return t('dashboard.greeting.morning')

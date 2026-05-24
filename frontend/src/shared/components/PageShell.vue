@@ -62,7 +62,9 @@ const mainClass = computed(() => {
 
     <!-- Floating controls: background + theme picker. Fixed-positioned, so
          DOM placement here has no visual impact. -->
-    <FloatingBackgroundPicker />
+    <ClientOnly>
+      <FloatingBackgroundPicker />
+    </ClientOnly>
   </div>
 </template>
 

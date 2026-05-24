@@ -127,7 +127,8 @@
       "accountDeactivated": "Le compte est désactivé",
       "orSignInWithEmail": "ou connectez-vous avec email",
       "emailInvalid": "Veuillez saisir une adresse e-mail valide.",
-      "passwordRequired": "Un mot de passe est requis."
+      "passwordRequired": "Un mot de passe est requis.",
+      "googleFailed": "La connexion avec Google a échoué. Veuillez réessayer."
     },
     "telegram": {
       "signIn": "Connectez-vous avec Telegram",
@@ -155,7 +156,9 @@
       "firstNameRequired": "Le prénom est obligatoire.",
       "lastNameRequired": "Le nom de famille est obligatoire.",
       "emailInvalid": "Veuillez saisir une adresse e-mail valide.",
-      "orRegisterWithEmail": "ou inscrivez-vous par email"
+      "orRegisterWithEmail": "ou inscrivez-vous par email",
+      "registerFailed": "L'inscription a échoué. Veuillez réessayer.",
+      "googleFailed": "La connexion avec Google a échoué. Veuillez réessayer."
     },
     "verifyEmail": {
       "title": "Vérifiez votre e-mail",

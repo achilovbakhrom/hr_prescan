@@ -1,7 +1,10 @@
 from decimal import Decimal
+from unittest.mock import patch
 
 import pytest
+from django.test import override_settings
 
+from apps.accounts.models import User
 from apps.applications.models import Application
 from apps.applications.services import (
     bulk_move_by_filter,
@@ -12,7 +15,8 @@ from apps.applications.services import (
 )
 from apps.common.exceptions import ApplicationError
 from apps.interviews.models import Interview
-from tests.factories import ApplicationFactory, InterviewFactory
+from apps.notifications.models import Message, Notification
+from tests.factories import ApplicationFactory, InterviewFactory, UserFactory
 
 
 class TestSubmitApplication:
@@ -57,6 +61,58 @@ class TestSubmitApplication:
         assert interview_session.screening_mode == Interview.ScreeningMode.MEET
         assert interview_session.livekit_room_name == f"interview-{interview_session.id}"
         assert result["interview_token"] == str(interview_session.interview_token)
+
+    @override_settings(
+        TELEGRAM_CANDIDATE_BOT_TOKEN="test-candidate-token",
+        TELEGRAM_CANDIDATE_BOT_USERNAME="TestCandidateBot",
+    )
+    def test_submit_application_sends_prescanning_link_to_joined_telegram_candidate(self, vacancy):
+        candidate = UserFactory(company=None, role=User.Role.CANDIDATE, telegram_id=998877)
+
+        with patch("apps.integrations.telegram_bot.client.requests.post") as post_mock:
+            post_mock.return_value.json.return_value = {"ok": True, "result": {"message_id": 77}}
+            result = submit_application(
+                vacancy_id=vacancy.id,
+                candidate_name="Jane Doe",
+                candidate_email="jane-telegram@example.com",
+                candidate=candidate,
+            )
+
+        payload = post_mock.call_args.kwargs["json"]
+        assert payload["chat_id"] == candidate.telegram_id
+        assert "parse_mode" not in payload
+        assert f"https://t.me/TestCandidateBot?start=ps_{result['prescan_token']}" in payload["text"]
+
+        notification = Notification.objects.get(user=candidate, type=Notification.Type.SYSTEM)
+        assert notification.data["kind"] == "prescanning_ready"
+        assert notification.data["delivery_channel"] == Message.DeliveryChannel.TELEGRAM
+        assert notification.data["delivery_status"] == Message.DeliveryStatus.DELIVERED
+        assert notification.data["telegram_message_id"] == "77"
+
+    @override_settings(
+        TELEGRAM_CANDIDATE_BOT_TOKEN="test-candidate-token",
+        TELEGRAM_CANDIDATE_BOT_USERNAME="TestCandidateBot",
+    )
+    def test_submit_application_sends_prescanning_link_to_internal_inbox_when_candidate_has_not_joined_bot(
+        self,
+        vacancy,
+    ):
+        candidate = UserFactory(company=None, role=User.Role.CANDIDATE, telegram_id=None)
+
+        with patch("apps.integrations.telegram_bot.client.requests.post") as post_mock:
+            result = submit_application(
+                vacancy_id=vacancy.id,
+                candidate_name="Jane Doe",
+                candidate_email="jane-inbox@example.com",
+                candidate=candidate,
+            )
+
+        post_mock.assert_not_called()
+        notification = Notification.objects.get(user=candidate, type=Notification.Type.SYSTEM)
+        assert notification.data["kind"] == "prescanning_ready"
+        assert notification.data["delivery_channel"] == Message.DeliveryChannel.WEB
+        assert notification.data["delivery_status"] == Message.DeliveryStatus.DELIVERED
+        assert notification.data["link"].endswith(f"ps_{result['prescan_token']}")
 
     def test_submit_application_duplicate_email_fails(self, vacancy):
         """Submitting the same email to the same vacancy raises an error."""

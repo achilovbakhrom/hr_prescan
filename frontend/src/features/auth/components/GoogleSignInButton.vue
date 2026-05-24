@@ -8,9 +8,11 @@ const emit = defineEmits<{
 }>()
 
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as string
+const enableLocalGoogleAuth = import.meta.env.VITE_ENABLE_LOCAL_GOOGLE_AUTH === 'true'
 const buttonContainer = ref<HTMLElement | null>(null)
 const { t } = useI18n()
 const darkMode = ref(false)
+const blockedLocalOrigin = ref(false)
 let themeObserver: MutationObserver | null = null
 
 interface GoogleCredentialResponse {
@@ -35,7 +37,7 @@ function handleCredentialResponse(response: GoogleCredentialResponse): void {
   if (response.credential) {
     emit('success', response.credential)
   } else {
-    emit('error', 'Google sign-in failed')
+    emit('error', t('auth.login.googleFailed'))
   }
 }
 
@@ -70,6 +72,11 @@ function renderGoogleButton(): void {
 
 onMounted(() => {
   if (!clientId) return
+  const hostname = window.location.hostname
+  blockedLocalOrigin.value =
+    !enableLocalGoogleAuth &&
+    (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1')
+  if (blockedLocalOrigin.value) return
 
   darkMode.value = isDarkMode()
   themeObserver = new MutationObserver(() => {
@@ -109,7 +116,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div v-if="clientId" class="mb-3">
+  <div v-if="clientId && !blockedLocalOrigin" class="mb-3">
     <div class="social-auth-google" :class="{ 'social-auth-google--dark': darkMode }">
       <div ref="buttonContainer" class="social-auth-google__target"></div>
       <div class="social-auth-google__visual">

@@ -32,7 +32,8 @@ const canUseGlobalSearch = computed(
   () =>
     Boolean(authStore.user?.company) &&
     authStore.activeMode === 'hr' &&
-    (authStore.user?.role === USER_ROLES.ADMIN || authStore.user?.role === USER_ROLES.HR),
+    (authStore.currentAccessRole === USER_ROLES.ADMIN ||
+      authStore.currentAccessRole === USER_ROLES.HR),
 )
 
 watch(canUseGlobalSearch, (allowed) => {
@@ -74,17 +75,23 @@ function handleMenuToggle(): void {
 <template>
   <header class="sticky top-0 z-40 px-3 pt-3 sm:px-4 lg:px-6">
     <div
-      class="mx-auto flex h-16 max-w-[1760px] items-center justify-between rounded-[24px] border border-white/50 bg-white/72 px-4 shadow-[0_18px_48px_rgba(15,23,42,0.08)] backdrop-blur-2xl dark:border-white/10 dark:bg-gray-950/72 dark:shadow-black/25"
+      class="mx-auto flex h-16 max-w-[1760px] items-center justify-between rounded-[24px] border border-white/50 bg-white/72 px-2 shadow-[0_18px_48px_rgba(15,23,42,0.08)] backdrop-blur-2xl dark:border-white/10 dark:bg-gray-950/72 dark:shadow-black/25 sm:px-4"
     >
-      <div class="flex min-w-0 items-center gap-3">
+      <div class="flex min-w-0 items-center gap-2 sm:gap-3">
         <Button
           icon="pi pi-bars"
           text
           severity="secondary"
+          class="shrink-0"
           :aria-label="t('common.aria.toggleMenu')"
           @click="handleMenuToggle"
         />
-        <AppLogo size="sm" to="/" />
+        <span class="sm:hidden">
+          <AppLogo size="sm" to="/" variant="glyph" />
+        </span>
+        <span class="hidden sm:inline-flex">
+          <AppLogo size="sm" to="/" />
+        </span>
         <a
           href="/jobs"
           target="_blank"
@@ -151,7 +158,9 @@ function handleMenuToggle(): void {
 
         <AIAssistantEntryButton @click="aiAssistant.open()" />
 
-        <ThemeToggle />
+        <span class="hidden sm:inline-flex">
+          <ThemeToggle />
+        </span>
         <LanguageSwitcher />
         <NotificationBell />
         <AppNavbarUserMenu />

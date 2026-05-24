@@ -127,7 +127,8 @@
       "accountDeactivated": "تم تعطيل الحساب",
       "orSignInWithEmail": "أو قم بتسجيل الدخول باستخدام البريد الإلكتروني",
       "emailInvalid": "الرجاء إدخال عنوان بريد إلكتروني صالح.",
-      "passwordRequired": "كلمة المرور مطلوبة."
+      "passwordRequired": "كلمة المرور مطلوبة.",
+      "googleFailed": "فشل تسجيل الدخول باستخدام Google. يرجى المحاولة مرة أخرى."
     },
     "telegram": {
       "signIn": "قم بتسجيل الدخول باستخدام Telegram",
@@ -155,7 +156,9 @@
       "firstNameRequired": "الاسم الأول مطلوب.",
       "lastNameRequired": "الاسم الأخير مطلوب.",
       "emailInvalid": "الرجاء إدخال عنوان بريد إلكتروني صالح.",
-      "orRegisterWithEmail": "أو التسجيل بالبريد الإلكتروني"
+      "orRegisterWithEmail": "أو التسجيل بالبريد الإلكتروني",
+      "registerFailed": "فشل التسجيل. يرجى المحاولة مرة أخرى.",
+      "googleFailed": "فشل تسجيل الدخول باستخدام Google. يرجى المحاولة مرة أخرى."
     },
     "verifyEmail": {
       "title": "التحقق من البريد الإلكتروني الخاص بك",

@@ -56,7 +56,7 @@ async function handleCompanySwitch(value: string): Promise<void> {
 </script>
 
 <template>
-  <div v-if="showSwitcher" class="hidden items-center gap-2 sm:inline-flex">
+  <div v-if="showSwitcher" class="hidden items-center gap-2 md:inline-flex">
     <Select
       :model-value="activeCompanyId"
       :options="companyOptions"
@@ -104,7 +104,7 @@ async function handleCompanySwitch(value: string): Promise<void> {
   </div>
   <div
     v-else-if="isHrMode && authStore.user?.company"
-    class="hidden items-center gap-2 rounded-md bg-gray-100 dark:bg-gray-800 px-2 py-1 text-xs font-medium text-gray-600 dark:text-gray-400 sm:inline-flex"
+    class="hidden items-center gap-2 rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400 md:inline-flex"
   >
     <CompanyLogo
       :logo="authStore.user.company.logo"

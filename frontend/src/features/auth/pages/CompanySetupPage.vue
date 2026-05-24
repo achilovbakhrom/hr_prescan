@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import InputText from 'primevue/inputtext'
@@ -57,6 +57,26 @@ function validate(): boolean {
   errors.value.email = requiresEmail.value && !emailRegex.test(email.value.trim())
   return !Object.values(errors.value).some(Boolean)
 }
+
+watch(companyName, (value) => {
+  if (submitted.value) errors.value.companyName = !value.trim()
+})
+
+watch(industries, (value) => {
+  if (submitted.value) errors.value.industries = value.length === 0
+})
+
+watch(size, (value) => {
+  if (submitted.value) errors.value.size = !value
+})
+
+watch(country, (value) => {
+  if (submitted.value) errors.value.country = !value.trim()
+})
+
+watch(email, (value) => {
+  if (submitted.value) errors.value.email = requiresEmail.value && !emailRegex.test(value.trim())
+})
 
 async function handleSubmit(): Promise<void> {
   submitted.value = true

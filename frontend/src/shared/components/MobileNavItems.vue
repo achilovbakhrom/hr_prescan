@@ -91,7 +91,7 @@ const navItems = computed<NavItem[]>(() => [
 ])
 
 const filteredItems = computed(() => {
-  const userRole = authStore.user?.role
+  const userRole = authStore.currentAccessRole
   if (!userRole) return []
   return navItems.value.filter(
     (item) => item.roles.includes(userRole) && hasPermission(item.permission),

@@ -129,7 +129,8 @@
       "emailPlaceholder": "Введите ваш email",
       "emailInvalid": "Введите корректный адрес электронной почты.",
       "passwordPlaceholder": "Введите пароль",
-      "passwordRequired": "Пароль обязателен."
+      "passwordRequired": "Пароль обязателен.",
+      "googleFailed": "Не удалось войти через Google. Попробуйте снова."
     },
     "telegram": {
       "signIn": "Войти через Telegram",
@@ -162,7 +163,9 @@
       "firstNameRequired": "Введите имя.",
       "lastNameRequired": "Введите фамилию.",
       "emailInvalid": "Введите корректный email.",
-      "orRegisterWithEmail": "или зарегистрируйтесь по email"
+      "orRegisterWithEmail": "или зарегистрируйтесь по email",
+      "registerFailed": "Не удалось зарегистрироваться. Попробуйте снова.",
+      "googleFailed": "Не удалось войти через Google. Попробуйте снова."
     },
     "verifyEmail": {
       "title": "Подтверждение электронной почты",

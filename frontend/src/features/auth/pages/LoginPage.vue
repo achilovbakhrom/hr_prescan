@@ -86,7 +86,7 @@ async function handleTelegramSuccess(
       await router.push(redirect || { name: ROUTE_NAMES.DASHBOARD })
     }
   } catch (err: unknown) {
-    errorMessage.value = err instanceof Error ? err.message : 'Telegram sign-in failed.'
+    errorMessage.value = err instanceof Error ? err.message : t('auth.telegram.requestFailed')
   }
 }
 

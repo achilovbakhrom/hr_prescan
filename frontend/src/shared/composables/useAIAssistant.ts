@@ -1,8 +1,9 @@
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { sendAICommand, type AIMessage, type FrontendAction } from '../api/aiAssistant'
 import { extractErrorMessage } from '../api/errors'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
+import type { UserRole } from '@/shared/types/auth.types'
 
 const STORAGE_KEY_PREFIX = 'prescreen_ai_assistant_history'
 const MAX_MESSAGES = 200 // 100 prompts × 2 (user + assistant)
@@ -14,6 +15,7 @@ function getStorageKey(role: string): string {
 }
 
 function loadHistory(role: string): AIMessage[] {
+  if (typeof localStorage === 'undefined') return []
   try {
     const raw = localStorage.getItem(getStorageKey(role))
     if (raw) return JSON.parse(raw) as AIMessage[]
@@ -24,8 +26,16 @@ function loadHistory(role: string): AIMessage[] {
 }
 
 function saveHistory(msgs: AIMessage[], role: string): void {
+  if (typeof localStorage === 'undefined') return
   const trimmed = msgs.slice(-MAX_MESSAGES)
   localStorage.setItem(getStorageKey(role), JSON.stringify(trimmed))
+}
+
+function activateRole(role: UserRole): void {
+  if (role === activeRole) return
+  activeRole = role
+  skipSave = true
+  messages.value = loadHistory(role)
 }
 
 function trimContextContent(content: string): string {
@@ -57,13 +67,8 @@ export function useAIAssistant() {
   const router = useRouter()
   const authStore = useAuthStore()
 
-  // Load role-specific chat history when role changes
-  const role = authStore.user?.role || 'hr'
-  if (role !== activeRole) {
-    activeRole = role
-    skipSave = true
-    messages.value = loadHistory(role)
-  }
+  const assistantRole = computed<UserRole>(() => authStore.currentAccessRole ?? 'hr')
+  watch(assistantRole, activateRole, { immediate: true })
 
   function toggle() {
     isOpen.value = !isOpen.value
@@ -121,8 +126,7 @@ export function useAIAssistant() {
         context.conversationHistory = recentHistory
       }
 
-      const userRole = authStore.user?.role
-      const response = await sendAICommand(text, context, userRole)
+      const response = await sendAICommand(text, context, assistantRole.value)
       messages.value.push({
         role: 'assistant',
         content: response.message,
@@ -146,7 +150,7 @@ export function useAIAssistant() {
   function clearHistory() {
     skipSave = true
     messages.value.splice(0, messages.value.length)
-    localStorage.removeItem(getStorageKey(activeRole))
+    if (typeof localStorage !== 'undefined') localStorage.removeItem(getStorageKey(activeRole))
   }
 
   return { isOpen, messages, sending, toggle, open, close, sendMessage, clearHistory }

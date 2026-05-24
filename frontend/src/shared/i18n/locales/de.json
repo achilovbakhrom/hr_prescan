@@ -127,7 +127,8 @@
       "accountDeactivated": "Konto ist deaktiviert",
       "orSignInWithEmail": "oder melden Sie sich per E-Mail an",
       "emailInvalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
-      "passwordRequired": "Passwort ist erforderlich."
+      "passwordRequired": "Passwort ist erforderlich.",
+      "googleFailed": "Anmeldung mit Google fehlgeschlagen. Bitte versuchen Sie es erneut."
     },
     "telegram": {
       "signIn": "Melden Sie sich mit Telegram an",
@@ -155,7 +156,9 @@
       "firstNameRequired": "Der Vorname ist erforderlich.",
       "lastNameRequired": "Nachname ist erforderlich.",
       "emailInvalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
-      "orRegisterWithEmail": "oder per E-Mail anmelden"
+      "orRegisterWithEmail": "oder per E-Mail anmelden",
+      "registerFailed": "Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "googleFailed": "Anmeldung mit Google fehlgeschlagen. Bitte versuchen Sie es erneut."
     },
     "verifyEmail": {
       "title": "Bestätigen Sie Ihre E-Mail",

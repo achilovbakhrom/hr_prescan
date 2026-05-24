@@ -63,8 +63,7 @@ async function handleRegister(): Promise<void> {
     })
     registered.value = true
   } catch (err: unknown) {
-    errorMessage.value =
-      err instanceof Error ? err.message : 'Registration failed. Please try again.'
+    errorMessage.value = err instanceof Error ? err.message : t('auth.register.registerFailed')
   }
 }
 
@@ -79,7 +78,7 @@ async function handleGoogleSuccess(credential: string): Promise<void> {
         : { name: ROUTE_NAMES.DASHBOARD },
     )
   } catch (err: unknown) {
-    errorMessage.value = err instanceof Error ? err.message : 'Google sign-in failed.'
+    errorMessage.value = err instanceof Error ? err.message : t('auth.register.googleFailed')
   }
 }
 
@@ -95,7 +94,7 @@ async function handleTelegramSuccess(
         : { name: ROUTE_NAMES.DASHBOARD },
     )
   } catch (err: unknown) {
-    errorMessage.value = err instanceof Error ? err.message : 'Telegram sign-in failed.'
+    errorMessage.value = err instanceof Error ? err.message : t('auth.telegram.requestFailed')
   }
 }
 </script>

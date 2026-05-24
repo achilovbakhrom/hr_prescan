@@ -124,7 +124,7 @@ const sections = computed<NavSection[]>(() => [
 ])
 
 const filteredSections = computed(() => {
-  const userRole = authStore.user?.role
+  const userRole = authStore.currentAccessRole
   if (!userRole) return []
   return sections.value
     .map((section) => ({

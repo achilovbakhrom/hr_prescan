@@ -42,7 +42,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
   if (
     authStore.isAuthenticated &&
     authStore.user?.onboardingCompleted === true &&
-    authStore.user.role === 'hr' &&
+    authStore.activeMode === 'hr' &&
+    authStore.currentAccessRole !== 'candidate' &&
     !authStore.user.company &&
     to.name !== ROUTE_NAMES.COMPANY_SETUP
   ) {
@@ -50,7 +51,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
   }
 
   const allowedRoles = to.meta.roles as string[] | undefined
-  if (allowedRoles && authStore.user && !allowedRoles.includes(authStore.user.role)) {
+  const accessRole = authStore.currentAccessRole
+  if (allowedRoles && accessRole && !allowedRoles.includes(accessRole)) {
     return navigateTo({ name: ROUTE_NAMES.FORBIDDEN })
   }
 })

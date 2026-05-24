@@ -5,12 +5,20 @@ import AppNavbar from './AppNavbar.vue'
 import AppSidebar from './AppSidebar.vue'
 import MobileNav from './MobileNav.vue'
 import PageShell from './PageShell.vue'
+import { useAuthStore } from '@/features/auth/stores/auth.store'
 
 const sidebarCollapsed = ref(false)
 const mobileNavOpen = ref(false)
+const appReady = ref(false)
+const authStore = useAuthStore()
 
-onMounted(() => {
-  sidebarCollapsed.value = localStorage.getItem('sidebar_collapsed') === 'true'
+onMounted(async () => {
+  try {
+    if (authStore.tokens && !authStore.user) await authStore.initAuth()
+    sidebarCollapsed.value = localStorage.getItem('sidebar_collapsed') === 'true'
+  } finally {
+    appReady.value = true
+  }
 })
 
 function toggleDesktopSidebar(): void {
@@ -32,7 +40,7 @@ function closeMobileNav(): void {
 
 <template>
   <PageShell variant="app">
-    <template #nav>
+    <template v-if="appReady" #nav>
       <AppNavbar
         :sidebar-collapsed="sidebarCollapsed"
         @toggle-sidebar="toggleDesktopSidebar"
@@ -40,7 +48,7 @@ function closeMobileNav(): void {
       />
     </template>
 
-    <div class="flex flex-1">
+    <div v-if="appReady" class="flex flex-1">
       <div class="mx-auto flex w-full max-w-[1760px] min-w-0 gap-0 xl:px-2">
         <AppSidebar
           :collapsed="sidebarCollapsed"
@@ -54,7 +62,11 @@ function closeMobileNav(): void {
       </div>
     </div>
 
-    <MobileNav :open="mobileNavOpen" @close="closeMobileNav" />
+    <div v-else class="flex min-h-[60vh] items-center justify-center">
+      <i class="pi pi-spinner pi-spin text-2xl text-[color:var(--color-text-muted)]"></i>
+    </div>
+
+    <MobileNav v-if="appReady" :open="mobileNavOpen" @close="closeMobileNav" />
     <Toast position="bottom-right" />
   </PageShell>
 </template>

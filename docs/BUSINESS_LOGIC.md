@@ -267,12 +267,13 @@ Candidates can apply via two surfaces: the **web app** (public job board) and th
    - **"Start Prescanning Now"** — opens the prescanning chat immediately
    - **"I'll do it later"** — saves the prescanning link. The link is also sent via email confirmation.
    - If the vacancy has a Telegram deep-link code, the screen also shows **"Open in Telegram"** so the candidate can continue from the candidate bot on mobile.
+   - If the application is linked to a candidate account, the platform also sends the exact `ps_<prescan_token>` deep link. Candidates who joined the candidate Telegram bot receive it in Telegram; other platform candidates receive it in the internal web inbox.
 6. The prescanning link remains valid until: (a) the vacancy is archived, or (b) the prescanning is completed
 7. Candidate receives a confirmation email with: application acknowledgment, prescanning link, vacancy details, and instructions
 8. After prescanning completes, AI evaluates and decides:
    - **Advance** — if interview step is enabled, the prepared interview session/link becomes available to the candidate on the web. If interview step is disabled, the candidate is moved directly to shortlisted.
    - **Reject** — candidate is moved to rejected status
-9. If advanced to interview, candidate receives an interview link and completes the Meet/video interview
+9. If advanced to interview, candidate receives an interview link and completes the Meet/video interview. Candidates who joined the candidate Telegram bot receive the web interview link in Telegram after prescanning advances; other platform candidates receive it in the internal web inbox.
 10. After interview completes, AI evaluates and decides to shortlist or reject the candidate
 
 #### Candidate-facing Telegram shortcuts
@@ -626,6 +627,12 @@ All batch actions require confirmation before executing.
 - If the candidate account has no Telegram link, the platform creates the message and a `DIRECT_MESSAGE` in-app notification for the candidate web inbox.
 - The HR web endpoint and HR Telegram assistant tool both use the same direct-message service, so web and bot history remain consistent.
 - The optional deeper AI video interview remains web-only. Telegram may link candidates back to the web interview when needed, but does not host the video interview itself.
+
+### 10.4 Candidate Screening Link System Messages
+- When an application is linked to a platform candidate account, application submission creates a `SYSTEM` notification with the exact prescanning bot deep link. If the candidate has joined/linked the candidate Telegram bot (`telegram_id` exists), the link is also sent through Telegram; otherwise it remains available in the internal web inbox.
+- When prescanning advances a candidate to the optional interview step, the platform creates a `SYSTEM` notification with the web-only interview URL. If the candidate has joined/linked the candidate Telegram bot, the link is also sent through Telegram; otherwise it remains available in the internal web inbox.
+- If the application has no linked platform candidate account, the platform has no bot or inbox target. HR uses the candidate's submitted contact details and handles the message manually after escalation to a human.
+- These system link messages are separate from HR-authored `Message` rows; custom HR messages continue to use the direct-message service and shared web/bot message history.
 
 ---
 

@@ -1,6 +1,9 @@
 from decimal import Decimal
 from unittest.mock import patch
 
+from django.test import override_settings
+
+from apps.accounts.models import User
 from apps.applications.models import Application
 from apps.interviews.chat_service.evaluation_prompt import derive_ai_decision_from_evaluation
 from apps.interviews.chat_service.prompts import build_system_prompt
@@ -11,7 +14,8 @@ from apps.interviews.services import (
     reset_interview,
     start_interview,
 )
-from tests.factories import ApplicationFactory, InterviewFactory
+from apps.notifications.models import Message, Notification
+from tests.factories import ApplicationFactory, InterviewFactory, UserFactory
 
 
 class TestStartSession:
@@ -117,6 +121,79 @@ class TestCompleteSession:
             status=Interview.Status.PENDING,
         ).first()
         assert interview_session is not None
+
+    @override_settings(
+        FRONTEND_URL="https://app.hrprescan.test",
+        TELEGRAM_CANDIDATE_BOT_TOKEN="test-candidate-token",
+        TELEGRAM_CANDIDATE_BOT_USERNAME="TestCandidateBot",
+    )
+    def test_complete_prescanning_sends_interview_link_to_joined_telegram_candidate(self, vacancy):
+        vacancy.interview_enabled = True
+        vacancy.save(update_fields=["interview_enabled"])
+        candidate = UserFactory(company=None, role=User.Role.CANDIDATE, telegram_id=556677)
+        app = ApplicationFactory(vacancy=vacancy, candidate=candidate, status=Application.Status.APPLIED)
+        session = InterviewFactory(
+            application=app,
+            session_type=Interview.SessionType.PRESCANNING,
+            status=Interview.Status.IN_PROGRESS,
+        )
+
+        with patch("apps.integrations.telegram_bot.client.requests.post") as post_mock:
+            post_mock.return_value.json.return_value = {"ok": True, "result": {"message_id": 78}}
+            complete_session(
+                interview=session,
+                overall_score=Decimal("8.00"),
+                ai_summary="Strong candidate.",
+                transcript=[],
+                ai_decision="advance",
+            )
+
+        interview_session = app.sessions.get(session_type=Interview.SessionType.INTERVIEW)
+        payload = post_mock.call_args.kwargs["json"]
+        assert payload["chat_id"] == candidate.telegram_id
+        assert "parse_mode" not in payload
+        assert f"https://app.hrprescan.test/interview/{interview_session.interview_token}" in payload["text"]
+
+        notification = Notification.objects.get(user=candidate, type=Notification.Type.SYSTEM)
+        assert notification.data["kind"] == "interview_ready"
+        assert notification.data["delivery_channel"] == Message.DeliveryChannel.TELEGRAM
+        assert notification.data["delivery_status"] == Message.DeliveryStatus.DELIVERED
+
+    @override_settings(
+        FRONTEND_URL="https://app.hrprescan.test",
+        TELEGRAM_CANDIDATE_BOT_TOKEN="test-candidate-token",
+        TELEGRAM_CANDIDATE_BOT_USERNAME="TestCandidateBot",
+    )
+    def test_complete_prescanning_sends_interview_link_to_internal_inbox_when_candidate_has_not_joined_bot(
+        self,
+        vacancy,
+    ):
+        vacancy.interview_enabled = True
+        vacancy.save(update_fields=["interview_enabled"])
+        candidate = UserFactory(company=None, role=User.Role.CANDIDATE, telegram_id=None)
+        app = ApplicationFactory(vacancy=vacancy, candidate=candidate, status=Application.Status.APPLIED)
+        session = InterviewFactory(
+            application=app,
+            session_type=Interview.SessionType.PRESCANNING,
+            status=Interview.Status.IN_PROGRESS,
+        )
+
+        with patch("apps.integrations.telegram_bot.client.requests.post") as post_mock:
+            complete_session(
+                interview=session,
+                overall_score=Decimal("8.00"),
+                ai_summary="Strong candidate.",
+                transcript=[],
+                ai_decision="advance",
+            )
+
+        post_mock.assert_not_called()
+        interview_session = app.sessions.get(session_type=Interview.SessionType.INTERVIEW)
+        notification = Notification.objects.get(user=candidate, type=Notification.Type.SYSTEM)
+        assert notification.data["kind"] == "interview_ready"
+        assert notification.data["delivery_channel"] == Message.DeliveryChannel.WEB
+        assert notification.data["delivery_status"] == Message.DeliveryStatus.DELIVERED
+        assert notification.data["link"] == f"https://app.hrprescan.test/interview/{interview_session.interview_token}"
 
     def test_evaluation_negative_recommendation_overrides_live_advance_marker(self):
         """A negative evaluator recommendation must reject even if chat ended with advance."""

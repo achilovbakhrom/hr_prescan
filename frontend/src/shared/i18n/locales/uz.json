@@ -127,7 +127,8 @@
       "emailPlaceholder": "Emailingizni kiriting",
       "emailInvalid": "Iltimos, to'g'ri email manzilini kiriting.",
       "passwordPlaceholder": "Parolingizni kiriting",
-      "passwordRequired": "Parol majburiy."
+      "passwordRequired": "Parol majburiy.",
+      "googleFailed": "Google orqali kirib bo'lmadi. Qayta urinib ko'ring."
     },
     "telegram": {
       "signIn": "Telegram orqali kirish",
@@ -155,7 +156,9 @@
       "firstNameRequired": "Ism kiritilishi shart.",
       "lastNameRequired": "Familiya kiritilishi shart.",
       "emailInvalid": "Toʻgʻri email kiriting.",
-      "orRegisterWithEmail": "yoki email orqali roʻyxatdan oʻting"
+      "orRegisterWithEmail": "yoki email orqali roʻyxatdan oʻting",
+      "registerFailed": "Ro'yxatdan o'tib bo'lmadi. Qayta urinib ko'ring.",
+      "googleFailed": "Google orqali kirib bo'lmadi. Qayta urinib ko'ring."
     },
     "verifyEmail": {
       "title": "Emailingizni tasdiqlang",

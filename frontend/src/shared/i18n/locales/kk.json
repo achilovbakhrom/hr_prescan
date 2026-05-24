@@ -127,7 +127,8 @@
       "accountDeactivated": "Есептік жазба өшірілді",
       "orSignInWithEmail": "немесе электрондық пошта арқылы жүйеге кіріңіз",
       "emailInvalid": "Жарамды электрондық пошта мекенжайын енгізіңіз.",
-      "passwordRequired": "Құпия сөз қажет."
+      "passwordRequired": "Құпия сөз қажет.",
+      "googleFailed": "Google арқылы кіру сәтсіз аяқталды. Қайталап көріңіз."
     },
     "telegram": {
       "signIn": "Telegram арқылы жүйеге кіріңіз",
@@ -155,7 +156,9 @@
       "firstNameRequired": "Аты қажет.",
       "lastNameRequired": "Тегі қажет.",
       "emailInvalid": "Жарамды электрондық пошта мекенжайын енгізіңіз.",
-      "orRegisterWithEmail": "немесе электрондық пошта арқылы тіркеліңіз"
+      "orRegisterWithEmail": "немесе электрондық пошта арқылы тіркеліңіз",
+      "registerFailed": "Тіркелу сәтсіз аяқталды. Қайталап көріңіз.",
+      "googleFailed": "Google арқылы кіру сәтсіз аяқталды. Қайталап көріңіз."
     },
     "verifyEmail": {
       "title": "Электрондық поштаңызды растаңыз",

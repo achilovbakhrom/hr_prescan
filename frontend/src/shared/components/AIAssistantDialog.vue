@@ -13,7 +13,7 @@ const { t } = useI18n()
 const authStore = useAuthStore()
 const { isOpen, messages, sending, close, sendMessage, clearHistory } = useAIAssistant()
 
-const isCandidate = computed(() => authStore.user?.role === 'candidate')
+const isCandidate = computed(() => authStore.currentAccessRole === 'candidate')
 const title = computed(() =>
   isCandidate.value ? t('aiAssistant.candidateTitle') : t('aiAssistant.hrTitle'),
 )
@@ -115,7 +115,7 @@ onUnmounted(() => {
           class="border-b border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900/80 lg:border-b-0 lg:border-r"
         >
           <p class="text-sm font-semibold text-slate-950 dark:text-white">
-            {{ t('aiAssistant.tryAsking') }}
+            {{ isCandidate ? t('aiAssistant.candidateTitle') : t('aiAssistant.tryAsking') }}
           </p>
           <p class="mt-1 text-xs leading-5 text-slate-600 dark:text-slate-300">
             {{ intro }}

@@ -79,6 +79,7 @@ def submit_application(
         snapshot_applied = apply_candidate_profile_cv_snapshot(application=application, snapshot=profile_snapshot)
         _enqueue_cv_processing(application=application, cv_file_path=cv_file_path, snapshot_applied=snapshot_applied)
         _sync_candidate_base(application=application)
+        _notify_candidate_prescanning_ready(application=application, prescan_session=prescan_session)
         return _submission_result(application=application, prescan_session=prescan_session)
 
     try:
@@ -111,6 +112,7 @@ def submit_application(
         create_interview_session(application=application)
 
     _sync_candidate_base(application=application)
+    _notify_candidate_prescanning_ready(application=application, prescan_session=prescan_session)
     return _submission_result(application=application, prescan_session=prescan_session)
 
 
@@ -133,6 +135,12 @@ def _sync_candidate_base(*, application: Application) -> None:
     from apps.applications.services.candidate_base import sync_hr_candidate_for_application
 
     transaction.on_commit(lambda: sync_hr_candidate_for_application(application=application))
+
+
+def _notify_candidate_prescanning_ready(*, application: Application, prescan_session: Interview) -> None:
+    from apps.notifications.services import notify_candidate_prescanning_ready
+
+    notify_candidate_prescanning_ready(application=application, prescan_session=prescan_session)
 
 
 def _submission_result(*, application: Application, prescan_session: Interview) -> dict:

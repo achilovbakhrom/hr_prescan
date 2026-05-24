@@ -39,7 +39,8 @@ async function enforceInitialRouteAccess(): Promise<void> {
   if (
     authStore.isAuthenticated &&
     authStore.user?.onboardingCompleted === true &&
-    authStore.user.role === 'hr' &&
+    authStore.activeMode === 'hr' &&
+    authStore.currentAccessRole !== 'candidate' &&
     !authStore.user.company &&
     route.name !== ROUTE_NAMES.COMPANY_SETUP
   ) {
@@ -48,7 +49,8 @@ async function enforceInitialRouteAccess(): Promise<void> {
   }
 
   const allowedRoles = route.meta.roles as string[] | undefined
-  if (allowedRoles && authStore.user && !allowedRoles.includes(authStore.user.role)) {
+  const accessRole = authStore.currentAccessRole
+  if (allowedRoles && accessRole && !allowedRoles.includes(accessRole)) {
     await navigateTo({ name: ROUTE_NAMES.FORBIDDEN }, { replace: true })
   }
 }

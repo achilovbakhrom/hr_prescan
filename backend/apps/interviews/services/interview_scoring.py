@@ -57,6 +57,7 @@ def complete_session(
     interview.save(update_fields=update_fields)
 
     application = interview.application
+    candidate_interview = None
 
     if interview.session_type == Interview.SessionType.PRESCANNING:
         if ai_decision == "reject":
@@ -66,7 +67,7 @@ def complete_session(
             application.status = Application.Status.PRESCANNED
             from apps.applications.services import create_interview_session
 
-            create_interview_session(application=application)
+            candidate_interview = create_interview_session(application=application)
         else:
             # Prescanning is the final AI step → shortlist on advance
             application.status = Application.Status.SHORTLISTED
@@ -78,6 +79,11 @@ def complete_session(
             application.status = Application.Status.SHORTLISTED
 
     application.save(update_fields=["status", "updated_at"])
+    if candidate_interview is not None:
+        from apps.notifications.services import notify_candidate_interview_ready
+
+        notify_candidate_interview_ready(application=application, interview=candidate_interview)
+
     from apps.applications.services.candidate_base import sync_hr_candidate_for_application
 
     sync_hr_candidate_for_application(application=application)

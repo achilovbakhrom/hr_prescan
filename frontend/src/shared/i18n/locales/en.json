@@ -129,7 +129,8 @@
       "emailPlaceholder": "Enter your email",
       "emailInvalid": "Please enter a valid email address.",
       "passwordPlaceholder": "Enter your password",
-      "passwordRequired": "Password is required."
+      "passwordRequired": "Password is required.",
+      "googleFailed": "Google sign-in failed. Please try again."
     },
     "telegram": {
       "signIn": "Sign in with Telegram",
@@ -162,7 +163,9 @@
       "firstNameRequired": "First name is required.",
       "lastNameRequired": "Last name is required.",
       "emailInvalid": "Please enter a valid email address.",
-      "orRegisterWithEmail": "or register with email"
+      "orRegisterWithEmail": "or register with email",
+      "registerFailed": "Registration failed. Please try again.",
+      "googleFailed": "Google sign-in failed. Please try again."
     },
     "verifyEmail": {
       "title": "Verify Your Email",
