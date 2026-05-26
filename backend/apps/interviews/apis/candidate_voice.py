@@ -154,14 +154,17 @@ class VoiceMessageAudioApi(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+        from apps.interviews.transcription_service import (
+            _get_s3_client,
+            is_voice_message_s3_key,
+        )
+
         audio_url = message["audio_url"]
-        if not audio_url.startswith("voice-messages/"):
+        if not is_voice_message_s3_key(audio_url):
             return Response(
                 {"detail": str(MSG_INVALID_AUDIO_URL)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
-        from apps.interviews.transcription_service import _get_s3_client
 
         s3 = _get_s3_client()
         try:

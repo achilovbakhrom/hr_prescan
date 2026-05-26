@@ -49,6 +49,15 @@ def upload_voice_message_to_s3(*, file_obj, interview_id: str, filename: str = "
     return key
 
 
+def is_voice_message_s3_key(key: str) -> bool:
+    """Return whether a stored object key is a voice-message object."""
+    prefix = (getattr(settings, "S3_KEY_PREFIX", "") or "").strip("/")
+    allowed_prefixes = ["voice-messages/"]
+    if prefix:
+        allowed_prefixes.append(f"{prefix}/voice-messages/")
+    return any(key.startswith(allowed_prefix) for allowed_prefix in allowed_prefixes)
+
+
 def transcribe_audio(*, file_bytes: bytes, filename: str = "audio.webm") -> str:
     """Transcribe audio using Google Gemini multimodal API. Returns transcript text."""
     client = genai.Client(api_key=settings.GOOGLE_API_KEY)

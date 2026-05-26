@@ -66,7 +66,7 @@ const { t } = useI18n()
           </div>
           <VoiceMessageBubble
             v-else
-            :audio-url="getAudioUrl(idx)"
+            :audio-url="msg.audioPlaybackUrl || getAudioUrl(idx)"
             :duration="msg.duration || 0"
             :transcript="msg.text"
           />

@@ -40,6 +40,7 @@ export interface ChatMessage {
   timestamp: string
   messageType?: 'text' | 'voice'
   audioUrl?: string
+  audioPlaybackUrl?: string
   duration?: number
 }
 

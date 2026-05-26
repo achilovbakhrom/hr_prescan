@@ -41,6 +41,11 @@ export function useChatInterview(token: string) {
   function getAudioUrl(index: number): string {
     return interviewService.getVoiceAudioUrl(token, index)
   }
+  function withVoicePlaybackUrls(chatHistory: ChatMessage[]): ChatMessage[] {
+    return chatHistory.map((msg, index) =>
+      msg.messageType === 'voice' ? { ...msg, audioPlaybackUrl: getAudioUrl(index) } : msg,
+    )
+  }
 
   function checkInterviewComplete(text: string): void {
     if (text.includes('[INTERVIEW_COMPLETE]') || text.includes('[END]')) {
@@ -111,10 +116,20 @@ export function useChatInterview(token: string) {
     scrollToBottom()
     try {
       const result = await interviewService.sendVoiceMessage(token, blob, voiceDuration)
+      let refreshedHistory = false
       const lastMsg = messages.value[messages.value.length - 1]
-      if (lastMsg?.role === 'candidate') lastMsg.text = result.candidateTranscript
+      if (lastMsg?.role === 'candidate') {
+        lastMsg.text = result.candidateTranscript
+        lastMsg.audioPlaybackUrl = getAudioUrl(messages.value.length - 1)
+      }
+      try {
+        messages.value = withVoicePlaybackUrls(await interviewService.getChatHistory(token))
+        refreshedHistory = true
+      } catch {
+        /* Keep optimistic message if history refresh is unavailable. */
+      }
       isTyping.value = false
-      messages.value.push(result.aiMessage)
+      if (!refreshedHistory) messages.value.push(result.aiMessage)
       checkInterviewComplete(result.aiMessage.text)
       await refreshStatus()
     } catch {
@@ -174,9 +189,9 @@ export function useChatInterview(token: string) {
       if (data.status === 'pending') {
         const started = await interviewService.startInterview(token)
         interview.value = started
-        if (started.chatHistory?.length) messages.value = started.chatHistory
+        if (started.chatHistory?.length) messages.value = withVoicePlaybackUrls(started.chatHistory)
       } else if (data.status === 'in_progress') {
-        messages.value = await interviewService.getChatHistory(token)
+        messages.value = withVoicePlaybackUrls(await interviewService.getChatHistory(token))
       }
       loading.value = false
       await nextTick()
