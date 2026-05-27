@@ -115,9 +115,7 @@ class TestVoiceMessageAudioApi:
             ],
         )
 
-        response = APIClient().get(
-            f"/api/public/interview/{interview.interview_token}/chat/voice/1/audio/"
-        )
+        response = APIClient().get(f"/api/public/interview/{interview.interview_token}/chat/voice/1/audio/")
 
         assert response.status_code == 200
         assert response.content == b"audio-bytes"
@@ -156,9 +154,7 @@ class TestVoiceMessageAudioApi:
             ],
         )
 
-        response = APIClient().get(
-            f"/api/public/interview/{interview.interview_token}/chat/voice/1/audio/"
-        )
+        response = APIClient().get(f"/api/public/interview/{interview.interview_token}/chat/voice/1/audio/")
 
         assert response.status_code == 200
         assert response.content == b"prefixed-audio"
