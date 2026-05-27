@@ -4,6 +4,7 @@ import logging
 import time
 
 from django.conf import settings
+from django.db import transaction
 from rest_framework import serializers, status
 from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
@@ -11,10 +12,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from apps.accounts.cv_services import get_or_create_candidate_profile
 from apps.accounts.models import User
 from apps.accounts.serializers import UserOutputSerializer
 from apps.applications.services import bind_existing_applications
 from apps.common.messages import MSG_ACCOUNT_DEACTIVATED
+from apps.integrations.telegram_bot.hr.onboarding import is_hr_placeholder, merge_hr_placeholder
 
 logger = logging.getLogger(__name__)
 
@@ -65,35 +68,43 @@ class TelegramAuthApi(APIView):
         last_name = data.get("last_name", "")
         username = data.get("username", "")
 
-        # Telegram Login is candidate-facing; HR bot links are scoped separately.
-        user = User.objects.filter(telegram_id=telegram_id, role=User.Role.CANDIDATE).first()
+        created = False
 
-        if user is None:
-            # Create new candidate user (no email — Telegram doesn't provide one)
-            user = User.objects.create_user(
-                email=f"tg_{telegram_id}@telegram.local",
-                password=None,
-                first_name=first_name,
-                last_name=last_name,
-                role=User.Role.CANDIDATE,
-                email_verified=True,
-            )
-            user.telegram_id = telegram_id
-            user.telegram_username = username
-            user.onboarding_completed = False
-            user.save(update_fields=["telegram_id", "telegram_username", "onboarding_completed", "updated_at"])
-            logger.info("Created new user via Telegram auth: tg_id=%s", telegram_id)
+        with transaction.atomic():
+            # Telegram Login is candidate-facing; HR bot links are scoped separately.
+            user = User.objects.select_for_update().filter(telegram_id=telegram_id, role=User.Role.CANDIDATE).first()
+
+            if user is None:
+                # Create new candidate user (no email — Telegram doesn't provide one)
+                user = User.objects.create_user(
+                    email=f"tg_{telegram_id}@telegram.local",
+                    password=None,
+                    first_name=first_name,
+                    last_name=last_name,
+                    role=User.Role.CANDIDATE,
+                    email_verified=True,
+                )
+                user.telegram_id = telegram_id
+                user.telegram_username = username
+                user.onboarding_completed = False
+                user.save(update_fields=["telegram_id", "telegram_username", "onboarding_completed", "updated_at"])
+                logger.info("Created new user via Telegram auth: tg_id=%s", telegram_id)
+                created = True
+            elif not user.is_active:
+                return Response(
+                    {"detail": str(MSG_ACCOUNT_DEACTIVATED)},
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+
+            self._merge_hr_placeholder_if_needed(user=user, telegram_id=telegram_id)
+
+            # Update username if changed
+            if user.telegram_username != username and username:
+                user.telegram_username = username
+                user.save(update_fields=["telegram_username", "updated_at"])
+
+        if created:
             bind_existing_applications(user=user)
-        elif not user.is_active:
-            return Response(
-                {"detail": str(MSG_ACCOUNT_DEACTIVATED)},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
-
-        # Update username if changed
-        if user.telegram_username != username and username:
-            user.telegram_username = username
-            user.save(update_fields=["telegram_username", "updated_at"])
 
         refresh = RefreshToken.for_user(user)
 
@@ -107,6 +118,22 @@ class TelegramAuthApi(APIView):
             },
             status=status.HTTP_200_OK,
         )
+
+    @staticmethod
+    def _merge_hr_placeholder_if_needed(*, user: User, telegram_id: int) -> None:
+        hr_user = (
+            User.objects.select_for_update()
+            .filter(telegram_id=telegram_id, role__in=[User.Role.ADMIN, User.Role.HR])
+            .exclude(id=user.id)
+            .first()
+        )
+        if hr_user is None or not is_hr_placeholder(user=hr_user, telegram_id=telegram_id):
+            return
+
+        if user.role == User.Role.CANDIDATE:
+            get_or_create_candidate_profile(user=user)
+        merge_hr_placeholder(source=hr_user, target=user)
+        user.refresh_from_db()
 
     @staticmethod
     def _verify_telegram_hash(data: dict) -> bool:

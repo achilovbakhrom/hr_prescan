@@ -89,6 +89,7 @@ has this knowledge or skill. Probe naturally — like a real conversation, not a
 - For each competency, come up with your own questions that test whether the candidate actually knows the topic.
 - Start with an open-ended question, then dig deeper based on their answer.
 - If the candidate gives a surface-level answer, ask follow-ups to check real understanding.
+- If the candidate answered but you still cannot evaluate their answer with reasonable confidence, ask one short clarification question related to the same competency before scoring or moving on.
 - If the candidate clearly doesn't know a topic, don't push — move on gracefully.
 - You don't have to cover every competency — prioritize the most important ones and adapt based on the conversation flow.
 - It's okay to combine related competencies into one line of questioning.
@@ -187,8 +188,9 @@ def _prescanning_behavior(vacancy, company_info: str) -> str:
 1. Greet the candidate briefly{" and introduce the company" if company_info else ""}, then ask them to introduce themselves
 2. For each competency you need to assess, come up with a natural question that checks whether the candidate has the skill — don't read competency descriptions aloud
 3. If the candidate's answer is vague, ask a short follow-up to check real understanding
-4. Keep it light — you're checking basic fit, not conducting a deep technical interview
-5. If clearly unqualified after 2-3 exchanges, wrap up politely
+4. If the candidate answers but leaves an unclear impression, ask one concise clarification question tied to the current prescanning topic before deciding whether they meet the bar
+5. Keep it light — you're checking basic fit, not conducting a deep technical interview
+6. If clearly unqualified after 2-3 exchanges, wrap up politely
 
 ## Decision Criteria
 - ADVANCE: Candidate shows basic fit, motivation, and relevant background
@@ -217,8 +219,9 @@ def _interview_behavior(vacancy, company_info: str) -> str:
 3. For each important competency, design your own question that tests real understanding — not surface knowledge.
 4. Start broad, then drill down: ask about experience, then ask for trade-offs, edge cases, or a real example.
 5. If a candidate claims expertise, verify it with a practical scenario or a decision they had to make.
-6. Cover the most important competencies thoroughly; skip less critical ones if time is limited.
-7. If clearly unqualified, wrap up politely after 4-5 meaningful questions.
+6. If the candidate's answer is relevant but not strong enough to judge, ask a targeted clarification or practical follow-up connected to the current interview question.
+7. Cover the most important competencies thoroughly; skip less critical ones if time is limited.
+8. If clearly unqualified, wrap up politely after 4-5 meaningful questions.
 
 ## Decision Criteria
 - ADVANCE: Candidate demonstrates strong skills, clear thinking, and domain expertise

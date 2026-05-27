@@ -290,6 +290,7 @@ Candidates can apply via two surfaces: the **web app** (public job board) and th
   - existing HR/admin users can still open the public bot and link themselves by entering their work email and confirming a 6-digit code sent to that email before a Telegram-first placeholder is created
   - authenticated HR/admin users can still use **Settings -> Telegram** in the web app to generate a one-time deep link; the HR bot asks for confirmation before connecting it
   - if that person later creates a web account and connects Telegram from web settings, the Telegram-first placeholder workspace is merged into the confirmed web account, including companies, vacancies, team memberships, invitations, notifications, messages, and subscription state where applicable; if the web account already has a default company, that company remains the default after merge
+  - if the same Telegram identity already has both a candidate placeholder (`tg_<telegram_id>@telegram.local`) and an HR-bot placeholder (`tg_hr_<telegram_id>@telegram.local`), web Telegram login merges the HR-bot workspace into the candidate account so the header account-mode switch exposes both HR and candidate spaces from one authenticated user
 - Authenticated candidate users can use **Profile -> Telegram** in the web app to generate a one-time `link_<token>` deep link. The candidate bot asks for confirmation before connecting the Telegram identity to the web profile.
 - Candidate-facing web screens also expose Telegram shortcuts in key places:
   - post-apply / prescanning-ready screen
@@ -385,14 +386,14 @@ Prescanning is the initial AI screening step. It is always enabled and always co
   - Prescanning evaluation criteria set by HR
 - HR can review, edit, add, or remove AI-suggested questions before publishing the vacancy
 - Questions cover both fixed categories and custom criteria (see 7.5)
-- **AI autonomy:** Beyond the HR-specified questions, the AI agent may ask additional questions or follow-ups based on the candidate's answers and CV data. HR-specified questions are the baseline, not the ceiling.
+- **AI autonomy:** Beyond the HR-specified questions, the AI agent may ask additional questions or follow-ups based on the candidate's answers and CV data. HR-specified questions are the baseline, not the ceiling. If a candidate answers but leaves an unclear impression and the AI cannot evaluate the answer confidently, the AI should ask a short clarification question tied to the same prescanning topic before scoring or moving on.
 - **Additional prompt:** HR can provide a free-text prompt with extra instructions for the AI agent (e.g., "Focus on communication skills", "Be lenient with junior candidates"). The agent reads and follows this prompt during the conversation.
 
 **Prescanning Flow:**
 1. Candidate opens the prescanning link
 2. AI greeting message appears immediately
 3. AI asks questions one by one; candidate types responses. If contact details are needed from an unauthenticated candidate, the AI asks for any HR contact method such as phone, email, Telegram, or WhatsApp, and must not require email specifically.
-4. AI can ask follow-up questions or probe deeper based on answers
+4. AI can ask follow-up questions or probe deeper based on answers, including a clarification question when a response is relevant but too vague to evaluate confidently
 5. Prescanning concludes when AI determines it has gathered enough information
 6. AI thanks the candidate and ends the session
 7. Candidate sees a "Thank you" screen with a suggestion to create an account (if unauthenticated)
@@ -428,7 +429,7 @@ Interview is the second, more rigorous AI screening step. HR enables it per vaca
   - Prescanning results (AI can reference what was discussed in prescanning to go deeper)
 - HR can review, edit, add, or remove AI-suggested questions
 - Interview questions are separate from prescanning questions and are typically tougher, more technical, or more domain-specific
-- **AI autonomy:** The AI agent may ask additional questions, present practical cases, or challenge the candidate's claims. The agent is expected to be more demanding than during prescanning.
+- **AI autonomy:** The AI agent may ask additional questions, present practical cases, or challenge the candidate's claims. The agent is expected to be more demanding than during prescanning. If an answer is relevant but not clear enough to evaluate strongly, the AI should ask a targeted clarification or practical follow-up connected to the current interview question.
 - **Additional prompt:** HR can provide a free-text prompt with extra instructions for the interview AI agent (e.g., "Be strict about technical knowledge", "Test system design thinking", "Present a real-world scenario"). This prompt is separate from the prescanning prompt.
 
 **Interview Flow — Meet/video:**
