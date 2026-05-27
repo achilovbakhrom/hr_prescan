@@ -73,20 +73,23 @@ def merge_hr_placeholder(*, source: User, target: User) -> None:
 
     _move_memberships(source=source, target=target)
     _move_subscription(source=source, target=target)
-    _activate_default_membership(user=target)
     _merge_language(source=source, target=target)
-
-    source.telegram_id = None
-    source.telegram_username = ""
-    source.is_active = False
-    source.company = None
-    source.save(update_fields=["telegram_id", "telegram_username", "is_active", "company", "updated_at"])
+    _deactivate_source_identity(source=source)
+    _activate_default_membership(user=target)
 
 
 def _merge_language(*, source: User, target: User) -> None:
     if source.language and source.language != target.language:
         target.language = source.language
         target.save(update_fields=["language", "updated_at"])
+
+
+def _deactivate_source_identity(*, source: User) -> None:
+    source.telegram_id = None
+    source.telegram_username = ""
+    source.is_active = False
+    source.company = None
+    source.save(update_fields=["telegram_id", "telegram_username", "is_active", "company", "updated_at"])
 
 
 def _move_memberships(*, source: User, target: User) -> None:

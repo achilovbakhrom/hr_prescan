@@ -290,6 +290,7 @@ Candidates can apply via two surfaces: the **web app** (public job board) and th
   - existing HR/admin users can still open the public bot and link themselves by entering their work email and confirming a 6-digit code sent to that email before a Telegram-first placeholder is created
   - authenticated HR/admin users can still use **Settings -> Telegram** in the web app to generate a one-time deep link; the HR bot asks for confirmation before connecting it
   - if that person later creates a web account and connects Telegram from web settings, the Telegram-first placeholder workspace is merged into the confirmed web account, including companies, vacancies, team memberships, invitations, notifications, messages, and subscription state where applicable; if the web account already has a default company, that company remains the default after merge
+  - if the same Telegram identity already has both a candidate placeholder (`tg_<telegram_id>@telegram.local`) and an HR-bot placeholder (`tg_hr_<telegram_id>@telegram.local`), web Telegram login merges the HR-bot workspace into the candidate account so the header account-mode switch exposes both HR and candidate spaces from one authenticated user
 - Authenticated candidate users can use **Profile -> Telegram** in the web app to generate a one-time `link_<token>` deep link. The candidate bot asks for confirmation before connecting the Telegram identity to the web profile.
 - Candidate-facing web screens also expose Telegram shortcuts in key places:
   - post-apply / prescanning-ready screen
