@@ -54,9 +54,9 @@ const widthClass: Record<Width, string> = {
     <!-- auth-wrap owns the ambient glow. It sits OUTSIDE GlassCard
          because GlassCard has `overflow-hidden` which clips any ::after. -->
     <div class="auth-wrap relative w-full" :class="widthClass[width]">
-      <!-- Prism glyph atop the card for brand presence -->
+      <!-- Linked brand mark atop the card for navigation back to the public home page. -->
       <div class="relative z-10 mb-6 flex justify-center">
-        <AppLogo variant="glyph" size="lg" :linked="false" />
+        <AppLogo variant="full" size="lg" to="/" />
       </div>
 
       <GlassCard class="relative z-10">
