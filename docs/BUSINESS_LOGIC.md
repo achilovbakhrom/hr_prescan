@@ -385,14 +385,14 @@ Prescanning is the initial AI screening step. It is always enabled and always co
   - Prescanning evaluation criteria set by HR
 - HR can review, edit, add, or remove AI-suggested questions before publishing the vacancy
 - Questions cover both fixed categories and custom criteria (see 7.5)
-- **AI autonomy:** Beyond the HR-specified questions, the AI agent may ask additional questions or follow-ups based on the candidate's answers and CV data. HR-specified questions are the baseline, not the ceiling.
+- **AI autonomy:** Beyond the HR-specified questions, the AI agent may ask additional questions or follow-ups based on the candidate's answers and CV data. HR-specified questions are the baseline, not the ceiling. If a candidate answers but leaves an unclear impression and the AI cannot evaluate the answer confidently, the AI should ask a short clarification question tied to the same prescanning topic before scoring or moving on.
 - **Additional prompt:** HR can provide a free-text prompt with extra instructions for the AI agent (e.g., "Focus on communication skills", "Be lenient with junior candidates"). The agent reads and follows this prompt during the conversation.
 
 **Prescanning Flow:**
 1. Candidate opens the prescanning link
 2. AI greeting message appears immediately
 3. AI asks questions one by one; candidate types responses. If contact details are needed from an unauthenticated candidate, the AI asks for any HR contact method such as phone, email, Telegram, or WhatsApp, and must not require email specifically.
-4. AI can ask follow-up questions or probe deeper based on answers
+4. AI can ask follow-up questions or probe deeper based on answers, including a clarification question when a response is relevant but too vague to evaluate confidently
 5. Prescanning concludes when AI determines it has gathered enough information
 6. AI thanks the candidate and ends the session
 7. Candidate sees a "Thank you" screen with a suggestion to create an account (if unauthenticated)
@@ -428,7 +428,7 @@ Interview is the second, more rigorous AI screening step. HR enables it per vaca
   - Prescanning results (AI can reference what was discussed in prescanning to go deeper)
 - HR can review, edit, add, or remove AI-suggested questions
 - Interview questions are separate from prescanning questions and are typically tougher, more technical, or more domain-specific
-- **AI autonomy:** The AI agent may ask additional questions, present practical cases, or challenge the candidate's claims. The agent is expected to be more demanding than during prescanning.
+- **AI autonomy:** The AI agent may ask additional questions, present practical cases, or challenge the candidate's claims. The agent is expected to be more demanding than during prescanning. If an answer is relevant but not clear enough to evaluate strongly, the AI should ask a targeted clarification or practical follow-up connected to the current interview question.
 - **Additional prompt:** HR can provide a free-text prompt with extra instructions for the interview AI agent (e.g., "Be strict about technical knowledge", "Test system design thinking", "Present a real-world scenario"). This prompt is separate from the prescanning prompt.
 
 **Interview Flow — Meet/video:**

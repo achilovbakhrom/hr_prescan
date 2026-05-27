@@ -50,6 +50,34 @@ class TestStartSession:
 
         assert "You MUST respond ONLY in Russian" in prompt
 
+    def test_prescanning_prompt_allows_clarification_when_answer_is_unclear(self, vacancy):
+        app = ApplicationFactory(vacancy=vacancy, status=Application.Status.APPLIED)
+        session = InterviewFactory(
+            application=app,
+            session_type=Interview.SessionType.PRESCANNING,
+            screening_mode=Interview.ScreeningMode.CHAT,
+            status=Interview.Status.PENDING,
+        )
+
+        prompt = build_system_prompt(session)
+
+        assert "cannot evaluate their answer with reasonable confidence" in prompt
+        assert "one concise clarification question tied to the current prescanning topic" in prompt
+
+    def test_interview_prompt_allows_clarification_when_answer_is_unclear(self, vacancy):
+        app = ApplicationFactory(vacancy=vacancy, status=Application.Status.PRESCANNED)
+        session = InterviewFactory(
+            application=app,
+            session_type=Interview.SessionType.INTERVIEW,
+            screening_mode=Interview.ScreeningMode.MEET,
+            status=Interview.Status.PENDING,
+        )
+
+        prompt = build_system_prompt(session)
+
+        assert "cannot evaluate their answer with reasonable confidence" in prompt
+        assert "ask a targeted clarification or practical follow-up" in prompt
+
 
 class TestCompleteSession:
     def test_complete_prescanning_advances_to_shortlisted_when_final_step(self, vacancy):
