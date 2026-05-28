@@ -1,6 +1,7 @@
 from django.urls import path
 
 from apps.vacancies.apis import (
+    GenerateInstructionsApi,
     GenerateQuestionsApi,
     GenerateVacancyContentApi,
     ParseCompanyFileApi,
@@ -46,6 +47,11 @@ hr_urlpatterns = [
         "<uuid:vacancy_id>/questions/generate/",
         GenerateQuestionsApi.as_view(),
         name="vacancy-generate-questions",
+    ),
+    path(
+        "<uuid:vacancy_id>/instructions/generate/",
+        GenerateInstructionsApi.as_view(),
+        name="vacancy-generate-instructions",
     ),
     path(
         "<uuid:vacancy_id>/regenerate-keywords/",

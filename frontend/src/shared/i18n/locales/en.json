@@ -559,18 +559,18 @@
       "prescanningAlwaysEnabled": "Always enabled",
       "prescanningHint": "Every candidate goes through automated AI prescanning after applying. The AI probes fit, filters weak matches, and scores answers against your criteria.",
       "prescanningLinkHint": "Candidates can complete prescreening from a unique link without signing in.",
-      "prescanningPrompt": "Additional Instructions for AI",
-      "prescanningPromptHint": "Guide the AI's behavior during prescanning. It already knows the vacancy details.",
-      "prescanningPromptPlaceholder": "e.g. Focus on their experience with microservices architecture...",
-      "prescanningLanguage": "Prescanning Language",
-      "prescanningLanguageHint": "Language the AI agent will use during prescanning",
+      "prescanningPrompt": "AI instructions",
+      "prescanningPromptHint": "Tell the AI what to focus on. You can write instructions or sample questions in any language.",
+      "prescanningPromptPlaceholder": "Focus on real project experience, motivation, availability, and must-have skills...",
+      "prescanningLanguage": "Screening language",
+      "prescanningLanguageHint": "Language the AI agent will use with candidates",
       "interviewOptional": "Second-step AI Interview",
       "interviewHint": "Enable a deeper interview for candidates who passed prescanning.",
       "interviewMode": "Interview Mode",
       "interviewDuration": "Duration (minutes)",
-      "interviewPrompt": "Additional Instructions for AI",
-      "interviewPromptHint": "Guide the interview AI. It will be tougher and more probing than prescanning.",
-      "interviewPromptPlaceholder": "e.g. Ask deeper technical questions about system design..."
+      "interviewPrompt": "AI instructions",
+      "interviewPromptHint": "Tell the interview AI what to probe more deeply. You can write instructions or sample questions in any language.",
+      "interviewPromptPlaceholder": "Ask for concrete examples, tradeoffs, decisions, and proof of senior-level claims..."
     },
     "overview": {
       "employmentType": "Employment",
@@ -670,6 +670,19 @@
     "screening": {
       "languageAndInstructions": "Language & instructions",
       "languageHint": "How the AI talks to candidates and any extra guidance for the AI agent."
+    },
+    "instructions": {
+      "title": "AI instructions",
+      "hint": "Tell the AI what to focus on during this step. You can write in any language and include topics, rules, red flags, tone, or a plain text list of questions.",
+      "placeholder": "Focus on real work experience with the required skills.\nAsk for concrete examples, not theory only.\nCheck motivation, availability, salary expectations, and communication clarity.\nBe strict about claims that do not match the candidate's CV.\nAlso ask:\n- Why are you interested in this role?\n- When can you start?",
+      "example": "Example: Focus on React, TypeScript, REST APIs, and teamwork. Ask for one real project example and one difficult technical decision. Be friendly but verify vague senior-level claims.",
+      "generate": "Generate AI Instructions",
+      "generated": "AI instructions generated",
+      "styleLight": "Light",
+      "styleBalanced": "Balanced",
+      "styleStrict": "Strict",
+      "advancedQuestions": "Advanced: sample questions",
+      "advancedQuestionsHint": "Optional question seeds for the AI. The agent treats them as guidance and may ask natural follow-ups instead of following a rigid script."
     },
     "settings": {
       "visibility": "Visibility & application",

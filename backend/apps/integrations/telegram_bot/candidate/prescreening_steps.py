@@ -22,7 +22,7 @@ from apps.integrations.telegram_bot.candidate.states import (
     STATE_PS_CONFIRM_PHONE,
 )
 from apps.integrations.telegram_bot.i18n import t
-from apps.integrations.telegram_bot.sessions import clear_session, update_session
+from apps.integrations.telegram_bot.sessions import update_session
 
 logger = logging.getLogger(__name__)
 
@@ -80,7 +80,7 @@ def go_to_cv_step(*, client, chat_id: int, user, session: dict, lang: str) -> No
 def start_interview_submission(*, client, chat_id: int, user, session: dict, lang: str) -> None:
     from apps.applications.services import submit_application
     from apps.integrations.telegram_bot.candidate.interview_flow import start_bot_interview
-    from apps.vacancies.models import InterviewQuestion, Vacancy
+    from apps.vacancies.models import Vacancy
 
     try:
         vacancy_id = UUID(session.get(SK_VACANCY_ID, ""))
@@ -101,20 +101,6 @@ def start_interview_submission(*, client, chat_id: int, user, session: dict, lan
         )
     except ApplicationError as exc:
         client.send_message(chat_id=chat_id, text=str(exc.message))
-        return
-
-    questions = list(
-        InterviewQuestion.objects.filter(
-            vacancy_id=vacancy_id,
-            step="prescanning",
-            is_active=True,
-        )
-        .order_by("order")
-        .values_list("text", flat=True)
-    )
-    if not questions:
-        client.send_message(chat_id=chat_id, text=t("candidate.ps_no_questions", lang=lang))
-        clear_session(role=ROLE_CANDIDATE, telegram_id=user.telegram_id)
         return
 
     vacancy = Vacancy.objects.filter(id=vacancy_id).first()

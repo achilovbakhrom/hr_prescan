@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 
 from apps.common.exceptions import ApplicationError
 from apps.interviews.models import Interview
-from apps.vacancies.models import InterviewQuestion, ScreeningStep, Vacancy
+from apps.vacancies.models import ScreeningStep, Vacancy
 from apps.vacancies.serializers import VacancyDetailOutputSerializer
 from apps.vacancies.services import (
     archive_vacancy,
@@ -289,37 +289,30 @@ class TestGenerateVacancyContent:
 
 
 class TestPublishVacancy:
-    def test_publish_requires_prescanning_questions(self, company, hr_user):
-        """Cannot publish a vacancy without active prescanning questions."""
+    def test_publish_does_not_require_prescanning_questions(self, company, hr_user):
+        """Questions are optional guidance; criteria are enough to publish."""
         vac = VacancyFactory(
             company=company,
             created_by=hr_user,
             status=Vacancy.Status.DRAFT,
         )
+        create_default_criteria(vacancy=vac, step=ScreeningStep.PRESCANNING)
 
-        with pytest.raises(ApplicationError, match="prescanning questions"):
-            publish_vacancy(vacancy=vac)
+        published = publish_vacancy(vacancy=vac)
 
-    def test_publish_with_interview_requires_interview_questions(self, company, hr_user):
-        """If interview_enabled, publishing also requires active interview questions."""
+        assert published.status == Vacancy.Status.PUBLISHED
+
+    def test_publish_with_interview_requires_interview_criteria(self, company, hr_user):
+        """If interview_enabled, publishing requires interview criteria, not questions."""
         vac = VacancyFactory(
             company=company,
             created_by=hr_user,
             status=Vacancy.Status.DRAFT,
             interview_enabled=True,
         )
-        # Add a prescanning question (required)
-        InterviewQuestion.objects.create(
-            vacancy=vac,
-            text="Why do you want this role?",
-            step=ScreeningStep.PRESCANNING,
-            is_active=True,
-            order=1,
-        )
         create_default_criteria(vacancy=vac, step=ScreeningStep.PRESCANNING)
-        # No interview questions yet
 
-        with pytest.raises(ApplicationError, match="interview questions"):
+        with pytest.raises(ApplicationError, match="interview evaluation criteria"):
             publish_vacancy(vacancy=vac)
 
 

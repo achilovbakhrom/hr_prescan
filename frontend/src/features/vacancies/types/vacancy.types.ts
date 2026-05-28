@@ -58,6 +58,12 @@ export interface GenerateQuestionsResponse {
   criteria: VacancyCriteria[]
 }
 
+export type InstructionStyle = 'light' | 'balanced' | 'strict'
+
+export interface GenerateInstructionsResponse {
+  instruction: string
+}
+
 export interface CreateVacancyRequest {
   title: string
   description: string

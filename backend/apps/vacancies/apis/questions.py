@@ -15,6 +15,7 @@ from apps.vacancies.services import (
     add_interview_question,
     delete_interview_question,
     generate_interview_questions,
+    generate_screening_instruction,
     generate_vacancy_criteria,
     update_interview_question,
 )
@@ -144,3 +145,32 @@ class GenerateQuestionsApi(APIView):
             },
             status=status.HTTP_201_CREATED,
         )
+
+
+class GenerateInstructionsApi(APIView):
+    """POST /api/hr/vacancies/{id}/instructions/generate/ — AI-generate editable instructions."""
+
+    permission_classes = [HasHRPermission]
+    hr_permission = HRPermissions.MANAGE_VACANCIES
+
+    class InputSerializer(serializers.Serializer):
+        step = serializers.ChoiceField(
+            choices=ScreeningStep.choices,
+            required=False,
+            default=ScreeningStep.PRESCANNING,
+        )
+        style = serializers.ChoiceField(
+            choices=("light", "balanced", "strict"),
+            required=False,
+            default="balanced",
+        )
+
+    def post(self, request: Request, vacancy_id: str) -> Response:
+        vacancy = get_user_vacancy_by_id(vacancy_id=vacancy_id, user=request.user)
+        if vacancy is None:
+            return Response({"detail": str(MSG_VACANCY_NOT_FOUND)}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = self.InputSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        instruction = generate_screening_instruction(vacancy=vacancy, **serializer.validated_data)
+        return Response({"instruction": instruction}, status=status.HTTP_200_OK)

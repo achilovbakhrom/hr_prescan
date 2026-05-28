@@ -664,6 +664,19 @@
       "languageAndInstructions": "Langue et instructions",
       "languageHint": "Comment l'IA parle aux candidats et conseils supplémentaires pour l'agent IA."
     },
+    "instructions": {
+      "title": "AI instructions",
+      "hint": "Tell the AI what to focus on during this step. You can write in any language and include topics, rules, red flags, tone, or a plain text list of questions.",
+      "placeholder": "Focus on real work experience with the required skills.\nAsk for concrete examples, not theory only.\nCheck motivation, availability, salary expectations, and communication clarity.\nBe strict about claims that do not match the candidate's CV.\nAlso ask:\n- Why are you interested in this role?\n- When can you start?",
+      "example": "Example: Focus on React, TypeScript, REST APIs, and teamwork. Ask for one real project example and one difficult technical decision. Be friendly but verify vague senior-level claims.",
+      "generate": "Generate AI Instructions",
+      "generated": "AI instructions generated",
+      "styleLight": "Light",
+      "styleBalanced": "Balanced",
+      "styleStrict": "Strict",
+      "advancedQuestions": "Advanced: sample questions",
+      "advancedQuestionsHint": "Optional question seeds for the AI. The agent treats them as guidance and may ask natural follow-ups instead of following a rigid script."
+    },
     "settings": {
       "visibility": "Visibilité et application",
       "interviewStep": "Étape de l'entretien",

@@ -664,6 +664,19 @@
       "languageAndInstructions": "Til va ko'rsatmalar",
       "languageHint": "AI nomzodlar bilan qaysi tilda gaplashadi va qo'shimcha ko'rsatmalar."
     },
+    "instructions": {
+      "title": "AI uchun ko'rsatmalar",
+      "hint": "Ushbu bosqichda AI nimalarga e'tibor berishini yozing. Istalgan tilda yozishingiz, mavzular, qoidalar, red flaglar, ohang yoki savollar ro'yxatini qo'shishingiz mumkin.",
+      "placeholder": "Majburiy ko'nikmalar bo'yicha real ish tajribasiga e'tibor ber.\nFaqat nazariya emas, aniq misollar so'ra.\nMotivatsiya, qachon boshlashi, maosh kutilmalari va muloqot ravshanligini tekshir.\nCV bilan mos kelmaydigan da'volarga qat'iyroq bo'l.\nShuningdek so'ra:\n- Nega bu rol sizga qiziq?\n- Qachon boshlay olasiz?",
+      "example": "Misol: React, TypeScript, REST API va jamoaviy ishga e'tibor ber. Bitta real loyiha va bitta murakkab texnik qaror haqida so'ra. Do'stona bo'l, lekin noaniq senior da'volarni tekshir.",
+      "generate": "AI ko'rsatmalarini yaratish",
+      "generated": "AI ko'rsatmalari yaratildi",
+      "styleLight": "Yengil",
+      "styleBalanced": "Muvozanatli",
+      "styleStrict": "Qat'iy",
+      "advancedQuestions": "Qo'shimcha: namunaviy savollar",
+      "advancedQuestionsHint": "AI uchun ixtiyoriy savol yo'nalishlari. Agent ularni qat'iy skript emas, yo'l-yo'riq sifatida ishlatadi va tabiiy follow-up savollar beradi."
+    },
     "settings": {
       "visibility": "Ko'rinish va arizalar",
       "interviewStep": "Suhbat bosqichi",

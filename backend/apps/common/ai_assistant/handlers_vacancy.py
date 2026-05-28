@@ -116,20 +116,20 @@ def handle_publish_vacancy(*, user, params):
     from apps.vacancies.services import publish_vacancy
 
     vacancy = resolve_vacancy(user=user, title=params.get("vacancy_title", ""))
-    prescreen_criteria, prescreen_questions = ensure_vacancy_screening_setup(
+    prescreen_criteria, prescreen_instructions = ensure_vacancy_screening_setup(
         vacancy=vacancy,
         step=ScreeningStep.PRESCANNING,
     )
     interview_criteria = []
-    interview_questions = []
+    interview_instructions = []
     if vacancy.interview_enabled:
-        interview_criteria, interview_questions = ensure_vacancy_screening_setup(
+        interview_criteria, interview_instructions = ensure_vacancy_screening_setup(
             vacancy=vacancy,
             step=ScreeningStep.INTERVIEW,
         )
     vacancy = publish_vacancy(vacancy=vacancy)
     generated_total = (
-        len(prescreen_criteria) + len(prescreen_questions) + len(interview_criteria) + len(interview_questions)
+        len(prescreen_criteria) + len(prescreen_instructions) + len(interview_criteria) + len(interview_instructions)
     )
     setup_note = f" Generated {generated_total} missing setup item(s) first." if generated_total else ""
     return {
