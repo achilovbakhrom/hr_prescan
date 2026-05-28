@@ -452,6 +452,7 @@ Interview is the second, more rigorous AI screening step. HR enables it per vaca
 
 ### 7.3.1 HR Silent Observer Mode (Meet mode only)
 - HR can join any active AI interview (meet mode) as a silent observer
+- Live observation is available only after the Meet interview is in progress and a LiveKit room exists; otherwise the UI must show an unavailable state instead of attempting to join
 - Candidate is NOT notified that HR is watching
 - HR can see and hear the interview in real-time but cannot speak or interact
 - HR sees the candidate's video and hears both the AI and candidate audio

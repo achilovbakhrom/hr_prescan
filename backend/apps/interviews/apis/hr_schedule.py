@@ -92,7 +92,33 @@ class ObserverTokenApi(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        token = generate_observer_token(interview=interview)
+        is_meet_interview = (
+            interview.session_type == Interview.SessionType.INTERVIEW
+            and interview.screening_mode == Interview.ScreeningMode.MEET
+        )
+        if not is_meet_interview:
+            return Response(
+                {"detail": "Live observation is only available for Meet interviews."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if interview.status != Interview.Status.IN_PROGRESS:
+            return Response(
+                {"detail": "Live observation is only available while the interview is in progress."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if not interview.livekit_room_name:
+            return Response(
+                {"detail": "Live room is not ready yet. Ask the candidate to join the interview first."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            token = generate_observer_token(interview=interview)
+        except ApplicationError as e:
+            return Response(
+                {"detail": e.message},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         return Response(
             {

@@ -2,6 +2,7 @@
 
 import json
 import logging
+import re
 from decimal import Decimal
 
 from django.conf import settings
@@ -13,6 +14,65 @@ from apps.interviews.chat_service.evaluation_prompt import build_eval_prompt, de
 from apps.interviews.models import Interview, InterviewScore
 
 logger = logging.getLogger(__name__)
+
+EVALUATION_MAX_OUTPUT_TOKENS = 8192
+_JSON_FENCE_RE = re.compile(r"^```(?:json)?\s*(?P<body>.*?)\s*```$", re.DOTALL | re.IGNORECASE)
+
+
+def _evaluation_response_schema() -> types.Schema:
+    evidence_item = types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "quote": types.Schema(type=types.Type.STRING),
+            "speaker": types.Schema(type=types.Type.STRING),
+        },
+    )
+    return types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "scores": types.Schema(
+                type=types.Type.ARRAY,
+                items=types.Schema(
+                    type=types.Type.OBJECT,
+                    properties={
+                        "criteria_id": types.Schema(type=types.Type.STRING),
+                        "score": types.Schema(type=types.Type.INTEGER),
+                        "notes": types.Schema(type=types.Type.STRING),
+                        "evidence": types.Schema(type=types.Type.ARRAY, items=evidence_item),
+                    },
+                    required=["criteria_id", "score", "notes"],
+                ),
+            ),
+            "overall_score": types.Schema(type=types.Type.NUMBER),
+            "summary": types.Schema(type=types.Type.STRING),
+            "decision_support": types.Schema(
+                type=types.Type.OBJECT,
+                properties={
+                    "recommendation": types.Schema(type=types.Type.STRING),
+                    "strengths": types.Schema(
+                        type=types.Type.ARRAY,
+                        items=types.Schema(type=types.Type.STRING),
+                    ),
+                    "risks": types.Schema(
+                        type=types.Type.ARRAY,
+                        items=types.Schema(type=types.Type.STRING),
+                    ),
+                    "positive_moments": types.Schema(
+                        type=types.Type.ARRAY,
+                        items=types.Schema(type=types.Type.STRING),
+                    ),
+                    "negative_moments": types.Schema(
+                        type=types.Type.ARRAY,
+                        items=types.Schema(type=types.Type.STRING),
+                    ),
+                    "conclusion": types.Schema(type=types.Type.STRING),
+                    "next_step": types.Schema(type=types.Type.STRING),
+                },
+            ),
+            "recommendation": types.Schema(type=types.Type.STRING),
+        },
+        required=["scores", "overall_score", "summary", "recommendation"],
+    )
 
 
 def evaluate_chat_interview(interview: Interview, *, ai_decision: str = "advance") -> None:
@@ -77,19 +137,21 @@ def evaluate_chat_interview(interview: Interview, *, ai_decision: str = "advance
         ],
         config=types.GenerateContentConfig(
             system_instruction="You are an expert HR evaluator. Respond only with valid JSON.",
-            max_output_tokens=2500,
+            max_output_tokens=EVALUATION_MAX_OUTPUT_TOKENS,
             temperature=0.3,
             response_mime_type="application/json",
+            response_schema=_evaluation_response_schema(),
         ),
     )
 
-    raw = response.text or "{}"
     try:
-        result = json.loads(raw)
-    except json.JSONDecodeError:
+        result = _parse_evaluation_response(response)
+    except (TypeError, ValueError, json.JSONDecodeError):
+        raw = response.text or ""
         logger.error(
-            "Failed to parse evaluation JSON for session %s. Raw response: %s",
+            "Failed to parse evaluation JSON for session %s. Raw response length=%d preview=%s",
             interview.id,
+            len(raw),
             raw[:500],
         )
         complete_session(
@@ -102,6 +164,33 @@ def evaluate_chat_interview(interview: Interview, *, ai_decision: str = "advance
         return
 
     _save_scores_and_complete(interview, result, criteria_list, ai_decision, step, complete_session)
+
+
+def _parse_evaluation_response(response) -> dict:
+    parsed = getattr(response, "parsed", None)
+    if parsed is not None:
+        if hasattr(parsed, "model_dump"):
+            parsed = parsed.model_dump()
+        if isinstance(parsed, dict):
+            return parsed
+
+    text = (getattr(response, "text", "") or "").strip()
+    fence_match = _JSON_FENCE_RE.match(text)
+    if fence_match:
+        text = fence_match.group("body").strip()
+
+    try:
+        payload = json.loads(text)
+    except json.JSONDecodeError:
+        start = text.find("{")
+        end = text.rfind("}")
+        if start < 0 or end <= start:
+            raise
+        payload = json.loads(text[start : end + 1])
+
+    if not isinstance(payload, dict):
+        raise ValueError("Evaluation response must be a JSON object.")
+    return payload
 
 
 def _save_scores_and_complete(

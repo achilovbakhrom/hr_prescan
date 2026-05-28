@@ -29,6 +29,7 @@ export const ROUTE_NAMES = {
   CANDIDATE_REVIEW_SHARE: 'candidate-review-share',
   INTERVIEW_LIST: 'interview-list',
   INTERVIEW_DETAIL: 'interview-detail',
+  INTERVIEW_OBSERVER: 'interview-observer',
   CANDIDATE_INTERVIEW: 'candidate-interview',
   INTERVIEW_CONFIRMATION: 'interview-confirmation',
   INTERVIEW_GATEWAY: 'interview-gateway',

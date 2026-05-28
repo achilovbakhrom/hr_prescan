@@ -18,6 +18,8 @@ def _create_livekit_token(
     can_subscribe: bool = True,
 ) -> str:
     """Create a LiveKit access token with the given grants."""
+    if not room_name:
+        raise ApplicationError("Live room is not available for this interview.")
     if not LIVEKIT_API_KEY or not LIVEKIT_API_SECRET:
         raise ApplicationError("LiveKit credentials not configured. Set LIVEKIT_API_KEY and LIVEKIT_API_SECRET.")
 

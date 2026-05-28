@@ -29,6 +29,20 @@ const router = useRouter()
 
 const isScheduled = computed(() => props.interview.status === 'pending')
 const isInProgress = computed(() => props.interview.status === 'in_progress')
+const canShowLiveObserver = computed(
+  () =>
+    isInProgress.value &&
+    props.interview.sessionType === 'interview' &&
+    props.interview.screeningMode === 'meet',
+)
+const canWatchLive = computed(
+  () => canShowLiveObserver.value && Boolean(props.interview.livekitRoomName),
+)
+const watchLiveTitle = computed(() =>
+  canWatchLive.value
+    ? undefined
+    : t('interviews.detailPage.liveRoomUnavailable', 'Live room is not ready yet.'),
+)
 const roomUrl = computed(
   () => `${window.location.origin}/interview/${props.interview.interviewToken}/room`,
 )
@@ -82,10 +96,12 @@ function formatDate(dateStr: string): string {
           @click="emit('cancel')"
         />
         <Button
-          v-if="isInProgress"
+          v-if="canShowLiveObserver"
           :label="t('interviews.detailPage.watchLive')"
           icon="pi pi-eye"
           size="small"
+          :disabled="!canWatchLive"
+          :title="watchLiveTitle"
           @click="emit('watchLive')"
         />
       </div>

@@ -1,10 +1,12 @@
 from decimal import Decimal
+from types import SimpleNamespace
 from unittest.mock import patch
 
 from django.test import override_settings
 
 from apps.accounts.models import User
 from apps.applications.models import Application
+from apps.interviews.chat_service.evaluation import _parse_evaluation_response
 from apps.interviews.chat_service.evaluation_prompt import derive_ai_decision_from_evaluation
 from apps.interviews.chat_service.prompts import build_system_prompt
 from apps.interviews.models import Interview
@@ -77,6 +79,38 @@ class TestStartSession:
 
         assert "cannot evaluate their answer with reasonable confidence" in prompt
         assert "ask a targeted clarification or practical follow-up" in prompt
+
+
+class TestEvaluationResponseParsing:
+    def test_parse_evaluation_response_uses_structured_payload(self):
+        payload = {
+            "scores": [],
+            "overall_score": 7.5,
+            "summary": "Good fit.",
+            "recommendation": "advance",
+        }
+
+        assert _parse_evaluation_response(SimpleNamespace(parsed=payload, text="")) == payload
+
+    def test_parse_evaluation_response_strips_markdown_fence(self):
+        response = SimpleNamespace(
+            parsed=None,
+            text='```json\n{"scores": [], "overall_score": 6, "summary": "OK", "recommendation": "advance"}\n```',
+        )
+
+        result = _parse_evaluation_response(response)
+
+        assert result["overall_score"] == 6
+
+    def test_parse_evaluation_response_extracts_json_object_from_text(self):
+        response = SimpleNamespace(
+            parsed=None,
+            text='Result:\n{"scores": [], "overall_score": 4, "summary": "Weak", "recommendation": "reject"}',
+        )
+
+        result = _parse_evaluation_response(response)
+
+        assert result["recommendation"] == "reject"
 
 
 class TestCompleteSession:
