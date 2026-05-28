@@ -14,7 +14,7 @@ from apps.integrations.telegram_bot.candidate.start import handle_account_link_s
 from apps.integrations.telegram_bot.candidate.states import STATE_CV_UPLOAD, STATE_PS_CV, STATE_PS_INTERVIEW
 from apps.integrations.telegram_bot.candidate.uploads import handle_document
 from apps.integrations.telegram_bot.i18n import t
-from apps.integrations.telegram_bot.sessions import get_session
+from apps.integrations.telegram_bot.sessions import get_session, update_session
 from apps.integrations.telegram_bot.voice import transcribe_voice
 
 
@@ -109,7 +109,7 @@ def _handle_text(*, client, chat_id: int, user, text: str, session: dict, lang: 
         payload = text[7:].strip() if text.startswith("/start ") else ""
         if handle_start_command(client=client, chat_id=chat_id, user=user, payload=payload, lang=lang):
             return
-        send_main_menu(client=client, chat_id=chat_id, lang=lang)
+        send_main_menu(client=client, chat_id=chat_id, lang=lang, telegram_id=user.telegram_id)
         return
 
     if text in ("/language", "/lang"):
@@ -156,8 +156,9 @@ def _handle_text(*, client, chat_id: int, user, text: str, session: dict, lang: 
         handle_prescreening_text(client=client, chat_id=chat_id, user=user, text=text, session=session, lang=lang)
         return
 
-    if text in ("/menu", "/help"):
-        send_main_menu(client=client, chat_id=chat_id, lang=lang)
+    if text in ("/menu", "/help", "/exit_ai", "/cancel"):
+        update_session(role=ROLE_CANDIDATE, telegram_id=user.telegram_id, ai_mode=False)
+        send_main_menu(client=client, chat_id=chat_id, lang=lang, telegram_id=user.telegram_id)
         return
 
     if text == "/register":

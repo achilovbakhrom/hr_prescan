@@ -68,6 +68,9 @@ class TelegramClient:
             payload["reply_markup"] = reply_markup
         return self._post("editMessageText", payload)
 
+    def delete_message(self, *, chat_id: int | str, message_id: int) -> dict[str, Any]:
+        return self._post("deleteMessage", {"chat_id": chat_id, "message_id": message_id})
+
     def answer_callback_query(
         self,
         *,

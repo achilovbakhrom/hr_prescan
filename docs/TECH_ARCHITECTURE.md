@@ -435,6 +435,7 @@ backend/apps/integrations/telegram_bot/
 ├── client.py           # TelegramClient — token-scoped Telegram Bot API wrapper
 ├── bots.py             # role registry: get_bot_config, get_client, dispatch_update
 ├── keyboards.py        # inline-keyboard helpers (paginated_list, button)
+├── screens.py          # single-message screen rendering, edit/send fallback, best-effort cleanup
 ├── sessions.py         # per-(role, telegram_id) Redis session state
 ├── i18n.py             # bot strings (en/ru/uz), normalize_language()
 ├── voice.py            # transcribe_voice(client, file_id) — Gemini
@@ -443,6 +444,7 @@ backend/apps/integrations/telegram_bot/
 │   ├── auth.py         # confirmed deep-link/email-code linking via TelegramLinkCode
 │   ├── deep_link.py    # deep-link confirmation callback flow
 │   ├── onboarding.py   # Telegram-first HR/admin placeholder account + merge
+│   ├── vacancy_wizard.py    # deterministic screen-based vacancy creation flow
 │   └── history.py      # Redis-backed conversation history for the agent
 └── candidate/          # Candidate bot
     ├── handlers.py     # update dispatcher (text/voice/document/callback)
@@ -488,6 +490,8 @@ Polling mode — no public URL needed. Each command takes over the bot it target
 ### AI agents
 
 The HR bot uses the existing LangChain ReAct agent (~25 tools across vacancies, candidates, interviews, dashboard, subscription, team). A separate **candidate AI agent** (search jobs, apply, profile, take prescan interview) ships in PR2 and lives under `apps/common/ai_assistant/agents/candidate_agent.py`.
+
+Bot pages use `screens.py` to keep menu-like flows in one active Telegram message. The helper first tries `editMessageText`, falls back to `sendMessage`, stores the active screen message id in Redis, and best-effort deletes replaced screen messages. AI mode remains transcript-style, but assistant replies include exit/main-menu controls while the `ai_mode` session flag is active.
 
 The Telegram Login Widget on the candidate web auth pages now uses `settings.TELEGRAM_LOGIN_WIDGET_TOKEN` (which prefers `TELEGRAM_CANDIDATE_BOT_TOKEN`, falling back to the HR bot token for backwards-compat).
 
