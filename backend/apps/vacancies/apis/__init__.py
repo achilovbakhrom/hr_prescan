@@ -28,8 +28,8 @@ from apps.vacancies.apis.vacancy_detail import (
 )
 
 __all__ = [
-    "GenerateQuestionsApi",
     "GenerateInstructionsApi",
+    "GenerateQuestionsApi",
     "GenerateVacancyContentApi",
     "ParseCompanyFileApi",
     "ParseCompanyUrlApi",
