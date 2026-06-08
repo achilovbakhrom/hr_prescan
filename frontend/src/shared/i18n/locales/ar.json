@@ -111,7 +111,8 @@
     "cvBuilder": "CV منشئ",
     "myCvs": "CVs الخاص بي",
     "hrAnalytics": "التحليلات",
-    "candidateBase": "قاعدة المرشحين"
+    "candidateBase": "قاعدة المرشحين",
+    "instructions": "كيف يعمل"
   },
   "validation": {
     "required": "هذا الحقل مطلوب",

@@ -62,6 +62,9 @@ export const ROUTE_NAMES = {
   PRIVACY_POLICY: 'privacy-policy',
   TERMS_OF_SERVICE: 'terms-of-service',
 
+  // Help
+  INSTRUCTIONS: 'instructions',
+
   // Errors
   NOT_FOUND: 'not-found',
   FORBIDDEN: 'forbidden',

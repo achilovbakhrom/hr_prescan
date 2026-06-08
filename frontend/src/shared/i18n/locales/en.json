@@ -111,7 +111,8 @@
     "cvBuilder": "CV Builder",
     "myCvs": "My CVs",
     "hrAnalytics": "Analytics",
-    "candidateBase": "Candidate Base"
+    "candidateBase": "Candidate Base",
+    "instructions": "How it works"
   },
   "validation": {
     "required": "This field is required",

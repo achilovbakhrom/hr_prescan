@@ -111,7 +111,8 @@
     "cvBuilder": "CV yaratish",
     "myCvs": "Mening CV larim",
     "hrAnalytics": "Analitika",
-    "candidateBase": "Nomzodlar bazasi"
+    "candidateBase": "Nomzodlar bazasi",
+    "instructions": "Qanday ishlaydi"
   },
   "validation": {
     "required": "Bu maydon majburiy",
