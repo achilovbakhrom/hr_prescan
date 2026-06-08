@@ -111,7 +111,8 @@
     "cvBuilder": "CV Constructor",
     "myCvs": "Mis CVs",
     "hrAnalytics": "Analítica",
-    "candidateBase": "Base de candidatos"
+    "candidateBase": "Base de candidatos",
+    "instructions": "Cómo funciona"
   },
   "validation": {
     "required": "Este campo es obligatorio",

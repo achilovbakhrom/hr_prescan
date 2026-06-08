@@ -111,7 +111,8 @@
     "cvBuilder": "Конструктор CV",
     "myCvs": "Мої резюме",
     "hrAnalytics": "Аналітика",
-    "candidateBase": "База кандидатів"
+    "candidateBase": "База кандидатів",
+    "instructions": "Як це працює"
   },
   "validation": {
     "required": "Це поле є обов'язковим для заповнення",

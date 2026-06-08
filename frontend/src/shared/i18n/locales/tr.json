@@ -111,7 +111,8 @@
     "cvBuilder": "CV Oluşturucu",
     "myCvs": "Benim CV'lerim",
     "hrAnalytics": "Analitik",
-    "candidateBase": "Aday havuzu"
+    "candidateBase": "Aday havuzu",
+    "instructions": "Nasıl çalışır"
   },
   "validation": {
     "required": "Bu alan zorunludur",

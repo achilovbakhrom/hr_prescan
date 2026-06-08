@@ -34,6 +34,12 @@ const navItems = computed<NavItem[]>(() => [
     roles: [USER_ROLES.ADMIN, USER_ROLES.HR, USER_ROLES.CANDIDATE],
   },
   {
+    label: t('nav.instructions'),
+    icon: 'pi pi-book',
+    to: '/instructions',
+    roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
+  },
+  {
     label: t('nav.vacancies'),
     icon: 'pi pi-briefcase',
     to: '/vacancies',

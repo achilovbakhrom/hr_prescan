@@ -111,7 +111,8 @@
     "cvBuilder": "CV Құрастырушы",
     "myCvs": "Менің CVтерім",
     "hrAnalytics": "Аналитика",
-    "candidateBase": "Кандидаттар базасы"
+    "candidateBase": "Кандидаттар базасы",
+    "instructions": "Қалай жұмыс істейді"
   },
   "validation": {
     "required": "Бұл өріс қажет",
