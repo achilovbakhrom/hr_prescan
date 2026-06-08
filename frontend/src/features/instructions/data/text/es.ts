@@ -10,7 +10,8 @@ const es: GuideText = {
   flows: {
     'create-vacancy': {
       title: 'Crear una vacante',
-      summary: 'Define el puesto y los requisitos del candidato sobre los que se construye todo lo demás.',
+      summary:
+        'Define el puesto y los requisitos del candidato sobre los que se construye todo lo demás.',
       steps: [
         {
           title: 'Abre la página de Vacantes',
@@ -76,7 +77,8 @@ const es: GuideText = {
     },
     'candidate-results': {
       title: 'Revisar los resultados del candidato',
-      summary: 'Las puntuaciones, respuestas y una recomendación de la IA de cada postulante en un solo lugar.',
+      summary:
+        'Las puntuaciones, respuestas y una recomendación de la IA de cada postulante en un solo lugar.',
       steps: [
         {
           title: 'Abre el tablero de Candidatos',
@@ -135,11 +137,22 @@ const es: GuideText = {
       ],
     },
     'ai-assistant': {
-      title: "Hazlo todo con el asistente de IA",
-      summary: "Pregunta en lenguaje natural — el asistente encuentra candidatos, redacta vacantes y analiza tu embudo.",
+      title: 'Hazlo todo con el asistente de IA',
+      summary:
+        'Pregunta en lenguaje natural — el asistente encuentra candidatos, redacta vacantes y analiza tu embudo.',
       steps: [
-        { title: "Abre el asistente", description: "Haz clic en “Preguntar a la IA” para abrir el asistente de RR. HH. Las tarjetas de acción rápida muestran lo que puede hacer: encontrar candidatos, crear una vacante, trabajar con vacantes o analizar tu embudo.", alt: "Asistente de IA con tarjetas de acción rápida" },
-        { title: "Pregunta en lenguaje natural", description: "Escribe una solicitud y el asistente hace el trabajo: lee tus datos, ejecuta acciones y responde con claridad y el siguiente paso.", alt: "Asistente de IA respondiendo una pregunta de RR. HH." },
+        {
+          title: 'Abre el asistente',
+          description:
+            'Haz clic en “Preguntar a la IA” para abrir el asistente de RR. HH. Las tarjetas de acción rápida muestran lo que puede hacer: encontrar candidatos, crear una vacante, trabajar con vacantes o analizar tu embudo.',
+          alt: 'Asistente de IA con tarjetas de acción rápida',
+        },
+        {
+          title: 'Pregunta en lenguaje natural',
+          description:
+            'Escribe una solicitud y el asistente hace el trabajo: lee tus datos, ejecuta acciones y responde con claridad y el siguiente paso.',
+          alt: 'Asistente de IA respondiendo una pregunta de RR. HH.',
+        },
       ],
     },
   },

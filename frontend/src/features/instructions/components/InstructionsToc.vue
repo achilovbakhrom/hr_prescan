@@ -27,7 +27,11 @@ function scrollTo(id: string): void {
           class="flex w-full items-start gap-3 rounded-lg px-3 py-2 text-left text-[13px] font-medium leading-snug text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
           @click="scrollTo(flow.id)"
         >
-          <i :class="flow.icon" class="mt-0.5 shrink-0 text-sm text-blue-600" aria-hidden="true"></i>
+          <i
+            :class="flow.icon"
+            class="mt-0.5 shrink-0 text-sm text-blue-600"
+            aria-hidden="true"
+          ></i>
           <span class="min-w-0 break-words">{{ i + 1 }}. {{ flow.title }}</span>
         </button>
       </li>

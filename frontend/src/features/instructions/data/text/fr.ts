@@ -52,7 +52,8 @@ const fr: GuideText = {
     },
     'setup-interview': {
       title: 'Configurer l’entretien IA',
-      summary: 'Ajoutez un entretien approfondi facultatif pour les candidats qui passent la présélection.',
+      summary:
+        'Ajoutez un entretien approfondi facultatif pour les candidats qui passent la présélection.',
       steps: [
         {
           title: 'Activez l’entretien de deuxième étape',
@@ -76,7 +77,8 @@ const fr: GuideText = {
     },
     'candidate-results': {
       title: 'Examiner les résultats du candidat',
-      summary: 'Les scores, réponses et une recommandation de l’IA pour chaque candidat, au même endroit.',
+      summary:
+        'Les scores, réponses et une recommandation de l’IA pour chaque candidat, au même endroit.',
       steps: [
         {
           title: 'Ouvrez le tableau Candidats',
@@ -135,11 +137,22 @@ const fr: GuideText = {
       ],
     },
     'ai-assistant': {
-      title: "Faites tout avec l’assistant IA",
-      summary: "Demandez en langage naturel — l’assistant trouve des candidats, rédige des offres et analyse votre tunnel.",
+      title: 'Faites tout avec l’assistant IA',
+      summary:
+        'Demandez en langage naturel — l’assistant trouve des candidats, rédige des offres et analyse votre tunnel.',
       steps: [
-        { title: "Ouvrez l’assistant", description: "Cliquez sur « Demander à l’IA » pour ouvrir l’assistant RH. Les cartes d’action rapide montrent ce qu’il peut faire : trouver des candidats, créer une offre, gérer les offres ou analyser votre tunnel de recrutement.", alt: "Assistant IA avec des cartes d’action rapide" },
-        { title: "Demandez en langage naturel", description: "Saisissez une demande et l’assistant fait le travail : il lit vos données, effectue des actions et répond clairement avec la prochaine étape.", alt: "Assistant IA répondant à une question RH" },
+        {
+          title: 'Ouvrez l’assistant',
+          description:
+            'Cliquez sur « Demander à l’IA » pour ouvrir l’assistant RH. Les cartes d’action rapide montrent ce qu’il peut faire : trouver des candidats, créer une offre, gérer les offres ou analyser votre tunnel de recrutement.',
+          alt: 'Assistant IA avec des cartes d’action rapide',
+        },
+        {
+          title: 'Demandez en langage naturel',
+          description:
+            'Saisissez une demande et l’assistant fait le travail : il lit vos données, effectue des actions et répond clairement avec la prochaine étape.',
+          alt: 'Assistant IA répondant à une question RH',
+        },
       ],
     },
   },

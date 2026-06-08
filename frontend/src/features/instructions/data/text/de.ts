@@ -52,7 +52,8 @@ const de: GuideText = {
     },
     'setup-interview': {
       title: 'KI-Interview einrichten',
-      summary: 'Füge ein optionales, tieferes Interview für Bewerber hinzu, die die Vorauswahl bestehen.',
+      summary:
+        'Füge ein optionales, tieferes Interview für Bewerber hinzu, die die Vorauswahl bestehen.',
       steps: [
         {
           title: 'Zweistufiges Interview aktivieren',
@@ -135,11 +136,22 @@ const de: GuideText = {
       ],
     },
     'ai-assistant': {
-      title: "Erledige alles mit dem KI-Assistenten",
-      summary: "Frag in natürlicher Sprache — der Assistent findet Kandidaten, erstellt Stellen und analysiert deinen Funnel.",
+      title: 'Erledige alles mit dem KI-Assistenten',
+      summary:
+        'Frag in natürlicher Sprache — der Assistent findet Kandidaten, erstellt Stellen und analysiert deinen Funnel.',
       steps: [
-        { title: "Assistenten öffnen", description: "Klicke auf „KI fragen“, um den HR-Assistenten zu öffnen. Die Schnellaktions-Karten zeigen, was er kann — Kandidaten finden, eine Stelle erstellen, Stellen bearbeiten oder deinen Recruiting-Funnel analysieren.", alt: "KI-Assistent mit Schnellaktions-Karten" },
-        { title: "In natürlicher Sprache fragen", description: "Gib eine Anfrage ein und der Assistent erledigt die Arbeit: Er liest deine Daten, führt Aktionen aus und antwortet klar mit dem nächsten Schritt.", alt: "KI-Assistent beantwortet eine HR-Frage" },
+        {
+          title: 'Assistenten öffnen',
+          description:
+            'Klicke auf „KI fragen“, um den HR-Assistenten zu öffnen. Die Schnellaktions-Karten zeigen, was er kann — Kandidaten finden, eine Stelle erstellen, Stellen bearbeiten oder deinen Recruiting-Funnel analysieren.',
+          alt: 'KI-Assistent mit Schnellaktions-Karten',
+        },
+        {
+          title: 'In natürlicher Sprache fragen',
+          description:
+            'Gib eine Anfrage ein und der Assistent erledigt die Arbeit: Er liest deine Daten, führt Aktionen aus und antwortet klar mit dem nächsten Schritt.',
+          alt: 'KI-Assistent beantwortet eine HR-Frage',
+        },
       ],
     },
   },

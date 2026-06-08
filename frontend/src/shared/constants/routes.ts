@@ -64,6 +64,7 @@ export const ROUTE_NAMES = {
 
   // Help
   INSTRUCTIONS: 'instructions',
+  GUIDE: 'guide',
 
   // Errors
   NOT_FOUND: 'not-found',
