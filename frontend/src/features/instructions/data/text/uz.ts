@@ -10,7 +10,8 @@ const uz: GuideText = {
   flows: {
     'create-vacancy': {
       title: 'Vakansiya yaratish',
-      summary: 'Lavozim va nomzodlarga qo‘yiladigan talablarni belgilang — qolgani shunga quriladi.',
+      summary:
+        'Lavozim va nomzodlarga qo‘yiladigan talablarni belgilang — qolgani shunga quriladi.',
       steps: [
         {
           title: '“Vakansiyalar” sahifasini oching',
@@ -135,11 +136,22 @@ const uz: GuideText = {
       ],
     },
     'ai-assistant': {
-      title: "Hammasini AI yordamchisi orqali bajaring",
-      summary: "Oddiy tilda so‘rang — yordamchi nomzodlarni topadi, vakansiya tayyorlaydi va voronkani tahlil qiladi.",
+      title: 'Hammasini AI yordamchisi orqali bajaring',
+      summary:
+        'Oddiy tilda so‘rang — yordamchi nomzodlarni topadi, vakansiya tayyorlaydi va voronkani tahlil qiladi.',
       steps: [
-        { title: "Yordamchini oching", description: "HR yordamchisini ochish uchun “AI’dan so‘rash”ni bosing. Tezkor amal kartochkalari nimani qila olishini ko‘rsatadi — nomzod topish, vakansiya yaratish, vakansiyalar bilan ishlash yoki voronkani tahlil qilish.", alt: "Tezkor amal kartochkalari bilan AI yordamchisi" },
-        { title: "Oddiy tilda so‘rang", description: "So‘rovni yozing — yordamchi ishni bajaradi: ma’lumotlaringizni o‘qiydi, amallarni bajaradi va aniq javob hamda keyingi qadam bilan javob beradi.", alt: "AI yordamchisi HR savoliga javob bermoqda" },
+        {
+          title: 'Yordamchini oching',
+          description:
+            'HR yordamchisini ochish uchun “AI’dan so‘rash”ni bosing. Tezkor amal kartochkalari nimani qila olishini ko‘rsatadi — nomzod topish, vakansiya yaratish, vakansiyalar bilan ishlash yoki voronkani tahlil qilish.',
+          alt: 'Tezkor amal kartochkalari bilan AI yordamchisi',
+        },
+        {
+          title: 'Oddiy tilda so‘rang',
+          description:
+            'So‘rovni yozing — yordamchi ishni bajaradi: ma’lumotlaringizni o‘qiydi, amallarni bajaradi va aniq javob hamda keyingi qadam bilan javob beradi.',
+          alt: 'AI yordamchisi HR savoliga javob bermoqda',
+        },
       ],
     },
   },

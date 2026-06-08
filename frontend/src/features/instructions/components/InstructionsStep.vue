@@ -13,7 +13,10 @@ const props = defineProps<{
 /** Fall back to the English screenshot if the localized one is missing. */
 function onImageError(e: Event): void {
   const img = e.target as HTMLImageElement
-  if (img.src !== location.origin + props.step.imageFallback && !img.src.endsWith(props.step.imageFallback)) {
+  if (
+    img.src !== location.origin + props.step.imageFallback &&
+    !img.src.endsWith(props.step.imageFallback)
+  ) {
     img.src = props.step.imageFallback
   }
 }

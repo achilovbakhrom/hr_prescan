@@ -50,13 +50,12 @@ function scrollTo(id: string): void {
                 </button>
               </li>
               <li>
-                <button
-                  type="button"
+                <RouterLink
+                  :to="{ name: ROUTE_NAMES.GUIDE }"
                   class="text-sm text-[color:var(--color-text-secondary)] transition-colors hover:text-[color:var(--color-text-primary)]"
-                  @click="scrollTo('how-it-works')"
                 >
                   {{ t('landing.howItWorks.title') }}
-                </button>
+                </RouterLink>
               </li>
               <li v-if="BILLING_ENABLED">
                 <RouterLink

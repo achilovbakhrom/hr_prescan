@@ -18,7 +18,9 @@ defineProps<{
 <template>
   <section :id="flow.id" class="scroll-mt-24">
     <GlassCard>
-      <header class="mb-6 flex items-start gap-4 border-b border-[color:var(--color-border-soft)] pb-5">
+      <header
+        class="mb-6 flex items-start gap-4 border-b border-[color:var(--color-border-soft)] pb-5"
+      >
         <span
           class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/40"
           aria-hidden="true"

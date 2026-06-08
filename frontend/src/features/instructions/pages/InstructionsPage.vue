@@ -18,7 +18,7 @@ const guide = computed(() => getGuide(locale.value))
 </script>
 
 <template>
-  <div class="mx-auto max-w-6xl">
+  <div class="mx-auto max-w-7xl">
     <header class="mb-8">
       <h1 class="text-3xl font-semibold tracking-tight text-[color:var(--color-text-primary)]">
         {{ guide.page.title }}

@@ -10,7 +10,11 @@ export const GUIDE_STRUCTURE: GuideStruct[] = [
     id: 'create-vacancy',
     icon: 'pi pi-briefcase',
     audience: 'hr',
-    steps: [{ image: '01-vacancies-list' }, { image: '02-create-form' }, { image: '03-vacancy-detail' }],
+    steps: [
+      { image: '01-vacancies-list' },
+      { image: '02-create-form' },
+      { image: '03-vacancy-detail' },
+    ],
   },
   {
     id: 'setup-prescreen',

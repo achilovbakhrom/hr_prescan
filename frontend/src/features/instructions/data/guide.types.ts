@@ -53,6 +53,12 @@ export interface GuideFlow {
   steps: GuideStep[]
 }
 export interface Guide {
-  page: { title: string; subtitle: string; onThisPage: string; forHr: string; forCandidates: string }
+  page: {
+    title: string
+    subtitle: string
+    onThisPage: string
+    forHr: string
+    forCandidates: string
+  }
   flows: GuideFlow[]
 }

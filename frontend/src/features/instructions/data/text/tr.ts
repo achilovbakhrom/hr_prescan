@@ -135,11 +135,21 @@ const tr: GuideText = {
       ],
     },
     'ai-assistant': {
-      title: "Her şeyi yapay zekâ asistanıyla yapın",
-      summary: "Sade bir dille sorun — asistan aday bulur, ilan hazırlar ve huninizi analiz eder.",
+      title: 'Her şeyi yapay zekâ asistanıyla yapın',
+      summary: 'Sade bir dille sorun — asistan aday bulur, ilan hazırlar ve huninizi analiz eder.',
       steps: [
-        { title: "Asistanı açın", description: "İK asistanını açmak için “Yapay Zekâya Sor”a tıklayın. Hızlı eylem kartları neler yapabileceğini gösterir — aday bulma, ilan oluşturma, ilanlarla çalışma veya işe alım huninizi analiz etme.", alt: "Hızlı eylem kartlarıyla yapay zekâ asistanı" },
-        { title: "Sade bir dille sorun", description: "Bir istek yazın, asistan işi yapar: verilerinizi okur, eylemleri gerçekleştirir ve net bir yanıt ile sonraki adımı verir.", alt: "İK sorusunu yanıtlayan yapay zekâ asistanı" },
+        {
+          title: 'Asistanı açın',
+          description:
+            'İK asistanını açmak için “Yapay Zekâya Sor”a tıklayın. Hızlı eylem kartları neler yapabileceğini gösterir — aday bulma, ilan oluşturma, ilanlarla çalışma veya işe alım huninizi analiz etme.',
+          alt: 'Hızlı eylem kartlarıyla yapay zekâ asistanı',
+        },
+        {
+          title: 'Sade bir dille sorun',
+          description:
+            'Bir istek yazın, asistan işi yapar: verilerinizi okur, eylemleri gerçekleştirir ve net bir yanıt ile sonraki adımı verir.',
+          alt: 'İK sorusunu yanıtlayan yapay zekâ asistanı',
+        },
       ],
     },
   },

@@ -135,11 +135,22 @@ const en: GuideText = {
       ],
     },
     'ai-assistant': {
-      title: "Do it with the AI assistant",
-      summary: "Ask in plain language — the assistant finds candidates, drafts vacancies and analyzes your funnel.",
+      title: 'Do it with the AI assistant',
+      summary:
+        'Ask in plain language — the assistant finds candidates, drafts vacancies and analyzes your funnel.',
       steps: [
-        { title: "Open the assistant", description: "Click “Ask AI” to open the HR assistant. The quick-action cards show what it can do — find candidates, create a vacancy, work with vacancies, or analyze your hiring funnel.", alt: "AI assistant with quick-action cards" },
-        { title: "Ask in plain language", description: "Type a request and the assistant does the work: it reads your data, performs actions and replies with a clear answer and the next step.", alt: "AI assistant answering an HR question" },
+        {
+          title: 'Open the assistant',
+          description:
+            'Click “Ask AI” to open the HR assistant. The quick-action cards show what it can do — find candidates, create a vacancy, work with vacancies, or analyze your hiring funnel.',
+          alt: 'AI assistant with quick-action cards',
+        },
+        {
+          title: 'Ask in plain language',
+          description:
+            'Type a request and the assistant does the work: it reads your data, performs actions and replies with a clear answer and the next step.',
+          alt: 'AI assistant answering an HR question',
+        },
       ],
     },
   },
