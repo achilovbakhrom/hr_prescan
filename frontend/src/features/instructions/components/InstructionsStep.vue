@@ -3,12 +3,20 @@
  * A single numbered step: index badge, title + description, and a real
  * screenshot. The screenshot opens full-size in a new tab on click.
  */
-import type { GuideStep } from '../data/flows'
+import type { GuideStep } from '../data/guide.types'
 
-defineProps<{
+const props = defineProps<{
   step: GuideStep
   index: number
 }>()
+
+/** Fall back to the English screenshot if the localized one is missing. */
+function onImageError(e: Event): void {
+  const img = e.target as HTMLImageElement
+  if (img.src !== location.origin + props.step.imageFallback && !img.src.endsWith(props.step.imageFallback)) {
+    img.src = props.step.imageFallback
+  }
+}
 </script>
 
 <template>
@@ -43,6 +51,7 @@ defineProps<{
           :alt="step.imageAlt"
           loading="lazy"
           class="w-full object-cover transition-transform duration-200 group-hover:scale-[1.01]"
+          @error="onImageError"
         />
       </a>
     </div>

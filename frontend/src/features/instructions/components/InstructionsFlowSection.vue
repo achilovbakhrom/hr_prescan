@@ -5,11 +5,13 @@
  */
 import GlassCard from '@/shared/components/GlassCard.vue'
 import InstructionsStep from './InstructionsStep.vue'
-import type { GuideFlow } from '../data/flows'
+import type { GuideFlow } from '../data/guide.types'
 
 defineProps<{
   flow: GuideFlow
   index: number
+  forHr: string
+  forCandidates: string
 }>()
 </script>
 
@@ -36,7 +38,7 @@ defineProps<{
                   : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
               "
             >
-              {{ flow.audience === 'hr' ? 'For HR' : 'For candidates' }}
+              {{ flow.audience === 'hr' ? forHr : forCandidates }}
             </span>
           </div>
           <p class="mt-1 text-sm text-[color:var(--color-text-muted)]">{{ flow.summary }}</p>
