@@ -1879,5 +1879,21 @@
     "selectPermissions": "Select permissions for this user",
     "allPermissions": "All permissions (Company Admin)",
     "noPermissions": "No permissions assigned"
+  },
+  "contact": {
+    "title": "Contact us",
+    "subtitle": "Have a question or feedback? Send us a message and we’ll get back to you.",
+    "name": "Name",
+    "namePlaceholder": "Your name",
+    "email": "Email",
+    "subject": "Subject",
+    "subjectPlaceholder": "What’s this about?",
+    "message": "Message",
+    "messagePlaceholder": "How can we help?",
+    "send": "Send message",
+    "sending": "Sending…",
+    "successTitle": "Message sent!",
+    "successBody": "Thanks for reaching out — we’ll reply to your email soon.",
+    "error": "Something went wrong. Please try again."
   }
 }

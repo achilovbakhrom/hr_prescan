@@ -1879,5 +1879,21 @@
     "selectPermissions": "Bu foydalanuvchi uchun ruxsatlarni tanlang",
     "allPermissions": "Barcha ruxsatlar (Kompaniya admini)",
     "noPermissions": "Ruxsatlar tayinlanmagan"
+  },
+  "contact": {
+    "title": "Biz bilan bogʻlanish",
+    "subtitle": "Savol yoki fikringiz bormi? Bizga yozing, javob beramiz.",
+    "name": "Ism",
+    "namePlaceholder": "Ismingiz",
+    "email": "Email",
+    "subject": "Mavzu",
+    "subjectPlaceholder": "Xabaringiz nima haqida?",
+    "message": "Xabar",
+    "messagePlaceholder": "Qanday yordam bera olamiz?",
+    "send": "Xabar yuborish",
+    "sending": "Yuborilmoqda…",
+    "successTitle": "Xabar yuborildi!",
+    "successBody": "Bogʻlanganingiz uchun rahmat — tez orada emailingizga javob beramiz.",
+    "error": "Nimadir xato ketdi. Iltimos, qayta urinib koʻring."
   }
 }

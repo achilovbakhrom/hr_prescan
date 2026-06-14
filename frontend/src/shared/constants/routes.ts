@@ -38,6 +38,7 @@ export const ROUTE_NAMES = {
   NOTIFICATIONS: 'notifications',
   TEAM_MANAGEMENT: 'team-management',
   PRICING: 'pricing',
+  CONTACT: 'contact',
   SUBSCRIPTION: 'subscription',
   ADMIN_DASHBOARD: 'admin-dashboard',
   ADMIN_COMPANIES: 'admin-companies',
