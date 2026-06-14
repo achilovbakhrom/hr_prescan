@@ -5,13 +5,13 @@ from apps.interviews.services.interview_crud import (
     schedule_human_interview,
     start_interview,
 )
-from apps.interviews.services.interview_livekit import (
-    generate_candidate_token,
-    generate_observer_token,
-)
 from apps.interviews.services.interview_integrity import (
     add_integrity_flag,
     create_integrity_flags,
+)
+from apps.interviews.services.interview_livekit import (
+    generate_candidate_token,
+    generate_observer_token,
 )
 from apps.interviews.services.interview_scoring import (
     complete_session,

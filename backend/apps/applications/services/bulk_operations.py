@@ -178,9 +178,13 @@ def bind_existing_applications(*, user: User) -> int:
     if user.phone:
         target_phone = _normalize_phone(user.phone)
         if target_phone:
-            phone_candidates = Application.objects.filter(
-                candidate__isnull=True,
-            ).exclude(candidate_phone="").values_list("id", "candidate_phone")
+            phone_candidates = (
+                Application.objects.filter(
+                    candidate__isnull=True,
+                )
+                .exclude(candidate_phone="")
+                .values_list("id", "candidate_phone")
+            )
             for app_id, candidate_phone in phone_candidates:
                 if _normalize_phone(candidate_phone) == target_phone:
                     matched_ids.add(app_id)

@@ -18,14 +18,11 @@ def _hr_recipients(*, company: Company) -> QuerySet[User]:
     (``User.company``): a multi-company HR/admin currently switched into a different
     company (or candidate mode) must still receive the company's notifications.
     """
-    return (
-        User.objects.filter(
-            memberships__company=company,
-            memberships__role__in=[User.Role.HR, User.Role.ADMIN],
-            is_active=True,
-        )
-        .distinct()
-    )
+    return User.objects.filter(
+        memberships__company=company,
+        memberships__role__in=[User.Role.HR, User.Role.ADMIN],
+        is_active=True,
+    ).distinct()
 
 
 # ---------------------------------------------------------------------------
@@ -112,8 +109,7 @@ def notify_session_completed(*, interview: Interview) -> None:
             type=Notification.Type.INTERVIEW_COMPLETED,
             title=title,
             message=(
-                f"{application.candidate_name} completed {step_label} for "
-                f"{application.vacancy.title}. Score: {score}."
+                f"{application.candidate_name} completed {step_label} for {application.vacancy.title}. Score: {score}."
             ),
             data={
                 "interview_id": str(interview.id),
@@ -137,8 +133,7 @@ def notify_status_changed(*, application: Application) -> None:
     """
     title = "Application Status Updated"
     message = (
-        f"Your application for {application.vacancy.title} "
-        f"has been updated to: {application.get_status_display()}."
+        f"Your application for {application.vacancy.title} has been updated to: {application.get_status_display()}."
     )
 
     if application.candidate:

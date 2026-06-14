@@ -9,7 +9,6 @@ from apps.applications.services.application_reopen import (
     get_existing_application,
     reopen_application,
 )
-from apps.applications.services.cv_selection import get_candidate_platform_cv, is_candidate_platform_cv_file
 from apps.applications.services.application_submit_helpers import (
     enqueue_cv_processing,
     notify_candidate_prescanning_ready,
@@ -17,6 +16,7 @@ from apps.applications.services.application_submit_helpers import (
     submission_result,
     sync_candidate_base,
 )
+from apps.applications.services.cv_selection import get_candidate_platform_cv, is_candidate_platform_cv_file
 from apps.applications.services.profile_cv_snapshot import (
     apply_candidate_profile_cv_snapshot,
     build_candidate_profile_cv_snapshot,
