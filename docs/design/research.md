@@ -1,4 +1,4 @@
-# HR PreScan UI Redesign — Research (T2)
+# HR PreScreen UI Redesign — Research (T2)
 
 **Phase:** Research only. No spec, no tokens, no code. Await user reaction before T3.
 

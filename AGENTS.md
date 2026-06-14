@@ -1,8 +1,8 @@
-# HR PreScan — Codex Project Guide
+# HR PreScreen — Codex Project Guide
 
 ## What this project is
 
-HR PreScan is a multi-tenant SaaS platform that automates candidate pre-screening using AI-powered interviews (text chat or video). The core goal is to help HR teams pre-filter large applicant pools before manual review.
+HR PreScreen is a multi-tenant SaaS platform that automates candidate pre-screening using AI-powered interviews (text chat or video). The core goal is to help HR teams pre-filter large applicant pools before manual review.
 
 ## Read These Docs First
 

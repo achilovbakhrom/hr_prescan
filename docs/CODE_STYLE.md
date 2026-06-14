@@ -1,10 +1,11 @@
-# HR PreScan — Code Style & Architecture Guide
+# HR PreScreen — Code Style & Architecture Guide
 
 ## 0. Core Principles
 
 All code must follow these principles:
 
 ### SOLID
+
 - **S — Single Responsibility:** Each class, function, and module does one thing. A service handles one domain, a component renders one concern.
 - **O — Open/Closed:** Extend behavior through new classes/composables, not by modifying existing ones. Use strategy patterns for evaluation criteria, notification channels, etc.
 - **L — Liskov Substitution:** Subclasses/implementations must be interchangeable. If `NotificationService` has subclasses (email, in-app), they must honor the same contract.
@@ -12,11 +13,13 @@ All code must follow these principles:
 - **D — Dependency Inversion:** High-level modules (services) should not depend on low-level modules (API clients) directly. Use the `integrations/` layer to abstract external services.
 
 ### KISS (Keep It Simple, Stupid)
+
 - Choose the simplest solution that works. No premature abstractions.
 - If a function is hard to explain, it's too complex — break it down.
 - Avoid clever code. Readable > short.
 
 ### DRY (Don't Repeat Yourself)
+
 - Extract shared logic into services, composables, or utils — but only after the second repetition (Rule of Three).
 - Don't DRY across unrelated domains — similar code in different contexts is fine.
 - Prefer duplication over the wrong abstraction.
@@ -34,14 +37,14 @@ Request → API View (validation) → Service (logic) → Model (data) → Respo
                                 → Selector (query) ──────────────►
 ```
 
-| Layer | Responsibility | Rules |
-|-------|---------------|-------|
-| **Models** | Fields, constraints, `__str__`, properties | No business logic. No external calls. |
-| **Services** | All write operations, orchestration | Can call other services, selectors, integrations, dispatch tasks |
-| **Selectors** | All read/query operations | Return QuerySets. Handle tenant scoping. No side effects. |
-| **APIs** | HTTP concerns only: validation, permissions, status codes | Must call services/selectors. No raw ORM queries. |
-| **Tasks** | Celery async wrappers | Thin — fetch objects, call services. No business logic. |
-| **Integrations** | External API wrappers | One file per service. Return domain-friendly data. |
+| Layer            | Responsibility                                            | Rules                                                            |
+| ---------------- | --------------------------------------------------------- | ---------------------------------------------------------------- |
+| **Models**       | Fields, constraints, `__str__`, properties                | No business logic. No external calls.                            |
+| **Services**     | All write operations, orchestration                       | Can call other services, selectors, integrations, dispatch tasks |
+| **Selectors**    | All read/query operations                                 | Return QuerySets. Handle tenant scoping. No side effects.        |
+| **APIs**         | HTTP concerns only: validation, permissions, status codes | Must call services/selectors. No raw ORM queries.                |
+| **Tasks**        | Celery async wrappers                                     | Thin — fetch objects, call services. No business logic.          |
+| **Integrations** | External API wrappers                                     | One file per service. Return domain-friendly data.               |
 
 ### Frontend: Feature-Based Modules (Vue.js 3)
 
@@ -52,14 +55,14 @@ User action → Component → Store (Pinia) → API Service → Backend
                         → Composable (reusable logic)
 ```
 
-| Layer | Responsibility | Rules |
-|-------|---------------|-------|
-| **Pages** | Route-level components | Compose feature components. Minimal logic. |
-| **Components** | UI building blocks | Props in, events out. No direct API calls. |
-| **Stores** | State management (Pinia) | Call API services. Expose state + actions. |
-| **Services** | API call functions | Typed request/response. Use shared Axios client. |
-| **Composables** | Reusable stateful logic (`use*`) | Can use stores, refs, lifecycle hooks. |
-| **Types** | TypeScript interfaces/types | Co-located with features or in `shared/types/`. |
+| Layer           | Responsibility                   | Rules                                            |
+| --------------- | -------------------------------- | ------------------------------------------------ |
+| **Pages**       | Route-level components           | Compose feature components. Minimal logic.       |
+| **Components**  | UI building blocks               | Props in, events out. No direct API calls.       |
+| **Stores**      | State management (Pinia)         | Call API services. Expose state + actions.       |
+| **Services**    | API call functions               | Typed request/response. Use shared Axios client. |
+| **Composables** | Reusable stateful logic (`use*`) | Can use stores, refs, lifecycle hooks.           |
+| **Types**       | TypeScript interfaces/types      | Co-located with features or in `shared/types/`.  |
 
 ---
 
@@ -130,23 +133,23 @@ backend/
 
 Every Django app follows the same file layout:
 
-| File | Purpose |
-|------|---------|
-| `models.py` | Django models (thin) |
-| `services.py` | Write operations + business logic |
-| `selectors.py` | Read operations (QuerySets) |
-| `apis.py` | DRF API views |
-| `serializers.py` | Input/output serializers |
+| File             | Purpose                                  |
+| ---------------- | ---------------------------------------- |
+| `models.py`      | Django models (thin)                     |
+| `services.py`    | Write operations + business logic        |
+| `selectors.py`   | Read operations (QuerySets)              |
+| `apis.py`        | DRF API views                            |
+| `serializers.py` | Input/output serializers                 |
 | `permissions.py` | DRF permission classes (if app-specific) |
-| `urls.py` | URL patterns |
-| `admin.py` | Django admin config |
-| `tasks.py` | Celery tasks |
-| `managers.py` | Custom QuerySet managers (if needed) |
-| `tests/` | Test directory with `factories.py` |
+| `urls.py`        | URL patterns                             |
+| `admin.py`       | Django admin config                      |
+| `tasks.py`       | Celery tasks                             |
+| `managers.py`    | Custom QuerySet managers (if needed)     |
+| `tests/`         | Test directory with `factories.py`       |
 
 ---
 
-## 3. Frontend Project Structure (Vue.js)
+## 3. Frontend Project Structure - Nuxt 4 (Vue 3)
 
 ```
 frontend/
@@ -199,15 +202,15 @@ frontend/
 
 Every feature module follows the same layout:
 
-| Folder | Purpose |
-|--------|---------|
-| `components/` | Feature-specific Vue components |
-| `composables/` | Feature-specific `use*` functions |
-| `pages/` | Route-level page components |
-| `stores/` | Pinia stores for this feature |
-| `services/` | API call functions (typed) |
-| `types/` | TypeScript interfaces for this feature |
-| `routes.ts` | Feature routes (lazy-loaded) |
+| Folder         | Purpose                                |
+| -------------- | -------------------------------------- |
+| `components/`  | Feature-specific Vue components        |
+| `composables/` | Feature-specific `use*` functions      |
+| `pages/`       | Route-level page components            |
+| `stores/`      | Pinia stores for this feature          |
+| `services/`    | API call functions (typed)             |
+| `types/`       | TypeScript interfaces for this feature |
+| `routes.ts`    | Feature routes (lazy-loaded)           |
 
 ---
 
@@ -329,17 +332,17 @@ def process_interview_results(interview_id: int, scores: dict, transcript: list)
 <!-- features/candidates/pages/CandidateListPage.vue -->
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import { useCandidateStore } from '../stores/candidate.store'
-import CandidateTable from '../components/CandidateTable.vue'
-import CandidateFilters from '../components/CandidateFilters.vue'
+import { onMounted } from "vue";
+import { useCandidateStore } from "../stores/candidate.store";
+import CandidateTable from "../components/CandidateTable.vue";
+import CandidateFilters from "../components/CandidateFilters.vue";
 
-const props = defineProps<{ vacancyId: string }>()
-const candidateStore = useCandidateStore()
+const props = defineProps<{ vacancyId: string }>();
+const candidateStore = useCandidateStore();
 
 onMounted(() => {
-  candidateStore.fetchCandidates(props.vacancyId)
-})
+  candidateStore.fetchCandidates(props.vacancyId);
+});
 </script>
 
 <template>
@@ -359,38 +362,38 @@ onMounted(() => {
 ```typescript
 // features/candidates/stores/candidate.store.ts
 
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import { candidateService } from '../services/candidate.service'
-import type { Candidate, CandidateFilters } from '../types/candidate.types'
+import { defineStore } from "pinia";
+import { ref } from "vue";
+import { candidateService } from "../services/candidate.service";
+import type { Candidate, CandidateFilters } from "../types/candidate.types";
 
-export const useCandidateStore = defineStore('candidate', () => {
-  const candidates = ref<Candidate[]>([])
-  const loading = ref(false)
+export const useCandidateStore = defineStore("candidate", () => {
+  const candidates = ref<Candidate[]>([]);
+  const loading = ref(false);
 
   async function fetchCandidates(vacancyId: string) {
-    loading.value = true
+    loading.value = true;
     try {
-      candidates.value = await candidateService.getByVacancy(vacancyId)
+      candidates.value = await candidateService.getByVacancy(vacancyId);
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
   async function applyFilters(filters: CandidateFilters) {
-    loading.value = true
+    loading.value = true;
     try {
       candidates.value = await candidateService.getByVacancy(
         filters.vacancyId,
         filters,
-      )
+      );
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
-  return { candidates, loading, fetchCandidates, applyFilters }
-})
+  return { candidates, loading, fetchCandidates, applyFilters };
+});
 ```
 
 ### 4.7 Vue: API Service
@@ -398,8 +401,8 @@ export const useCandidateStore = defineStore('candidate', () => {
 ```typescript
 // features/candidates/services/candidate.service.ts
 
-import { apiClient } from '@/shared/api/client'
-import type { Candidate, CandidateFilters } from '../types/candidate.types'
+import { apiClient } from "@/shared/api/client";
+import type { Candidate, CandidateFilters } from "../types/candidate.types";
 
 export const candidateService = {
   async getByVacancy(
@@ -409,19 +412,19 @@ export const candidateService = {
     const { data } = await apiClient.get(
       `/hr/vacancies/${vacancyId}/candidates/`,
       { params: filters },
-    )
-    return data.results
+    );
+    return data.results;
   },
 
   async getDetail(candidateId: string): Promise<Candidate> {
-    const { data } = await apiClient.get(`/hr/candidates/${candidateId}/`)
-    return data
+    const { data } = await apiClient.get(`/hr/candidates/${candidateId}/`);
+    return data;
   },
 
   async updateStatus(candidateId: string, status: string): Promise<void> {
-    await apiClient.patch(`/hr/candidates/${candidateId}/status/`, { status })
+    await apiClient.patch(`/hr/candidates/${candidateId}/status/`, { status });
   },
-}
+};
 ```
 
 ### 4.8 Vue: Composable
@@ -429,30 +432,30 @@ export const candidateService = {
 ```typescript
 // shared/composables/useSSE.ts
 
-import { ref, onUnmounted } from 'vue'
+import { ref, onUnmounted } from "vue";
 
 export function useSSE(url: string) {
-  const events = ref<any[]>([])
-  const connected = ref(false)
-  let source: EventSource | null = null
+  const events = ref<any[]>([]);
+  const connected = ref(false);
+  let source: EventSource | null = null;
 
   function connect() {
-    source = new EventSource(url)
-    source.onopen = () => (connected.value = true)
+    source = new EventSource(url);
+    source.onopen = () => (connected.value = true);
     source.onmessage = (event) => {
-      events.value.push(JSON.parse(event.data))
-    }
-    source.onerror = () => (connected.value = false)
+      events.value.push(JSON.parse(event.data));
+    };
+    source.onerror = () => (connected.value = false);
   }
 
   function disconnect() {
-    source?.close()
-    connected.value = false
+    source?.close();
+    connected.value = false;
   }
 
-  onUnmounted(disconnect)
+  onUnmounted(disconnect);
 
-  return { events, connected, connect, disconnect }
+  return { events, connected, connect, disconnect };
 }
 ```
 
@@ -461,32 +464,32 @@ export function useSSE(url: string) {
 ```typescript
 // shared/api/client.ts
 
-import axios from 'axios'
-import { useAuthStore } from '@/features/auth/stores/auth.store'
+import axios from "axios";
+import { useAuthStore } from "@/features/auth/stores/auth.store";
 
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL + '/api',
-  headers: { 'Content-Type': 'application/json' },
-})
+  baseURL: import.meta.env.VITE_API_URL + "/api",
+  headers: { "Content-Type": "application/json" },
+});
 
 apiClient.interceptors.request.use((config) => {
-  const auth = useAuthStore()
+  const auth = useAuthStore();
   if (auth.accessToken) {
-    config.headers.Authorization = `Bearer ${auth.accessToken}`
+    config.headers.Authorization = `Bearer ${auth.accessToken}`;
   }
-  return config
-})
+  return config;
+});
 
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.response?.status === 401) {
-      const auth = useAuthStore()
-      await auth.refreshToken()
+      const auth = useAuthStore();
+      await auth.refreshToken();
     }
-    return Promise.reject(error)
+    return Promise.reject(error);
   },
-)
+);
 ```
 
 ---
@@ -504,6 +507,7 @@ apiClient.interceptors.response.use(
 - Imports: use absolute imports (`from apps.interviews.services import ...`)
 - Type hints on all service/selector function signatures
 - **No hardcoded strings** — use `TextChoices` / `IntegerChoices` enums for statuses, roles, and any repeated string values:
+
   ```python
   # apps/interviews/models.py
   class InterviewStatus(models.TextChoices):
@@ -533,28 +537,28 @@ apiClient.interceptors.response.use(
   ```typescript
   // shared/constants/roles.ts
   export const UserRole = {
-    ADMIN: 'admin',
-    HR: 'hr',
-    CANDIDATE: 'candidate',
-  } as const
-  export type UserRole = (typeof UserRole)[keyof typeof UserRole]
+    ADMIN: "admin",
+    HR: "hr",
+    CANDIDATE: "candidate",
+  } as const;
+  export type UserRole = (typeof UserRole)[keyof typeof UserRole];
 
   // features/candidates/types/candidate.types.ts
   export interface Candidate {
-    id: string
-    name: string
-    email: string
-    status: CandidateStatus
-    scores: InterviewScore[]
+    id: string;
+    name: string;
+    email: string;
+    status: CandidateStatus;
+    scores: InterviewScore[];
   }
 
   export type CandidateStatus =
-    | 'applied'
-    | 'interview_scheduled'
-    | 'interview_completed'
-    | 'reviewing'
-    | 'shortlisted'
-    | 'rejected'
+    | "applied"
+    | "interview_scheduled"
+    | "interview_completed"
+    | "reviewing"
+    | "shortlisted"
+    | "rejected";
   ```
 
 ### 5.3 File Size & Splitting
@@ -563,6 +567,7 @@ apiClient.interceptors.response.use(
 - **Django:** If `services.py` gets large, convert to a `services/` package with files per domain area (e.g., `services/scheduling.py`, `services/scoring.py`). Same for `selectors.py`, `apis.py`, `serializers.py`.
 - **Vue:** If a component exceeds ~150 lines, extract sub-components. If a store gets large, split into multiple stores.
 - **Splitting pattern for Django:**
+
   ```
   # Before (single file)
   apps/interviews/services.py        # 400 lines, too big
@@ -574,6 +579,7 @@ apiClient.interceptors.response.use(
   ├── scoring.py                     # complete_interview, calculate_scores
   └── livekit.py                     # create_room, generate_token
   ```
+
 - **Rule of thumb:** One file = one clear responsibility. If you can't describe what a file does in one sentence, it's doing too much.
 
 ### 5.4 General
@@ -627,23 +633,26 @@ addopts = "--reuse-db --no-migrations -x -v"
 ### 6.2 Frontend: `eslint.config.js`
 
 ```javascript
-import pluginVue from 'eslint-plugin-vue'
-import tseslint from 'typescript-eslint'
-import prettierConfig from 'eslint-config-prettier'
+import pluginVue from "eslint-plugin-vue";
+import tseslint from "typescript-eslint";
+import prettierConfig from "eslint-config-prettier";
 
 export default [
   ...tseslint.configs.recommended,
-  ...pluginVue.configs['flat/recommended'],
+  ...pluginVue.configs["flat/recommended"],
   prettierConfig,
   {
     rules: {
-      'vue/multi-word-component-names': 'off',
-      'vue/no-unused-vars': 'error',
-      '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      "vue/multi-word-component-names": "off",
+      "vue/no-unused-vars": "error",
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_" },
+      ],
     },
   },
-]
+];
 ```
 
 ### 6.3 Frontend: `.prettierrc`
@@ -697,6 +706,7 @@ repos:
 ### MVP Phase: No Unit Tests
 
 For the MVP, we skip unit tests to move fast. Code quality is enforced by:
+
 - **Linters** (Ruff, ESLint) — catch bugs and bad patterns at commit time
 - **Formatters** (Ruff formatter, Prettier) — consistent code style automatically
 - **Type checking** (mypy, vue-tsc) — catch type errors before runtime
@@ -705,24 +715,31 @@ For the MVP, we skip unit tests to move fast. Code quality is enforced by:
 
 ### Post-MVP: Add Tests Gradually
 
-| What | How | When to Add |
-|------|-----|-------------|
-| Services | `pytest` + `factory_boy` | After MVP, highest priority |
-| Composables | `vitest` | After MVP |
-| API endpoints | `pytest` + DRF test client | When adding complex flows |
-| E2E | Playwright | When user base grows |
+| What          | How                        | When to Add                 |
+| ------------- | -------------------------- | --------------------------- |
+| Services      | `pytest` + `factory_boy`   | After MVP, highest priority |
+| Composables   | `vitest`                   | After MVP                   |
+| API endpoints | `pytest` + DRF test client | When adding complex flows   |
+| E2E           | Playwright                 | When user base grows        |
 
 ---
 
 ## 8. Naming Conventions
 
-| What | Backend (Python) | Frontend (TypeScript/Vue) |
-|------|-----------------|--------------------------|
-| Files | `snake_case.py` | `PascalCase.vue`, `camelCase.ts` |
-| Classes | `PascalCase` | `PascalCase` |
-| Functions | `snake_case` | `camelCase` |
-| Variables | `snake_case` | `camelCase` |
-| Constants | `UPPER_SNAKE_CASE` | `UPPER_SNAKE_CASE` |
+| What        | Backend (Python)                       | Frontend (TypeScript/Vue)        |
+| ----------- | -------------------------------------- | -------------------------------- |
+| Files       | `snake_case.py`                        | `PascalCase.vue`, `camelCase.ts` |
+| Classes     | `PascalCase`                           | `PascalCase`                     |
+| Functions   | `snake_case`                           | `camelCase`                      |
+| Variables   | `snake_case`                           | `camelCase`                      |
+| Constants   | `UPPER_SNAKE_CASE`                     | `UPPER_SNAKE_CASE`               |
+| URLs        | `/api/kebab-case/`                     | `/kebab-case`                    |
+| DB tables   | `app_name_model_name` (Django default) | —                                |
+| Components  | —                                      | `PascalCase.vue`                 |
+| Composables | —                                      | `useCamelCase.ts`                |
+| Stores      | —                                      | `camelCase.store.ts`             |
+| Services    | —                                      | `camelCase.service.ts`           |
+| Types       | —                                      | `camelCase.types.ts`             `UPPER_SNAKE_CASE` |
 | URLs | `/api/kebab-case/` | `/kebab-case` |
 | DB tables | `app_name_model_name` (Django default) | — |
 | Components | — | `PascalCase.vue` |

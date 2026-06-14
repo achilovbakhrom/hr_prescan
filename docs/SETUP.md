@@ -250,7 +250,7 @@ ELEVENLABS_API_KEY=
 ELEVENLABS_VOICE_ID=EXAVITQu4vr4xnSDxMaL
 
 # === HEADHUNTER / hh.uz ===
-HH_USER_AGENT=HR PreScan vacancy parser
+HH_USER_AGENT=HR PreScreen vacancy parser
 HH_TOKEN_URL=https://api.hh.ru/token
 HH_UZ_ACCESS_TOKEN=
 HH_UZ_CLIENT_ID=
@@ -294,7 +294,7 @@ cat > /opt/prescreen/.env << EOF
 DOMAIN=dev.prescreen-app.com
 GITHUB_REPOSITORY=achilovbakhrom/hr_prescan
 IMAGE_TAG=dev
-HH_USER_AGENT=HR PreScan vacancy parser
+HH_USER_AGENT=HR PreScreen vacancy parser
 HH_TOKEN_URL=https://api.hh.ru/token
 HH_UZ_ACCESS_TOKEN=
 EOF
@@ -503,7 +503,7 @@ ELEVENLABS_API_KEY=
 ELEVENLABS_VOICE_ID=EXAVITQu4vr4xnSDxMaL
 
 # === HEADHUNTER / hh.uz ===
-HH_USER_AGENT=HR PreScan vacancy parser
+HH_USER_AGENT=HR PreScreen vacancy parser
 HH_TOKEN_URL=https://api.hh.ru/token
 HH_UZ_ACCESS_TOKEN=
 HH_UZ_CLIENT_ID=
@@ -541,7 +541,7 @@ cat > /opt/prescreen/.env << EOF
 DOMAIN=prescreen-app.com
 GITHUB_REPOSITORY=achilovbakhrom/hr_prescan
 IMAGE_TAG=latest
-HH_USER_AGENT=HR PreScan vacancy parser
+HH_USER_AGENT=HR PreScreen vacancy parser
 HH_TOKEN_URL=https://api.hh.ru/token
 HH_UZ_ACCESS_TOKEN=
 EOF

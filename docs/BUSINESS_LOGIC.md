@@ -1,8 +1,8 @@
-# HR PreScan — Business Logic
+# HR PreScreen — Business Logic
 
 ## 1. Overview
 
-HR PreScan is a multi-tenant SaaS platform that automates the full candidate screening pipeline using AI-powered prescanning chat and video interviews. When a vacancy receives hundreds of applicants, manually screening each one is time-consuming and inconsistent.
+HR PreScreen is a multi-tenant SaaS platform that automates the full candidate screening pipeline using AI-powered prescanning chat and video interviews. When a vacancy receives hundreds of applicants, manually screening each one is time-consuming and inconsistent.
 
 **The platform provides a two-step AI screening pipeline:**
 
@@ -13,13 +13,16 @@ The AI agent evaluates candidates at each step and decides whether to advance th
 
 **Platform:** Web application (mobile versions planned for later)
 **Languages:** English, Russian, Uzbek, Kazakh, Turkish, Arabic, Spanish, French, German, and Ukrainian for the web app, public translation, and AI screening language selection. Telegram bot interface copy currently remains English/Russian/Uzbek, while Telegram prescreening follows the vacancy's selected screening language. Deeper video interview sessions use a voice-provider policy: native Deepgram speech recognition for supported interview languages including Arabic; native Deepgram voices for English, Spanish, French, and German; per-language ElevenLabs multilingual voices for Russian, Ukrainian, Turkish, Arabic, and Kazakh; Uzbek interview sessions currently run in Russian until native Uzbek voice quality is acceptable. If a configured ElevenLabs voice is blocked or unavailable, the agent falls back to an API-usable ElevenLabs premade recovery voice before allowing silence; the spoken text must remain in the vacancy's resolved interview language.
-**Tech Stack:** Django (backend) + Nuxt/Vue.js (frontend), deployed via Docker Compose with zero-downtime strategy
+**Tech Stack:** Django (backend) + Nuxt 4 / Vue 3 (frontend), deployed via Docker Compose with zero-downtime strategy
 
 ---
 
 ## 2. User Roles
 
 ### 2.1 Admin (Platform Admin)
+
+> **Two distinct "admin" notions:** the **account/company owner** (`User.role = "admin"`, created on company setup — the HR who owns the account) and the **platform admin** (`is_staff=True`, gated by the `IsPlatformAdmin` permission). The description below refers to the **platform admin**; the account-owner admin role is a separate, per-account role.
+
 - Manages the entire platform
 - User management (create/block/delete companies and users)
 - System settings and configuration
@@ -55,6 +58,7 @@ The AI agent evaluates candidates at each step and decides whether to advance th
 - HR mode requires at least one live company membership. The web header shows the current mode, the company dropdown, and an option to switch to candidate mode or create a candidate space.
 - Candidate mode requires a candidate space (candidate role or candidate profile). The web header hides the HR company dropdown and shows only the account-mode switch.
 - Creating an HR space from a candidate account creates the required company and preserves the candidate space. Creating a candidate space from an HR account collects the required personal profile fields and switches into candidate mode.
+- Creating an HR space grants the account the 14-day Professional trial, the same trial granted at company setup. Granting is **idempotent** — if the account owner already has a subscription (trial or otherwise), no second subscription/trial is created. HR-space creation is **never blocked** by the absence of a paid plan; free users can create HR spaces (billing is paused).
 - If the account is linked to a Telegram identity that already owns an HR-bot placeholder workspace (`tg_hr_<telegram_id>@telegram.local`), creating an HR space from web first merges that placeholder into the current account (same merge used by web Telegram login), then creates the new company — so the bot-created workspace and the new web company both end up on one account. If a real (non-placeholder) HR/admin account already holds the same Telegram identity, HR-space creation is refused with a message to sign in with that account instead.
 - HR permissions only apply while `active_mode=hr`; candidate profile and dashboard APIs only apply while `active_mode=candidate`.
 
@@ -67,7 +71,7 @@ The AI agent evaluates candidates at each step and decides whether to advance th
 - **Invitations target the account, not a single company.** When an HR invites a teammate, they pick which companies the invitee gets access to (default: all non-deleted companies at the time of invite). On accept, one `CompanyMembership` is created per selected company and the invitee's `User.account_owner` is set to the inviter's account owner.
 - **A user belongs to at most one account.** Accepting an invitation is blocked if the user already owns companies or already belongs to another account — they have to leave the current account first.
 - **Default membership per user.** Each user picks one of their memberships as `is_default` — used implicitly for new vacancies and pre-selected in forms.
-- **Registration creates the user's own account**: one Company (with the user as `account_owner` and `is_default=True` membership) plus a 14-day trial. Additional companies are added from the **Companies** page.
+- **Registration does not create a company or trial.** `POST /api/auth/register/` creates a **candidate** user with **no company and no trial** (`onboarding_completed=False`). The user's first Company (with the user as `account_owner` and `is_default=True` ADMIN `CompanyMembership`) and the 14-day trial are created **later**, when the user chooses the HR role and completes **company setup** (`complete_company_setup`). Additional companies are added from the **Companies** page.
 - **Soft delete** marks `Company.is_deleted=True`: affects every member of that company, transfers each affected user's default to their next non-deleted membership, and historical vacancies keep the company name for display. The acting user cannot delete their last non-deleted company.
 - Data isolation: vacancy/application/interview queries scope to the caller's memberships (for invitees) or to all companies on the caller's account (for the owner).
 - Company API responses expose the company's country as a human-readable country name. Client create/update requests may still submit the ISO-backed country code selected from the reference list.
@@ -87,38 +91,20 @@ The AI agent evaluates candidates at each step and decides whether to advance th
 
 ### 4.2 Plans
 
-**Free Plan:**
-- 1 active vacancy
-- 10 AI sessions (prescanning + interviews) per month
-- 1 HR user
-- Prescanning only (no interview step)
-- 100 MB storage (CVs only, no recordings)
-- Community support
-- HR PreScan branding on public vacancy pages
+> **Billing is temporarily disabled** (`BILLING_ENABLED=false`, early-access pause — see §4.1). The plans below are the seeded tiers (`subscriptions.services.plan.create_default_plans`) and their limits take effect only once billing is re-enabled. While paused, all accounts use the product without these limits.
 
-**Pro Plan — $49/month ($490/year):**
-- 10 active vacancies
-- 200 AI sessions per month
-- 5 HR users
-- Full pipeline: prescanning + Meet/video interview step
-- 10 GB storage (CVs + interview recordings)
-- Email support
-- No HR PreScan branding
-- Custom company branding on vacancy pages
-- Screening analytics dashboard
+Four tiers (prices in USD; yearly ≈ 2 months free):
 
-**Enterprise Plan — custom pricing:**
-- Unlimited active vacancies
-- Unlimited AI sessions
-- Unlimited HR users
-- Full pipeline: prescanning + Meet/video interview step
-- 100 GB storage (expandable)
-- Priority support + dedicated account manager
-- SSO / SAML integration
-- Custom AI prompts and question templates
-- API access for ATS integration
-- Data residency options (EU, US)
-- SLA guarantees (99.9% uptime)
+| Plan | Price (mo / yr) | Active vacancies | AI sessions / month | HR users | Storage |
+|------|-----------------|------------------|---------------------|----------|---------|
+| **Free** | $0 | 2 | 10 | 1 | 1 GB |
+| **Starter** | $49 / $470 | 10 | 50 | 3 | 10 GB |
+| **Professional** | $149 / $1,430 | 50 | 200 | 10 | 50 GB |
+| **Enterprise** | $399 / $3,830 | Unlimited | Unlimited | Unlimited | 500 GB |
+
+- **AI sessions / month** = `max_interviews_per_month` (counts prescanning + interview sessions).
+- For **Enterprise**, the model stores `0` for vacancies / sessions / HR users to mean **unlimited**; storage is capped at 500 GB.
+- Only these four quota fields (`max_vacancies`, `max_interviews_per_month`, `max_hr_users`, `max_storage_gb`) are enforced in code. Feature-level perks (support tier, branding removal, SSO/SAML, API/ATS access, SLAs, data residency) are product positioning and are **not** currently enforced by the subscription system.
 
 ### 4.3 Overage & Limits
 - While billing is paused, overage limits are informational only and must not block core HR workflows.
@@ -186,26 +172,28 @@ HR can configure external parsing sources per company to collect vacancy drafts 
 
 Vacancies follow a one-directional lifecycle. Once published, a vacancy cannot return to draft.
 
-1. **Draft** — vacancy created but not published. HR configures AI instructions, criteria, and settings.
+1. **Draft** — vacancy created but not published. HR configures AI instructions, criteria, and settings. Can be soft-deleted.
 2. **Published** — live and accepting applications. Can be paused or archived.
 3. **Paused** — temporarily not accepting new applications. Can be resumed (back to published) or archived.
 4. **Archived** — vacancy is permanently closed. All pending sessions are expired. Cannot be reopened. Can be soft-deleted.
 
 ```
-Draft → Published ↔ Paused → Archived → (Soft Delete)
+Draft → Published ↔ Paused → Archived
                   └──────────→ Archived
+
+(Soft Delete) ← Draft or Archived
 ```
 
 An HR can manage multiple active vacancies simultaneously.
 
 ### 5.3.1 Vacancy Soft Delete
 
-- Only **archived** vacancies can be soft-deleted
+- **Draft or archived** vacancies can be soft-deleted
 - Soft-deleted vacancies are permanently hidden from all views (HR vacancy list, public job board, API)
 - Data is retained in the database for compliance/audit purposes but is not accessible through the UI or API
 - Related data (applications, sessions, scores) remains intact and linked
 - The HR vacancy list is divided into two tabs: **Active** (draft + published + paused) and **Archived**
-- The Archived tab shows a delete button per vacancy with a confirmation dialog
+- The delete button (with a confirmation dialog) appears for drafts (Active tab) and archived vacancies (Archived tab)
 
 ### 5.4 Two-Step Screening Pipeline
 
@@ -288,7 +276,7 @@ Candidates can apply via two surfaces: the **web app** (public job board) and th
   - new HR users can start directly in Telegram; `/start` creates a Telegram-first admin placeholder account, requires them to pick a language (en / ru / uz), then requires them to create a company before using vacancy, candidate, interview, team, dashboard, or subscription commands
   - selecting a language in the HR bot writes the same `User.language` field used by the web app; if the Telegram workspace is later merged into a web account, that selected language follows the merged account
   - until a Telegram-first HR user has a company, blocked HR-bot prompts include a **Create company** inline button; after the user taps it, the company-name prompt is shown without repeating that button
-  - existing HR/admin users can still open the public bot and link themselves by entering their work email and confirming a 6-digit code sent to that email before a Telegram-first placeholder is created
+  - the Telegram-first HR placeholder workspace is created **eagerly on first interaction** (`/start` or the first non-email message), not deferred until email linking is declined. Existing HR/admin users can still open the public bot and link themselves by entering their work email and confirming a 6-digit code sent to that email
   - authenticated HR/admin users can still use **Settings -> Telegram** in the web app to generate a one-time deep link; the HR bot asks for confirmation before connecting it
   - if that person later creates a web account and connects Telegram from web settings, the Telegram-first placeholder workspace is merged into the confirmed web account, including companies, vacancies, team memberships, invitations, notifications, messages, and subscription state where applicable; if the web account already has a default company, that company remains the default after merge
   - if the same Telegram identity already has both a candidate placeholder (`tg_<telegram_id>@telegram.local`) and an HR-bot placeholder (`tg_hr_<telegram_id>@telegram.local`), web Telegram login merges the HR-bot workspace into the candidate account so the header account-mode switch exposes both HR and candidate spaces from one authenticated user
@@ -351,7 +339,7 @@ The candidate bot lets a candidate browse entry points, apply, and complete pres
 - Telegram AI mode is explicitly entered and exited. While AI mode is active, bot replies include an Exit AI mode control; `/exit_ai`, `/cancel`, or returning to the main menu must leave AI mode. Outside AI mode, arbitrary free text is blocked and the bot shows normal action buttons.
 - The HR Telegram bot follows the same link safety rule as the candidate bot: a Telegram-first placeholder workspace may be merged into a confirmed web HR/admin account, but an already-linked real HR/admin account is resumed instead of being blocked by an unlink warning or silently rebound to another web user. Candidate links with the same Telegram identity do not block HR-bot linking, and HR links do not block candidate-bot linking.
 - Bot-created users are seeded from `message.from.language_code` when it matches a supported bot locale (en / ru / uz), then bot strings use the stored `User.language`. Authenticated web users can change the same field from the header language switcher; HR and candidate Telegram bot UIs also expose a language picker that updates `User.language` for future bot replies.
-- New Telegram candidate users must register in the bot before they can use vacancy, prescreening, CV, or assistant actions. Registration asks for a phone number first using Telegram's native contact-sharing button (manual phone entry is still accepted), then asks the candidate to choose the bot language (`en` / `ru` / `uz`). The selected language is persisted to `User.language` and drives future bot replies. If the user opened a vacancy/prescreening deep link first, the bot resumes that payload after required onboarding.
+- New Telegram candidate users must register in the bot before they can use vacancy, prescreening, CV, or assistant actions. Registration asks for a phone number first using Telegram's native contact-sharing button (manual phone entry is still accepted), then asks the candidate to choose the bot language (`en` / `ru` / `uz`). The selected language is persisted to `User.language` and drives future bot replies. If the user opened a vacancy/prescreening deep link first, the bot resumes that payload after required onboarding. A legacy `/register` bot flow (asks full name, then phone, then DMs a generated password) still exists but is superseded by this onboarding.
 - Candidate Telegram bot menus expose direct buttons for job search, prescreening, Messages, creating a CV with the candidate AI assistant, viewing saved CVs, uploading an existing CV file, downloading generated/uploaded CV files, changing language, and AI mode.
 
 ---
@@ -464,16 +452,11 @@ Interview is the second, more rigorous AI screening step. HR enables it per vaca
 
 Each step (prescanning and interview) produces its own independent set of scores.
 
-**Fixed categories (always scored per step, 1-10 scale):**
-- Soft skills (communication, teamwork, adaptability)
-- Language proficiency
-- Communication clarity
-- Motivation and enthusiasm
-- Cultural fit
-
-**Custom criteria (defined by HR per step, 1-10 scale):**
+**Scoring criteria (editable per step, 1-10 scale):**
+- Scoring is driven entirely by the vacancy's editable **criteria** table — HR can add, edit, remove, and re-weight criteria per step. There is no fixed, always-scored category set.
+- New vacancies are seeded with **default** criteria (Technical Skills, Communication, Problem Solving, Cultural Fit, Experience Relevance), but these are starting defaults, not mandatory categories — HR can change or delete any of them.
 - HR adds step-specific criteria (e.g., prescanning: "general React knowledge"; interview: "advanced React architecture")
-- AI scores these based on conversation answers and CV data
+- AI scores each criterion based on conversation answers and CV data
 
 **Output per candidate per step (both modes):**
 - Score for each category (1-10)
@@ -627,6 +610,11 @@ All batch actions require confirmation before executing.
 - Notification types mirror email notifications
 - Click-to-navigate to relevant page
 
+**Channels per event (current implementation):**
+- New application received → HR/owner accounts get an in-app notification + email. Fired after the apply transaction commits and fully guarded, so a notification failure never breaks the application submission.
+- Prescanning completed / interview completed → HR/owner accounts get an in-app notification + email (with the session score summary), in addition to the existing Telegram push to linked HR accounts. Both AI steps use the `interview_completed` notification type with a step-specific title.
+- Status change → account candidates get an in-app notification + email; anonymous applicants (no linked account, only `candidate_email`) receive the same status-change email directly (no in-app entry, since there is no account inbox). Both reuse the shared `notification` email template.
+
 ### 10.3 HR-to-Candidate Direct Messages
 - HR direct messages are allowed only when an application is linked to a platform candidate account (`Application.candidate`). If the application has no platform inbox, the platform rejects the send and tells HR to use direct external contact.
 - Every HR-to-candidate direct message is stored as a platform `Message` row before delivery. The message records delivery channel, status, delivered timestamp, Telegram message id when available, and failure reason when delivery fails.
@@ -676,7 +664,9 @@ Applied → Prescanned → Interviewed* → Shortlisted → Hired
 Applied → Prescanned, Shortlisted, Hired, Rejected, Archived, Expired
 
 Prescanned → Interviewed (when interview enabled), Shortlisted, Hired,
-             Rejected, Archived, Applied (reset)
+             Rejected, Archived, Applied (reset),
+             Expired (vacancy archived while a prescanned application still
+             has a pending interview session)
 
 Interviewed → Shortlisted, Hired, Rejected, Archived, Prescanned (revert)
 
@@ -721,15 +711,15 @@ Archived → Applied (restore)
 
 ### 14.1 Company Registration
 
-1. Company representative visits the platform and clicks "Register Company"
-2. Fills in company details:
+Registration itself does **not** create a company or trial — `POST /api/auth/register/` creates a **candidate** user (`onboarding_completed=False`, no company, no trial). The company is created at the separate **company setup** step (`complete_company_setup`) after the user chooses the HR role.
+
+1. User registers (email/password) and verifies their email — must confirm before proceeding
+2. User chooses the **HR** role and proceeds to **company setup**, where company details are collected:
    - Company name
    - Industry
    - Company size (number of employees)
    - Country / region
-   - Contact person name and email
-3. Sets up admin account (email/password)
-4. Email verification sent — must confirm before proceeding
+3. Completing company setup creates the user's first Company, the ADMIN `CompanyMembership`, and the 14-day trial
 
 ### 14.2 Subscription Selection
 
@@ -752,7 +742,8 @@ Archived → Applied (restore)
 3. Invitation is scoped to the inviter's account, not to a single company. Only one pending invitation per email per account is allowed at a time.
 4. Invitee receives an email listing the account name and the granted companies, with a sign-up / sign-in link.
 5. On accept, a `CompanyMembership` is created for each granted company, `User.account_owner` is set to the inviter's account owner, and the invitee lands in the default company. A user who already owns companies (or belongs to another account) cannot accept — they must leave the current account first.
-6. Account admin can manage HR permissions (activate/deactivate) and invitation scope for future invites.
+6. Account admin can manage HR permissions (activate/deactivate) and invitation scope for future invites. HR permissions are stored **per company on the member's `CompanyMembership`**, which is the source of truth — switching company reloads `User.hr_permissions` from the membership. Editing a member's permissions writes to the `CompanyMembership` for the admin's current company; the live `User.hr_permissions` is also updated only when that member is currently active in the same company, so the change takes effect immediately.
+7. The team list for a company shows every user who holds a `CompanyMembership` in it, regardless of which company (or candidate mode) each member is currently switched into. Each member's `role`, `hr_permissions`, and `company` in the team-list response reflect that member's `CompanyMembership` for the **queried** company (the membership being the source of truth), not the member's live active-company pointer — so a member currently switched into a different company still shows the correct role and permissions for this company.
 
 ### 14.5 Creating First Vacancy
 
@@ -766,7 +757,12 @@ Archived → Applied (restore)
 
 ## 15. AI Interview Integrity & Anti-Cheating
 
+> **Implementation status:** Most of this section is **planned but not yet active**. Identity verification (§15.1), camera-based behavior monitoring (§15.2 — face presence / multiple faces / gaze), and content-based cheating detection in the prescanning chat (§15.3 — scripted / AI-generated / response-timing / cross-step) are **not yet implemented**. What currently runs is only a transcript-based heuristic on the Meet/video interview path: a single over-long candidate turn is flagged. The prescanning chat produces **no** integrity flags today.
+
 ### 15.1 Identity Verification (Meet mode — interview step only)
+
+> **Not yet implemented** — planned.
+
 
 - Before the interview starts, candidate is asked to show an ID document on camera (optional, configurable by HR)
 - System takes a photo of the candidate at the start of the interview
@@ -774,12 +770,16 @@ Archived → Applied (restore)
 
 ### 15.2 Behavior Monitoring During Interview (Meet mode — interview step only)
 
+> **Not yet implemented** — planned. Camera-based monitoring (face presence, multiple faces, gaze) does not run today. The only integrity signal currently produced on the Meet/video path is a transcript word-count heuristic that flags an unusually long single candidate turn (see "Audio anomaly detection" below).
+
 - **Face presence detection** — AI monitors that a face is visible on camera throughout the interview. If the candidate disappears for an extended period, a warning is issued
 - **Multiple faces detection** — if more than one person is detected on camera, AI flags it
 - **Eye tracking / gaze detection** — AI monitors if the candidate is frequently looking away from the screen (possible sign of reading from notes). This is logged as a note, not an automatic disqualification
-- **Audio anomaly detection** — AI detects if another voice is heard or if the candidate appears to be receiving prompts from someone else
+- **Audio anomaly detection** — *currently* this is only a transcript word-count heuristic that flags an unusually long single candidate turn; it is **not** speaker/voice diarisation. The planned behavior (detecting another voice or that the candidate appears to be receiving prompts from someone else) is not yet implemented.
 
 ### 15.3 Content-Based Cheating Detection (prescanning chat and Meet/video sessions)
+
+> **Not yet implemented** — planned. The prescanning chat produces no integrity flags today; scripted-answer, AI-generated-answer, response-timing, and cross-step detection are not active.
 
 - **Response consistency** — AI cross-references answers with CV claims (if CV was uploaded). Inconsistencies are flagged (e.g., claims 5 years of React experience but can't answer basic questions)
 - **Scripted answer detection** — AI analyzes response patterns. If answers sound overly rehearsed or read aloud (unnatural pacing, no pauses), it's noted
@@ -790,7 +790,7 @@ Archived → Applied (restore)
 ### 15.4 Integrity Report
 
 - After each step (prescanning and interview), an integrity section is included in the evaluation
-- Flags are shown to HR with severity levels: info, warning, critical
+- Flags are shown to HR with severity levels: low, medium, high
 - HR makes the final decision — flags are informational, not automatic rejections
 - Examples of flags:
   - "Candidate looked away from screen frequently (12 times)" (Meet mode interview only)
@@ -807,13 +807,13 @@ Archived → Applied (restore)
 - If the candidate's connection drops, the room stays alive for a reconnection window (default: 5 minutes)
 - The AI agent pauses and waits for the candidate to rejoin
 - If the candidate reconnects within the window, the session resumes from where it left off
-- If the candidate does not reconnect, the session is completed with partial data and a note indicating disconnection
+- If the candidate does not reconnect, the session is completed with partial data (LiveKit 5-min `empty_timeout` + shutdown evaluation). Note: while partial-data completion on disconnect works, the session is **not currently tagged with an explicit "disconnection" note** distinguishing it from a normal completion.
 
 ### 16.2 Browser Close Mid-Chat (prescanning only)
 - Chat history is persisted server-side
 - Candidate reopens the session link and sees their full conversation history
 - The session continues from where it left off
-- If no messages are sent for the idle timeout period (default: 24 hours), the session is auto-completed with partial data and a note indicating abandonment
+- **Not yet implemented:** the documented "24h idle → auto-complete with partial data + abandonment note" is not active. Abandoned prescanning sessions currently stay `IN_PROGRESS` until HR manually resets them.
 
 ### 16.3 Vacancy Archived During Active Session
 - **Session not started (pending):** link becomes invalid, candidate sees "This vacancy is no longer accepting applications"
