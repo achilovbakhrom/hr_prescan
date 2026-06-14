@@ -71,6 +71,17 @@ def register_user(
     )
     user.onboarding_completed = False
     user.save(update_fields=["onboarding_completed", "updated_at"])
+
+    # Auto-bind any anonymous applications previously submitted with this email,
+    # mirroring the Google/Telegram auth paths. Resilient: never break signup if
+    # there is nothing to bind or binding fails.
+    try:
+        from apps.applications.services import bind_existing_applications
+
+        bind_existing_applications(user=user)
+    except Exception as exc:
+        logger.warning("bind_existing_applications failed for user %s: %s", user.email, exc)
+
     send_verification_email.delay(user_id=str(user.id))
     return user
 

@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from django.db.models import QuerySet
+from django.db.models import F, QuerySet
 
 from apps.accounts.models import Company, Invitation, User
 
@@ -11,8 +11,27 @@ def get_user_by_email(*, email: str) -> User | None:
 
 
 def get_company_users(*, company: Company) -> QuerySet[User]:
-    """Return all users belonging to a company."""
-    return User.objects.filter(company=company).select_related("company").order_by("-created_at")
+    """Return all users who hold a membership in a company.
+
+    Membership is the source of truth — this includes members currently switched
+    into a different company or candidate mode, not just those whose active-company
+    pointer (``User.company``) happens to be this company.
+
+    Each row is annotated with the member's ``role`` and ``hr_permissions`` for the
+    *queried* company (``membership_role`` / ``membership_hr_permissions``), so the
+    team read path reflects the queried company's membership rather than the member's
+    live active-company pointer. ``select_related`` covers
+    ``UserOutputSerializer.account_owner_name``/``is_account_owner`` traversals.
+    """
+    return (
+        User.objects.filter(memberships__company=company)
+        .select_related("company", "account_owner")
+        .annotate(
+            membership_role=F("memberships__role"),
+            membership_hr_permissions=F("memberships__hr_permissions"),
+        )
+        .order_by("-created_at")
+    )
 
 
 def get_user_by_id(*, user_id: UUID) -> User | None:

@@ -105,9 +105,20 @@ def _create_membership_from_invitation(user: User, invitation: Invitation) -> No
             membership.hr_permissions = perms
             membership.save(update_fields=["role", "hr_permissions"])
 
-    user.company = companies[0]
+    # Land the user on their default company, not just the first granted one. For a
+    # brand-new user the first granted membership became default above; for an
+    # existing user their prior default is preserved (re-accepting never demotes it).
+    default_membership = CompanyMembership.objects.filter(user=user, is_default=True).select_related("company").first()
+    if default_membership is not None:
+        active_company = default_membership.company
+        active_permissions = default_membership.hr_permissions
+    else:
+        active_company = companies[0]
+        active_permissions = perms
+
+    user.company = active_company
     user.role = User.Role.HR
-    user.hr_permissions = perms
+    user.hr_permissions = active_permissions
     user.save(update_fields=["account_owner", "company", "role", "hr_permissions", "updated_at"])
 
 

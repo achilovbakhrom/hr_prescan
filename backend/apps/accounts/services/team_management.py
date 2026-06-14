@@ -1,4 +1,4 @@
-from apps.accounts.models import User
+from apps.accounts.models import Company, CompanyMembership, User
 from apps.common.exceptions import ApplicationError
 from apps.common.messages import (
     MSG_CANNOT_DEACTIVATE_SELF,
@@ -42,4 +42,27 @@ def activate_user(*, user: User, activated_by: User) -> User:
 
     user.is_active = True
     user.save(update_fields=["is_active", "updated_at"])
+    return user
+
+
+def set_member_permissions(*, user: User, company: Company, permissions: list[str]) -> User:
+    """Update an HR member's permissions for a company.
+
+    The CompanyMembership is the source of truth — switch_company reloads
+    User.hr_permissions from the membership on every switch, so the write must land
+    on the membership. The live User.hr_permissions is updated only when the member
+    is currently active in this company, so the change takes effect immediately.
+    """
+    try:
+        membership = CompanyMembership.objects.get(user=user, company=company)
+    except CompanyMembership.DoesNotExist as exc:
+        raise ApplicationError(str(MSG_MANAGE_OWN_COMPANY)) from exc
+
+    membership.hr_permissions = permissions
+    membership.save(update_fields=["hr_permissions"])
+
+    if user.company_id == company.id:
+        user.hr_permissions = permissions
+        user.save(update_fields=["hr_permissions", "updated_at"])
+
     return user

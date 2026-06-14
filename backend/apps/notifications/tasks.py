@@ -38,6 +38,38 @@ def send_email_notification(notification_id: str) -> None:
 
 
 @shared_task
+def send_status_change_email(
+    to: str,
+    subject: str,
+    title: str,
+    message: str,
+    application_id: str = "",
+) -> None:
+    """Send a status-change email to an anonymous applicant (no platform account).
+
+    Reuses the same `notification` email template as in-app notification emails
+    so the look matches the account-candidate path.
+
+    No action URL is included: ``/candidates/<id>`` is an authenticated HR route
+    and there is no public application-tracking page, so a link would be broken
+    for an anonymous applicant. The ``application_id`` arg is kept for backwards
+    compatibility but intentionally unused.
+    """
+    from apps.common.email import send_templated_email
+
+    send_templated_email(
+        to=to,
+        subject=subject,
+        template="notification",
+        context={
+            "notification_title": title,
+            "notification_message": message,
+            "action_url": "",
+        },
+    )
+
+
+@shared_task
 def notify_hr_company_telegram(
     company_id: str,
     application_id: str,

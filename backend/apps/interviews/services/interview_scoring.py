@@ -1,11 +1,9 @@
 import logging
 from decimal import Decimal
-from uuid import UUID
 
 from apps.applications.models import Application
 from apps.common.exceptions import ApplicationError
-from apps.common.messages import MSG_INTERVIEW_NOT_FOUND
-from apps.interviews.models import Interview, InterviewIntegrityFlag, InterviewScore
+from apps.interviews.models import Interview, InterviewScore
 
 logger = logging.getLogger(__name__)
 
@@ -107,7 +105,31 @@ def complete_session(
     except Exception as exc:
         logger.warning("Failed to schedule HR Telegram notification: %s", exc)
 
+    # Notify HR team in-app + email (alongside the Telegram push, guarded so a
+    # notification failure never affects session completion).
+    _notify_hr_session_completed(interview=interview)
+
     return interview
+
+
+def _notify_hr_session_completed(*, interview: Interview) -> None:
+    """Create the in-app + email HR notification for a completed session.
+
+    Covers both prescanning and interview steps; fully guarded. Deferred to
+    on_commit so the Notification row (and its enqueued email) is never created
+    if the surrounding score-saving transaction rolls back.
+    """
+    from django.db import transaction
+
+    def _send() -> None:
+        try:
+            from apps.notifications.services import notify_session_completed
+
+            notify_session_completed(interview=interview)
+        except Exception as exc:
+            logger.warning("Failed to send HR session-completed notification: %s", exc)
+
+    transaction.on_commit(_send)
 
 
 def save_interview_scores(
@@ -133,57 +155,3 @@ def save_interview_scores(
         )
         score_objects.append(score_obj)
     return score_objects
-
-
-def add_integrity_flag(
-    *,
-    interview: Interview,
-    flag_type: str,
-    severity: str,
-    description: str,
-    timestamp_seconds: int | None = None,
-) -> InterviewIntegrityFlag:
-    """Create an integrity flag for an interview."""
-    return InterviewIntegrityFlag.objects.create(
-        interview=interview,
-        flag_type=flag_type,
-        severity=severity,
-        description=description,
-        timestamp_seconds=timestamp_seconds,
-    )
-
-
-def create_integrity_flags(
-    *,
-    interview_id: UUID,
-    flags_data: list[dict],
-) -> list[InterviewIntegrityFlag]:
-    """Bulk-create IntegrityFlag records for an interview.
-
-    Args:
-        interview_id: UUID of the interview to attach flags to.
-        flags_data: List of dicts with keys: flag_type, severity, description,
-                    and optionally timestamp_seconds.
-
-    Returns:
-        List of created InterviewIntegrityFlag instances.
-    """
-    try:
-        interview = Interview.objects.get(id=interview_id)
-    except Interview.DoesNotExist:
-        raise ApplicationError(str(MSG_INTERVIEW_NOT_FOUND)) from None
-
-    flag_objects = [
-        InterviewIntegrityFlag(
-            interview=interview,
-            flag_type=flag["flag_type"],
-            severity=flag["severity"],
-            description=flag["description"],
-            timestamp_seconds=flag.get("timestamp_seconds"),
-        )
-        for flag in flags_data
-    ]
-
-    created = InterviewIntegrityFlag.objects.bulk_create(flag_objects)
-    logger.info("Created %d integrity flags for interview %s.", len(created), interview_id)
-    return created

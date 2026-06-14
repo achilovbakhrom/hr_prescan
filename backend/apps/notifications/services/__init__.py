@@ -20,6 +20,7 @@ from apps.notifications.services.notification_email import (
     notify_application_received,
     notify_interview_completed,
     notify_interview_ready,
+    notify_session_completed,
     notify_status_changed,
 )
 
@@ -37,6 +38,7 @@ __all__ = [
     "notify_candidate_prescanning_ready",
     "notify_interview_completed",
     "notify_interview_ready",
+    "notify_session_completed",
     "notify_status_changed",
     "send_candidate_message",
     "send_message",

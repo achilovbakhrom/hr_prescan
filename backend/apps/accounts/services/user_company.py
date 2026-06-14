@@ -56,6 +56,15 @@ def create_user_company(
         user.active_mode = User.ActiveMode.HR
         user.onboarding_completed = True
         user.save(update_fields=["company", "role", "active_mode", "onboarding_completed", "updated_at"])
+
+    # Grant the same 14-day trial that complete_company_setup does. Idempotent:
+    # the subscriptions service no-ops if the account owner already has a
+    # subscription, so a second HR space never starts a second trial. Free users
+    # are not blocked — billing is paused and the trial is granted regardless.
+    from apps.subscriptions.services import grant_trial
+
+    grant_trial(user=user.effective_account_owner)
+
     return company
 
 
