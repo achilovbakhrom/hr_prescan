@@ -97,7 +97,7 @@ const { t } = useI18n()
             v-if="selectedCompany.website"
             :href="selectedCompany.website"
             target="_blank"
-            class="text-xs text-blue-500 dark:text-blue-400 hover:underline"
+            class="text-xs text-[color:var(--color-accent)] hover:underline"
           >
             {{ selectedCompany.website }}
           </a>

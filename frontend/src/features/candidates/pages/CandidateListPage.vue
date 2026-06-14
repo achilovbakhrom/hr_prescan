@@ -34,7 +34,6 @@ const statusFilter = ref<string | undefined>(undefined)
 const orderingFilter = ref<string>('-created_at')
 const searchQuery = ref('')
 const selectedVacancy = ref<Vacancy | null>(null)
-const selectedCandidates = ref<Application[]>([])
 const activeSection = ref<'applications' | 'base'>('applications')
 let searchTimeout: ReturnType<typeof setTimeout> | null = null
 
@@ -44,6 +43,7 @@ const statusOptions = computed(() => [
   { label: t('candidates.status.prescanned'), value: 'prescanned' },
   { label: t('candidates.status.interviewed'), value: 'interviewed' },
   { label: t('candidates.status.shortlisted'), value: 'shortlisted' },
+  { label: t('candidates.status.hired'), value: 'hired' },
   { label: t('candidates.status.rejected'), value: 'rejected' },
   { label: t('candidates.status.expired'), value: 'expired' },
 ])
@@ -177,7 +177,6 @@ function handleKanbanStatusChange(candidateId: string, status: ApplicationStatus
 
     <GlassCard v-else-if="viewMode === 'table'" class="!p-0 overflow-hidden">
       <CandidateListTable
-        v-model:selected-candidates="selectedCandidates"
         :candidates="candidateStore.candidates"
         :loading="candidateStore.loading"
         :search-query="searchQuery"

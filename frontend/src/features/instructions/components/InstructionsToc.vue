@@ -29,7 +29,7 @@ function scrollTo(id: string): void {
         >
           <i
             :class="flow.icon"
-            class="mt-0.5 shrink-0 text-sm text-blue-600"
+            class="mt-0.5 shrink-0 text-sm text-[color:var(--color-accent)]"
             aria-hidden="true"
           ></i>
           <span class="min-w-0 break-words">{{ i + 1 }}. {{ flow.title }}</span>

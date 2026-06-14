@@ -44,7 +44,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="mx-auto max-w-7xl space-y-6">
+  <div class="w-full space-y-6">
     <header class="flex flex-col gap-1">
       <h1 class="text-3xl font-semibold tracking-tight text-[color:var(--color-text-primary)]">
         {{ t('subscriptions.title') }}

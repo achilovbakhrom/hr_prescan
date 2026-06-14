@@ -104,7 +104,7 @@ onUnmounted(() => {
       <span class="text-sm font-semibold text-gray-900">{{ t('notifications.title') }}</span>
       <button
         v-if="notificationStore.unreadCount > 0"
-        class="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800"
+        class="text-xs text-[color:var(--color-accent)] hover:opacity-80"
         @click="handleMarkAllAsRead"
       >
         {{ t('notifications.markAllRead') }}
@@ -123,7 +123,7 @@ onUnmounted(() => {
         v-for="notification in recentNotifications"
         :key="notification.id"
         class="flex w-full items-start gap-3 px-4 py-3 text-left transition hover:bg-gray-50"
-        :class="{ 'bg-blue-50': !notification.isRead }"
+        :class="{ 'bg-[color:var(--color-accent-soft)]': !notification.isRead }"
         @click="handleNotificationClick(notification)"
       >
         <i :class="getIcon(notification.type)" class="mt-0.5 text-gray-400"></i>
@@ -140,7 +140,7 @@ onUnmounted(() => {
         </div>
         <span
           v-if="!notification.isRead"
-          class="mt-1 h-2 w-2 flex-shrink-0 rounded-full bg-blue-500"
+          class="mt-1 h-2 w-2 flex-shrink-0 rounded-full bg-[color:var(--color-accent)]"
         ></span>
       </button>
     </div>

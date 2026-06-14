@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import InputNumber from 'primevue/inputnumber'
 import Textarea from 'primevue/textarea'
 import ToggleSwitch from 'primevue/toggleswitch'
 import type { InterviewMode } from '../types/vacancy.types'
@@ -11,7 +10,6 @@ defineProps<{
 }>()
 const interviewEnabled = defineModel<boolean>('interviewEnabled', { required: true })
 const interviewMode = defineModel<InterviewMode>('interviewMode', { required: true })
-const interviewDuration = defineModel<number>('interviewDuration', { required: true })
 const interviewPrompt = defineModel<string>('interviewPrompt', { required: true })
 
 const { t } = useI18n()
@@ -36,34 +34,16 @@ interviewMode.value = 'meet'
     </div>
 
     <div v-if="interviewEnabled" class="space-y-4">
-      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div>
-          <label class="mb-1 block text-sm font-medium">{{
-            t('vacancies.form.interviewMode')
-          }}</label>
-          <div class="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm">
-            {{ t('vacancies.interviewMode.meet') }}
-          </div>
-          <small v-if="hasError('interviewMode')" class="text-red-500">{{
-            fieldError('interviewMode')
-          }}</small>
+      <div>
+        <label class="mb-1 block text-sm font-medium">{{
+          t('vacancies.form.interviewMode')
+        }}</label>
+        <div class="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm">
+          {{ t('vacancies.interviewMode.meet') }}
         </div>
-        <div>
-          <label class="mb-1 block text-sm font-medium">{{
-            t('vacancies.form.interviewDuration')
-          }}</label>
-          <InputNumber
-            v-model="interviewDuration"
-            class="w-full"
-            :min="10"
-            :max="120"
-            :step="5"
-            :invalid="hasError('interviewDuration')"
-          />
-          <small v-if="hasError('interviewDuration')" class="text-red-500">{{
-            fieldError('interviewDuration')
-          }}</small>
-        </div>
+        <small v-if="hasError('interviewMode')" class="text-red-500">{{
+          fieldError('interviewMode')
+        }}</small>
       </div>
       <div>
         <label class="mb-1 block text-sm font-medium"

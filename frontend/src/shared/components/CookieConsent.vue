@@ -57,7 +57,7 @@ function decline(): void {
             {{ t('cookies.message') }}
             <RouterLink
               to="/privacy"
-              class="ml-1 font-medium text-blue-600 dark:text-blue-400 hover:underline"
+              class="ml-1 font-medium text-[color:var(--color-accent)] hover:underline"
               @click="visible = false"
             >
               {{ t('cookies.learnMore') }}

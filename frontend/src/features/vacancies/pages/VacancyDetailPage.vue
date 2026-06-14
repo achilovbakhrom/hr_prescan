@@ -62,8 +62,6 @@ const interviewCriteria = computed(
   () => vacancy.value?.criteria.filter((c) => c.step === 'interview') ?? [],
 )
 
-const candidatesTotal = computed(() => vacancy.value?.candidatesTotal ?? 0)
-const candidatesShortlisted = computed(() => vacancy.value?.candidatesShortlisted ?? 0)
 const { translatingKey, handleBatchTranslate } = useVacancyBatchTranslation(vacancyId, vacancy)
 const prescanningLoading = computed(
   () => vacancyStore.loading || translatingKey.value?.startsWith('prescanning:') === true,
@@ -120,13 +118,7 @@ async function handleStatusChange(status: VacancyStatus): Promise<void> {
       />
 
       <!-- Rail layout -->
-      <VacancyDetailLayout
-        :vacancy="vacancy"
-        :active="activeSection"
-        :candidates-total="candidatesTotal"
-        :candidates-shortlisted="candidatesShortlisted"
-        @navigate="navigateSection"
-      >
+      <VacancyDetailLayout :vacancy="vacancy" :active="activeSection" @navigate="navigateSection">
         <div v-if="activeSection === 'details'" class="py-1">
           <VacancyDetailsForm :vacancy="vacancy" />
         </div>

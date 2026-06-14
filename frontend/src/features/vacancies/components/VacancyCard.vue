@@ -56,7 +56,7 @@ function onStatusClick(event: Event, id: string, status: VacancyStatus): void {
           <span v-if="vacancy.location"
             ><i class="pi pi-map-marker mr-1"></i>{{ vacancy.location }}</span
           >
-          <span v-if="vacancy.isRemote" class="text-blue-600">{{
+          <span v-if="vacancy.isRemote" class="text-[color:var(--color-accent)]">{{
             t('vacancies.overview.remote')
           }}</span>
           <span><i class="pi pi-calendar mr-1"></i>{{ formatDate(vacancy.createdAt) }}</span>
@@ -107,7 +107,7 @@ function onStatusClick(event: Event, id: string, status: VacancyStatus): void {
         class="flex items-center gap-1.5 rounded-lg bg-blue-50 dark:bg-blue-950 px-2 py-1 sm:px-2.5 sm:py-1.5"
       >
         <i class="pi pi-users text-xs text-blue-500"></i>
-        <span class="text-xs font-semibold text-blue-700 dark:text-blue-300 sm:text-sm">{{
+        <span class="text-xs font-semibold text-[color:var(--color-accent)] sm:text-sm">{{
           vacancy.candidatesTotal ?? 0
         }}</span>
         <span class="text-[10px] text-blue-400 sm:text-xs">{{ t('vacancies.applied') }}</span>

@@ -66,6 +66,10 @@ export interface SubmitApplicationRequest {
   candidatePhone?: string
   cvFile?: File
   cvId?: string
+  profilePhoto?: File
+  linkedinUrl?: string
+  coverNote?: string
+  prescreenConsent?: boolean
 }
 
 export interface HRCandidateRecord {

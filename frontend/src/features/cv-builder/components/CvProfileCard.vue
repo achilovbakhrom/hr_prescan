@@ -32,7 +32,7 @@ function progressColor(score: number): string {
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div class="flex items-center gap-4">
         <div
-          class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300"
+          class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[color:var(--color-accent-soft)] text-[color:var(--color-accent)]"
         >
           <i class="pi pi-user text-xl"></i>
         </div>

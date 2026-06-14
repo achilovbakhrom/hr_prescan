@@ -31,7 +31,7 @@ The AI agent evaluates candidates at each step and decides whether to advance th
 - Belongs to a company (multi-tenant)
 - Creates and manages vacancies
 - Configures prescanning setup per vacancy (AI instructions and structured criteria)
-- Optionally configures interview step per vacancy (AI instructions, structured criteria, and duration)
+- Optionally configures interview step per vacancy (AI instructions and structured criteria)
 - Reviews candidate scores from both prescanning and interview stages
 - Filters and sorts candidates by AI scores
 - Manages candidate pipeline per vacancy
@@ -231,7 +231,7 @@ Each vacancy has a two-step AI screening pipeline. HR configures each step durin
   - AI instructions — separate interview guidance, usually tougher and more domain-specific than prescanning. HR can write instructions or sample questions in any language.
   - Evaluation criteria — own set, separate from prescanning criteria
   - Sample questions / topic seeds — optional advanced guidance for deeper probing, not a strict script
-  - Duration — configurable pacing target
+  - Pacing — the agent uses a built-in default pacing target (~30 minutes). Interview length is **not** configured by HR.
 - AI converses with the candidate via a video call on LiveKit. Full integrity monitoring (face detection, gaze tracking, audio anomaly detection). Interview is recorded. Suitable for mid-to-senior roles or positions requiring presentation skills.
 
 #### 5.4.3 Pipeline Rules
@@ -257,7 +257,7 @@ Candidates can apply via two surfaces: the **web app** (public job board) and th
 ### 6.1 Web flow
 
 1. Candidate finds a vacancy (public job board or direct link)
-2. Candidate fills in personal details. No account is required. The standard web form collects name, email, and optional phone; assistant-led unauthenticated prescreening must ask for a general HR contact method instead of requiring email-only contact.
+2. Candidate fills in personal details. No account is required. The standard web form collects name, email, and optional phone; assistant-led unauthenticated prescreening must ask for a general HR contact method instead of requiring email-only contact. The web apply form also collects optional extras — a profile photo, a LinkedIn/portfolio link, and a short "why are you a great fit?" note — and requires an explicit consent checkbox agreeing to AI pre-screening and the privacy terms before the application can be submitted. The Telegram apply flow collects name/contact and CV only; the optional extras are web-only.
 3. Candidate uploads CV/resume (optional but recommended; PDF, DOCX supported). If an authenticated candidate does not upload a CV for this application, the application automatically reuses the candidate's platform resume data. If the candidate also has a generated platform CV PDF, the active saved CV file is attached, falling back to the latest saved CV with a file.
 4. System creates the application and simultaneously creates a prescanning session with a unique link
    - If the vacancy has the interview step enabled, the system also prepares a separate web interview session/link, but the interview cannot be started until prescanning is completed and the candidate advances.
@@ -414,8 +414,8 @@ Interview is the second, more rigorous AI screening step. HR enables it per vaca
 - Microphone permission is required. Camera is recommended for integrity checks but is not mandatory; candidates can join a Meet interview with audio only if camera access fails or no camera is available.
 - Candidate sees a device-check preview before joining the room
 - The live room UI prioritizes the active AI/candidate conversation: large main stage, pinned self-view, compact top status bar, centered microphone/camera/leave controls, speaking indicators, and live transcript overlay.
-- Interview duration is configurable by HR per vacancy
-- The configured duration is an approximate pacing target, not a hard cutoff. As the target time approaches, the AI should ask shorter follow-ups and move toward a natural close.
+- Interview pacing uses a built-in default target (~30 minutes); it is not configured by HR.
+- This pacing target is approximate, not a hard cutoff. As it approaches, the AI should ask shorter follow-ups and move toward a natural close.
 - Full integrity monitoring (face detection, gaze tracking, audio anomaly detection)
 - Interview is recorded
 
@@ -442,7 +442,7 @@ Interview is the second, more rigorous AI screening step. HR enables it per vaca
 4. AI agent greets the candidate and explains the process
 5. AI asks interview questions one by one, listens to responses
 6. AI can ask follow-up questions, present cases, or probe deeper
-7. Interview concludes when all key questions are covered, the agent has enough evidence, the target duration is approaching, or the early-finish rule applies
+7. Interview concludes when all key questions are covered, the agent has enough evidence, the built-in pacing target is approaching, or the early-finish rule applies
 8. AI asks for final words, thanks the candidate, and ends the session
 9. Candidate sees a "Thank you" screen
 
@@ -757,7 +757,7 @@ Archived → Applied (restore)
 1. After onboarding, the system guides the HR to create their first vacancy
 2. A brief tutorial/wizard walks through vacancy creation steps
 3. HR configures prescanning (AI instructions and criteria)
-4. HR optionally enables and configures interview step (AI instructions, criteria, and duration)
+4. HR optionally enables and configures interview step (AI instructions and criteria)
 5. Once published, the vacancy is live and ready to receive candidates
 
 ---

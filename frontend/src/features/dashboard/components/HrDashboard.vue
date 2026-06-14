@@ -1,106 +1,86 @@
 <script setup lang="ts">
 /**
- * HrDashboard — 2-column glass layout per spec §9.
- * Main column: quick-stat metric cards + pipeline overview.
- * Rail column: AI assistant teaser + recent activity feed.
- *
- * Data values and computed metrics preserved from previous version.
+ * HrDashboard — redesigned to match the Figma dashboard composition:
+ *   - 4 KPI cards (active vacancies, candidates screened, interviews, avg score)
+ *   - 2-column body: Recent candidates table (left) + Upcoming interviews and
+ *     Hiring funnel (right rail).
+ * Data comes from the dashboard stats endpoint + company analytics (funnel).
  */
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { useVacancyStore } from '@/features/vacancies/stores/vacancy.store'
-import { useInterviewStore } from '@/features/interviews/stores/interview.store'
+import { useDashboardStore } from '../stores/dashboard.store'
+import { useAnalyticsStore } from '../stores/analytics.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import DashboardStatsCard from './DashboardStatsCard.vue'
-import DashboardPipelineOverview from './DashboardPipelineOverview.vue'
-import DashboardActivityFeed from './DashboardActivityFeed.vue'
+import RecentApplicationsTable from './RecentApplicationsTable.vue'
+import UpcomingInterviewsTable from './UpcomingInterviewsTable.vue'
+import HiringFunnel from './HiringFunnel.vue'
 
 const router = useRouter()
 const { t } = useI18n()
-const vacancyStore = useVacancyStore()
-const interviewStore = useInterviewStore()
+const dashboardStore = useDashboardStore()
+const analyticsStore = useAnalyticsStore()
 
-const activeVacancies = computed(
-  () => vacancyStore.vacancies.filter((v) => v.status === 'published').length,
-)
-const draftVacancies = computed(
-  () => vacancyStore.vacancies.filter((v) => v.status === 'draft').length,
-)
-const pausedVacancies = computed(
-  () => vacancyStore.vacancies.filter((v) => v.status === 'paused').length,
-)
-const totalVacancies = computed(() => vacancyStore.vacancies.length)
-const scheduledInterviews = computed(
-  () => interviewStore.interviews.filter((i) => i.status === 'pending').length,
-)
-const completedInterviews = computed(
-  () => interviewStore.interviews.filter((i) => i.status === 'completed').length,
-)
-const totalInterviews = computed(() => interviewStore.interviews.length)
+const stats = computed(() => dashboardStore.stats)
+const funnel = computed(() => analyticsStore.analytics?.funnel ?? null)
 
-const recentInterviews = computed(() =>
-  [...interviewStore.interviews]
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    .slice(0, 6),
-)
+const avgScore = computed(() => {
+  // Backend average is 0–100; the design shows the score on a /10 scale.
+  const s = stats.value?.averageMatchScore
+  return s == null ? '—' : (s / 10).toFixed(1)
+})
 
-const statsSublabel = computed(
-  () =>
-    `${activeVacancies.value} ${t('dashboard.stats.active')} · ${draftVacancies.value} ${t('dashboard.stats.draft')}` +
-    (pausedVacancies.value > 0
-      ? ` · ${pausedVacancies.value} ${t('vacancies.status.paused').toLowerCase()}`
-      : ''),
-)
+onMounted(() => {
+  void dashboardStore.fetchStats()
+  void analyticsStore.fetchAnalytics()
+})
 </script>
 
 <template>
-  <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-    <!-- Main column -->
-    <div class="flex flex-col gap-6">
-      <!-- Stats grid -->
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <DashboardStatsCard
-          icon="pi pi-briefcase"
-          icon-accent="default"
-          :label="t('dashboard.activeVacancies')"
-          :value="totalVacancies"
-          :sublabel="statsSublabel"
-          clickable
-          @click="router.push({ name: ROUTE_NAMES.VACANCY_LIST })"
-        />
-        <DashboardStatsCard
-          icon="pi pi-calendar"
-          icon-accent="warning"
-          :label="t('dashboard.pendingInterviews')"
-          :value="scheduledInterviews"
-          :sublabel="`${completedInterviews} ${t('dashboard.stats.completed')}`"
-          clickable
-          @click="router.push({ name: ROUTE_NAMES.INTERVIEW_LIST })"
-        />
-        <DashboardStatsCard
-          icon="pi pi-check-circle"
-          icon-accent="success"
-          :label="t('dashboard.completedInterviews')"
-          :value="completedInterviews"
-          :sublabel="t('dashboard.stats.aiInterviewsDone')"
-        />
-        <DashboardStatsCard
-          icon="pi pi-users"
-          icon-accent="ai"
-          :label="t('interviews.title')"
-          :value="totalInterviews"
-          :sublabel="t('dashboard.stats.allTime')"
-        />
-      </div>
-
-      <!-- Pipeline overview -->
-      <DashboardPipelineOverview :vacancies="vacancyStore.vacancies" />
+  <div class="flex flex-col gap-6">
+    <!-- KPI cards -->
+    <div class="grid grid-cols-2 gap-4 xl:grid-cols-4">
+      <DashboardStatsCard
+        icon="pi pi-briefcase"
+        icon-accent="default"
+        :label="t('dashboard.activeVacancies')"
+        :value="stats?.activeVacanciesCount ?? 0"
+        clickable
+        @click="router.push({ name: ROUTE_NAMES.VACANCY_LIST })"
+      />
+      <DashboardStatsCard
+        icon="pi pi-users"
+        icon-accent="teal"
+        :label="t('dashboard.candidatesScreened')"
+        :value="stats?.totalCandidatesCount ?? 0"
+        clickable
+        @click="router.push({ name: ROUTE_NAMES.CANDIDATE_LIST })"
+      />
+      <DashboardStatsCard
+        icon="pi pi-video"
+        icon-accent="celebrate"
+        :label="t('dashboard.pendingInterviews')"
+        :value="stats?.pendingInterviewsCount ?? 0"
+        :sublabel="`${stats?.completedInterviewsCount ?? 0} ${t('dashboard.stats.completed')}`"
+        clickable
+        @click="router.push({ name: ROUTE_NAMES.INTERVIEW_LIST })"
+      />
+      <DashboardStatsCard
+        icon="pi pi-star"
+        icon-accent="success"
+        :label="t('dashboard.avgScore')"
+        :value="avgScore"
+      />
     </div>
 
-    <!-- Rail -->
-    <aside class="flex flex-col gap-6">
-      <DashboardActivityFeed :interviews="recentInterviews" />
-    </aside>
+    <!-- Body: recent candidates + rail -->
+    <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <RecentApplicationsTable :applications="stats?.recentApplications ?? []" />
+      <aside class="flex flex-col gap-6">
+        <UpcomingInterviewsTable :interviews="stats?.upcomingInterviews ?? []" />
+        <HiringFunnel :funnel="funnel" />
+      </aside>
+    </div>
   </div>
 </template>

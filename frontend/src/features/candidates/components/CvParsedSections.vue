@@ -123,7 +123,9 @@ function contactHref(label: string, value: string): string | undefined {
       </h3>
       <div class="space-y-3 border-l-2 border-blue-200 dark:border-blue-800 pl-4">
         <div v-for="(entry, idx) in experience" :key="idx" class="relative">
-          <div class="absolute -left-[1.35rem] top-1 h-2.5 w-2.5 rounded-full bg-blue-500"></div>
+          <div
+            class="absolute -left-[1.35rem] top-1 h-2.5 w-2.5 rounded-full bg-[color:var(--color-accent)]"
+          ></div>
           <p class="font-medium">{{ entry.position || entry.role }}</p>
           <p class="text-sm text-gray-600">
             {{ entry.company

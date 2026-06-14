@@ -34,6 +34,10 @@ def submit_application(
     candidate_phone: str = "",
     cv_file_path: str = "",
     cv_original_filename: str = "",
+    profile_photo: str = "",
+    linkedin_url: str = "",
+    cover_note: str = "",
+    prescreen_consent: bool = False,
     candidate: User | None = None,
     channel: str = "web",
 ) -> dict:
@@ -74,6 +78,10 @@ def submit_application(
             candidate_phone=candidate_phone,
             cv_file_path=cv_file_path,
             cv_original_filename=cv_original_filename,
+            profile_photo=profile_photo,
+            linkedin_url=linkedin_url,
+            cover_note=cover_note,
+            prescreen_consent=prescreen_consent,
             channel=channel,
         )
         snapshot_applied = apply_candidate_profile_cv_snapshot(application=application, snapshot=profile_snapshot)
@@ -91,6 +99,10 @@ def submit_application(
             candidate_phone=candidate_phone,
             cv_file=cv_file_path,
             cv_original_filename=cv_original_filename,
+            profile_photo=profile_photo,
+            linkedin_url=linkedin_url,
+            cover_note=cover_note,
+            prescreen_consent=prescreen_consent,
         )
     except IntegrityError:
         raise ApplicationError(str(MSG_ALREADY_APPLIED)) from None
@@ -186,7 +198,6 @@ def create_interview_session(*, application: Application) -> Interview | None:
         "screening_mode": Interview.ScreeningMode.MEET,
         "status": Interview.Status.PENDING,
         "language": resolve_interview_language(vacancy.prescanning_language),
-        "duration_minutes": vacancy.interview_duration,
     }
 
     interview = Interview.objects.create(**interview_kwargs)

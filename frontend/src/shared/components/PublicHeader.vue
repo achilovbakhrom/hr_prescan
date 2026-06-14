@@ -86,7 +86,7 @@ function initials(): string {
             @click="toggleUserMenu"
           >
             <div
-              class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-950 text-sm font-medium text-blue-700"
+              class="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--color-accent-soft)] text-sm font-medium text-[color:var(--color-accent)]"
             >
               {{ initials() }}
             </div>
@@ -105,7 +105,7 @@ function initials(): string {
           <RouterLink
             v-if="!isAuthEntryPage"
             :to="{ name: ROUTE_NAMES.LOGIN }"
-            class="rounded-lg bg-blue-600 dark:bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            class="rounded-lg bg-[color:var(--color-accent)] px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
           >
             {{ t('nav.signIn') }}
           </RouterLink>

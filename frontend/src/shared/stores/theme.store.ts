@@ -16,7 +16,10 @@ export type BackgroundMode =
 
 const SCHEME_KEY = 'hr_prescan_color_scheme'
 const BG_KEY = 'hr_prescan_bg_mode'
-const DEFAULT_BACKGROUND_MODE: BackgroundMode = 'mesh'
+// Flat surface by default to match the Figma redesign (clean dark/light
+// background, no animated mesh). Users can still opt into a background via the
+// floating picker.
+const DEFAULT_BACKGROUND_MODE: BackgroundMode = 'off'
 
 const VALID_BG_MODES: readonly BackgroundMode[] = [
   'off',

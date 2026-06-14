@@ -22,7 +22,7 @@ defineProps<{
         class="mb-6 flex items-start gap-4 border-b border-[color:var(--color-border-soft)] pb-5"
       >
         <span
-          class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/40"
+          class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[color:var(--color-accent-soft)] text-[color:var(--color-accent)]"
           aria-hidden="true"
         >
           <i :class="flow.icon" class="text-lg"></i>
@@ -36,7 +36,7 @@ defineProps<{
               class="rounded-full px-2 py-0.5 text-[11px] font-medium"
               :class="
                 flow.audience === 'hr'
-                  ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300'
+                  ? 'bg-[color:var(--color-accent-soft)] text-[color:var(--color-accent)]'
                   : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
               "
             >

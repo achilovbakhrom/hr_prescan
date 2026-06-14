@@ -13,7 +13,7 @@ defineProps<{
       <div
         v-if="icon"
         class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg"
-        :class="color ?? 'bg-blue-100 text-blue-600'"
+        :class="color ?? 'bg-[color:var(--color-accent-soft)] text-[color:var(--color-accent)]'"
       >
         <i :class="icon" class="text-lg"></i>
       </div>

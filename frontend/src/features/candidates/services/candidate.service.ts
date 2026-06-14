@@ -100,6 +100,16 @@ export const candidateService = {
     if (data.cvId) {
       formData.append('cv_id', data.cvId)
     }
+    if (data.profilePhoto) {
+      formData.append('profile_photo', data.profilePhoto)
+    }
+    if (data.linkedinUrl) {
+      formData.append('linkedin_url', data.linkedinUrl)
+    }
+    if (data.coverNote) {
+      formData.append('cover_note', data.coverNote)
+    }
+    formData.append('prescreen_consent', data.prescreenConsent ? 'true' : 'false')
     const response = await apiClient.post<Application>(
       `/public/vacancies/${vacancyId}/apply/`,
       formData,

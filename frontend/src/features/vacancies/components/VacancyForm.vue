@@ -114,7 +114,6 @@ function handleSave(): void {
         <VacancyInterviewTab
           v-model:interview-enabled="form.interviewEnabled.value"
           v-model:interview-mode="form.interviewMode.value"
-          v-model:interview-duration="form.interviewDuration.value"
           v-model:interview-prompt="form.interviewPrompt.value"
           :has-error="form.hasError"
           :field-error="form.fieldError"

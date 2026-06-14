@@ -65,7 +65,6 @@ def update_vacancy(*, vacancy: Vacancy, data: dict) -> Vacancy:
         "employment_type",
         "experience_level",
         "visibility",
-        "interview_duration",
         "interview_mode",
         "interview_enabled",
         "cv_required",

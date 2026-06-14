@@ -119,7 +119,7 @@ onBeforeUnmount(() => {
     >
       <div
         class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
-        :class="msg.role === 'ai' ? 'bg-blue-500' : 'bg-gray-500'"
+        :class="msg.role === 'ai' ? 'bg-[color:var(--color-accent)]' : 'bg-gray-500'"
       >
         {{ msg.role === 'ai' ? 'AI' : 'C' }}
       </div>
@@ -128,7 +128,7 @@ onBeforeUnmount(() => {
         :class="
           msg.role === 'ai'
             ? 'rounded-tl-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800'
-            : 'rounded-tr-md bg-blue-600 dark:bg-blue-700 text-white'
+            : 'rounded-tr-md bg-[color:var(--color-accent)] text-white'
         "
       >
         <template v-if="msg.messageType === 'voice'">

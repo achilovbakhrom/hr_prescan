@@ -33,6 +33,23 @@ def upload_cv_to_s3(*, file_obj, vacancy_id) -> str:
     return key
 
 
+def upload_profile_photo_to_s3(*, file_obj, vacancy_id) -> str:
+    """Upload a candidate profile photo to S3/MinIO and return the object key."""
+    ext = file_obj.name.rsplit(".", 1)[-1] if "." in file_obj.name else "jpg"
+    prefix = (getattr(settings, "S3_KEY_PREFIX", "") or "").strip("/")
+    base = f"profile_photos/{vacancy_id}/{uuid.uuid4()}.{ext}"
+    key = f"{prefix}/{base}" if prefix else base
+
+    s3 = _get_s3_client()
+    s3.upload_fileobj(
+        file_obj,
+        settings.AWS_STORAGE_BUCKET_NAME,
+        key,
+        ExtraArgs={"ContentType": file_obj.content_type or "application/octet-stream"},
+    )
+    return key
+
+
 def generate_cv_download_url(*, cv_file_path: str, expiration: int = 3600) -> str:
     """Generate a presigned URL for downloading a CV from S3/MinIO."""
     s3 = _get_s3_client()

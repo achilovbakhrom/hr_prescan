@@ -6,54 +6,59 @@
    previous implementation's reliance on `@theme` custom properties
    that rendered washed-out.
 
-   Palette (slate-based, high contrast):
-     bg base      : #0f172a  (slate-900)
-     bg raised    : #1e293b  (slate-800)
-     bg elevated  : #273549  (slate-750)
-     border       : #334155  (slate-700)
-     text primary : #f8fafc  (slate-50)
-     text body    : #e2e8f0  (slate-200)
-     text muted   : #cbd5e1  (slate-300)
-     accent       : #60a5fa  (blue-400)
+   Palette (PreScreen AI redesign — near-black + violet):
+     bg base      : #08070f
+     bg sidebar   : #0b0913
+     bg raised    : #15131f
+     bg elevated  : #1b1828
+     card glass   : rgba(16, 14, 26, 0.82)
+     border       : rgba(255, 255, 255, 0.08)
+     text primary : #ffffff
+     text body    : #c9c8d6
+     text muted   : #9d9cb2
+     accent       : #a78bfa  (violet-300)
    ============================================================ */
 
 html.dark {
   color-scheme: dark;
-  background-color: #0f172a !important;
+  background-color: #08070f !important;
 
   /* Dark values for the design tokens consumed by scoped Vue styles.
      (These mirror the `@theme` block in main.css.) */
-  --color-surface-base: #0f172a;
-  --color-surface-raised: #1e293b;
-  --color-surface-sunken: #0a0f1d;
+  --color-surface-base: #08070f;
+  --color-surface-raised: #15131f;
+  --color-surface-sunken: #0b0913;
+  /* App page (content area) background — near-black so cards (#100e1a) read as
+     slightly raised tiles, matching the Figma dark redesign. */
+  --app-page-bg: #08070f;
 
-  --color-surface-glass-1: #1e293b;
-  --color-surface-glass-2: #19223a;
-  --color-surface-glass-float: #273549;
+  --color-surface-glass-1: #100e1a;
+  --color-surface-glass-2: #15131f;
+  --color-surface-glass-float: #1b1828;
 
-  --color-border-soft: #334155;
-  --color-border-glass: #334155;
-  --color-border-ring: rgba(96, 165, 250, 0.55);
+  --color-border-soft: rgba(255, 255, 255, 0.08);
+  --color-border-glass: rgba(255, 255, 255, 0.08);
+  --color-border-ring: rgba(167, 139, 250, 0.5);
 
-  --color-text-primary: #f8fafc;
-  --color-text-secondary: #e2e8f0;
-  --color-text-muted: #94a3b8;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #c9c8d6;
+  --color-text-muted: #9d9cb2;
   --color-text-on-accent: #ffffff;
 
-  /* Brighter accent hues in dark so text like "Powered by GPT-4 & Voice AI"
-     reads clearly against dark glass panels. */
-  --color-accent: #60a5fa;
+  /* Brighter accent hues in dark so accent text reads clearly against
+     dark glass panels. */
+  --color-accent: #a78bfa;
   --color-accent-ai: #c4b5fd;
-  --color-accent-celebrate: #fdba74;
-  --color-accent-soft: rgba(96, 165, 250, 0.22);
-  --color-accent-ai-soft: rgba(196, 181, 253, 0.22);
-  --color-accent-celebrate-soft: rgba(253, 186, 116, 0.2);
+  --color-accent-celebrate: #f9a8d4;
+  --color-accent-soft: rgba(167, 139, 250, 0.18);
+  --color-accent-ai-soft: rgba(196, 181, 253, 0.2);
+  --color-accent-celebrate-soft: rgba(249, 168, 212, 0.18);
 
   --shadow-glass-1: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.5);
   --shadow-glass-float: 0 2px 4px rgba(0, 0, 0, 0.5), 0 24px 48px rgba(0, 0, 0, 0.6);
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.35);
 
-  --p-datatable-header-cell-background: rgba(255, 255, 255, 0.055);
+  --p-datatable-header-cell-background: rgba(255, 255, 255, 0.05);
   --p-datatable-header-cell-hover-background: rgba(255, 255, 255, 0.08);
   --p-datatable-header-cell-selected-background: rgba(255, 255, 255, 0.08);
 }
@@ -64,7 +69,7 @@ html.dark {
 html.dark body {
   background-color: transparent !important;
   background-image: none !important;
-  color: #e2e8f0 !important;
+  color: #c9c8d6 !important;
 }
 
 /* ---- Headings always pop ---- */
@@ -76,7 +81,7 @@ html.dark h3 {
 html.dark h4,
 html.dark h5,
 html.dark h6 {
-  color: #f8fafc !important;
+  color: #ffffff !important;
 }
 
 /* ---- Body copy ---- */
@@ -89,10 +94,10 @@ html.dark span:not([class*='text-']):not([class*='color-']) {
 
 /* ---- Links ---- */
 html.dark a:not(.p-button):not([class*='p-button']) {
-  color: #93c5fd !important;
+  color: #c4b5fd !important;
 }
 html.dark a:not(.p-button):not([class*='p-button']):hover {
-  color: #dbeafe !important;
+  color: #ddd6fe !important;
 }
 
 /* ---- Muted utility text (Tailwind slate/gray 400/500/600) ---- */
@@ -103,7 +108,7 @@ html.dark .text-slate-400,
 html.dark .text-slate-500,
 html.dark .text-slate-600,
 html.dark [class*='text-[color:var(--color-text-muted)]'] {
-  color: #cbd5e1 !important;
+  color: #9d9cb2 !important;
 }
 html.dark .text-gray-700,
 html.dark .text-gray-800,
@@ -112,23 +117,21 @@ html.dark .text-slate-700,
 html.dark .text-slate-800,
 html.dark .text-slate-900,
 html.dark [class*='text-[color:var(--color-text-primary)]'] {
-  color: #f8fafc !important;
+  color: #ffffff !important;
 }
 html.dark [class*='text-[color:var(--color-text-secondary)]'] {
-  color: #e2e8f0 !important;
+  color: #c9c8d6 !important;
 }
 
-/* ---- Glass surfaces: real translucent + blur in dark.
-        Translucency is tight enough (0.72 alpha) that text stays readable
-        even against the animated background orbs. ---- */
+/* ---- Glass surfaces: near-black translucent + blur in dark. ---- */
 html.dark .glass-card,
 html.dark .glass-surface,
 html.dark [class*='bg-glass-'],
 html.dark .bg-glass-1,
 html.dark .bg-glass-2,
 html.dark .bg-glass-float {
-  background: rgba(30, 41, 59, 0.72) !important;
-  background-color: rgba(30, 41, 59, 0.72) !important;
+  background: rgba(16, 14, 26, 0.82) !important;
+  background-color: rgba(16, 14, 26, 0.82) !important;
   backdrop-filter: blur(18px) saturate(1.4) !important;
   -webkit-backdrop-filter: blur(18px) saturate(1.4) !important;
   border-color: rgba(255, 255, 255, 0.08) !important;
@@ -137,17 +140,16 @@ html.dark .bg-glass-float {
     0 8px 24px rgba(0, 0, 0, 0.5) !important;
 }
 
-/* ---- PrimeVue surfaces — translucent blurry glass, same recipe as the
-        .glass-card / .glass-surface rule above. ---- */
+/* ---- PrimeVue surfaces — translucent glass, same recipe as glass-card. ---- */
 html.dark .p-card,
 html.dark .p-panel,
 html.dark .p-dialog,
 html.dark .p-overlaypanel,
 html.dark .p-menu,
 html.dark .surface {
-  background: rgba(30, 41, 59, 0.72) !important;
-  background-color: rgba(30, 41, 59, 0.72) !important;
-  color: #e2e8f0 !important;
+  background: rgba(16, 14, 26, 0.86) !important;
+  background-color: rgba(16, 14, 26, 0.86) !important;
+  color: #c9c8d6 !important;
   border-color: rgba(255, 255, 255, 0.08) !important;
   backdrop-filter: blur(18px) saturate(1.4) !important;
   -webkit-backdrop-filter: blur(18px) saturate(1.4) !important;
@@ -161,9 +163,9 @@ html.dark .p-dropdown-panel,
 html.dark .p-multiselect-overlay,
 html.dark .p-multiselect-panel,
 html.dark .p-autocomplete-overlay {
-  background: #1e293b !important;
-  background-color: #1e293b !important;
-  border-color: #334155 !important;
+  background: #15131f !important;
+  background-color: #15131f !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
@@ -178,8 +180,8 @@ html.dark .p-dropdown-items,
 html.dark .p-multiselect-list,
 html.dark .p-multiselect-items,
 html.dark .p-autocomplete-list {
-  background: #1e293b !important;
-  background-color: #1e293b !important;
+  background: #15131f !important;
+  background-color: #15131f !important;
 }
 
 /* ---- Inputs ---- */
@@ -192,39 +194,39 @@ html.dark .p-multiselect,
 html.dark input:not([type='checkbox']):not([type='radio']),
 html.dark textarea,
 html.dark select {
-  background-color: #0f172a !important;
-  color: #f8fafc !important;
-  border-color: #334155 !important;
+  background-color: #15131f !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
 }
 html.dark .p-inputtext::placeholder,
 html.dark input::placeholder,
 html.dark textarea::placeholder {
-  color: #94a3b8 !important;
+  color: #6e6d84 !important;
 }
 
-/* ---- Buttons: keep primary vivid; secondary = elevated slate ---- */
+/* ---- Buttons: keep primary vivid; secondary = elevated near-black ---- */
 html.dark .p-button {
   color: #ffffff !important;
 }
 html.dark .p-button.p-button-secondary {
-  background-color: #273549 !important;
-  color: #f1f5f9 !important;
-  border-color: #475569 !important;
+  background-color: #1b1828 !important;
+  color: #e7e6ef !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
 }
 html.dark .p-button.p-button-secondary:hover:not(:disabled) {
-  background-color: #334155 !important;
+  background-color: #232032 !important;
 }
 html.dark .p-button.p-button-text {
   background: transparent !important;
-  color: #93c5fd !important;
+  color: #c4b5fd !important;
 }
 html.dark .p-button.p-button-text:hover:not(:disabled) {
-  background-color: rgba(147, 197, 253, 0.12) !important;
+  background-color: rgba(167, 139, 250, 0.14) !important;
 }
 html.dark .p-button.p-button-outlined {
   background: transparent !important;
-  border-color: #60a5fa !important;
-  color: #60a5fa !important;
+  border-color: #a78bfa !important;
+  color: #a78bfa !important;
 }
 
 /* ---- Generic border utilities (cover common Tailwind border colors) ---- */
@@ -236,12 +238,12 @@ html.dark .border-slate-200,
 html.dark .border-slate-300,
 html.dark .border-glass,
 html.dark [class*='border-[color:var(--color-border-soft)]'] {
-  border-color: #334155 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
 /* ---- Horizontal dividers ---- */
 html.dark hr {
-  border-color: #334155 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
 /* ---- Animated backgrounds stay active in dark. Each variant has its
@@ -262,11 +264,11 @@ html.dark .shadow-2xl {
     0 8px 24px rgba(0, 0, 0, 0.5) !important;
 }
 
-/* ---- Nav & sticky bars: solid dark strip, no transparency ---- */
+/* ---- Nav & sticky bars: solid near-black strip, no transparency ---- */
 html.dark nav,
 html.dark .sticky {
-  background-color: #0f172a !important;
-  border-bottom-color: #334155 !important;
+  background-color: #0b0913 !important;
+  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
   backdrop-filter: none !important;
 }
 
@@ -277,11 +279,11 @@ html.dark tbody,
 html.dark tr {
   background-color: transparent !important;
   color: inherit !important;
-  border-color: #334155 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }
 html.dark th {
   background-color: transparent !important;
-  color: #f8fafc !important;
+  color: #ffffff !important;
 }
 html.dark .p-datatable,
 html.dark .p-datatable .p-datatable-table-container,
@@ -294,12 +296,12 @@ html.dark .p-datatable .p-datatable-thead > tr {
 html.dark .p-datatable .p-datatable-thead > tr > th,
 html.dark th.p-datatable-header-cell,
 html.dark thead.p-datatable-thead > tr > th {
-  background: rgba(255, 255, 255, 0.055) !important;
-  background-color: rgba(255, 255, 255, 0.055) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  background-color: rgba(255, 255, 255, 0.05) !important;
 }
 html.dark td {
-  border-color: #334155 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }
 html.dark tr:hover td {
-  background-color: #273549 !important;
+  background-color: #1b1828 !important;
 }

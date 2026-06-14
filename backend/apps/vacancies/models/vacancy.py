@@ -88,7 +88,6 @@ class Vacancy(BaseModel):
         default=InterviewMode.MEET,
     )
     interview_enabled = models.BooleanField(default=False)
-    interview_duration = models.IntegerField(default=30)  # Meet/video interview pacing target
     cv_required = models.BooleanField(default=False)
     company_info = models.TextField(blank=True, default="")  # Optional company description for AI interview intro
     prescanning_prompt = models.TextField(blank=True, default="")  # Additional instructions for prescanning AI agent

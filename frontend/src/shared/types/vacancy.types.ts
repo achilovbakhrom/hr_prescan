@@ -26,7 +26,6 @@ export interface Vacancy {
   prescanningLanguage: string
   companyInfo: string
   shareToken: string
-  interviewDuration: number
   criteriaCount: number
   questionsCount: number
   candidatesTotal: number

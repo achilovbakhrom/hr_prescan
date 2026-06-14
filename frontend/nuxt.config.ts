@@ -12,6 +12,10 @@ export default defineNuxtConfig({
   srcDir: 'src',
   devtools: { enabled: false },
   css: [
+    // NOTE: primeicons is loaded as a static stylesheet via `app.head.link`
+    // (public/primeicons/primeicons.css), NOT here — the Nuxt/Lightning-CSS
+    // pipeline strips the `\eXXX` glyph codepoints from the icon `content`
+    // rules, leaving empty icons. Serving it raw from /public preserves them.
     '@fontsource/geist-sans/400.css',
     '@fontsource/geist-sans/500.css',
     '@fontsource/geist-sans/600.css',
@@ -63,6 +67,8 @@ export default defineNuxtConfig({
       link: [
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
         { rel: 'canonical', href: 'https://prescreen-app.com/' },
+        // PrimeIcons served raw from /public so the glyph codepoints survive.
+        { rel: 'stylesheet', href: '/primeicons/primeicons.css' },
       ],
     },
   },

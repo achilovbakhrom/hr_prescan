@@ -24,6 +24,10 @@ def reopen_application(
     cv_original_filename: str,
     candidate: User | None,
     channel: str,
+    profile_photo: str = "",
+    linkedin_url: str = "",
+    cover_note: str = "",
+    prescreen_consent: bool = False,
 ) -> tuple[Application, Interview]:
     application.sessions.exclude(
         status__in=[Interview.Status.COMPLETED, Interview.Status.CANCELLED, Interview.Status.EXPIRED],
@@ -36,6 +40,10 @@ def reopen_application(
     application.candidate_phone = candidate_phone
     application.cv_file = cv_file_path
     application.cv_original_filename = cv_original_filename
+    application.profile_photo = profile_photo
+    application.linkedin_url = linkedin_url
+    application.cover_note = cover_note
+    application.prescreen_consent = prescreen_consent
     application.cv_parsed_text = ""
     application.cv_parsed_data = {}
     application.match_score = None
@@ -54,6 +62,10 @@ def reopen_application(
             "candidate_phone",
             "cv_file",
             "cv_original_filename",
+            "profile_photo",
+            "linkedin_url",
+            "cover_note",
+            "prescreen_consent",
             "cv_parsed_text",
             "cv_parsed_data",
             "match_score",
