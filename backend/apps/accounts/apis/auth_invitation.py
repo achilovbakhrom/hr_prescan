@@ -156,7 +156,11 @@ class CompleteOnboardingApi(APIView):
         serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        complete_onboarding(user=request.user, role=serializer.validated_data["role"])
+        try:
+            complete_onboarding(user=request.user, role=serializer.validated_data["role"])
+        except ApplicationError as e:
+            return Response({"detail": e.message}, status=status.HTTP_400_BAD_REQUEST)
+
         request.user.refresh_from_db()
         refresh = RefreshToken.for_user(request.user)
 
