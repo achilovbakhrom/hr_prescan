@@ -852,7 +852,9 @@
         "emailRequired": "Email is required",
         "emailInvalid": "Invalid email format",
         "consentRequired": "Please accept the pre-screening and privacy terms to continue"
-      }
+      },
+      "backgroundLabel": "How would you like to share your background?",
+      "linkedinRefHint": "A reference link for the recruiter — it isn’t analyzed by the AI prescreen."
     },
     "dialogs": {
       "bulkConfirmHeader": "Confirm Bulk Action",

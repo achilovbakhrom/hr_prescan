@@ -852,7 +852,9 @@
       "linkedin": "LinkedIn / portfolio",
       "coverNote": "Pourquoi êtes-vous le bon profil ? (facultatif)",
       "coverNotePlaceholder": "Quelques phrases sur pourquoi ce poste vous correspond…",
-      "consent": "J'accepte les conditions de présélection par IA et de confidentialité."
+      "consent": "J'accepte les conditions de présélection par IA et de confidentialité.",
+      "backgroundLabel": "Comment souhaitez-vous présenter votre parcours ?",
+      "linkedinRefHint": "Un lien de référence pour le recruteur — il n’est pas analysé par le préscreening IA."
     },
     "dialogs": {
       "bulkConfirmHeader": "Confirmer l'action groupée",

@@ -4,10 +4,8 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
-import FileUpload from 'primevue/fileupload'
-import type { FileUploadSelectEvent } from 'primevue/fileupload'
 import GlassCard from '@/shared/components/GlassCard.vue'
-import CvSelectionSection from './CvSelectionSection.vue'
+import ApplicationBackgroundChoice from './ApplicationBackgroundChoice.vue'
 import ApplicationExtraFields from './ApplicationExtraFields.vue'
 
 interface VacancyBrief {
@@ -51,10 +49,6 @@ const { t } = useI18n()
 const displayCompany = computed(
   () => props.vacancy?.company?.name || props.vacancy?.companyName || '',
 )
-
-function onFileSelect(event: FileUploadSelectEvent): void {
-  emit('update:cvFile', (event.files[0] as File) ?? null)
-}
 </script>
 
 <template>
@@ -152,37 +146,20 @@ function onFileSelect(event: FileUploadSelectEvent): void {
         />
       </div>
 
-      <CvSelectionSection
-        v-if="isLoggedIn"
+      <ApplicationBackgroundChoice
+        :is-logged-in="isLoggedIn"
         :cv-required="vacancy?.cvRequired ?? false"
+        :linkedin-url="linkedinUrl"
         @update:cv-file="emit('update:cvFile', $event)"
         @update:cv-id="emit('update:cvId', $event)"
+        @update:linkedin-url="emit('update:linkedinUrl', $event)"
       />
-      <div v-else>
-        <label class="mb-1 block text-sm font-medium">
-          {{ t('candidates.application.uploadCv')
-          }}<span v-if="vacancy?.cvRequired" class="text-[color:var(--color-danger)]">*</span>
-        </label>
-        <FileUpload
-          mode="basic"
-          accept=".pdf,.docx"
-          :max-file-size="10000000"
-          :choose-label="t('candidates.application.chooseCv')"
-          :auto="false"
-          @select="onFileSelect"
-        />
-        <small class="text-[color:var(--color-text-muted)]">
-          {{ t('candidates.application.acceptedFormats') }}
-        </small>
-      </div>
 
       <ApplicationExtraFields
-        :linkedin-url="linkedinUrl"
         :cover-note="coverNote"
         :prescreen-consent="prescreenConsent"
         :consent-error="errors.consent"
         @update:profile-photo="emit('update:profilePhoto', $event)"
-        @update:linkedin-url="emit('update:linkedinUrl', $event)"
         @update:cover-note="emit('update:coverNote', $event)"
         @update:prescreen-consent="emit('update:prescreenConsent', $event)"
       />

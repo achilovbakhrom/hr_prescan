@@ -852,7 +852,9 @@
       "linkedin": "LinkedIn / portfolio",
       "coverNote": "Nega mos kelasiz? (ixtiyoriy)",
       "coverNotePlaceholder": "Bu lavozim sizga nega mos kelishi haqida bir necha jumla…",
-      "consent": "Men AI dastlabki tekshiruv va maxfiylik shartlariga roziman."
+      "consent": "Men AI dastlabki tekshiruv va maxfiylik shartlariga roziman.",
+      "backgroundLabel": "Tajribangizni qanday ulashmoqchisiz?",
+      "linkedinRefHint": "Rekruter uchun havola — uni AI dastlabki tekshiruvi tahlil qilmaydi."
     },
     "dialogs": {
       "bulkConfirmHeader": "Ommaviy amalni tasdiqlash",

@@ -852,7 +852,9 @@
       "linkedin": "LinkedIn / Portfolio",
       "coverNote": "Warum passen Sie gut? (optional)",
       "coverNotePlaceholder": "Ein paar Sätze, warum diese Rolle zu Ihnen passt…",
-      "consent": "Ich stimme den KI-Vorauswahl- und Datenschutzbedingungen zu."
+      "consent": "Ich stimme den KI-Vorauswahl- und Datenschutzbedingungen zu.",
+      "backgroundLabel": "Wie möchten Sie Ihren Werdegang teilen?",
+      "linkedinRefHint": "Ein Referenzlink für den Recruiter — er wird vom KI-Prescreening nicht analysiert."
     },
     "dialogs": {
       "bulkConfirmHeader": "Bestätigen Sie die Massenaktion",

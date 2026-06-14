@@ -852,7 +852,9 @@
       "linkedin": "LinkedIn / portafolio",
       "coverNote": "¿Por qué encajas bien? (opcional)",
       "coverNotePlaceholder": "Unas frases sobre por qué este puesto encaja contigo…",
-      "consent": "Acepto los términos de preselección con IA y privacidad."
+      "consent": "Acepto los términos de preselección con IA y privacidad.",
+      "backgroundLabel": "¿Cómo quieres compartir tu experiencia?",
+      "linkedinRefHint": "Un enlace de referencia para el reclutador; el prescreening con IA no lo analiza."
     },
     "dialogs": {
       "bulkConfirmHeader": "Confirmar acción masiva",

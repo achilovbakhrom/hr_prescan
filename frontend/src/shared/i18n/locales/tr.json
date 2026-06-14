@@ -852,7 +852,9 @@
       "linkedin": "LinkedIn / portföy",
       "coverNote": "Neden uygunsunuz? (isteğe bağlı)",
       "coverNotePlaceholder": "Bu rolün size neden uygun olduğuna dair birkaç cümle…",
-      "consent": "Yapay zeka ön eleme ve gizlilik şartlarını kabul ediyorum."
+      "consent": "Yapay zeka ön eleme ve gizlilik şartlarını kabul ediyorum.",
+      "backgroundLabel": "Geçmişinizi nasıl paylaşmak istersiniz?",
+      "linkedinRefHint": "İşe alımcı için bir referans bağlantısı — yapay zekâ ön elemesi tarafından analiz edilmez."
     },
     "dialogs": {
       "bulkConfirmHeader": "Toplu İşlemi Onayla",
