@@ -7,6 +7,7 @@ import Button from 'primevue/button'
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
+import CountryAutocomplete from '@/shared/components/CountryAutocomplete.vue'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { AccountMode } from '@/shared/types/auth.types'
@@ -150,7 +151,7 @@ async function createCandidateSpace(): Promise<void> {
         </label>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
           {{ t('auth.companySetup.country') }}
-          <InputText v-model="hrForm.country" class="mt-1 w-full" />
+          <CountryAutocomplete v-model="hrForm.country" class="mt-1 block" />
         </label>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
           {{ t('settings.company.website') }}

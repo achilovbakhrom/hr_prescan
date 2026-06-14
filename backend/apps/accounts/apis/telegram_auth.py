@@ -12,12 +12,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from apps.accounts.cv_services import get_or_create_candidate_profile
 from apps.accounts.models import User
 from apps.accounts.serializers import UserOutputSerializer
 from apps.applications.services import bind_existing_applications
 from apps.common.messages import MSG_ACCOUNT_DEACTIVATED
-from apps.integrations.telegram_bot.hr.onboarding import is_hr_placeholder, merge_hr_placeholder
+from apps.integrations.telegram_bot.hr.onboarding import merge_hr_placeholder_if_needed
 
 logger = logging.getLogger(__name__)
 
@@ -96,7 +95,7 @@ class TelegramAuthApi(APIView):
                     status=status.HTTP_401_UNAUTHORIZED,
                 )
 
-            self._merge_hr_placeholder_if_needed(user=user, telegram_id=telegram_id)
+            merge_hr_placeholder_if_needed(user=user, telegram_id=telegram_id)
 
             # Update username if changed
             if user.telegram_username != username and username:
@@ -118,22 +117,6 @@ class TelegramAuthApi(APIView):
             },
             status=status.HTTP_200_OK,
         )
-
-    @staticmethod
-    def _merge_hr_placeholder_if_needed(*, user: User, telegram_id: int) -> None:
-        hr_user = (
-            User.objects.select_for_update()
-            .filter(telegram_id=telegram_id, role__in=[User.Role.ADMIN, User.Role.HR])
-            .exclude(id=user.id)
-            .first()
-        )
-        if hr_user is None or not is_hr_placeholder(user=hr_user, telegram_id=telegram_id):
-            return
-
-        if user.role == User.Role.CANDIDATE:
-            get_or_create_candidate_profile(user=user)
-        merge_hr_placeholder(source=hr_user, target=user)
-        user.refresh_from_db()
 
     @staticmethod
     def _verify_telegram_hash(data: dict) -> bool:
