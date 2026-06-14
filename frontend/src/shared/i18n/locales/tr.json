@@ -1879,5 +1879,21 @@
     "selectPermissions": "Bu kullanıcı için izinleri seçin",
     "allPermissions": "Tüm izinler (Şirket Yöneticisi)",
     "noPermissions": "Hiçbir izin atanmadı"
+  },
+  "contact": {
+    "title": "Bize ulaşın",
+    "subtitle": "Sorunuz veya geri bildiriminiz mi var? Bize yazın, size dönelim.",
+    "name": "Ad",
+    "namePlaceholder": "Adınız",
+    "email": "E-posta",
+    "subject": "Konu",
+    "subjectPlaceholder": "Konu nedir?",
+    "message": "Mesaj",
+    "messagePlaceholder": "Nasıl yardımcı olabiliriz?",
+    "send": "Mesaj gönder",
+    "sending": "Gönderiliyor…",
+    "successTitle": "Mesaj gönderildi!",
+    "successBody": "Bize ulaştığınız için teşekkürler — yakında e-postanıza yanıt vereceğiz.",
+    "error": "Bir şeyler ters gitti. Lütfen tekrar deneyin."
   }
 }

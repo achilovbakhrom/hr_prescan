@@ -386,3 +386,5 @@ EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True").lower() in ("true", "1")
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "PreScreen AI <noreply@prescreenai.com>")
+# Inbox that receives public contact-form submissions.
+CONTACT_EMAIL = os.environ.get("CONTACT_EMAIL", "mailbak36@gmail.com")

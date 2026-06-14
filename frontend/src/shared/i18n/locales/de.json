@@ -1879,5 +1879,21 @@
     "selectPermissions": "Wählen Sie Berechtigungen für diesen Benutzer aus",
     "allPermissions": "Alle Berechtigungen (Firmenadministrator)",
     "noPermissions": "Keine Berechtigungen zugewiesen"
+  },
+  "contact": {
+    "title": "Kontakt",
+    "subtitle": "Eine Frage oder Feedback? Schreiben Sie uns, wir melden uns.",
+    "name": "Name",
+    "namePlaceholder": "Ihr Name",
+    "email": "E-Mail",
+    "subject": "Betreff",
+    "subjectPlaceholder": "Worum geht es?",
+    "message": "Nachricht",
+    "messagePlaceholder": "Wie können wir helfen?",
+    "send": "Nachricht senden",
+    "sending": "Senden…",
+    "successTitle": "Nachricht gesendet!",
+    "successBody": "Danke für Ihre Nachricht — wir antworten bald per E-Mail.",
+    "error": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
   }
 }

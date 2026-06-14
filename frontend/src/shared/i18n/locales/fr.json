@@ -1879,5 +1879,21 @@
     "selectPermissions": "Sélectionnez les autorisations pour cet utilisateur",
     "allPermissions": "Toutes les autorisations (administrateur de l'entreprise)",
     "noPermissions": "Aucune autorisation attribuée"
+  },
+  "contact": {
+    "title": "Nous contacter",
+    "subtitle": "Une question ou un retour ? Écrivez-nous, nous vous répondrons.",
+    "name": "Nom",
+    "namePlaceholder": "Votre nom",
+    "email": "E-mail",
+    "subject": "Objet",
+    "subjectPlaceholder": "De quoi s’agit-il ?",
+    "message": "Message",
+    "messagePlaceholder": "Comment pouvons-nous aider ?",
+    "send": "Envoyer le message",
+    "sending": "Envoi…",
+    "successTitle": "Message envoyé !",
+    "successBody": "Merci de nous avoir contactés — nous répondrons bientôt par e-mail.",
+    "error": "Une erreur s’est produite. Veuillez réessayer."
   }
 }

@@ -100,6 +100,14 @@ function scrollTo(id: string): void {
                   {{ t('nav.browseJobs') }}
                 </RouterLink>
               </li>
+              <li>
+                <RouterLink
+                  :to="{ name: ROUTE_NAMES.CONTACT }"
+                  class="text-sm text-[color:var(--color-text-secondary)] transition-colors hover:text-[color:var(--color-text-primary)]"
+                >
+                  {{ t('contact.title') }}
+                </RouterLink>
+              </li>
             </ul>
           </div>
 

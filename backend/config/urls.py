@@ -35,6 +35,7 @@ from apps.common.apis_ai import AIAssistantApi
 from apps.common.apis_app_config import PublicAppConfigApi
 from apps.common.apis_candidate_ai import CandidateAIAssistantApi
 from apps.common.apis_candidate_dashboard import CandidateDashboardApi
+from apps.common.apis_contact import ContactApi
 from apps.common.apis_country import CountryListApi
 from apps.common.apis_detect_language import DetectLanguageApi
 from apps.common.apis_education_level import EducationLevelListApi
@@ -113,6 +114,7 @@ urlpatterns = [
     path("api/hr/translate/batch/", BatchTranslateApi.as_view(), name="hr-translate-batch"),
     path("api/translate/", TranslatePublicContentApi.as_view(), name="public-translate"),
     path("api/notifications/", include((notification_urlpatterns, "notifications"))),
+    path("api/public/contact/", ContactApi.as_view(), name="public-contact"),
     path("api/public/countries/", CountryListApi.as_view(), name="public-countries"),
     path("api/public/industries/", IndustryListApi.as_view(), name="public-industries"),
     path("api/public/skills/", SkillListApi.as_view(), name="public-skills"),
