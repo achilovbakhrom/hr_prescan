@@ -73,6 +73,19 @@ const recommendation = computed(() => {
           {{ props.candidate.candidatePhone || t('candidates.overviewDetails.notProvided') }}
         </p>
       </div>
+      <div v-if="props.candidate.linkedinUrl">
+        <p class="text-sm text-gray-500">{{ t('candidates.application.linkedin') }}</p>
+        <a
+          :href="props.candidate.linkedinUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex max-w-full items-center gap-1.5 font-medium text-[color:var(--color-accent)] hover:underline"
+        >
+          <i class="pi pi-linkedin shrink-0"></i>
+          <span class="truncate">{{ props.candidate.linkedinUrl }}</span>
+          <i class="pi pi-external-link shrink-0 text-xs"></i>
+        </a>
+      </div>
       <div>
         <p class="text-sm text-gray-500">{{ t('nav.vacancies') }}</p>
         <p class="font-medium">{{ props.candidate.vacancyTitle }}</p>
