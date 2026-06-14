@@ -139,11 +139,32 @@ jobs:
       - name: Pull new images on production host
         run: |
           ssh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} \
-            "cd ${{ secrets.PROD_DEPLOY_PATH }} && \
-             echo '${{ secrets.GITHUB_TOKEN }}' | \
-               docker login ghcr.io -u ${{ github.actor }} --password-stdin && \
-             IMAGE_TAG=${{ github.sha }} \
-               docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml pull"
+            GITHUB_TOKEN='${{ secrets.GITHUB_TOKEN }}' \
+            GITHUB_ACTOR='${{ github.actor }}' \
+            PROD_DEPLOY_PATH='${{ secrets.PROD_DEPLOY_PATH }}' \
+            bash -s <<'EOSSH'
+          set -euo pipefail
+          cd "$PROD_DEPLOY_PATH"
+          echo "$GITHUB_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+
+          for image in \
+            "ghcr.io/${{ github.repository }}/backend:${{ github.sha }}" \
+            "ghcr.io/${{ github.repository }}/frontend:${{ github.sha }}" \
+            "ghcr.io/${{ github.repository }}/livekit-agent:${{ github.sha }}"; do
+            for attempt in 1 2 3; do
+              if docker pull "$image"; then
+                break
+              fi
+              if [ "$attempt" -eq 3 ]; then
+                echo "[ERROR] Failed to pull $image after $attempt attempts."
+                exit 1
+              fi
+              sleep_seconds=$((attempt * 10))
+              echo "[WARN] Pull attempt $attempt for $image failed, retrying in ${sleep_seconds}s..."
+              sleep "$sleep_seconds"
+            done
+          done
+          EOSSH
 
       - name: Ensure observability stack is up
         run: |
