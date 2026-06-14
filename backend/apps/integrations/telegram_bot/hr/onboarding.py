@@ -78,6 +78,37 @@ def merge_hr_placeholder(*, source: User, target: User) -> None:
     _activate_default_membership(user=target)
 
 
+def merge_hr_placeholder_if_needed(*, user: User, telegram_id: int | None) -> User:
+    """Merge a Telegram-first HR placeholder sharing this telegram_id into `user`.
+
+    Promoting a web account to HR/admin (e.g. creating an HR space, or web
+    Telegram login) would otherwise violate the ``unique_hr_admin_telegram_id``
+    constraint when a bot-created placeholder already holds the same
+    telegram_id. Merging reassigns the placeholder's workspace and clears its
+    telegram_id, freeing the constraint. No-op when there is no telegram_id or
+    no matching placeholder. Returns the (refreshed) target user.
+    """
+    if telegram_id is None:
+        return user
+
+    placeholder = (
+        User.objects.select_for_update()
+        .filter(telegram_id=telegram_id, role__in=[User.Role.ADMIN, User.Role.HR])
+        .exclude(id=user.id)
+        .first()
+    )
+    if placeholder is None or not is_hr_placeholder(user=placeholder, telegram_id=telegram_id):
+        return user
+
+    if user.role == User.Role.CANDIDATE:
+        from apps.accounts.cv_services import get_or_create_candidate_profile
+
+        get_or_create_candidate_profile(user=user)
+    merge_hr_placeholder(source=placeholder, target=user)
+    user.refresh_from_db()
+    return user
+
+
 def _merge_language(*, source: User, target: User) -> None:
     if source.language and source.language != target.language:
         target.language = source.language

@@ -55,6 +55,7 @@ The AI agent evaluates candidates at each step and decides whether to advance th
 - HR mode requires at least one live company membership. The web header shows the current mode, the company dropdown, and an option to switch to candidate mode or create a candidate space.
 - Candidate mode requires a candidate space (candidate role or candidate profile). The web header hides the HR company dropdown and shows only the account-mode switch.
 - Creating an HR space from a candidate account creates the required company and preserves the candidate space. Creating a candidate space from an HR account collects the required personal profile fields and switches into candidate mode.
+- If the account is linked to a Telegram identity that already owns an HR-bot placeholder workspace (`tg_hr_<telegram_id>@telegram.local`), creating an HR space from web first merges that placeholder into the current account (same merge used by web Telegram login), then creates the new company — so the bot-created workspace and the new web company both end up on one account. If a real (non-placeholder) HR/admin account already holds the same Telegram identity, HR-space creation is refused with a message to sign in with that account instead.
 - HR permissions only apply while `active_mode=hr`; candidate profile and dashboard APIs only apply while `active_mode=candidate`.
 
 ---

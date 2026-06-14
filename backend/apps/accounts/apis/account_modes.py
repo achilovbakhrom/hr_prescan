@@ -14,6 +14,7 @@ from apps.accounts.models import CandidateProfile, Company, CompanyMembership, U
 from apps.accounts.serializers import UserOutputSerializer
 from apps.accounts.services import create_user_company, switch_company, switch_to_personal
 from apps.common.exceptions import ApplicationError
+from apps.integrations.telegram_bot.hr.onboarding import merge_hr_placeholder_if_needed
 
 
 def _has_candidate_space(user: User) -> bool:
@@ -116,6 +117,26 @@ class CreateHrSpaceApi(APIView):
         serializer.is_valid(raise_exception=True)
         try:
             with transaction.atomic():
+                # A Telegram-first HR placeholder may already hold this user's
+                # telegram_id as an admin/hr row; promoting the account to ADMIN
+                # below would otherwise violate unique_hr_admin_telegram_id.
+                merge_hr_placeholder_if_needed(
+                    user=request.user,
+                    telegram_id=request.user.telegram_id,
+                )
+                if (
+                    request.user.telegram_id is not None
+                    and User.objects.filter(
+                        telegram_id=request.user.telegram_id,
+                        role__in=[User.Role.ADMIN, User.Role.HR],
+                    )
+                    .exclude(id=request.user.id)
+                    .exists()
+                ):
+                    raise ApplicationError(
+                        "An HR account is already linked to your Telegram. "
+                        "Sign in with that account to manage its workspace."
+                    )
                 if (
                     request.user.role == User.Role.CANDIDATE
                     and not CandidateProfile.objects.filter(user=request.user).exists()
