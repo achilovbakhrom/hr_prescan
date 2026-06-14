@@ -1,7 +1,7 @@
 [project]
 name = "hr-prescan-e2e"
 version = "0.1.0"
-description = "E2E tests for HR PreScan platform"
+description = "E2E tests for HR PreScreen platform"
 requires-python = ">=3.12"
 dependencies = [
     "pytest>=8.0",

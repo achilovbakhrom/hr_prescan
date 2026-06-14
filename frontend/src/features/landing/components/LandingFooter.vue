@@ -146,7 +146,7 @@ function scrollTo(id: string): void {
           <div class="flex items-center gap-3">
             <AppLogo variant="glyph" size="sm" />
             <p class="text-xs text-[color:var(--color-text-muted)]">
-              &copy; {{ new Date().getFullYear() }} HR PreScan.
+              &copy; {{ new Date().getFullYear() }} HR PreScreen.
               {{ t('landing.footer.copyright') }}
             </p>
           </div>

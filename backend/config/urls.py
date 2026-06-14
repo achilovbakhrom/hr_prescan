@@ -1,5 +1,5 @@
 """
-Root URL configuration for HR PreScan.
+Root URL configuration for HR PreScreen.
 """
 
 from django.conf import settings

@@ -1,5 +1,5 @@
 """
-Production settings for HR PreScan.
+Production settings for HR PreScreen.
 
 Extends base settings with:
 - Security hardening (SSL, HSTS, CSP)

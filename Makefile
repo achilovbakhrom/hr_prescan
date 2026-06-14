@@ -44,7 +44,7 @@ setup: ## First-time setup: copy env, build images, start services, run migratio
 	docker compose exec django python manage.py migrate --noinput
 	docker compose exec django python manage.py collectstatic --noinput
 	@echo ""
-	@echo "🚀 HR PreScan is running!"
+	@echo "🚀 HR PreScreen is running!"
 	@echo "   Frontend:  http://localhost:3000"
 	@echo "   Backend:   http://localhost:8000"
 	@echo "   API docs:  http://localhost:8000/api/health/"

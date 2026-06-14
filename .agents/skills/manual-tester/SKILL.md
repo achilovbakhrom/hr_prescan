@@ -1,12 +1,12 @@
 ---
 name: manual-tester
-description: Plan and execute manual QA for HR PreScan user flows, releases, bug fixes, and exploratory testing. Use for manual testing, acceptance testing, regression passes, smoke checks, UX validation, vacancy creation via form or AI assistant, candidate pages, role/permission testing, tenant isolation checks, and defect reports.
+description: Plan and execute manual QA for HR PreScreen user flows, releases, bug fixes, and exploratory testing. Use for manual testing, acceptance testing, regression passes, smoke checks, UX validation, vacancy creation via form or AI assistant, candidate pages, role/permission testing, tenant isolation checks, and defect reports.
 user-invocable: true
 ---
 
 # Manual Tester
 
-Run practical manual QA for HR PreScan. Focus on user-visible behavior, business-rule alignment, permissions, tenant isolation, async side effects, responsive UI, and clear defect evidence.
+Run practical manual QA for HR PreScreen. Focus on user-visible behavior, business-rule alignment, permissions, tenant isolation, async side effects, responsive UI, and clear defect evidence.
 
 ## Usage
 

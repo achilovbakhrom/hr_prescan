@@ -1,5 +1,5 @@
 """
-Base Django settings for HR PreScan.
+Base Django settings for HR PreScreen.
 
 Shared settings used across all environments.
 Environment-specific values are read from environment variables.
@@ -179,7 +179,7 @@ REST_FRAMEWORK = {
 
 # drf-spectacular — OpenAPI / Swagger
 SPECTACULAR_SETTINGS = {
-    "TITLE": "HR PreScan API",
+    "TITLE": "HR PreScreen API",
     "DESCRIPTION": "AI-powered candidate pre-screening platform API",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
@@ -309,7 +309,7 @@ SIMPLE_JWT = {
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
 
 # HeadHunter parser
-HH_USER_AGENT = os.environ.get("HH_USER_AGENT", "HR PreScan vacancy parser")
+HH_USER_AGENT = os.environ.get("HH_USER_AGENT", "HR PreScreen vacancy parser")
 HH_TOKEN_URL = os.environ.get("HH_TOKEN_URL", "https://api.hh.ru/token")
 HH_ACCESS_TOKEN = os.environ.get("HH_ACCESS_TOKEN", "")
 HH_RU_ACCESS_TOKEN = os.environ.get("HH_RU_ACCESS_TOKEN", "")

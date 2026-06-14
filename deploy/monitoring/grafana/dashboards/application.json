@@ -162,7 +162,7 @@
   "time": { "from": "now-1h", "to": "now" },
   "timepicker": {},
   "timezone": "browser",
-  "title": "HR PreScan — Application",
+  "title": "HR PreScreen — Application",
   "uid": "hrprescan-application",
   "version": 1
 }

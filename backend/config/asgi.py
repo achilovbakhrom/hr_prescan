@@ -1,5 +1,5 @@
 """
-ASGI config for HR PreScan.
+ASGI config for HR PreScreen.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 """

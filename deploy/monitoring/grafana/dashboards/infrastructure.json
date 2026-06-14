@@ -172,7 +172,7 @@
   "time": { "from": "now-1h", "to": "now" },
   "timepicker": {},
   "timezone": "browser",
-  "title": "HR PreScan — Infrastructure",
+  "title": "HR PreScreen — Infrastructure",
   "uid": "hrprescan-infrastructure",
   "version": 1
 }

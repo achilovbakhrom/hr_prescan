@@ -51,7 +51,7 @@ def _build_prompt_review_request(*, interview: Interview, prompt_text: str) -> s
     session_label = "prescanning" if interview.session_type == "prescanning" else "interview"
     mode_label = "video meet" if interview.screening_mode == "meet" else "chat"
 
-    return f"""Evaluate the following HR PreScan AI {session_label} prompt for a {mode_label} session.
+    return f"""Evaluate the following HR PreScreen AI {session_label} prompt for a {mode_label} session.
 
 ## Evaluation Rubric
 Score each area from 1 to 10:

@@ -1,5 +1,5 @@
 """
-Celery application configuration for HR PreScan.
+Celery application configuration for HR PreScreen.
 """
 
 import os
