@@ -1,11 +1,5 @@
 <script setup lang="ts">
-/**
- * ApplicationFormPage — candidate applies to a public vacancy.
- *
- * T13 redesign: steps sit inside glass cards; a glass progress breadcrumb
- * sits above indicating where the user is (Form → Ready → Prescan done).
- * Each step is extracted into its own component to stay under 200 lines.
- */
+/** ApplicationFormPage — candidate applies to a public vacancy (Form → Ready → Done). */
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
@@ -39,6 +33,10 @@ const email = ref('')
 const phone = ref('')
 const cvFile = ref<File | null>(null)
 const cvId = ref<string | null>(null)
+const profilePhoto = ref<File | null>(null)
+const linkedinUrl = ref('')
+const coverNote = ref('')
+const prescreenConsent = ref(false)
 const errors = ref<Record<string, string>>({})
 
 const step = ref<'form' | 'ready' | 'done'>('form')
@@ -88,6 +86,9 @@ function validate(): boolean {
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
     errors.value.email = t('candidates.application.validation.emailInvalid')
   }
+  if (!prescreenConsent.value) {
+    errors.value.consent = t('candidates.application.validation.consentRequired')
+  }
   return Object.keys(errors.value).length === 0
 }
 
@@ -100,6 +101,10 @@ async function handleSubmit(): Promise<void> {
       candidatePhone: phone.value.trim() || undefined,
       cvFile: cvFile.value ?? undefined,
       cvId: cvId.value ?? undefined,
+      profilePhoto: profilePhoto.value ?? undefined,
+      linkedinUrl: linkedinUrl.value.trim() || undefined,
+      coverNote: coverNote.value.trim() || undefined,
+      prescreenConsent: prescreenConsent.value,
     })
     const resp = application as unknown as Record<string, unknown>
     prescanToken.value = (resp.prescanToken ??
@@ -161,21 +166,22 @@ async function copyLink(): Promise<void> {
 
     <ApplicationFormCard
       v-else
+      v-model:name="name"
+      v-model:email="email"
+      v-model:phone="phone"
+      v-model:linkedin-url="linkedinUrl"
+      v-model:cover-note="coverNote"
+      v-model:prescreen-consent="prescreenConsent"
       :vacancy-id="vacancyId"
       :vacancy="vacancy"
       :is-logged-in="isLoggedIn"
       :full-name="fullName"
-      :name="name"
-      :email="email"
-      :phone="phone"
       :errors="errors"
       :candidate-store-error="candidateStore.error"
       :candidate-store-loading="candidateStore.loading"
-      @update:name="name = $event"
-      @update:email="email = $event"
-      @update:phone="phone = $event"
       @update:cv-file="cvFile = $event"
       @update:cv-id="cvId = $event"
+      @update:profile-photo="profilePhoto = $event"
       @submit="handleSubmit"
     />
 

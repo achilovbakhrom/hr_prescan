@@ -124,8 +124,6 @@ def reset_interview(*, interview: Interview) -> Interview:
     }
     if interview.session_type == Interview.SessionType.INTERVIEW:
         session_kwargs["language"] = resolve_interview_language(interview.language)
-    if session_kwargs["screening_mode"] == Interview.ScreeningMode.MEET:
-        session_kwargs["duration_minutes"] = application.vacancy.interview_duration
 
     new_session = Interview.objects.create(**session_kwargs)
     if new_session.screening_mode == Interview.ScreeningMode.MEET:

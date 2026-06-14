@@ -24,6 +24,7 @@ from apps.applications.services.s3_utils import (
     _get_s3_client,
     generate_cv_download_url,
     upload_cv_to_s3,
+    upload_profile_photo_to_s3,
 )
 from apps.applications.services.screening_reset import reset_application_screening
 from apps.applications.services.share_review import rotate_hiring_manager_token
@@ -55,4 +56,5 @@ __all__ = [
     "sync_hr_candidate_for_application",
     "update_application_status",
     "upload_cv_to_s3",
+    "upload_profile_photo_to_s3",
 ]

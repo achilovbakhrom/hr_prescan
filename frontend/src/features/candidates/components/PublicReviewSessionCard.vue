@@ -54,7 +54,7 @@ function handleExport(format: 'doc' | 'txt'): void {
   <div>
     <div class="mb-3 flex items-center justify-between gap-3">
       <div>
-        <p class="text-xs font-semibold uppercase tracking-wide text-blue-600">
+        <p class="text-xs font-semibold uppercase tracking-wide text-[color:var(--color-accent)]">
           {{ session.sessionType }}
         </p>
         <p class="text-sm text-gray-500">{{ session.screeningMode }} · {{ session.status }}</p>

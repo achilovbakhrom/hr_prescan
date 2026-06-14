@@ -81,7 +81,6 @@ export interface CreateVacancyRequest {
   interviewMode?: InterviewMode
   interviewEnabled?: boolean
   cvRequired?: boolean
-  interviewDuration?: number
   companyInfo?: string
   companyId?: string
   prescanningPrompt?: string

@@ -119,7 +119,6 @@ def test_public_parsed_vacancy_detail_is_read_only(company, hr_user):
     assert response.data["company"] is None
     assert response.data["can_apply"] is False
     assert response.data["cv_required"] is False
-    assert response.data["interview_duration"] == 0
     assert response.data["telegram_code"] is None
     assert response.data["salary_min"] == "1000.00"
     assert response.data["salary_max"] == "2000.00"

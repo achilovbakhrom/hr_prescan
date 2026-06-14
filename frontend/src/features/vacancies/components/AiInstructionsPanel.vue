@@ -3,7 +3,6 @@ import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useToast } from 'primevue/usetoast'
 import Button from 'primevue/button'
-import InputNumber from 'primevue/inputnumber'
 import Textarea from 'primevue/textarea'
 import Select from '@/shared/components/AppSelect.vue'
 import { PRESCANNING_LANGUAGE_OPTIONS } from '@/shared/i18n/supportedLocales'
@@ -21,7 +20,6 @@ const vacancyStore = useVacancyStore()
 
 const language = ref(props.vacancy.prescanningLanguage || 'en')
 const instruction = ref(currentInstruction(props.vacancy))
-const interviewDuration = ref<number>(props.vacancy.interviewDuration || 30)
 const style = ref<InstructionStyle>('balanced')
 const saving = ref(false)
 const generating = ref(false)
@@ -45,10 +43,7 @@ const dirty = computed(() => {
       instruction.value !== (props.vacancy.prescanningPrompt || '')
     )
   }
-  return (
-    instruction.value !== (props.vacancy.interviewPrompt || '') ||
-    interviewDuration.value !== (props.vacancy.interviewDuration || 30)
-  )
+  return instruction.value !== (props.vacancy.interviewPrompt || '')
 })
 
 watch(
@@ -56,7 +51,6 @@ watch(
   (vacancy) => {
     language.value = vacancy.prescanningLanguage || 'en'
     instruction.value = currentInstruction(vacancy)
-    interviewDuration.value = vacancy.interviewDuration || 30
   },
   { deep: true },
 )
@@ -89,7 +83,7 @@ async function save(): Promise<void> {
     const payload: Record<string, unknown> =
       props.step === 'prescanning'
         ? { prescanningLanguage: language.value, prescanningPrompt: instruction.value }
-        : { interviewPrompt: instruction.value, interviewDuration: interviewDuration.value ?? 30 }
+        : { interviewPrompt: instruction.value }
     if (props.step === 'interview' && !interviewLocked.value) payload.interviewMode = 'meet'
     await vacancyStore.updateVacancy(props.vacancy.id, payload)
     toast.add({ severity: 'success', summary: t('common.saved'), life: 2500 })
@@ -144,20 +138,12 @@ async function save(): Promise<void> {
       />
     </div>
 
-    <div v-if="step === 'interview'" class="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-      <div>
-        <label class="mb-1 block text-xs font-medium text-gray-600">
-          {{ t('vacancies.form.interviewMode') }}
-        </label>
-        <div class="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm">
-          {{ t('vacancies.interviewMode.meet') }}
-        </div>
-      </div>
-      <div>
-        <label class="mb-1 block text-xs font-medium text-gray-600">
-          {{ t('vacancies.form.interviewDuration') }}
-        </label>
-        <InputNumber v-model="interviewDuration" class="w-full" :min="10" :max="120" :step="5" />
+    <div v-if="step === 'interview'" class="mb-4">
+      <label class="mb-1 block text-xs font-medium text-gray-600">
+        {{ t('vacancies.form.interviewMode') }}
+      </label>
+      <div class="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm sm:w-60">
+        {{ t('vacancies.interviewMode.meet') }}
       </div>
     </div>
 

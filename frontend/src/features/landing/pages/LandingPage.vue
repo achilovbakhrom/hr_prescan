@@ -1,69 +1,60 @@
 <script setup lang="ts">
 /**
- * LandingPage — composes the 8 redesigned marketing sections.
+ * LandingPage — marketing page composed to match the Figma redesign:
+ * Nav → Hero → Logos → How it works → Features → CTA(+Telegram) → Footer.
  *
- * The landing route is registered outside of PublicLayout (see
- * `frontend/src/app/router.ts`), so this page provides its own PageShell
- * wrapper to get AnimatedBackground + FloatingBackgroundPicker. It also
- * honors the global background default and any explicit user choice.
+ * Flat surface with soft radial glows (the Figma ellipses), not the animated
+ * mesh — consistent with the flattened app theme.
  */
-import AnimatedBackground from '@/shared/components/AnimatedBackground.vue'
-import FloatingBackgroundPicker from '@/shared/components/FloatingBackgroundPicker.vue'
 import { useScrollAnimation } from '../composables/useScrollAnimation'
 import LandingNav from '../components/LandingNav.vue'
 import LandingHero from '../components/LandingHero.vue'
-import LandingStats from '../components/LandingStats.vue'
-import LandingIntroVideo from '../components/LandingIntroVideo.vue'
+import LandingLogos from '../components/LandingLogos.vue'
+import LandingHowItWorks from '../components/LandingHowItWorks.vue'
 import LandingFeatures from '../components/LandingFeatures.vue'
-import LandingPipeline from '../components/LandingPipeline.vue'
 import LandingCta from '../components/LandingCta.vue'
 import LandingFooter from '../components/LandingFooter.vue'
-// LandingJobs is temporarily unmounted — see docs/design/spec.md §9. Restore
-// once a public /api/public/vacancies endpoint is wired up with real data.
 
 useScrollAnimation()
-
-// The user's background choice from the FloatingBackgroundPicker is honored —
-// we no longer force the landing page to a specific variant on mount. The
-// global default lives in `theme.store.readBackground()` for first-time
-// visitors.
 </script>
 
 <template>
-  <!-- Page root is transparent so the Vellum (fixed, behind `main`) bleeds
-       through every scroll section. Each section is also bg-transparent and
-       stacks its content inside GlassCard / GlassSurface — the "floating
-       islands on atmosphere" pattern from spec §9. -->
-  <div class="landing-page relative isolate min-h-screen w-full overflow-x-clip bg-transparent">
-    <!-- Background layer (fixed, full-bleed) -->
-    <AnimatedBackground />
+  <div class="landing-page relative isolate min-h-screen w-full overflow-x-clip">
+    <!-- Background: smooth light lavender wash (Figma), concentrated softly
+         in the hero area and fading to near-white below. -->
+    <div
+      class="pointer-events-none fixed inset-0 -z-10"
+      style="
+        background:
+          radial-gradient(ellipse 70% 50% at 78% 8%, rgba(236, 72, 153, 0.08), transparent 60%),
+          radial-gradient(ellipse 90% 60% at 20% -5%, rgba(124, 58, 237, 0.1), transparent 60%),
+          linear-gradient(180deg, #f6f4ff 0%, #fbfaff 38%, #ffffff 100%);
+      "
+    ></div>
+    <div
+      class="pointer-events-none fixed inset-0 -z-10 hidden dark:block"
+      style="
+        background:
+          radial-gradient(ellipse 80% 50% at 78% 6%, rgba(236, 72, 153, 0.12), transparent 60%),
+          radial-gradient(ellipse 90% 60% at 18% -5%, rgba(124, 58, 237, 0.16), transparent 60%),
+          linear-gradient(180deg, #0c0a16 0%, #08070f 45%, #07060d 100%);
+      "
+    ></div>
 
-    <!-- Sticky translucent header -->
     <LandingNav />
 
-    <!-- Main scroll column -->
-    <main class="relative z-0 bg-transparent pb-24 md:pb-12">
+    <main class="relative z-0 pb-16">
       <LandingHero />
-      <LandingStats />
-      <LandingIntroVideo />
+      <LandingLogos />
+      <LandingHowItWorks />
       <LandingFeatures />
-      <LandingPipeline />
       <LandingCta />
       <LandingFooter />
     </main>
-
-    <!-- Floating chrome — background + theme picker -->
-    <FloatingBackgroundPicker />
   </div>
 </template>
 
 <style>
-/* Entrance + scroll reveal shared classes. Kept global so child sections can
-   reference them without <style scoped> barriers. */
-/* Default = fully visible. The first-mount opacity/translate was invisible
-   under static screenshot/slow-load paths when IntersectionObserver hadn't
-   fired yet. Entrance animation now only plays if we explicitly start it
-   from a below-fold mount. */
 .scroll-animate {
   opacity: 1;
   transform: none;
@@ -83,9 +74,6 @@ useScrollAnimation()
 }
 .scroll-animate-delay-3 {
   transition-delay: 240ms;
-}
-.scroll-animate-delay-4 {
-  transition-delay: 320ms;
 }
 
 @media (prefers-reduced-motion: reduce) {

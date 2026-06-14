@@ -1,10 +1,5 @@
 <script setup lang="ts">
-/**
- * ApplicationFormCard — the "form" step of ApplicationFormPage.
- *
- * Extracted to keep the page under 200 lines. Owns the input layout only;
- * the parent page holds state, validation, and submission.
- */
+/** ApplicationFormCard — the "form" step of ApplicationFormPage (input layout only). */
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import InputText from 'primevue/inputtext'
@@ -13,6 +8,7 @@ import FileUpload from 'primevue/fileupload'
 import type { FileUploadSelectEvent } from 'primevue/fileupload'
 import GlassCard from '@/shared/components/GlassCard.vue'
 import CvSelectionSection from './CvSelectionSection.vue'
+import ApplicationExtraFields from './ApplicationExtraFields.vue'
 
 interface VacancyBrief {
   title: string
@@ -29,6 +25,9 @@ const props = defineProps<{
   name: string
   email: string
   phone: string
+  linkedinUrl: string
+  coverNote: string
+  prescreenConsent: boolean
   errors: Record<string, string>
   candidateStoreError: string | null
   candidateStoreLoading: boolean
@@ -40,6 +39,10 @@ const emit = defineEmits<{
   'update:phone': [value: string]
   'update:cvFile': [value: File | null]
   'update:cvId': [value: string | null]
+  'update:profilePhoto': [value: File | null]
+  'update:linkedinUrl': [value: string]
+  'update:coverNote': [value: string]
+  'update:prescreenConsent': [value: boolean]
   submit: []
 }>()
 
@@ -172,6 +175,17 @@ function onFileSelect(event: FileUploadSelectEvent): void {
           {{ t('candidates.application.acceptedFormats') }}
         </small>
       </div>
+
+      <ApplicationExtraFields
+        :linkedin-url="linkedinUrl"
+        :cover-note="coverNote"
+        :prescreen-consent="prescreenConsent"
+        :consent-error="errors.consent"
+        @update:profile-photo="emit('update:profilePhoto', $event)"
+        @update:linkedin-url="emit('update:linkedinUrl', $event)"
+        @update:cover-note="emit('update:coverNote', $event)"
+        @update:prescreen-consent="emit('update:prescreenConsent', $event)"
+      />
 
       <Button
         type="submit"

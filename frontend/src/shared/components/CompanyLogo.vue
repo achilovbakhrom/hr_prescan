@@ -50,7 +50,7 @@ const iconClass = computed(
     v-else
     :class="[
       boxClass,
-      'flex shrink-0 items-center justify-center bg-blue-50 dark:bg-blue-950 text-blue-600',
+      'flex shrink-0 items-center justify-center bg-[color:var(--color-accent-soft)] text-[color:var(--color-accent)]',
     ]"
     role="img"
     :aria-label="resolvedName || 'Company'"

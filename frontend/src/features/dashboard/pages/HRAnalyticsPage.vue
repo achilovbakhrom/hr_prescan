@@ -27,7 +27,7 @@ const processMetrics = computed(() => analyticsStore.analytics?.processMetrics ?
 </script>
 
 <template>
-  <div class="mx-auto w-full max-w-[1440px]">
+  <div class="w-full">
     <!-- Sticky glass toolbar -->
     <GlassSurface
       level="1"

@@ -26,7 +26,7 @@ defineExpose({ seekTo })
 <template>
   <div class="rounded-lg border border-gray-200 dark:border-gray-700 p-4">
     <div class="mb-3 flex items-center gap-2 text-sm font-medium text-gray-700">
-      <i class="pi pi-video text-blue-600"></i>
+      <i class="pi pi-video text-[color:var(--color-accent)]"></i>
       {{ t('interviews.recording') }}
     </div>
     <video

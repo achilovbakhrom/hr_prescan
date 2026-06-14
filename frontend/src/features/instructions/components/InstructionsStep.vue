@@ -27,7 +27,7 @@ function onImageError(e: Event): void {
     <!-- Step number + connector -->
     <div class="flex shrink-0 flex-row items-center gap-3 sm:flex-col sm:items-center">
       <span
-        class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-sm font-semibold text-white"
+        class="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--color-accent)] text-sm font-semibold text-white"
         aria-hidden="true"
       >
         {{ index }}

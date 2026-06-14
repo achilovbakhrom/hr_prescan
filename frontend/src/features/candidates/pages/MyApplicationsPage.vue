@@ -34,7 +34,7 @@ function browseJobs(): void {
 </script>
 
 <template>
-  <div class="mx-auto max-w-7xl space-y-6">
+  <div class="w-full space-y-6">
     <header class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div>
         <h1 class="text-3xl font-semibold tracking-tight text-[color:var(--color-text-primary)]">

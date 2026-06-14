@@ -43,7 +43,7 @@ function toggleUserMenu(event: Event): void {
     @click="toggleUserMenu"
   >
     <div
-      class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-medium text-blue-700 dark:bg-blue-950"
+      class="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--color-accent-soft)] text-sm font-medium text-[color:var(--color-accent)]"
     >
       {{ authStore.user?.firstName?.charAt(0) ?? ''
       }}{{ authStore.user?.lastName?.charAt(0) ?? '' }}

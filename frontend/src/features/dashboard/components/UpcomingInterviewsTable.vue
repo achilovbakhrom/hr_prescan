@@ -1,56 +1,72 @@
 <script setup lang="ts">
+/** Upcoming interviews — glass card list with avatar + time chip (Figma dashboard rail). */
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
+import GlassCard from '@/shared/components/GlassCard.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import type { UpcomingInterview } from '../types/dashboard.types'
 
-defineProps<{
-  interviews: UpcomingInterview[]
-}>()
+defineProps<{ interviews: UpcomingInterview[] }>()
 
 const { t } = useI18n()
-
 const router = useRouter()
 
-function viewDetail(interview: UpcomingInterview): void {
-  router.push({
-    name: ROUTE_NAMES.INTERVIEW_DETAIL,
-    params: { id: interview.id },
-  })
+function initials(name: string): string {
+  return name
+    .split(' ')
+    .map((p) => p[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase()
 }
-
-function formatDateTime(dateStr: string): string {
-  return new Date(dateStr).toLocaleString()
+function timeLabel(dateStr: string): string {
+  return new Date(dateStr).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })
+}
+function open(i: UpcomingInterview): void {
+  router.push({ name: ROUTE_NAMES.INTERVIEW_DETAIL, params: { id: i.id } })
 }
 </script>
 
 <template>
-  <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white">
-    <div class="border-b border-gray-200 dark:border-gray-700 px-5 py-3">
-      <h3 class="text-sm font-semibold text-gray-700">{{ t('dashboard.upcomingInterviews') }}</h3>
+  <GlassCard class="overflow-hidden p-0">
+    <div class="px-5 py-4">
+      <h3 class="text-base font-semibold text-[color:var(--color-text-primary)]">
+        {{ t('dashboard.upcomingInterviews') }}
+      </h3>
     </div>
-    <DataTable
-      :value="interviews"
-      striped-rows
-      row-hover
-      class="cursor-pointer"
-      @row-click="(e) => viewDetail(e.data)"
+
+    <button
+      v-for="i in interviews"
+      :key="i.id"
+      type="button"
+      class="flex w-full items-center gap-3 border-t border-[color:var(--color-border-soft)] px-5 py-3 text-left transition-colors hover:bg-[color:var(--color-surface-raised)]"
+      @click="open(i)"
     >
-      <Column field="candidateName" :header="t('dashboard.table.candidate')" />
-      <Column field="vacancyTitle" :header="t('dashboard.table.vacancy')" />
-      <Column :header="t('dashboard.table.dateTime')">
-        <template #body="{ data }">
-          {{ formatDateTime((data as UpcomingInterview).createdAt) }}
-        </template>
-      </Column>
-      <Column field="status" :header="t('common.status')" />
-      <template #empty>
-        <div class="py-4 text-center text-sm text-gray-500">
-          {{ t('dashboard.noUpcomingInterviews') }}
-        </div>
-      </template>
-    </DataTable>
-  </div>
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[color:var(--color-accent-soft)] text-xs font-semibold text-[color:var(--color-accent)]"
+      >
+        {{ initials(i.candidateName) }}
+      </span>
+      <span class="flex min-w-0 flex-1 flex-col">
+        <span class="truncate text-sm font-medium text-[color:var(--color-text-primary)]">
+          {{ i.candidateName }}
+        </span>
+        <span class="truncate text-xs text-[color:var(--color-text-muted)]">
+          {{ i.vacancyTitle }}
+        </span>
+      </span>
+      <span
+        class="shrink-0 rounded-lg bg-[color:var(--color-accent-soft)] px-2.5 py-1 font-mono text-xs font-medium text-[color:var(--color-accent)]"
+      >
+        {{ timeLabel(i.createdAt) }}
+      </span>
+    </button>
+
+    <div
+      v-if="interviews.length === 0"
+      class="border-t border-[color:var(--color-border-soft)] px-5 py-8 text-center text-sm text-[color:var(--color-text-muted)]"
+    >
+      {{ t('dashboard.noUpcomingInterviews') }}
+    </div>
+  </GlassCard>
 </template>

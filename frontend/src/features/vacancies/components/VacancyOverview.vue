@@ -111,10 +111,6 @@ function formatSalary(): string {
         <p class="text-sm text-gray-500">{{ t('vacancies.form.interviewMode') }}</p>
         <p class="font-medium">{{ t('vacancies.interviewMode.meet') }}</p>
       </div>
-      <div v-if="vacancy.interviewEnabled">
-        <p class="text-sm text-gray-500">{{ t('vacancies.form.interviewDuration') }}</p>
-        <p class="font-medium">{{ vacancy.interviewDuration }} min</p>
-      </div>
     </div>
 
     <div
@@ -135,7 +131,7 @@ function formatSalary(): string {
         </div>
         <div
           v-else
-          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-950 text-blue-600"
+          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[color:var(--color-accent-soft)] text-[color:var(--color-accent)]"
         >
           <i class="pi pi-building text-lg"></i>
         </div>
@@ -149,7 +145,7 @@ function formatSalary(): string {
             :href="vacancy.company.website"
             target="_blank"
             rel="noopener noreferrer"
-            class="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+            class="text-sm text-[color:var(--color-accent)] hover:underline"
           >
             {{ vacancy.company.website }}
           </a>

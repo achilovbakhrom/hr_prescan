@@ -69,7 +69,7 @@ function toggleRowMenu(event: Event, id: string) {
           @click="viewDetail(data as Application)"
         >
           <div
-            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-950 text-xs font-semibold text-blue-700"
+            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[color:var(--color-accent-soft)] text-xs font-semibold text-[color:var(--color-accent)]"
           >
             {{
               (data as Application).candidateName
@@ -118,7 +118,7 @@ function toggleRowMenu(event: Event, id: string) {
       <template #body="{ data }">
         <span
           v-if="(data as Application).matchScore !== null"
-          class="rounded px-1.5 py-0.5 text-xs font-medium bg-blue-50 dark:bg-blue-950 text-blue-700"
+          class="rounded px-1.5 py-0.5 text-xs font-medium bg-[color:var(--color-accent-soft)] text-[color:var(--color-accent)]"
           >{{ (data as Application).matchScore }}%</span
         >
         <span v-else class="text-xs text-gray-400">---</span>

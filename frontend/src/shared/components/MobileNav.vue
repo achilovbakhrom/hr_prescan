@@ -104,7 +104,7 @@ watch(
         <div v-if="authStore.user" class="border-t border-gray-200 dark:border-gray-700 px-4 py-3">
           <div class="flex items-center gap-3">
             <div
-              class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-950 text-sm font-medium text-blue-700"
+              class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[color:var(--color-accent-soft)] text-sm font-medium text-[color:var(--color-accent)]"
             >
               {{ authStore.user.firstName?.charAt(0) ?? ''
               }}{{ authStore.user.lastName?.charAt(0) ?? '' }}
