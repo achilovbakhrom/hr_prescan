@@ -7,6 +7,7 @@ from apps.vacancies.apis.public import (
     PublicVacancyListApi,
 )
 from apps.vacancies.apis.questions import (
+    GenerateInstructionsApi,
     GenerateQuestionsApi,
     VacancyQuestionDetailApi,
     VacancyQuestionListCreateApi,
@@ -27,6 +28,7 @@ from apps.vacancies.apis.vacancy_detail import (
 )
 
 __all__ = [
+    "GenerateInstructionsApi",
     "GenerateQuestionsApi",
     "GenerateVacancyContentApi",
     "ParseCompanyFileApi",

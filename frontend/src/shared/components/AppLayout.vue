@@ -40,25 +40,24 @@ function closeMobileNav(): void {
 
 <template>
   <PageShell variant="app">
-    <template v-if="appReady" #nav>
-      <AppNavbar
-        :sidebar-collapsed="sidebarCollapsed"
-        @toggle-sidebar="toggleDesktopSidebar"
-        @toggle-mobile-nav="toggleMobileNav"
+    <div v-if="appReady" class="flex min-h-screen w-full">
+      <!-- Full-height sidebar (Figma: logo at top, flush left) -->
+      <AppSidebar
+        :collapsed="sidebarCollapsed"
+        class="hidden shrink-0 self-start lg:sticky lg:top-0 lg:flex lg:h-screen"
+        @toggle="toggleDesktopSidebar"
       />
-    </template>
 
-    <div v-if="appReady" class="flex flex-1">
-      <div class="mx-auto flex w-full max-w-[1760px] min-w-0 gap-0 xl:px-2">
-        <AppSidebar
-          :collapsed="sidebarCollapsed"
-          class="hidden lg:sticky lg:top-24 lg:flex lg:h-[calc(100vh-7rem)] lg:self-start"
-          @toggle="toggleDesktopSidebar"
+      <!-- Content column: topbar + page -->
+      <div class="flex min-w-0 flex-1 flex-col">
+        <AppNavbar
+          :sidebar-collapsed="sidebarCollapsed"
+          @toggle-sidebar="toggleDesktopSidebar"
+          @toggle-mobile-nav="toggleMobileNav"
         />
-
-        <div class="min-w-0 flex-1 lg:pl-5" id="main-content">
+        <main id="main-content" class="w-full flex-1 px-4 py-5 sm:px-6 lg:px-8">
           <RouterView />
-        </div>
+        </main>
       </div>
     </div>
 

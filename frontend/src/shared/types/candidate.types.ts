@@ -22,6 +22,10 @@ export interface Application {
   candidatePhone: string
   cvFile: string
   cvOriginalFilename: string
+  profilePhoto?: string
+  linkedinUrl?: string
+  coverNote?: string
+  prescreenConsent?: boolean
   matchScore: number | null
   prescanningScore: number | null
   interviewScore: number | null

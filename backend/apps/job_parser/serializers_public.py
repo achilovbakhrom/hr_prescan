@@ -73,7 +73,6 @@ class PublicParsedVacancyDetailOutputSerializer(PublicParsedVacancyListOutputSer
     requirements_translations = serializers.SerializerMethodField()
     description_translations = serializers.SerializerMethodField()
     title_translations = serializers.SerializerMethodField()
-    interview_duration = serializers.SerializerMethodField()
     telegram_code = serializers.SerializerMethodField()
 
     class Meta(PublicParsedVacancyListOutputSerializer.Meta):
@@ -95,7 +94,6 @@ class PublicParsedVacancyDetailOutputSerializer(PublicParsedVacancyListOutputSer
             "company_name",
             "cv_required",
             "deadline",
-            "interview_duration",
             "telegram_code",
             "title_translations",
             "description_translations",
@@ -122,9 +120,6 @@ class PublicParsedVacancyDetailOutputSerializer(PublicParsedVacancyListOutputSer
 
     def get_company(self, obj) -> None:
         return None
-
-    def get_interview_duration(self, obj) -> int:
-        return 0
 
     def get_telegram_code(self, obj) -> None:
         return None

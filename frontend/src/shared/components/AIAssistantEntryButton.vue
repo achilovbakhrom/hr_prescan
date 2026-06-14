@@ -27,7 +27,7 @@ const tooltip = computed(() =>
 <template>
   <button
     type="button"
-    class="group relative inline-flex h-9 min-w-11 shrink-0 items-center justify-center gap-1 rounded-xl border border-[color:var(--color-border-glass)] bg-white/80 px-2 text-[11px] font-bold text-[color:var(--color-accent)] shadow-sm transition-colors hover:bg-white dark:bg-gray-900/75 dark:text-cyan-300 dark:hover:bg-gray-900 sm:h-11 sm:w-auto sm:gap-2 sm:rounded-2xl sm:border-cyan-300 sm:bg-cyan-600 sm:px-3 sm:text-left sm:text-xs sm:font-semibold sm:text-white sm:shadow-lg sm:shadow-cyan-700/20 sm:hover:-translate-y-0.5 sm:hover:bg-emerald-600 sm:hover:shadow-emerald-700/20 sm:dark:border-cyan-500/60 sm:dark:bg-cyan-600 sm:dark:text-white sm:dark:hover:bg-emerald-600"
+    class="group relative inline-flex h-9 min-w-11 shrink-0 items-center justify-center gap-1 rounded-xl border border-[color:var(--color-border-glass)] bg-white/80 px-2 text-[11px] font-bold text-[color:var(--color-accent)] shadow-sm transition-colors hover:bg-white dark:bg-gray-900/75 dark:text-violet-300 dark:hover:bg-gray-900 sm:h-11 sm:w-auto sm:gap-2 sm:rounded-2xl sm:border-violet-400 sm:bg-violet-600 sm:px-3 sm:text-left sm:text-xs sm:font-semibold sm:text-white sm:shadow-lg sm:shadow-violet-700/20 sm:hover:-translate-y-0.5 sm:hover:bg-violet-700 sm:hover:shadow-violet-800/20 sm:dark:border-violet-500/60 sm:dark:bg-violet-600 sm:dark:text-white sm:dark:hover:bg-violet-700"
     :title="tooltip"
     :aria-label="label"
     @click="$emit('click')"
@@ -40,7 +40,7 @@ const tooltip = computed(() =>
     <span class="sm:hidden">AI</span>
     <span class="hidden 2xl:block">
       <span class="block leading-4">{{ label }}</span>
-      <span class="block max-w-[180px] truncate text-[10px] font-normal text-cyan-50">
+      <span class="block max-w-[180px] truncate text-[10px] font-normal text-violet-100">
         {{ hint }}
       </span>
     </span>

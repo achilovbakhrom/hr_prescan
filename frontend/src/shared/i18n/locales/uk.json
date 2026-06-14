@@ -111,7 +111,8 @@
     "cvBuilder": "Конструктор CV",
     "myCvs": "Мої резюме",
     "hrAnalytics": "Аналітика",
-    "candidateBase": "База кандидатів"
+    "candidateBase": "База кандидатів",
+    "instructions": "Як це працює"
   },
   "validation": {
     "required": "Це поле є обов'язковим для заповнення",
@@ -226,8 +227,8 @@
   },
   "landing": {
     "hero": {
-      "title": "Суворий AI-прескринінг перед людськими співбесідами",
-      "subtitle": "PreScreen AI — не дошка вакансій і не конструктор CV. Він додає динамічні фільтри кандидатів, проводить структурований AI-прескринінг і показує HR лише кандидатів, вартих ручної уваги.",
+      "title": "Перестаньте переглядати 100 резюме вручну.",
+      "subtitle": "PreScreen AI інтерв’ює кожного кандидата й видає ранжований шортліст — щоб ви зустрічалися лише з вартими вашого часу.",
       "getStarted": "Почніть безкоштовно",
       "cta": "Почніть безкоштовну пробну версію",
       "demo": "Переглянути демо",
@@ -243,7 +244,8 @@
       "openHrTelegram": "Відкрити HR-бота",
       "publicJobsTitle": "Публічний список вакансій",
       "publicJobsHint": "Відкрийте сторінку /jobs, щоб переглянути активні вакансії та почати заявку без входу.",
-      "openPublicJobs": "Відкрити вакансії"
+      "openPublicJobs": "Відкрити вакансії",
+      "trustedBy": "Нам довіряють 500+ команд найму"
     },
     "mockup": {
       "title": "AI-прескринінг",
@@ -257,7 +259,7 @@
       }
     },
     "features": {
-      "title": "AI-шар для відбору кандидатів",
+      "title": "Усе, що потрібно для відбору.",
       "subtitle": "Система посилює ваш найм суворими фільтрами, автоматичними AI-розмовами та оцінюванням на основі доказів.",
       "aiPrescanning": "Інтелектуальний попередній відбір",
       "aiPrescanningDesc": "Кожен кандидат автоматично проходить AI-чат за вашими обов’язковими фільтрами, критеріями та питаннями ролі.",
@@ -293,7 +295,8 @@
       "step3": "AI проводить інтерв’ю",
       "step3Desc": "Кваліфіковані кандидати переходять до суворіших чат- або відеоінтерв’ю.",
       "step4": "Огляд і найм",
-      "step4Desc": "Переглядайте оцінки штучного інтелекту, дивіться записи та приймайте зважені рішення щодо найму."
+      "step4Desc": "Переглядайте оцінки штучного інтелекту, дивіться записи та приймайте зважені рішення щодо найму.",
+      "heading": "Три кроки. Нуль ручного відбору."
     },
     "stats": {
       "companies": "Компанії",
@@ -308,7 +311,7 @@
       "freeTrial": "14-денна безкоштовна пробна версія"
     },
     "cta": {
-      "title": "Готові дозволити ШІ виконувати перевірку?",
+      "title": "Готові наймати швидше?",
       "subtitle": "Приєднуйтесь до компаній, які економлять 90% часу на перевірку завдяки співбесідам на основі ШІ.",
       "startFree": "Почніть безкоштовну пробну версію",
       "viewPricing": "Переглянути ціни"
@@ -359,7 +362,22 @@
     "latestJobsSubtitle": "Переглядайте останні вакансії від компаній за допомогою PreScreen AI",
     "noJobsYet": "Вакансій ще немає. Перевірте незабаром!",
     "noJobsCheckBack": "Незабаром перевірте нові можливості",
-    "remote": "Дистанційний"
+    "remote": "Дистанційний",
+    "heroPreview": {
+      "live": "ШІ-інтерв’ю · наживо",
+      "interviewer": "ШІ-інтерв’юер",
+      "question": "Розкажіть про складну задачу, яку ви нещодавно вирішили.",
+      "overallScore": "Загальний бал",
+      "advancing": "Проходить на інтерв’ю"
+    },
+    "trust": {
+      "label": "Нам довіряють команди з"
+    },
+    "telegram": {
+      "prefer": "Віддаєте перевагу Telegram?",
+      "apply": "Відгукнутися через Telegram",
+      "recruiter": "Рекрутер? HR-бот"
+    }
   },
   "dashboard": {
     "greeting": {
@@ -420,7 +438,9 @@
       "recommendedJobs": "Рекомендовані вакансії",
       "noRecommendations": "Рекомендацій ще немає",
       "noRecommendationsHint": "Тут з’являться нові вакансії"
-    }
+    },
+    "candidatesScreened": "Перевірено кандидатів",
+    "avgScore": "Середній бал"
   },
   "analytics": {
     "title": "Аналітика",
@@ -664,6 +684,19 @@
       "languageAndInstructions": "Мова та інструкції",
       "languageHint": "Як ШІ спілкується з кандидатами та будь-які додаткові вказівки для агента ШІ."
     },
+    "instructions": {
+      "title": "AI instructions",
+      "hint": "Tell the AI what to focus on during this step. You can write in any language and include topics, rules, red flags, tone, or a plain text list of questions.",
+      "placeholder": "Focus on real work experience with the required skills.\nAsk for concrete examples, not theory only.\nCheck motivation, availability, salary expectations, and communication clarity.\nBe strict about claims that do not match the candidate's CV.\nAlso ask:\n- Why are you interested in this role?\n- When can you start?",
+      "example": "Example: Focus on React, TypeScript, REST APIs, and teamwork. Ask for one real project example and one difficult technical decision. Be friendly but verify vague senior-level claims.",
+      "generate": "Generate AI Instructions",
+      "generated": "AI instructions generated",
+      "styleLight": "Light",
+      "styleBalanced": "Balanced",
+      "styleStrict": "Strict",
+      "advancedQuestions": "Advanced: sample questions",
+      "advancedQuestionsHint": "Optional question seeds for the AI. The agent treats them as guidance and may ask natural follow-ups instead of following a rigid script."
+    },
     "settings": {
       "visibility": "Видимість і застосування",
       "interviewStep": "Крок співбесіди",
@@ -810,8 +843,18 @@
       "validation": {
         "nameRequired": "Необхідно вказати ім'я",
         "emailRequired": "Необхідно вказати адресу електронної пошти",
-        "emailInvalid": "Недійсний формат електронної пошти"
-      }
+        "emailInvalid": "Недійсний формат електронної пошти",
+        "consentRequired": "Прийміть умови передскринінгу та конфіденційності, щоб продовжити"
+      },
+      "profilePhoto": "Фото профілю",
+      "choosePhoto": "Завантажити фото",
+      "profilePhotoHint": "Необов'язково — додає обличчя до вашої заявки (макс. 5 МБ).",
+      "linkedin": "LinkedIn / портфоліо",
+      "coverNote": "Чому ви підходите? (необов'язково)",
+      "coverNotePlaceholder": "Кілька речень про те, чому ця роль вам підходить…",
+      "consent": "Я погоджуюся з умовами ШІ-передскринінгу та конфіденційності.",
+      "backgroundLabel": "Як ви хочете поділитися своїм досвідом?",
+      "linkedinRefHint": "Посилання для рекрутера — ШІ-прескринінг його не аналізує."
     },
     "dialogs": {
       "bulkConfirmHeader": "Підтвердити групову дію",
@@ -981,6 +1024,13 @@
     "noCandidatesApplied": "Жоден кандидат ще не подав заявки",
     "candidateBase": {
       "applications": "Заявки"
+    },
+    "appliedFor": "Вакансія",
+    "aiScore": "AI-оцінка",
+    "scoreTier": {
+      "strong": "Сильний",
+      "good": "Добрий",
+      "weak": "Слабкий"
     }
   },
   "interviews": {
@@ -1279,10 +1329,17 @@
         "admin": "адмін",
         "hr": "менеджер з персоналу",
         "candidate": "Кандидат"
-      }
+      },
+      "activeMembers": "активних учасників",
+      "pendingInvitations": "запрошень в очікуванні"
     },
     "language": "Мова",
-    "theme": "Тема"
+    "theme": "Тема",
+    "account": {
+      "title": "Акаунт",
+      "role": "Роль",
+      "memberSince": "Учасник з"
+    }
   },
   "subscriptions": {
     "title": "Підписка",

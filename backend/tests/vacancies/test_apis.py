@@ -227,30 +227,22 @@ def test_ai_assistant_generate_questions_creates_missing_criteria():
     questions_mock.assert_called_once_with(vacancy=vacancy, step=ScreeningStep.INTERVIEW)
 
 
-def test_ai_assistant_publish_generates_missing_prescanning_questions():
+def test_ai_assistant_publish_generates_missing_prescanning_instructions():
     from apps.common.ai_assistant.handlers_vacancy import handle_publish_vacancy
 
     user, vacancy = _member_vacancy_in_second_company()
     create_default_criteria(vacancy=vacancy, step=ScreeningStep.PRESCANNING)
 
-    def create_question(*, vacancy, step):
-        return [
-            InterviewQuestion.objects.create(
-                vacancy=vacancy,
-                text="Why are you interested in this role?",
-                category="Motivation",
-                step=step,
-                order=1,
-            )
-        ]
-
-    with patch("apps.vacancies.services.generate_interview_questions", side_effect=create_question) as questions_mock:
+    with patch(
+        "apps.vacancies.services.generate_screening_instruction", return_value="Focus on real experience."
+    ) as instruction_mock:
         result = handle_publish_vacancy(user=user, params={"vacancy_title": vacancy.title})
 
     vacancy.refresh_from_db()
     assert result["success"] is True
     assert vacancy.status == Vacancy.Status.PUBLISHED
-    questions_mock.assert_called_once_with(vacancy=vacancy, step=ScreeningStep.PRESCANNING)
+    assert vacancy.prescanning_prompt == "Focus on real experience."
+    instruction_mock.assert_called_once_with(vacancy=vacancy, step=ScreeningStep.PRESCANNING)
 
 
 def test_generate_questions_passes_interview_step_to_generator():
@@ -292,6 +284,30 @@ def test_generate_questions_passes_interview_step_to_generator():
     assert response.data["questions"][0]["step"] == ScreeningStep.INTERVIEW
     criteria_mock.assert_called_once_with(vacancy=vacancy, step=ScreeningStep.INTERVIEW)
     questions_mock.assert_called_once_with(vacancy=vacancy, step=ScreeningStep.INTERVIEW)
+
+
+def test_generate_instructions_endpoint_returns_instruction():
+    user, vacancy = _member_vacancy_in_second_company()
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    with patch(
+        "apps.vacancies.apis.questions.generate_screening_instruction",
+        return_value="Focus on practical experience.",
+    ) as instruction_mock:
+        response = client.post(
+            f"/api/hr/vacancies/{vacancy.id}/instructions/generate/",
+            {"step": "prescanning", "style": "balanced"},
+            format="json",
+        )
+
+    assert response.status_code == 200
+    assert response.data["instruction"] == "Focus on practical experience."
+    instruction_mock.assert_called_once_with(
+        vacancy=vacancy,
+        step=ScreeningStep.PRESCANNING,
+        style="balanced",
+    )
 
 
 def test_generate_vacancy_content_requires_manage_vacancies_permission():

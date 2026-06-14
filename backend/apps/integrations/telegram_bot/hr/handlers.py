@@ -22,7 +22,7 @@ from apps.integrations.telegram_bot.hr.onboarding_flow import (
     send_language_picker,
 )
 from apps.integrations.telegram_bot.i18n import normalize_language
-from apps.integrations.telegram_bot.sessions import get_session
+from apps.integrations.telegram_bot.sessions import get_session, update_session
 from apps.integrations.telegram_bot.voice import transcribe_voice
 
 
@@ -35,6 +35,7 @@ def handle_update(update_data: dict) -> None:
 
     message = update_data.get("message", {})
     chat_id = message.get("chat", {}).get("id")
+    message_id = message.get("message_id")
     if not chat_id:
         return
 
@@ -118,6 +119,11 @@ def handle_update(update_data: dict) -> None:
         return
 
     if text in ("/menu", "/start_menu"):
+        update_session(role=ROLE_HR, telegram_id=telegram_id, ai_mode=False, state="", vacancy_wizard={})
+        send_main_menu(client=client, chat_id=chat_id, user=user)
+        return
+    if text in ("/exit_ai", "/cancel"):
+        update_session(role=ROLE_HR, telegram_id=telegram_id, ai_mode=False, state="", vacancy_wizard={})
         send_main_menu(client=client, chat_id=chat_id, user=user)
         return
 
@@ -128,6 +134,18 @@ def handle_update(update_data: dict) -> None:
         return
 
     session = get_session(role=ROLE_HR, telegram_id=telegram_id)
+    from apps.integrations.telegram_bot.hr.vacancy_wizard import handle_text as handle_vacancy_wizard_text
+
+    if handle_vacancy_wizard_text(
+        client=client,
+        chat_id=chat_id,
+        telegram_id=telegram_id,
+        user=user,
+        text=text,
+        message_id=message_id,
+    ):
+        return
+
     if not session.get("ai_mode"):
         client.send_message(
             chat_id=chat_id,

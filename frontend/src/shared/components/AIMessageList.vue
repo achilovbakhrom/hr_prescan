@@ -32,7 +32,7 @@ function formatMessage(text: string): string {
     >
       <div
         v-if="msg.role === 'user'"
-        class="max-w-[85%] rounded-2xl rounded-tr-sm bg-blue-600 dark:bg-blue-700 px-3.5 py-2.5"
+        class="max-w-[85%] rounded-2xl rounded-tr-sm bg-[color:var(--color-accent)] px-3.5 py-2.5"
       >
         <p class="whitespace-pre-wrap text-sm text-white">{{ msg.content }}</p>
       </div>

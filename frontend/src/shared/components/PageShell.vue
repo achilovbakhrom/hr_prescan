@@ -27,10 +27,8 @@ const mainClass = computed(() => {
   const base = ['relative', 'z-0', 'min-h-screen']
   if (props.variant === 'public') {
     base.push('mx-auto', 'w-full', 'max-w-6xl', 'px-4', 'sm:px-6', 'lg:px-8', 'py-6')
-  } else {
-    // App variant: wider gutter on mobile, comfortable desktop padding.
-    base.push('px-4', 'sm:px-6', 'lg:px-8', 'py-4', 'sm:py-6')
   }
+  // App variant: full-bleed — AppLayout owns the sidebar + content padding.
   return base
 })
 </script>

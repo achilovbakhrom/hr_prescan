@@ -7,6 +7,7 @@ from uuid import UUID
 from apps.accounts.models import User
 from apps.integrations.telegram_bot import keyboards as kb
 from apps.integrations.telegram_bot.i18n import t
+from apps.integrations.telegram_bot.screens import send_screen
 
 CB_VAC_APPLY = "cand:vac:apply"
 CB_MENU = "cand:menu"
@@ -66,7 +67,12 @@ def main_menu_keyboard(*, lang: str) -> dict:
 
 
 def ai_mode_keyboard(*, lang: str) -> dict:
-    return kb.inline_keyboard([[kb.button(text=t("candidate.btn_exit_ai", lang=lang), callback_data=CB_AI_EXIT)]])
+    return kb.inline_keyboard(
+        [
+            [kb.button(text=t("candidate.btn_exit_ai", lang=lang), callback_data=CB_AI_EXIT)],
+            [kb.button(text=t("candidate.btn_main_menu", lang=lang), callback_data=CB_MENU)],
+        ]
+    )
 
 
 def language_keyboard(*, lang: str) -> dict:
@@ -82,11 +88,30 @@ def language_keyboard(*, lang: str) -> dict:
     )
 
 
-def send_main_menu(*, client, chat_id: int, lang: str) -> None:
-    client.send_message(
+def send_main_menu(
+    *,
+    client,
+    chat_id: int,
+    lang: str,
+    telegram_id: int | None = None,
+    source_message_id: int | None = None,
+) -> None:
+    if telegram_id is None:
+        client.send_message(
+            chat_id=chat_id,
+            text=t("candidate.main_menu", lang=lang),
+            reply_markup=main_menu_keyboard(lang=lang),
+        )
+        return
+    send_screen(
+        client=client,
+        role="candidate",
+        telegram_id=telegram_id,
         chat_id=chat_id,
         text=t("candidate.main_menu", lang=lang),
         reply_markup=main_menu_keyboard(lang=lang),
+        screen_name="main_menu",
+        source_message_id=source_message_id,
     )
 
 

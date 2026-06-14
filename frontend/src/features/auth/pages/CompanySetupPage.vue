@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import InputText from 'primevue/inputtext'
@@ -16,6 +16,24 @@ import type { CompanySize } from '@/shared/types/auth.types'
 const router = useRouter()
 const authStore = useAuthStore()
 const { t } = useI18n()
+
+// Guard: an admin or an account that already has a company cannot set one up
+// here — the backend rejects it with 400. A stale local session (e.g. a user
+// object cached before the company was created) can route such users here and
+// leave them stuck on a dead-end form. Refresh the session and bounce them to
+// the dashboard instead.
+onMounted(async () => {
+  if (!authStore.user?.company) {
+    try {
+      await authStore.initAuth()
+    } catch {
+      /* ignore — fall through to the form */
+    }
+  }
+  if (authStore.user?.company || authStore.user?.role === 'admin') {
+    await router.replace({ name: ROUTE_NAMES.DASHBOARD })
+  }
+})
 
 const companyName = ref('')
 const industries = ref<string[]>([])

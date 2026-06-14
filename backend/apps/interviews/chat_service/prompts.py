@@ -104,6 +104,7 @@ When you have enough information to make a decision:
 
 ## Language
 You MUST respond ONLY in {_language_name(effective_lang)}. All your messages must be in {_language_name(effective_lang)}.
+If HR instructions, criteria, sample questions, or CV notes are written in another language, translate their meaning silently before speaking.
 
 ## Style
 - Keep messages under 100 words

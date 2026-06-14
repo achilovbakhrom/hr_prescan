@@ -1,18 +1,11 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useToast } from 'primevue/usetoast'
-import Button from 'primevue/button'
-import Dropdown from '@/shared/components/AppSelect.vue'
-import InputNumber from 'primevue/inputnumber'
-import Textarea from 'primevue/textarea'
-import { PRESCANNING_LANGUAGE_OPTIONS } from '@/shared/i18n/supportedLocales'
 import QuestionList from './QuestionList.vue'
 import CriteriaList from './CriteriaList.vue'
-import { useVacancyStore } from '../stores/vacancy.store'
+import AiInstructionsPanel from './AiInstructionsPanel.vue'
 import type { InterviewQuestion, VacancyCriteria, VacancyDetail } from '../types/vacancy.types'
 
-const props = defineProps<{
+defineProps<{
   vacancy: VacancyDetail
   step: 'prescanning' | 'interview'
   questions: InterviewQuestion[]
@@ -33,168 +26,33 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
-const toast = useToast()
-const vacancyStore = useVacancyStore()
-
-// Local form state mirroring vacancy fields for this step
-const language = ref(props.vacancy.prescanningLanguage || 'en')
-const prompt = ref(
-  props.step === 'prescanning'
-    ? props.vacancy.prescanningPrompt || ''
-    : props.vacancy.interviewPrompt || '',
-)
-const interviewDuration = ref<number>(props.vacancy.interviewDuration || 30)
-const saving = ref(false)
-const interviewLocked = computed(
-  () =>
-    props.vacancy.canChangeInterviewMode === false ||
-    (props.vacancy.canChangeInterviewMode == null && (props.vacancy.candidatesTotal ?? 0) > 0),
-)
-
-watch(
-  () => props.vacancy,
-  (v) => {
-    language.value = v.prescanningLanguage || 'en'
-    prompt.value =
-      props.step === 'prescanning' ? v.prescanningPrompt || '' : v.interviewPrompt || ''
-    interviewDuration.value = v.interviewDuration || 30
-  },
-  { deep: true },
-)
-
-const dirty = computed(() => {
-  if (props.step === 'prescanning') {
-    return (
-      language.value !== (props.vacancy.prescanningLanguage || 'en') ||
-      prompt.value !== (props.vacancy.prescanningPrompt || '')
-    )
-  }
-  return (
-    prompt.value !== (props.vacancy.interviewPrompt || '') ||
-    interviewDuration.value !== (props.vacancy.interviewDuration || 30)
-  )
-})
-
-async function save(): Promise<void> {
-  saving.value = true
-  try {
-    const payload: Record<string, unknown> =
-      props.step === 'prescanning'
-        ? { prescanningLanguage: language.value, prescanningPrompt: prompt.value }
-        : {
-            interviewPrompt: prompt.value,
-            interviewDuration: interviewDuration.value ?? 30,
-          }
-    if (props.step === 'interview' && !interviewLocked.value) {
-      payload.interviewMode = 'meet'
-    }
-    await vacancyStore.updateVacancy(props.vacancy.id, payload)
-    toast.add({ severity: 'success', summary: t('common.saved'), life: 2500 })
-  } catch {
-    toast.add({ severity: 'error', summary: vacancyStore.error || t('common.error'), life: 4000 })
-  } finally {
-    saving.value = false
-  }
-}
 </script>
 
 <template>
   <div class="space-y-6">
-    <!-- Block 1: Language & Instructions -->
-    <section
-      class="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-5"
+    <AiInstructionsPanel :vacancy="vacancy" :step="step" />
+
+    <details
+      class="rounded-xl border border-gray-100 bg-white p-5 dark:border-gray-800 dark:bg-gray-800"
     >
-      <h3 class="mb-1 text-sm font-semibold text-gray-900">
-        {{ t('vacancies.screening.languageAndInstructions') }}
-      </h3>
-      <p class="mb-4 text-xs text-gray-500">{{ t('vacancies.screening.languageHint') }}</p>
-
-      <div v-if="step === 'prescanning'" class="mb-4">
-        <label class="mb-1 block text-xs font-medium text-gray-600">{{
-          t('vacancies.form.prescanningLanguage')
-        }}</label>
-        <Dropdown
-          v-model="language"
-          :options="PRESCANNING_LANGUAGE_OPTIONS"
-          option-label="label"
-          option-value="value"
-          class="w-full sm:w-60"
+      <summary class="cursor-pointer text-sm font-semibold text-gray-900">
+        {{ t('vacancies.instructions.advancedQuestions') }}
+      </summary>
+      <p class="mt-2 text-xs text-gray-500">
+        {{ t('vacancies.instructions.advancedQuestionsHint') }}
+      </p>
+      <div class="mt-4">
+        <QuestionList
+          :questions="questions"
+          :loading="loading"
+          @add="(d) => emit('addQuestion', { ...d, step })"
+          @update="(qId, d) => emit('updateQuestion', qId, d)"
+          @delete="(qId) => emit('deleteQuestion', qId)"
+          @generate="() => emit('generateQuestions')"
+          @translate-all="() => emit('translateQuestions')"
         />
       </div>
-
-      <div v-if="step === 'interview'" class="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div>
-          <label class="mb-1 block text-xs font-medium text-gray-600">{{
-            t('vacancies.form.interviewMode')
-          }}</label>
-          <div class="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm">
-            {{ t('vacancies.interviewMode.meet') }}
-          </div>
-          <p v-if="interviewLocked" class="mt-1 text-xs text-[color:var(--color-warning)]">
-            {{ t('vacancies.settings.interviewLocked', 'Locked — applications already received') }}
-          </p>
-        </div>
-        <div>
-          <label class="mb-1 block text-xs font-medium text-gray-600">{{
-            t('vacancies.form.interviewDuration')
-          }}</label>
-          <InputNumber v-model="interviewDuration" class="w-full" :min="10" :max="120" :step="5" />
-        </div>
-      </div>
-
-      <div>
-        <label class="mb-1 block text-xs font-medium text-gray-600"
-          >{{
-            step === 'prescanning'
-              ? t('vacancies.form.prescanningPrompt')
-              : t('vacancies.form.interviewPrompt')
-          }}
-          ({{ t('common.optional') }})</label
-        >
-        <p class="mb-2 text-xs text-gray-400">
-          {{
-            step === 'prescanning'
-              ? t('vacancies.form.prescanningPromptHint')
-              : t('vacancies.form.interviewPromptHint')
-          }}
-        </p>
-        <Textarea
-          v-model="prompt"
-          class="w-full"
-          rows="4"
-          :placeholder="
-            step === 'prescanning'
-              ? t('vacancies.form.prescanningPromptPlaceholder')
-              : t('vacancies.form.interviewPromptPlaceholder')
-          "
-        />
-      </div>
-
-      <div v-if="dirty" class="mt-4 flex justify-end">
-        <Button
-          :label="t('common.save')"
-          icon="pi pi-check"
-          size="small"
-          :loading="saving"
-          @click="save"
-        />
-      </div>
-    </section>
-
-    <!-- Block 2: Questions -->
-    <section
-      class="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 p-5"
-    >
-      <QuestionList
-        :questions="questions"
-        :loading="loading"
-        @add="(d) => emit('addQuestion', { ...d, step })"
-        @update="(qId, d) => emit('updateQuestion', qId, d)"
-        @delete="(qId) => emit('deleteQuestion', qId)"
-        @generate="() => emit('generateQuestions')"
-        @translate-all="() => emit('translateQuestions')"
-      />
-    </section>
+    </details>
 
     <!-- Block 3: Criteria -->
     <section

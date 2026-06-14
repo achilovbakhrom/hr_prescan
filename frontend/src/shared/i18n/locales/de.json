@@ -111,7 +111,8 @@
     "cvBuilder": "CV Builder",
     "myCvs": "Meine CVs",
     "hrAnalytics": "Analytik",
-    "candidateBase": "Kandidatenpool"
+    "candidateBase": "Kandidatenpool",
+    "instructions": "So funktioniert's"
   },
   "validation": {
     "required": "Dieses Feld ist erforderlich",
@@ -226,8 +227,8 @@
   },
   "landing": {
     "hero": {
-      "title": "Strenges AI-Prescreening vor menschlichen Interviews",
-      "subtitle": "PreScreen AI ist keine Jobbörse und kein CV-Builder. Es ergänzt dynamische Kandidatenfilter, führt strukturiertes AI-Prescreening durch und zeigt HR nur Kandidaten, die manuell geprüft werden sollten.",
+      "title": "Schluss mit dem manuellen Sichten von 100 Lebensläufen.",
+      "subtitle": "PreScreen AI interviewt jeden Bewerber und liefert eine bewertete Auswahlliste – damit Sie nur die richtigen Personen treffen.",
       "getStarted": "Starten Sie kostenlos durch",
       "cta": "Kostenlose Testversion starten",
       "demo": "Demo ansehen",
@@ -243,7 +244,8 @@
       "openHrTelegram": "HR-Bot öffnen",
       "publicJobsTitle": "Öffentliche Stellenliste",
       "publicJobsHint": "Öffnen Sie die Seite /jobs, um aktive Stellen zu durchsuchen und eine Bewerbung ohne Anmeldung zu starten.",
-      "openPublicJobs": "Stellen öffnen"
+      "openPublicJobs": "Stellen öffnen",
+      "trustedBy": "Vertraut von 500+ Recruiting-Teams"
     },
     "mockup": {
       "title": "AI-Vorscreening",
@@ -257,7 +259,7 @@
       }
     },
     "features": {
-      "title": "AI-Schicht zur Kandidatenauswahl",
+      "title": "Alles, was das Screening braucht.",
       "subtitle": "Das System stärkt Ihren Recruiting-Prozess mit strengen Filtern, automatisierten AI-Gesprächen und evidenzbasierter Bewertung.",
       "aiPrescanning": "Intelligentes Vorscreening",
       "aiPrescanningDesc": "Jeder Kandidat wird automatisch per AI-Chat gegen Ihre Pflichtfilter, Kriterien und rollenspezifischen Fragen geprüft.",
@@ -293,7 +295,8 @@
       "step3": "AI interviewt",
       "step3Desc": "Qualifizierte Kandidaten wechseln in strengere Chat- oder Video-Interviews.",
       "step4": "Bewertung und Einstellung",
-      "step4Desc": "Überprüfen Sie die AI-Ergebnisse, schauen Sie sich Aufzeichnungen an und treffen Sie fundierte Einstellungsentscheidungen."
+      "step4Desc": "Überprüfen Sie die AI-Ergebnisse, schauen Sie sich Aufzeichnungen an und treffen Sie fundierte Einstellungsentscheidungen.",
+      "heading": "Drei Schritte. Kein manuelles Screening."
     },
     "stats": {
       "companies": "Unternehmen",
@@ -308,7 +311,7 @@
       "freeTrial": "14-tägige kostenlose Testversion"
     },
     "cta": {
-      "title": "Sind Sie bereit, AI Ihr Screening durchführen zu lassen?",
+      "title": "Bereit, schneller einzustellen?",
       "subtitle": "Schließen Sie sich Unternehmen an, die mit AI-gestützten Interviews 90 % der Screening-Zeit einsparen.",
       "startFree": "Kostenlose Testversion starten",
       "viewPricing": "Preise anzeigen"
@@ -359,7 +362,22 @@
     "latestJobsSubtitle": "Durchsuchen Sie die neuesten Stellenangebote von Unternehmen mit PreScreen AI",
     "noJobsYet": "Noch keine offenen Stellen. Schauen Sie bald wieder vorbei!",
     "noJobsCheckBack": "Schauen Sie bald wieder vorbei, um neue Möglichkeiten zu entdecken",
-    "remote": "Fernbedienung"
+    "remote": "Fernbedienung",
+    "heroPreview": {
+      "live": "KI-Interview · live",
+      "interviewer": "KI-Interviewer",
+      "question": "Erzählen Sie von einem schwierigen Problem, das Sie kürzlich gelöst haben.",
+      "overallScore": "Gesamtbewertung",
+      "advancing": "Weiter zum Interview"
+    },
+    "trust": {
+      "label": "Vertraut von Teams bei"
+    },
+    "telegram": {
+      "prefer": "Lieber Telegram?",
+      "apply": "Über Telegram bewerben",
+      "recruiter": "Recruiter? HR-Bot"
+    }
   },
   "dashboard": {
     "greeting": {
@@ -420,7 +438,9 @@
       "recommendedJobs": "Empfohlene Jobs",
       "noRecommendations": "Noch keine Empfehlungen",
       "noRecommendationsHint": "Hier werden neue Stellenangebote angezeigt"
-    }
+    },
+    "candidatesScreened": "Kandidaten geprüft",
+    "avgScore": "Ø Bewertung"
   },
   "analytics": {
     "title": "Analytik",
@@ -664,6 +684,19 @@
       "languageAndInstructions": "Sprache und Anweisungen",
       "languageHint": "Wie der AI mit Kandidaten spricht und zusätzliche Anleitungen für den AI-Agenten."
     },
+    "instructions": {
+      "title": "AI instructions",
+      "hint": "Tell the AI what to focus on during this step. You can write in any language and include topics, rules, red flags, tone, or a plain text list of questions.",
+      "placeholder": "Focus on real work experience with the required skills.\nAsk for concrete examples, not theory only.\nCheck motivation, availability, salary expectations, and communication clarity.\nBe strict about claims that do not match the candidate's CV.\nAlso ask:\n- Why are you interested in this role?\n- When can you start?",
+      "example": "Example: Focus on React, TypeScript, REST APIs, and teamwork. Ask for one real project example and one difficult technical decision. Be friendly but verify vague senior-level claims.",
+      "generate": "Generate AI Instructions",
+      "generated": "AI instructions generated",
+      "styleLight": "Light",
+      "styleBalanced": "Balanced",
+      "styleStrict": "Strict",
+      "advancedQuestions": "Advanced: sample questions",
+      "advancedQuestionsHint": "Optional question seeds for the AI. The agent treats them as guidance and may ask natural follow-ups instead of following a rigid script."
+    },
     "settings": {
       "visibility": "Sichtbarkeit & Anwendung",
       "interviewStep": "Interviewschritt",
@@ -810,8 +843,18 @@
       "validation": {
         "nameRequired": "Name ist erforderlich",
         "emailRequired": "E-Mail ist erforderlich",
-        "emailInvalid": "Ungültiges E-Mail-Format"
-      }
+        "emailInvalid": "Ungültiges E-Mail-Format",
+        "consentRequired": "Bitte akzeptieren Sie die Vorauswahl- und Datenschutzbedingungen, um fortzufahren"
+      },
+      "profilePhoto": "Profilfoto",
+      "choosePhoto": "Foto hochladen",
+      "profilePhotoHint": "Optional — verleiht Ihrer Bewerbung ein Gesicht (max. 5 MB).",
+      "linkedin": "LinkedIn / Portfolio",
+      "coverNote": "Warum passen Sie gut? (optional)",
+      "coverNotePlaceholder": "Ein paar Sätze, warum diese Rolle zu Ihnen passt…",
+      "consent": "Ich stimme den KI-Vorauswahl- und Datenschutzbedingungen zu.",
+      "backgroundLabel": "Wie möchten Sie Ihren Werdegang teilen?",
+      "linkedinRefHint": "Ein Referenzlink für den Recruiter — er wird vom KI-Prescreening nicht analysiert."
     },
     "dialogs": {
       "bulkConfirmHeader": "Bestätigen Sie die Massenaktion",
@@ -981,6 +1024,13 @@
     "noCandidatesApplied": "Es haben sich noch keine Kandidaten beworben",
     "candidateBase": {
       "applications": "Bewerbungen"
+    },
+    "appliedFor": "Stelle",
+    "aiScore": "KI-Score",
+    "scoreTier": {
+      "strong": "Stark",
+      "good": "Gut",
+      "weak": "Schwach"
     }
   },
   "interviews": {
@@ -1279,10 +1329,17 @@
         "admin": "Admin",
         "hr": "HR-Manager",
         "candidate": "Kandidat"
-      }
+      },
+      "activeMembers": "aktive Mitglieder",
+      "pendingInvitations": "ausstehende Einladungen"
     },
     "language": "Sprache",
-    "theme": "Thema"
+    "theme": "Thema",
+    "account": {
+      "title": "Konto",
+      "role": "Rolle",
+      "memberSince": "Mitglied seit"
+    }
   },
   "subscriptions": {
     "title": "Abonnement",

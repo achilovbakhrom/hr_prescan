@@ -14,6 +14,7 @@ from .criteria_questions import (
     update_interview_question,
     update_vacancy_criteria,
 )
+from .instructions_ai import generate_screening_instruction
 from .vacancy_ai import (
     generate_interview_questions,
     generate_vacancy_keywords,
@@ -40,6 +41,7 @@ __all__ = [
     "delete_vacancy_criteria",
     "detect_language",
     "generate_interview_questions",
+    "generate_screening_instruction",
     "generate_vacancy_content",
     "generate_vacancy_criteria",
     "generate_vacancy_keywords",

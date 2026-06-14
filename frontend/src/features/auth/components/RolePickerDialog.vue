@@ -44,11 +44,11 @@ function pick(role: GoogleAuthRole): void {
       <button
         type="button"
         :disabled="loading"
-        class="flex flex-col items-start gap-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 text-left transition-colors hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+        class="flex flex-col items-start gap-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 text-left transition-colors hover:border-[color:var(--color-accent)] hover:bg-[color:var(--color-accent-soft)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent)] disabled:cursor-not-allowed disabled:opacity-50"
         @click="pick('candidate')"
       >
         <div
-          class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-950 text-blue-600"
+          class="flex h-10 w-10 items-center justify-center rounded-full bg-[color:var(--color-accent-soft)] text-[color:var(--color-accent)]"
         >
           <i class="pi pi-briefcase text-xl"></i>
         </div>
@@ -63,7 +63,7 @@ function pick(role: GoogleAuthRole): void {
       <button
         type="button"
         :disabled="loading"
-        class="flex flex-col items-start gap-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 text-left transition-colors hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+        class="flex flex-col items-start gap-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 text-left transition-colors hover:border-[color:var(--color-accent)] hover:bg-[color:var(--color-accent-soft)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent)] disabled:cursor-not-allowed disabled:opacity-50"
         @click="pick('hr')"
       >
         <div

@@ -40,7 +40,7 @@ onUnmounted(() => window.removeEventListener('message', onMessage))
       class="flex h-full w-full flex-col overflow-hidden bg-white dark:bg-gray-800 sm:h-[85vh] sm:max-h-[700px] sm:max-w-3xl sm:rounded-2xl sm:shadow-2xl"
     >
       <div
-        class="flex items-center justify-between bg-gradient-to-r from-blue-600 to-blue-700 px-3 py-2.5 sm:px-4 sm:py-3"
+        class="flex items-center justify-between bg-[color:var(--color-accent)] px-3 py-2.5 sm:px-4 sm:py-3"
       >
         <div class="flex items-center gap-2 sm:gap-3">
           <div
@@ -52,7 +52,7 @@ onUnmounted(() => window.removeEventListener('message', onMessage))
             <p class="truncate text-xs font-semibold text-white sm:text-sm">
               {{ t('interviews.chat.aiPrescanning') }}
             </p>
-            <p class="hidden text-xs text-blue-100 sm:block">
+            <p class="hidden text-xs text-white/80 sm:block">
               {{ t('candidates.application.answerQuestions') }}
             </p>
           </div>
@@ -91,7 +91,7 @@ onUnmounted(() => window.removeEventListener('message', onMessage))
     <div class="mx-auto flex max-w-3xl items-center justify-between">
       <div class="flex items-center gap-2 sm:gap-3">
         <div
-          class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 dark:bg-blue-700 sm:h-10 sm:w-10"
+          class="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--color-accent)] sm:h-10 sm:w-10"
         >
           <i class="pi pi-comments text-xs text-white sm:text-sm"></i>
         </div>

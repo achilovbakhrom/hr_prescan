@@ -50,6 +50,7 @@ from apps.common.ai_assistant.handlers_vacancy import (
 )
 from apps.common.ai_assistant.handlers_vacancy_generation import (
     handle_generate_criteria,
+    handle_generate_instructions,
     handle_generate_questions,
     handle_regenerate_keywords,
 )
@@ -89,6 +90,7 @@ TOOL_MAP = {
     "archive_vacancy": handle_archive_vacancy,
     "delete_vacancy": handle_delete_vacancy,
     "generate_questions": handle_generate_questions,
+    "generate_instructions": handle_generate_instructions,
     "generate_criteria": handle_generate_criteria,
     "regenerate_keywords": handle_regenerate_keywords,
     "list_companies": handle_list_companies,

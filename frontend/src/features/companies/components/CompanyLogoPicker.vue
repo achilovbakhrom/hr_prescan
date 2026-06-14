@@ -43,7 +43,7 @@ function handleChange(event: Event): void {
 <template>
   <button
     type="button"
-    class="group relative h-12 w-12 shrink-0 overflow-hidden rounded-xl transition hover:ring-2 hover:ring-blue-400 disabled:cursor-not-allowed disabled:opacity-60"
+    class="group relative h-12 w-12 shrink-0 overflow-hidden rounded-xl transition hover:ring-2 hover:ring-[color:var(--color-accent)] disabled:cursor-not-allowed disabled:opacity-60"
     :title="t('companies.changeLogo')"
     :disabled="uploading"
     @click="open"

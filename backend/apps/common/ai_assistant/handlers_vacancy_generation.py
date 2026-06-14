@@ -5,18 +5,22 @@ from apps.vacancies.models import ScreeningStep
 
 
 def ensure_vacancy_screening_setup(*, vacancy, step: str) -> tuple[list, list]:
-    """Create missing criteria/questions needed before publishing a vacancy."""
-    from apps.vacancies.services import generate_interview_questions, generate_vacancy_criteria
+    """Create missing criteria and draft AI instructions needed before publishing."""
+    from apps.vacancies.services import generate_screening_instruction, generate_vacancy_criteria
 
     generated_criteria = []
     if not vacancy.criteria.filter(step=step).exists():
         generated_criteria = generate_vacancy_criteria(vacancy=vacancy, step=step)
 
-    generated_questions = []
-    if not vacancy.questions.filter(is_active=True, step=step).exists():
-        generated_questions = generate_interview_questions(vacancy=vacancy, step=step)
+    generated_instructions = []
+    prompt_field = "prescanning_prompt" if step == ScreeningStep.PRESCANNING else "interview_prompt"
+    if not (getattr(vacancy, prompt_field) or "").strip():
+        instruction = generate_screening_instruction(vacancy=vacancy, step=step)
+        setattr(vacancy, prompt_field, instruction)
+        vacancy.save(update_fields=[prompt_field, "updated_at"])
+        generated_instructions.append(instruction)
 
-    return generated_criteria, generated_questions
+    return generated_criteria, generated_instructions
 
 
 def handle_generate_questions(*, user, params):
@@ -40,6 +44,23 @@ def handle_generate_questions(*, user, params):
         "message": f"Generated {len(data['questions'])} {step} questions{criteria_note} for '{vacancy.title}'.",
         "data": data,
         "action": "generate_questions",
+    }
+
+
+def handle_generate_instructions(*, user, params):
+    from apps.vacancies.services import generate_screening_instruction, update_vacancy
+
+    vacancy = resolve_vacancy(user=user, title=params.get("vacancy_title", ""))
+    step = params.get("step", ScreeningStep.PRESCANNING)
+    style = params.get("style", "balanced")
+    instruction = generate_screening_instruction(vacancy=vacancy, step=step, style=style)
+    field = "prescanning_prompt" if step == ScreeningStep.PRESCANNING else "interview_prompt"
+    update_vacancy(vacancy=vacancy, data={field: instruction})
+    return {
+        "success": True,
+        "message": f"Generated {step} AI instructions for '{vacancy.title}'.",
+        "data": {"instruction": instruction, "step": step, "style": style},
+        "action": "generate_instructions",
     }
 
 

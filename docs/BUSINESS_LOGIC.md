@@ -7,7 +7,7 @@ HR PreScan is a multi-tenant SaaS platform that automates the full candidate scr
 **The platform provides a two-step AI screening pipeline:**
 
 1. **Prescanning** — an initial AI conversation (always via chat) that quickly filters candidates based on general fit, soft skills, and basic qualifications. Every vacancy has prescanning enabled by default.
-2. **Interview** — an optional, more rigorous AI video conversation with tougher, domain-specific questions. HR enables this per vacancy by configuring interview questions and criteria.
+2. **Interview** — an optional, more rigorous AI video conversation with tougher, domain-specific probing. HR enables this per vacancy by configuring interview AI instructions, criteria, and duration.
 
 The AI agent evaluates candidates at each step and decides whether to advance them to the next stage or reject them. HR can also manually move candidates between stages at any time. The platform handles the screening pipeline; HR retains full control over final decisions.
 
@@ -30,8 +30,8 @@ The AI agent evaluates candidates at each step and decides whether to advance th
 ### 2.2 HR Manager
 - Belongs to a company (multi-tenant)
 - Creates and manages vacancies
-- Configures prescanning setup per vacancy (questions, criteria, additional prompt for AI agent)
-- Optionally configures interview step per vacancy (questions, criteria, duration, additional prompt for AI agent)
+- Configures prescanning setup per vacancy (AI instructions and structured criteria)
+- Optionally configures interview step per vacancy (AI instructions and structured criteria)
 - Reviews candidate scores from both prescanning and interview stages
 - Filters and sorts candidates by AI scores
 - Manages candidate pipeline per vacancy
@@ -137,9 +137,9 @@ HR provides the following information:
 - **Description** — detailed job description and responsibilities. HR can generate this with AI after entering a title with at least 5 characters.
 - **AI-generated vacancy content** — the Basic Info form can generate or regenerate candidate-facing description, requirements, and responsibilities from the title, current form values, optional vacancy context, and HR's free-text AI instruction. During vacancy creation, the form keeps the temporary AI generation context so follow-up instructions such as "extend the description" or "regenerate requirements" use prior generated content; this context is cleared when the vacancy draft is created. Generated content is AI-graded for relevance, specificity, formatting, compliance, and unsupported claims; low-scoring drafts are revised once before being returned to HR.
 - **AI assistant input** — HR can paste long job descriptions into the AI assistant for vacancy creation; recent chat history may be shortened for model context, but the current pasted vacancy text is preserved up to the request limit.
-- **AI assistant publication setup** — after creating a vacancy draft, the AI assistant asks whether it should generate prescanning questions and role-specific evaluation criteria/competencies itself. If HR agrees (for example, says "generate yourself" or "publish it"), it creates any missing required questions/criteria for enabled screening steps before publishing, so publish does not fail on incomplete AI setup.
+- **AI assistant publication setup** — after creating a vacancy draft, the AI assistant asks whether it should generate screening instructions and role-specific evaluation criteria/competencies itself. If HR agrees (for example, says "generate yourself" or "publish it"), it creates any missing required criteria and draft instructions for enabled screening steps before publishing, so publish does not fail on incomplete AI setup.
 - **AI assistant vacancy disambiguation** — when multiple accessible vacancies match the same title, assistant tools must return a clarification with status/company/candidate-count choices instead of surfacing a failed action. Follow-up answers can disambiguate candidate listing by vacancy status or company.
-- **AI screening setup generation** — when HR uses the screening "Generate with AI" action for a step, the platform creates missing evaluation criteria for that step before generating questions, so generated questions are aligned to the scoring criteria.
+- **AI screening setup generation** — when HR uses the screening "Generate AI Instructions" action for a step, the platform drafts editable instructions from the vacancy, experience level, skills, and criteria. The advanced question generator can still create optional sample questions aligned to the scoring criteria.
 - **Required Skills** — key skills and qualifications needed
 - **Salary Range** — min/max salary is optional. If both min and max are empty, the vacancy salary is treated as negotiable and should remain visible in public listings as "Negotiable".
 - **Location** — optional remote, onsite, or hybrid context (with city/country if applicable)
@@ -168,7 +168,7 @@ HR can configure external parsing sources per company to collect vacancy drafts 
 - Parsed vacancies without salary min/max are treated as salary negotiable and must still appear in public job board results, including when salary filters are applied.
 - Parsed vacancies are stored separately from internal `Vacancy` rows. Active parsed vacancies can appear on the public job board as read-only content, but they cannot be applied to and do not start prescreening/interview workflows.
 - HeadHunter source sync is started through a Celery-backed parsing endpoint. HR can stop a running source sync; the task is revoked and the parser also checks for the stop state between fetched pages/items.
-- Importing a parsed vacancy creates a **Draft** and **Private** internal vacancy so HR can review, edit screening settings, add questions, and publish manually.
+- Importing a parsed vacancy creates a **Draft** and **Private** internal vacancy so HR can review, edit screening instructions/criteria, and publish manually.
 - Parsed vacancies are scoped to the HR user's live company memberships and cannot be shared across tenants.
 - Actuality statuses for parsed vacancies:
   - **Active** — seen in the latest source sync or newly ingested from Telegram.
@@ -185,7 +185,7 @@ HR can configure external parsing sources per company to collect vacancy drafts 
 
 Vacancies follow a one-directional lifecycle. Once published, a vacancy cannot return to draft.
 
-1. **Draft** — vacancy created but not published. HR configures questions, criteria, and settings.
+1. **Draft** — vacancy created but not published. HR configures AI instructions, criteria, and settings.
 2. **Published** — live and accepting applications. Can be paused or archived.
 3. **Paused** — temporarily not accepting new applications. Can be resumed (back to published) or archived.
 4. **Archived** — vacancy is permanently closed. All pending sessions are expired. Cannot be reopened. Can be soft-deleted.
@@ -215,9 +215,9 @@ Each vacancy has a two-step AI screening pipeline. HR configures each step durin
 - **Mode:** Always chat — AI converses with the candidate via real-time text messaging in the browser
 - **Purpose:** Quick initial screening to filter out clearly unqualified candidates
 - **Configuration:**
-  - Questions — literal candidate-facing questions AI-generated based on the vacancy, which HR can review/edit/add/remove
+  - AI instructions — the primary HR-authored guidance for the agent. HR can write in any language and may include topics, tone, strictness, red flags, or a plain-text list of sample questions.
   - Evaluation criteria / competencies — fixed categories plus optional AI-generated or HR-defined criteria (see 7.5)
-  - Additional prompt — free-text field where HR writes any instructions for the AI agent (e.g., "Focus on communication skills", "Be lenient with junior candidates")
+  - Sample questions / topic seeds — optional advanced guidance. They are not a rigid questionnaire; the AI uses them as coverage goals and asks natural follow-ups.
 - No camera or microphone required
 - No video recording; the transcript is the primary artifact
 - Integrity checks are limited to content-based analysis (response consistency, scripted/AI-generated answer detection)
@@ -226,12 +226,12 @@ Each vacancy has a two-step AI screening pipeline. HR configures each step durin
 
 - **Mode:** Meet/video only
 - **Purpose:** Deeper, more rigorous AI evaluation for candidates who passed prescanning
-- **To enable:** HR must configure questions and evaluation criteria for the interview step
+- **To enable:** HR must configure evaluation criteria for the interview step; AI instructions are recommended and can be generated automatically
 - **Configuration:**
-  - Questions — own set of literal candidate-facing questions, separate from prescanning questions; tougher and more domain-specific
+  - AI instructions — separate interview guidance, usually tougher and more domain-specific than prescanning. HR can write instructions or sample questions in any language.
   - Evaluation criteria — own set, separate from prescanning criteria
-  - Additional prompt — free-text field for HR instructions (e.g., "Be strict about technical knowledge", "Test system design thinking")
-  - Duration — configurable pacing target
+  - Sample questions / topic seeds — optional advanced guidance for deeper probing, not a strict script
+  - Pacing — the agent uses a built-in default pacing target (~30 minutes). Interview length is **not** configured by HR.
 - AI converses with the candidate via a video call on LiveKit. Full integrity monitoring (face detection, gaze tracking, audio anomaly detection). Interview is recorded. Suitable for mid-to-senior roles or positions requiring presentation skills.
 
 #### 5.4.3 Pipeline Rules
@@ -257,7 +257,7 @@ Candidates can apply via two surfaces: the **web app** (public job board) and th
 ### 6.1 Web flow
 
 1. Candidate finds a vacancy (public job board or direct link)
-2. Candidate fills in personal details. No account is required. The standard web form collects name, email, and optional phone; assistant-led unauthenticated prescreening must ask for a general HR contact method instead of requiring email-only contact.
+2. Candidate fills in personal details. No account is required. The standard web form collects name, email, and optional phone; assistant-led unauthenticated prescreening must ask for a general HR contact method instead of requiring email-only contact. For sharing background, the web form presents a single mutually-exclusive choice: **upload a CV** *or* **provide a LinkedIn/portfolio link** (not both). The CV is parsed and used by the AI prescreen (and the CV-vs-answers integrity check); the LinkedIn/portfolio link is a **reference link for the recruiter only — it is NOT scraped, parsed, or fed to the AI** (so a LinkedIn-only candidate's prescreen relies on chat answers alone). When the vacancy requires a CV, only the CV option is shown. The form also collects optional extras — a profile photo and a short "why are you a great fit?" note — and requires an explicit consent checkbox agreeing to AI pre-screening and the privacy terms before the application can be submitted. The Telegram apply flow collects name/contact and CV only; the optional extras are web-only.
 3. Candidate uploads CV/resume (optional but recommended; PDF, DOCX supported). If an authenticated candidate does not upload a CV for this application, the application automatically reuses the candidate's platform resume data. If the candidate also has a generated platform CV PDF, the active saved CV file is attached, falling back to the latest saved CV with a file.
 4. System creates the application and simultaneously creates a prescanning session with a unique link
    - If the vacancy has the interview step enabled, the system also prepares a separate web interview session/link, but the interview cannot be started until prescanning is completed and the candidate advances.
@@ -330,7 +330,7 @@ The candidate bot lets a candidate browse entry points, apply, and complete pres
    - when the candidate selects a vacancy, enters a fallback vacancy code, or opens an exact prescreening deep link, the bot UI switches to the vacancy/interview `prescanning_language` so the Telegram flow matches the language selected in the web app
    - if the candidate has no saved contact, the bot asks for any contact HR can use (phone, email, Telegram, WhatsApp, etc.) instead of requiring email-only or phone-only contact
    - during the CV step, saved platform CVs are offered first (active CV first), and the candidate can either select one of them or upload a new file; optional CV steps can still be skipped
-   - Telegram uses the same conversational AI chat engine as web prescanning; vacancy questions are competencies for the AI to assess, not a rigid numbered questionnaire.
+   - Telegram uses the same conversational AI chat engine and AI instructions as web prescanning. Vacancy sample questions are optional coverage guidance, not a rigid numbered questionnaire.
    - answers can be text or voice
    - the bot stores progress and can resume an in-progress Telegram prescreening session from the same deep link
 10. Candidates can open **Messages** from the bot menu to view recent HR direct messages. Telegram-delivered HR messages remain stored in the platform inbox, so bot and web history use the same source of truth.
@@ -344,6 +344,9 @@ The candidate bot lets a candidate browse entry points, apply, and complete pres
 - Candidate "My Applications" list/detail responses expose CV match, prescanning, and interview scores. The primary displayed score is the overall screening score from prescanning/interview when available; CV match is shown separately and only acts as a fallback before screening results exist.
 - Bot UI is **button-driven** wherever possible (Telegram inline keyboards). Free-text replies outside structured steps do not invoke AI unless the user has explicitly entered **AI mode**.
 - The HR Telegram bot exposes button shortcuts for dashboard, vacancies, vacancy creation, candidates, sending candidate messages, interviews, team, subscription, language, and AI mode. Feature buttons route clear natural-language prompts to the HR AI assistant, so recruiters do not need to memorize commands or internal IDs. Arbitrary recruiter text is ignored until AI mode is enabled.
+- Telegram bot menu flows use a single-message screen model where possible. Main menu, language settings, vacancy creation, CV center, message lists, and similar pages should update one active bot message instead of creating a long chat trail. Every screen must expose a clear route back to the main menu, and in-progress setup flows must expose cancel/back controls where safe.
+- HR vacancy creation in Telegram is a deterministic screen-based wizard, not a free-form AI chat by default. The bot asks one setup question at a time, updates the same screen after each answer, allows cancel/back/main-menu navigation, creates the vacancy only after a final summary confirmation, then returns to the main menu after the recruiter chooses to publish or keep the draft.
+- Telegram AI mode is explicitly entered and exited. While AI mode is active, bot replies include an Exit AI mode control; `/exit_ai`, `/cancel`, or returning to the main menu must leave AI mode. Outside AI mode, arbitrary free text is blocked and the bot shows normal action buttons.
 - The HR Telegram bot follows the same link safety rule as the candidate bot: a Telegram-first placeholder workspace may be merged into a confirmed web HR/admin account, but an already-linked real HR/admin account is resumed instead of being blocked by an unlink warning or silently rebound to another web user. Candidate links with the same Telegram identity do not block HR-bot linking, and HR links do not block candidate-bot linking.
 - Bot-created users are seeded from `message.from.language_code` when it matches a supported bot locale (en / ru / uz), then bot strings use the stored `User.language`. Authenticated web users can change the same field from the header language switcher; HR and candidate Telegram bot UIs also expose a language picker that updates `User.language` for future bot replies.
 - New Telegram candidate users must register in the bot before they can use vacancy, prescreening, CV, or assistant actions. Registration asks for a phone number first using Telegram's native contact-sharing button (manual phone entry is still accepted), then asks the candidate to choose the bot language (`en` / `ru` / `uz`). The selected language is persisted to `User.language` and drives future bot replies. If the user opened a vacancy/prescreening deep link first, the bot resumes that payload after required onboarding.
@@ -353,7 +356,7 @@ The candidate bot lets a candidate browse entry points, apply, and complete pres
 
 ## 7. AI Screening Process
 
-The platform uses a two-step AI screening pipeline. Each step is an independent AI conversation with its own questions, criteria, scoring, and agent behavior.
+The platform uses a two-step AI screening pipeline. Each step is an independent AI conversation with its own AI instructions, criteria, scoring, and agent behavior.
 
 ### 7.1 CV Analysis (before prescanning)
 - When a candidate uploads their CV, AI analyzes it before prescanning begins
@@ -374,20 +377,20 @@ Prescanning is the initial AI screening step. It is always enabled and always co
 - A typing indicator shows when AI is composing a response
 - Messages are persisted server-side — candidate can close the browser and resume later by reopening the prescanning link
 - Idle timeout is configurable (default: 24 hours of no activity)
-- No time limit — the conversation continues until all questions are covered
+- No time limit — the conversation continues until the AI has enough evidence against the configured criteria and instructions
 - AI decides when enough information has been gathered and wraps up naturally
 - A progress indicator shows approximate completion
 - Supported languages: English, Russian, Uzbek, Kazakh, Turkish, Arabic, Spanish, French, German, and Ukrainian. HR selects the vacancy `prescanning_language`; new vacancy forms default it from the current web locale.
 
 **Question Generation:**
-- AI automatically generates prescanning questions based on:
+- AI can generate editable prescanning instructions and optional sample questions based on:
   - Vacancy description and required skills
   - Candidate's CV, if uploaded (tailored questions)
   - Prescanning evaluation criteria set by HR
-- HR can review, edit, add, or remove AI-suggested questions before publishing the vacancy
-- Questions cover both fixed categories and custom criteria (see 7.5)
-- **AI autonomy:** Beyond the HR-specified questions, the AI agent may ask additional questions or follow-ups based on the candidate's answers and CV data. HR-specified questions are the baseline, not the ceiling. If a candidate answers but leaves an unclear impression and the AI cannot evaluate the answer confidently, the AI should ask a short clarification question tied to the same prescanning topic before scoring or moving on.
-- **Additional prompt:** HR can provide a free-text prompt with extra instructions for the AI agent (e.g., "Focus on communication skills", "Be lenient with junior candidates"). The agent reads and follows this prompt during the conversation.
+- HR can edit AI instructions directly. Instructions can be written in any language; the agent silently interprets them and speaks to the candidate in the configured screening language.
+- Instructions can include natural guidance, topics to cover, must-have skills, red flags, tone, strictness, and a plain text list of exact questions if HR wants.
+- Optional sample questions cover both fixed categories and custom criteria (see 7.5)
+- **AI autonomy:** The AI agent may ask additional questions or follow-ups based on the candidate's answers and CV data. HR-specified sample questions are a baseline, not the ceiling. If a candidate answers but leaves an unclear impression and the AI cannot evaluate the answer confidently, the AI should ask a short clarification question tied to the same prescanning topic before scoring or moving on.
 
 **Prescanning Flow:**
 1. Candidate opens the prescanning link
@@ -403,7 +406,7 @@ Prescanning is the initial AI screening step. It is always enabled and always co
 
 ### 7.3 Step 2: Interview (optional)
 
-Interview is the second, more rigorous AI screening step. HR enables it per vacancy by configuring interview questions and criteria. The interview AI agent is tougher and more domain-specific than prescanning.
+Interview is the second, more rigorous AI screening step. HR enables it per vacancy by configuring interview criteria and optional AI instructions. The interview AI agent is tougher and more domain-specific than prescanning.
 
 **Setup — Meet/video interview:**
 - Conducted in a video room (similar to Google Meet) via LiveKit
@@ -411,8 +414,8 @@ Interview is the second, more rigorous AI screening step. HR enables it per vaca
 - Microphone permission is required. Camera is recommended for integrity checks but is not mandatory; candidates can join a Meet interview with audio only if camera access fails or no camera is available.
 - Candidate sees a device-check preview before joining the room
 - The live room UI prioritizes the active AI/candidate conversation: large main stage, pinned self-view, compact top status bar, centered microphone/camera/leave controls, speaking indicators, and live transcript overlay.
-- Interview duration is configurable by HR per vacancy
-- The configured duration is an approximate pacing target, not a hard cutoff. As the target time approaches, the AI should ask shorter follow-ups and move toward a natural close.
+- Interview pacing uses a built-in default target (~30 minutes); it is not configured by HR.
+- This pacing target is approximate, not a hard cutoff. As it approaches, the AI should ask shorter follow-ups and move toward a natural close.
 - Full integrity monitoring (face detection, gaze tracking, audio anomaly detection)
 - Interview is recorded
 
@@ -422,15 +425,15 @@ Interview is the second, more rigorous AI screening step. HR enables it per vaca
 - The interview agent should speak in concise, natural language. If the candidate refuses to continue, says the role/profession is not relevant, or clearly does not fit the role after clarification, the agent ends the interview kindly instead of continuing to probe. Before any normal or early finish, the agent asks for the candidate's final words for HR.
 
 **Question Generation:**
-- AI generates interview questions based on:
+- AI can generate editable interview instructions and optional sample questions based on:
   - Vacancy description and required skills
   - Candidate's CV, if uploaded
   - Interview evaluation criteria set by HR
   - Prescanning results (AI can reference what was discussed in prescanning to go deeper)
-- HR can review, edit, add, or remove AI-suggested questions
-- Interview questions are separate from prescanning questions and are typically tougher, more technical, or more domain-specific
+- HR can edit interview instructions directly. Instructions can be written in any language and may include exact questions as plain text.
+- Optional interview sample questions are separate from prescanning sample questions and are typically tougher, more technical, or more domain-specific
 - **AI autonomy:** The AI agent may ask additional questions, present practical cases, or challenge the candidate's claims. The agent is expected to be more demanding than during prescanning. If an answer is relevant but not clear enough to evaluate strongly, the AI should ask a targeted clarification or practical follow-up connected to the current interview question.
-- **Additional prompt:** HR can provide a free-text prompt with extra instructions for the interview AI agent (e.g., "Be strict about technical knowledge", "Test system design thinking", "Present a real-world scenario"). This prompt is separate from the prescanning prompt.
+- **Instruction separation:** Interview instructions are separate from prescanning instructions.
 
 **Interview Flow — Meet/video:**
 1. Candidate receives an interview link after being advanced from prescanning
@@ -439,7 +442,7 @@ Interview is the second, more rigorous AI screening step. HR enables it per vaca
 4. AI agent greets the candidate and explains the process
 5. AI asks interview questions one by one, listens to responses
 6. AI can ask follow-up questions, present cases, or probe deeper
-7. Interview concludes when all key questions are covered, the agent has enough evidence, the target duration is approaching, or the early-finish rule applies
+7. Interview concludes when all key questions are covered, the agent has enough evidence, the built-in pacing target is approaching, or the early-finish rule applies
 8. AI asks for final words, thanks the candidate, and ends the session
 9. Candidate sees a "Thank you" screen
 
@@ -449,6 +452,7 @@ Interview is the second, more rigorous AI screening step. HR enables it per vaca
 
 ### 7.3.1 HR Silent Observer Mode (Meet mode only)
 - HR can join any active AI interview (meet mode) as a silent observer
+- Live observation is available only after the Meet interview is in progress and a LiveKit room exists; otherwise the UI must show an unavailable state instead of attempting to join
 - Candidate is NOT notified that HR is watching
 - HR can see and hear the interview in real-time but cannot speak or interact
 - HR sees the candidate's video and hears both the AI and candidate audio
@@ -752,8 +756,8 @@ Archived → Applied (restore)
 
 1. After onboarding, the system guides the HR to create their first vacancy
 2. A brief tutorial/wizard walks through vacancy creation steps
-3. HR configures prescanning (questions, criteria, additional prompt)
-4. HR optionally enables and configures interview step (questions, criteria, duration, additional prompt)
+3. HR configures prescanning (AI instructions and criteria)
+4. HR optionally enables and configures interview step (AI instructions and criteria)
 5. Once published, the vacancy is live and ready to receive candidates
 
 ---

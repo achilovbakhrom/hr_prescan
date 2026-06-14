@@ -16,7 +16,8 @@ from apps.applications.apis import (
 )
 from apps.applications.models import HRCandidate
 from apps.applications.services import sync_hr_candidate_for_application
-from apps.interviews.apis import HRApplicationInterviewApi
+from apps.common.exceptions import ApplicationError
+from apps.interviews.apis import HRApplicationInterviewApi, ObserverTokenApi
 from apps.interviews.models import Interview
 from apps.notifications.apis import HRMessageListApi, SendCandidateEmailApi
 from tests.factories import ApplicationFactory, CompanyFactory, InterviewFactory, UserFactory, VacancyFactory
@@ -231,6 +232,76 @@ def test_candidate_interview_api_uses_user_memberships():
 
     assert response.status_code == status.HTTP_200_OK
     assert response.data["id"] == str(interview.id)
+
+
+def test_observer_token_rejects_non_meet_session_without_500():
+    user, second_company = _hr_user_with_two_companies([HRPermissions.MANAGE_INTERVIEWS])
+    vacancy = VacancyFactory(company=second_company, created_by=user)
+    application = ApplicationFactory(vacancy=vacancy)
+    interview = InterviewFactory(
+        application=application,
+        session_type=Interview.SessionType.PRESCANNING,
+        screening_mode=Interview.ScreeningMode.CHAT,
+        status=Interview.Status.IN_PROGRESS,
+    )
+    factory = APIRequestFactory()
+    request = factory.get(f"/api/hr/interviews/{interview.id}/observer-token/")
+    force_authenticate(request, user=user)
+
+    response = ObserverTokenApi.as_view()(request, interview_id=str(interview.id))
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "Meet interviews" in response.data["detail"]
+
+
+def test_observer_token_returns_token_for_active_meet_interview():
+    user, second_company = _hr_user_with_two_companies([HRPermissions.MANAGE_INTERVIEWS])
+    vacancy = VacancyFactory(company=second_company, created_by=user)
+    application = ApplicationFactory(vacancy=vacancy)
+    interview = InterviewFactory(
+        application=application,
+        session_type=Interview.SessionType.INTERVIEW,
+        screening_mode=Interview.ScreeningMode.MEET,
+        status=Interview.Status.IN_PROGRESS,
+        livekit_room_name="interview-room",
+    )
+    factory = APIRequestFactory()
+    request = factory.get(f"/api/hr/interviews/{interview.id}/observer-token/")
+    force_authenticate(request, user=user)
+
+    with patch("apps.interviews.apis.hr_schedule.generate_observer_token", return_value="observer-token"):
+        response = ObserverTokenApi.as_view()(request, interview_id=str(interview.id))
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data == {
+        "token": "observer-token",
+        "room_name": "interview-room",
+    }
+
+
+def test_observer_token_maps_livekit_errors_to_400():
+    user, second_company = _hr_user_with_two_companies([HRPermissions.MANAGE_INTERVIEWS])
+    vacancy = VacancyFactory(company=second_company, created_by=user)
+    application = ApplicationFactory(vacancy=vacancy)
+    interview = InterviewFactory(
+        application=application,
+        session_type=Interview.SessionType.INTERVIEW,
+        screening_mode=Interview.ScreeningMode.MEET,
+        status=Interview.Status.IN_PROGRESS,
+        livekit_room_name="interview-room",
+    )
+    factory = APIRequestFactory()
+    request = factory.get(f"/api/hr/interviews/{interview.id}/observer-token/")
+    force_authenticate(request, user=user)
+
+    with patch(
+        "apps.interviews.apis.hr_schedule.generate_observer_token",
+        side_effect=ApplicationError("LiveKit credentials not configured."),
+    ):
+        response = ObserverTokenApi.as_view()(request, interview_id=str(interview.id))
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.data["detail"] == "LiveKit credentials not configured."
 
 
 def test_candidate_messages_api_uses_user_memberships():

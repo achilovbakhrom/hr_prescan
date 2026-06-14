@@ -73,7 +73,7 @@ def handle_help(*, user, params):
     help_text = (
         "I can help you with:\n"
         "- **Vacancies**: list, create, update, publish, pause, archive, delete, "
-        "generate questions, regenerate keywords\n"
+        "generate instructions, generate optional questions, regenerate keywords\n"
         "- **Companies**: list, create, update, delete, set default\n"
         "- **Candidates**: list by vacancy, update status, bulk move, add notes\n"
         "- **Interviews**: list, cancel, reset\n"

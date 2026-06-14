@@ -89,5 +89,5 @@ All detailed docs live in `docs/`:
 - Vacancies can be public (job board) or private (link-only)
 - AI interview questions are auto-generated but HR can edit them before publishing
 - The platform does NOT dictate HR's post-screening workflow — it provides tools (schedule, chat, email, reject) and HR decides
-- Interview duration is configurable per vacancy
+- Interview length is not HR-configurable; the AI uses a built-in pacing target (~30 min)
 - Scoring uses both fixed categories (soft skills, language, communication, motivation, cultural fit) and custom HR-defined criteria

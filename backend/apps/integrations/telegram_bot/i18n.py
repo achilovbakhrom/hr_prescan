@@ -146,6 +146,11 @@ _STRINGS: dict[str, dict[str, str]] = {
         "ru": "Выйти из AI-режима",
         "uz": "AI rejimidan chiqish",
     },
+    "candidate.btn_main_menu": {
+        "en": "Main menu",
+        "ru": "Главное меню",
+        "uz": "Asosiy menyu",
+    },
     "candidate.ai_mode_started": {
         "en": "AI mode is on. Send your question or request in plain language.",
         "ru": "AI-режим включён. Напишите вопрос или запрос обычным текстом.",

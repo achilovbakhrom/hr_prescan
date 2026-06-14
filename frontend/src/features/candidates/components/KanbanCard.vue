@@ -121,7 +121,7 @@ function onDragStart(event: DragEvent): void {
     >
       <span
         v-if="candidate.matchScore !== null"
-        class="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[10px] font-medium bg-blue-50 dark:bg-blue-950 text-blue-700"
+        class="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[10px] font-medium bg-[color:var(--color-accent-soft)] text-[color:var(--color-accent)]"
         :title="t('candidates.scoreTitles.cvMatch')"
       >
         {{ t('candidates.scoreLabels.cv') }} {{ candidate.matchScore }}%

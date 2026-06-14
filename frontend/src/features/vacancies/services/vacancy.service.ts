@@ -6,6 +6,8 @@ import type {
   VacancyCriteria,
   InterviewQuestion,
   GenerateQuestionsResponse,
+  GenerateInstructionsResponse,
+  InstructionStyle,
   StepType,
   CreateVacancyRequest,
   UpdateVacancyRequest,
@@ -154,6 +156,18 @@ export const vacancyService = {
     const response = await apiClient.post<GenerateQuestionsResponse>(
       `/hr/vacancies/${vacancyId}/questions/generate/`,
       { step },
+    )
+    return response.data
+  },
+
+  async generateInstructions(
+    vacancyId: string,
+    step: StepType = 'prescanning',
+    style: InstructionStyle = 'balanced',
+  ): Promise<GenerateInstructionsResponse> {
+    const response = await apiClient.post<GenerateInstructionsResponse>(
+      `/hr/vacancies/${vacancyId}/instructions/generate/`,
+      { step, style },
     )
     return response.data
   },

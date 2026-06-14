@@ -22,7 +22,7 @@ def build_eval_prompt(vacancy, criteria_json: str, transcript_text: str, step_la
 
 ## Your Task
 Score the candidate on EACH criteria (1-10 scale) and provide a brief note explaining each score.
-For every score, include evidence snippets from the transcript when available.
+Keep each note concise. For every score, include at most one short evidence quote from the transcript when available.
 Also provide a structured decision_support object with recommendation, strengths, risks, positive_moments,
 negative_moments, conclusion, and next_step, an overall weighted score (1-10), and a final recommendation.
 Use "reject" when the candidate should not move to the next stage or should not be shortlisted, even if they have
@@ -39,7 +39,7 @@ Respond with ONLY valid JSON in this exact format:
       "criteria_id": "<uuid>",
       "score": 8,
       "notes": "Brief explanation with transcript evidence",
-      "evidence": [{{"quote": "Short exact quote", "speaker": "candidate", "timestamp": null, "line": null}}]
+      "evidence": [{{"quote": "Short exact quote", "speaker": "candidate"}}]
     }},
     ...
   ],

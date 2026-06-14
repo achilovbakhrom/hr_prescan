@@ -18,7 +18,7 @@ const { t } = useI18n()
 
 function tabClass(isActive: boolean): string {
   return isActive
-    ? 'bg-blue-600 text-white'
+    ? 'bg-[color:var(--color-accent)] text-white'
     : 'bg-gray-100 text-gray-600 dark:text-gray-400 hover:bg-gray-200'
 }
 </script>

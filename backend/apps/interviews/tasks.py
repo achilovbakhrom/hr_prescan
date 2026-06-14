@@ -53,7 +53,6 @@ def send_scheduling_confirmation_email(interview_id: str) -> None:
             "scheduled_at": interview.scheduled_at.strftime("%B %d, %Y at %H:%M UTC")
             if interview.scheduled_at
             else "TBD",
-            "duration": vacancy.interview_duration or 30,
             "interview_url": interview_url,
         },
     )

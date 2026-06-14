@@ -8,6 +8,7 @@ import type {
   VacancyDetail,
   VacancyStatus,
   StepType,
+  InstructionStyle,
   CreateVacancyRequest,
   UpdateVacancyRequest,
 } from '../types/vacancy.types'
@@ -141,6 +142,23 @@ export const useVacancyStore = defineStore('vacancy', () => {
     }
   }
 
+  async function generateInstructions(
+    vacancyId: string,
+    step: StepType = 'prescanning',
+    style: InstructionStyle = 'balanced',
+  ): Promise<string> {
+    loading.value = true
+    error.value = null
+    try {
+      const generated = await vacancyService.generateInstructions(vacancyId, step, style)
+      return generated.instruction
+    } catch (err: unknown) {
+      handleError(err)
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     vacancies,
     currentVacancy,
@@ -161,5 +179,6 @@ export const useVacancyStore = defineStore('vacancy', () => {
     updateQuestion,
     deleteQuestion,
     generateQuestions,
+    generateInstructions,
   }
 })

@@ -79,7 +79,7 @@ async function handleToggleActive(userId: string): Promise<void> {
 </script>
 
 <template>
-  <div class="mx-auto max-w-7xl space-y-6">
+  <div class="w-full space-y-6">
     <!-- Header / glass toolbar -->
     <GlassCard class="!p-4">
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

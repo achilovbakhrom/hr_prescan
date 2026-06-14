@@ -1,4 +1,3 @@
-@import 'primeicons/primeicons.css';
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
 
@@ -10,14 +9,14 @@
 
 :root {
   --app-light-background-wash:
-    radial-gradient(ellipse 60% 40% at 20% 0%, rgba(59, 130, 246, 0.05), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 20% 0%, rgba(167, 139, 250, 0.05), transparent 70%),
     radial-gradient(ellipse 60% 40% at 80% 100%, rgba(168, 85, 247, 0.04), transparent 70%);
 }
 
 html {
   min-height: 100%;
   overflow-x: hidden;
-  background: var(--color-surface-base, #ffffff);
+  background: var(--app-page-bg, #ffffff);
 }
 
 html:not(.dark) {
@@ -40,7 +39,7 @@ body,
 }
 
 #__nuxt {
-  background: var(--color-surface-base, #ffffff);
+  background: var(--app-page-bg, #ffffff);
 }
 
 html:not(.dark) #__nuxt {
@@ -80,222 +79,111 @@ html:not(.dark) #__nuxt {
   display: grid;
   place-items: center;
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(248, 250, 252, 0.92)),
-    radial-gradient(circle at 28% 20%, rgba(37, 99, 235, 0.16), transparent 34rem),
-    radial-gradient(circle at 74% 76%, rgba(124, 92, 255, 0.12), transparent 30rem),
-    radial-gradient(circle at 52% 54%, rgba(20, 184, 166, 0.08), transparent 24rem),
-    var(--color-surface-base, #ffffff);
-  backdrop-filter: blur(10px);
+    radial-gradient(ellipse 46% 38% at 50% 44%, rgba(124, 58, 237, 0.1), transparent 70%),
+    var(--app-page-bg, #ffffff);
 }
 
 .app-preloader__surface {
   display: grid;
   justify-items: center;
-  gap: 0.875rem;
-  transform: translateY(-0.75rem);
+  gap: 1.4rem;
 }
 
-.app-preloader__mark {
+.app-preloader__orb {
   position: relative;
   display: grid;
-  width: 7.25rem;
-  height: 7.25rem;
+  width: 6rem;
+  height: 6rem;
   place-items: center;
 }
 
-.app-preloader__glow {
+.app-preloader__ring {
   position: absolute;
-  inset: 1rem;
+  inset: 0;
   border-radius: 9999px;
-  background:
-    radial-gradient(circle, rgba(37, 99, 235, 0.28), transparent 62%),
-    radial-gradient(circle at 70% 30%, rgba(168, 85, 247, 0.2), transparent 58%);
-  filter: blur(14px);
-  opacity: 0.9;
-  animation: app-preloader-breathe 1.7s ease-in-out infinite;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(124, 58, 237, 0) 30deg,
+    #7c3aed 210deg,
+    #ec4899 320deg,
+    transparent 360deg
+  );
+  -webkit-mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - 0.4rem),
+    #000 calc(100% - 0.34rem)
+  );
+  mask: radial-gradient(farthest-side, transparent calc(100% - 0.4rem), #000 calc(100% - 0.34rem));
+  animation: app-preloader-spin 0.95s linear infinite;
 }
 
-.app-preloader__logo {
+.app-preloader__dot {
   position: relative;
   z-index: 2;
-  filter: drop-shadow(0 18px 28px rgba(37, 99, 235, 0.22));
-  animation: app-preloader-float 1.8s ease-in-out infinite;
-}
-
-.app-preloader__logo .app-logo__glyph {
-  width: 4.5rem;
-  height: 4.5rem;
-}
-
-.app-preloader__beam {
-  position: absolute;
-  z-index: 3;
-  left: 0.35rem;
-  right: 0.35rem;
-  height: 0.1875rem;
+  width: 0.6rem;
+  height: 0.6rem;
   border-radius: 9999px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(14, 165, 233, 0.1),
-    rgba(255, 255, 255, 0.96),
-    rgba(37, 99, 235, 0.72),
-    transparent
-  );
-  box-shadow: 0 0 18px rgba(37, 99, 235, 0.38);
-  animation: app-preloader-scan 1.35s ease-in-out infinite;
-}
-
-.app-preloader__spark {
-  position: absolute;
-  width: 0.625rem;
-  height: 0.625rem;
-  border-radius: 9999px;
-  background: rgba(37, 99, 235, 0.78);
-  box-shadow: 0 0 18px rgba(37, 99, 235, 0.42);
-  animation: app-preloader-spark 1.6s ease-in-out infinite;
-}
-
-.app-preloader__spark--one {
-  top: 1.15rem;
-  right: 1.55rem;
-}
-
-.app-preloader__spark--two {
-  bottom: 1.4rem;
-  left: 1.35rem;
-  width: 0.45rem;
-  height: 0.45rem;
-  animation-delay: 180ms;
-}
-
-.app-preloader__spark--three {
-  right: 1.2rem;
-  bottom: 2rem;
-  width: 0.35rem;
-  height: 0.35rem;
-  background: rgba(20, 184, 166, 0.82);
-  animation-delay: 320ms;
+  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  box-shadow: 0 0 16px rgba(124, 58, 237, 0.5);
+  animation: app-preloader-pulse 1.4s ease-in-out infinite;
 }
 
 .app-preloader__brand {
-  color: var(--color-text-primary, #0b0f17);
   font-size: 0.95rem;
   font-weight: 700;
-}
-
-.app-preloader__bar {
-  position: relative;
-  width: 12rem;
-  height: 0.25rem;
-  overflow: hidden;
-  border-radius: 9999px;
-  background: rgba(37, 99, 235, 0.1);
-}
-
-.app-preloader__bar > span {
-  position: absolute;
-  inset-block: 0;
-  width: 45%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, rgba(37, 99, 235, 0), #2563eb, #7c5cff);
-  animation: app-preloader-bar 1.05s ease-in-out infinite;
+  letter-spacing: 0.01em;
+  background: linear-gradient(90deg, #7c3aed, #a855f7, #ec4899, #a855f7, #7c3aed);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: app-preloader-shimmer 2.4s linear infinite;
 }
 
 html.dark .app-preloader {
   background:
-    linear-gradient(135deg, rgba(15, 23, 42, 0.86), rgba(2, 6, 23, 0.94)),
-    radial-gradient(circle at 28% 20%, rgba(59, 130, 246, 0.22), transparent 34rem),
-    radial-gradient(circle at 74% 76%, rgba(124, 92, 255, 0.16), transparent 30rem),
-    radial-gradient(circle at 52% 54%, rgba(20, 184, 166, 0.1), transparent 24rem),
-    var(--color-surface-base, #0f172a);
-}
-
-html.dark .app-preloader__brand {
-  color: #f8fafc;
-}
-
-html.dark .app-preloader__bar {
-  background: rgba(148, 163, 184, 0.18);
+    radial-gradient(ellipse 46% 38% at 50% 44%, rgba(167, 139, 250, 0.14), transparent 70%),
+    var(--app-page-bg, #08070f);
 }
 
 .app-preloader-enter-active,
 .app-preloader-leave-active {
-  transition:
-    opacity 260ms var(--ease-ios, ease),
-    transform 260ms var(--ease-ios, ease);
+  transition: opacity 300ms var(--ease-ios, ease);
 }
 
 .app-preloader-enter-from,
 .app-preloader-leave-to {
   opacity: 0;
-  transform: scale(0.985);
 }
 
-@keyframes app-preloader-breathe {
+@keyframes app-preloader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes app-preloader-pulse {
   0%,
   100% {
-    opacity: 0.65;
-    transform: scale(0.92);
+    transform: scale(1);
   }
   50% {
-    opacity: 1;
-    transform: scale(1.08);
+    transform: scale(1.06);
   }
 }
 
-@keyframes app-preloader-float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-0.25rem);
-  }
-}
-
-@keyframes app-preloader-scan {
-  0% {
-    opacity: 0;
-    transform: translateY(-2.25rem) scaleX(0.72);
-  }
-  18%,
-  74% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(2.25rem) scaleX(0.9);
-  }
-}
-
-@keyframes app-preloader-spark {
-  0%,
-  100% {
-    opacity: 0.22;
-    transform: scale(0.82);
-  }
-  45% {
-    opacity: 0.9;
-    transform: scale(1.18);
-  }
-}
-
-@keyframes app-preloader-bar {
-  0% {
-    transform: translateX(-105%);
-  }
-  100% {
-    transform: translateX(245%);
+@keyframes app-preloader-shimmer {
+  to {
+    background-position: 200% center;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .app-preloader__glow,
-  .app-preloader__logo,
-  .app-preloader__beam,
-  .app-preloader__spark,
-  .app-preloader__bar > span {
+  .app-preloader__ring,
+  .app-preloader__dot,
+  .app-preloader__brand {
     animation: none;
   }
 }
@@ -357,32 +245,37 @@ body,
 
   /* ---- Surfaces (solid) ---- */
   --color-surface-base: #ffffff;
-  --color-surface-raised: #f7f8fa;
-  --color-surface-sunken: #eef0f3;
+  --color-surface-raised: #faf9fe;
+  --color-surface-sunken: #f0eef7;
+  /* App page (content area) background — light neutral so white cards read as
+     distinct tiles (Figma redesign uses a flat gray page + solid white cards). */
+  --app-page-bg: #f4f4f8;
 
   /* ---- Surfaces (glass / translucent) ---- */
-  --color-surface-glass-1: rgba(255, 255, 255, 0.64);
-  --color-surface-glass-2: rgba(255, 255, 255, 0.48);
-  --color-surface-glass-float: rgba(255, 255, 255, 0.76);
+  /* Solid in the flat redesign: cards sit on the gray page, not over an
+     animated background, so they need to read as opaque white tiles. */
+  --color-surface-glass-1: #ffffff;
+  --color-surface-glass-2: #faf9fe;
+  --color-surface-glass-float: #ffffff;
 
   /* ---- Borders ---- */
-  --color-border-soft: #e5e7eb;
-  --color-border-glass: rgba(255, 255, 255, 0.72);
-  --color-border-ring: rgba(37, 99, 235, 0.45);
+  --color-border-soft: #e7e4f1;
+  --color-border-glass: #e7e4f1;
+  --color-border-ring: rgba(124, 58, 237, 0.45);
 
   /* ---- Text ---- */
-  --color-text-primary: #0b0f17;
-  --color-text-secondary: #374151;
-  --color-text-muted: #6b7280;
+  --color-text-primary: #15101f;
+  --color-text-secondary: #5c5872;
+  --color-text-muted: #9a98ad;
   --color-text-on-accent: #ffffff;
 
   /* ---- Accents ---- */
-  --color-accent: #2563eb;
-  --color-accent-soft: #dbeafe;
-  --color-accent-ai: #7c5cff;
+  --color-accent: #7c3aed;
+  --color-accent-soft: #efe9fc;
+  --color-accent-ai: #7c3aed;
   --color-accent-ai-soft: #ede9fe;
-  --color-accent-celebrate: #ff9b73;
-  --color-accent-celebrate-soft: #ffe9de;
+  --color-accent-celebrate: #ec4899;
+  --color-accent-celebrate-soft: #fce7f3;
 
   /* ---- Semantic (state) ---- */
   --color-success: #10b981;

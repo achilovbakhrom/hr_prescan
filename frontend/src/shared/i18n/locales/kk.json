@@ -111,7 +111,8 @@
     "cvBuilder": "CV Құрастырушы",
     "myCvs": "Менің CVтерім",
     "hrAnalytics": "Аналитика",
-    "candidateBase": "Кандидаттар базасы"
+    "candidateBase": "Кандидаттар базасы",
+    "instructions": "Қалай жұмыс істейді"
   },
   "validation": {
     "required": "Бұл өріс қажет",
@@ -226,8 +227,8 @@
   },
   "landing": {
     "hero": {
-      "title": "HR сұхбатына дейін қатаң AI прескрининг",
-      "subtitle": "PreScreen AI жұмыс іздеу тақтасы немесе CV құралы емес. Ол динамикалық кандидат сүзгілерін қосады, құрылымдалған AI прескрининг жүргізеді және HR-ға тек қолмен қарауға лайық кандидаттарды көрсетеді.",
+      "title": "100 түйіндемені қолмен қарауды тоқтатыңыз.",
+      "subtitle": "PreScreen AI әр үміткермен сұхбаттасып, рейтингтелген қысқа тізім ұсынады — осылайша уақытыңызға лайық адамдармен ғана кездесесіз.",
       "getStarted": "Жұмысты тегін бастаңыз",
       "cta": "Тегін сынақ нұсқасын бастаңыз",
       "demo": "Демо көру",
@@ -243,7 +244,8 @@
       "openHrTelegram": "HR роботын ашыңыз",
       "publicJobsTitle": "Ашық вакансиялар тізімі",
       "publicJobsHint": "Белсенді вакансияларды көру және аккаунтсыз өтініш бастау үшін /jobs бетін ашыңыз.",
-      "openPublicJobs": "Вакансияларды ашу"
+      "openPublicJobs": "Вакансияларды ашу",
+      "trustedBy": "500+ жалдау командасы сенеді"
     },
     "mockup": {
       "title": "AI алдын ала скрининг",
@@ -257,7 +259,7 @@
       }
     },
     "features": {
-      "title": "Кандидат таңдауға арналған AI қабаты",
+      "title": "Сұрыптауға қажеттінің бәрі.",
       "subtitle": "Жүйе жалдау процесіне қатаң сүзгілер, автоматты AI әңгімелері және дәлелге негізделген бағалау қосады.",
       "aiPrescanning": "Интеллектуалды алдын ала скрининг",
       "aiPrescanningDesc": "Әр кандидат міндетті сүзгілер, критерийлер және рөлге арналған сұрақтар бойынша AI чат арқылы тексеріледі.",
@@ -293,7 +295,8 @@
       "step3": "AI сұхбат жүргізеді",
       "step3Desc": "Сәйкес кандидаттар қатаңырақ чат немесе видео сұхбатқа өтеді.",
       "step4": "Қарау және жалдау",
-      "step4Desc": "AI ұпайларын қарап шығыңыз, жазбаларды қараңыз және жұмысқа қабылдау туралы негізделген шешімдер қабылдаңыз."
+      "step4Desc": "AI ұпайларын қарап шығыңыз, жазбаларды қараңыз және жұмысқа қабылдау туралы негізделген шешімдер қабылдаңыз.",
+      "heading": "Үш қадам. Қолмен сұрыптау жоқ."
     },
     "stats": {
       "companies": "Компаниялар",
@@ -308,7 +311,7 @@
       "freeTrial": "14 күндік тегін сынақ нұсқасы"
     },
     "cta": {
-      "title": "AI скринингті өңдеуге дайынсыз ба?",
+      "title": "Жылдамырақ жалдауға дайынсыз ба?",
       "subtitle": "AI-мен жұмыс істейтін сұхбаттармен скрининг уақытының 90% үнемдейтін компанияларға қосылыңыз.",
       "startFree": "Тегін сынақ нұсқасын бастаңыз",
       "viewPricing": "Бағаны көру"
@@ -359,7 +362,22 @@
     "latestJobsSubtitle": "PreScreen AI көмегімен компаниялардағы соңғы бос орындарды шолыңыз",
     "noJobsYet": "Әзірге бос жұмыс орындары жоқ. Жақында қайта тексеріңіз!",
     "noJobsCheckBack": "Жаңа мүмкіндіктер үшін жақын арада қайта тексеріңіз",
-    "remote": "Қашықтан"
+    "remote": "Қашықтан",
+    "heroPreview": {
+      "live": "ЖИ сұхбаты · тікелей эфир",
+      "interviewer": "ЖИ сұхбаткер",
+      "question": "Жақында шешкен күрделі мәселе туралы айтыңыз.",
+      "overallScore": "Жалпы балл",
+      "advancing": "Сұхбатқа өтеді"
+    },
+    "trust": {
+      "label": "Бізге сенетін командалар"
+    },
+    "telegram": {
+      "prefer": "Telegram қалайсыз ба?",
+      "apply": "Telegram арқылы өтініш беру",
+      "recruiter": "Рекрутер? HR-бот"
+    }
   },
   "dashboard": {
     "greeting": {
@@ -420,7 +438,9 @@
       "recommendedJobs": "Ұсынылатын жұмыстар",
       "noRecommendations": "Әзірге ұсыныстар жоқ",
       "noRecommendationsHint": "Мұнда жаңа жұмыс орындары пайда болады"
-    }
+    },
+    "candidatesScreened": "Тексерілген үміткерлер",
+    "avgScore": "Орташа балл"
   },
   "analytics": {
     "title": "Аналитика",
@@ -664,6 +684,19 @@
       "languageAndInstructions": "Тіл және нұсқаулар",
       "languageHint": "AI кандидаттармен қалай сөйлесетіні және AI агентіне арналған кез келген қосымша нұсқаулық."
     },
+    "instructions": {
+      "title": "AI instructions",
+      "hint": "Tell the AI what to focus on during this step. You can write in any language and include topics, rules, red flags, tone, or a plain text list of questions.",
+      "placeholder": "Focus on real work experience with the required skills.\nAsk for concrete examples, not theory only.\nCheck motivation, availability, salary expectations, and communication clarity.\nBe strict about claims that do not match the candidate's CV.\nAlso ask:\n- Why are you interested in this role?\n- When can you start?",
+      "example": "Example: Focus on React, TypeScript, REST APIs, and teamwork. Ask for one real project example and one difficult technical decision. Be friendly but verify vague senior-level claims.",
+      "generate": "Generate AI Instructions",
+      "generated": "AI instructions generated",
+      "styleLight": "Light",
+      "styleBalanced": "Balanced",
+      "styleStrict": "Strict",
+      "advancedQuestions": "Advanced: sample questions",
+      "advancedQuestionsHint": "Optional question seeds for the AI. The agent treats them as guidance and may ask natural follow-ups instead of following a rigid script."
+    },
     "settings": {
       "visibility": "Көріну және қолдану",
       "interviewStep": "Сұхбат кезеңі",
@@ -810,8 +843,18 @@
       "validation": {
         "nameRequired": "Аты қажет",
         "emailRequired": "Электрондық пошта қажет",
-        "emailInvalid": "Жарамсыз электрондық пошта пішімі"
-      }
+        "emailInvalid": "Жарамсыз электрондық пошта пішімі",
+        "consentRequired": "Жалғастыру үшін алдын ала тексеру және құпиялылық шарттарын қабылдаңыз"
+      },
+      "profilePhoto": "Профиль фотосы",
+      "choosePhoto": "Фото жүктеу",
+      "profilePhotoHint": "Міндетті емес — өтінішіңізге бет қосады (макс. 5 МБ).",
+      "linkedin": "LinkedIn / портфолио",
+      "coverNote": "Неге қолайлысыз? (міндетті емес)",
+      "coverNotePlaceholder": "Бұл рөл сізге неге сай келетіні туралы бірнеше сөйлем…",
+      "consent": "ЖИ алдын ала тексеру және құпиялылық шарттарымен келісемін.",
+      "backgroundLabel": "Тәжірибеңізбен қалай бөліскіңіз келеді?",
+      "linkedinRefHint": "Рекрутерге арналған сілтеме — оны ЖИ-прескрининг талдамайды."
     },
     "dialogs": {
       "bulkConfirmHeader": "Жаппай әрекетті растау",
@@ -981,6 +1024,13 @@
     "noCandidatesApplied": "Әзірге үміткерлер өтініш берген жоқ",
     "candidateBase": {
       "applications": "Өтінімдер"
+    },
+    "appliedFor": "Вакансия",
+    "aiScore": "AI бағасы",
+    "scoreTier": {
+      "strong": "Күшті",
+      "good": "Жақсы",
+      "weak": "Әлсіз"
     }
   },
   "interviews": {
@@ -1279,10 +1329,17 @@
         "admin": "Админ",
         "hr": "HR менеджері",
         "candidate": "Кандидат"
-      }
+      },
+      "activeMembers": "белсенді мүше",
+      "pendingInvitations": "күтудегі шақыру"
     },
     "language": "Тіл",
-    "theme": "Тақырып"
+    "theme": "Тақырып",
+    "account": {
+      "title": "Аккаунт",
+      "role": "Рөл",
+      "memberSince": "Мүше болған күн"
+    }
   },
   "subscriptions": {
     "title": "Жазылым",

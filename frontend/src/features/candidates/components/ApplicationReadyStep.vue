@@ -35,9 +35,9 @@ const { t } = useI18n()
       class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 text-center sm:p-8"
     >
       <div
-        class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-950 sm:mb-4 sm:h-16 sm:w-16"
+        class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[color:var(--color-accent-soft)] sm:mb-4 sm:h-16 sm:w-16"
       >
-        <i class="pi pi-comments text-2xl text-blue-600 dark:text-blue-400 sm:text-3xl"></i>
+        <i class="pi pi-comments text-2xl text-[color:var(--color-accent)] sm:text-3xl"></i>
       </div>
       <h2 class="mb-2 text-lg font-bold text-gray-900 dark:text-white sm:text-xl">
         {{ t('candidates.application.prescanReady') }}
@@ -94,16 +94,16 @@ const { t } = useI18n()
       />
 
       <div
-        class="rounded-lg border border-blue-100 dark:border-blue-900 bg-blue-50 dark:bg-blue-950 p-3 text-left sm:p-4"
+        class="rounded-lg border border-[color:var(--color-border-soft)] bg-[color:var(--color-accent-soft)] p-3 text-left sm:p-4"
       >
-        <p class="text-xs text-blue-800 dark:text-blue-200 sm:text-sm">
+        <p class="text-xs text-[color:var(--color-text-secondary)] sm:text-sm">
           <i class="pi pi-user-plus mr-1"></i>
           <strong>{{ t('candidates.application.tip') }}:</strong>
           {{ t('candidates.application.tipText') }}
         </p>
         <RouterLink
           to="/register"
-          class="mt-2 inline-block text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline sm:text-sm"
+          class="mt-2 inline-block text-xs font-medium text-[color:var(--color-accent)] hover:underline sm:text-sm"
         >
           {{ t('candidates.application.createAccount') }}
         </RouterLink>

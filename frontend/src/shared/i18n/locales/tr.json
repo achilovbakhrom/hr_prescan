@@ -111,7 +111,8 @@
     "cvBuilder": "CV Oluşturucu",
     "myCvs": "Benim CV'lerim",
     "hrAnalytics": "Analitik",
-    "candidateBase": "Aday havuzu"
+    "candidateBase": "Aday havuzu",
+    "instructions": "Nasıl çalışır"
   },
   "validation": {
     "required": "Bu alan zorunludur",
@@ -226,8 +227,8 @@
   },
   "landing": {
     "hero": {
-      "title": "İK görüşmesinden önce sıkı AI ön eleme",
-      "subtitle": "PreScreen AI bir iş ilanı panosu veya CV oluşturucu değildir. Dinamik aday filtreleri ekler, yapılandırılmış AI ön eleme yürütür ve İK'ya yalnızca manuel incelemeye değer adayları gösterir.",
+      "title": "100 özgeçmişi elle elemeyi bırakın.",
+      "subtitle": "PreScreen AI her adayla görüşür ve size sıralı bir kısa liste sunar — böylece yalnızca değerli kişilerle görüşürsünüz.",
       "getStarted": "Ücretsiz Başlayın",
       "cta": "Ücretsiz Denemeyi Başlat",
       "demo": "Demoyu İzle",
@@ -243,7 +244,8 @@
       "openHrTelegram": "İK Botunu Aç",
       "publicJobsTitle": "Herkese açık ilan listesi",
       "publicJobsHint": "Aktif ilanları görmek ve giriş yapmadan başvuru başlatmak için /jobs sayfasını açın.",
-      "openPublicJobs": "İlanları Aç"
+      "openPublicJobs": "İlanları Aç",
+      "trustedBy": "500+ işe alım ekibi güveniyor"
     },
     "mockup": {
       "title": "AI Ön Tarama",
@@ -257,7 +259,7 @@
       }
     },
     "features": {
-      "title": "Aday seçimi için AI katmanı",
+      "title": "Elemenin ihtiyacı olan her şey.",
       "subtitle": "Sistem işe alım sürecinize sıkı filtreler, otomatik AI görüşmeleri ve kanıta dayalı puanlama ekler.",
       "aiPrescanning": "Akıllı Ön Tarama",
       "aiPrescanningDesc": "Her aday, zorunlu filtreleriniz, kriterleriniz ve role özel sorularınız üzerinden AI sohbetiyle otomatik olarak elenir.",
@@ -293,7 +295,8 @@
       "step3": "AI görüşme yapar",
       "step3Desc": "Uygun adaylar daha sıkı sohbet veya video görüşmesine geçer.",
       "step4": "İncele ve Kirala",
-      "step4Desc": "AI puanlarını inceleyin, kayıtları izleyin ve bilinçli işe alım kararları verin."
+      "step4Desc": "AI puanlarını inceleyin, kayıtları izleyin ve bilinçli işe alım kararları verin.",
+      "heading": "Üç adım. Sıfır manuel eleme."
     },
     "stats": {
       "companies": "Şirketler",
@@ -308,7 +311,7 @@
       "freeTrial": "14 günlük ücretsiz deneme"
     },
     "cta": {
-      "title": "Tarama İşleminizi AI'nin Gerçekleştirmesine İzin Vermeye Hazır Mısınız?",
+      "title": "Daha hızlı işe almaya hazır mısınız?",
       "subtitle": "AI destekli röportajlarla tarama süresinden %90 tasarruf sağlayan şirketlere katılın.",
       "startFree": "Ücretsiz Denemeyi Başlat",
       "viewPricing": "Fiyatlandırmayı Görüntüle"
@@ -359,7 +362,22 @@
     "latestJobsSubtitle": "PreScreen AI kullanan şirketlerin en son iş ilanlarına göz atın",
     "noJobsYet": "Henüz iş ilanı yok. Yakında tekrar kontrol edin!",
     "noJobsCheckBack": "Yeni fırsatlar için kısa süre sonra tekrar kontrol edin",
-    "remote": "Uzaktan"
+    "remote": "Uzaktan",
+    "heroPreview": {
+      "live": "Yapay zekâ görüşmesi · canlı",
+      "interviewer": "Yapay zekâ görüşmecisi",
+      "question": "Yakın zamanda çözdüğünüz zor bir problemi anlatın.",
+      "overallScore": "Genel puan",
+      "advancing": "Görüşmeye geçiyor"
+    },
+    "trust": {
+      "label": "Şu ekipler güveniyor"
+    },
+    "telegram": {
+      "prefer": "Telegram mı tercih edersiniz?",
+      "apply": "Telegram ile başvur",
+      "recruiter": "İşe alımcı mı? İK botu"
+    }
   },
   "dashboard": {
     "greeting": {
@@ -420,7 +438,9 @@
       "recommendedJobs": "Önerilen İşler",
       "noRecommendations": "Henüz öneri yok",
       "noRecommendationsHint": "Yeni iş fırsatları burada görünecek"
-    }
+    },
+    "candidatesScreened": "Taranan adaylar",
+    "avgScore": "Ort. puan"
   },
   "analytics": {
     "title": "Analitik",
@@ -664,6 +684,19 @@
       "languageAndInstructions": "Dil ve talimatlar",
       "languageHint": "AI adaylarla nasıl konuşuyor ve AI temsilcisi için ekstra rehberlik."
     },
+    "instructions": {
+      "title": "AI instructions",
+      "hint": "Tell the AI what to focus on during this step. You can write in any language and include topics, rules, red flags, tone, or a plain text list of questions.",
+      "placeholder": "Focus on real work experience with the required skills.\nAsk for concrete examples, not theory only.\nCheck motivation, availability, salary expectations, and communication clarity.\nBe strict about claims that do not match the candidate's CV.\nAlso ask:\n- Why are you interested in this role?\n- When can you start?",
+      "example": "Example: Focus on React, TypeScript, REST APIs, and teamwork. Ask for one real project example and one difficult technical decision. Be friendly but verify vague senior-level claims.",
+      "generate": "Generate AI Instructions",
+      "generated": "AI instructions generated",
+      "styleLight": "Light",
+      "styleBalanced": "Balanced",
+      "styleStrict": "Strict",
+      "advancedQuestions": "Advanced: sample questions",
+      "advancedQuestionsHint": "Optional question seeds for the AI. The agent treats them as guidance and may ask natural follow-ups instead of following a rigid script."
+    },
     "settings": {
       "visibility": "Görünürlük ve uygulama",
       "interviewStep": "Mülakat adımı",
@@ -810,8 +843,18 @@
       "validation": {
         "nameRequired": "Ad gerekli",
         "emailRequired": "E-posta gerekli",
-        "emailInvalid": "Geçersiz e-posta biçimi"
-      }
+        "emailInvalid": "Geçersiz e-posta biçimi",
+        "consentRequired": "Devam etmek için ön eleme ve gizlilik şartlarını kabul edin"
+      },
+      "profilePhoto": "Profil fotoğrafı",
+      "choosePhoto": "Fotoğraf yükle",
+      "profilePhotoHint": "İsteğe bağlı — başvurunuza bir yüz ekler (en fazla 5 MB).",
+      "linkedin": "LinkedIn / portföy",
+      "coverNote": "Neden uygunsunuz? (isteğe bağlı)",
+      "coverNotePlaceholder": "Bu rolün size neden uygun olduğuna dair birkaç cümle…",
+      "consent": "Yapay zeka ön eleme ve gizlilik şartlarını kabul ediyorum.",
+      "backgroundLabel": "Geçmişinizi nasıl paylaşmak istersiniz?",
+      "linkedinRefHint": "İşe alımcı için bir referans bağlantısı — yapay zekâ ön elemesi tarafından analiz edilmez."
     },
     "dialogs": {
       "bulkConfirmHeader": "Toplu İşlemi Onayla",
@@ -981,6 +1024,13 @@
     "noCandidatesApplied": "Henüz aday başvurusu yapılmadı",
     "candidateBase": {
       "applications": "Başvurular"
+    },
+    "appliedFor": "Pozisyon",
+    "aiScore": "AI puanı",
+    "scoreTier": {
+      "strong": "Güçlü",
+      "good": "İyi",
+      "weak": "Zayıf"
     }
   },
   "interviews": {
@@ -1279,10 +1329,17 @@
         "admin": "Yönetici",
         "hr": "İK Müdürü",
         "candidate": "aday"
-      }
+      },
+      "activeMembers": "aktif üye",
+      "pendingInvitations": "bekleyen davet"
     },
     "language": "Dil",
-    "theme": "Tema"
+    "theme": "Tema",
+    "account": {
+      "title": "Hesap",
+      "role": "Rol",
+      "memberSince": "Üyelik tarihi"
+    }
   },
   "subscriptions": {
     "title": "Abonelik",

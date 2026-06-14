@@ -8,12 +8,11 @@
 import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import GlassCard from '@/shared/components/GlassCard.vue'
 import { extractErrorMessage } from '@/shared/api/errors'
 import { useCandidateStore } from '../stores/candidate.store'
 import { useInterviewData } from '../composables/useInterviewData'
 import CandidateActions from '../components/CandidateActions.vue'
-import CandidateScoreCard from '../components/CandidateScoreCard.vue'
+import CandidateDetailHero from '../components/CandidateDetailHero.vue'
 import CandidateDetailTabs from '../components/CandidateDetailTabs.vue'
 import { candidateService } from '../services/candidate.service'
 import { calculateOverallScore } from '../utils/score'
@@ -113,27 +112,12 @@ function handleShareTokenRotated(token: string): void {
 
 <template>
   <div class="space-y-4">
-    <div class="flex items-center gap-2 sm:gap-3">
-      <button
-        class="shrink-0 rounded-lg p-1.5 text-[color:var(--color-text-muted)] transition-colors hover:bg-[color:var(--color-surface-sunken)] hover:text-[color:var(--color-text-primary)]"
-        @click="router.back()"
-      >
-        <i class="pi pi-arrow-left"></i>
-      </button>
-      <div class="min-w-0 flex-1">
-        <h1
-          class="truncate text-lg font-bold text-[color:var(--color-text-primary)] sm:text-xl md:text-2xl"
-        >
-          {{ candidate?.candidateName ?? t('common.loading') }}
-        </h1>
-        <p
-          v-if="candidate"
-          class="truncate text-xs text-[color:var(--color-text-muted)] sm:text-sm"
-        >
-          {{ candidate.vacancyTitle }}
-        </p>
-      </div>
-    </div>
+    <button
+      class="inline-flex items-center gap-2 text-sm text-[color:var(--color-text-muted)] transition-colors hover:text-[color:var(--color-text-primary)]"
+      @click="router.back()"
+    >
+      <i class="pi pi-arrow-left"></i> {{ t('nav.candidates') }}
+    </button>
 
     <p v-if="candidateStore.error" class="text-sm text-[color:var(--color-danger)]">
       {{ candidateStore.error }}
@@ -143,50 +127,38 @@ function handleShareTokenRotated(token: string): void {
     </div>
 
     <template v-else-if="candidate">
-      <GlassCard class="!p-3">
-        <CandidateActions
-          :candidate-id="candidate.id"
-          :candidate-name="candidate.candidateName"
-          :candidate-email="candidate.candidateEmail"
-          :current-status="candidate.status"
-          :loading="candidateStore.loading"
-          :interview-enabled="candidate.interviewEnabled"
-          :hiring-manager-token="candidate.hiringManagerToken"
-          @status-change="handleStatusChange"
-          @reset-screening="handleResetScreening"
-          @share-token-rotated="handleShareTokenRotated"
-        />
-      </GlassCard>
-
-      <div class="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_20rem]">
-        <div class="min-w-0">
-          <CandidateDetailTabs
-            :candidate="candidate"
+      <CandidateDetailHero :candidate="candidate" :overall-score="overallScore">
+        <template #actions>
+          <CandidateActions
+            :candidate-id="candidate.id"
+            :candidate-name="candidate.candidateName"
+            :candidate-email="candidate.candidateEmail"
+            :current-status="candidate.status"
             :loading="candidateStore.loading"
-            :active-tab="activeTab"
-            :prescanning-score="effectivePrescanningScore"
-            :interview-score="effectiveInterviewScore"
-            :ai-summary="aiSummary"
-            :ai-summary-translations="aiSummaryTranslations"
-            :ai-summary-interview-id="aiSummaryInterviewId"
-            :analysis-sessions="analysisSessions"
-            @update:active-tab="activeTab = $event"
-            @update:ai-summary-translations="aiSummaryTranslations = $event"
-            @save-notes="handleSaveNotes"
-            @download-cv="handleDownloadCv"
+            :interview-enabled="candidate.interviewEnabled"
+            :hiring-manager-token="candidate.hiringManagerToken"
+            @status-change="handleStatusChange"
+            @reset-screening="handleResetScreening"
+            @share-token-rotated="handleShareTokenRotated"
           />
-        </div>
-        <aside class="hidden lg:block">
-          <div class="sticky top-4">
-            <CandidateScoreCard
-              :overall-score="overallScore"
-              :prescanning-score="effectivePrescanningScore"
-              :interview-score="effectiveInterviewScore"
-              :cv-match-score="candidate.matchScore"
-            />
-          </div>
-        </aside>
-      </div>
+        </template>
+      </CandidateDetailHero>
+
+      <CandidateDetailTabs
+        :candidate="candidate"
+        :loading="candidateStore.loading"
+        :active-tab="activeTab"
+        :prescanning-score="effectivePrescanningScore"
+        :interview-score="effectiveInterviewScore"
+        :ai-summary="aiSummary"
+        :ai-summary-translations="aiSummaryTranslations"
+        :ai-summary-interview-id="aiSummaryInterviewId"
+        :analysis-sessions="analysisSessions"
+        @update:active-tab="activeTab = $event"
+        @update:ai-summary-translations="aiSummaryTranslations = $event"
+        @save-notes="handleSaveNotes"
+        @download-cv="handleDownloadCv"
+      />
     </template>
   </div>
 </template>

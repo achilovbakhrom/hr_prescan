@@ -7,7 +7,11 @@ from rest_framework.views import APIView
 
 from apps.accounts.models import CandidateCV
 from apps.applications.serializers import ApplicationDetailOutputSerializer
-from apps.applications.services import submit_application, upload_cv_to_s3
+from apps.applications.services import (
+    submit_application,
+    upload_cv_to_s3,
+    upload_profile_photo_to_s3,
+)
 from apps.common.exceptions import ApplicationError
 
 
@@ -28,6 +32,20 @@ class SubmitApplicationApi(APIView):
         )
         cv_file = serializers.FileField(required=False, allow_null=True, default=None)
         cv_id = serializers.UUIDField(required=False, allow_null=True, default=None)
+        profile_photo = serializers.ImageField(required=False, allow_null=True, default=None)
+        linkedin_url = serializers.CharField(
+            max_length=500,
+            required=False,
+            allow_blank=True,
+            default="",
+        )
+        cover_note = serializers.CharField(
+            max_length=2000,
+            required=False,
+            allow_blank=True,
+            default="",
+        )
+        prescreen_consent = serializers.BooleanField(required=False, default=False)
 
     def _resolve_cv(self, request, data, vacancy_id):
         """Resolve CV from uploaded file or existing profile CV."""
@@ -65,6 +83,11 @@ class SubmitApplicationApi(APIView):
         except ApplicationError as e:
             return Response({"detail": e.message}, status=status.HTTP_400_BAD_REQUEST)
 
+        photo_file = data.pop("profile_photo", None)
+        profile_photo_path = ""
+        if photo_file:
+            profile_photo_path = upload_profile_photo_to_s3(file_obj=photo_file, vacancy_id=vacancy_id)
+
         candidate = None
         if request.user and request.user.is_authenticated:
             candidate = request.user
@@ -75,6 +98,7 @@ class SubmitApplicationApi(APIView):
                 candidate=candidate,
                 cv_file_path=cv_file_path,
                 cv_original_filename=cv_original_filename,
+                profile_photo=profile_photo_path,
                 **data,
             )
         except ApplicationError as e:

@@ -111,7 +111,8 @@
     "cvBuilder": "CV yaratish",
     "myCvs": "Mening CV larim",
     "hrAnalytics": "Analitika",
-    "candidateBase": "Nomzodlar bazasi"
+    "candidateBase": "Nomzodlar bazasi",
+    "instructions": "Qanday ishlaydi"
   },
   "validation": {
     "required": "Bu maydon majburiy",
@@ -226,8 +227,8 @@
   },
   "landing": {
     "hero": {
-      "title": "HR intervyusidan oldin qat'iy AI prescreening",
-      "subtitle": "PreScreen AI ish e'lonlari doskasi yoki CV yaratuvchi emas. U dinamik nomzod filtrlarini qo'shadi, tuzilgan AI prescreening o'tkazadi va HRga faqat e'tiborga arziydigan nomzodlarni ko'rsatadi.",
+      "title": "100 ta rezyumeni qoʻlda koʻrishni bas qiling.",
+      "subtitle": "PreScreen AI har bir nomzod bilan suhbatlashadi va reytingli qisqa roʻyxat beradi — shunda siz faqat vaqtingizga arzigulik odamlar bilan uchrashasiz.",
       "getStarted": "Bepul boshlash",
       "cta": "Sinov muddatini boshlash",
       "demo": "Demoni ko'rish",
@@ -243,7 +244,8 @@
       "openHrTelegram": "HR botini ochish",
       "publicJobsTitle": "Ochiq vakansiyalar ro'yxati",
       "publicJobsHint": "Faol vakansiyalarni ko'rish va accountga kirmasdan ariza yuborish uchun /jobs sahifasini oching.",
-      "openPublicJobs": "Vakansiyalarni ochish"
+      "openPublicJobs": "Vakansiyalarni ochish",
+      "trustedBy": "500+ ishga olish jamoasi ishonadi"
     },
     "mockup": {
       "title": "AI preskrining",
@@ -257,7 +259,7 @@
       }
     },
     "features": {
-      "title": "Nomzod tanlash uchun AI qatlami",
+      "title": "Saralash uchun kerakli hammasi.",
       "subtitle": "Tizim hiring jarayoningizga qat'iy filtrlar, avtomatik AI suhbatlari va dalillarga asoslangan baholash qo'shadi.",
       "aiPrescanning": "Aqlli oldindan tekshiruv",
       "aiPrescanningDesc": "Har bir nomzod majburiy filtrlar, mezonlar va rolga mos savollar bo'yicha AI chat orqali tekshiriladi.",
@@ -293,7 +295,8 @@
       "step3": "AI intervyu o'tkazadi",
       "step3Desc": "Mos nomzodlar qattiqroq chat yoki video intervyuga o'tadi.",
       "step4": "Ko'rib chiqish va yollash",
-      "step4Desc": "AI ballarini ko'ring, yozuvlarni tomosha qiling va asosli yollash qarorlarini qabul qiling."
+      "step4Desc": "AI ballarini ko'ring, yozuvlarni tomosha qiling va asosli yollash qarorlarini qabul qiling.",
+      "heading": "Uch qadam. Qoʻlda saralash yoʻq."
     },
     "stats": {
       "companies": "Kompaniyalar",
@@ -308,7 +311,7 @@
       "freeTrial": "14 kunlik bepul sinov"
     },
     "cta": {
-      "title": "AI tekshiruvni o'z zimmasiga olishga tayyormisiz?",
+      "title": "Tezroq ishga olishga tayyormisiz?",
       "subtitle": "AI intervyular bilan tekshiruv vaqtini 90% tejayotgan kompaniyalarga qo'shiling.",
       "startFree": "Sinov muddatini boshlash",
       "viewPricing": "Narxlarni ko'rish"
@@ -359,7 +362,22 @@
     "latestJobsSubtitle": "PreScreen AI dan foydalanayotgan kompaniyalarning so'nggi ish o'rinlarini ko'ring",
     "noJobsYet": "Hozircha ish o'rinlari yo'q. Tez orada tekshirib ko'ring!",
     "noJobsCheckBack": "Yangi imkoniyatlar uchun tez orada qayta tekshiring",
-    "remote": "Masofaviy"
+    "remote": "Masofaviy",
+    "heroPreview": {
+      "live": "AI suhbati · jonli",
+      "interviewer": "AI suhbatdosh",
+      "question": "Yaqinda hal qilgan murakkab muammoingiz haqida gapiring.",
+      "overallScore": "Umumiy ball",
+      "advancing": "Suhbatga oʻtadi"
+    },
+    "trust": {
+      "label": "Bizga ishonadigan jamoalar"
+    },
+    "telegram": {
+      "prefer": "Telegramni afzal koʻrasizmi?",
+      "apply": "Telegram orqali ariza berish",
+      "recruiter": "Rekruter? HR bot"
+    }
   },
   "dashboard": {
     "greeting": {
@@ -420,7 +438,9 @@
       "recommendedJobs": "Tavsiya etilgan ishlar",
       "noRecommendations": "Hozircha tavsiyalar yo'q",
       "noRecommendationsHint": "Yangi ish o'rinlari bu yerda ko'rinadi"
-    }
+    },
+    "candidatesScreened": "Tekshirilgan nomzodlar",
+    "avgScore": "O'rtacha ball"
   },
   "analytics": {
     "title": "Analitika",
@@ -664,6 +684,19 @@
       "languageAndInstructions": "Til va ko'rsatmalar",
       "languageHint": "AI nomzodlar bilan qaysi tilda gaplashadi va qo'shimcha ko'rsatmalar."
     },
+    "instructions": {
+      "title": "AI uchun ko'rsatmalar",
+      "hint": "Ushbu bosqichda AI nimalarga e'tibor berishini yozing. Istalgan tilda yozishingiz, mavzular, qoidalar, red flaglar, ohang yoki savollar ro'yxatini qo'shishingiz mumkin.",
+      "placeholder": "Majburiy ko'nikmalar bo'yicha real ish tajribasiga e'tibor ber.\nFaqat nazariya emas, aniq misollar so'ra.\nMotivatsiya, qachon boshlashi, maosh kutilmalari va muloqot ravshanligini tekshir.\nCV bilan mos kelmaydigan da'volarga qat'iyroq bo'l.\nShuningdek so'ra:\n- Nega bu rol sizga qiziq?\n- Qachon boshlay olasiz?",
+      "example": "Misol: React, TypeScript, REST API va jamoaviy ishga e'tibor ber. Bitta real loyiha va bitta murakkab texnik qaror haqida so'ra. Do'stona bo'l, lekin noaniq senior da'volarni tekshir.",
+      "generate": "AI ko'rsatmalarini yaratish",
+      "generated": "AI ko'rsatmalari yaratildi",
+      "styleLight": "Yengil",
+      "styleBalanced": "Muvozanatli",
+      "styleStrict": "Qat'iy",
+      "advancedQuestions": "Qo'shimcha: namunaviy savollar",
+      "advancedQuestionsHint": "AI uchun ixtiyoriy savol yo'nalishlari. Agent ularni qat'iy skript emas, yo'l-yo'riq sifatida ishlatadi va tabiiy follow-up savollar beradi."
+    },
     "settings": {
       "visibility": "Ko'rinish va arizalar",
       "interviewStep": "Suhbat bosqichi",
@@ -810,8 +843,18 @@
       "validation": {
         "nameRequired": "Ism majburiy",
         "emailRequired": "Email majburiy",
-        "emailInvalid": "Email formati noto'g'ri"
-      }
+        "emailInvalid": "Email formati noto'g'ri",
+        "consentRequired": "Davom etish uchun dastlabki tekshiruv va maxfiylik shartlarini qabul qiling"
+      },
+      "profilePhoto": "Profil rasmi",
+      "choosePhoto": "Rasm yuklash",
+      "profilePhotoHint": "Ixtiyoriy — arizangizga yuz qo'shadi (maks. 5 MB).",
+      "linkedin": "LinkedIn / portfolio",
+      "coverNote": "Nega mos kelasiz? (ixtiyoriy)",
+      "coverNotePlaceholder": "Bu lavozim sizga nega mos kelishi haqida bir necha jumla…",
+      "consent": "Men AI dastlabki tekshiruv va maxfiylik shartlariga roziman.",
+      "backgroundLabel": "Tajribangizni qanday ulashmoqchisiz?",
+      "linkedinRefHint": "Rekruter uchun havola — uni AI dastlabki tekshiruvi tahlil qilmaydi."
     },
     "dialogs": {
       "bulkConfirmHeader": "Ommaviy amalni tasdiqlash",
@@ -981,6 +1024,13 @@
     "noCandidatesApplied": "Hozircha hech kim ariza topshirmagan",
     "candidateBase": {
       "applications": "Arizalar"
+    },
+    "appliedFor": "Lavozim",
+    "aiScore": "AI bahosi",
+    "scoreTier": {
+      "strong": "Kuchli",
+      "good": "Yaxshi",
+      "weak": "Zaif"
     }
   },
   "interviews": {
@@ -1279,10 +1329,17 @@
         "admin": "Administrator",
         "hr": "HR-menejer",
         "candidate": "Nomzod"
-      }
+      },
+      "activeMembers": "faol aʼzo",
+      "pendingInvitations": "kutilayotgan taklif"
     },
     "language": "Til",
-    "theme": "Mavzu"
+    "theme": "Mavzu",
+    "account": {
+      "title": "Hisob",
+      "role": "Rol",
+      "memberSince": "A'zo bo'lgan sana"
+    }
   },
   "subscriptions": {
     "title": "Obuna",

@@ -130,7 +130,7 @@ def _suppress_stale_failures(actions_taken):
     """Drop failed actions that a later successful call to the same tool superseded.
 
     The ReAct agent commonly retries: e.g. publish_vacancy fails because
-    questions don't exist yet, the agent then calls generate_questions, then
+    criteria don't exist yet, the agent then calls generate_criteria, then
     re-tries publish_vacancy. The retry succeeds and the vacancy IS published,
     but the original failure is still in the trace. Surfacing it confuses
     the user ("you said it failed, but it's published?"). Keep only the

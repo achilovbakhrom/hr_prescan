@@ -4,19 +4,23 @@
  * Left rail: SettingsNav, content: personal + invitations + telegram.
  * Spec: docs/design/spec.md §9.
  */
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Message from 'primevue/message'
 import { useAuthStore } from '@/features/auth/stores/auth.store'
 import { authService } from '@/features/auth/services/auth.service'
-import SettingsNav from '../components/SettingsNav.vue'
+import { ROUTE_NAMES } from '@/shared/constants/routes'
 import TelegramConnection from '../components/TelegramConnection.vue'
 import ProfileInvitationsCard from '../components/ProfileInvitationsCard.vue'
 import ProfilePersonalCard from '../components/ProfilePersonalCard.vue'
+import SettingsAccountCard from '../components/SettingsAccountCard.vue'
 import type { PendingInvitation } from '@/shared/types/auth.types'
 
 const { t } = useI18n()
+const router = useRouter()
 const authStore = useAuthStore()
+const isAdmin = computed(() => authStore.user?.role === 'admin')
 
 const firstName = ref('')
 const lastName = ref('')
@@ -31,11 +35,21 @@ const acceptingToken = ref<string | null>(null)
 
 const activeSection = ref('personal')
 
-const navItems = [
-  { id: 'invitations', labelKey: 'settings.profile.invitations', icon: 'pi pi-envelope' },
-  { id: 'personal', labelKey: 'settings.profile.personalInfo', icon: 'pi pi-user' },
-  { id: 'notifications', labelKey: 'settings.profile.notifications', icon: 'pi pi-bell' },
-]
+const tabs = computed(() => [
+  { id: 'profile', label: t('nav.profile'), active: true },
+  ...(isAdmin.value
+    ? [{ id: 'team', label: t('nav.team'), route: ROUTE_NAMES.TEAM_MANAGEMENT }]
+    : []),
+  { id: 'notifications', label: t('settings.profile.notifications'), scroll: 'notifications' },
+  ...(isAdmin.value
+    ? [{ id: 'billing', label: t('nav.subscription'), route: ROUTE_NAMES.SUBSCRIPTION }]
+    : []),
+])
+
+function onTab(tab: { route?: string; scroll?: string }): void {
+  if (tab.route) router.push({ name: tab.route })
+  else if (tab.scroll) scrollToSection(tab.scroll)
+}
 
 onMounted(() => {
   if (authStore.user) {
@@ -87,7 +101,7 @@ function scrollToSection(id: string): void {
 </script>
 
 <template>
-  <div class="mx-auto max-w-7xl">
+  <div class="w-full">
     <header class="mb-6 flex flex-col gap-1">
       <h1 class="text-3xl font-semibold tracking-tight text-[color:var(--color-text-primary)]">
         {{ t('settings.profile.title') }}
@@ -97,9 +111,26 @@ function scrollToSection(id: string): void {
       </p>
     </header>
 
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-[220px_1fr]">
-      <SettingsNav :active-id="activeSection" :items="navItems" @select="scrollToSection" />
+    <div
+      class="mb-6 -mx-1 flex gap-1 overflow-x-auto border-b border-[color:var(--color-border-soft)] px-1"
+    >
+      <button
+        v-for="tab in tabs"
+        :key="tab.id"
+        type="button"
+        class="shrink-0 border-b-2 px-3 pb-3 text-sm font-medium transition-colors"
+        :class="
+          tab.active
+            ? 'border-[color:var(--color-accent)] text-[color:var(--color-accent)]'
+            : 'border-transparent text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-text-primary)]'
+        "
+        @click="onTab(tab)"
+      >
+        {{ tab.label }}
+      </button>
+    </div>
 
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_340px]">
       <div class="space-y-6">
         <Message
           v-if="successMessage"
@@ -137,6 +168,10 @@ function scrollToSection(id: string): void {
           />
         </div>
       </div>
+
+      <aside>
+        <SettingsAccountCard />
+      </aside>
     </div>
   </div>
 </template>

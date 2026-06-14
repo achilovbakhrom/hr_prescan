@@ -19,7 +19,6 @@ from apps.integrations.telegram_bot.candidate.menus import (
     CB_MENU,
     CB_VAC_APPLY,
     ai_mode_keyboard,
-    main_menu_keyboard,
     parse_callback,
     send_main_menu,
 )
@@ -39,7 +38,9 @@ def handle_callback(*, client, callback: dict) -> None:
 
 def process_callback(*, client, callback: dict) -> None:
     data = callback.get("data", "")
-    chat_id = callback.get("message", {}).get("chat", {}).get("id")
+    message = callback.get("message", {})
+    chat_id = message.get("chat", {}).get("id")
+    message_id = message.get("message_id")
     sender = callback.get("from", {})
     telegram_id = sender.get("id")
     if not chat_id or not telegram_id:
@@ -81,18 +82,21 @@ def process_callback(*, client, callback: dict) -> None:
         _confirm_apply(client=client, chat_id=chat_id, user=user, arg=arg, session=session, lang=lang)
     elif action == CB_AI_START:
         update_session(role=ROLE_CANDIDATE, telegram_id=telegram_id, ai_mode=True)
-        client.send_message(
+        from apps.integrations.telegram_bot.screens import send_screen
+
+        send_screen(
+            client=client,
+            role=ROLE_CANDIDATE,
+            telegram_id=telegram_id,
             chat_id=chat_id,
             text=t("candidate.ai_mode_started", lang=lang),
             reply_markup=ai_mode_keyboard(lang=lang),
+            screen_name="ai_mode",
+            source_message_id=message_id,
         )
     elif action == CB_AI_EXIT:
         update_session(role=ROLE_CANDIDATE, telegram_id=telegram_id, ai_mode=False)
-        client.send_message(
-            chat_id=chat_id,
-            text=t("candidate.ai_mode_stopped", lang=lang),
-            reply_markup=main_menu_keyboard(lang=lang),
-        )
+        send_main_menu(client=client, chat_id=chat_id, lang=lang, telegram_id=telegram_id, source_message_id=message_id)
     elif action == CB_JOB_SEARCH:
         _route_button_to_assistant(
             client=client,
@@ -112,7 +116,8 @@ def process_callback(*, client, callback: dict) -> None:
     elif action == CB_MESSAGES:
         show_recent_messages(client=client, chat_id=chat_id, user=user, lang=lang)
     elif action == CB_MENU:
-        send_main_menu(client=client, chat_id=chat_id, lang=lang)
+        update_session(role=ROLE_CANDIDATE, telegram_id=telegram_id, ai_mode=False, state="")
+        send_main_menu(client=client, chat_id=chat_id, lang=lang, telegram_id=telegram_id, source_message_id=message_id)
     elif data.startswith("cand:ps:"):
         from apps.integrations.telegram_bot.candidate.prescreening import handle_prescreening_callback
 

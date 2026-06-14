@@ -34,6 +34,12 @@ const navItems = computed<NavItem[]>(() => [
     roles: [USER_ROLES.ADMIN, USER_ROLES.HR, USER_ROLES.CANDIDATE],
   },
   {
+    label: t('nav.instructions'),
+    icon: 'pi pi-book',
+    to: '/instructions',
+    roles: [USER_ROLES.ADMIN, USER_ROLES.HR],
+  },
+  {
     label: t('nav.vacancies'),
     icon: 'pi pi-briefcase',
     to: '/vacancies',
@@ -115,7 +121,9 @@ function isActive(path: string): boolean {
           :to="item.to"
           class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors"
           :class="
-            isActive(item.to) ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-100'
+            isActive(item.to)
+              ? 'bg-[color:var(--color-accent-soft)] text-[color:var(--color-accent)]'
+              : 'text-gray-700 hover:bg-gray-100'
           "
           :aria-current="isActive(item.to) ? 'page' : undefined"
         >

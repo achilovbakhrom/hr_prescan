@@ -67,7 +67,6 @@ class VacancyListCreateApi(APIView):
         )
         interview_enabled = serializers.BooleanField(required=False, default=False)
         cv_required = serializers.BooleanField(required=False, default=False)
-        interview_duration = serializers.IntegerField(required=False, default=30)
         company_info = serializers.CharField(required=False, allow_blank=True, default="")
         prescanning_prompt = serializers.CharField(required=False, allow_blank=True, default="")
         interview_prompt = serializers.CharField(required=False, allow_blank=True, default="")

@@ -13,12 +13,11 @@ from apps.integrations.telegram_bot.candidate.states import (
     STATE_PS_INTERVIEW,
 )
 from apps.integrations.telegram_bot.i18n import t
-from apps.integrations.telegram_bot.sessions import clear_session, update_session
+from apps.integrations.telegram_bot.sessions import update_session
 
 
 def resume_bot_interview(*, client, chat_id: int, user, interview, lang: str) -> None:
     from apps.interviews.models import Interview
-    from apps.vacancies.models import InterviewQuestion
 
     if interview.session_type != Interview.SessionType.PRESCANNING:
         client.send_message(chat_id=chat_id, text=t("candidate.ps_not_available", lang=lang))
@@ -30,20 +29,6 @@ def resume_bot_interview(*, client, chat_id: int, user, interview, lang: str) ->
         Interview.Status.EXPIRED,
     ):
         client.send_message(chat_id=chat_id, text=t("candidate.ps_not_available", lang=lang))
-        return
-
-    questions = list(
-        InterviewQuestion.objects.filter(
-            vacancy_id=interview.application.vacancy_id,
-            step="prescanning",
-            is_active=True,
-        )
-        .order_by("order")
-        .values_list("text", flat=True)
-    )
-    if not questions:
-        client.send_message(chat_id=chat_id, text=t("candidate.ps_no_questions", lang=lang))
-        clear_session(role=ROLE_CANDIDATE, telegram_id=user.telegram_id)
         return
 
     if interview.status == Interview.Status.IN_PROGRESS and interview.channel != Interview.Channel.TELEGRAM:

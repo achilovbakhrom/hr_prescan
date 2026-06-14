@@ -40,6 +40,12 @@ class Application(BaseModel):
     cv_file = models.CharField(max_length=500, blank=True, default="")  # MinIO path
     cv_original_filename = models.CharField(max_length=255, blank=True, default="")
 
+    # Optional candidate-supplied extras (collected on the apply form)
+    profile_photo = models.CharField(max_length=500, blank=True, default="")  # MinIO path
+    linkedin_url = models.CharField(max_length=500, blank=True, default="")  # LinkedIn/portfolio link
+    cover_note = models.TextField(blank=True, default="")  # "Why are you a great fit?"
+    prescreen_consent = models.BooleanField(default=False)  # agreed to AI prescreening & privacy
+
     # AI-parsed data (populated by Celery tasks)
     cv_parsed_text = models.TextField(blank=True, default="")  # raw extracted text
     cv_parsed_data = models.JSONField(default=dict, blank=True)  # structured: skills, experience, education
