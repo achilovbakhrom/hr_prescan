@@ -85,6 +85,15 @@ export const useCvBuilderProfileStore = defineStore('cvBuilderProfile', () => {
     }
   }
 
+  /**
+   * Merge edits into the in-memory profile immediately so the live preview
+   * reflects unsaved changes as the user types. Does NOT hit the API.
+   */
+  function patchProfileLocal(partial: Partial<CandidateProfile>): void {
+    if (!profile.value) return
+    profile.value = { ...profile.value, ...partial }
+  }
+
   async function fetchProfile(): Promise<void> {
     loading.value = true
     clearErrors()
@@ -140,6 +149,7 @@ export const useCvBuilderProfileStore = defineStore('cvBuilderProfile', () => {
     error,
     fieldErrors,
     clearErrors,
+    patchProfileLocal,
     fetchProfile,
     updateProfile,
     updateSkills,

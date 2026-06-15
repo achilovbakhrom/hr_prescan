@@ -1697,7 +1697,8 @@
       "photoUploadSuccess": "Фото загружено",
       "photoRemoveSuccess": "Фото удалено",
       "photoInvalidType": "Допустимы только JPEG, PNG или WEBP",
-      "photoTooLarge": "Фото должно быть меньше 5 МБ"
+      "photoTooLarge": "Фото должно быть меньше 5 МБ",
+      "fixErrors": "Исправьте выделенные поля перед сохранением"
     },
     "employmentTypes": {
       "fullTime": "Полная занятость",

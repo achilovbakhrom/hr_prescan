@@ -1697,7 +1697,8 @@
       "photoUploadSuccess": "Фото жүктеп салынды",
       "photoRemoveSuccess": "Фото өшірілді",
       "photoInvalidType": "Тек JPEG, PNG немесе WEBP кескіндеріне рұқсат етіледі",
-      "photoTooLarge": "Фотосурет көлемі 5 МБ-тан аз болуы керек"
+      "photoTooLarge": "Фотосурет көлемі 5 МБ-тан аз болуы керек",
+      "fixErrors": "Сақтамас бұрын белгіленген өрістерді түзетіңіз"
     },
     "employmentTypes": {
       "fullTime": "Толық уақыт",

@@ -1697,7 +1697,8 @@
       "photoUploadSuccess": "Fotoğraf yüklendi",
       "photoRemoveSuccess": "Fotoğraf kaldırıldı",
       "photoInvalidType": "Yalnızca JPEG, PNG veya WEBP resimlerine izin verilir",
-      "photoTooLarge": "Fotoğraf 5 MB'tan küçük olmalıdır"
+      "photoTooLarge": "Fotoğraf 5 MB'tan küçük olmalıdır",
+      "fixErrors": "Kaydetmeden önce işaretli alanları düzeltin"
     },
     "employmentTypes": {
       "fullTime": "Tam Zamanlı",

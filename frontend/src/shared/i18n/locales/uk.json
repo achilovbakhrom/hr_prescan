@@ -1697,7 +1697,8 @@
       "photoUploadSuccess": "Фото завантажено",
       "photoRemoveSuccess": "Фото видалено",
       "photoInvalidType": "Дозволяються лише зображення JPEG, PNG або WEBP",
-      "photoTooLarge": "Фото має бути менше 5 МБ"
+      "photoTooLarge": "Фото має бути менше 5 МБ",
+      "fixErrors": "Виправте виділені поля перед збереженням"
     },
     "employmentTypes": {
       "fullTime": "Повний робочий день",

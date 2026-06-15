@@ -1697,7 +1697,8 @@
       "photoUploadSuccess": "Foto subida",
       "photoRemoveSuccess": "Foto eliminada",
       "photoInvalidType": "Solo se permiten imágenes JPEG, PNG o WEBP",
-      "photoTooLarge": "La foto debe tener menos de 5 MB."
+      "photoTooLarge": "La foto debe tener menos de 5 MB.",
+      "fixErrors": "Corrige los campos resaltados antes de guardar"
     },
     "employmentTypes": {
       "fullTime": "Tiempo completo",

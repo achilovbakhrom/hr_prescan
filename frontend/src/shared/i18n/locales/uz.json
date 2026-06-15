@@ -1697,7 +1697,8 @@
       "photoUploadSuccess": "Rasm yuklandi",
       "photoRemoveSuccess": "Rasm o'chirildi",
       "photoInvalidType": "Faqat JPEG, PNG yoki WEBP ruxsat etiladi",
-      "photoTooLarge": "Rasm 5 MB dan kichik bo'lishi kerak"
+      "photoTooLarge": "Rasm 5 MB dan kichik bo'lishi kerak",
+      "fixErrors": "Saqlashdan oldin belgilangan maydonlarni tuzating"
     },
     "employmentTypes": {
       "fullTime": "To'liq stavka",

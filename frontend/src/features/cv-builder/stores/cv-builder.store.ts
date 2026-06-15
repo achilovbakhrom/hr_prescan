@@ -3,6 +3,7 @@ import { useCvBuilderProfileStore } from './cv-builder-profile.store'
 import { useCvBuilderCvStore } from './cv-builder-cv.store'
 import { computed } from 'vue'
 import type {
+  CandidateProfile,
   ProfileUpdatePayload,
   WorkExperiencePayload,
   EducationPayload,
@@ -43,6 +44,7 @@ export const useCvBuilderStore = defineStore('cvBuilder', () => {
 
   // Delegate to profile store
   const fetchProfile = profileStore.fetchProfile.bind(profileStore)
+  const patchProfileLocal = (p: Partial<CandidateProfile>) => profileStore.patchProfileLocal(p)
   const updateProfile = (d: ProfileUpdatePayload) => profileStore.updateProfile(d)
   const updateSkills = (s: string[]) => profileStore.updateSkills(s)
   const uploadPhoto = (file: File) => profileStore.uploadPhoto(file)
@@ -78,6 +80,7 @@ export const useCvBuilderStore = defineStore('cvBuilder', () => {
     fieldErrors,
     clearErrors,
     fetchProfile,
+    patchProfileLocal,
     updateProfile,
     updateSkills,
     uploadPhoto,
