@@ -9,6 +9,13 @@ from apps.applications.services.application_reopen import (
     get_existing_application,
     reopen_application,
 )
+from apps.applications.services.application_submit_helpers import (
+    enqueue_cv_processing,
+    notify_candidate_prescanning_ready,
+    notify_hr_application_received,
+    submission_result,
+    sync_candidate_base,
+)
 from apps.applications.services.cv_selection import get_candidate_platform_cv, is_candidate_platform_cv_file
 from apps.applications.services.profile_cv_snapshot import (
     apply_candidate_profile_cv_snapshot,
@@ -18,7 +25,9 @@ from apps.common.exceptions import ApplicationError
 from apps.common.language import resolve_interview_language
 from apps.common.messages import (
     MSG_ALREADY_APPLIED,
+    MSG_CV_OR_LINKEDIN_NOT_BOTH,
     MSG_CV_REQUIRED,
+    MSG_PRESCREEN_CONSENT_REQUIRED,
     MSG_VACANCY_NOT_ACCEPTING,
     MSG_VACANCY_NOT_FOUND,
 )
@@ -54,6 +63,16 @@ def submit_application(
     if vacancy.status != Vacancy.Status.PUBLISHED:
         raise ApplicationError(str(MSG_VACANCY_NOT_ACCEPTING))
 
+    # Web apply requires explicit consent to AI pre-screening.
+    # The Telegram flow only collects name/contact/CV, so it is exempt.
+    if channel == "web" and not prescreen_consent:
+        raise ApplicationError(str(MSG_PRESCREEN_CONSENT_REQUIRED))
+
+    # CV-or-LinkedIn are mutually exclusive on the web path: a candidate
+    # provides one or the other, not both.
+    if channel == "web" and cv_file_path and linkedin_url:
+        raise ApplicationError(str(MSG_CV_OR_LINKEDIN_NOT_BOTH))
+
     if not cv_file_path:
         cv_file_path, cv_original_filename = get_candidate_platform_cv(candidate=candidate)
 
@@ -85,10 +104,11 @@ def submit_application(
             channel=channel,
         )
         snapshot_applied = apply_candidate_profile_cv_snapshot(application=application, snapshot=profile_snapshot)
-        _enqueue_cv_processing(application=application, cv_file_path=cv_file_path, snapshot_applied=snapshot_applied)
-        _sync_candidate_base(application=application)
-        _notify_candidate_prescanning_ready(application=application, prescan_session=prescan_session)
-        return _submission_result(application=application, prescan_session=prescan_session)
+        enqueue_cv_processing(application=application, cv_file_path=cv_file_path, snapshot_applied=snapshot_applied)
+        sync_candidate_base(application=application)
+        notify_candidate_prescanning_ready(application=application, prescan_session=prescan_session)
+        notify_hr_application_received(application=application)
+        return submission_result(application=application, prescan_session=prescan_session)
 
     try:
         application = Application.objects.create(
@@ -108,7 +128,7 @@ def submit_application(
         raise ApplicationError(str(MSG_ALREADY_APPLIED)) from None
 
     snapshot_applied = apply_candidate_profile_cv_snapshot(application=application, snapshot=profile_snapshot)
-    _enqueue_cv_processing(application=application, cv_file_path=cv_file_path, snapshot_applied=snapshot_applied)
+    enqueue_cv_processing(application=application, cv_file_path=cv_file_path, snapshot_applied=snapshot_applied)
 
     # Create prescanning session immediately (always chat mode)
     prescan_session = Interview.objects.create(
@@ -123,52 +143,10 @@ def submit_application(
     if vacancy.interview_enabled:
         create_interview_session(application=application)
 
-    _sync_candidate_base(application=application)
-    _notify_candidate_prescanning_ready(application=application, prescan_session=prescan_session)
-    return _submission_result(application=application, prescan_session=prescan_session)
-
-
-def _enqueue_cv_processing(*, application: Application, cv_file_path: str, snapshot_applied: bool = False) -> None:
-    if not cv_file_path and not snapshot_applied:
-        return
-    from django.db import transaction
-
-    from apps.applications.tasks import calculate_cv_match, process_cv
-
-    if cv_file_path:
-        transaction.on_commit(lambda: process_cv.delay(str(application.id)))
-    else:
-        transaction.on_commit(lambda: calculate_cv_match.delay(str(application.id)))
-
-
-def _sync_candidate_base(*, application: Application) -> None:
-    from django.db import transaction
-
-    from apps.applications.services.candidate_base import sync_hr_candidate_for_application
-
-    transaction.on_commit(lambda: sync_hr_candidate_for_application(application=application))
-
-
-def _notify_candidate_prescanning_ready(*, application: Application, prescan_session: Interview) -> None:
-    from apps.notifications.services import notify_candidate_prescanning_ready
-
+    sync_candidate_base(application=application)
     notify_candidate_prescanning_ready(application=application, prescan_session=prescan_session)
-
-
-def _submission_result(*, application: Application, prescan_session: Interview) -> dict:
-    interview_session = (
-        application.sessions.filter(session_type=Interview.SessionType.INTERVIEW)
-        .exclude(status=Interview.Status.CANCELLED)
-        .order_by("-created_at")
-        .first()
-    )
-    return {
-        "application": application,
-        "prescan_session": prescan_session,
-        "prescan_token": str(prescan_session.interview_token),
-        "interview_session": interview_session,
-        "interview_token": str(interview_session.interview_token) if interview_session else None,
-    }
+    notify_hr_application_received(application=application)
+    return submission_result(application=application, prescan_session=prescan_session)
 
 
 def create_interview_session(*, application: Application) -> Interview | None:

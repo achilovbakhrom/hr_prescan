@@ -1,9 +1,9 @@
 apiVersion: 1
 
 providers:
-  - name: "HR PreScan Dashboards"
+  - name: "HR PreScreen Dashboards"
     orgId: 1
-    folder: "HR PreScan"
+    folder: "HR PreScreen"
     folderUid: "hr-prescan"
     type: file
     disableDeletion: false

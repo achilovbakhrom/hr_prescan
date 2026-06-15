@@ -1,4 +1,4 @@
-# HR PreScan UI Redesign — Design Spec (T3)
+# HR PreScreen UI Redesign — Design Spec (T3)
 
 **Authoritative doc for implementation.** Read alongside `docs/design/research.md`.
 
@@ -374,7 +374,7 @@ All `<svg>`/CSS-only. All fixed-position (`position: fixed; inset: 0; pointer-ev
 
 - Preserve the existing `size` prop (sm/md/lg) and `linked`/`to` props.
 - Replace SVG body with the Prism spec above.
-- Add a `variant?: 'full' | 'glyph' | 'wordmark'` prop. `full` = glyph + "HR PreScan" wordmark in Geist 600; `glyph` = mark only (for collapsed sidebar, favicon); `wordmark` = text only (rare).
+- Add a `variant?: 'full' | 'glyph' | 'wordmark'` prop. `full` = glyph + "HR PreScreen" wordmark in Geist 600; `glyph` = mark only (for collapsed sidebar, favicon); `wordmark` = text only (rare).
 - Hover: 2s subtle rotation of the prism (rotateY 0 → 8° → 0) + top beam opacity pulse. Reduced-motion: no rotation, keep color.
 
 ### Favicons / app icons
@@ -384,7 +384,7 @@ Generate from the glyph:
 - `public/favicon-32.png`, `public/favicon-16.png`.
 - `public/apple-touch-icon.png` — 180×180, full-bleed prism on white background, 10% padding.
 - `public/android-chrome-192.png`, `public/android-chrome-512.png` — maskable, prism centered on a `#0b0f17` safe zone (40%).
-- `public/og-image.png` — 1200×630. Composition: prism glyph at 320px on the left, "HR PreScan" in Geist 700 at 88px, tagline "Pre-screen candidates in minutes, not hours" in Geist 500 at 32px. Background: Aurora-still (CSS gradient, flattened to PNG). Dark-mode version at `public/og-image-dark.png`.
+- `public/og-image.png` — 1200×630. Composition: prism glyph at 320px on the left, "HR PreScreen" in Geist 700 at 88px, tagline "Pre-screen candidates in minutes, not hours" in Geist 500 at 32px. Background: Aurora-still (CSS gradient, flattened to PNG). Dark-mode version at `public/og-image-dark.png`.
 
 ### Animated hover variant (top nav)
 

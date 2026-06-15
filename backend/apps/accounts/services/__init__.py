@@ -20,7 +20,11 @@ from apps.accounts.services.membership import (
     accept_invitation_existing_user,
     invite_hr,
 )
-from apps.accounts.services.team_management import activate_user, deactivate_user
+from apps.accounts.services.team_management import (
+    activate_user,
+    deactivate_user,
+    set_member_permissions,
+)
 from apps.accounts.services.user_company import (
     create_user_company,
     soft_delete_company,
@@ -42,6 +46,7 @@ __all__ = [
     "invite_hr",
     "register_user",
     "set_default_company",
+    "set_member_permissions",
     "soft_delete_company",
     "switch_company",
     "switch_to_personal",

@@ -1,5 +1,5 @@
 """
-Shared email utilities for HR PreScan.
+Shared email utilities for HR PreScreen.
 
 Provides a simple wrapper around Django's send_mail that renders
 HTML templates with a consistent branded layout.

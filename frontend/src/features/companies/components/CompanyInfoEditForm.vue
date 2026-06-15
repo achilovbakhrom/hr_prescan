@@ -8,6 +8,7 @@ import { useI18n } from 'vue-i18n'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
 import Button from 'primevue/button'
+import CountryAutocomplete from '@/shared/components/CountryAutocomplete.vue'
 import type { Company } from '../types/company.types'
 
 const props = defineProps<{
@@ -20,6 +21,7 @@ const emit = defineEmits<{
     payload: {
       name: string
       customIndustry: string
+      country: string
       website: string
       description: string
     },
@@ -31,6 +33,7 @@ const { t } = useI18n()
 
 const name = ref(props.company.name)
 const customIndustry = ref(props.company.customIndustry)
+const country = ref(props.company.country ?? '')
 const website = ref(props.company.website ?? '')
 const description = ref(props.company.description ?? '')
 
@@ -39,6 +42,7 @@ watch(
   (c) => {
     name.value = c.name
     customIndustry.value = c.customIndustry
+    country.value = c.country ?? ''
     website.value = c.website ?? ''
     description.value = c.description ?? ''
   },
@@ -49,6 +53,7 @@ function handleSubmit(): void {
   emit('save', {
     name: name.value,
     customIndustry: customIndustry.value,
+    country: country.value,
     website: website.value,
     description: description.value,
   })
@@ -68,6 +73,12 @@ function handleSubmit(): void {
         {{ t('companies.industry') }}
       </label>
       <InputText v-model="customIndustry" class="w-full" />
+    </div>
+    <div>
+      <label class="mb-1 block text-sm font-medium text-[color:var(--color-text-secondary)]">
+        {{ t('companies.country') }}
+      </label>
+      <CountryAutocomplete v-model="country" class="block w-full" />
     </div>
     <div>
       <label class="mb-1 block text-sm font-medium text-[color:var(--color-text-secondary)]">

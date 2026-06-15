@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, watch, onMounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import Message from 'primevue/message'
+import { useToast } from 'primevue/usetoast'
 import PersonalInfoBasics from './PersonalInfoBasics.vue'
 import PersonalInfoLinks from './PersonalInfoLinks.vue'
 import PersonalInfoLocation from './PersonalInfoLocation.vue'
@@ -14,6 +14,7 @@ import { validateForm } from '@/shared/utils/form-validation'
 import { createPersonalInfoSchema } from '../validation/personal-info.schema'
 
 const { t } = useI18n()
+const toast = useToast()
 const store = useCvBuilderStore()
 
 const headline = ref('')
@@ -29,8 +30,6 @@ const desiredSalaryCurrency = ref('')
 const desiredSalaryNegotiable = ref(false)
 const desiredEmploymentType = ref('')
 const isOpenToWork = ref(false)
-const successMessage = ref<string | null>(null)
-const errorMessage = ref<string | null>(null)
 const fieldErrors = ref<FieldErrors>({})
 
 function populateForm(): void {
@@ -55,6 +54,21 @@ onMounted(() => {
   populateForm()
 })
 
+// Keep the in-memory profile in sync with edits so the live preview updates
+// as the user types (no API call until Save).
+watch(
+  [headline, summary, location, isOpenToWork],
+  () => {
+    store.patchProfileLocal({
+      headline: headline.value,
+      summary: summary.value,
+      location: location.value,
+      isOpenToWork: isOpenToWork.value,
+    })
+  },
+  { flush: 'post' },
+)
+
 function formatDate(date: Date | null): string | null {
   if (!date) return null
   const year = date.getFullYear()
@@ -63,9 +77,13 @@ function formatDate(date: Date | null): string | null {
   return `${year}-${month}-${day}`
 }
 
+function scrollToFirstError(): void {
+  document
+    .querySelector('.p-invalid, [data-field-error="true"]')
+    ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+}
+
 async function handleSave(): Promise<void> {
-  successMessage.value = null
-  errorMessage.value = null
   fieldErrors.value = {}
 
   const schema = createPersonalInfoSchema(t)
@@ -84,10 +102,13 @@ async function handleSave(): Promise<void> {
   })
   if (errors) {
     fieldErrors.value = errors
+    toast.add({
+      severity: 'warn',
+      summary: t('cvBuilder.personal.fixErrors'),
+      life: 4000,
+    })
     await nextTick()
-    document
-      .querySelector('.p-invalid, [data-field-error="true"]')
-      ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    scrollToFirstError()
     return
   }
 
@@ -107,19 +128,31 @@ async function handleSave(): Promise<void> {
       desiredEmploymentType: desiredEmploymentType.value || undefined,
       isOpenToWork: isOpenToWork.value,
     })
-    successMessage.value = t('cvBuilder.personal.saveSuccess')
+    toast.add({
+      severity: 'success',
+      summary: t('cvBuilder.personal.saveSuccess'),
+      life: 2500,
+    })
   } catch (err: unknown) {
+    let message: string
     if (err instanceof ApiValidationError) {
       fieldErrors.value = err.fieldErrors
-      errorMessage.value = err.message
+      message = err.message
     } else {
-      errorMessage.value = err instanceof Error ? err.message : t('common.error')
+      message = err instanceof Error ? err.message : t('common.error')
     }
+    toast.add({ severity: 'error', summary: message, life: 4000 })
     await nextTick()
-    document
-      .querySelector('.p-invalid, [data-field-error="true"]')
-      ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    scrollToFirstError()
   }
+}
+
+function onPhotoSuccess(message: string): void {
+  toast.add({ severity: 'success', summary: message, life: 2500 })
+}
+
+function onPhotoError(message: string): void {
+  toast.add({ severity: 'error', summary: message, life: 4000 })
 }
 
 defineExpose({ save: handleSave })
@@ -127,17 +160,14 @@ defineExpose({ save: handleSave })
 
 <template>
   <div>
-    <Message v-if="successMessage" severity="success" class="mb-4">{{ successMessage }}</Message>
-    <Message v-if="errorMessage" severity="error" class="mb-4">{{ errorMessage }}</Message>
-
     <form class="flex flex-col gap-5" @submit.prevent="handleSave">
-      <PersonalInfoPhoto @success="successMessage = $event" @error="errorMessage = $event" />
+      <PersonalInfoPhoto @success="onPhotoSuccess" @error="onPhotoError" />
 
       <PersonalInfoBasics
         v-model:headline="headline"
         v-model:summary="summary"
         :field-errors="fieldErrors"
-        @error="errorMessage = $event"
+        @error="onPhotoError"
       />
 
       <PersonalInfoLocation

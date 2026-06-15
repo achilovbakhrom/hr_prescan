@@ -1697,7 +1697,8 @@
       "photoUploadSuccess": "Photo uploaded",
       "photoRemoveSuccess": "Photo removed",
       "photoInvalidType": "Only JPEG, PNG, or WEBP images are allowed",
-      "photoTooLarge": "Photo must be smaller than 5 MB"
+      "photoTooLarge": "Photo must be smaller than 5 MB",
+      "fixErrors": "Please fix the highlighted fields before saving"
     },
     "employmentTypes": {
       "fullTime": "Full Time",

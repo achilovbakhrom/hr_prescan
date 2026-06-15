@@ -2,8 +2,6 @@ import logging
 from datetime import timedelta
 from decimal import Decimal
 
-from django.conf import settings
-from django.db import transaction
 from django.utils import timezone
 
 from apps.accounts.models import User
@@ -113,68 +111,3 @@ def cancel_subscription(*, subscription: UserSubscription) -> UserSubscription:
     subscription.user.save(update_fields=["subscription_status", "updated_at"])
 
     return subscription
-
-
-@transaction.atomic
-def expire_trial(*, user: User) -> None:
-    """Downgrade a user from trial to the Free plan."""
-    if not settings.BILLING_ENABLED:
-        return
-
-    free_plan = SubscriptionPlan.objects.filter(
-        tier=SubscriptionPlan.Tier.FREE,
-        is_active=True,
-    ).first()
-
-    if free_plan is None:
-        logger.error(
-            "Free plan not found — cannot downgrade user %s (%s) from trial.",
-            user.email,
-            user.id,
-        )
-        return
-
-    now = timezone.now()
-
-    UserSubscription.objects.update_or_create(
-        user=user,
-        defaults={
-            "plan": free_plan,
-            "billing_period": UserSubscription.BillingPeriod.MONTHLY,
-            "current_period_start": now,
-            "current_period_end": now + timedelta(days=30),
-            "is_active": True,
-        },
-    )
-
-    user.subscription_plan = free_plan
-    user.subscription_status = User.SubscriptionStatus.ACTIVE
-    user.save(update_fields=["subscription_plan", "subscription_status", "updated_at"])
-
-    logger.info(
-        "Trial expired for user %s (%s) — downgraded to Free plan.",
-        user.email,
-        user.id,
-    )
-
-
-def check_and_expire_trials() -> int:
-    """Check all trial users and downgrade expired ones. Returns count of expired trials."""
-    if not settings.BILLING_ENABLED:
-        return 0
-
-    now = timezone.now()
-    expired_users = User.objects.filter(
-        subscription_status=User.SubscriptionStatus.TRIAL,
-        trial_ends_at__lte=now,
-    )
-
-    count = 0
-    for user in expired_users:
-        expire_trial(user=user)
-        count += 1
-
-    if count:
-        logger.info("Expired %d trial(s).", count)
-
-    return count

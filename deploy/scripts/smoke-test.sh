@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# smoke-test.sh — Post-deployment smoke tests for HR PreScan
+# smoke-test.sh — Post-deployment smoke tests for HR PreScreen
 #
 # Usage:
 #   ./scripts/smoke-test.sh [BASE_URL]

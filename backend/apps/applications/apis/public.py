@@ -13,6 +13,7 @@ from apps.applications.services import (
     upload_profile_photo_to_s3,
 )
 from apps.common.exceptions import ApplicationError
+from apps.common.messages import MSG_CV_OR_LINKEDIN_NOT_BOTH
 
 
 class SubmitApplicationApi(APIView):
@@ -54,6 +55,11 @@ class SubmitApplicationApi(APIView):
 
         if cv_file and cv_id:
             raise ApplicationError("Provide either cv_file or cv_id, not both.")
+
+        # CV and LinkedIn/portfolio link are mutually exclusive. Reject before
+        # uploading to S3 to avoid orphaned files.
+        if (cv_file or cv_id) and data.get("linkedin_url"):
+            raise ApplicationError(str(MSG_CV_OR_LINKEDIN_NOT_BOTH))
 
         if cv_id:
             if not (request.user and request.user.is_authenticated):

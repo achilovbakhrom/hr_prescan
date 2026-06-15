@@ -1,5 +1,5 @@
 """
-WSGI config for HR PreScan.
+WSGI config for HR PreScreen.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 """

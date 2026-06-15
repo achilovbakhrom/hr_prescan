@@ -1,4 +1,4 @@
-# HR PreScan — Development Roadmap
+# HR PreScreen — Development Roadmap
 
 Each phase produces a working, deployable result. Tasks are ordered by dependency.
 Mark tasks with `[x]` as they are completed.

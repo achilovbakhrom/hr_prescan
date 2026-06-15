@@ -23,7 +23,7 @@ WEBROOT="/var/www/certbot"
 DATA_PATH="/etc/letsencrypt"
 
 echo "========================================="
-echo " HR PreScan — Let's Encrypt Init Script"
+echo " HR PreScreen — Let's Encrypt Init Script"
 echo " Domain : ${DOMAIN}"
 echo " Email  : ${EMAIL}"
 echo " Staging: ${STAGING}"

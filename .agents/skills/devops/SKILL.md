@@ -1,12 +1,12 @@
 ---
 name: devops
-description: Operate the HR PreScan dev and prod servers — SSH, container health, logs, deploy status, env var changes, backups, and the Contabo API. Use when the user asks about server state, a deploy, a production issue, or any "ssh into…" / "check on the server…" / "restart…" / "pull logs…" request.
+description: Operate the HR PreScreen dev and prod servers — SSH, container health, logs, deploy status, env var changes, backups, and the Contabo API. Use when the user asks about server state, a deploy, a production issue, or any "ssh into…" / "check on the server…" / "restart…" / "pull logs…" request.
 user-invocable: true
 ---
 
 # DevOps Skill
 
-Hands-on operations for the HR PreScan infrastructure. Two servers, same shape:
+Hands-on operations for the HR PreScreen infrastructure. Two servers, same shape:
 
 | Env  | Host env var          | Role                                              |
 |------|-----------------------|---------------------------------------------------|

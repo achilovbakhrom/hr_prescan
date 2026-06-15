@@ -189,7 +189,7 @@
   "time": { "from": "now-24h", "to": "now" },
   "timepicker": {},
   "timezone": "browser",
-  "title": "HR PreScan — Business KPIs",
+  "title": "HR PreScreen — Business KPIs",
   "uid": "hrprescan-business",
   "version": 1
 }

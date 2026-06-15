@@ -7,12 +7,14 @@ from rest_framework.views import APIView
 from apps.accounts.permissions import HasHRPermission, HRPermissions
 from apps.accounts.selectors import get_company_users, get_user_by_id
 from apps.accounts.serializers import (
+    TeamMemberOutputSerializer,
     TeamMemberUpdateSerializer,
     UserOutputSerializer,
 )
 from apps.accounts.services import (
     activate_user,
     deactivate_user,
+    set_member_permissions,
     switch_company,
     switch_to_personal,
 )
@@ -36,7 +38,11 @@ class TeamListApi(APIView):
 
         users = get_company_users(company=company)
         return Response(
-            UserOutputSerializer(users, many=True).data,
+            TeamMemberOutputSerializer(
+                users,
+                many=True,
+                context={"queried_company": company},
+            ).data,
             status=status.HTTP_200_OK,
         )
 
@@ -50,6 +56,13 @@ class TeamMemberDetailApi(APIView):
     def patch(self, request: Request, user_id: str) -> Response:
         serializer = TeamMemberUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
+        company = request.user.company
+        if company is None:
+            return Response(
+                {"detail": str(MSG_NOT_IN_COMPANY)},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
         target_user = get_user_by_id(user_id=user_id)
         if target_user is None:
@@ -66,8 +79,11 @@ class TeamMemberDetailApi(APIView):
                     target_user = deactivate_user(user=target_user, deactivated_by=request.user)
 
             if "hr_permissions" in serializer.validated_data:
-                target_user.hr_permissions = serializer.validated_data["hr_permissions"]
-                target_user.save(update_fields=["hr_permissions", "updated_at"])
+                target_user = set_member_permissions(
+                    user=target_user,
+                    company=company,
+                    permissions=serializer.validated_data["hr_permissions"],
+                )
         except ApplicationError as e:
             return Response({"detail": e.message}, status=status.HTTP_400_BAD_REQUEST)
 

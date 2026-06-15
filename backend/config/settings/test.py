@@ -1,5 +1,5 @@
 """
-Test settings for HR PreScan.
+Test settings for HR PreScreen.
 """
 
 from config.settings.base import *

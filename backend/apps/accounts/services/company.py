@@ -1,17 +1,9 @@
-import logging
-from datetime import timedelta
-
 from django.db import transaction
-from django.utils import timezone
 
 from apps.accounts.models import Company, CompanyMembership, User
 from apps.accounts.services.auth import create_user
 from apps.accounts.tasks import send_verification_email
 from apps.common.exceptions import ApplicationError
-
-logger = logging.getLogger(__name__)
-
-TRIAL_DURATION_DAYS = 14
 
 
 def _create_company(
@@ -47,37 +39,9 @@ def _create_company(
 
 def _grant_trial_to_user(user: User) -> None:
     """Start a 14-day Professional trial on the user. Idempotent — no-op if already subscribed."""
-    from apps.subscriptions.models import SubscriptionPlan, UserSubscription
+    from apps.subscriptions.services import grant_trial
 
-    now = timezone.now()
-
-    pro_plan = SubscriptionPlan.objects.filter(
-        tier=SubscriptionPlan.Tier.PROFESSIONAL,
-        is_active=True,
-    ).first()
-
-    user.subscription_plan = pro_plan
-    user.subscription_status = User.SubscriptionStatus.TRIAL
-    user.trial_ends_at = now + timedelta(days=TRIAL_DURATION_DAYS)
-    user.save(update_fields=["subscription_plan", "subscription_status", "trial_ends_at", "updated_at"])
-
-    if pro_plan is not None:
-        UserSubscription.objects.update_or_create(
-            user=user,
-            defaults={
-                "plan": pro_plan,
-                "billing_period": UserSubscription.BillingPeriod.MONTHLY,
-                "current_period_start": now,
-                "current_period_end": now + timedelta(days=TRIAL_DURATION_DAYS),
-                "is_active": True,
-            },
-        )
-    else:
-        logger.warning(
-            "Professional plan not found — user %s (%s) created without trial subscription.",
-            user.email,
-            user.id,
-        )
+    grant_trial(user=user)
 
 
 @transaction.atomic

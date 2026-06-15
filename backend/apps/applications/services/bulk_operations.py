@@ -148,17 +148,48 @@ def add_hr_note(*, application: Application, note: str) -> Application:
     return application
 
 
+def _normalize_phone(phone: str) -> str:
+    """Reduce a phone number to a comparable form.
+
+    Strips all non-digit characters except a leading "+", so formatting
+    differences (spaces, dashes, parentheses) do not cause false misses.
+    """
+    if not phone:
+        return ""
+    phone = phone.strip()
+    has_plus = phone.startswith("+")
+    digits = "".join(ch for ch in phone if ch.isdigit())
+    return f"+{digits}" if has_plus and digits else digits
+
+
 def bind_existing_applications(*, user: User) -> int:
     """Bind anonymous applications to a newly registered user.
 
     Finds Applications where candidate_email (case-insensitive) matches
-    user.email OR candidate_phone matches user.phone (if user has a phone),
-    and candidate is NULL. Sets candidate=user on matching records.
+    user.email OR candidate_phone matches user.phone (normalized, if the user
+    has a phone), and candidate is NULL. Sets candidate=user on matching
+    records.
 
     Returns the number of applications bound.
     """
-    filter_q = Q(candidate__isnull=True, candidate_email__iexact=user.email)
-    if user.phone:
-        filter_q |= Q(candidate__isnull=True, candidate_phone=user.phone)
+    email_q = Q(candidate__isnull=True, candidate_email__iexact=user.email)
+    matched_ids = set(Application.objects.filter(email_q).values_list("id", flat=True))
 
-    return Application.objects.filter(filter_q).update(candidate=user)
+    if user.phone:
+        target_phone = _normalize_phone(user.phone)
+        if target_phone:
+            phone_candidates = (
+                Application.objects.filter(
+                    candidate__isnull=True,
+                )
+                .exclude(candidate_phone="")
+                .values_list("id", "candidate_phone")
+            )
+            for app_id, candidate_phone in phone_candidates:
+                if _normalize_phone(candidate_phone) == target_phone:
+                    matched_ids.add(app_id)
+
+    if not matched_ids:
+        return 0
+
+    return Application.objects.filter(id__in=matched_ids).update(candidate=user)

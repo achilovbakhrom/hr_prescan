@@ -1697,7 +1697,8 @@
       "photoUploadSuccess": "تم تحميل الصورة",
       "photoRemoveSuccess": "تمت إزالة الصورة",
       "photoInvalidType": "يُسمح فقط بالصور JPEG أو PNG أو WEBP",
-      "photoTooLarge": "يجب أن يكون حجم الصورة أقل من 5 ميغابايت"
+      "photoTooLarge": "يجب أن يكون حجم الصورة أقل من 5 ميغابايت",
+      "fixErrors": "يرجى تصحيح الحقول المميزة قبل الحفظ"
     },
     "employmentTypes": {
       "fullTime": "دوام كامل",

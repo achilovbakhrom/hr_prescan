@@ -1,8 +1,8 @@
-# HR PreScan — Project Guide
+# HR PreScreen — Project Guide
 
 ## What is this project?
 
-HR PreScan is a multi-tenant SaaS platform that automates candidate pre-screening using AI-powered interviews (text chat or video). The core goal: help HR pre-filter candidates so they don't manually screen 100+ applicants per vacancy.
+HR PreScreen is a multi-tenant SaaS platform that automates candidate pre-screening using AI-powered interviews (text chat or video). The core goal: help HR pre-filter candidates so they don't manually screen 100+ applicants per vacancy.
 
 ## Documentation
 
@@ -10,14 +10,14 @@ All detailed docs live in `docs/`:
 
 - `docs/BUSINESS_LOGIC.md` — product requirements, user flows, scoring logic. Read before making architectural decisions.
 - `docs/TECH_ARCHITECTURE.md` — services, communication, DB schema, API structure.
-- `docs/CODE_STYLE.md` — SOLID/KISS/DRY principles, Service Layer pattern, feature-based Vue modules.
+- `docs/CODE_STYLE.md` — SOLID/KISS/DRY principles, Service Layer pattern, feature-based frontend modules.
 - `docs/DEVOPS.md` — CI/CD, zero-downtime deployment, backups, monitoring.
 - `docs/ROADMAP.md` — 16 phases (0-15) with checkboxes. Check at the start of every session for current progress.
 
 ## Tech Stack
 
 - **Backend:** Django, DRF, Celery, PostgreSQL, Redis, RabbitMQ
-- **Frontend:** Vue 3, TypeScript, Pinia, PrimeVue, Tailwind CSS
+- **Frontend:** Nuxt 4 (built on Vue 3), TypeScript, Pinia, PrimeVue, Tailwind CSS
 - **AI Interview:** LiveKit + Deepgram STT + Gemini 3.0 Flash + ElevenLabs TTS
 - **Storage:** MinIO (S3-compatible)
 - **Deployment:** Docker Compose, GitHub Actions CI/CD
@@ -26,7 +26,7 @@ All detailed docs live in `docs/`:
 
 ```
 ├── backend/              # Django REST API
-├── frontend/             # Vue.js SPA
+├── frontend/             # Nuxt 4 app (Vue 3, SSR-capable; legacy Vite build retained as :legacy)
 ├── livekit-agent/        # AI interview agent
 ├── docs/                 # Project documentation
 ├── deploy/               # Deployment & infrastructure
@@ -61,8 +61,10 @@ All detailed docs live in `docs/`:
 - Permission classes on every API view.
 - **File size limit: 200 lines max per file.** If a file exceeds 200 lines, split it. For APIs: split by resource (e.g., `apis/profile.py`, `apis/education.py`). For services: split by domain concern. For AI assistants: extract handlers into separate modules. No exceptions — refactor before adding more code to an oversized file.
 
-### Frontend — Feature-Sliced Design (FSD)
+### Frontend — Nuxt 4 + Feature-Sliced Design (FSD)
 
+- **Framework**: Nuxt 4 (Vue 3), SSR-capable, `srcDir: src` — so the FSD `src/` structure below is preserved (not Nuxt file-based `pages/`). Routing is vue-router within `src/`. Tailwind via the Vite plugin, PrimeVue for UI. The standalone Vite SPA build survives only as the `:legacy` npm scripts.
+- **Typecheck / lint**: `yarn --cwd frontend typecheck` (= `nuxt typecheck`) and `yarn --cwd frontend lint:check` (eslint). `vue-tsc` is only used by the legacy build.
 - **Layer structure**: `shared/` → `features/` → `app/`. Never import upward.
 - **Feature isolation**: each feature (`auth`, `candidates`, `vacancies`, etc.) is self-contained with its own `pages/`, `components/`, `services/`, `stores/`, `types/`, `routes.ts`.
 - **No cross-feature imports**: if two features need the same thing, move it to `shared/`.
@@ -81,6 +83,7 @@ All detailed docs live in `docs/`:
 - **Before starting any task** (bug fix, refactor, new feature, or anything else), assess whether the change affects business logic — user flows, statuses, pipelines, scoring, vacancy lifecycle, candidate pipeline, API contracts, or any behavior documented in `docs/BUSINESS_LOGIC.md`.
 - **If it does affect business logic**, update `docs/BUSINESS_LOGIC.md` as part of the same task — not as a follow-up. The code and the docs must stay in sync at all times.
 - **If unsure** whether a change affects business logic, err on the side of updating the doc.
+- **SEO on public surfaces**: if a change touches public/indexable pages or their discoverability — landing, public job board, public vacancy detail (`/jobs/:id`), route metadata, page titles/descriptions, canonical URLs, Open Graph/Twitter cards, `robots.txt`, sitemap, or `JobPosting` structured data — run the `seo-manager` agent (`.claude/agents/seo-manager.md`) and apply its findings before pushing. It keeps indexable pages correct and keeps private/app/auth/tokenized pages (applications, interviews, dashboard, admin, settings, share/CV-token URLs) out of the index.
 - **Code review before push**: After completing any code change (feature, bug fix, refactor — anything), run `/review` on the changed files BEFORE committing or pushing. Do NOT push code that hasn't been reviewed. Fix all critical issues and warnings found by the review before pushing.
 
 ## Important Notes
@@ -90,4 +93,4 @@ All detailed docs live in `docs/`:
 - AI interview questions are auto-generated but HR can edit them before publishing
 - The platform does NOT dictate HR's post-screening workflow — it provides tools (schedule, chat, email, reject) and HR decides
 - Interview length is not HR-configurable; the AI uses a built-in pacing target (~30 min)
-- Scoring uses both fixed categories (soft skills, language, communication, motivation, cultural fit) and custom HR-defined criteria
+- Scoring is driven by editable per-vacancy criteria (with seeded defaults like Technical Skills, Communication, Problem Solving, Cultural Fit, Experience Relevance) — there is no fixed always-scored category set; HR can add, edit, remove, and re-weight criteria

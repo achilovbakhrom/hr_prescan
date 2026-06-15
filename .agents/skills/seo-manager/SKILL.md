@@ -1,6 +1,6 @@
 ---
 name: seo-manager
-description: Audit and improve technical SEO for HR PreScan public pages. Use when Codex needs to review or implement search indexing, SSR/prerender strategy, route metadata, canonical URLs, robots.txt, sitemaps, Open Graph/Twitter cards, hreflang, structured data such as JobPosting, Search Console readiness, or SPA JavaScript SEO best practices.
+description: Audit and improve technical SEO for HR PreScreen public pages. Use when Codex needs to review or implement search indexing, SSR/prerender strategy, route metadata, canonical URLs, robots.txt, sitemaps, Open Graph/Twitter cards, hreflang, structured data such as JobPosting, Search Console readiness, or SPA JavaScript SEO best practices.
 ---
 
 # SEO Manager
@@ -25,7 +25,7 @@ Own technical SEO outcomes for public, indexable surfaces while protecting priva
    - Full SSR/Nuxt only when route/content needs justify migration cost.
 9. Validate with local build, browser inspection, and crawler-facing checks. For production work, verify deployed `/robots.txt`, `/sitemap.xml`, representative public pages, and HTTP status codes.
 
-## HR PreScan Rules
+## HR PreScreen Rules
 
 - Public vacancy canonical URL is `/jobs/:id`.
 - Share-token vacancy URLs must remain usable but must not be indexed; canonicalize them to `/jobs/:id`.

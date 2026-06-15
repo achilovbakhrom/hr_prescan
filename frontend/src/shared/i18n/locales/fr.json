@@ -1697,7 +1697,8 @@
       "photoUploadSuccess": "Photo téléchargée",
       "photoRemoveSuccess": "Photo supprimée",
       "photoInvalidType": "Seules les images JPEG, PNG ou WEBP sont autorisées",
-      "photoTooLarge": "La photo doit être inférieure à 5 Mo"
+      "photoTooLarge": "La photo doit être inférieure à 5 Mo",
+      "fixErrors": "Veuillez corriger les champs en surbrillance avant d’enregistrer"
     },
     "employmentTypes": {
       "fullTime": "Temps plein",

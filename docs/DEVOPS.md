@@ -1,4 +1,4 @@
-# HR PreScan — DevOps & Infrastructure
+# HR PreScreen — DevOps & Infrastructure
 
 ## 1. Docker Compose Services (Full List)
 

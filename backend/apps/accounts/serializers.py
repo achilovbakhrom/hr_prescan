@@ -75,6 +75,35 @@ class UserOutputSerializer(serializers.ModelSerializer):
         return obj.account_owner_id is None
 
 
+class TeamMemberOutputSerializer(UserOutputSerializer):
+    """Team-list variant of UserOutputSerializer.
+
+    Same field NAMES/shape as UserOutputSerializer (the frontend depends on them),
+    but ``role``, ``hr_permissions`` and ``company`` reflect the member's
+    CompanyMembership for the *queried* company rather than their live active-company
+    pointer. Expects rows annotated by ``get_company_users`` with
+    ``membership_role``/``membership_hr_permissions`` and a ``queried_company`` in
+    the serializer context.
+    """
+
+    role = serializers.SerializerMethodField()
+    hr_permissions = serializers.SerializerMethodField()
+    company = serializers.SerializerMethodField()
+
+    def get_role(self, obj: User) -> str:
+        return getattr(obj, "membership_role", None) or obj.role
+
+    def get_hr_permissions(self, obj: User) -> list[str]:
+        permissions = getattr(obj, "membership_hr_permissions", None)
+        return permissions if permissions is not None else obj.hr_permissions
+
+    def get_company(self, obj: User) -> dict | None:
+        company = self.context.get("queried_company")
+        if company is None:
+            return None
+        return CompanyOutputSerializer(company).data
+
+
 class InviteHRInputSerializer(serializers.Serializer):
     email = serializers.EmailField()
     permissions = serializers.ListField(

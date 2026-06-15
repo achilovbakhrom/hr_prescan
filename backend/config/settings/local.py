@@ -1,5 +1,5 @@
 """
-Local development settings for HR PreScan.
+Local development settings for HR PreScreen.
 """
 
 from config.settings.base import *

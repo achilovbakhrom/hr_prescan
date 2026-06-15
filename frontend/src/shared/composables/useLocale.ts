@@ -1,6 +1,6 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { setLocale, getLocale, type SupportedLocale } from '@/shared/i18n'
+import { setLocale, type SupportedLocale } from '@/shared/i18n'
 import { LOCALE_OPTIONS } from '@/shared/i18n/supportedLocales'
 import type { LocaleOption } from '@/shared/i18n/supportedLocales'
 
@@ -9,7 +9,10 @@ export type { SupportedLocale, LocaleOption } from '@/shared/i18n/supportedLocal
 export function useLocale() {
   const { t, locale } = useI18n()
 
-  const currentLocale = computed<SupportedLocale>(() => getLocale() as SupportedLocale)
+  const currentLocale = computed<SupportedLocale>(() => {
+    const code = locale.value as SupportedLocale
+    return LOCALE_OPTIONS.some((opt) => opt.code === code) ? code : ('en' as SupportedLocale)
+  })
 
   const currentLocaleOption = computed<LocaleOption | undefined>(() =>
     LOCALE_OPTIONS.find((opt) => opt.code === currentLocale.value),

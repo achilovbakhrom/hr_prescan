@@ -32,6 +32,7 @@ onMounted(() => {
 async function handleSave(payload: {
   name: string
   customIndustry: string
+  country: string
   website: string
   description: string
 }): Promise<void> {

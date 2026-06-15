@@ -38,7 +38,7 @@ def hh_get(*, source: ParsedVacancySource, path: str, params: dict) -> dict:
 
 
 def _hh_headers(*, source: ParsedVacancySource) -> dict[str, str]:
-    user_agent = getattr(settings, "HH_USER_AGENT", "HR PreScan vacancy parser")
+    user_agent = getattr(settings, "HH_USER_AGENT", "HR PreScreen vacancy parser")
     headers = {
         "Accept": "application/json",
         "User-Agent": user_agent,

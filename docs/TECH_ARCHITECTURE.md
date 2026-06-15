@@ -1,4 +1,4 @@
-# HR PreScan — Technical Architecture
+# HR PreScreen — Technical Architecture
 
 ## 1. Tech Stack Summary
 

@@ -1,4 +1,4 @@
-# HR PreScan
+# HR PreScreen
 
 AI-powered candidate pre-screening platform. Companies post vacancies, candidates apply and are interviewed by an AI agent via video, and HR reviews scores and recordings.
 

@@ -18,7 +18,7 @@ CRON_LOG="/var/log/hr_prescan_backup.log"
 CRON_USER="${SUDO_USER:-root}"
 
 echo "============================================="
-echo " HR PreScan — Backup Cron Installer"
+echo " HR PreScreen — Backup Cron Installer"
 echo " Script  : ${BACKUP_SCRIPT}"
 echo " Env file: ${ENV_FILE}"
 echo " Cron user: ${CRON_USER}"
@@ -38,7 +38,7 @@ mkdir -p "$(dirname "${ENV_FILE}")"
 if [ ! -f "${ENV_FILE}" ]; then
     echo "[INFO] Creating env file template at ${ENV_FILE}"
     cat > "${ENV_FILE}" <<'ENVEOF'
-# HR PreScan backup environment variables
+# HR PreScreen backup environment variables
 # Fill in real values before running backups.
 POSTGRES_DB=hr_prescan
 POSTGRES_USER=postgres

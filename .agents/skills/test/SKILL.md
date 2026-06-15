@@ -6,7 +6,7 @@ user-invocable: true
 
 # QA Test Runner
 
-Run automated tests for the HR PreScan project. Supports backend, frontend, E2E, or all test suites.
+Run automated tests for the HR PreScreen project. Supports backend, frontend, E2E, or all test suites.
 
 ## Usage
 
